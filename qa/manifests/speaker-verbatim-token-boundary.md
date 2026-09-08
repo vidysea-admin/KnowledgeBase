@@ -9,7 +9,7 @@ instead. Please amend C2 to require whole-word containment and a name-shaped `di
 **Dual check:** no
 **Issues addressed:** none filed — the cycle-1 checker recorded both in EXPLANATION, correctly
 declining to FAIL an artifact that met C2 *as written*.
-**Status:** ready-for-check (cycle 3)
+**Status:** superseded-by `speaker-denylist-ledger-corpus` (STALLED at cycle 3 of 3; see close-out)
 **Branch:** `lane/a-speakers`
 
 ## Why
@@ -302,3 +302,25 @@ lines, the rules 218.
 3. **Non-Latin scripts are refused wholesale** by the shape guard's `\p{Lu}` requirement — a real
    limit, not just the particle list.
 4. **`"J"` from `"My name is J. Smith."`** ships as `person:j`. Carried from cycle 2, uncharged.
+
+
+---
+
+## Close-out — STALLED, then superseded (2026-09-08)
+
+**This manifest was left at `ready-for-check (cycle 3)` after the unit stalled.** The cycle-3
+checker FAILed it, the Approver decided the remedy should land as a new unit rather than override
+the cycle cap, that unit (`speaker-denylist-ledger-corpus`) was built, PASSed and merged — and I
+never came back to flip this status. A maker tick's reconcile step found it.
+
+Recording it because the gap is the interesting part: **the handshake is only as good as the
+close-out.** A manifest sitting at `ready-for-check` with a FAIL verdict against it reads, to any
+later session or sweep, as a check that never happened. The work was done and verified; the
+bookkeeping that makes that legible was not.
+
+**Final state:** STALLED at fix cycle 3 of 3 on ISS-095 (the `"Not"` denylist miss) and a
+measurement-scope habit — not on design. Superseded by `speaker-denylist-ledger-corpus`, which
+closed ISS-095, brought ISS-093 from 15/20 to 17/20 refused, and is itself `checked-PASS`.
+
+The three gazetteer residues (India, Mumbai, Google) remain open and carried, as does the
+enlarged-allowlist description defect and one nominal pin.
