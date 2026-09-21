@@ -1,6 +1,6 @@
 ﻿# Manifest — T-021/U0.10 semantic embedding leg (2026-09-21)
 
-Status: ready-for-check
+Status: checked-PASS (qa/verdicts/golden-set-semantic-leg.md, Cycle checked: 0, commit 5fab76e)
 Fix cycle: 0
 
 **Unit:** run the golden-set semantic embedding leg under the ANSWERED egress gate (Option A,
