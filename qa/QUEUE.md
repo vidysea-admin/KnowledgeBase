@@ -17,6 +17,21 @@
 > `qa/evidence/u2-4-phase3-precision-regate-2026-09-22/` (15:45–15:53, QUEUE item 2 in progress) appeared
 > during this sweep. The 00:30→15:45 asleep gap is real; the loop is running again. No manifest at
 > ready-for-check yet — no check raced.
+>
+> **2nd consolidation pass 16:19 (duplicate dispatch resolved):** a second consolidation landed over the
+> same range and DEDUPED against the minted ten. Dropped as already minted/remedied: the "two manifests
+> without Status" residue (both now carry `## Status: superseded-by …` from this sweep's marker-only
+> folds), the asleep-gap row (deduped to the ISS-054-class record + correction above), and the .codex/
+> row (= ISS-268). preflight.json mtime anomaly ruled EXPLAINED (last commit 16af160 is the ISS-256
+> restore itself; content matches HEAD; index-stat noise). **6 new ids minted: ISS-276/281 (medium) ·
+> ISS-277/278/279/280 (low)** — tracker-integrity residue (goal.json vs TASKS.md on T-021/U0.10, stale
+> completed ts, stale T-008 dep, T-021/U0.10 dual-scope), superseded-contract markers, and client.ts
+> churn-erosion with the auth-repair gate still unanswered. ISS-215 refreshed (the 16:05 Umesh
+> Gemini-vs-qwen entry is the one fresh unfolded inbox item). Consolidation hint (extends ISS-214):
+> three pending asks resolve to edits of `.claude/hooks/mc-sessionstart.ps1` — ledger-shard-union-hook,
+> mc-hooks-manifest-blindness, and ISS-267's fix-gap branch — ONE combined Approver ask could settle all
+> three. Gate count now 20 with the maker's new `write-guard-contract-contradiction.md` (Answered:
+> \<pending\>). Token line re-scanned 16:19:22 (outages 10, Agent blocked 8; opus share 0.0).
 
 - GRILL: web-fallback vs Phase-1 exit — ask-web-fallback-tavily records the unwired seam as production
   default while the north star's Phase-1 exit requires off-corpus web fallback; wire-it-or-sign-the-honest-limit
@@ -26,9 +41,11 @@
 
 1. **Maker duty — handshake (13 days old)** — respond to the delivery-gate-stamp-adoption cycle-1 FAIL
    (ISS-266; the verdict's unit findings are ISS-227/228/229). A FAIL verdict unanswered since 2026-09-09
-   outranks every backlog tier: the pair is stalled, not empty.
+   outranks every backlog tier: the pair is stalled, not empty. *(In progress: fix-cycle-2 build dispatch
+   is queued, blocked only by the classifier outage — tick 16:03.)*
 2. **Tier 3 (roadmap) — U2.4 phase-3 precision re-gate** — the phase-4 speaker write unit's precondition
    (gate speaker-segment-identity A answered 2026-09-21; ISS-255 fixed; the re-gate itself has not been run).
+   *(IN FLIGHT: build running since tick 15:46; evidence dir `qa/evidence/u2-4-phase3-precision-regate-2026-09-22/`.)*
 3. **Tier 2 (high, uncapped) — ISS-260 fix direction** — e31065a scope addendum + Dockerfile/compose
    diff-review, keeping the aggregate-landing precedent honest.
 
