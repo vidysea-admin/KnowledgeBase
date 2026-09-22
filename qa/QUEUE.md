@@ -12,6 +12,11 @@
 > Maker liveness: the maker-checker loop is **asleep ~15.5 h** (last tick 2026-09-22T00:30 HEARTBEAT-ARMED;
 > no `qa/.paused`; ISS-054 recurrence, deduped). The /goal monitor ticks (last_deterministic_tick
 > 2026-09-22T15:31) — the maker's ScheduleWakeup chain died with its session. Resume = `/maker continue`.
+> **Correction 16:10:** the maker WOKE mid-sweep — `qa/gates/write-guard-contract-contradiction.md`
+> (15:45, STALL reconciliation for write-guard-enforcement-gaps, options A/B/C) and
+> `qa/evidence/u2-4-phase3-precision-regate-2026-09-22/` (15:45–15:53, QUEUE item 2 in progress) appeared
+> during this sweep. The 00:30→15:45 asleep gap is real; the loop is running again. No manifest at
+> ready-for-check yet — no check raced.
 
 - GRILL: web-fallback vs Phase-1 exit — ask-web-fallback-tavily records the unwired seam as production
   default while the north star's Phase-1 exit requires off-corpus web fallback; wire-it-or-sign-the-honest-limit
