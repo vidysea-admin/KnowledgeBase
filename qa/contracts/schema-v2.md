@@ -94,3 +94,10 @@ collection accessors enforcing `coll(tenantId)`.
   so a row with no vector, or with a dims that disagrees with vector.length, validates cleanly);
   (ii) plan §10 U1.2's `text` field is struck in favour of ADR-0001 decision 2, recorded here so
   U1.4/U1.5 cannot re-litigate it from the plan text.
+- 2026-09-22 · routine (record lesson) · **generated input space** (inbox 2026-09-08, chunker
+  cycle 1): hand-picked fixtures verify the shapes the author already imagined; the defects live
+  in the shapes they did not. Any function with a branchy accumulation loop needs a GENERATED
+  input space, not examples — `buildChunks` now carries its own 45-shape fuzz, which immediately
+  caught a third bug (an 802-char chunk against an 800 ceiling). Same treatment owed to any
+  future accumulation loop (U1.4's top-k merge, U1.5's reciprocal-rank fusion) ·
+  qa/feedback-inbox.md, folded by Mode B sweep

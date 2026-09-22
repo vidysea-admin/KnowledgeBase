@@ -1,74 +1,77 @@
-﻿# QUEUE — checker Mode B sweep 2026-09-21T23:50+05:30
+# QUEUE — checker Mode B sweep 2026-09-22T16:05+05:30 (3-shard wave, consolidated)
 
-> Range: `fb57a81..HEAD` (25 commits; prior sweep stopped at HEAD `91d7ed2`, BLOCKED).
-> Bound root `D:/KnowledgeBase`. **Terminal state: FINDINGS: 5** — ISS-260 (high,
-> bypass), ISS-261/262/263 (medium), ISS-264 (low). ISS-245 flipped open→fixed after
-> on-disk verification. The 2026-09-19 sweep's five-commit bypass finding (ISS-260's
-> subject) is now filed and its gap is covered retroactively. Cycle-number anomaly
-> (verdicts at `Cycle checked: 1` vs manifests at `Fix cycle: 0`) measured and
-> **closed-at-6**: the maker's close-outs were verified on disk this sweep.
+> Range: `5fab76e..HEAD` (4 commits; prior sweep stopped at HEAD `5fab76e`). **Terminal state: FINDINGS: 10**
+> — ISS-266/267/268 (pair-state + mirror) · ISS-269..272 (silent-failure, high, filed-don't-fix under the D-014
+> class cap) · ISS-273 (erosion signals) · ISS-274 (goal-drift → GRILL row) · ISS-275 (loop-design).
+> Bypass: **none** (4 commits in range, all covered or process-surface).
+> Pair-state: the SessionStart hook's "Checks pending: 1 [delivery-gate-manifest-blindness]" is ruled a
+> **FALSE POSITIVE of the gated ISS-183 defect** (unanchored prose match at manifest :35/:47/:208 +
+> `Select-Object -First 1` reading the 3-cycle verdict's first stamp as 1). True state: **pend=0 dispatch
+> gaps; 1 fix-gap** (delivery-gate-stamp-adoption, 13 days — ISS-266). PASS-not-closed 0 and Queue-TODO 0
+> are disk-true.
+> Maker liveness: the maker-checker loop is **asleep ~15.5 h** (last tick 2026-09-22T00:30 HEARTBEAT-ARMED;
+> no `qa/.paused`; ISS-054 recurrence, deduped). The /goal monitor ticks (last_deterministic_tick
+> 2026-09-22T15:31) — the maker's ScheduleWakeup chain died with its session. Resume = `/maker continue`.
+
+- GRILL: web-fallback vs Phase-1 exit — ask-web-fallback-tavily records the unwired seam as production
+  default while the north star's Phase-1 exit requires off-corpus web fallback; wire-it-or-sign-the-honest-limit
+  is an Approver amendment (ISS-274)
 
 ## Current top 3 (backlog-priority order)
 
-1. **Tier 1 — lint-loc split of `packages/index/src/pipeline/speakers-llm.test.ts`**
-   (ISS-262). The structure gate is red at HEAD; the file crossed the 400-line budget in
-   the `speaker-run-agreement` unit whose checker never re-ran lint. Split the two
-   agreement tests into a sibling test file. Cheap, unblocks `lint:structure` for every
-   later unit's manifest evidence.
-2. **Tier 2 — U2.4 phase-3 precision re-gate, the phase-4 write unit's precondition**
-   (roadmap tier 3; gate speaker-segment-identity A requires a hand-labelled corpus run at
-   100% accepted precision + zero wrong links before any model-derived speaker write).
-   ISS-255 is fixed (handover rule + 2-of-3 agreement) but the re-gate itself has not
-   been run; the write unit stays blocked until it passes.
-3. **Tier 3 — e31065a scope addendum + Dockerfile/compose diff-review** (ISS-263).
-   Manifest addendum naming the extra files with verify evidence, or a DECISIONS/compound
-   note covering the AGENTS.md landing; diff-review the Dockerfile and docker-compose
-   hunks once. Unblocks nothing else, keeps the aggregate-landing precedent honest
-   (ISS-260's fix direction).
+1. **Maker duty — handshake (13 days old)** — respond to the delivery-gate-stamp-adoption cycle-1 FAIL
+   (ISS-266; the verdict's unit findings are ISS-227/228/229). A FAIL verdict unanswered since 2026-09-09
+   outranks every backlog tier: the pair is stalled, not empty.
+2. **Tier 3 (roadmap) — U2.4 phase-3 precision re-gate** — the phase-4 speaker write unit's precondition
+   (gate speaker-segment-identity A answered 2026-09-21; ISS-255 fixed; the re-gate itself has not been run).
+3. **Tier 2 (high, uncapped) — ISS-260 fix direction** — e31065a scope addendum + Dockerfile/compose
+   diff-review, keeping the aggregate-landing precedent honest.
 
-**NOT re-filed (already covered):** lint-root 16>15 (ISS-248, Approver budget entry
-pending); delivery-gate-stamp-adoption cycle-1 FAIL (ISS-227/228/229 maker fix gap);
-`.last-tick` staleness (see note below); mc-sessionstart union hook (ledger-shard-union-hook
-gate, open with the Approver). Gate answers legitimately on disk as of 2026-09-21:
-speaker-segment-identity A, github-export-internal-qa A, external-eval-data-egress A,
-iss-245-multifile-plan A.
-
-## `.last-tick` note (fresh ruling)
-
-`qa/.last-tick` file mtime is 21-09-2026 18:34:47 — 5 h 15 m old at sweep time — but its
-last line records work at 2026-09-21T20:35:00+05:30 (~2 h 45 m before the sweep), and the
-git log shows U2.4 commits up to 4c62df7 (17:21) with verdicts committed by checkers after
-that. Work is recent, no `qa/.paused` exists, and the maker held its next build unit for
-this sweep per the dispatch (ISS-221). **Ruled: not asleep; the mtime-vs-content offset is
-recorded as a close-out hygiene note (see ISS-261), not a fresh ISS-054.** Next tick should
-append a fresh stamp line (mtime refresh) when it resumes.
+**Filed-don't-fix (D-014 class cap — non-security seam with ≥2 PASSes):** ISS-269/270 (speaker seam:
+speaker-llm-windows, iss-255-handover-direction, speaker-run-agreement) · ISS-271/272 (golden-set/eval seam:
+golden-set-semantic-leg, golden-set-regeneration, eval-baseline-control). A human may still pull them;
+ISS-269/270 fold naturally into any future unit touching `speakers-llm.ts`. **ISS-104** (critical,
+speaker naming-cue) is the only open critical and sits on the same capped seam per this repo's own
+precedent — pull decision belongs to a human; the U2.4 precision re-gate is the natural venue if pulled.
 
 ## State summary
 
-- Union ledger: 262 rows (main 240 + c-unrun-writers shard 22), 262 distinct ids, 0 parse
-  errors, 0 duplicate ids. Open: 1 critical (ISS-104) / 23 high / 38 medium / 24 low.
-  Fixed 130, verified 64 (unchanged — verification debt stands).
-- Goal: 62 tasks, 43 done, 2 in_progress (U2.4, U3.1), 17 pending. North star unchanged
-  since the last contract amendment. No `.regrill-due`. T-021/U0.10 semantic leg
-  checker-PASSed; both `in_progress` tasks await their closure units (U2.4's phase-4 write
-  unit is gate-blocked; U3.1's remaining sub-items are U3.2-dependent).
-- Handshake: 8 recent manifests all `checked-PASS` (0 pending); sole ready-for-check gap is
-  the known delivery-gate-stamp-adoption cycle-1 FAIL. Working-tree diffs at sweep time
-  (goal tracker heartbeat files + the maker's golden-set-semantic-leg status flip) were
-  read as evidence and left unstaged.
-- Bypass: 25 commits in range, 3 code-bearing gaps filed (ISS-260/263/264); the 20
-  qa/verdicts+manifests+heartbeats and 2 probe-file commits are process-surface. ISS-104
-  re-derivation probe (0c50eb6) is a read-only checker-support artifact (17/20 stable).
-- Gates needing the Approver (pre-existing, not re-filed): d015-generalisation-scope,
-  d023-supersede, delivery-gate-c4-heading-form (premise re-verified: the exact heading
-  form appears in 4 verdict files, 5 occurrences), mc-hooks-manifest-blindness,
-  handshake-liveness-contract-start, ledger-shard-union-hook,
-  ui-surfaces-test-file-exclusion (Answered line carries no date/choice), plus ISS-215's
-  gate-queue triage and ISS-221 (atomic issue-id allocation).
+- Union ledger: 295 rows (273 main + 22 c-unrun-writers), ids ISS-001..ISS-275 + ISS-C-* 1..22, 0 duplicate
+  ids. Open: 93 canonical / 99 union (10 new this sweep: 5 high, 3 medium, 2 low). Token-ledger line appended
+  (opus_sub_share 0.0; no unit at fix cycle 3).
+- Mode A this session: **no new verdict** — delivery-gate-manifest-blindness is STALLED-closed at cycle 3 of 3
+  (verdict d171d0c FAIL 5/9; disposition "do not open a cycle 4"). Residue: ISS-205 (regex fix for the next
+  unit touching that hook block) + two Approver gates (mc-hooks-manifest-blindness, delivery-gate-c4-heading-form).
+- Contract maintenance: 8 inbox entries folded into 6 contracts (ai-provider-seam; loop-safety ×4 lessons;
+  golden-set-recall; schema-v2; ledger-shard-union-readers; tracker-integrity); 2 marker-only folds; 1 deferred
+  (Umesh write-guard shape → write-guard.md is status `proposed`, applies on ratification). All additions;
+  nothing weakened.
+- Enforcement: wired+alive (5 project hooks registered + 2 user-level; D-006 carries `Approved-by: Umesh` and
+  covers the wiring). Loop spec `qa/loop.md` present and consistent (seven terminal states; no adapter.json →
+  no contradiction). `qa/adapter.json` absent → data-boundary check out of scope by design. Known gated hook
+  defects live verbatim: ISS-183 (blindness/First-1), union-blind open-issue count (open ISS-129), and the new
+  no-fix-gap-branch (ISS-267).
+- Gates needing the Approver (pre-existing unless noted): d015-generalisation-scope · d023-supersede ·
+  delivery-gate-c4-heading-form · mc-hooks-manifest-blindness · handshake-liveness-contract-start ·
+  ledger-shard-union-hook · ui-surfaces-test-file-exclusion (Answered line empty) · loop-safety-contract-ratification ·
+  enforcement-hooks-unauthorized-and-live-regressed (`(pending)`; absent from the prior list — folded into
+  ISS-215 triage) · ISS-215 gate-queue triage · ISS-221 (atomic issue-id allocation) · **new: ISS-267** needs a
+  gate file (enforcement path) — raise on the next maker tick · **new: ISS-268** .codex/ mirror disposition ·
+  **new: ISS-274** web-fallback GRILL.
+- Goal: north star unchanged since 2026-09-03; the uncommitted `.goal/goal.json` diff is tracker metadata only
+  (updated ts/velocity/eta/last_deterministic_tick 2026-09-22T15:31). Coverage: Phase-1 surfaces covered
+  (ingestion · tree+vector index · router · citations · tenancy/write-guard · Developer API); partial: meeting-bot
+  capture, speaker attribution (phase-4 write blocked on the precision re-gate), live web fallback (ISS-274),
+  head-to-head championship tier; missing: AI counsellor client contract (T-013 pending, no contract in
+  qa/contracts/).
+- Bypass: none — 7da0a41's source diff is exactly the two test files its manifest names (105→301 lint-loc claim
+  misstatement already filed as ISS-265); 31e8534/baeb66f are process close-outs. Bookkeeping (covered by open
+  ISS-C-UNRUN-WRITERS-013): iss-262-lint-loc-split's ready-for-check state never entered git history (verdict
+  baeb66f cited an uncommitted manifest).
+- `.last-tick` note: content is 2026-09-22T00:30 (HEARTBEAT-ARMED; two units landed) — age is the defect, ruled
+  maker-asleep above (ISS-054 recurrence), not a hygiene gap.
 
-## Historical sweep — 2026-09-19T06:43+05:30 (superseded as routing; see git history)
-
-Prior sweep routing (the 2026-09-10 and 2026-09-09 sweep sections and the 2026-09-21
-maker landing note) was replaced in this refresh; read it at
-`git show 5fab76e:qa/QUEUE.md`. Nothing in it was contradicted except items resolved
-above (the five-commit bypass gap, ISS-245's fix verification, the U2.2/T-021 routing).
+## Historical sweeps (superseded as routing; read in git)
+- 2026-09-21T23:50 sweep (FINDINGS:5, ISS-260..264; ISS-245 verified fixed; cycle-number anomaly closed-at-6):
+  `git show 5fab76e:qa/QUEUE.md`.
+- Earlier sweeps: `git show d142628~1:qa/QUEUE.md` and prior history.

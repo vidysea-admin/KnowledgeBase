@@ -1,1 +1,2 @@
-﻿2026-09-21T23:50:00+05:30 FINDINGS:5 (ISS-260 high, ISS-261/262/263 medium, ISS-264 low; ISS-245 open->fixed verified; closed-at-6: cycle-number anomaly) HEAD=5fab76e75f753fb9dcf955567bd855bf356c8ade
+2026-09-22T16:05:00+05:30 FINDINGS:10 (ISS-266 stamp-adoption fix-gap 13d, ISS-267 no-fix-gap-branch, ISS-268 codex-mirror; ISS-269..272 silent-failure high file-dont-fix per D-014 cap; ISS-273 erosion; ISS-274 goal-drift GRILL; ISS-275 loop-design) | bypass:none | hook '1 pending [delivery-gate-manifest-blindness]' ruled FALSE-POSITIVE-ISS-183 (true pend=0/fix-gap=1) | maker loop asleep 15.5h (ISS-054 recurrence) | 12 inbox entries folded into 6 contracts + 2 marker + 1 deferred | sharded 3-wave
+31e8534cc78c1c147e15dc8df8939b080932c3bb

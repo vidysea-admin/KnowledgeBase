@@ -78,3 +78,10 @@ should be, and the content of any individual verdict.
   every commit until someone else acts is a gate people delete. C1–C3 are author-owned and
   deterministic, so a `--gate g1` flag wired into `lint:structure` is the correct follow-up —
   filed as ISS-053, not required for this cycle's PASS · tracker-honesty cycle-1 check.
+- 2026-09-22 · routine (fold routine feedback) · **a close is not complete until BOTH trackers
+  agree** (inbox 2026-09-08, second occurrence): the checker's /goal close writes
+  `.goal/goal.json` only, so G1 went red on every PASS (U1.1 at 15:xx, U1.2 at 15:57 the same
+  hour) until the next maker tick noticed. Remedy recorded: the maker's close-out step runs a G1
+  check before it stamps the tick. The gate firing predictably on every PASS is the gate working
+  as designed — but a gate people learn to clear reflexively is a finding, not a feature ·
+  qa/feedback-inbox.md, folded by Mode B sweep

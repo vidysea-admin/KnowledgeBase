@@ -65,3 +65,13 @@ should be re-run then, not treated as final).**
   against a heuristic stand-in. No wiring into `apps/api`'s `/ask` route (this is an offline eval
   script, not a production code path). No T-022 (evaluator calibration) — that is a separate,
   later unit that depends on this one's golden set existing.
+
+## Amendment log
+- 2026-09-22 · routine (record edge case) · **paid-path stub rule** (inbox 2026-09-08, ISS-095):
+  "all N paths verified" is not coverage when the unverified path is the one that costs money —
+  and cost is exactly what makes a path stay unverified. Any script with a paid or slow path
+  needs a stub-backed exercise of that exact code path (`--self-test` with a fake provider,
+  proven by mutation while `--dry-run` stays blind); the expensive path is the one most likely
+  untested and therefore most likely broken (ISS-095 ReferenceError shipped under three green
+  free CLI paths). Applies to transcribe-*.mjs, eval-calibration.mjs and any future generator ·
+  qa/feedback-inbox.md, folded by Mode B sweep

@@ -104,3 +104,20 @@ on any checker that mutates source. No product code.
   gate note was wrong. C7/C8 now cite **D-022**, which ratifies them as policy in their own right;
   C1–C6 stay traceable to D-014. **No criterion text, invariant or scope line was changed** — this
   amendment is provenance only · raised as ISS-087 by a Mode B sweep
+- 2026-09-22 · routine (fold routine feedback, 3 inbox entries) · (a) **post-restore close-out
+  re-verify**: any unit whose evidence includes a mutation re-runs `git diff <mutated-file>` at
+  close-out and asserts empty, as a step separate from the restore — the ISS-083 incident proved a
+  restore verified once is not a restore that held; close-out discipline owned by the maker's
+  close-out step, not a new criterion. (b) **voluntary-guard skip**: a mutation guard that must be
+  voluntarily invoked is skipped by exactly the actors it protects — the closure is procedural:
+  the armed-files assertion ([C7]) is repeated in every mutation-bearing checker **dispatch
+  prompt**, since dispatch text is read at the moment of use whereas a criterion is read at
+  close-out. (c) **paired destructive ops**: the destructive half of an arm/restore pair must
+  independently verify it acts on something the safe half registered — covered by
+  `mutate.test.mjs` case (f) (byte-identical on refusal); recorded so future revert/rollback
+  helpers inherit it · qa/feedback-inbox.md 2026-09-08 entries, folded by Mode B sweep
+- 2026-09-22 · routine (fold routine feedback) · **exit-code evidence**: every gate in a
+  manifest's evidence block is verified by EXIT CODE (`cmd >/dev/null 2>&1; echo EXIT=$?`); a
+  grep may illustrate a result but may never establish one — on an `&&` chain, grepping output
+  attributed a pass to steps that never ran (ISS-100 family, third instance) ·
+  qa/feedback-inbox.md 2026-09-08 entry, folded by Mode B sweep

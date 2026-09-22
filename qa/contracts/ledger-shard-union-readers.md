@@ -62,3 +62,11 @@ what the rule requires rather than what the submission happens to contain.
   own test file is 285 non-blank lines against `loc.max` 300 and cannot absorb 112 more. The
   criterion is not weakened — the verdict for this cycle is FAIL on other grounds, so this
   clarification passes nothing — it only stops [C6] forbidding the correct fix for [ISS-140].
+- 2026-09-22 · routine (fold routine feedback) · **content-compare integrity** (inbox 2026-09-08,
+  merge incident): an integrity check that counts rows and scans duplicate ids cannot see the
+  failure where a row SURVIVES under its id while its CONTENT is replaced — exactly what a
+  line-oriented merge of an append-only counter-keyed JSONL produces when two lanes allocate from
+  one counter (c1efa10: 10 findings gone, every shape gate green). Integrity gates for such
+  artifacts must compare CONTENT against merged-in ancestors, not just shape at HEAD; same hazard
+  named for docs/FEATURES.jsonl and docs/DECISIONS.md · qa/feedback-inbox.md, folded by Mode B
+  sweep

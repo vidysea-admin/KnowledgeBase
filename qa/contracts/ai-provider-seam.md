@@ -120,3 +120,9 @@ fakes, matching the pattern already used in `packages/ask` (injectable `score_fn
   floor — that gap is real and filed as ISS-096, but writing a criterion for the purpose of failing
   the unit in front of the amendment would distort the gate as surely as softening one would; it
   becomes a criterion when U1.3 wires embed() into indexing.
+- 2026-09-22 · routine (record confirmation) · inbox 2026-09-03T11:02 Umesh: "humko tho system
+  adaptive banana hai … koi bhi api key chal jaaye … easy fallback se" — folded as a **design
+  confirmation**, no criterion change: five provider adapters behind one `Provider` interface,
+  `config/ai-routing.yaml`'s ordered per-jobKind chain and `complete()`'s try-in-order with
+  `AllProvidersFailedError` are exactly that design (D-005/D-008, verified in U1.x checks).
+  Entry had sat unmarked since 2026-09-03 · Mode B sweep fold-in, qa/feedback-inbox.md
