@@ -136,3 +136,11 @@ KEPT because it enforces a named human Approver, which is a protocol requirement
 | 2026-09-08 TASKS/goal divergence at close | folded → `qa/contracts/tracker-integrity.md` amendment log |
 | 2026-09-09 Umesh write-guard shape (verbatim, lines 100–113) | **DEFERRED** — target `qa/contracts/write-guard.md` is status `proposed` awaiting Approver ratification; the fold applies on ratification. Content retained above. |
 | 2026-09-10 session-load credential recovery | folded (marker above) — implemented and checked, cited verdict |
+
+2026-09-22T16:05+05:30 · Umesh (chat, mid-tick) · VERBATIM: "iske liye tho maine gemini model use krne ko boal hai naa speaker transcription and diarization k liyee?" (re: U2.4 speaker resolution phases 1-3, qwen3:8b pin)
+PATTERN: layer/model confusion risk — transcription+diarization (audio->text+labels) ran on Gemini (T-003, 23/23, done); U2.4 speaker IDENTITY resolution (spk:N -> person, from transcript text) is a different layer, pinned local qwen3:8b by the answered gate speaker-segment-identity A (2026-09-21) and ai-routing.yaml `speakers: [ollama]` so person-identity claims are never adjudicated by a public model.
+APPLIES NEXT: (1) confirm the layer distinction with Umesh; (2) if he wants identity on Gemini too, that overrides the gate's local-only rationale — small routing unit (ai-routing.yaml speakers chain) + gate re-point, NOT a silent edit; (3) the in-flight phase-3 re-gate measures the qwen path per the answered gate regardless.
+— folded 2026-09-24 (Mode B sweep consolidation): tracked open, not a build item — carried in ISS-215 as the "one fresh unfolded entry" since 2026-09-22T16:19; still awaiting Umesh's confirm/override per APPLIES NEXT (1)/(2). No routing edit made silently.
+
+- 2026-09-24T21:56:12+05:30 · user (chat, maker resume session) · "just remember that you are the /maker   only" — role reminder: this session builds + dispatches; verdicts/sweeps come only from fresh /checker subagents.
+— folded 2026-09-24 (Mode B sweep consolidation): process-only, no contract or build target — recorded as standing session-role discipline; ISS-215 refreshed to reflect both entries now accounted for.

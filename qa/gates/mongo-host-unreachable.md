@@ -137,3 +137,17 @@ NOT clicked. The page continues to disclose that topic/decision detection, dupli
 flagging and the review-before-publish queue are not built yet.
 This extends the recovery evidence to the application's group-list read path only;
 T-007 persistence and review lifecycle remain unverified/incomplete.
+
+### lkb scope — Answered (2026-09-24, Mode B sweep shard 2 check)
+
+The `lkb`-tenant scope of this gate is answered for the live product surface: D-028 (2026-09-24)
+records Mongo `lkb`/tenant `toc` holding the webinar session, source, 80 turns, 3 speakers, 6 orgs,
+15 topics and 94 `graph_edges`, with read-back queries answered live. This is a real write-and-read
+round trip on the same host this gate opened against, so the `lkb` connectivity question is closed
+going forward — cite D-028, not this gate, for future `lkb` reachability claims.
+
+**Not closed by this:** T-007's WhatsApp persistence half. This sweep's shard 2 check reports the
+WhatsApp Mongo endpoint (`whatsapp_msg`, same host family) reachable but returning an **empty**
+database on 2026-09-24 — no linked WhatsApp account, so there is nothing to read yet. That is a
+different blocker (account linking, not host/network reachability) and keeps T-007 criterion 14
+open under its existing terms. Do not read the `lkb` answer above as closing WhatsApp too.

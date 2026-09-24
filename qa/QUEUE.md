@@ -1,4 +1,63 @@
-# QUEUE — checker Mode B sweep 2026-09-22T16:05+05:30 (3-shard wave, consolidated)
+# QUEUE — checker Mode B sweep 2026-09-24T22:1x+05:30 (3-shard wave, consolidated)
+
+> Range: `3ca44fb..HEAD` (HEAD `b1c9d01`) + working tree. **Terminal state: FINDINGS: 1 new (ISS-288,
+> medium)** — everything else this sweep's shards proposed either duplicated live checker output
+> that landed mid-sweep, was already authorized/disclosed, or did not hold up on verification.
+> Concurrency note: this sweep ran WHILE two Mode A checkers were active on the same tree —
+> `u2-4-phase3-precision-regate` (FAILed cycle 0 at `b1c9d01`, minted ISS-282..284, fix cycle 1
+> since dispatched) and `webinar-bot-live` (FAILed cycle 0, committed `97674cb` during this sweep,
+> minted ISS-285..287, drafted `qa/contracts/meeting-bot-live-capture.md` T-024b DRAFT). Both are
+> folded in below rather than re-derived. HEAD moved `b1c9d01`→`97674cb` mid-sweep; `.last-sweep`
+> is stamped at the true tip.
+>
+> **Shard findings, verified against disk:**
+> - **(a) bypass, disclosed** — `fd74864`/`cfaf464` (feature commits) landed before the
+>   `webinar-bot-live` manifest (`2657bee`). This is D-027's explicit fast-track ("Umesh chose
+>   build + live run today, manifest and /checker afterwards"), stated in the manifest's own Queue
+>   tier line. Not a process violation; no ISS.
+> - **(b) pair-state, resolved live** — both units flagged as ready-for-check with no verdict are
+>   now answered: `u2-4-phase3-precision-regate` FAIL (`b1c9d01`) and `webinar-bot-live` FAIL
+>   (verdict landed mid-sweep, `qa/verdicts/webinar-bot-live.md`, cycle 0, ISSUES-WRITTEN ISS-285,
+>   ISS-286, ISS-287). No dispatch gap remains.
+> - **(c) maker-liveness, NOT an ISS-054 recurrence** — `qa/.last-tick`'s prior history
+>   (2026-09-10..09-21 entries) was replaced by a single 2026-09-24T21:56 line, and shard 1 read
+>   this as a possible asleep-loop gap. Checked against `git log`: **zero commits exist between
+>   `4aa9d13` (2026-09-22T16:28) and `fd74864` (2026-09-24T18:26)** — a ~50h gap with no maker
+>   activity at all, not a live-but-unstamped session (ISS-054's defining trait is "real maker work
+>   HAS happened since" the stale stamp). No work happened, so there is nothing for the tick file to
+>   have missed; ruled EXPLAINED, no ISS. The `.last-tick` history truncation itself is cosmetic —
+>   every prior tick's content survives in its own commit message.
+> - **(d)** `.codex/` = ISS-268 (already tracked). No new.
+> - **(e) inbox fold** — both named entries folded in `qa/feedback-inbox.md` this sweep (Gemini-vs-
+>   qwen tracked via ISS-215 refresh; the 21:56 "/maker only" role reminder is process-only). ISS-215
+>   refreshed: 0 fresh unfolded entries remain; its own open reason (6 unanswered Approver gates)
+>   stands.
+> - **(f) contract staleness, resolved live** — `qa/contracts/meeting-bot-capture.md` C3 vs the
+>   shipped browser joiner: the `webinar-bot-live` Mode A checker drafted
+>   `qa/contracts/meeting-bot-live-capture.md` (T-024b, DRAFT, supersedes C3 for the browser joiner)
+>   during this sweep's window. No duplicate drafted; nothing further to file.
+> - **shard 2(a) tracker-divergence, CONFIRMED, minted** — `.goal/goal.json` U4.2 and U2.6 both still
+>   `pending` despite D-027/D-028 recording live, verified progress on both (U4.2 already reads
+>   `in_progress` in TASKS.md — one status ahead of goal.json). Same class as ISS-276. **ISS-288,
+>   medium** (tracker bookkeeping only, no auth/data-write surface, so not full-ceremony).
+> - **shard 2(c) gate staleness** — `qa/gates/mongo-host-unreachable.md` appended: the `lkb` scope
+>   answered per D-028's live write-and-read round trip; WhatsApp/T-007 persistence kept explicitly
+>   open (endpoint reachable, database empty on 2026-09-24 — no linked account, a different blocker
+>   than host reachability). `delivery-gate-manifest-blindness` remains STALLED (HUMAN_GATE), has its
+>   own `qa/debug` report; enforcement liveness CLEAN.
+> - **shard 3, check 7** — no scope (no PASSed units in range `3ca44fb..HEAD`). Informational:
+>   `scripts/sync-webinar-session.mjs:167,178` (deleteMany-then-insert, no transaction) is left to
+>   the `webinar-bot-live` Mode A checker's own fix-cycle scope, not filed here — none of its three
+>   issued findings (ISS-285/286/287: lint-dirsize budget, missing capability-coverage table, undis-
+>   closed touched files) cover it, so it is still open for that unit's next cycle to pick up or a
+>   future sweep to file if it does not land.
+>
+> Token line appended 21:59:51 (main 188.6M / sub 24.6M, opus_sub_share 0.108, sub_agents 10,
+> compactions 1, outages 0). `.last-sweep` restamped HEAD=`b1c9d01`.
+
+---
+
+## Prior sweep header (2026-09-22T16:05+05:30, superseded as routing; kept for its own findings below)
 
 > Range: `5fab76e..HEAD` (4 commits; prior sweep stopped at HEAD `5fab76e`). **Terminal state: FINDINGS: 10**
 > — ISS-266/267/268 (pair-state + mirror) · ISS-269..272 (silent-failure, high, filed-don't-fix under the D-014
@@ -37,30 +96,45 @@
   default while the north star's Phase-1 exit requires off-corpus web fallback; wire-it-or-sign-the-honest-limit
   is an Approver amendment (ISS-274)
 
-## Current top 3 (backlog-priority order)
+## Current top 3 (backlog-priority order, refreshed 2026-09-24 sweep)
 
-1. **Maker duty — handshake (13 days old)** — respond to the delivery-gate-stamp-adoption cycle-1 FAIL
-   (ISS-266; the verdict's unit findings are ISS-227/228/229). A FAIL verdict unanswered since 2026-09-09
-   outranks every backlog tier: the pair is stalled, not empty. *(In progress: fix-cycle-2 build dispatch
-   is queued, blocked only by the classifier outage — tick 16:03.)*
-2. **Tier 3 (roadmap) — U2.4 phase-3 precision re-gate** — the phase-4 speaker write unit's precondition
-   (gate speaker-segment-identity A answered 2026-09-21; ISS-255 fixed; the re-gate itself has not been run).
-   *(IN FLIGHT: build running since tick 15:46; evidence dir `qa/evidence/u2-4-phase3-precision-regate-2026-09-22/`.)*
-3. **Tier 2 (high, uncapped) — ISS-260 fix direction** — e31065a scope addendum + Dockerfile/compose
-   diff-review, keeping the aggregate-landing precedent honest.
+1. **Maker duty — handshake, u2-4-phase3-precision-regate FAIL (cycle 0, same day)** — respond to
+   ISS-282 (critical: gate's own precision/wrong-link/addition bars all fail on re-run), ISS-283
+   (high: D-015 stability claim false, outer run 3 never executed), ISS-284 (medium: undisclosed
+   evidence files + no-longer-reproducing corpus numbers). A FAIL verdict outranks every backlog
+   tier. *(In progress: fix cycle 1 already dispatched per `qa/.last-tick` 22:04 — opus, lane
+   `a-speakers`, experiment detached.)*
+2. **Maker duty — handshake, webinar-bot-live FAIL (cycle 0, landed mid-this-sweep)** — respond to
+   ISS-285 (high: `scripts/` dirsize budget breach, 32→33 files, the manifest's verify subset never
+   ran the full `pnpm lint:structure`), ISS-286 (high: no Capability coverage table on a full-
+   ceremony data-write unit), ISS-287 (low: untracked touched files + a stale STUB comment in
+   `browser-joiner.ts`). Also closes T-033 once it PASSes. *(Not yet dispatched as of this sweep —
+   verdict just landed; next maker tick should pick this up alongside #1.)*
+3. **Tier 3 (roadmap, user's standing choice 2026-09-24) — webinar-bot P1 reliability**: T-047
+   (record controller must survive console close + finalize-on-restart watchdog — today's own
+   16:30:56 controller-death incident), then T-029 (auto-reconnect on connection-interrupted), T-030
+   (Telegram status alerts), T-032 (OBS Safe-Mode/websocket-down guard), T-033 (folds into #2 above
+   once that FAIL is answered). Both FAILs in #1/#2 are same-seam prerequisites for this tier, not a
+   substitute for it — pull #3 once #1/#2 are answered, per the user's explicit ordering.
 
 **Filed-don't-fix (D-014 class cap — non-security seam with ≥2 PASSes):** ISS-269/270 (speaker seam:
 speaker-llm-windows, iss-255-handover-direction, speaker-run-agreement) · ISS-271/272 (golden-set/eval seam:
 golden-set-semantic-leg, golden-set-regeneration, eval-baseline-control). A human may still pull them;
 ISS-269/270 fold naturally into any future unit touching `speakers-llm.ts`. **ISS-104** (critical,
-speaker naming-cue) is the only open critical and sits on the same capped seam per this repo's own
-precedent — pull decision belongs to a human; the U2.4 precision re-gate is the natural venue if pulled.
+speaker naming-cue) is the only open critical besides today's ISS-282 and sits on the same capped
+speaker seam per this repo's own precedent — pull decision belongs to a human; the u2-4-phase3 fix
+cycle 1 already in flight is the natural venue if pulled alongside it.
 
 ## State summary
 
+- **2026-09-24 sweep update:** ids now run through ISS-288 (main ledger only in this repo; no
+  `qa/issues.*.jsonl` lane shards exist — single-tree work). This sweep minted 1 (ISS-288, medium,
+  tracker-divergence); the two concurrent Mode A checkers minted 6 more independently (ISS-282..284,
+  ISS-285..287) — both folded above, not re-derived. Token-ledger line appended 21:59:51.
 - Union ledger: 295 rows (273 main + 22 c-unrun-writers), ids ISS-001..ISS-275 + ISS-C-* 1..22, 0 duplicate
   ids. Open: 93 canonical / 99 union (10 new this sweep: 5 high, 3 medium, 2 low). Token-ledger line appended
-  (opus_sub_share 0.0; no unit at fix cycle 3).
+  (opus_sub_share 0.0; no unit at fix cycle 3). [figures below this line are from the 2026-09-22 sweep;
+  not recomputed this pass — see the 2026-09-24 update above for the delta]
 - Mode A this session: **no new verdict** — delivery-gate-manifest-blindness is STALLED-closed at cycle 3 of 3
   (verdict d171d0c FAIL 5/9; disposition "do not open a cycle 4"). Residue: ISS-205 (regex fix for the next
   unit touching that hook block) + two Approver gates (mc-hooks-manifest-blindness, delivery-gate-c4-heading-form).
