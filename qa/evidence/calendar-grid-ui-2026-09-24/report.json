@@ -1,0 +1,74 @@
+{
+  "unit": "calendar-grid-ui",
+  "contract": "qa/contracts/calendar-grid-ui.md",
+  "date": "2026-09-24",
+  "actor": "maker (smoke check only — NOT the validation; the checker runs its own visible-browser pass per qa/evidence/ui-epic-2026-09-24/checker-probes.md)",
+  "harness": "playwright MCP, headed Chromium",
+  "servers": {
+    "api": "http://127.0.0.1:3301 (fresh dev server on this branch's code)",
+    "web": "http://127.0.0.1:5176 (vite --strictPort, VITE_API_BASE_URL=http://127.0.0.1:3301)",
+    "data": "live — 27 real sessions + real Google Calendar meetings via gws"
+  },
+  "pagesVisited": [
+    { "url": "/calendar?view=month&date=2026-09-25", "consoleErrors": 0 },
+    { "url": "/calendar?view=week&date=2026-09-25", "consoleErrors": 0 },
+    { "url": "/calendar?view=day&date=2026-09-25", "consoleErrors": 0 },
+    { "url": "/calendar?view=month&date=2026-09-25&kind=session&q=zzzznothing", "consoleErrors": 0 },
+    { "url": "/calendar?view=list", "consoleErrors": 0 }
+  ],
+  "consoleNote": "0 application console errors across all five. Only 2 React Router v7 future-flag warnings, present repo-wide and not from this unit.",
+  "interactions": [
+    {
+      "did": "load /calendar?view=month",
+      "expected": "a real 7-column grid of whole weeks with today marked (C1/C3)",
+      "observed": "month-grid present; 35 cells; 35 % 7 === 0; exactly 1 cell with data-today=true; range label 'September 2026'; 3 session chips + 5 meeting chips",
+      "pass": true
+    },
+    {
+      "did": "switch to week",
+      "expected": "hour axis, 7 day columns (C2)",
+      "observed": "7 day-columns, hour labels rendered, 1 all-day chip in the all-day lane",
+      "pass": true
+    },
+    {
+      "did": "C9 TIMEZONE — locate the real 11:00 AM meeting on the axis",
+      "expected": "renders in the 11:00 row; no UTC shift, no off-by-one",
+      "observed": "aria-label 'meeting: Weekly Sync Up with Umesh, 11:00 AM–11:30 AM'; style top 45.8333% (= 11/24 exactly); height 2.08333% (= 0.5/24). Page states 'All times shown in Asia/Calcutta.'",
+      "pass": true
+    },
+    {
+      "did": "click a timed event",
+      "expected": "detail panel with only the fields the API returned (C6)",
+      "observed": "'Weekly Sync Up with Umesh · Fri, Sep 25, 2026 · 11:00 AM–11:30 AM · Organiser: manish.k@vidysea.com · Join'; join href https://meet.google.com/ovg-uuov-qve; no session link (correct — it is a meeting); URL carried ?event=meeting%3A6bm9...",
+      "pass": true
+    },
+    {
+      "did": "apply an impossible filter combination (kind=session AND q=zzzznothing)",
+      "expected": "explicit 'no events match these filters', never a blank grid (C5)",
+      "observed": "'No events match these filters.'; month-grid NOT rendered; '2 filter(s) active'",
+      "pass": true
+    },
+    {
+      "did": "apply kind=session alone",
+      "expected": "rendered event count changes, URL carries it",
+      "observed": "'3 event(s) in this range · 27 of 35 after filters'; 3 session chips, 0 meeting chips",
+      "pass": true
+    },
+    {
+      "did": "I5 — open the list view",
+      "expected": "the original Upcoming + Past lists still work",
+      "observed": "agenda-view present; sections 'Upcoming' and 'Past'; 8 working Join links; 27 session links; the Gmail 'Scan Gmail' review queue still present",
+      "pass": true
+    }
+  ],
+  "notMeasuredInBrowser": [
+    "C2 overlap with REAL data — the live calendar currently has exactly one timed event on 2026-09-25, so no two events naturally overlap. Overlap is proven by unit tests at both the model level (layoutDayColumn gives columns 0/1 of 2) and the DOM level (two positioned-event nodes with different `left`). The checker's own probe will need to arrange an overlapping pair.",
+    "A fifth screenshot (filtered month view) timed out twice in the screenshot tool ('element not stable') and was recorded as a DOM measurement instead; the filter behaviour itself is captured above."
+  ],
+  "screenshots": [
+    "c01-month-view.png",
+    "c02-week-view-hour-axis.png",
+    "c03-day-view-detail-panel.png",
+    "c04-list-view-preserved.png"
+  ]
+}
