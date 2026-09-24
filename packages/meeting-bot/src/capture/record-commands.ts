@@ -15,6 +15,7 @@ import { OBSWebSocket } from "obs-websocket-js";
 import { createBrowserJoiner } from "../joiners/browser-joiner.js";
 import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
+import { removeControllerState, writeControllerState } from "./controller-state.js";
 import { createObsBrowserDeps } from "./obs-windows.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -65,7 +66,12 @@ export async function runRecord(rest: string[]): Promise<void> {
   const untilArg = flag(rest, "--until");
   if (!url || !untilArg) {
     throw new Error("usage: lkb record <url> --until HH:MM [--end-not-before HH:MM] [--title T] " +
-      "[--session-id ID] [--transcribe]");
+      "[--session-id ID] [--transcribe]\n" +
+      "  Run detached so a closed console can't kill it (T-047): powershell -NoProfile " +
+      "-ExecutionPolicy Bypass -File scripts/webinar/start-record-detached.ps1 -Url <url> " +
+      "-Until HH:MM [-Title T]\n" +
+      "  Recover an orphaned recording (OBS still running, no live controller): `lkb watchdog` " +
+      "— idempotent, safe on a timer, no-op when nothing is recording");
   }
   const envFile = path.join(REPO_ROOT, ".env");
   if (existsSync(envFile)) process.loadEnvFile(envFile);
@@ -102,40 +108,58 @@ export async function runRecord(rest: string[]): Promise<void> {
   let gone = false;
   void bot.browserExited(sessionHandle)?.then(() => (gone = true));
 
-  console.log(`[bot] recording until ${until.toLocaleTimeString()} ` +
-    `(early stop on 'ended' only after ${endNotBefore.toLocaleTimeString()})`);
-  try {
-    for (;;) {
-      const now = Date.now();
-      if (now >= until.getTime()) { console.log("[bot] --until reached"); break; }
-      if (gone) { console.log("[bot] bot browser exited"); break; }
-      if (endedAt !== undefined && now >= endNotBefore.getTime() && now - endedAt > 60_000) {
-        console.log("[bot] webinar reported ended"); break;
-      }
-      await new Promise((r) => setTimeout(r, 5000));
-    }
-  } finally {
-    try {
-      await joiner.stop(sessionHandle);
-    } catch (e) {
-      // e.g. OBS restarted mid-run. The file is usually still on disk — fall back to it below.
-      console.error(`[bot] stop failed: ${e instanceof Error ? e.message : String(e)}`);
-    }
-    await bot.disconnect().catch(() => {});
-  }
+  // T-047: written now, removed only once cleanup below actually runs to completion. If this
+  // process is killed out from under OBS (console closed — the 2026-09-24 16:30:56 failure),
+  // this file is left behind with a pid that's no longer alive; `lkb watchdog` uses exactly that
+  // to detect it and finish the job (stop OBS, unmute, close bot Chrome, finalize).
+  writeControllerState(RECORD_DIR, {
+    pid: process.pid,
+    sessionId,
+    title,
+    platform,
+    until: until.toISOString(),
+    obsOutputDir: RECORD_DIR,
+    startedAt: new Date(startedAt).toISOString(),
+  });
 
-  let video = bot.outputPath(sessionHandle);
-  if (!video || !existsSync(video)) {
-    const newest = readdirSync(RECORD_DIR)
-      .filter((f) => f.endsWith(".mkv"))
-      .map((f) => path.join(RECORD_DIR, f))
-      .filter((f) => statSync(f).mtimeMs >= startedAt)
-      .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs)[0];
-    if (newest) console.warn(`[bot] using newest recording in ${RECORD_DIR}: ${newest}`);
-    video = newest;
+  try {
+    console.log(`[bot] recording until ${until.toLocaleTimeString()} ` +
+      `(early stop on 'ended' only after ${endNotBefore.toLocaleTimeString()})`);
+    try {
+      for (;;) {
+        const now = Date.now();
+        if (now >= until.getTime()) { console.log("[bot] --until reached"); break; }
+        if (gone) { console.log("[bot] bot browser exited"); break; }
+        if (endedAt !== undefined && now >= endNotBefore.getTime() && now - endedAt > 60_000) {
+          console.log("[bot] webinar reported ended"); break;
+        }
+        await new Promise((r) => setTimeout(r, 5000));
+      }
+    } finally {
+      try {
+        await joiner.stop(sessionHandle);
+      } catch (e) {
+        // e.g. OBS restarted mid-run. The file is usually still on disk — fall back to it below.
+        console.error(`[bot] stop failed: ${e instanceof Error ? e.message : String(e)}`);
+      }
+      await bot.disconnect().catch(() => {});
+    }
+
+    let video = bot.outputPath(sessionHandle);
+    if (!video || !existsSync(video)) {
+      const newest = readdirSync(RECORD_DIR)
+        .filter((f) => f.endsWith(".mkv"))
+        .map((f) => path.join(RECORD_DIR, f))
+        .filter((f) => statSync(f).mtimeMs >= startedAt)
+        .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs)[0];
+      if (newest) console.warn(`[bot] using newest recording in ${RECORD_DIR}: ${newest}`);
+      video = newest;
+    }
+    if (!video || !existsSync(video)) throw new Error(`no recording file produced (${video ?? "none"})`);
+    await finalizeRecording(video, sessionId, title, platform, rest.includes("--transcribe"));
+  } finally {
+    removeControllerState(RECORD_DIR);
   }
-  if (!video || !existsSync(video)) throw new Error(`no recording file produced (${video ?? "none"})`);
-  await finalizeRecording(video, sessionId, title, platform, rest.includes("--transcribe"));
 }
 
 /** Recording file → m4a → silence gate → source.json → (optional) transcript. Shared by `record`
