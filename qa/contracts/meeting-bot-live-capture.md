@@ -43,7 +43,7 @@ injected-fake demo path of meeting-bot-capture.md's C3/C5 with a live one for pl
    and restores exactly the inputs it muted (never inputs that were already muted before the run) —
    on every exit path, including a thrown error mid-`launch()`.
 4. **Silence gate** (`src/capture/record-commands.ts` `finalizeRecording`): measures `max_volume`
-   via `ffmpeg volumedetect`; a capture at or below `SILENCE_MAX_DB` (−50 dB) MUST throw before any
+   via `ffmpeg volumedetect`; a capture **strictly below** `SILENCE_MAX_DB` (−50 dB) MUST throw before any
    transcription call and MUST still register `source.json` (with `audioLevel.silent: true`) so the
    attempt is not silently lost.
 5. **Recovery / mid-run controller death** (`runFinalize --stop-obs`): when invoked with
@@ -57,7 +57,7 @@ injected-fake demo path of meeting-bot-capture.md's C3/C5 with a live one for pl
    `capture/obs-windows.ts` or `capture/record-commands.ts`; `data/bot-profile/` (holds live login
    cookies) and `raw/webinars/` (raw recordings) are gitignored and never referenced from a path
    that could land under a tracked directory.
-7. **Data-write scoping** (`scripts/sync-webinar-session.mjs`): every Mongo write goes through a
+7. **Data-write scoping** (`scripts/webinar/sync-session.mjs`): every Mongo write goes through a
    `packages/db` `coll(tenantId)` accessor (never a raw driver handle); the turns and graph_edges
    deletes are scoped by `sessionId`/`sessionRef` in addition to tenant, so a re-run can only ever
    replace the rows of the one session named on the command line — never another session's or
@@ -81,6 +81,22 @@ reliability follow-ups, not preconditions for T-024b's own criteria above. In-br
 replacing OBS (T-034) is a separate phase-2 contract.
 
 ## Amendment log
+- 2026-09-24 · routine (draft correction, still NOT adopted) · **C7's path corrected**
+  `scripts/sync-webinar-session.mjs` → `scripts/webinar/sync-session.mjs` (the file moved in
+  webinar-bot-live fix cycle 1 under ISS-285; this was the last non-historical reference to the old
+  path in the repo, and it was on the checker's own surface). **C4's boundary wording corrected**
+  "at or below `SILENCE_MAX_DB`" → "strictly below", to match the implementation
+  (`record-commands.ts:157` is `maxDb < SILENCE_MAX_DB`) — the code was not changed to match a
+  criterion drafted after it was built, and no criterion was weakened. · cycle-1 checker.
+- 2026-09-24 · **adoption ruling: NOT ADOPTED — open HUMAN_GATE for the Approver.** Two independent
+  checkers converged on this: `checker/SKILL.md`'s criticality gate makes initial contract creation
+  human-approved *always*, this is a Lab Protocol repo, and no `docs/DECISIONS.md` entry authorizes
+  `T-024b`/`meeting-bot-live-capture`. A draft the checker wrote for itself cannot self-ratify, and
+  a second checker agreeing with the first is still not a human. The cycle-1 checker initially ruled
+  ADOPTED and **reversed that ruling**; the reversal is recorded here rather than made silently.
+  Until an Approver-signed entry exists, units are graded against `meeting-bot-capture.md` C1-C7
+  (C3 superseded for the browser joiner) and these criteria serve only as structure for judging
+  capability-coverage completeness.
 - 2026-09-24 · initial draft · criteria proposed by `/checker` per the `webinar-bot-live` manifest's
   direct request; drafted from the manifest's "What changed"/"Actual outputs"/"Known gaps" and this
   check's own re-derivation (43/43 tests, Mongo read-back of 94 graph_edges with 225/225 evidence
