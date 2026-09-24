@@ -281,4 +281,8 @@ test("c1b: an unquoted rhetorical call deep inside a long turn is not a handover
   // then t007 [spk:1] "That's a yes." (gold unnamed). No quote marks, so only the CLOSING bound refuses it.
   const { resolved } = await extractSpeakers(corpus(LEEDS), replies([{ speakerRef: "spk:1", displayName: "Shweta", turnIds: [`${LEEDS}-t007`] }]));
   assert.deepEqual(resolved, []);
+  // A clause-opening call early in a long turn is answered inside that turn, not by the next speaker.
+  const lecture = "Priya, what do you think? I think the answer is clear. " + "The deadlines move every year and students should plan early. ".repeat(5);
+  const long = await extractSpeakers([turn("t1", "Host", lecture), turn("t2", "spk:1", "Sure.")], replies([{ speakerRef: "spk:1", displayName: "Priya", turnIds: ["t2"] }]));
+  assert.deepEqual(long.resolved, [], "only the turn's closing stretch hands the floor on");
 });
