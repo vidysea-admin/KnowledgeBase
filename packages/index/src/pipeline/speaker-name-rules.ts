@@ -138,16 +138,10 @@ const NAMING_CUES_BEFORE = [
   "speaker is", "presenter is", "please welcome",
 ];
 /**
- * Handover markers (ISS-255): a turn whose before-context contains one of these is the CURRENT
- * speaker INTRODUCING SOMEONE ELSE — "I invite our next speaker, Ruby, from Uni-Italia". Such a
- * cue is evidence Ruby exists and speaks NEXT, never that the turn's own label IS Ruby. The live
- * U2.4 phase-3 eval shipped exactly that inversion: the moderator was accepted as `Ruby` off his
- * own handover turn while the real Ruby (spk:2) self-named one turn later.
- *
- * So when a handover marker sits in the before-context, only a SELF-NAMING cue can still bind
- * the name to the speaking label ("my name is X" inside the same turn); every other cue branch
- * (after-cues like `from`/`here`/`speaking`, greetings, demonstratives, address) is refused for
- * that occurrence.
+ * Handover markers (ISS-255): "I invite our next speaker, Ruby, from Uni-Italia" is the CURRENT
+ * speaker introducing someone who speaks NEXT; the live eval once credited the moderator as Ruby.
+ * With a marker in the before-context, only a SELF-NAMING cue ("my name is X") can still bind the
+ * name to the speaking label; every other cue branch is refused for that occurrence.
  */
 const HANDOVER_MARKERS = [
   "invite", "invited", "inviting", "welcome our next speaker", "next speaker",
@@ -275,43 +269,47 @@ export function citesNameAsSelfIdentification(text: string, name: string): boole
 }
 
 /**
- * Quoted or reported speech names someone the SPEAKER is not addressing (c1b review PoCs):
- * `Everybody keeps asking me, "Priya, what do you think?"` and `Thank you, Kshitij, said the intern`.
- * Inside an open quote, after "asks me / told us / said", or before "said / asked", it binds nobody.
+ * Relation cues are an ALLOWLIST of address SHAPES, never a denylist of reporting verbs. Review of
+ * 03e46dd broke a verb list three ways ("People often go, Priya, what...", a stray 5" inch mark
+ * flipping quote parity, "Thank you, Kshitij, someone mentioned"). So an address counts only when
+ * it OPENS a clause: after turn start, sentence punctuation, a filler, or a fixed call-on lead-in.
+ * A name right after a quote mark, inside an open quote, or framed by said/asks-me/told-us is out.
  */
+const LEAD_IN = String.raw`(?:^|[.!?]|\b(?:uh|um|so|okay|ok|and|now|alright|right|well|yes|perfect|great|with that|ask you|to you))[\s,]*`;
+const OPENS_VOCATIVE = new RegExp(`${LEAD_IN}$`, "iu");
+const OPENS_GREETING = new RegExp(`${LEAD_IN}(?:hi|hello|hey|welcome|good (?:morning|afternoon|evening))[\\s,]*$`, "iu");
+const OPENS_THANKS = new RegExp(`${LEAD_IN}(?:thank you|thanks)(?: (?:so|very) much| a lot| a ton| a bunch| again)?[\\s,]*$`, "iu");
 const reported = (text: string, name: string, at: number): boolean =>
-  (text.slice(0, at).match(/["“”]/gu) ?? []).length % 2 === 1 ||
+  /["“”][\s,]*$/u.test(text.slice(Math.max(0, at - 4), at)) || (text.slice(0, at).match(/["“”]/gu) ?? []).length % 2 === 1 ||
   /\b((asks?|asked|asking|tells?|told) (me|us)|said|says)$/u.test(tidyBefore(text, at)) ||
-  /^[\s,]*(said|says|told|asked|replied|wrote)\b/iu.test(text.slice(at + name.length, at + name.length + 24));
+  /^[\s,]*(said|says|told|asked|replied|wrote|mentioned)\b/iu.test(text.slice(at + name.length, at + name.length + 24));
 
 /**
- * Forward address: the named person speaks NEXT. A handover ("over to X", "I invite ... X",
- * "X, please go ahead"), or -- only in the turn's closing stretch, where the floor is handed on --
- * a greeting ("Hi, Nikhil.") or a question calling on them ("Rashi, I'll pass it on back to you").
- * Mid-turn the same shapes are rhetorical ("Shweta, any more takers"); quotes are `reported`.
+ * Forward address, in the turn's closing stretch where the floor is handed on: a handover ("over
+ * to you, Nikhil", "I invite ... X"), a clause-opening greeting ("Hi, Nikhil."), or a clause-opening
+ * call ("Rashi, I'll pass it on back to you", "ask you, Nupur, what do you think").
  */
 const CLOSING = 200;
-const GREETING_BEFORE = /(^|\W)(hi|hello|hey|welcome|good (morning|afternoon|evening))$/u;
 const CALLED_ON = ["what", "how", "would", "could", "can you", "do you", "did you", "any ", "your", "please", "i'll pass", "i will pass"];
 export function citesNameAsHandover(text: string, name: string): boolean {
   return nameOccurrences(text, name).some((at) => {
-    const [before, after, rest] = [tidyBefore(text, at), tidyAfter(text, name, at), text.slice(at + name.length)];
-    return !reported(text, name, at) && (HANDOVER_CUES_BEFORE.some((c) => before.endsWith(c)) ||
+    const [before, after, rest, lead] = [tidyBefore(text, at), tidyAfter(text, name, at), text.slice(at + name.length), text.slice(0, at)];
+    return text.length - at <= CLOSING && !reported(text, name, at) && (HANDOVER_CUES_BEFORE.some((c) => before.endsWith(c)) ||
       HANDOVER_MARKERS.some((m) => text.slice(Math.max(0, at - 40), at).toLowerCase().includes(m)) ||
-      (text.length - at <= CLOSING && GREETING_BEFORE.test(before) && /^\s*[,.!]/u.test(rest)) ||
-      (text.length - at <= CLOSING && /^\s*,/u.test(rest) && [...HANDOVER_FOLLOWERS, ...CALLED_ON].some((c) => after.startsWith(c))));
+      (OPENS_GREETING.test(lead) && /^\s*[,.!]/u.test(rest)) ||
+      (OPENS_VOCATIVE.test(lead) && /^\s*,/u.test(rest) && [...HANDOVER_FOLLOWERS, ...CALLED_ON].some((c) => after.startsWith(c))));
   });
 }
 
 /**
- * Backward address: "Thank you, X" / "Thanks so much X, for ..." OPENING a turn thanks the person
- * who JUST spoke. A turn thanking two people ("Thank you, Kshitij. Thanks, Anisha", "thank you
- * Bhakti, thank you TOC team") does not say which of them spoke last, so it binds neither.
+ * Backward address: a clause-opening "Thank you, X" in a turn's first 120 chars, closed by
+ * punctuation, "for" or "and", thanks the person who JUST spoke. A turn thanking two people
+ * ("Thank you, Kshitij. Thanks, Anisha") does not say which of them spoke last: it binds neither.
  */
 const THANKED = /\b[Tt]hank(?:s| you)(?: (?:so|very) much| a lot| a ton| a bunch| again| also)?(?: to)?[\s,]+(\p{Lu}[\p{L}'’-]*)/gu;
 export function citesNameAsThanks(text: string, name: string): boolean {
   const first = name.trim().split(/\s+/)[0] ?? "";
   if ([...text.matchAll(THANKED)].some((m) => m[1] !== first && !isDiscourseOnly(m[1] ?? ""))) return false;
   return nameOccurrences(text, name).some((at) => at <= 120 && !reported(text, name, at) &&
-    /(thank you|thanks)( (so|very) much| a lot| a ton| a bunch| again)?$/u.test(tidyBefore(text, at)) && /^(\s*[,.!?]|\s*$|\s+for\b)/u.test(text.slice(at + name.length)));
+    OPENS_THANKS.test(text.slice(0, at)) && /^(\s*[.!?]|\s*$|,?\s+for\b|,\s+and\b)/u.test(text.slice(at + name.length)));
 }

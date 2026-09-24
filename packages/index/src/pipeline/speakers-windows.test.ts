@@ -264,6 +264,18 @@ test("c1b review: quoted or reported speech names nobody, even in a SHORT turn (
   assert.deepEqual(t.resolved, [], "'thanks a ton, X' is a second thanked person");
 });
 
+test("c1b review 2: an address must OPEN a clause -- no reporting-verb list to fall off", async () => {
+  // The reviewer's second-round PoCs against the verb/quote-parity denylist, all bypasses of it.
+  const next = (text: string) => [turn("t1", "spk:0", text), turn("t2", "spk:1", "Not much new today.")];
+  for (const text of ["People often go, Priya, what do you make of this?", 'He wears a 5" badge. Random folks always go, "Priya, any updates?"']) {
+    const r = await extractSpeakers(next(text), replies([{ speakerRef: "spk:1", displayName: "Priya", turnIds: ["t1"] }]));
+    assert.deepEqual(r.resolved, [], text);
+  }
+  const prev = [turn("t1", "spk:3", "Here is my final point."), turn("t2", "Host", "Thank you, Kshitij, someone mentioned earlier in the hallway.")];
+  const p = await extractSpeakers(prev, replies([{ speakerRef: "spk:3", displayName: "Kshitij", turnIds: ["t1"] }]));
+  assert.deepEqual(p.resolved, [], "a thank-you must close on punctuation, 'for' or 'and'");
+});
+
 test("c1b: an unquoted rhetorical call deep inside a long turn is not a handover (closing-stretch bound)", async () => {
   // leeds t006 [spk:0], 11500 chars: "... Alka, Shweta, any more takers that we have? ..." at offset 7266,
   // then t007 [spk:1] "That's a yes." (gold unnamed). No quote marks, so only the CLOSING bound refuses it.
