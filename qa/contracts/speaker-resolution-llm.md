@@ -125,6 +125,22 @@ criteria on whichever unit first writes a `speakers` document or mutates `speake
    collides identically, so it is not a regression introduced here. The apply unit must
    disambiguate before two people are merged into one stored identity.
 
+## Phase-3 gate bar-2 reading (checker ruling, cycle-1 check of `u2-4-phase3-precision-regate`)
+
+- **[C14]** *(checker-added, cycle 1 of `u2-4-phase3-precision-regate`)* `qa/gates/speaker-segment-identity.md`'s
+  phase-3 bar 2 ("zero wrong label/name/citation links") is measured, for THIS path, by whether each
+  shipped evidence turn is inside — or immediately adjacent to, in the direction its cue requires — a
+  claimed block whose gold person is the accepted name (`05-score.mjs`'s `wrongEvidencePairsRelational`
+  / `relationalInvalid`), never by the legacy `wrongEvidencePairs` counter, which accepts an evidence
+  turn only when it lies inside a gold block **of the named person themself** — i.e. only a
+  self-naming turn. Every greeting/handover/thanks turn this path deliberately admits (see "Why this
+  is a separate contract" above) is spoken by someone else and fails the legacy counter by
+  construction, so that counter cannot discriminate a correct relational citation from a wrong one on
+  this path — it reads the same non-zero number whether the citations are right or wrong. This does
+  **not** relax C2/C2a/C2b/C12: every evidence turn must still contain the name verbatim, in a
+  cue-shaped occurrence, exactly as before; C14 only says which of the two counters *in the
+  measurement script* operationalizes "wrong citation link" for this path's admitted evidence class.
+
 ## Amendment log
 
 - 2026-09-08 · routine · Initial contract authored by the checker from the maker's proposed
@@ -147,3 +163,19 @@ criteria on whichever unit first writes a `speakers` document or mutates `speake
   the bare pronoun `"I"` still ship as people (checker probe, reproduced). Both additions are
   **tightenings**; neither was written to fail a conforming artifact, and both were placed on the
   contract by the checker's own cycle-1 verdict before this unit was built.
+- 2026-09-25 · routine (clarification) · Added **[C14]**, ruling that the gate's phase-3 bar 2
+  ("zero wrong ... citation links") is read via `05-score.mjs`'s relational check, not its legacy
+  `wrongEvidencePairs` counter. · *Why:* `u2-4-phase3-precision-regate` fix cycle 1's manifest
+  explicitly asked the checker to rule on this, since the legacy counter reads 18 (every one of 18
+  relation-evidence citations, x3 outer runs) while the relational check reads 0, and the two
+  readings disagree on whether bar 2 holds. The legacy counter's own definition — an evidence turn
+  must lie inside a gold block of the person it names — cannot be satisfied by a greeting, handover
+  or thanks turn, which this path's own "Why this is a separate contract" section (predating the
+  gate's 2026-09-21 answer) already commits to admitting; a metric that reads "wrong" on every
+  correct instance of an explicitly-designed-for evidence class carries no discriminating
+  information for this path. This is a routine reading clarification, not a criterion softening:
+  C2/C2a/C2b/C12's verbatim-and-cue requirement is unchanged and was independently re-verified this
+  cycle (D-020 mutation falsification, 6 mutants, all caught). If a future unit wants the legacy
+  counter reinstated as bar 2's measure — e.g. because relational evidence turns out to be a bigger
+  fabrication risk than this cycle's evidence shows — that is a criterion **tightening against an
+  admitted evidence class**, which is a CRITICAL amendment requiring the human, not a routine one.
