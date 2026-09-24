@@ -22,6 +22,7 @@ import { OBSWebSocket } from "obs-websocket-js";
 
 import type { JoinOpts, JoinResult } from "../joiner.js";
 import type { BrowserJoinerDeps } from "../joiners/browser-joiner.js";
+import { ensureObsReady, type ObsGuardProbes } from "./obs-guard.js";
 
 export interface BotEvent {
   event: string;
@@ -59,7 +60,7 @@ interface Run {
   outputPath?: string;
 }
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 export function botWindowTitle(handle: string): string {
   return `LKB-BOT ${handle}`;
@@ -71,6 +72,61 @@ function windowSpec(title: string): string {
   return `${title.replace(/:/g, "#3A")} - Google Chrome:Chrome_WidgetWin_1:chrome.exe`;
 }
 
+function isObsProcessRunning(): boolean {
+  try {
+    const r = spawnSync("tasklist", ["/FI", "IMAGENAME eq obs64.exe", "/NH"], { encoding: "utf8", timeout: 10_000 });
+    return (r.stdout ?? "").toLowerCase().includes("obs64.exe");
+  } catch {
+    return false;
+  }
+}
+
+/** Sends WM_CLOSE to OBS's main window (Process.CloseMainWindow) — the graceful-shutdown signal;
+ * never a taskkill /F. A no-op if OBS isn't running or has no visible main window. */
+function requestObsGracefulClose(): void {
+  spawnSync("powershell", ["-NoProfile", "-Command",
+    "Get-Process obs64 -ErrorAction SilentlyContinue | ForEach-Object { $_.CloseMainWindow() | Out-Null }"],
+    { encoding: "utf8", timeout: 10_000 });
+}
+
+/** OBS 32 removed --disable-shutdown-check (obsproject/obs-studio#12650); the documented
+ * replacement is clearing this unclean-shutdown sentinel before relaunch so OBS boots normally
+ * instead of offering Safe Mode. `.sentinel` has been reported as either a file or a folder
+ * depending on version, so this removes either. */
+function clearObsShutdownSentinel(): void {
+  if (!process.env.APPDATA) return; // nothing we can safely target
+  rmSync(path.join(process.env.APPDATA, "obs-studio", ".sentinel"), { force: true, recursive: true });
+}
+
+function launchObsNormally(cfg: ObsBrowserConfig): void {
+  // --disable-shutdown-check kept for older OBS where it still works; clearObsShutdownSentinel
+  // above is the part that actually works on OBS 32 (see obs-guard.ts header).
+  spawn(cfg.obsExe, ["--minimize-to-tray", "--disable-shutdown-check", "--disable-updater"], {
+    cwd: path.dirname(cfg.obsExe),
+    detached: true,
+    stdio: "ignore",
+  }).unref();
+}
+
+function forceKillObsNeverCall(): never {
+  throw new Error("BUG: the OBS guard must never force-kill OBS (T-032 — see obs-guard.ts).");
+}
+
+function createRealObsGuardProbes(cfg: ObsBrowserConfig, obs: OBSWebSocket, log: (msg: string) => void): ObsGuardProbes {
+  return {
+    isObsRunning: isObsProcessRunning,
+    connectWebsocket: async () => {
+      await obs.connect(cfg.obsUrl, cfg.obsPassword);
+    },
+    requestGracefulClose: async () => requestObsGracefulClose(),
+    clearShutdownSentinel: clearObsShutdownSentinel,
+    launchObs: () => launchObsNormally(cfg),
+    forceKillObs: forceKillObsNeverCall,
+    sleep,
+    log,
+  };
+}
+
 export function createObsBrowserDeps(cfg: ObsBrowserConfig) {
   const log = cfg.log ?? ((m: string) => console.log(`[bot] ${m}`));
   const obs = new OBSWebSocket();
@@ -79,29 +135,8 @@ export function createObsBrowserDeps(cfg: ObsBrowserConfig) {
 
   async function connectObs(): Promise<void> {
     if (connected) return;
-    try {
-      await obs.connect(cfg.obsUrl, cfg.obsPassword);
-      connected = true;
-      return;
-    } catch {
-      log("OBS not reachable — launching it");
-    }
-    spawn(cfg.obsExe, ["--minimize-to-tray", "--disable-shutdown-check", "--disable-updater"], {
-      cwd: path.dirname(cfg.obsExe),
-      detached: true,
-      stdio: "ignore",
-    }).unref();
-    for (let i = 0; i < 30; i++) {
-      await sleep(2000);
-      try {
-        await obs.connect(cfg.obsUrl, cfg.obsPassword);
-        connected = true;
-        return;
-      } catch {
-        /* still starting */
-      }
-    }
-    throw new Error(`OBS websocket never came up at ${cfg.obsUrl} (is Tools → WebSocket Server enabled?)`);
+    await ensureObsReady(createRealObsGuardProbes(cfg, obs, log));
+    connected = true;
   }
 
   async function upsertInput(inputName: string, inputKind: string, inputSettings: Record<string, unknown>) {
