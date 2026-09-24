@@ -1,0 +1,64 @@
+{
+  "unit": "brain-knowledge-graph",
+  "contract": "qa/contracts/brain-knowledge-graph.md",
+  "date": "2026-09-24",
+  "actor": "maker (smoke check only — NOT the validation; the checker runs its own visible-browser pass, qa/evidence/ui-epic-2026-09-24/checker-probes.md)",
+  "harness": "playwright MCP, headed Chromium",
+  "servers": {
+    "api": "http://127.0.0.1:3301 (fresh `pnpm -C apps/api dev` on this unit's code; the pre-existing :3300 instance is running STALE pre-unit code and was deliberately left alone)",
+    "web": "http://127.0.0.1:5176 (vite --strictPort, VITE_API_BASE_URL=http://127.0.0.1:3301)",
+    "mongo": "MONGODB_URL from .env (13.202.206.101), tenant toc, live data"
+  },
+  "pagesVisited": [
+    { "url": "/brain", "consoleErrors": 0, "note": "2 React Router v7 future-flag warnings + a dev-server favicon 404; no application error" },
+    { "url": "/brain?node=session:2026-09-24-zoho-next-european-study-destinations", "consoleErrors": 0 },
+    { "url": "/brain?kinds=person,country,session&q=hungary", "consoleErrors": 0 },
+    { "url": "/sessions/2026-09-24-zoho-next-european-study-destinations#turn-...-t002", "consoleErrors": 0 }
+  ],
+  "domProbe": {
+    "criterion": "C2",
+    "baselineBeforeUnit": { "shapes": 13, "svgTextLabels": 0 },
+    "measuredNow": { "nodeGroups": 207, "svgText": 207, "svgTitle": 207, "equal": true },
+    "renderedCounts": "showing 207 of 207 node(s) · 642 of 642 relationship(s) · 94 from graph_edges, 548 from tree_index"
+  },
+  "interactions": [
+    {
+      "did": "click the 2026-09-24 zoho session node",
+      "expected": "panel opens with kind, label, neighbours grouped by edge type",
+      "observed": "panel present; groups: session topic (6), session org (1), held on (1), captured (1), spoke in (3), covers (22), Evidence (44); 34 clickable neighbours; URL became ?node=session%3A2026-09-24-zoho-...",
+      "pass": true
+    },
+    {
+      "did": "read a derived relationship's confidence in the panel",
+      "expected": "confidence stated for sub-1 rows (C4)",
+      "observed": "panel text matches /confidence 0\.\d\d/; SVG shows 465 dashed (inferred) vs 177 solid lines",
+      "pass": true
+    },
+    {
+      "did": "click the first evidence link (spoke_in · turn ...-t002)",
+      "expected": "resolves to that exact turn in the transcript (C3)",
+      "observed": "navigated to /sessions/2026-09-24-zoho-next-european-study-destinations#turn-...-t002; anchor found among 80 turn anchors; turn text 'Devanshi-tion and build a more diversified Europe portfolio...'; highlighted background rgb(253,243,223)",
+      "pass": true
+    },
+    {
+      "did": "load /brain?kinds=person,country,session&q=hungary (filter state from the URL alone)",
+      "expected": "filters apply on load; rendered node count changes; count of active filters shown (C5)",
+      "observed": "5 nodes / 5 labels (The Next European Stu…, Devanshi, Anjum, Sagar, Hungary); '2 filter(s) active'; 'showing 5 of 207 node(s) · 7 of 642 relationship(s)'",
+      "pass": true
+    },
+    {
+      "did": "C6 freshness — look for the 2026-09-24 webinar on /brain",
+      "expected": "present, labelled, with its graph_edges",
+      "observed": "node session:2026-09-24-zoho-next-european-study-destinations, label 'The Next European Study Destinations to Watch: New Choices for Your Europe Portfolio', sources ['tree_index','graph_edges']",
+      "pass": true
+    }
+  ],
+  "notMeasuredInBrowser": [
+    "C7 staleness banner — live data currently has sessionsMissing = 0, so the banner correctly does not render. Covered by unit test 'a session that exists but is not in the graph is counted on screen'.",
+    "C8 empty state — needs a tenant key with no data; proven at the store layer (loadGraph('probe-tenant-xyz') -> null) and by unit test 'a 404 becomes an explanatory empty state'."
+  ],
+  "screenshots": [
+    "b01-graph-with-labels-and-panel.png",
+    "b02-filtered-view-url-state.png"
+  ]
+}

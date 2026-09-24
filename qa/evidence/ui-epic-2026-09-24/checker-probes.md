@@ -10,7 +10,7 @@ a UI unit: the instrument is written by the party that did not build the thing.
 |---|---|---|---|---|
 | 1 | C2 labels | DOM: count `svg circle,svg rect,svg g[class*=node]` vs `svg text,svg title` | labels > 0 AND labels == visible node count | shapes 13, labels **0** |
 | 2 | C1 union | `GET /graph` body contains a node whose id/label derives from `graph_edges` (person/country/date kinds) | ≥1 node of a kind not in {session,topic,org} | 164 nodes/526 edges, kinds only session/topic/org |
-| 3 | C6 freshness | `GET /graph` contains `2026-09-24-zoho-next-european-study-destinations` | present | **absent** |
+| 3 | C6 freshness | see the AMENDED C6 probe below — the original is now contaminated | node present AND sourced from graph_edges | **absent at baseline; tree_index has since been changed by another lane** |
 | 4 | C3 drill-down | click topic -> panel -> click a neighbour -> reach a session -> follow an `evidence[].turnId` link | final URL resolves to a real turn; every hop clickable | panel is one level, terminal |
 | 5 | C4 confidence | inspect a `covers`/`discussed` edge (confidence 0.7-0.8) vs `held_on` (1.0) | visually distinguishable; confidence readable | n/a (edges not rendered at all) |
 | 6 | C5 filters | apply kind filter + text search | rendered node count changes; URL carries filter state | no filter control exists |
@@ -31,6 +31,43 @@ a UI unit: the instrument is written by the party that did not build the thing.
 | 8 | C8 keyboard | tab to an event, open it | reachable and operable without a mouse |
 | 9 | I4 budget | `node scripts/lint-loc.mjs` + full `pnpm lint:structure` | green (ISS-285 was filed for running a subset) |
 | 10 | I5 no regression | list view | still reachable until the grid passes |
+
+
+## AMENDED C6 PROBE — 2026-09-24, after the original was contaminated
+
+**Why this changed.** The original [C6] probe was: *"`GET /graph` contains
+`2026-09-24-zoho-next-european-study-destinations`"*. Between writing that probe and running it, the
+peer session's `webinar-bot-live` cycle-2 build ran its indexing against the SAME shared `lkb`
+database (the worktree isolates code, not data), so `tree_index` for tenant `toc` **now mentions
+that session already**. Measured from the main tree: topics 15→158, orgs 6→8, chunks 1452→1517,
+`tree_index` mentions the session = true.
+
+**The probe as written would therefore pass on another unit's work.** `/graph` builds from
+`tree_index`; the session is now in `tree_index`; so U-BRAIN could satisfy its freshness criterion
+without ever building the `graph_edges` union that [C1] requires. That is a test passing for a
+reason unrelated to what it claims to prove — the exact vacuity class this repo has filed three
+times (ISS-179), and it would have flattered the unit I am judging.
+
+**Amended probe — it must discriminate on SOURCE, not presence:**
+
+1. `GET /graph` must return at least one node whose `kind` is one that `flatten-graph.ts` cannot
+   emit. That file produces `session | topic | org` only (`flatten-graph.ts:28`). A node of kind
+   `person`, `country` or `date` can therefore have come **only** from `graph_edges`.
+2. At least one returned edge must carry a `type` from the `graph_edges` vocabulary —
+   `spoke_in`, `covers`, `discussed`, `held_on` — none of which exist in `flatten-graph.ts`'s
+   `session-topic | session-org | topic-cooccurrence` set.
+3. At least one edge must expose `evidence[].turnId` resolving to a real turn, which `tree_index`
+   carries no equivalent of.
+4. Only then does the session's presence count toward [C6].
+
+**Negative control, required:** run the same probe against the PRE-UNIT build. It must FAIL on
+rows 1-3 — if it passes before the unit exists, the probe proves nothing and must be rewritten
+again.
+
+**Standing note for both remaining UI units:** any "before" figure quoted from the shared database
+after 2026-09-24 ~23:40 is post-indexing, not a true baseline. Baselines recorded earlier in this
+file (13 node shapes / 0 labels; /graph 164 nodes, 526 edges, kinds session|topic|org only) were
+measured BEFORE that write and remain valid as the pre-state for [C1] and [C2].
 
 ## Cross-tenant probe set (re-run verbatim for both units; I1)
 
