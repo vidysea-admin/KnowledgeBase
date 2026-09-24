@@ -15,7 +15,7 @@ import { OBSWebSocket } from "obs-websocket-js";
 import { createBrowserJoiner } from "../joiners/browser-joiner.js";
 import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
-import { removeControllerState, writeControllerState } from "./controller-state.js";
+import { getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
 import { createObsBrowserDeps } from "./obs-windows.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -120,6 +120,10 @@ export async function runRecord(rest: string[]): Promise<void> {
     until: until.toISOString(),
     obsOutputDir: RECORD_DIR,
     startedAt: new Date(startedAt).toISOString(),
+    // ISS-T-047-CONTROLLER-002: identity marker beyond the bare pid, so a later watchdog tick can
+    // tell this exact process apart from whatever the OS recycles onto this pid after it dies.
+    // undefined (probe failure) is fine — isControllerAlive falls back to pid-only trust.
+    controllerStartedAt: getProcessStartTime(process.pid),
   });
 
   try {

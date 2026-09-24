@@ -10,6 +10,9 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 import {
+  controllerMatchesIdentity,
+  getProcessStartTime,
+  isControllerAlive,
   isPidAlive,
   readControllerState,
   removeControllerState,
@@ -48,6 +51,17 @@ test("write then read round-trips the same state", () => {
   const dir = tmpDir();
   try {
     const state = sample();
+    writeControllerState(dir, state);
+    assert.deepEqual(readControllerState(dir), state);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("write then read round-trips controllerStartedAt (ISS-T-047-CONTROLLER-002's identity marker)", () => {
+  const dir = tmpDir();
+  try {
+    const state = sample({ controllerStartedAt: "2026-09-24T10:00:00.000000+05:30" });
     writeControllerState(dir, state);
     assert.deepEqual(readControllerState(dir), state);
   } finally {
@@ -104,4 +118,69 @@ test("isPidAlive is false for a pid that cannot correspond to a live process", (
   // Avoid -1 (POSIX process-group broadcast semantics) or 0 (own process group) — pick a
   // concrete large pid instead, which is what a real dead-controller pid looks like.
   assert.equal(isPidAlive(999_999_999), false);
+});
+
+// --- ISS-T-047-CONTROLLER-002: identity beyond bare pid (pid-reuse defense) -----------------
+
+test("getProcessStartTime returns a parseable timestamp for this process's own (real, live) pid", () => {
+  const t = getProcessStartTime(process.pid);
+  assert.equal(typeof t, "string");
+  assert.ok(!Number.isNaN(new Date(t as string).getTime()), `expected a parseable timestamp, got ${t}`);
+});
+
+test("getProcessStartTime returns undefined (never throws) for a pid that cannot correspond to a live process", () => {
+  assert.equal(getProcessStartTime(999_999_999), undefined);
+});
+
+test("controllerMatchesIdentity: no identity was ever recorded (older state file) → trusts pid-alive, back-compat", () => {
+  assert.equal(controllerMatchesIdentity(undefined, "2026-09-24T10:00:00.000000+05:30"), true);
+});
+
+test("controllerMatchesIdentity: recorded identity but the live probe couldn't determine the actual one → " +
+  "doesn't newly distrust a pid-alive process (a probe failure must never manufacture a false mismatch)", () => {
+  assert.equal(controllerMatchesIdentity("2026-09-24T10:00:00.000000+05:30", undefined), true);
+});
+
+test("controllerMatchesIdentity: matching start time → same process, alive", () => {
+  const t = "2026-09-24T10:00:00.000000+05:30";
+  assert.equal(controllerMatchesIdentity(t, t), true);
+});
+
+test("ISS-T-047-CONTROLLER-002: controllerMatchesIdentity — mismatched start time (the OS recycled the pid " +
+  "onto an unrelated process after the original controller died) → NOT the same controller", () => {
+  assert.equal(
+    controllerMatchesIdentity("2026-09-24T10:00:00.000000+05:30", "2026-09-24T16:45:00.000000+05:30"),
+    false,
+  );
+});
+
+test("isControllerAlive — pid alive, no controllerStartedAt recorded (older/undefined) → alive (back-compat, " +
+  "and short-circuits before ever probing getProcessStartTime — see controller-state.ts)", () => {
+  const state = sample({ pid: process.pid, controllerStartedAt: undefined });
+  assert.equal(isControllerAlive(state), true);
+});
+
+test("isControllerAlive — pid not alive at all → dead regardless of identity", () => {
+  const state = sample({ pid: 999_999_999, controllerStartedAt: "2026-09-24T10:00:00.000000+05:30" });
+  assert.equal(isControllerAlive(state), false);
+});
+
+test("ISS-T-047-CONTROLLER-002: isControllerAlive — pid-reuse case via INJECTED probes: pid reports alive " +
+  "(the OS recycled it onto an unrelated process) but the recorded identity does not match the actual " +
+  "one → reports dead, not alive", () => {
+  const state = sample({ pid: 4242, controllerStartedAt: "2026-09-24T10:00:00.000000+05:30" });
+  const alive = isControllerAlive(state, {
+    pidAlive: () => true,
+    processStartTime: () => "2026-09-24T16:45:00.000000+05:30", // different process now holds this pid
+  });
+  assert.equal(alive, false);
+});
+
+test("isControllerAlive — pid alive, identity matches (injected probes) → alive, the same controller", () => {
+  const state = sample({ pid: 4242, controllerStartedAt: "2026-09-24T10:00:00.000000+05:30" });
+  const alive = isControllerAlive(state, {
+    pidAlive: () => true,
+    processStartTime: () => "2026-09-24T10:00:00.000000+05:30",
+  });
+  assert.equal(alive, true);
 });

@@ -7,6 +7,7 @@
  * the controller died mid-run without a chance to clean up — exactly the 2026-09-24 16:30:56
  * failure (console closed, Ctrl+C exit 0xC000013A) that T-047 closes.
  */
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
@@ -21,6 +22,15 @@ export interface RecordState {
   obsOutputDir: string;
   /** ISO timestamp of when this state file was written. */
   startedAt: string;
+  /**
+   * ISS-T-047-CONTROLLER-002: the controlling process's OS start time (from `getProcessStartTime`
+   * at write time), recorded so a later watchdog tick can tell "the pid that wrote this state is
+   * still alive" apart from "some unrelated process the OS later recycled onto the same pid is
+   * alive." Optional/undefined for state files written before this field existed, or when the
+   * platform probe fails at write time — both fall back to the old pid-only trust rather than
+   * treating the controller as dead on missing data.
+   */
+  controllerStartedAt?: string;
 }
 
 export function stateFilePath(recordDir: string): string {
@@ -60,4 +70,63 @@ export function isPidAlive(pid: number): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * ISS-T-047-CONTROLLER-002: the OS process-creation timestamp for `pid`, as an identity marker
+ * beyond the bare pid number (which the OS is free to recycle onto an unrelated process once the
+ * original controller has died). Windows-only (`Get-Process`), matching the rest of this package
+ * (OBS_EXE, the `chrome.exe` cleanup in record-commands.ts are already Windows-specific). Returns
+ * undefined — never throws — on any failure (no such process, powershell unavailable, parse
+ * failure): callers must treat "can't determine" as "can't confirm a mismatch," not as proof of
+ * one, the same conservative direction as ISS-T-047-CONTROLLER-001's OBS-unknown fix.
+ */
+export function getProcessStartTime(pid: number): string | undefined {
+  try {
+    const out = execFileSync(
+      "powershell",
+      ["-NoProfile", "-Command", `(Get-Process -Id ${pid} -ErrorAction Stop).StartTime.ToString("o")`],
+      { encoding: "utf8" },
+    ).trim();
+    return out || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Pure comparison: does the identity recorded in `RecordState.controllerStartedAt` match the
+ * pid's actual current OS start time? `undefined` on either side means "can't confirm a
+ * mismatch" and is trusted (back-compat with state files written before this field existed, and
+ * with a failed `getProcessStartTime` probe) — a probe failure must never make a live controller
+ * look dead, only a real mismatch may. Separated from `isPidAlive`/`getProcessStartTime` so the
+ * decision itself is testable without spawning real processes.
+ */
+export function controllerMatchesIdentity(expectedStartedAt: string | undefined, actualStartedAt: string | undefined): boolean {
+  if (!expectedStartedAt || !actualStartedAt) return true;
+  return expectedStartedAt === actualStartedAt;
+}
+
+/**
+ * Combined liveness check the watchdog uses: alive by pid AND (if both sides recorded an
+ * identity) that identity still matches, so a pid the OS recycled onto an unrelated process after
+ * the original controller died is correctly reported as dead rather than masking the exact
+ * scenario T-047 exists to catch.
+ *
+ * `probes` defaults to the real OS checks (`isPidAlive`, `getProcessStartTime`) but is
+ * injectable so a test can exercise this exact function's pid-reuse branch deterministically,
+ * without spawning a real process to simulate a mismatch.
+ */
+export function isControllerAlive(
+  state: RecordState,
+  probes: { pidAlive?: (pid: number) => boolean; processStartTime?: (pid: number) => string | undefined } = {},
+): boolean {
+  const pidAlive = probes.pidAlive ?? isPidAlive;
+  const processStartTime = probes.processStartTime ?? getProcessStartTime;
+  if (!pidAlive(state.pid)) return false;
+  // No identity was recorded (state file predates this field, or the write-time probe failed) —
+  // nothing to compare against, so don't pay for a getProcessStartTime probe on every tick just
+  // to immediately discard it; fall back to the pid-alive result, same as before this fix.
+  if (!state.controllerStartedAt) return true;
+  return controllerMatchesIdentity(state.controllerStartedAt, processStartTime(state.pid));
 }
