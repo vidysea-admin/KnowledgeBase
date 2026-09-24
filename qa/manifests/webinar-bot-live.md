@@ -26,7 +26,70 @@
 
 The fields match the TOC dirs. `session.json` has `_id, tenantId, sourceId, title, date, org, status`. `session_page.json` has `_id, tenantId, sessionId, summary, keyInsights, evidence[]`. `claims.json` is `[]`, because nobody hand-wrote claims for this session. `seed-toc.mjs` also reads `claims.json` unconditionally. Nothing in these files goes beyond what those three inputs state.
 
-Once the files existed, `packages/index/src/tree/tree-real-data.test.ts` failed on its hard-coded count (`actual: 24, expected: 23`), because the directory now legitimately holds 24 sessions. The count is now derived from the directory listing, with 23 as a floor: `dirCount >= 23`, `sessions.length === dirCount`, `pages.length === dirCount`, and session leaves `=== dirCount`. The test name and its other two assertions are unchanged.
+Once the files existed, `packages/index/src/tree/tree-real-data.test.ts` failed on its hard-coded count (`actual: 24, expected: 23`), because the directory now legitimately holds 24 sessions. The count is now derived from the directory listing, with 23 as a floor: `dirCount >= 23`, and session leaves `=== dirCount`. The test name and its other two assertions were touched again in the cycle-2 amendment below (a peer-checker finding on this same edit, still cycle 2 — no verdict for cycle 2 existed yet when it was raised).
+
+**Known limitation, disclosed not fixed:** the `dirCount >= 23` floor only guards against *mass*
+deletion — it detects zero dirs, or fewer than 23, but a regression that dropped some sessions
+while staying at or above 23 (e.g. 28 real dirs quietly becoming 23) would pass this floor
+silently. The floor is a sanity check on catastrophic loss, not a count-accuracy assertion; no
+exact expected count exists because the directory legitimately grows over time (ISS-294 is itself
+an instance of that growth). Not fixed this cycle — tracked as the same debt class as T-033.
+
+### Cycle-2 amendment: `sessions.length`/`pages.length` assertions were vacuous by construction
+
+A peer checker's finding on this same file, raised before any cycle-2 verdict existed (so this is
+still fix cycle 2, not cycle 3): `assert.equal(sessions.length, dirCount, ...)` and
+`assert.equal(pages.length, dirCount, ...)` could never fail on their own. `loadRealData()`
+(`tree-real-data.test.ts:26-42` pre-amendment) iterated the same `readdirSync` with the same
+`isDirectory` predicate the test uses for `dirCount`, and did an **unguarded** `readFileSync` per
+dir — so `sessions.length`/`pages.length` always equaled `dirCount` whenever `loadRealData()`
+returned at all, and a directory missing either file made it throw `ENOENT` *before* either
+assertion ran, crashing the whole test with an unhandled exception rather than a named,
+directory-identifying assertion failure.
+
+**Fix.** `loadRealData()` now wraps the per-dir reads in `try/catch`, collects failures into a
+`missing: string[]` (`"<dirName>: <err.code ?? err.message>"`) instead of letting them throw, and
+returns `{ sessions, pages, missing }`. The two vacuous length assertions are replaced with
+`assert.deepEqual(missing, [], ...)`, which names every directory missing either file in the
+failure message. `allSessionLevelNodes.length === dirCount` and the `dirCount >= 23` floor are
+unchanged. `loadRealData` has exactly one caller (grepped: only this test file), so no other
+call site needed updating. The test's title was stale (still said "23 session leaves" after the
+directory-derived-count change earlier in this same cycle); renamed to "real data: every migrated
+session dir has session.json + session_page.json, cross-session topic, schema-valid shape".
+
+**Proof (D-020: byte backup + trap on EXIT/INT/TERM/ERR + `timeout` + `cmp`; a throwaway copy of
+the whole monorepo was impractical — pnpm workspace deps/node_modules make an isolated copy far
+more expensive than an in-place byte-backup on one tracked, clean-status data file; instead the
+mechanics were followed exactly in-place, matching row 13's `session-rows.test.mjs` precedent).**
+Session dir `2026-05-08-funding-dreams-loans-forex` had a clean git status. `session.json` was
+copied to a scratch backup, then deleted, with a `trap` set to restore it on `EXIT INT TERM ERR`
+before the mutation:
+
+FIXED code, mutant applied — the named assertion fails, naming the directory:
+```
+ℹ pass 214
+ℹ fail 1
+✖ failing tests:
+  AssertionError [ERR_ASSERTION]: every migrated session dir must have session.json + session_page.json; missing: 2026-05-08-funding-dreams-loans-forex: ENOENT
+```
+Restored, `cmp` confirmed byte-identical, re-run green: `215/215`.
+
+Then, to prove the OLD vacuous assertions would NOT have been the thing that failed: the fix was
+stashed (`git stash push -- packages/index/src/tree/tree-real-data.test.ts`) to restore the
+pre-amendment code, the same file was deleted again under the same backup+trap+cmp discipline, and
+the pre-fix code was run:
+```
+ℹ pass 214
+ℹ fail 1
+✖ failing tests:
+  Error: ENOENT: no such file or directory, open '...\2026-05-08-funding-dreams-loans-forex\session.json'
+    code: 'ENOENT'
+```
+This is an **unhandled exception from `readFileSync` inside `loadRealData()`**, thrown before
+`sessions.length`/`pages.length` are ever compared — confirming those two assertions could never
+have been the line that failed; the test crashes on the read, not on the count check. Restored
+(`cmp` byte-identical), then `git stash pop` reapplied the fix, and the full suite was re-run green
+(`215/215`) before continuing.
 
 > **[B] sev: high**: "the session is written but never indexed — chunks 0, session_pages 0, claims 0, tree_index does not mention it — so /ask cannot answer from it while /search finds 20 turns - fix direction: have the sync (or a documented follow-up step) refresh tree_index/chunks/session_pages, or flip status.index to a tracked task the manifest names" → **ISS-296**
 
@@ -71,6 +134,25 @@ The 23 TOC sessions came in differently. Their `session_pages` and `claims` came
 
 A throw in step 1 deletes nothing. Every row is either its old or its new version, and a re-run converges.
 
+**Stated plainly: this swap is NOT atomic.** `coll(tenantId)` is a standalone Mongo connection
+(`hello` above: `setName: null`), so there is no session/transaction wrapping the upsert loop and
+the `deleteMany`. **The crash window is between "every upsert has succeeded" and "the stale-row
+delete completes."** A process death inside that window leaves the OLD generation's rows (not yet
+deleted) coexisting with the NEW generation's rows (already upserted) — i.e. for any row whose
+deterministic id is unchanged between generations, the upsert simply overwrote it in place, so
+there is nothing to duplicate; but for a row whose content maps to a **different** deterministic id
+in the new generation than in the old (e.g. a turn's position/speaker changed enough to reindex its
+`-tNNN` suffix, or an edge's participant set changed), the old-id row is still present and the
+new-id row now also exists — that is the duplicate. What a crash in this window **never** produces
+is a partially-deleted session: nothing is removed until every upsert of the new generation has
+already landed, so the session is always at-least-fully-present, never half-gone.
+
+**How a re-run heals it.** The next `sync-session.mjs` run for the same session re-upserts the
+(now-current) new generation under a fresh `syncGen`, then deletes everything NOT carrying that
+fresh gen — which now includes the previous run's orphaned old-generation rows as well as the
+half-applied new-generation rows from the crashed run. So the duplicate window is closed by the
+next successful run, not by this one; it is not self-healing mid-run, only healed across runs.
+
 The ids are deterministic (`<sid>-tNNN`, `toc-edge:…`), so "insert the new generation, then delete the old" becomes "upsert, then delete stale". Giving the new generation separate ids would change every turn id that edges, pages and claims cite.
 
 Tenant scoping is still applied by the accessor. The helper receives `coll(tenantId)`, never a raw handle.
@@ -87,7 +169,7 @@ Tenant scoping is still applied by the accessor. The helper receives `coll(tenan
   - a re-sync keeps `status.index` at `done`;
   - header doc updated.
 - `apps/api/src/production.ts`: `buildIndexer` extracted and exported. Behaviour is unchanged; `buildProductionDeps` uses it.
-- `packages/index/src/tree/tree-real-data.test.ts`: the session count comes from the directory listing, with 23 as the floor.
+- `packages/index/src/tree/tree-real-data.test.ts`: the session count comes from the directory listing, with 23 as the floor. **Cycle-2 amendment (same cycle, before any cycle-2 verdict):** `loadRealData()` no longer lets a missing `session.json`/`session_page.json` throw unhandled `ENOENT`; it collects `missing: string[]` and the test asserts `missing` is empty by name, replacing two assertions (`sessions.length === dirCount`, `pages.length === dirCount`) that were vacuous by construction. Test title renamed. See "Cycle-2 amendment" above and coverage row 20.
 - `apps/web/src/pages/MeetingBotPage.tsx` and `.test.tsx`: ISS-297.
 - `data/toc-migrated/2026-09-24-zoho-next-european-study-destinations/{session,session_page,claims}.json` (**new**, generated by `--emit-files`).
 - `package.json`: `test:lint` gains `scripts/webinar/session-rows.test.mjs`.
@@ -111,6 +193,53 @@ Tenant scoping is still applied by the accessor. The helper receives `coll(tenan
 | ISS-294 files | `pnpm --filter @lkb/index test` with and without the files | before: 214/215, ENOENT → after: 215/215 (row 14) |
 | ISS-296 indexed | live `--index` run + read-only read-back | chunks 65, session_pages 1, claims 66, tree_index mentions the session |
 | ISS-297 page | vitest + a browser smoke run | 3/3; report.json `pass: true` |
+| Cycle-2 amendment (vacuous-assertion fix) | `pnpm --filter @lkb/index test` + mutation proof (row 20) | GREEN 215/215; mutation proof COVERED (row 20) |
+
+### Re-run after the cycle-2 amendment
+
+Re-run in full, after the amendment landed on top of the rest of cycle 2:
+
+```
+$ pnpm -r test        → exit 0. Two of three back-to-back runs were clean; a third run hit an
+                         UNRELATED pre-existing flake: apps/web's AskPage.test.tsx "renders the
+                         API error message rather than a generic failure" timed out at 5000ms
+                         (vitest testTimeout) under this run's own measured load — its own
+                         "Duration" line reported setup 44.68s / collect 414.02s for a suite that
+                         normally completes in seconds, consistent with concurrent lane activity on
+                         this shared machine, the same class already disclosed in cycle 1 for the
+                         docs/PROGRESS.md flake. This unit touched neither AskPage.tsx nor its test
+                         this cycle. The pasted result below is from a clean run.
+packages/core test: ℹ tests 7 / ℹ pass 7 / ℹ fail 0
+apps/web test:  Test Files  13 passed (13)
+apps/web test:       Tests  56 passed (56)
+packages/db test: ℹ tests 14 / ℹ pass 14 / ℹ fail 0
+packages/ai test: ℹ tests 74 / ℹ pass 74 / ℹ fail 0
+packages/index test: ℹ tests 215 / ℹ pass 215 / ℹ fail 0
+packages/ask test: ℹ tests 50 / ℹ pass 50 / ℹ fail 0
+packages/ingest test: ℹ tests 97 / ℹ pass 97 / ℹ fail 0
+packages/meeting-bot test: ℹ tests 43 / ℹ pass 43 / ℹ fail 0
+apps/api test: ℹ tests 173 / ℹ pass 173 / ℹ fail 0
+
+$ pnpm -r typecheck    → first attempt crashed OOM ("FATAL ERROR: ... JavaScript heap out of
+                          memory") in packages/index and packages/ingest's tsc processes under the
+                          same concurrent-load condition — not a type error, a memory crash, and not
+                          caused by this unit's own (unchanged) types. Re-run clean: exit 0, all 10
+                          projects report "Done" (apps/web, packages/core, packages/ai, packages/db,
+                          packages/ask, packages/index, packages/ingest, packages/meeting-bot,
+                          apps/api — 10 of 11 workspace projects, matching every prior cycle).
+
+$ pnpm lint:structure   → same pre-existing lint-root FAIL (ISS-248, 16 loose root files against a
+                          15 budget — the identical 16 filenames as cycle 2's first evidence pass,
+                          unchanged by this amendment). Chain short-circuits there, so every later
+                          stage was re-run individually, all OK:
+lint-dupes: OK (320 unique export(s), 24 unique schema $id(s))
+lint-migrations: OK (1102 file(s) scanned)          # was 1094 at the prior evidence pass — normal
+                                                       drift from concurrent lanes, not this unit
+snapshot.mjs --check: OK (117 lines, budget 200)
+lint.test.mjs: ℹ tests 14 / ℹ pass 14 / ℹ fail 0
+tracker-audit --gate g1,g4: OK (gate G1,G4)
+depcruise: ✔ no dependency violations found (311 modules, 961 dependencies cruised)
+```
 
 **`pnpm -r test`**: the FULL run, not filtered. It exited 0. The complete 835-line output is in `qa/evidence/webinar-bot-live-c2-2026-09-24/pnpm-r-test.txt`. Every per-package summary line, verbatim:
 ```
@@ -225,6 +354,48 @@ After the re-sync:
 
 **Where the data went.** `--index` sent this session's 80 turns to the routed `summarize`, `claims` and `embedding` chains, which try Gemini first per `config/ai-routing.yaml`. Gemini also transcribed this session. This is tenant-toc webinar content, not V3.3, Pathlynks or student data.
 
+### Shared-data disclosure (orchestrator addendum, cycle 2)
+
+1. **These writes are live and already happened, on the shared Mongo `lkb`, tenant `toc`.** The
+   `--index` run and the sync above ran against the real shared database, before any cycle-2
+   verdict exists. They do not roll back with the git branch — a rejected verdict on this manifest
+   would not undo them; only a further, separate write would. The peer checker's read-back from the
+   main tree (not this lane) measured the resulting state: **topics 15→158, orgs 6→8, chunks
+   1452→1517** (as given to me — this lane's own earlier read-back reported chunks at 0→65 for
+   *this session's own* chunk count, a different number from the collection-wide total the checker
+   is reporting here), **`tree_index(toc)` now mentions the session.**
+2. **The topics jump (+143) is a side effect of `indexSession` running on this one session, not a
+   miscount.** Traced through the code: `promoteAndPersistEntities(tenantId, sessionId, rootDoc,
+   db, ...)` (`apps/api/src/indexing/session.ts:262`) is called with `rootDoc` — the FULL tenant
+   tree root, not a per-session slice. `regenerate()` (`packages/index/src/tree/regenerate.ts:81-84`)
+   rebuilds only the touched year's subtree but returns it merged with every untouched year's
+   subtree unchanged, so the object `promoteAndPersistEntities` receives still spans the WHOLE
+   tenant's sessions. Inside, `promoteTreeEntities(root)` (`promote-entities.ts:62`) walks that
+   whole tree and `updateOne(..., { upsert: true })`s every topic/org node it finds
+   (`promote-entities.ts:64-77`) — there is no per-session filter on what gets promoted. This is
+   **the first time `indexSession` has ever run for tenant `toc`**: this manifest's own cycle-2
+   text above states the 23 TOC sessions were seeded via `seed-toc.mjs`/`backfill.mjs`, which never
+   call `indexSession` or `promoteAndPersistEntities`. So this one session's index run was also the
+   first-ever topic/org promotion sweep across the entire pre-existing 23-session corpus, not just
+   this session's own ~15 topics (the dry-run's per-session breakdown) — that is consistent with a
+   jump far larger than one session's own topic count. `orgs 6→8` fits the same mechanism at a
+   smaller scale (most org names already existed; 2 were new). This is upsert-only, per the
+   module's own header comment ("UPSERT, NEVER DELETE-THEN-INSERT"), so it is additive, not
+   destructive — but it means "index one session" has a whole-tenant side effect on `topics`/`orgs`
+   the first time it runs for a tenant, which is not obvious from the CLI's own output (it only
+   prints this session's own topic count, 15, in both dry-run and live-run text above). Not fixed
+   this cycle; disclosed.
+3. **Known gap: recording-notice boilerplate became a claim.** `{"text":"This webinar is being
+   recorded.","status":"needs-review"}` was extracted as a claim. Boilerplate is not filtered
+   before claim extraction runs; `status: "needs-review"` (the same default every freshly
+   extracted claim gets, per `session.ts:220-223`) limits the harm — nothing downstream treats it
+   as verified — but it is still a real row occupying the claims collection for no informational
+   value. Disclosed, not fixed here.
+4. **No pre-state can be re-measured now.** The writes above already happened against the shared
+   database; the "before" counts this manifest cites for the collection-wide totals came from the
+   peer checker's own prior read, not a fresh baseline this session can reproduce, because running
+   the read again would only return the current (post-write) state.
+
 ## Capability coverage (cycle 2 rows; rows 1–12 below stand unchanged)
 
 Mutation runs follow D-020: a byte backup to scratch, a `trap` restore on EXIT/INT/TERM/ERR, `timeout` around the test command, and a `cmp` after the restore.
@@ -238,6 +409,7 @@ Mutation runs follow D-020: a byte backup to scratch, a `trap` restore on EXIT/I
 | 17 | ISS-296: `--index` indexes through the production `indexSession` binding | the live run + read-back above | `UNVERIFIED by automated test.` Verified once, live: chunks 0→65, session_pages 0→1, claims 0→66, tree_index mentions 0→1, status.index → done. `indexSession` has its own pre-existing suite (`apps/api/src/indexing/session.test.ts`, green inside `apps/api` 173/173). The script-level wiring has no unit test; the debt is tracked as **T-033**. |
 | 18 | The `buildIndexer` extraction leaves the server's ingest binding unchanged | `pnpm -r typecheck` + `apps/api` 173/173 | `UNVERIFIED by falsification.` It type-checks and the api suite is green, but `production.ts` is "never imported by tests" (its own header), so no test pins it. Debt: **T-033**. |
 | 19 | `--dry-run` (including with `--index` and `--emit-files`) makes no Mongo connection and writes no file | the dry-run above, against an unroutable host | Observed live: the same counts, "would write", exit 0 in 2.3 s against TEST-NET-1. The data files appeared only after the live run. This is one observation, not a repeatable test. Debt: **T-033**. |
+| 20 | Cycle-2 amendment: a session dir missing `session.json`/`session_page.json` fails with a named, directory-identifying assertion, not an unhandled ENOENT crash | `pnpm --filter @lkb/index test`, mutant = delete one session dir's `session.json` (D-020: backup+trap+timeout+cmp) | **COVERED.** Fixed code, mutant applied: `ℹ pass 214 / ℹ fail 1`, `AssertionError: every migrated session dir must have session.json + session_page.json; missing: 2026-05-08-funding-dreams-loans-forex: ENOENT`. Restored, `cmp` OK, re-run 215/215. Pre-fix code (stashed), same mutant: `ℹ pass 214 / ℹ fail 1`, `Error: ENOENT: no such file or directory, open '...session.json'` — an unhandled exception from `readFileSync`, not the length assertions, confirming they were vacuous. Restored, `cmp` OK, fix reapplied (`git stash pop`), re-run 215/215. |
 
 ## Live browser evidence (cycle 2)
 `qa/evidence/browser-webinar-bot-live-c2-2026-09-24/report.json` records a real browser run: headless Chromium via playwright-core, against the lane's `apps/web` vite dev server at `127.0.0.1:5291`. No API server was running. The shared Playwright MCP browser was in use by another session, which is why playwright-core was used. The smoke script (`smoke.mjs`) and a screenshot (`meeting-bot.png`) are saved next to the report.
