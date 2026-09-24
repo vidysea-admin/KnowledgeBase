@@ -18,6 +18,7 @@ import { selectJoinStrategy } from "../strategy.js";
 import { getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
 import { createObsBrowserDeps } from "./obs-windows.js";
 import { collectGapEvent, gapsForSourceDoc, type GapWindow } from "./reconnect-gaps.js";
+import { createTelegramNotifier, readTurnCount, type TelegramNotifier } from "./telegram-alerts.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
@@ -90,6 +91,9 @@ export async function runRecord(rest: string[]): Promise<void> {
 
   let endedAt: number | undefined;
   const gaps: GapWindow[] = []; // T-029: filled from "gap" events on sb_join.py's stdout stream
+  // T-030: reads TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID from the .env already loaded above; disabled
+  // (one log line, never throws) when either is missing.
+  const telegram = createTelegramNotifier();
   const bot = createObsBrowserDeps({
     obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455",
     obsPassword,
@@ -102,12 +106,14 @@ export async function runRecord(rest: string[]): Promise<void> {
     onEvent: (_h, ev) => {
       if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
       collectGapEvent(gaps, ev);
+      telegram.onBotEvent(ev); // T-030: disconnected (reconnect-reload) / recovered (closed gap)
     },
   });
   const joiner = createBrowserJoiner(bot.deps);
 
   const startedAt = Date.now();
   const { sessionHandle } = await joiner.join(url, { tenantId: "vidysea", consentNote: title });
+  telegram.notifyJoined(title, platform); // T-030
   let gone = false;
   void bot.browserExited(sessionHandle)?.then(() => (gone = true));
 
@@ -163,7 +169,8 @@ export async function runRecord(rest: string[]): Promise<void> {
       video = newest;
     }
     if (!video || !existsSync(video)) throw new Error(`no recording file produced (${video ?? "none"})`);
-    await finalizeRecording(video, sessionId, title, platform, rest.includes("--transcribe"), gaps);
+    await finalizeRecording(video, sessionId, title, platform, rest.includes("--transcribe"), gaps,
+      telegram, (Date.now() - startedAt) / 1000);
   } finally {
     removeControllerState(RECORD_DIR);
   }
@@ -171,9 +178,13 @@ export async function runRecord(rest: string[]): Promise<void> {
 
 /** Recording file → m4a → silence gate → source.json → (optional) transcript. Shared by `record`
  * and `finalize` (the recovery path when the controlling process died mid-run). */
-async function finalizeRecording(
+export async function finalizeRecording(
   video: string, sessionId: string, title: string, platform: string, transcribe: boolean,
   gaps: GapWindow[] = [], // T-029: [] on the `finalize` recovery path — no live event stream to draw from there
+  // T-030: defaults to a fresh notifier when called from the `finalize` recovery path (runFinalize
+  // never builds its own — record-commands.ts loads TELEGRAM_* from .env before either call).
+  telegram: TelegramNotifier = createTelegramNotifier(),
+  durationSec?: number, // T-030: unknown (0) on the `finalize` recovery path — no live startedAt there
 ): Promise<void> {
   const audio = path.join(RECORD_DIR, `${sessionId}.m4a`);
   execFileSync("ffmpeg", ["-y", "-hide_banner", "-loglevel", "error", "-i", video, "-vn", "-ac", "1",
@@ -218,10 +229,17 @@ async function finalizeRecording(
   if (silent) {
     throw new Error(`recording is silent (max ${maxDb} dB) — not transcribing; the capture did not hear the bot window`);
   }
+  const turnsPath = path.join(dataDir, "turns.json");
   if (transcribe) {
     execFileSync("node", [path.join(REPO_ROOT, "scripts", "transcribe-long-session.mjs"), sessionId],
       { cwd: REPO_ROOT, stdio: "inherit" });
   }
+  // T-030: finished + transcript-ready summary — no LLM call, turnCount is turns.json's own length.
+  telegram.notifyFinished({
+    title, sessionId, durationSec: durationSec ?? 0, gapCount: gaps.length,
+    transcriptPath: transcribe ? toPosix(path.relative(REPO_ROOT, turnsPath)) : undefined,
+    turnCount: transcribe ? readTurnCount(turnsPath) : undefined,
+  });
 }
 
 /**
