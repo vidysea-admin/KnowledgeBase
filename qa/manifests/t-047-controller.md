@@ -7,7 +7,7 @@ only — its own Non-goals section explicitly excludes T-047 from that contract'
 unit, unrelated to whether T-047 itself is done). TASKS.md row T-047.
 **Goal task:** T-047
 **Date:** 2026-09-24
-**Fix cycle:** 0 of max 3
+**Fix cycle:** 1 of max 3
 **Dual check:** no — not auth/tenancy/data-write class; reliability/process-lifecycle feature
 **Issues addressed:** none
 **Executor:** claude-sonnet-subagent
@@ -107,5 +107,133 @@ tracker-audit: OK (gate G1,G4)
 Not UI-touching — no browser/web surface changed. This unit touches only
 `packages/meeting-bot/src/capture/*.ts`, `packages/meeting-bot/src/cli.ts`, and a new PowerShell
 launcher script; nothing renders in a browser.
+
+## Cycle 1 changes
+
+**Commit:** `b303a5f` (parent `1e1a84e`) — `git diff 1e1a84e..b303a5f --stat`: 5 files, all inside
+`packages/meeting-bot/src/capture/` (`watchdog.ts`, `watchdog.test.ts`, `controller-state.ts`,
+`controller-state.test.ts`, `record-commands.ts`). No file outside this list touched.
+
+Fixes **ISS-T-047-CONTROLLER-001** (high) and **ISS-T-047-CONTROLLER-002** (medium) from
+`qa/verdicts/t-047-controller.md` cycle 0 (FAIL) / `qa/issues.t-047-controller.jsonl`.
+
+### ISS-T-047-CONTROLLER-001 (high) — tri-state OBS probe
+
+`isObsRecording` (watchdog.ts:96-106 at cycle 0) collapsed an OBS websocket connect/call failure
+into "not recording", identical to a confirmed-idle result. With a dead controller, that made
+`decideWatchdogAction` return `stale-cleanup` → `tickWatchdog` called `clearState()` with no
+finalize, destroying the one artifact recovery depends on, on a merely transient OBS hiccup.
+
+- `watchdog.ts`: new exported `ObsStatus = "recording" | "idle" | "unknown"`. `decideWatchdogAction`
+  takes `obsStatus: ObsStatus` (was `obsRecording: boolean`) and returns a new `noop-unknown` action
+  for `obsStatus === "unknown"` — **never** `stale-cleanup`, **never** `finalize`. `tickWatchdog`'s
+  switch adds a `noop-unknown` case: logs a warning (no probe error content — the catch never had
+  reason to touch `OBS_WS_PASSWORD` and now doesn't touch the error object either), does not call
+  `clearState` or `finalize`. `WatchdogProbes.getObsStatus` replaces `isObsRecording`, returning
+  `Promise<ObsStatus>`.
+- New exported `ObsStatusClient` interface + `createGetObsStatus(obsUrl, obsPassword, makeClient?)`
+  builds the real probe with an **injectable OBS client factory** (defaults to real `OBSWebSocket`),
+  so a test can exercise the exact production error path (`connect()` throws → `"unknown"`) via a
+  fake client instead of a hand-rewritten stand-in. `runWatchdog` now calls
+  `createGetObsStatus(obsUrl, obsPassword)`.
+
+### ISS-T-047-CONTROLLER-002 (medium) — pid-reuse identity check
+
+`RecordState` carried only a bare `pid`; OS pid recycling after a dead controller could
+permanently mask it as alive.
+
+- `controller-state.ts`: `RecordState.controllerStartedAt?: string` (OS process-creation time).
+  New `getProcessStartTime(pid)` (Windows `Get-Process -Id <pid> ... StartTime`, matching this
+  package's existing Windows-only surface — `OBS_EXE`, the `chrome.exe` cleanup in
+  `record-commands.ts`), returns `undefined` on any failure, never throws. New pure
+  `controllerMatchesIdentity(expected, actual)` — either side `undefined` trusts pid-alive
+  (back-compat / probe-failure-safe); a real mismatch reports false. New
+  `isControllerAlive(state, probes?)` combines `isPidAlive` + (if an identity was recorded)
+  `controllerMatchesIdentity`, short-circuiting the `getProcessStartTime` probe entirely when no
+  identity was recorded (perf: no extra PowerShell spawn on old/undefined state files). `probes`
+  (`{ pidAlive?, processStartTime? }`) defaults to the real OS checks but is injectable for
+  deterministic pid-reuse tests.
+- `watchdog.ts`: `WatchdogProbes.isControllerAlive` now takes the **full `RecordState`** (was bare
+  `pid`) so the real wiring can check identity too; `tickWatchdog` passes `state` instead of
+  `state.pid`. `runWatchdog` wires the real `isControllerAlive` directly (was `isPidAlive`).
+- `record-commands.ts`: `runRecord` records `controllerStartedAt: getProcessStartTime(process.pid)`
+  alongside the existing fields when writing controller state.
+
+### Evidence
+
+```
+$ pnpm --filter @lkb/meeting-bot typecheck
+> tsc --noEmit -p tsconfig.json
+(no output — clean)
+
+$ pnpm --filter @lkb/meeting-bot test
+ℹ tests 82
+ℹ pass 82
+ℹ fail 0
+```
+(was 62/62 at cycle 0; +20 new tests covering both fixes, including two real-OS-probe smoke
+tests for `getProcessStartTime` and one end-to-end test wiring the REAL `createGetObsStatus`
+through `tickWatchdog` with an injected client whose `connect()` throws, proving state survives
+and a later tick with OBS `'recording'` finalizes.)
+
+```
+$ pnpm -r typecheck   (10/10 projects)
+... all "Done", no errors
+```
+
+```
+$ pnpm -r --no-bail test   (full workspace)
+core 7/7, db 14/14, ai 74/74, ask 50/50, ingest 97/97, meeting-bot 82/82, apps/api 173/173
+index 214/215 — the 1 failure is tree-real-data.test.ts ENOENT on
+data/toc-migrated/2026-09-24-zoho-next-european-study-destinations/session.json — confirmed
+pre-existing (ledger ISS-294, from the separate webinar-bot-live unit; this cycle's diff
+touches zero files under packages/index, confirmed via `git diff 1e1a84e..b303a5f --stat`).
+apps/web: under the full `-r` run's CPU contention, 4 files/5 tests failed on async-timing
+(userEvent/act) — re-ran `pnpm --filter @lkb/web test` in isolation: 13/13 files, 55/55 tests
+green. This unit's diff touches zero files under apps/web.
+```
+
+```
+$ pnpm lint:structure
+lint-loc: OK, lint-dirsize: OK, lint-root: FAIL — 16 loose files (budget 15) — confirmed
+pre-existing (ledger ISS-248; git ls-tree -r 1e1a84e --name-only | grep -v / lists the same 16
+root files at this cycle's base commit; this cycle added zero root files).
+lint-dupes: OK (337 exports, 24 schema $ids) · lint-migrations: OK (1095 files) ·
+snapshot.mjs --check: OK · lint.test.mjs: 14/14 · tracker-audit --gate g1,g4: OK ·
+depcruise: no violations (316 modules, 981 deps)
+```
+
+### Falsifications (D-020: timeout + byte-backup-in-trap on error/interrupt + cmp)
+
+1. **ISS-T-047-CONTROLLER-001 fix** — reverted `decideWatchdogAction`'s
+   `if (obsStatus === "unknown") return { kind: "noop-unknown", state };` line. Re-ran
+   `watchdog.test.ts`: exactly the 3 tests tagged `ISS-T-047-CONTROLLER-001` fail (the pure
+   decision test, the injected-probes tickWatchdog test, and the real-`createGetObsStatus`
+   end-to-end test), 17/20 pass otherwise. Restored from backup in a trap on EXIT/ERR/INT/TERM,
+   `cmp` confirmed byte-identical. `RESTORED-OK-WATCHDOG` printed.
+2. **ISS-T-047-CONTROLLER-002 fix** — reverted `isControllerAlive`'s identity check to
+   `return isPidAlive(state.pid);` only. First attempt: **0 tests failed** — this exposed a real
+   coverage gap (the direct real-OS-spawn identity test had been trimmed earlier in this cycle
+   for being too slow, and nothing else exercised the production `isControllerAlive` composition
+   itself, only its pure sub-parts). Fixed by adding injectable `probes` to `isControllerAlive`
+   and a fast deterministic pid-reuse test using them (`controller-state.test.ts`,
+   `ISS-T-047-CONTROLLER-002: isControllerAlive — pid-reuse case via INJECTED probes`). Re-ran the
+   falsification: exactly that 1 test fails, 18/19 pass otherwise. Restored from backup in a trap,
+   `cmp` confirmed byte-identical. `RESTORED-OK-CONTROLLER-STATE-2` printed.
+
+### Deviations from the verdict's fix_direction
+
+- ISS-T-047-CONTROLLER-001's fix_direction suggested "have `decideWatchdogAction` accept an
+  explicit `obsStatus`" — done, plus the tri-state also propagates through `WatchdogProbes` and a
+  new injectable `createGetObsStatus`, so the real production error path (not just the pure
+  decision function) has direct test coverage per the task's explicit ask.
+- ISS-T-047-CONTROLLER-002's fix_direction offered either "process start time" or "a heartbeat
+  the controller refreshes" — chose process start time (`Get-Process` `StartTime`), consistent
+  with this package's existing Windows-only surface, and cheaper than adding a periodic
+  heartbeat-write loop to `runRecord`'s existing poll loop.
+- `isControllerAlive` gained an optional `probes` parameter not present in the verdict's
+  fix_direction — added specifically to close the coverage gap the first falsification attempt
+  surfaced (see above); it is additive and defaults to the real OS checks, so `runWatchdog`'s
+  wiring (`isControllerAlive` passed by reference) is unchanged.
 
 ## Status: ready-for-check
