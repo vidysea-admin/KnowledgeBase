@@ -282,3 +282,34 @@ function nameOccurrences(text: string, name: string): number[] {
 export function citesNameAsAnIntroduction(text: string, name: string): boolean {
   return nameOccurrences(text, name).some((at) => hasNamingCue(text, name, at));
 }
+
+/**
+ * ISS-282 (phase-3 re-gate, 0/8 correct): the cue rule says a turn NAMES someone, never WHO. Every
+ * wrong identity was a third party ("Thank you, Sonal", "Let me first introduce Shithij") credited
+ * to the speaking label. These split it by DIRECTION; `speakers-llm.ts` pairs each with a relation.
+ */
+/** Forward cues only: the named person speaks NEXT. Thanks and greetings look backward — absent. */
+const HANDOVER_CUES_BEFORE = ["over to", "hand over to", "handing over to", "introduce", "introducing",
+  "please welcome", "joined by", "next presenter is", "next up is", "speaker is", "presenter is"];
+const HANDOVER_FOLLOWERS = ["please go ahead", "go ahead", "over to you", "the stage is yours", "the floor is yours"];
+const tidyBefore = (text: string, at: number): string => text.slice(Math.max(0, at - 40), at).toLowerCase().replace(/[\s,:;."'’()—-]+$/u, "");
+const tidyAfter = (text: string, name: string, at: number): string => text.slice(at + name.length, at + name.length + 28).toLowerCase().replace(/^[\s,:;."'’()—-]+/u, "");
+
+/** The speaker names ITSELF: "my name is X", "this side X", "X here", "X speaking.", "This is X Y". */
+export function citesNameAsSelfIdentification(text: string, name: string): boolean {
+  return nameOccurrences(text, name).some((at) => {
+    const [before, after] = [tidyBefore(text, at), tidyAfter(text, name, at)];
+    const speaking = /^speaking\b\s*([\p{L}']+)?/u.exec(after);
+    return hasNamingCue(text, name, at) && ([...SELF_NAMING_CUES, "this side"].some((c) => before.endsWith(c)) ||
+      after.startsWith("here") || after.startsWith("this side") || (!!speaking && (!speaking[1] || FUNCTION_FOLLOWERS.has(speaking[1]))) ||
+      (name.trim().split(/\s+/).length > 1 && before.endsWith("this is")));
+  });
+}
+
+/** The speaker hands the floor TO the named person: "over to X", "I invite ... X", "X, please go ahead". */
+export function citesNameAsHandover(text: string, name: string): boolean {
+  return nameOccurrences(text, name).some((at) =>
+    HANDOVER_CUES_BEFORE.some((c) => tidyBefore(text, at).endsWith(c)) ||
+    HANDOVER_MARKERS.some((m) => text.slice(Math.max(0, at - 40), at).toLowerCase().includes(m)) ||
+    (/^\s*,/u.test(text.slice(at + name.length)) && HANDOVER_FOLLOWERS.some((c) => tidyAfter(text, name, at).startsWith(c))));
+}

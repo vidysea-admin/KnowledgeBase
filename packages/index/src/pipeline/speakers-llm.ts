@@ -25,7 +25,7 @@ import type { Turns } from "@lkb/core";
 import type { CompleteResult, Job } from "@lkb/ai";
 import { parseJsonLoose } from "@lkb/ai";
 import { personIdFor, resolveSpeakers, type ResolvedSpeaker } from "./speakers.js";
-import { looksLikeAName, isDiscourseOnly, citesNameAsAnIntroduction } from "./speaker-name-rules.js";
+import { looksLikeAName, isDiscourseOnly, citesNameAsSelfIdentification, citesNameAsHandover } from "./speaker-name-rules.js";
 
 export type SpeakersCompleteFn = (job: Job) => Promise<CompleteResult>;
 
@@ -239,8 +239,13 @@ export async function extractSpeakers(turns: Turns[], complete: SpeakersComplete
     for (const key of seenThisRun) votes.set(key, (votes.get(key) ?? 0) + 1);
   }
 
-  // label -> name -> evidence. Kept per-name so a contradiction is visible rather than overwritten.
-  const claims = new Map<string, Map<string, { turnId: string; sessionId: string }[]>>();
+  // label -> name -> evidence (+ the blocks it binds). Kept per-name so a contradiction is visible.
+  type Block = { startTurnIndex: number; endTurnIndex: number };
+  const claims = new Map<string, Map<string, { turnId: string; sessionId: string; block: Block }[]>>();
+  const indexById = new Map(turns.map((t, i) => [t._id, i]));
+  const blockMap = labelBlocks(turns);
+  const blockAt = (label: string, i: number): Block | undefined =>
+    blockMap.get(label)?.find((b) => i >= b.startTurnIndex && i <= b.endTurnIndex);
 
   for (const entry of raw as RawSpeaker[]) {
     if (typeof entry !== "object" || entry === null) continue;
@@ -263,41 +268,48 @@ export async function extractSpeakers(turns: Turns[], complete: SpeakersComplete
     if (isDiscourseOnly(name)) continue;
 
     const cited = Array.isArray(entry.turnIds) ? entry.turnIds : [];
-    const evidence: { turnId: string; sessionId: string }[] = [];
+    const evidence: { turnId: string; sessionId: string; block: Block }[] = [];
     for (const id of cited) {
       if (typeof id !== "string") continue;
       const t = byId.get(id);
-      if (!t) continue;                                  // fabricated turn id
-      // THE RULE: the name must appear in its evidence as whole words, never as a substring
-      // buried inside a longer word ("Ruby" inside "Rubykumar" is a different person).
-      if (!citesNameAsAnIntroduction(t.text ?? "", name)) continue;
-      if (evidence.some((e) => e.turnId === id)) continue;
-      evidence.push({ turnId: id, sessionId: t.sessionId });
+      const i = indexById.get(id);
+      if (!t || i === undefined) continue;               // fabricated turn id
+      // THE RULE (whole-word containment inside a naming cue) now also binds by RELATION (ISS-282):
+      // the label's OWN turn naming ITSELF, or another speaker's handover immediately before one of
+      // the label's blocks. A turn naming a third party evidences that person exists, never who spoke.
+      const own = t.speakerRef === speakerRef && citesNameAsSelfIdentification(t.text ?? "", name);
+      const handover = !own && t.speakerRef !== speakerRef && turns[i + 1]?.speakerRef === speakerRef &&
+        citesNameAsHandover(t.text ?? "", name);
+      const block = own || handover ? blockAt(speakerRef, own ? i : i + 1) : undefined;
+      if (!block || evidence.some((e) => e.turnId === id)) continue;
+      evidence.push({ turnId: id, sessionId: t.sessionId, block });
     }
     if (evidence.length === 0) continue;                 // nothing survived -- the speaker does not ship
 
     // Merge across runs WITHOUT duplicating evidence: the same (label, name) pair is filtered
     // in every run, so its surviving turns recur verbatim. One copy per turn id.
-    const byName = claims.get(speakerRef) ?? new Map<string, { turnId: string; sessionId: string }[]>();
+    const byName = claims.get(speakerRef) ?? new Map<string, { turnId: string; sessionId: string; block: Block }[]>();
     const merged = [...(byName.get(name) ?? [])];
     for (const e of evidence) if (!merged.some((m) => m.turnId === e.turnId)) merged.push(e);
     byName.set(name, merged);
     claims.set(speakerRef, byName);
   }
 
+  // ISS-282: one evidence turn binds at most ONE label ("Hi, Jubin" was credited to spk:1 AND spk:3).
+  const labelsByTurn = new Map<string, Set<string>>();
+  for (const [ref, byName] of claims) for (const ev of byName.values()) for (const e of ev) labelsByTurn.set(e.turnId, (labelsByTurn.get(e.turnId) ?? new Set()).add(ref));
   const resolved: ResolvedSpeaker[] = [];
   for (const [speakerRef, byName] of claims) {
     if (byName.size !== 1) continue;                     // contradiction: not ours to settle
     const entry = [...byName.entries()][0];
     if (!entry) continue;
-    const [displayName, evidence] = entry;
-    // Segment-aware scope (speaker-segment-identity gate): the LLM path's identity evidence is
-    // scoped the same way as the deterministic pass â€” to the contiguous block(s) holding its
-    // citing turns. The LLM path has no block map of its own, so the deterministic floor is
-    // re-run for the scoping only; its identity decisions here are already re-filtered above.
-    const floor = resolveSpeakers(turns);
-    const ownBlocks =
-      floor.resolved.find((r) => r.speakerRef === speakerRef && r.displayName === displayName)?.blocks ?? [];
+    const [displayName, bound] = entry;
+    if (bound.some((e) => (labelsByTurn.get(e.turnId)?.size ?? 0) > 1)) continue;
+    const evidence = bound.map(({ turnId, sessionId }) => ({ turnId, sessionId }));
+    // Segment-aware scope (speaker-segment-identity gate): the block(s) each cited turn BINDS. ISS-282:
+    // the old scoping re-ran the deterministic floor, whose lookup returned [] for every LLM-only
+    // identity -- so each shipped label-wide. Blocks now come from the evidence itself.
+    const ownBlocks = [...new Map(bound.map((e) => [e.block.startTurnIndex, e.block])).values()].sort((a, b) => a.startTurnIndex - b.startTurnIndex);
     resolved.push({ speakerRef, displayName, personId: personIdFor(displayName), evidence, blocks: ownBlocks });
   }
   resolved.sort((a, b) => a.speakerRef.localeCompare(b.speakerRef));

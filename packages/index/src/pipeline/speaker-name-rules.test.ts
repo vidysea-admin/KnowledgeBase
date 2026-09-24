@@ -17,6 +17,7 @@ import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
 
 import { extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
+import { citesNameAsAnIntroduction } from "./speaker-name-rules.js";
 
 function turn(id: string, speakerRef: string, text: string): Turns {
   return { _id: id, tenantId: "t1", sessionId: "s1", speakerRef, tStart: 0, tEnd: 0, text };
@@ -71,8 +72,11 @@ const ISS_093_CORPUS: [string, string][] = [
   ["English speaking students may apply.", "English"],
 ];
 
-/** The four ISS-093 cases that remain open by design -- proper nouns, not discourse words. */
-const ISS_093_GAZETTEER = new Set(["India", "Mumbai", "Google"]);
+/**
+ * The ISS-093 cases that remain open by design -- proper nouns, not discourse words. ISS-282 closed
+ * "Mumbai": "Coming up next, Mumbai" is not the SPEAKER naming itself, so it no longer binds spk:0.
+ */
+const ISS_093_GAZETTEER = new Set(["India", "Google"]);
 
 for (const [text, name] of ISS_093_CORPUS) {
   const expectedRefusal = !ISS_093_GAZETTEER.has(name);
@@ -126,11 +130,12 @@ test("ISS-098: a bare noun after `speaking` declines the cue WITHOUT vetoing lat
   // The cycle-2 bug was an unconditional early return: the speaking branch refused the whole
   // predicate, so no later cue could fire. Here the participle declines but the address comma
   // still supplies a cue, which only works if the branch falls through.
-  const { resolved } = await extractSpeakers(
-    [turn("t1", "spk:0", "Prasanti, what do you think of English speaking students?")],
-    replies([{ speakerRef: "spk:0", displayName: "Prasanti", turnIds: ["t1"] }]),
-  );
-  assert.equal(resolved.length, 1, "a declining speaking branch must not veto the address cue");
+  // ISS-282 moved this assertion to the cue predicate it pins: the address names PRASANTI, so it
+  // can no longer identify the label SPEAKING it (spk:0) -- that refusal is asserted below.
+  const text = "Prasanti, what do you think of English speaking students?";
+  assert.equal(citesNameAsAnIntroduction(text, "Prasanti"), true, "a declining speaking branch must not veto the address cue");
+  const { resolved } = await extractSpeakers([turn("t1", "spk:0", text)], replies([{ speakerRef: "spk:0", displayName: "Prasanti", turnIds: ["t1"] }]));
+  assert.deepEqual(resolved, [], "ISS-282: addressing Prasanti does not make the speaker Prasanti");
 });
 
 /**

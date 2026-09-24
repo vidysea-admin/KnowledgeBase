@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
+import { readFileSync } from "node:fs";
 
 import { buildSpeakerWindows, extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
 
@@ -124,4 +125,73 @@ test("ISS-255 (2): evidence merges across runs without duplication", async () =>
   ]));
   assert.equal(resolved.length, 1);
   assert.deepEqual(resolved[0]?.evidence, [{ turnId: "t1", sessionId: "s1" }], "3 runs proposing the same turns yield ONE evidence row");
+});
+/**
+ * ISS-282 (critical) — the U2.4 phase-3 re-gate measured 0/8 accepted identities correct. Every
+ * wrong one was a turn that NAMES A THIRD PARTY ("Thank you, Sonal", "Let me first introduce
+ * Shithij", "Hi, Jubin") credited to the label speaking it — or to a label that never spoke it —
+ * and every one was scored label-wide because its `blocks` came back empty.
+ *
+ * D-015: these are the ledger's own recorded reproductions, replayed VERBATIM against the real
+ * transcripts: same session, same label, same name, same cited turn, proposed in 3/3 runs (so the
+ * agreement vote cannot be what refuses them). Source: measurement-summary.json wrongLinkList.
+ */
+const ISS_282: [string, string, string, string][] = [
+  ["2026-05-23-uniaccess-atlas-skilltech", "spk:0", "Sonal", "t007"],
+  ["2026-07-15-creative-futures", "spk:0", "Priyanka Roy", "t267"],
+  ["2026-07-30-in-focus-3", "spk:1", "Shithij", "t022"],
+  ["2026-07-30-in-focus-3", "spk:2", "Anisha", "t094"],
+  ["2026-08-03-uk-beyond-offer-letters", "spk:4", "Bhavya", "t042"],
+  ["2026-08-24-uniaccess-leeds-arts-university", "spk:1", "Jubin", "t088"],
+  ["2026-08-24-uniaccess-leeds-arts-university", "spk:3", "Jubin", "t088"],
+  ["2026-05-23-uniaccess-atlas-skilltech", "spk:0", "Sonal", "t007"], // outer run 2 repeat
+];
+const corpus = (session: string): Turns[] =>
+  JSON.parse(readFileSync(new URL(`../../../../data/toc-migrated/${session}/turns.json`, import.meta.url), "utf8")) as Turns[];
+
+for (const [i, [session, ref, name, t]] of ISS_282.entries()) {
+  test(`ISS-282 #${i + 1}/${ISS_282.length}: ${session} ${ref} -> ${JSON.stringify(name)} via ${t} is refused`, async () => {
+    const { resolved } = await extractSpeakers(corpus(session), replies([
+      { speakerRef: ref, displayName: name, turnIds: [`${session}-${t}`] },
+    ]));
+    assert.deepEqual(resolved.map((r) => `${r.speakerRef}|${r.displayName}`), [], "a turn naming someone else never identifies its speaker");
+  });
+}
+
+test("ISS-282: the label's OWN self-identifying turn binds, scoped to that ONE block (never label-wide)", async () => {
+  const turns = [
+    turn("t1", "spk:0", "Okay, let us begin."),
+    turn("t2", "Anchor", "Next slide."),
+    turn("t3", "spk:0", "Hello, Ruby here."), // an LLM-only cue: the deterministic floor cannot scope it
+    turn("t4", "spk:0", "I lead admissions."),
+  ];
+  const { resolved } = await extractSpeakers(turns, replies([{ speakerRef: "spk:0", displayName: "Ruby", turnIds: ["t3"] }]));
+  assert.equal(resolved.length, 1);
+  assert.deepEqual(resolved[0]?.blocks, [{ startTurnIndex: 2, endTurnIndex: 3 }], "the block holding the evidence, not spk:0's first block");
+});
+
+test("ISS-282: a handover by ANOTHER speaker binds the label whose block immediately FOLLOWS it", async () => {
+  const turns = [
+    turn("t1", "Anchor", "Good morning Prasanti, please go ahead."),
+    turn("t2", "spk:1", "Thank you so much."),
+    turn("t3", "spk:1", "Let me share my screen."),
+  ];
+  const { resolved } = await extractSpeakers(turns, replies([{ speakerRef: "spk:1", displayName: "Prasanti", turnIds: ["t1"] }]));
+  assert.equal(resolved.length, 1, "handover-then-block is the greeting class this path exists to admit");
+  assert.deepEqual(resolved[0]?.blocks, [{ startTurnIndex: 1, endTurnIndex: 2 }]);
+  // Thanks look BACKWARD: "Thank you, Bhavya." before spk:4 names the previous speaker (ISS-282 #5 shape).
+  const thanks = [turn("t1", "Jasminder", "Thank you, Bhavya. Thank you, Bhakti."), turn("t2", "spk:4", "Thank you all.")];
+  const back = await extractSpeakers(thanks, replies([{ speakerRef: "spk:4", displayName: "Bhavya", turnIds: ["t1"] }]));
+  assert.deepEqual(back.resolved, [], "a thank-you is not a handover");
+});
+
+test("ISS-282: one evidence turn never binds two labels", async () => {
+  const turns = [turn("t1", "spk:1", "I'm Kshitij, and over to Ruby."), turn("t2", "spk:0", "Hello all.")];
+  const alone = await extractSpeakers(turns, replies([{ speakerRef: "spk:1", displayName: "Kshitij", turnIds: ["t1"] }]));
+  assert.equal(alone.resolved.length, 1, "on its own, t1 binds spk:1 by self-identification");
+  const both = await extractSpeakers(turns, replies([
+    { speakerRef: "spk:1", displayName: "Kshitij", turnIds: ["t1"] },
+    { speakerRef: "spk:0", displayName: "Ruby", turnIds: ["t1"] },
+  ]));
+  assert.deepEqual(both.resolved, [], "a turn claimed as evidence by two labels settles neither");
 });

@@ -18,6 +18,10 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const OUT = "qa/evidence/u2-4-phase3-precision-regate-2026-09-22";
+// fix cycle 1: --tag <t> scores run-results.<t>.jsonl / raw-proposals.<t>.jsonl and writes
+// measurement-summary.<t>.json; no tag = the cycle-0 files, unchanged.
+const TAG = process.argv.includes("--tag") ? process.argv[process.argv.indexOf("--tag") + 1] : null;
+const tagged = (base, ext) => (TAG ? `${base}.${TAG}.${ext}` : `${base}.${ext}`);
 const gold = JSON.parse(readFileSync(join(OUT, "gold-labels.json"), "utf8"));
 
 // per-turn gold override (mid-sentence diarizer join measured in the labelling notes:
@@ -46,7 +50,7 @@ const personMatch = (accepted, goldPerson) => {
 };
 const POSITIONAL = /^spk:\d+$/;
 
-const results = readFileSync(join(OUT, "run-results.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
+const results = readFileSync(join(OUT, tagged("run-results", "jsonl")), "utf8").trim().split("\n").map((l) => JSON.parse(l));
 
 // ---- per-session turn -> block index (same block definition the pipeline uses)
 const sessionData = new Map();
@@ -225,7 +229,7 @@ const visaRuns = perRun.filter((r) => r.session === visa).sort((a, b) => a.outer
 const visaSets = visaRuns.map((r) => JSON.stringify([...r.acceptedSet]));
 iss255.cases.push({ id: 2, name: "accepted set stable across outer runs 1-3 (recorded run 1 vs 2-3 instability)", pass: visaRuns.length === 3 && new Set(visaSets).size === 1, acceptedSets: visaSets });
 
-const rawLines = readFileSync(join(OUT, "raw-proposals.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
+const rawLines = readFileSync(join(OUT, tagged("raw-proposals", "jsonl")), "utf8").trim().split("\n").map((l) => JSON.parse(l));
 const multiNameLabels = [];
 for (const session of sessions) {
   for (const outer of [1, 2, 3]) {
@@ -285,7 +289,7 @@ const summary = {
   iss255,
   perRun: perRun.map((r) => ({ session: r.session, outerRun: r.outerRun, windows: r.windows, providerCalls: r.providerCalls, ms: r.ms, degraded: r.degraded, accepted: r.checks.map((c) => ({ speakerRef: c.speakerRef, displayName: c.displayName, evidenceTurns: c.evidenceTurns, identityCorrect: c.identityCorrect, reasons: c.reasons })), unresolved: r.unresolved })),
 };
-writeFileSync(join(OUT, "measurement-summary.json"), JSON.stringify(summary, null, 2));
+writeFileSync(join(OUT, tagged("measurement-summary", "json")), JSON.stringify(summary, null, 2));
 console.log(JSON.stringify({
   accepted: totalAccepted, correct: totalCorrect, precision: summary.bar1_acceptedIdentityPrecision.precision,
   wrongIdentities: wrongLinkList.length, wrongPairs,

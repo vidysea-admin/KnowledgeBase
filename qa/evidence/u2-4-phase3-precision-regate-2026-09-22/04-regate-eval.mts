@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { readFileSync, appendFileSync, readdirSync } from "node:fs";
+import { readFileSync, appendFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { register } from "tsx/esm/api";
 register();
@@ -24,7 +24,8 @@ async function complete(job) {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ model: MODEL, stream: false, messages: job.messages, think: false, options: { temperature: 0, seed: 42, num_predict: 300 } }),
-    });
+      signal: AbortSignal.timeout(CALL_TIMEOUT_MS), // fix cycle 1: a hung call fails the window, never the run
+    }).catch((e) => ({ ok: false, status: String(e?.name ?? e) }) as unknown as Response);
     if (res.ok) {
       const j = await res.json();
       return { text: j.message?.content ?? "", json: undefined, usage: { inputTokens: j.prompt_eval_count ?? 0, outputTokens: j.eval_count ?? 0 }, provider: "ollama", model: MODEL, costUsd: 0 };
@@ -36,20 +37,25 @@ async function complete(job) {
 }
 
 const OUT = "qa/evidence/u2-4-phase3-precision-regate-2026-09-22";
-const RAW = join(OUT, "raw-proposals.jsonl");
-const RES = join(OUT, "run-results.jsonl");
-
-const SESSIONS = readdirSync("data/toc-migrated", { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort()
-  .filter((s) => {
-    const t = JSON.parse(readFileSync(join("data/toc-migrated", s, "turns.json"), "utf8"));
-    return t.some((x) => /^spk:\d+$/.test(x.speakerRef ?? ""));
-  });
-
-// CLI: --run N (outer run number, default 1) --only <substring,...> (resume chunking)
+// CLI: --run N (single outer run) | --runs 1,2,3 (sequential, one process) · --only <substr,...>
+//      --tag <t> (fix cycle 1: writes run-results.<t>.jsonl / raw-proposals.<t>.jsonl, leaving the
+//      cycle-0 files untouched) · --timeout-ms N (per provider call, default 180000)
 const args = process.argv.slice(2);
-const runNo = Number(args[args.indexOf("--run") + 1] ?? 1);
-const onlyIdx = args.indexOf("--only");
-const only = onlyIdx >= 0 ? args[onlyIdx + 1].split(",") : null;
+const arg = (k: string) => (args.indexOf(k) >= 0 ? args[args.indexOf(k) + 1] : undefined);
+const RUNS = (arg("--runs") ?? arg("--run") ?? "1").split(",").map(Number);
+const only = arg("--only")?.split(",") ?? null;
+const TAG = arg("--tag");
+const CALL_TIMEOUT_MS = Number(arg("--timeout-ms") ?? 180000);
+const RAW = join(OUT, TAG ? `raw-proposals.${TAG}.jsonl` : "raw-proposals.jsonl");
+const RES = join(OUT, TAG ? `run-results.${TAG}.jsonl` : "run-results.jsonl");
+
+// ISS-284: the corpus is PINNED to the gold-labelled session list, never re-discovered from
+// data/toc-migrated (a later ingest -- the 2026-09-24 Zoho webinar -- silently grew it to 12).
+const SESSIONS: string[] = JSON.parse(readFileSync(join(OUT, "gold-labels.json"), "utf8")).sessions.map((g) => g.session);
+// Resumable: a (run, session) already flushed to RES is skipped, so a killed process restarts clean.
+const DONE = new Set(existsSync(RES) ? readFileSync(RES, "utf8").trim().split("
+").filter(Boolean).map((l) => { const j = JSON.parse(l); return `${j.outerRun}|${j.session}`; }) : []);
+let runNo = RUNS[0];
 
 let calls = 0;
 let windowLabels: string[] = [];
@@ -70,8 +76,9 @@ const instrumented = async (job) => {
 
 let CURRENT = { session: "" };
 
-for (const session of SESSIONS) {
+for (runNo of RUNS) for (const session of SESSIONS) {
   if (only && !only.some((o) => session.includes(o))) continue;
+  if (DONE.has(`${runNo}|${session}`)) { console.log(`[run ${runNo}] ${session}: already flushed, skipped`); continue; }
   const turns = JSON.parse(readFileSync(join("data/toc-migrated", session, "turns.json"), "utf8"));
   const windows = buildSpeakerWindows(turns);
   windowLabels = windows.map((w) => w.label);
@@ -92,6 +99,6 @@ for (const session of SESSIONS) {
   };
   appendFileSync(RES, JSON.stringify(line) + "\n");
   console.log(`[run ${runNo}] ${session}: ${ms}ms, calls=${calls}, resolved=${r.resolved.length}, unresolved=${r.unresolved.length}, degraded=${r.degraded ? r.degraded.reason : "no"}`);
-  for (const s of r.resolved) console.log(`   ACCEPTED ${s.speakerRef} -> "${s.displayName}" ev=${s.evidence.map((e) => e.turnId).join(",")}`);
+  for (const s of r.resolved) console.log(`   ACCEPTED ${s.speakerRef} -> "${s.displayName}" ev=${s.evidence.map((e) => e.turnId).join(",")} blocks=${JSON.stringify(s.blocks)}`);
   for (const s of floor.resolved) console.log(`   FLOOR ${s.speakerRef} -> "${s.displayName}" ev=${s.evidence.map((e) => e.turnId).join(",")}`);
 }
