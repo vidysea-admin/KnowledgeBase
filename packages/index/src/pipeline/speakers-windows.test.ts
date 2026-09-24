@@ -274,6 +274,10 @@ test("c1b review 2: an address must OPEN a clause -- no reporting-verb list to f
   const prev = [turn("t1", "spk:3", "Here is my final point."), turn("t2", "Host", "Thank you, Kshitij, someone mentioned earlier in the hallway.")];
   const p = await extractSpeakers(prev, replies([{ speakerRef: "spk:3", displayName: "Kshitij", turnIds: ["t1"] }]));
   assert.deepEqual(p.resolved, [], "a thank-you must close on punctuation, 'for' or 'and'");
+  // A clause-opening call INSIDE an open quotation passes the shape allowlist; only reported() refuses it.
+  const inQuote = next('She told me yesterday: "It was fine. Priya, what do you think?');
+  const q = await extractSpeakers(inQuote, replies([{ speakerRef: "spk:1", displayName: "Priya", turnIds: ["t1"] }]));
+  assert.deepEqual(q.resolved, [], "a call inside an open quote is reported speech");
 });
 
 test("c1b: an unquoted rhetorical call deep inside a long turn is not a handover (closing-stretch bound)", async () => {
