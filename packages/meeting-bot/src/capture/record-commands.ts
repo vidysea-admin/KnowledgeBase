@@ -17,6 +17,7 @@ import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
 import { getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
 import { createObsBrowserDeps } from "./obs-windows.js";
+import { collectGapEvent, gapsForSourceDoc, type GapWindow } from "./reconnect-gaps.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
@@ -88,6 +89,7 @@ export async function runRecord(rest: string[]): Promise<void> {
   }
 
   let endedAt: number | undefined;
+  const gaps: GapWindow[] = []; // T-029: filled from "gap" events on sb_join.py's stdout stream
   const bot = createObsBrowserDeps({
     obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455",
     obsPassword,
@@ -99,6 +101,7 @@ export async function runRecord(rest: string[]): Promise<void> {
     autoClick: platform === "zoho",
     onEvent: (_h, ev) => {
       if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
+      collectGapEvent(gaps, ev);
     },
   });
   const joiner = createBrowserJoiner(bot.deps);
@@ -160,7 +163,7 @@ export async function runRecord(rest: string[]): Promise<void> {
       video = newest;
     }
     if (!video || !existsSync(video)) throw new Error(`no recording file produced (${video ?? "none"})`);
-    await finalizeRecording(video, sessionId, title, platform, rest.includes("--transcribe"));
+    await finalizeRecording(video, sessionId, title, platform, rest.includes("--transcribe"), gaps);
   } finally {
     removeControllerState(RECORD_DIR);
   }
@@ -170,6 +173,7 @@ export async function runRecord(rest: string[]): Promise<void> {
  * and `finalize` (the recovery path when the controlling process died mid-run). */
 async function finalizeRecording(
   video: string, sessionId: string, title: string, platform: string, transcribe: boolean,
+  gaps: GapWindow[] = [], // T-029: [] on the `finalize` recovery path — no live event stream to draw from there
 ): Promise<void> {
   const audio = path.join(RECORD_DIR, `${sessionId}.m4a`);
   execFileSync("ffmpeg", ["-y", "-hide_banner", "-loglevel", "error", "-i", video, "-vn", "-ac", "1",
@@ -199,6 +203,7 @@ async function finalizeRecording(
     path: toPosix(path.relative(REPO_ROOT, video)),
     audioPath: toPosix(path.relative(REPO_ROOT, audio)),
     audioLevel: { maxDb, meanDb, silent },
+    gaps: gapsForSourceDoc(gaps), // T-029: forced-disconnect windows recovered mid-run, if any
     consent: {
       given: true,
       recordedBy: "Umesh Sugara (registered attendee) via LKB bot",
