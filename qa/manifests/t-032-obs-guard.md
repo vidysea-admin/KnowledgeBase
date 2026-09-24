@@ -12,7 +12,7 @@ unit treats the roadmap row as the binding criterion.
 **Severity gate:** full ceremony (touches the capture/OBS path that gates whether a session records
 at all — a silent recording-never-started failure is the same failure class this unit exists to
 close).
-**Status:** ready-for-check
+**Status:** checked-PASS — qa/verdicts/t-032-obs-guard.md (Cycle checked: 0, peer checker knowledgebase-33, 0c310b2); merged to master; meeting-bot 88/88 on merged tree
 **Worktree:** `D:/KnowledgeBase-lanes/t-032-obs-guard`, branch `wave/t-032-obs-guard`, base `784df67`
 **Commit:** `47b1b4d` — `git diff 784df67..47b1b4d --stat`: 3 files, all inside
 `packages/meeting-bot/src/capture/` (`obs-windows.ts` modified, `obs-guard.ts` and
