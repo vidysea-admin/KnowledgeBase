@@ -149,3 +149,77 @@ The FAIL rests entirely on a real, traced-not-speculated gap in the production w
 does not mention and no test touches: an OBS-unreachable tick is indistinguishable from a
 confirmed-idle tick, and the former destroys the one artifact recovery depends on. This is a
 one-function fix (see ISS-T-047-CONTROLLER-001's fix_direction), not a redesign.
+
+---
+
+# Verdict — t-047-controller (CYCLE 1)
+
+**Cycle checked:** 1
+**Date:** 2026-09-25
+**Checker:** orchestrating checker (main session), Mode A, bound to `D:/KnowledgeBase`.
+**Commit under check:** `b303a5f` (code) + `5ff2f37` (manifest), lane `D:/KnowledgeBase-lanes/t-047-controller`, branch `wave/t-047-controller`.
+**Governing criteria:** the T-047 roadmap row. **T-024b is NOT adopted** (`qa/gates/meeting-bot-live-capture-adoption.md` still open), and its own Non-goals exclude T-047 — so it was not treated as binding, and the manifest is right to say so.
+**Issues addressed:** ISS-T-047-CONTROLLER-001 (high), -002 (medium), from cycle-0 verdict `9e79864`, read from the ledger union including the lane shard (D-019).
+**Independence:** I did not build this unit.
+
+VERDICT: PASS
+SCOREBOARD: 2/2 addressed issues verified fixed, both roadmap halves delivered
+ISSUES-WRITTEN: none
+LIVE-BROWSER: NOT APPLICABLE — no UI surface. The unit changes `packages/meeting-bot/src/capture/*` (process-lifecycle + an OBS websocket probe) and adds one PowerShell launcher. No `*.tsx/jsx/vue/svelte/html/css`, nothing under `apps/web/**`, `**/routes/**`, `**/pages/**` or `**/components/**`, and no rendering path reads this code. Stated with the reason rather than omitted, per D-024.
+
+## I ran my own falsifications rather than accepting the maker's
+
+The brief I set myself was to look hard at one number: the maker disclosed that its identity-revert mutant initially killed **zero** tests, and only killed one after it added a deterministic pid-reuse test. A mutant that kills nothing is precisely the vacuity signal this project keeps filing (the ISS-179 class), so I re-derived both mutants from the diff myself.
+
+D-020 posture: byte backups, `timeout 300`, restore in a `trap` firing on EXIT/INT/TERM/ERR, verified by SHA256 **and** `cmp` on both files.
+
+| run | result |
+|---|---|
+| **control** (unmutated) | `pass 82 · fail 0` |
+| **M1** — delete the tri-state branch `if (obsStatus === "unknown") return { kind: "noop-unknown", state }` | `pass 79 · **fail 3**` |
+| **M2** — make `isControllerAlive` ignore the recorded identity | `pass 81 · **fail 1**` |
+| restore | `RESTORE OK (both sha256 match)` · `CMP identical` |
+
+Both mutants die, and the counts match what the maker reported (3 and 1). **The coverage gap behind that initial zero is genuinely closed** — this is the one thing I most expected to find soft, and it is not.
+
+## ISS-T-047-CONTROLLER-001 (high) — tri-state OBS probe. FIXED.
+
+`decideWatchdogAction` (`watchdog.ts:51-61`) now takes an `obsStatus` and handles `"unknown"` **before** the recording/stale branch, returning `noop-unknown` with the state retained. So a dead controller plus a transiently unreachable OBS no longer routes into `stale-cleanup`, which is what wiped the recovery state file. The code comment states the symmetry correctly: *"it is exactly as wrong to finalize on unconfirmed 'recording' as it is to clear state on unconfirmed 'not recording'."*
+
+The real probe is `createGetObsStatus(obsUrl, obsPassword, makeClient)` (`watchdog.ts:76-79`) with an injectable client factory defaulting to a real `OBSWebSocket`. That matters: it means the **production** connect-throws path is the one under test, not a hand-rewritten stand-in — which is exactly what ISS-001's `fix_direction` asked for.
+
+## ISS-T-047-CONTROLLER-002 (medium) — pid recycling. FIXED.
+
+`RecordState.controllerStartedAt` records the OS process-creation time at write time; `isControllerAlive` (`controller-state.ts:120-132`) checks pid liveness first, then compares the recorded identity via the pure `controllerMatchesIdentity`. A recycled pid whose start time differs is correctly reported dead. Probes are injectable, so the mismatch is testable without spawning a real process.
+
+**One residual, disclosed by the maker and recorded here as a note rather than a finding.**
+`isControllerAlive` contains `if (!state.controllerStartedAt) return true;` — when no identity was recorded, it falls back to bare pid-liveness, i.e. the original ISS-002 behaviour. The manifest discloses this at lines 149-151 ("either side `undefined` trusts pid-alive — back-compat / probe-failure-safe"), and it satisfies ISS-002's `fix_direction` literally: you cannot reject a mismatch against something that was never recorded.
+
+The residual worth naming: the code cannot distinguish *"old state file, predates this field"* from *"`getProcessStartTime` failed at write time just now"*. In the second case the new protection silently does not engage for that recording, and nothing says so. On Windows `Get-Process … StartTime` can fail on permissions. A one-line marker distinguishing the two would close it. Per this repo's D-014 verdict rule a low-severity observation belongs in EXPLANATION and **does not** enter the backlog, so I am not filing it — but the next unit touching `controller-state.ts` should take it.
+
+## Both halves of the roadmap row are delivered
+
+The T-047 row asks for two things, and a unit delivering only the watchdog would be a partial ship:
+
+1. **"run hidden/detached"** — `scripts/webinar/start-record-detached.ps1` launches the recorder fully detached from the calling console, and `record-commands.ts:70-71` prints the invocation. `obs-windows.ts:91` spawns with `detached: true`.
+2. **"finalize-on-restart watchdog"** — `watchdog.ts` + the `controller-state.ts` state file, with `runWatchdog` **reusing `runFinalize`** from `record-commands.ts` rather than duplicating the stop/unmute/close sequence. Reuse over duplication is the right call and avoids the two-implementations drift this repo has been bitten by.
+
+## Verification I ran
+
+```
+pnpm --filter @lkb/meeting-bot test   -> 82/82 (was 62; +20)
+pnpm -r --no-bail test                -> all packages green EXCEPT packages/index 214/215
+node scripts/lint-loc.mjs             -> OK (300 files)
+node scripts/lint-dirsize.mjs         -> OK (80 dirs)
+node scripts/lint-dupes.mjs           -> OK (337 exports, 24 schema $ids)
+node scripts/lint-root.mjs            -> FAIL (pre-existing, see below)
+npx depcruise ...                     -> no violations (316 modules, 981 deps)
+```
+
+**The single `packages/index` failure is provably not this unit's.** It is `tree-real-data.test.ts` ENOENT on the webinar `session.json` — ISS-294 — and the failing test still carries its **old title** ("23 session leaves"), which is the tell that this lane branches from before that fix. I PASSed that fix myself in `wave/iss-291-sync-txn` (`c21355e`) and it is now merged to master (`856d31b`), where `packages/index` is green. It resolves when this lane rebases or merges; nothing to do here.
+
+**`lint-root` FAIL is the same pre-existing ISS-248** — 16 tracked loose root files against a budget of 15, reproduced identically on master, and this unit adds no root file. Notably the new `scripts/webinar/start-record-detached.ps1` does **not** breach `lint-dirsize` (80 dirs OK), so the ISS-285 hazard that failed a sibling unit's cycle 1 does not recur here. I checked that specifically because a new file under `scripts/` is exactly what caused it before.
+
+## Why PASS
+
+Both filed issues are fixed at the mechanism ISS-001 and ISS-002 each named, not merely at their symptom; both fixes die under mutants I derived from the diff myself; the production error path is genuinely under test through an injected factory rather than a stand-in; both halves of the roadmap row ship; and every gate is green except one pre-existing repo-level failure and one test already fixed on master. `ISSUES-WRITTEN: none` is a complete check here — I went looking specifically at the identity fallback and at the new `scripts/` file for a budget breach, and neither rises above an EXPLANATION note.
