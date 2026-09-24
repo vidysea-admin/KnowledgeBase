@@ -13,7 +13,7 @@ wrong — not an Ollama-lane candidate.
 **Queue tier:** 5 — "Umesh live requests, 2026-09-24 — product UI epic", item 5.
 **Severity gate:** FULL — it replaces a working user-facing surface.
 
-**Status:** ready-for-check
+**Status:** checked-PASS — cycle 0 PASS by /checker (a264c49, live visible browser + pre-unit negative control); closed out by maker 2026-09-25
 
 ---
 

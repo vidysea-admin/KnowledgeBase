@@ -14,7 +14,7 @@ tenancy invariant on it — not an Ollama-lane candidate under the maker's never
 **Severity gate:** FULL — it changes a read path (`GET /graph` now reads a second collection) and a
 user-facing surface, so manifest + verdict + contract + close-out all apply.
 
-**Status:** ready-for-check
+**Status:** checked-PASS — cycle 0 PASS by /checker (a264c49, live visible browser + pre-unit negative control); closed out by maker 2026-09-25
 
 ---
 
