@@ -155,6 +155,37 @@ waiting on #1/#2.
 visible-browser evidence, and per the standing rule the live check is run by a CHECKER writing its
 own script, never by the maker re-running its own. Both contracts name their verification probes.
 
+## Checker note, 2026-09-24 — id-citation defect across concurrent lanes (NOT yet a ledger row, deliberately)
+
+Two orchestrator sessions and several worktree lanes were appending to `qa/issues.jsonl` at once
+this evening. Measured state at the time of writing: **zero duplicate ids, no row lost or altered**
+— the ledger itself is intact. But `qa/verdicts/webinar-bot-live.md` carries
+`ISSUES-WRITTEN: ISS-289, ISS-290, ISS-291, ISS-292`, and against the ledger union three of those
+four resolve to **other units' rows**:
+
+| cited | actually resolves to |
+|---|---|
+| ISS-289 | `speaker-resolution-llm` — circular citation-validity in `05-score.mjs` |
+| ISS-290 | `speaker-resolution-llm` — no corpus pin |
+| ISS-291 | `meeting-bot-live-capture` — correct, genuinely that unit's |
+| ISS-292 | `brain-knowledge-graph` — filed by the checker for Umesh's /brain request |
+
+**Why this is worse than a miscount.** D-015 requires a fix to be measured against its issue's OWN
+recorded reproductions. webinar-bot-live fix cycle 2 is about to perform exactly that measurement;
+if it resolves ISS-289 it will read the phase-3 scorer's row and measure the wrong thing. D-019
+already named this: *"an audit trail whose references silently repoint is worse than an incomplete
+one, because it still looks correct."*
+
+**Root cause, stated for whoever builds the fix:** ids are chosen at READ time and written at APPEND
+time, and everything bad happens in that window. The durable fix is to compute max-id over the union
+and append in the SAME operation. Renumbering existing rows is forbidden (D-019).
+
+**Why no ISS row yet, on purpose:** filing one now means allocating from the very counter that is
+being contested by two live agents — the defect reproducing itself inside its own bug report. Both
+owning sessions have been notified in writing and told to re-allocate from the current max and to
+record their old→new mapping rather than hide it. **This row gets filed once the lanes settle**, and
+until then this note is the record.
+
 ## State summary
 
 - **2026-09-24 sweep update:** ids now run through ISS-288 (main ledger only in this repo; no
