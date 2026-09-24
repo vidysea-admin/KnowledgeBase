@@ -20,21 +20,34 @@
  *   org-partner_of-org · session-covers-country · session-covers-topic ·
  *   person-discussed-topic · person-discussed-country · session-held_on-date ·
  *   date-in_month-month · user-captured-session
- * Re-running replaces this session's turns and edges; it never touches other sessions.
+ * Re-running replaces this session's turns and edges; it never touches other sessions. The
+ * replace is a generation swap (ISS-291, `session-rows.mjs`): new rows are upserted first and the
+ * old generation is deleted only after every write succeeded, so a crash never leaves the session
+ * partially deleted. (The Mongo is standalone — no transactions.)
  *
- * Usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run]
+ * --emit-files (ISS-294): writes session.json / session_page.json / claims.json into the session
+ *   dir, derived from meta/source/turns — the files every other data/toc-migrated/<id>/ carries.
+ * --index (ISS-296): after the sync, runs the SAME `indexSession` every live-ingested session goes
+ *   through (apps/api/src/indexing/session.ts, bound by production.ts's `buildIndexer`): LLM
+ *   summary -> session_pages, claims, chunks + embeddings, incremental tree_index, entity
+ *   promotion, status.index -> done. With --dry-run it prints the plan and connects to nothing.
+ *
+ * Usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run] [--emit-files] [--index]
  */
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import "dotenv/config";
 import { register } from "tsx/esm/api";
+import { replaceSessionRows, buildSessionFiles } from "./session-rows.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const sessionId = process.argv[2];
 const DRY_RUN = process.argv.includes("--dry-run");
+const EMIT_FILES = process.argv.includes("--emit-files");
+const INDEX = process.argv.includes("--index");
 if (!sessionId) {
-  console.error("usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run]");
+  console.error("usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run] [--emit-files] [--index]");
   process.exit(1);
 }
 const dir = join(ROOT, "data", "toc-migrated", sessionId);
@@ -141,12 +154,27 @@ console.log(`session ${sessionId} (tenant ${tenantId})`);
 console.log(`  turns ${turns.length} · speakers ${speakerDocs.length} · orgs ${orgDocs.length} · topics ${topicDocs.length}`);
 console.log(`  graph_edges ${edgeList.length}: ${JSON.stringify(byType)}`);
 
+if (EMIT_FILES) {
+  const files = buildSessionFiles({ sessionId, tenantId, sessionDoc, meta, turns });
+  for (const [name, doc] of [["session.json", files.session], ["session_page.json", files.sessionPage], ["claims.json", files.claims]]) {
+    if (!DRY_RUN) writeFileSync(join(dir, name), `${JSON.stringify(doc, null, 2)}\n`);
+    console.log(`  ${DRY_RUN ? "would write" : "wrote"} ${name}`);
+  }
+}
+
+register();
+if (INDEX && DRY_RUN) {
+  // No connection: the plan is computed from the same turns the live run will read back.
+  const { buildChunks } = await import("../../packages/index/src/index.ts");
+  console.log(`  index plan: summarize + claims (LLM, routed per config/ai-routing.yaml) -> session_pages/claims; ` +
+    `${buildChunks(turns).length} chunk(s) to embed from ${turns.length} turns; tree_index regenerate([${sessionId}]); ` +
+    `entity promotion; sessions.status.index -> done`);
+}
 if (DRY_RUN) {
   console.log("No Mongo connection attempted (--dry-run).");
   process.exit(0);
 }
 
-register();
 const { connect, close } = await import("../../packages/db/src/client.js");
 const { sources } = await import("../../packages/db/src/collections/sources.js");
 const { sessions } = await import("../../packages/db/src/collections/sessions.js");
@@ -163,11 +191,14 @@ const upsert = (coll, doc) => {
 const strip = ({ tenantId: _t, ...rest }) => rest;
 
 await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", process.env.MONGODB_DB || "lkb");
+const gen = `gen-${Date.now()}`;
 try {
   await upsert(sources, sourceDoc);
+  // Never regress an index status a previous --index run already advanced to "done".
+  const prior = await sessions(tenantId).findOne({ _id: sessionId });
+  if (prior?.status?.index === "done") sessionDoc.status.index = "done";
   await upsert(sessions, sessionDoc);
-  const del = await turnsColl(tenantId).deleteMany({ sessionId });
-  for (const t of turns) await turnsColl(tenantId).insertOne(strip(t));
+  const tw = await replaceSessionRows(turnsColl(tenantId), { sessionId }, turns.map(strip), gen);
   for (const s of speakerDocs) await upsert(speakers, s);
   for (const o of orgDocs) await upsert(orgs, o);
   for (const t of topicDocs) {
@@ -177,9 +208,15 @@ try {
       { upsert: true },
     );
   }
-  const delE = await graphEdges(tenantId).deleteMany({ sessionRef: sessionId });
-  for (const e of edgeList) await graphEdges(tenantId).insertOne(e);
-  console.log(`written: turns -${del.deletedCount}/+${turns.length}, graph_edges -${delE.deletedCount}/+${edgeList.length}`);
+  const ew = await replaceSessionRows(graphEdges(tenantId), { sessionRef: sessionId }, edgeList, gen);
+  console.log(`written (${gen}): turns ${tw.upserted} upserted/${tw.removedStale} stale removed, ` +
+    `graph_edges ${ew.upserted} upserted/${ew.removedStale} stale removed`);
+  if (INDEX) {
+    const { buildIndexer } = await import("../../apps/api/src/production.ts");
+    const res = await buildIndexer()(tenantId, sessionId);
+    console.log(`indexed: chunks ${res.chunks.written}${res.chunks.skipped ? ` (skipped: ${res.chunks.skipped})` : ""}` +
+      `${res.entities ? `, entities ${JSON.stringify(res.entities)}` : ""}`);
+  }
 } finally {
   await close();
 }

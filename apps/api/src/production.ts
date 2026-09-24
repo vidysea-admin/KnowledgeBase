@@ -71,15 +71,18 @@ export function buildRouting(): {
   return { chains, providers, jobWrite };
 }
 
-export function buildProductionDeps(): ServerDeps {
-  const { chains, providers, jobWrite } = buildRouting();
-
-  const tavilySearchFn = createTavilySearchFn();
-
-  // Real "make ingested content searchable" step (ISS: summarize/claims/tree_index were declared
-  // job kinds with no implementation until now — see indexing.ts). Bound once here so every
-  // ingest composition root only ever calls `(tenantId, sessionId) => Promise<void>`.
-  const boundIndexer: BoundIndexer = (tenantId, sessionId) =>
+/**
+ * Real "make ingested content searchable" step (ISS: summarize/claims/tree_index were declared
+ * job kinds with no implementation until now — see indexing.ts). Bound once so every ingest
+ * composition root only ever calls `(tenantId, sessionId) => Promise<void>`.
+ *
+ * Exported (ISS-296) for the same reason `buildRouting` is: `scripts/webinar/sync-session.mjs
+ * --index` must index a bot-captured session through EXACTLY the binding the server's ingest
+ * routes use, not a second copy of it that could drift.
+ */
+export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRouting()): BoundIndexer {
+  const { chains, providers, jobWrite } = routing;
+  return (tenantId, sessionId) =>
     indexSession(tenantId, sessionId, {
       complete: (job) => routeComplete(job.kind, job, { chains, providers, write: jobWrite, tenantId }),
       // Wired only when a chain is configured for it (U1.3). Passing an embedder unconditionally
@@ -90,6 +93,15 @@ export function buildProductionDeps(): ServerDeps {
         ? (job) => routeEmbed("embedding", job, { chains, providers, write: jobWrite, tenantId })
         : undefined,
     });
+}
+
+export function buildProductionDeps(): ServerDeps {
+  const routing = buildRouting();
+  const { chains, providers, jobWrite } = routing;
+
+  const tavilySearchFn = createTavilySearchFn();
+
+  const boundIndexer = buildIndexer(routing);
 
   return {
     keyStore: createMongoApiKeyStore(),

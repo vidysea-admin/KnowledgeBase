@@ -1,0 +1,49 @@
+{
+  "unit": "webinar-bot-live",
+  "fixCycle": 2,
+  "date": "2026-09-24",
+  "app": "apps/web vite dev @ http://127.0.0.1:5291 (lane worktree, no API server)",
+  "browser": "playwright-core chromium headless",
+  "pages": [
+    {
+      "url": "/meeting-bot",
+      "h1": "Meeting Bot",
+      "loadMs": 1690,
+      "checks": {
+        "noNotLiveYet": true,
+        "noStaleNeverJoined": true,
+        "listsZohoCloudOnAir": true,
+        "showsLiveJoiner": true,
+        "disclosesNoReconnectT029": true,
+        "disclosesIncompleteCapture": true
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "action": "load /meeting-bot (unauthenticated)",
+      "sawLoginGate": true
+    },
+    {
+      "action": "fill API-key form with a placeholder + click Continue",
+      "url": "http://127.0.0.1:5291/meeting-bot"
+    },
+    {
+      "action": "reload /meeting-bot (key in localStorage)",
+      "url": "http://127.0.0.1:5291/meeting-bot"
+    },
+    {
+      "action": "click nav /",
+      "url": "http://127.0.0.1:5291/"
+    },
+    {
+      "action": "click nav /meeting-bot",
+      "url": "http://127.0.0.1:5291/meeting-bot",
+      "h1": "Meeting Bot"
+    }
+  ],
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "pass": true
+}
