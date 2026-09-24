@@ -4,15 +4,15 @@
   "north_star": "Build the Vidysea Living Knowledge Base as the brain for an AI virtual counsellor that matches and then beats every living top human counsellor in head-to-head evaluation (public championship, AlphaGo-style). Phase 1 exit: POST /ask over the 23 TOC sessions returns speaker+timestamp-cited internal answers, with web-fallback for off-corpus questions.",
   "status": "active",
   "created": "2026-09-03T07:01:15",
-  "updated": "2026-09-24T22:25:03",
+  "updated": "2026-09-25T02:26:43",
   "progress": {
     "total": 84,
-    "done": 43,
-    "in_progress": 4,
+    "done": 47,
+    "in_progress": 2,
     "blocked": 0,
-    "pending": 37,
+    "pending": 35,
     "current": "U2.4",
-    "percent": 51
+    "percent": 56
   },
   "tasks": [
     {
@@ -627,13 +627,14 @@
     {
       "id": "U2.6",
       "title": "Real graph_edges rows + merge at the route boundary",
-      "status": "in_progress",
+      "status": "done",
       "base_criticality": "MEDIUM",
       "deps": [
         "U2.1"
       ],
       "criticality": "critical",
-      "note": "do NOT reshape flatten-graph.ts — map in routes/graph.ts | 2026-09-24: live evidence D-027/D-028; awaiting checker (webinar-bot-live) — ISS-288"
+      "note": "do NOT reshape flatten-graph.ts — map in routes/graph.ts | 2026-09-24: live evidence D-027/D-028; awaiting checker (webinar-bot-live) — ISS-288",
+      "completed": "2026-09-25T02:21:30"
     },
     {
       "id": "U3.1",
@@ -667,13 +668,14 @@
     {
       "id": "U4.2",
       "title": "ONE real meeting-bot joiner (browser/Meet); quarantine the other two",
-      "status": "in_progress",
+      "status": "done",
       "base_criticality": "MEDIUM",
       "deps": [
         "U4.1"
       ],
       "criticality": "low",
-      "note": "three stubs + a package imported by nothing is negative-value inventory | 2026-09-24: live evidence D-027/D-028; awaiting checker (webinar-bot-live) — ISS-288"
+      "note": "three stubs + a package imported by nothing is negative-value inventory | 2026-09-24: live evidence D-027/D-028; awaiting checker (webinar-bot-live) — ISS-288",
+      "completed": "2026-09-25T02:21:20"
     },
     {
       "id": "T-029",
@@ -705,11 +707,12 @@
     {
       "id": "T-032",
       "title": "OBS guard: Safe Mode / websocket-down detection + normal restart",
-      "status": "pending",
+      "status": "done",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "force-killed OBS relaunched in Safe Mode on 2026-09-24"
+      "note": "force-killed OBS relaunched in Safe Mode on 2026-09-24",
+      "completed": "2026-09-25T02:22:09"
     },
     {
       "id": "T-033",
@@ -840,11 +843,12 @@
     {
       "id": "T-047",
       "title": "Record controller must survive console close: run hidden/detached, plus a finalize-on-restart watchdog (detect OBS still recording with no controller → finalize)",
-      "status": "pending",
+      "status": "done",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "2026-09-24: controller died 16:30:56 (console closed, Ctrl+C exit); OBS + bot kept going; recovered by hand with `lkb finalize --stop-obs`"
+      "note": "2026-09-24: controller died 16:30:56 (console closed, Ctrl+C exit); OBS + bot kept going; recovered by hand with `lkb finalize --stop-obs`",
+      "completed": "2026-09-25T02:21:13"
     },
     {
       "id": "T-049",
@@ -947,8 +951,8 @@
     "risk_tolerance": "conservative"
   },
   "analytics": {
-    "velocity_per_day": 1.02,
-    "eta_days": 40.2
+    "velocity_per_day": 1.19,
+    "eta_days": 31.1
   },
-  "last_deterministic_tick": "2026-09-24T22:25:03"
+  "last_deterministic_tick": "2026-09-25T02:26:43"
 }

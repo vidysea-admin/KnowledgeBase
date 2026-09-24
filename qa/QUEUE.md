@@ -1,4 +1,84 @@
-# QUEUE — checker Mode B sweep 2026-09-24T22:1x+05:30 (3-shard wave, consolidated)
+# QUEUE — checker Mode B sweep 2026-09-25T02:xx+05:30 (3-shard wave, consolidated)
+
+> Bound to `D:/KnowledgeBase`, master @ `b60b9fc` at dispatch; sweep writer runs solo (a parallel
+> `/maker` session, knowledgebase-ef, is live in the same tree — this consolidation touched only
+> checker surfaces + a narrow commit). **Terminal state: FINDINGS: 5 new (ISS-299 medium, ISS-300
+> medium, ISS-301 low) + 8 ledger rows moved to `verified` on re-derived evidence** (ISS-288,
+> ISS-291, ISS-292, ISS-293, ISS-294, ISS-295, ISS-296, ISS-297) + 3 `.goal/goal.json` tasks closed
+> (T-047, U4.2, U2.6) via `goal_cli.py done`.
+>
+> **Verified and closed, re-derived from disk (not from the shard reports' say-so):**
+> - **T-047** — cycle 1 PASSed (`8c1cfc1`) and merged (`784df67`) 2026-09-25T00:31; `.goal/goal.json`
+>   still read `pending`. Closed. **ISS-299 (medium, tracker-integrity)** filed for the tracker gap
+>   itself, since goal.json and TASKS.md do not self-update on merge.
+> - **U4.2** — "ONE real meeting-bot joiner; quarantine the other two." `webinar-bot-live` cycle 2
+>   PASS (`c21355e`, merged `856d31b`) confirms one live browser joiner (Zoho webinar, OBS-recorded)
+>   and the Vexa/system-audio stub language correctly re-scoped to those two only. Closed. ISS-294/
+>   296/297/291 (all COVERED per the cycle-2 verdict's own capability table) moved `open → verified`.
+> - **U2.6** — "Real graph_edges rows + merge at the route boundary." Re-derived independently
+>   against `qa/contracts/brain-knowledge-graph.md` [C1] and the U-BRAIN verdict (`a264c49`): `/graph`
+>   now unions `tree_index` + `graph_edges`, and `apps/api/src/routes/graph.ts`'s stale "ZERO real
+>   rows" disclosure is corrected in the same change. Closed. ISS-295 moved `open → verified`; ISS-292
+>   (brain-knowledge-graph, 7/8 criteria MET) and ISS-293 (calendar-grid-ui, 8/9 MET) also moved
+>   `open → verified` — both manifests read `checked-PASS`, closed out by the maker 2026-09-25, and
+>   neither had been reflected in the ledger yet.
+> - **ISS-288** (the prior sweep's tracker-divergence finding for U4.2/U2.6) moved `fixed → verified`
+>   — its fix_direction asked only for `pending → in_progress`; this sweep verified the underlying
+>   work and closed both tasks outright, which is a strict superset.
+>
+> **Shard findings NOT filed, verified against disk:**
+> - **t-029-reconnect stale-builder state** — real (`sb_join.py`/`test_sb_join.py` modified,
+>   uncommitted, mtimes 01:02/02:11), but `qa/.last-tick`'s own most recent line already documents
+>   "t-029 dead amendment builder re-dispatched" — known and in hand, not filed.
+> - **u2-4-phase3-fix cycle 1** — `ready-for-check` (`6256e94`) with the maker's own checker already
+>   dispatched. Not a gap.
+> - **Untracked `qa/manifests/u2-4-phase3-precision-regate.md`** — confirmed a stale cycle-0 copy
+>   (`Status: ready-for-check` at Fix cycle 0, superseded by the cycle-1 rework on
+>   `u2-4-phase3-fix`). Low-severity leftover, not an issue; left untouched (not a checker-owned
+>   surface to clean up).
+> - **Six standing HUMAN_GATE files remain unanswered** (only Umesh can close these — not filed,
+>   per dispatch): `enforcement-hooks-unauthorized-and-live-regressed.md`,
+>   `d015-generalisation-scope.md`, `d023-supersede.md`, `ledger-shard-union-hook.md`,
+>   `mc-hooks-manifest-blindness.md`, `ui-surfaces-test-file-exclusion.md`.
+> - **`lane-data-isolation` contract** — status `proposed` (encodes Umesh's option-D answer on
+>   `qa/gates/lane-writes-shared-database.md`); the maker has not yet built to it. Not a sweep
+>   finding — noted for the maker's own backlog.
+>
+> **Structural + spend signals (never a blocker):**
+> - **ISS-300 (medium, structural-erosion)** — `packages/meeting-bot/src/capture/record-commands.ts`
+>   (270 lines) rewritten across 5 units (`21a2efe`, `fd74864`, `cfaf464`, `1e1a84e`, `b303a5f`); its
+>   siblings `controller-state.ts`/`watchdog.ts` each got a dedicated `.test.ts`, it did not.
+> - **ISS-301 (low, token-spend)** — 2026-09-24 `opus_sub_share` 0.53 (38 subagents, 11 Opus),
+>   driven by wave concurrency (peak 5), not any single fix-cycle-3 manifest.
+>
+> **Top-3 recommended next units** (project tier order — tier 3 roadmap is not optional):
+> 1. **[tier 3 — roadmap, mandatory]** `T-033` — "Tests (fake OBS client failure paths, audioPath) +
+>    /checker PASS for the phase-0 bot." Unblocked: its stated dependency `T-032` now reads `done` in
+>    goal.json (peer-checker PASSed since the last sweep). Continues the user's standing P1 sequence
+>    (T-047 → T-029 → T-030 → T-032 → **T-033**). TASKS.md:123 already notes "closes U4.2" — verify
+>    that framing still holds now that U4.2 closed via the webinar-bot-live route instead; if T-033's
+>    own scope is already subsumed, say so in its manifest rather than silently dropping it.
+> 2. **[tier 2 — open critical ledger issue]** `ISS-104` — speaker-resolution-llm, critical,
+>    2026-09-08, still `open`: the cycle-2 naming-cue rule does not close C2b (a cue phrase adjacent
+>    to any capitalised non-name still ships a fabricated person). Related to but distinct from the
+>    in-flight `u2-4-phase3-fix` cycle (that unit targets the phase-3 precision re-gate bars; ISS-104
+>    targets the underlying cue-rule false-positive class). Pick up once `u2-4-phase3-fix` cycle 1's
+>    verdict lands, on the same files, to avoid a collision.
+> 3. **[tier 3 — roadmap]** `T-031` — "Live audio watchdog via OBS meters (>2 min silence → alert +
+>    reconnect)." Unblocked (no deps in goal.json), not yet started, next in the meeting-bot roadmap
+>    sequence after the T-029/T-030/T-032/T-033 SERIAL chain clears.
+> 4. **[maker-owned, not a checker surface]** Flip `TASKS.md` trackers to match the goal.json closes
+>    this sweep made: `T-047` (line 137, open → done, cite `784df67`/`8c1cfc1`), `U2.6` (line 110,
+>    open → done, cite `a264c49`), `U4.2` (line 113, in_progress → done, cite `c21355e`/`856d31b`).
+>    Per project CLAUDE.md, TASKS.md is not checker-writable — queued for the maker.
+>
+> Token line appended 02:06:45 (main 520.2M / sub 405.9M, opus_sub_share 0.53, sub_agents 38,
+> compactions 2, outages 0). `.last-sweep` stamped at HEAD `b60b9fc` (unchanged by this sweep — no
+> code commit made; ledger/inbox/queue/goal changes only).
+
+---
+
+## Prior sweep header (2026-09-24T22:1x+05:30, 3-shard wave, superseded as routing; kept for its own findings below)
 
 > Range: `3ca44fb..HEAD` (HEAD `b1c9d01`) + working tree. **Terminal state: FINDINGS: 1 new (ISS-288,
 > medium)** — everything else this sweep's shards proposed either duplicated live checker output

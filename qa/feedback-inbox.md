@@ -144,3 +144,6 @@ APPLIES NEXT: (1) confirm the layer distinction with Umesh; (2) if he wants iden
 
 - 2026-09-24T21:56:12+05:30 · user (chat, maker resume session) · "just remember that you are the /maker   only" — role reminder: this session builds + dispatches; verdicts/sweeps come only from fresh /checker subagents.
 — folded 2026-09-24 (Mode B sweep consolidation): process-only, no contract or build target — recorded as standing session-role discipline; ISS-215 refreshed to reflect both entries now accounted for.
+
+- 2026-09-24T22:53:11+05:30 · knowledgebase-98 (peer checker session) · PATTERN: verdict files must carry `**Cycle checked:** N` on its own line, never only mid-line behind a `·` separator — the Stop-hook delivery gate (ISS-184 class, gate delivery-gate-c4-heading-form.md) cannot see compound stamps and reports phantom pending checks. EVIDENCE: qa/verdicts/u2-4-phase3-precision-regate.md line 3 compound stamp → hook "1 check pending" false positive 2026-09-24. APPLIES NEXT: every checker dispatch prompt from the maker; verdict template.
+— folded 2026-09-25 (Mode B sweep consolidation): already covered by D-030 (2026-09-25), which amended `qa/contracts/delivery-gate.md` [C4] to DROP the heading-stamp form and require the own-line `**Cycle checked:** N` form this entry asks for. No further build target; the amendment IS the applied pattern.
