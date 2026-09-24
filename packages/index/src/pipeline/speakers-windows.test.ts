@@ -263,3 +263,10 @@ test("c1b review: quoted or reported speech names nobody, even in a SHORT turn (
   const t = await extractSpeakers(ton, replies([{ speakerRef: "spk:3", displayName: "Kshitij", turnIds: ["t1"] }]));
   assert.deepEqual(t.resolved, [], "'thanks a ton, X' is a second thanked person");
 });
+
+test("c1b: an unquoted rhetorical call deep inside a long turn is not a handover (closing-stretch bound)", async () => {
+  // leeds t006 [spk:0], 11500 chars: "... Alka, Shweta, any more takers that we have? ..." at offset 7266,
+  // then t007 [spk:1] "That's a yes." (gold unnamed). No quote marks, so only the CLOSING bound refuses it.
+  const { resolved } = await extractSpeakers(corpus(LEEDS), replies([{ speakerRef: "spk:1", displayName: "Shweta", turnIds: [`${LEEDS}-t007`] }]));
+  assert.deepEqual(resolved, []);
+});
