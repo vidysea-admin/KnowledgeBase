@@ -441,4 +441,4 @@ and still stands; this amendment did not touch the reload/click behaviour observ
 extracted it into named, independently-tested functions.
 
 Fix cycle: 0
-Status: ready-for-check
+Status: checked-PASS — qa/verdicts/t-029-reconnect.md (Cycle checked: 0, 9eb5307); merged to master; meeting-bot 94/94 + pytest 17/17 on merged tree; debt ISS-T-029-1 (low, live proof script uncommitted)
