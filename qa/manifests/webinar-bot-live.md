@@ -8,7 +8,7 @@
 **Issues addressed:** ISS-285 (high, lint-dirsize regression), ISS-286 (high, missing Capability coverage table), ISS-287 (low, stale doc comment + undisclosed touched files). Live-run defects (unrelated to this cycle) remain tracked as T-029, T-030, T-032, T-047.
 **Queue tier:** 3, a roadmap task (Umesh's fast-track: built and live-run first, checked after; recorded in D-027)
 **Severity gate:** FULL ceremony. `scripts/webinar/sync-session.mjs` performs **data writes** to Mongo (lkb, tenant `toc`).
-**Status:** checked-PASS (verdict qa/verdicts/webinar-bot-live.md, cycle 1, commit 0add6e4)
+**Status:** FAIL cycle 1 — dual verdict (PASS by sonnet checker 0add6e4 + FAIL by opus checker with live-browser leg, same file; any FAIL = FAIL). Close-out 1e3c0cd was premature and is withdrawn. Fix cycle 2 pending (folds ISS-291).
 **Commits (cycle 0):** `fd74864` (feature) · `cfaf464` (split record commands out of cli.ts for lint-loc) · **(cycle 1, this fix):** see bottom of this file, on branch `feat/webinar-bot`
 
 ## What changed (cycle 0)
