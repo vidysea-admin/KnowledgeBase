@@ -125,6 +125,36 @@ speaker naming-cue) is the only open critical besides today's ISS-282 and sits o
 speaker seam per this repo's own precedent — pull decision belongs to a human; the u2-4-phase3 fix
 cycle 1 already in flight is the natural venue if pulled alongside it.
 
+## Umesh live requests, 2026-09-24 — product UI epic (checker-authored contracts, added by /checker)
+
+Two direct user instructions this session, both grounded in a visible-browser validation run by the
+checker the same evening. **These are independent of the two open FAILs above** — they touch
+`apps/web/src/pages/BrainPage.tsx`, `CalendarPage.tsx` and `apps/api/src/routes/graph.ts`, no file
+shared with the speaker seam or the webinar-bot seam, so they may run concurrently rather than
+waiting on #1/#2.
+
+4. **U-BRAIN — rebuild /brain as a real, drill-down, self-refreshing knowledge graph.**
+   Contract `qa/contracts/brain-knowledge-graph.md` (proposed, checker-authored). Issue **ISS-292**
+   (high). Umesh: *"it should look like a knowledgegraph aur like click krne mai we should get
+   further details like drill down ... isko update bhi krte rhna hai along with new sessions."*
+   Measured now: **0 rendered node labels** against 13 node shapes; `GET /graph` = 164 nodes/526
+   edges from `tree_index` only; the 94 real `graph_edges` rows are read by **no route**; the
+   2026-09-24 session has `chunks=0`, `session_pages=0` and is absent from `tree_index`, so it never
+   reaches the graph. Full ceremony: it changes a read path, so [I1] requires the cross-tenant probe
+   set to still pass.
+
+5. **U-CAL — rebuild /calendar as a Google-Calendar-shaped grid with filters.**
+   Contract `qa/contracts/calendar-grid-ui.md` (proposed, checker-authored). Issue **ISS-293**
+   (high). Umesh: *"this calendar should and must look like google calendar along with filters and
+   all."* Measured now: `CalendarPage.tsx` (191 LOC) renders `groupByMonth()` as stacked cards —
+   no month/week/day grid, no hour axis, no overlap handling, no filter control, and past sessions
+   and upcoming meetings sit in two disjoint lists. Renders the existing API only ([I1]); the
+   timezone criterion [C9] is an automatic FAIL if a row shifts.
+
+**Checker note on sequencing.** These are UI-surface units, so D-024 applies: each needs live
+visible-browser evidence, and per the standing rule the live check is run by a CHECKER writing its
+own script, never by the maker re-running its own. Both contracts name their verification probes.
+
 ## State summary
 
 - **2026-09-24 sweep update:** ids now run through ISS-288 (main ledger only in this repo; no
