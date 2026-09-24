@@ -2,7 +2,9 @@
  * packages/index/src/tree/tree-real-data.test.ts — T-004b contract C4: real-data integration
  * test. Loads T-002's actual migrated output (data/toc-migrated/*), no fixtures, no network,
  * builds a real tree with buildTree's default heuristic extractor, and checks:
- *   1. exactly 23 session leaves (one per data/toc-migrated/<slug>/ directory),
+ *   1. one session leaf per data/toc-migrated/<slug>/ directory — the 23 T-002 TOC sessions
+ *      plus any session added since (the 2026-09-24 bot-captured webinar, ISS-294), so the count
+ *      is derived from the directory listing, with 23 as the floor,
  *   2. at least one topic node whose evidence.sessionRefs spans more than one session
  *      (proves cross-session topic grouping works on real content, not synthetic fixtures),
  *   3. every node in the tree validates against schema/tree_index.schema.json's shape.
@@ -57,8 +59,10 @@ function assertValidNode(n: TreeIndexNode, path: string): void {
 
 test("real T-002 data: 23 session leaves, cross-session topic, schema-valid shape", () => {
   const { sessions, pages } = loadRealData();
-  assert.equal(sessions.length, 23, "expected 23 real migrated sessions as the fixture set");
-  assert.equal(pages.length, 23, "expected 23 real session_page.json files alongside them");
+  const dirCount = readdirSync(DATA_DIR, { withFileTypes: true }).filter((d) => d.isDirectory()).length;
+  assert.ok(dirCount >= 23, `expected at least the 23 real T-002 sessions, found ${dirCount} dirs`);
+  assert.equal(sessions.length, dirCount, "expected one session.json per migrated session dir");
+  assert.equal(pages.length, dirCount, "expected one session_page.json alongside each");
 
   const roots = buildTree(sessions, pages);
   assert.ok("toc" in roots, "expected a single tenant root for 'toc'");
@@ -75,7 +79,7 @@ test("real T-002 data: 23 session leaves, cross-session topic, schema-valid shap
   };
   walk(root);
 
-  assert.equal(allSessionLevelNodes.length, 23, "expected 23 session leaves in the built tree");
+  assert.equal(allSessionLevelNodes.length, dirCount, "expected one session leaf per migrated session");
 
   const crossSessionTopics = allTopicLevelNodes.filter((t) => {
     const refs = (t.evidence as { sessionRefs?: string[] } | undefined)?.sessionRefs ?? [];

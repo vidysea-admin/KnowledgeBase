@@ -1,0 +1,19 @@
+Scope: 10 of 11 workspace projects
+apps/web typecheck$ tsc --noEmit -p tsconfig.json
+packages/core typecheck$ tsc --noEmit -p tsconfig.json
+packages/core typecheck: Done
+apps/web typecheck: Done
+packages/db typecheck$ tsc --noEmit -p tsconfig.json
+packages/ai typecheck$ tsc --noEmit -p tsconfig.json
+packages/db typecheck: Done
+packages/ai typecheck: Done
+packages/ask typecheck$ tsc --noEmit -p tsconfig.json
+packages/index typecheck$ tsc --noEmit -p tsconfig.json
+packages/ingest typecheck$ tsc --noEmit -p tsconfig.json
+packages/ask typecheck: Done
+packages/ingest typecheck: Done
+packages/index typecheck: Done
+packages/meeting-bot typecheck$ tsc --noEmit -p tsconfig.json
+apps/api typecheck$ tsc --noEmit -p tsconfig.json
+packages/meeting-bot typecheck: Done
+apps/api typecheck: Done

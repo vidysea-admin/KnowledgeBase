@@ -1,0 +1,9 @@
+
+> living-knowledge-base@0.0.0 lint:structure D:\KnowledgeBase-lanes\iss-291-sync-txn
+> node scripts/lint-loc.mjs && node scripts/lint-dirsize.mjs && node scripts/lint-root.mjs && node scripts/lint-dupes.mjs && node scripts/lint-migrations.mjs && node scripts/snapshot.mjs --check && node --test scripts/lint.test.mjs && node scripts/tracker-audit.mjs --gate g1,g4 && depcruise --config .dependency-cruiser.cjs packages apps workers
+
+lint-loc: OK (298 file(s) within budget)
+lint-dirsize: OK (80 dir(s) within budget)
+lint-root: FAIL — 1 violation(s)
+  root has 16 loose files (budget 15): .dependency-cruiser.cjs .dockerignore .env.example .gitignore .gitmodules AGENTS.md ARCHITECTURE.md docker-compose.yml Living-Knowledge-Base-Architecture.html migrate-mongo-config.cjs package.json pnpm-lock.yaml pnpm-workspace.yaml structure.config.json TASKS.md tsconfig.base.json
+ ELIFECYCLE  Command failed with exit code 1.

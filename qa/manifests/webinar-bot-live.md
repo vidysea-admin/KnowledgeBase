@@ -3,13 +3,272 @@
 **Contract:** qa/contracts/meeting-bot-capture.md (C1/C2 extended, C3 superseded for the browser joiner). Draft successor `qa/contracts/meeting-bot-live-capture.md` (T-024b) exists, checker-authored, not yet adopted (the maker never edits qa/contracts/).
 **Goal task:** U4.2 (one real meeting-bot joiner) · T-024b · D-027 · D-028
 **Date:** 2026-09-24
-**Fix cycle:** 1 of max 3
+**Fix cycle:** 2
+(of max 3)
 **Dual check:** no
-**Issues addressed:** ISS-285 (high, lint-dirsize regression), ISS-286 (high, missing Capability coverage table), ISS-287 (low, stale doc comment + undisclosed touched files). Live-run defects (unrelated to this cycle) remain tracked as T-029, T-030, T-032, T-047.
+**Issues addressed (cycle 2):** ISS-294 (high, [C7] `pnpm -r test` red), ISS-296 (high, [B] session never indexed), ISS-297 (medium, [C] /meeting-bot page false), ISS-291 (high, data-write: sync-session delete-then-insert with no transaction). NOT this unit's: ISS-295 (graph_edges unreachable by any route — owned by the other session's U-BRAIN unit; `apps/api/src/routes/graph.ts` untouched here). The cycle-1 FAIL block's `ISSUES-WRITTEN: ISS-289..292` is the known cross-lane citation defect; the peer checker re-allocated them to ISS-294..297 (master 6afbdbb), and the original ISS-291 is its own row.
+**Issues addressed (cycle 1):** ISS-285 (high, lint-dirsize regression), ISS-286 (high, missing Capability coverage table), ISS-287 (low, stale doc comment + undisclosed touched files). Live-run defects (unrelated to this cycle) remain tracked as T-029, T-030, T-032, T-047.
 **Queue tier:** 3, a roadmap task (Umesh's fast-track: built and live-run first, checked after; recorded in D-027)
 **Severity gate:** FULL ceremony. `scripts/webinar/sync-session.mjs` performs **data writes** to Mongo (lkb, tenant `toc`).
-**Status:** FAIL cycle 1 — dual verdict (PASS by sonnet checker 0add6e4 + FAIL by opus checker with live-browser leg, same file; any FAIL = FAIL). Close-out 1e3c0cd was premature and is withdrawn. Fix cycle 2 pending (folds ISS-291).
+**Status:** ready-for-check
 **Commits (cycle 0):** `fd74864` (feature) · `cfaf464` (split record commands out of cli.ts for lint-loc) · **(cycle 1, this fix):** see bottom of this file, on branch `feat/webinar-bot`
+
+**Commits (cycle 2):** on branch `wave/iss-291-sync-txn` (lane worktree `D:/KnowledgeBase-lanes/iss-291-sync-txn`, base master `ceb268c`); sha in the commit that carries this manifest.
+
+## Fix cycle 2: findings answered (each quoted verbatim from the cycle-1 FAIL block)
+
+> **[C7] sev: high**: "`pnpm -r test` fails: packages/index tree-real-data.test.ts ENOENTs on this unit's own new data dir, the only one of 27 missing session.json/session_page.json - fix direction: emit session.json + session_page.json for the bot-captured session (same artifacts Finding B needs), then re-run `pnpm -r test` — not just the meeting-bot filter" → **ISS-294**
+
+**Fix.** `sync-session.mjs --emit-files` writes `session.json`, `session_page.json` and `claims.json` into `data/toc-migrated/2026-09-24-zoho-next-european-study-destinations/`. `buildSessionFiles` (`scripts/webinar/session-rows.mjs`) builds them from three inputs:
+- `meta.json`: title, date, people, roles, orgs, partnerOf;
+- `source.json`: `_id`;
+- `turns.json`: the evidence turn ids, one per speaking person (that person's first turn).
+
+The fields match the TOC dirs. `session.json` has `_id, tenantId, sourceId, title, date, org, status`. `session_page.json` has `_id, tenantId, sessionId, summary, keyInsights, evidence[]`. `claims.json` is `[]`, because nobody hand-wrote claims for this session. `seed-toc.mjs` also reads `claims.json` unconditionally. Nothing in these files goes beyond what those three inputs state.
+
+Once the files existed, `packages/index/src/tree/tree-real-data.test.ts` failed on its hard-coded count (`actual: 24, expected: 23`), because the directory now legitimately holds 24 sessions. The count is now derived from the directory listing, with 23 as a floor: `dirCount >= 23`, `sessions.length === dirCount`, `pages.length === dirCount`, and session leaves `=== dirCount`. The test name and its other two assertions are unchanged.
+
+> **[B] sev: high**: "the session is written but never indexed — chunks 0, session_pages 0, claims 0, tree_index does not mention it — so /ask cannot answer from it while /search finds 20 turns - fix direction: have the sync (or a documented follow-up step) refresh tree_index/chunks/session_pages, or flip status.index to a tracked task the manifest names" → **ISS-296**
+
+**The existing indexing path.** Every live-ingested session is indexed by `indexSession` (`apps/api/src/indexing/session.ts:151`). That covers URL ingest (`apps/api/src/ingest-store.ts:68-70`) and WhatsApp (`whatsapp-store.ts:166-168`). `production.ts` binds it once. It runs these steps:
+- LLM summary → `session_pages`;
+- evidence-checked claims → `claims`;
+- `writeSessionChunks` → `chunks` + vectors;
+- `recordVectorGap`;
+- an incremental `regenerate()` of `tree_index`;
+- `promoteAndPersistEntities`;
+- `status.index → "done"`.
+
+The 23 TOC sessions came in differently. Their `session_pages` and `claims` came from pre-written JSON via `seed-toc.mjs`, and their chunks from `backfill.mjs chunks`, which calls the same `writeSessionChunks`. `indexSession` is the one path that covers all four missing stores.
+
+**Reused, not reimplemented.** `production.ts` had an inline `boundIndexer` closure. It is now an exported `buildIndexer(routing = buildRouting())`, and `buildProductionDeps` calls `buildIndexer(routing)` with its same routing object, so the server's binding is unchanged. `sync-session.mjs --index` runs `buildIndexer()(tenantId, sessionId)` after the sync. The only writes are `indexSession`'s own: its `scopedCollection` accessors and its existing `tree_index` `replaceOne(treeIndexRootFilter(tenantId))`. No graph route was touched. A re-sync no longer resets `status.index` from `done` back to `pending` (`sync-session.mjs:198-200`).
+
+> **[C] sev: medium**: "/meeting-bot page still says "Not live yet" and "every joiner is a tested-against-fakes stub", and omits zoho/cloudonair - fix direction: update MeetingBotPage.tsx:6,13,31-32 to describe the real browser joiner and list the two new platforms" → **ISS-297**
+
+**Fix.** Changes to `apps/web/src/pages/MeetingBotPage.tsx`:
+- The header now reads "One real joiner is live (a local browser on Windows, recorded with OBS)".
+- Platform detection now lists "Meet / Teams / Zoom / Webex / Zoho (webinar & meeting) / Google Cloud OnAir".
+- A new card: "Live since 2026-09-24 · Browser joiner + OBS capture".
+- A "Known gaps" note:
+  - no auto-reconnect yet (T-029);
+  - the first run lost about 5–8 minutes, so **its capture is not complete**;
+  - the window video is sometimes black;
+  - it runs on one Windows machine;
+  - the Vexa and system-audio joiners are still tested-against-fakes stubs.
+
+`MeetingBotPage.test.tsx`:
+- The first test asserted the sentence that is now false. It is rewritten to assert that the stale text is absent and that the live joiner and each gap are present.
+- New test: the Zoho / Cloud OnAir listing.
+- The four-building-blocks test is unchanged.
+
+> **ISS-291 (high, data-write)**: "scripts/webinar/sync-session.mjs deletes a session's turns and graph_edges then re-inserts them one-by-one with no transaction and no rollback on partial failure"
+
+**Transaction support checked.** `hello` against `MONGODB_URL` returned `{"setName":null,"msg":null,"isWritablePrimary":true,"maxWireVersion":21,...}`. That is a **standalone** server with no replica set, so `withTransaction` is unavailable.
+
+**Fix: a safe swap.** `replaceSessionRows` in `scripts/webinar/session-rows.mjs` runs two steps:
+1. Upsert every new row by its deterministic `_id` through `coll(tenantId).updateOne(..., {upsert:true})`, stamped `syncGen: gen-<ms>`.
+2. **Only after every upsert has succeeded**, run `coll(tenantId).deleteMany({ ...scope, syncGen: { $ne: gen } })`. This removes old-generation rows, including rows the new set no longer has.
+
+A throw in step 1 deletes nothing. Every row is either its old or its new version, and a re-run converges.
+
+The ids are deterministic (`<sid>-tNNN`, `toc-edge:…`), so "insert the new generation, then delete the old" becomes "upsert, then delete stale". Giving the new generation separate ids would change every turn id that edges, pages and claims cite.
+
+Tenant scoping is still applied by the accessor. The helper receives `coll(tenantId)`, never a raw handle.
+
+## What changed (cycle 2)
+- `scripts/webinar/session-rows.mjs` (**new**): `replaceSessionRows` (ISS-291) and `buildSessionFiles` (ISS-294). They are a separate module so they can be unit-tested; `sync-session.mjs` runs its whole job at import time.
+- `scripts/webinar/session-rows.test.mjs` (**new**, wired into `package.json` `test:lint`): 3 tests.
+  - a clean swap;
+  - an **injected failing write** mid-run: a fake `coll` whose 2nd upsert throws;
+  - the derived session files.
+- `scripts/webinar/sync-session.mjs`:
+  - turns and graph_edges now go through `replaceSessionRows`;
+  - new `--emit-files` and `--index` flags;
+  - a re-sync keeps `status.index` at `done`;
+  - header doc updated.
+- `apps/api/src/production.ts`: `buildIndexer` extracted and exported. Behaviour is unchanged; `buildProductionDeps` uses it.
+- `packages/index/src/tree/tree-real-data.test.ts`: the session count comes from the directory listing, with 23 as the floor.
+- `apps/web/src/pages/MeetingBotPage.tsx` and `.test.tsx`: ISS-297.
+- `data/toc-migrated/2026-09-24-zoho-next-european-study-destinations/{session,session_page,claims}.json` (**new**, generated by `--emit-files`).
+- `package.json`: `test:lint` gains `scripts/webinar/session-rows.test.mjs`.
+- Evidence:
+  - `qa/evidence/webinar-bot-live-c2-2026-09-24/`: the full outputs of `pnpm -r test`, `pnpm -r typecheck` and `pnpm lint:structure`, ANSI stripped;
+  - `qa/evidence/browser-webinar-bot-live-c2-2026-09-24/`: report.json, a screenshot and the smoke script.
+- **Not touched:**
+  - `apps/api/src/routes/graph.ts`, the `apps/web` Brain and Calendar pages, and `packages/index/src/tree/flatten-graph.ts` (the other session's files);
+  - `qa/contracts/`;
+  - `packages/db/src/lib/tenantScope.ts`.
+
+## How to verify (cycle 2): contract criteria, then commands with REAL outputs
+
+| Criterion | Command | Result |
+|---|---|---|
+| **meeting-bot-capture.md C7** ("no regression": `pnpm -r test` + `pnpm -r typecheck` green) | `pnpm -r test` · `pnpm -r typecheck` | GREEN, both exit 0 (below) |
+| C7 structure gates | full `pnpm lint:structure`, plus each stage after lint-root run on its own | all green except the pre-existing lint-root failure (ISS-248) |
+| C1/C2 (platform detection + join-strategy routing, incl. zoho/cloudonair) | inside `pnpm -r test` → `packages/meeting-bot 43/43` | GREEN |
+| C3 | superseded for the browser joiner only (cycle-1 ruling); untouched this cycle | — |
+| ISS-291 safe write | `node --test scripts/webinar/session-rows.test.mjs` + falsification | GREEN 3/3; the mutant goes red (Capability coverage row 13) |
+| ISS-294 files | `pnpm --filter @lkb/index test` with and without the files | before: 214/215, ENOENT → after: 215/215 (row 14) |
+| ISS-296 indexed | live `--index` run + read-only read-back | chunks 65, session_pages 1, claims 66, tree_index mentions the session |
+| ISS-297 page | vitest + a browser smoke run | 3/3; report.json `pass: true` |
+
+**`pnpm -r test`**: the FULL run, not filtered. It exited 0. The complete 835-line output is in `qa/evidence/webinar-bot-live-c2-2026-09-24/pnpm-r-test.txt`. Every per-package summary line, verbatim:
+```
+Scope: 10 of 11 workspace projects
+packages/core test: ℹ tests 7
+packages/core test: ℹ pass 7
+packages/core test: ℹ fail 0
+apps/web test:  Test Files  13 passed (13)
+apps/web test:       Tests  56 passed (56)
+packages/db test: ℹ tests 14
+packages/db test: ℹ pass 14
+packages/db test: ℹ fail 0
+packages/ai test: ℹ tests 74
+packages/ai test: ℹ pass 74
+packages/ai test: ℹ fail 0
+packages/ask test: ℹ tests 50
+packages/ask test: ℹ pass 50
+packages/ask test: ℹ fail 0
+packages/index test: ℹ tests 215
+packages/index test: ℹ pass 215
+packages/index test: ℹ fail 0
+packages/ingest test: ℹ tests 97
+packages/ingest test: ℹ pass 97
+packages/ingest test: ℹ fail 0
+packages/meeting-bot test: ℹ tests 43
+packages/meeting-bot test: ℹ pass 43
+packages/meeting-bot test: ℹ fail 0
+apps/api test: ℹ tests 173
+apps/api test: ℹ pass 173
+apps/api test: ℹ fail 0
+RC=0   (no ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL)
+```
+
+**`pnpm -r typecheck`**: exited 0, and all 10 projects report `Done` (`pnpm-r-typecheck.txt`).
+
+**`pnpm lint:structure`**: the FULL composite. Its complete output, verbatim (also in `pnpm-lint-structure.txt`):
+```
+> living-knowledge-base@0.0.0 lint:structure D:\KnowledgeBase-lanes\iss-291-sync-txn
+> node scripts/lint-loc.mjs && node scripts/lint-dirsize.mjs && node scripts/lint-root.mjs && node scripts/lint-dupes.mjs && node scripts/lint-migrations.mjs && node scripts/snapshot.mjs --check && node --test scripts/lint.test.mjs && node scripts/tracker-audit.mjs --gate g1,g4 && depcruise --config .dependency-cruiser.cjs packages apps workers
+
+lint-loc: OK (298 file(s) within budget)
+lint-dirsize: OK (80 dir(s) within budget)
+lint-root: FAIL — 1 violation(s)
+  root has 16 loose files (budget 15): .dependency-cruiser.cjs .dockerignore .env.example .gitignore .gitmodules AGENTS.md ARCHITECTURE.md docker-compose.yml Living-Knowledge-Base-Architecture.html migrate-mongo-config.cjs package.json pnpm-lock.yaml pnpm-workspace.yaml structure.config.json TASKS.md tsconfig.base.json
+ ELIFECYCLE  Command failed with exit code 1.
+```
+The lint-root failure is **pre-existing (ISS-248)**. `git ls-tree ceb268c | awk '$2=="blob"{print $4}' | wc -l` returns `16`: the same 16 names, at this cycle's base commit. This cycle adds no root file.
+
+The chain stops at lint-root, so each later stage was run on its own:
+```
+$ node scripts/lint-dupes.mjs        → lint-dupes: OK (320 unique export(s), 24 unique schema $id(s))
+$ node scripts/lint-migrations.mjs   → lint-migrations: OK (1094 file(s) scanned)
+$ node scripts/snapshot.mjs --check  → OK: docs/SNAPSHOT.md matches a fresh regeneration (117 lines, budget 200)
+$ node --test scripts/lint.test.mjs  → ℹ tests 14 / ℹ pass 14 / ℹ fail 0
+$ node scripts/tracker-audit.mjs --gate g1,g4 → tracker-audit: OK (gate G1,G4)
+$ npx depcruise --config .dependency-cruiser.cjs packages apps workers → ✔ no dependency violations found (311 modules, 961 dependencies cruised)
+```
+lint-migrations scans fewer files here (1094) than in the main tree (~3436), because the lane has no `raw/` payload. There is no violation in either.
+
+**Dry-run.** The new flags, run against an unroutable host (`MONGODB_URL=mongodb://192.0.2.1:27017`, `MONGODB_DB=SHOULD_NEVER_BE_TOUCHED`). It exited 0 in 2.3 s:
+```
+$ node scripts/webinar/sync-session.mjs 2026-09-24-zoho-next-european-study-destinations --dry-run --emit-files --index
+session 2026-09-24-zoho-next-european-study-destinations (tenant toc)
+  turns 80 · speakers 3 · orgs 6 · topics 15
+  graph_edges 94: {"held_on":1,"in_month":1,"captured":1,"spoke_in":3,"represents":2,"located_in":8,"partner_of":4,"covers":22,"discussed":52}
+  would write session.json
+  would write session_page.json
+  would write claims.json
+  index plan: summarize + claims (LLM, routed per config/ai-routing.yaml) -> session_pages/claims; 65 chunk(s) to embed from 80 turns; tree_index regenerate([2026-09-24-zoho-next-european-study-destinations]); entity promotion; sessions.status.index -> done
+No Mongo connection attempted (--dry-run).
+```
+The plain dry-run still prints turns 80 · speakers 3 · orgs 6 · topics 15 · graph_edges 94, the same breakdown as cycles 0 and 1.
+
+**Live runs** (tenant toc, this one session only):
+```
+$ node scripts/webinar/sync-session.mjs 2026-09-24-zoho-next-european-study-destinations --emit-files --index
+session 2026-09-24-zoho-next-european-study-destinations (tenant toc)
+  turns 80 · speakers 3 · orgs 6 · topics 15
+  graph_edges 94: {"held_on":1,"in_month":1,"captured":1,"spoke_in":3,"represents":2,"located_in":8,"partner_of":4,"covers":22,"discussed":52}
+  wrote session.json
+  wrote session_page.json
+  wrote claims.json
+written (gen-1790271063597): turns 80 upserted/0 stale removed, graph_edges 94 upserted/0 stale removed
+indexed: chunks 65, entities {"topics":143,"orgs":2,"claimsTagged":66,"skipped":null}
+
+$ node scripts/webinar/sync-session.mjs 2026-09-24-zoho-next-european-study-destinations      # idempotent re-sync
+written (gen-1790271151036): turns 80 upserted/0 stale removed, graph_edges 94 upserted/0 stale removed
+```
+
+**Read-only read-back after the re-sync.** My own probe, using only `countDocuments`, `distinct` and `findOne`:
+```
+{"setName":null,"msg":null,"isWritablePrimary":true,"maxWireVersion":21,"logicalSessionTimeoutMinutes":30}
+turns 80
+graph_edges 94
+chunks 65
+session_pages 1
+claims 66
+tree_index toc docs 1 mentions session: 1
+sessions.status {"transcribe":"done","diarize":"done","summarize":"done","index":"done"}
+turns with syncGen 80 distinct gens ["gen-1790271151036"]
+edges distinct gens ["gen-1790271151036"]
+session_page summary: This webinar highlights Hungary and Greece as emerging study destinations, moving beyond their traditional tourism image. Anjum from International Business School (IBS) in Hungary and Sagar from Hellenic American University (HAU) in Greece present their institutions, emphasizing affordability, Engli
+cross-tenant rows {"turns":0,"edges":0,"chunks":0}
+```
+The same probe, run before any write this cycle, returned `turns 80 · graph_edges 94 · chunks 0 · session_pages 0 · claims 0 · tree_index mentions session: 0`, which matches the checker's numbers.
+
+After the re-sync:
+- all 80 turns and all 94 edges carry one generation, so no stale rows remain;
+- `status.index` stayed `done`.
+
+**Not verified by me:** a live `POST /ask` answer for this session. No API server ran in this lane; the checker's Mode D covers it.
+
+**Where the data went.** `--index` sent this session's 80 turns to the routed `summarize`, `claims` and `embedding` chains, which try Gemini first per `config/ai-routing.yaml`. Gemini also transcribed this session. This is tenant-toc webinar content, not V3.3, Pathlynks or student data.
+
+## Capability coverage (cycle 2 rows; rows 1–12 below stand unchanged)
+
+Mutation runs follow D-020: a byte backup to scratch, a `trap` restore on EXIT/INT/TERM/ERR, `timeout` around the test command, and a `cmp` after the restore.
+
+| # | Capability | Check | `observed` |
+|---|---|---|---|
+| 13 | ISS-291 safe swap: a failure mid-write deletes nothing; a success removes only this scope's stale rows | `node --test scripts/webinar/session-rows.test.mjs` | **COVERED.** Green before: 3/3. Mutant: put back the old order (`await scoped.deleteMany({ ...scope })` before the upsert loop). Red after, 1 pass / 2 fail: `✖ safe swap: an injected failing write mid-run deletes NOTHING` with `AssertionError: all 4 rows of the session must still exist after a failed run`, and `✖ safe swap: a successful run ...` with `actual: { upserted: 3, removedStale: 0 }` against `expected: { upserted: 3, removedStale: 1 }`. The derived-files test stayed green, so the mutant is isolated. `cmp` printed `restored byte-identical`; re-run green, 3/3. |
+| 14 | ISS-294: the webinar dir carries session.json + session_page.json, so packages/index's real-data tree test passes | `pnpm --filter @lkb/index test` | **COVERED.** With the two files removed (the cycle-1 state): `ℹ tests 215 / ℹ pass 214 / ℹ fail 1`, `Error: ENOENT: no such file or directory, open '...\2026-09-24-zoho-next-european-study-destinations\session.json'`. After the restore (`cmp` OK): 215/215. |
+| 15 | ISS-294: the emitted files are derived (evidence turn ids are real turns) and the committed file equals the generator's output | `session-rows.test.mjs`, test 3 | **COVERED by assertion.** The evidence ids are a subset of turns.json ids, and the committed `session_page.json` evidence deep-equals the `buildSessionFiles` output. No separate mutant run. |
+| 16 | ISS-297: the page states the live joiner and its gaps and lists zoho/cloudonair; the stale "Not live yet" is gone | `pnpm --filter @lkb/web exec vitest run src/pages/MeetingBotPage.test.tsx` | **COVERED.** With HEAD's page text put back into the file: `× honestly discloses the one live joiner and its known gaps`, `× lists the Zoho and Cloud OnAir platforms the detector now recognises`, `Tests 2 failed / 1 passed (3)`. After the restore (`cmp` OK): `Tests 3 passed (3)`. |
+| 17 | ISS-296: `--index` indexes through the production `indexSession` binding | the live run + read-back above | `UNVERIFIED by automated test.` Verified once, live: chunks 0→65, session_pages 0→1, claims 0→66, tree_index mentions 0→1, status.index → done. `indexSession` has its own pre-existing suite (`apps/api/src/indexing/session.test.ts`, green inside `apps/api` 173/173). The script-level wiring has no unit test; the debt is tracked as **T-033**. |
+| 18 | The `buildIndexer` extraction leaves the server's ingest binding unchanged | `pnpm -r typecheck` + `apps/api` 173/173 | `UNVERIFIED by falsification.` It type-checks and the api suite is green, but `production.ts` is "never imported by tests" (its own header), so no test pins it. Debt: **T-033**. |
+| 19 | `--dry-run` (including with `--index` and `--emit-files`) makes no Mongo connection and writes no file | the dry-run above, against an unroutable host | Observed live: the same counts, "would write", exit 0 in 2.3 s against TEST-NET-1. The data files appeared only after the live run. This is one observation, not a repeatable test. Debt: **T-033**. |
+
+## Live browser evidence (cycle 2)
+`qa/evidence/browser-webinar-bot-live-c2-2026-09-24/report.json` records a real browser run: headless Chromium via playwright-core, against the lane's `apps/web` vite dev server at `127.0.0.1:5291`. No API server was running. The shared Playwright MCP browser was in use by another session, which is why playwright-core was used. The smoke script (`smoke.mjs`) and a screenshot (`meeting-bot.png`) are saved next to the report.
+- **Page `/meeting-bot`:** h1 "Meeting Bot". All 6 checks came back true:
+  - no "Not live yet";
+  - no "never joined";
+  - Zoho and Cloud OnAir listed;
+  - the live-joiner card shown;
+  - T-029 disclosed;
+  - the incomplete capture disclosed.
+- **Interactions:**
+  - the unauthenticated load showed the API-key gate;
+  - filled the form with a placeholder (not a real key) and clicked Continue;
+  - reloaded `/meeting-bot`;
+  - clicked nav `/`, then nav `/meeting-bot`, and the page re-rendered.
+- **Result:** `consoleErrors: []`, `pageErrors: []`, `failedRequests: []`, `pass: true`.
+
+**The capture is not complete.** About 5–8 minutes are missing because there is no auto-reconnect (T-029). ISS-295 (graph_edges read by no route) is not part of this unit.
+
+## Review (senior-software-engineer agent, fresh context, read-only): **Approve**
+It found nothing at critical or high. It re-ran the tests: 3/3.
+
+It confirmed four things:
+- the fake collection's `$ne` matches Mongo's semantics on a missing field;
+- tenant scoping is delegated to the `coll(tenantId)` accessors;
+- the `buildIndexer` extraction is behaviour-preserving (one `buildRouting()`);
+- the dry-run exits before any Mongo import or `connect()`.
+
+It raised two open questions. Both are disclosed here, not fixed:
+1. A `$set` upsert cannot remove a field that a later run's doc no longer has; the old delete+insert wrote the full document. Today's field builders are fixed per type, so this does not occur now, and it has no test.
+2. Turn `_id`s have no tenant prefix. This is pre-existing, and a cross-tenant slug collision fails loudly with E11000; it never leaks.
 
 ## What changed (cycle 0)
 - `packages/meeting-bot/src/platform.ts`, `strategy.ts` and their tests: new platforms `zoho` (webinar/meeting.zoho.*) and `cloudonair` (Google Cloud OnAir), both routed to `browser`. A lookalike host (`zoho.in.evil.example`) stays `unknown`.
@@ -205,8 +464,8 @@ and the manifest's own "Known gaps" section disclosed several of these before th
    - `sb_join.py` auto-click list: can it click anything that shares or unmutes?
 3. Draft T-024b contract criteria from this manifest (live join, per-process capture, silence gate, recovery, data-write scoping).
 
-## Live browser evidence
-Not a web-UI change. The live-run evidence is the Zoho participant page read over CDP at 16:07/16:42, a frame showing 4 panelists (16:05), and Zoho's "Thank you for attending" email at 17:09.
+## Live browser evidence (cycles 0–1; superseded for cycle 2 by "Live browser evidence (cycle 2)" above, which does touch the web UI)
+Not a web-UI change in cycles 0–1. The live-run evidence is the Zoho participant page read over CDP at 16:07/16:42, a frame showing 4 panelists (16:05), and Zoho's "Thank you for attending" email at 17:09.
 
 ## Fix-cycle-1 addendum (orchestrator, 2026-09-24 22:40)
 - `.goal/goal.json`: registered T-029…T-050 (22 tasks) that cycle 0 added to TASKS.md without goal rows (tracker-audit G1 row-set, a regression this unit caused); U4.2 and U2.6 moved pending → in_progress with a note citing D-027/D-028 (closes the substance of ISS-288, medium, same file). Goal monitor re-run to refresh progress totals.
