@@ -1,159 +1,194 @@
-# Manifest — u2-4-phase3-precision-regate: U2.4 phase-3 precision re-gate on the hand-labelled 240-block corpus (2026-09-22)
+# Manifest — u2-4-phase3-precision-regate: U2.4 phase-3 precision re-gate on the hand-labelled 240-block corpus
 
-Fix cycle: 0 · Issues addressed: none (gate precondition; unblocks U2.4 phase-4) · Executor: claude-sonnet-subagent · Executor rationale: no qa/DELEGATION.md registry exists; Claude subagent by default · Goal task: U2.4
+Fix cycle: 1 · Issues addressed: ISS-282 (critical), ISS-283 (high), ISS-284 (medium) · Executor: claude-opus subagent (maker build) · Goal task: U2.4
+Branch / worktree: `wave/u2-4-phase3-fix` @ `D:/KnowledgeBase-lanes/u2-4-phase3-fix` (from master 4aa9d13)
+Contract: `qa/contracts/speaker-resolution-llm.md` · Gate: `qa/gates/speaker-segment-identity.md` (answered A, phase-3 bars)
+Cycle-0 verdict: `qa/verdicts/u2-4-phase3-precision-regate.md` (FAIL, imported from b1c9d01). The cycle-0 manifest text is in git at c527207.
 
-**Unit:** qa/QUEUE.md tier 2 — the U2.4 phase-3 precision re-gate, the precondition of the phase-4
-speaker write unit. Measured against the answered gate `qa/gates/speaker-segment-identity.md`
-(answered A): its phase-3 step verbatim — *hand-label the 240-block corpus, run the frozen local
-qwen3:8b digest three times with no Mongo/job writer, and require 100% accepted identity
-precision, zero wrong label/name/citation links, deterministic-floor preservation, stable accepted
-facts, and at least one correct addition.*
+## Status: building — experiment running
 
-## What changed (measurement unit — pipeline code untouched)
+The code fix is complete and tested. The 3-outer-run re-measurement is running detached (below).
+**This manifest makes NO precision, stability or addition claim** (ISS-283). Those bars are decided
+only by `05-score.mjs --tag c1` over the completed `run-results.c1.jsonl`. Its output gets appended
+here verbatim when the run finishes. Until then every phase-3 bar is **unmeasured**, not passed.
 
-**No pipeline code was adjusted.** `packages/index/src/**`, `apps/**`, `packages/ai/**`,
-`config/**`, `schema/**` are byte-untouched; no Mongo write, no job writer, no model-derived
-speaker write anywhere in this unit (phase 3 is no-write BY DESIGN; the phase-4 write unit stays
-blocked behind this gate's verdict).
+## Root cause (confirmed on master's code, 4aa9d13)
 
-New files are MEASUREMENT ARTIFACTS ONLY, under the evidence dir + one manifest:
-- `qa/evidence/u2-4-phase3-precision-regate-2026-09-22/gold-labels.json` — the completed hand
-  labels for all 240 blocks (11 sessions, 494 positional turns, 29 session/label pairs), with
-  per-block provenance kind, evidence quote, and confidence. Provenance kinds: self-naming,
-  address-adjacent, called-on, speech-continuation, inferred-chain, none. Ground truth rule: what
-  the transcript text says; blocks with no naming evidence are gold-`unnamed` (no identity claim
-  is possible from the text).
-- `01-block-stats.mjs` — corpus measurement (reproduces the gate's own numbers: 11 sessions /
-  494 positional / 240 blocks / 29 session-label pairs → `corpus-stats.json`).
-- `02-dump-blocks.mjs`, `corpus-dump/*.txt` — full-text per-block dumps used for labelling.
-- `03-dump-compact.mjs`, `compact-dump.txt` — compact dumps for the large sessions.
-- `04-regate-eval.mts` — runs the REAL shipped `extractSpeakers` (2-of-3 window agreement,
-  ISS-255 handover-direction rule, verbatim/shape/discourse/contradiction filters, block scoping)
-  over the corpus with the frozen local digest `qwen3:8b` (500a1f067a9f), NO Mongo/job writer;
-  flushes `run-results.jsonl` + `raw-proposals.jsonl` after every (outer run, session).
-- `05-score.mjs` — measures the five bars + ISS-255 by id → `measurement-summary.json`.
-- `06-window-count.mts` — window/call census (260 windows/internal pass; 2,340 provider calls).
+1. `speakers-llm.ts` `extractSpeakers`, evidence loop (was L265-276). The only per-turn check was
+   `citesNameAsAnIntroduction(t.text, name)`, which asks whether the turn's TEXT names someone. It
+   never related the turn's speaker to the claimed label. So a third party named or addressed in a
+   turn passed as the label's identity. All 8 cycle-0 wrong links are this:
+   - t007 "Thank you, Sonal" (own turn, spk:0)
+   - t022 "Let me first introduce Shithij" (own turn, spk:1)
+   - t094 "Thank you, Kshitij. Thanks, Anisha" (spk:2)
+   - t042 "Thank you, Bhavya" (spk:4)
+   - t088 "Hi, Jubin" (spoken by spk:1, credited to spk:1 AND spk:3)
+   - t267, spoken by the named speaker `Priyanka`, credited to spk:0 (the next turn is spk:1)
+2. Block scoping (was L298-300) re-ran the deterministic floor and looked up
+   `floor.resolved.find(same label && same name)?.blocks ?? []`. The floor only knows "my name is".
+   So every LLM-only identity got `[]` and was scored label-wide (e.g. 17 blocks for spk:1).
 
-## Chunking (recorded per the unit brief)
+Verified by the 8 regression tests below failing on the unmodified code (before-run pasted).
 
-One background process, three OUTER runs (1→3) sequential. Chunking unit = (outer run, session):
-11 chunks per outer run, each ≤29 min (largest: leeds-arts 102 windows × 3 internal runs ≈ 26 min;
-visa 37 × 3 ≈ 29 min), each flushed to `run-results.jsonl` + `raw-proposals.jsonl` on completion
-so partial completion is measurable. No chunk exceeded ~40 min. Total: 2,340 provider calls.
+## What changed
 
-## How to verify (exact commands + expected)
+Code (commit 6497719, edited in place; nothing deleted or renamed):
+- `packages/index/src/pipeline/speaker-name-rules.ts` — added two predicates:
+  - `citesNameAsSelfIdentification`: the occurrence has a naming cue AND the cue's subject is the
+    speaker. Accepted forms: "my name is X", "I'm X", "I am X", "call me X", "this side X",
+    "X here", "X speaking" (the idiom), and multi-token "This is X Y".
+  - `citesNameAsHandover`: forward cues only. Accepted forms: over to, introduce, please welcome,
+    joined by, next presenter is, the handover markers, and "X, please go ahead" / "X, over to you".
+    Thanks and greetings are deliberately NOT handover cues, because they look backward.
+- `packages/index/src/pipeline/speakers-llm.ts` `extractSpeakers`:
+  - A cited turn binds (label, name) only if it is (a) the label's OWN turn and self-identifies,
+    or (b) another speaker's handover turn whose NEXT turn starts one of the label's blocks.
+  - Each evidence row carries the block it binds. The accepted identity's `blocks` are those
+    blocks, never a label-wide `[]`.
+  - A turn cited as evidence by two labels refuses both.
+  - The floor re-run for scoping is gone.
+- Tests: `speakers-windows.test.ts` gains 11 tests:
+  - the 8 ISS-282 ledger reproductions, replayed verbatim against the real transcripts;
+  - own-turn block scoping;
+  - handover-then-block, plus a check that a thank-you is not a handover;
+  - one turn cited by two labels.
+- Superseded test expectations (the same pattern ISS-255 used for its handover rows):
+  - `speakers-llm.test.ts`: the two ISS-094 rows "Good morning Prasanti, please go ahead." and
+    "Prasanti, what do you think about this?" are spoken BY spk:0 and claim spk:0. They moved to an
+    ISS-282 supersession block that asserts refusal. The greeting-handover form still ships for
+    the FOLLOWING label (new windows test).
+  - `speaker-name-rules.test.ts`: "Mumbai" is removed from the ISS-093 gazetteer-residue set
+    because it is now refused. That test is designed to fail when a residue closes.
+  - `speaker-name-rules.test.ts`: the ISS-098 fall-through test now asserts the cue predicate
+    directly, plus the ISS-282 refusal.
 
-From the repo root (`D:/KnowledgeBase`), Ollama running with the frozen digest loaded:
-1. `node qa/evidence/u2-4-phase3-precision-regate-2026-09-22/01-block-stats.mjs`
-   → `TOTAL positional: 494 | blocks: 240 | session/label pairs: 29` (the gate's own corpus).
-2. `node_modules/.bin/tsx qa/evidence/u2-4-phase3-precision-regate-2026-09-22/04-regate-eval.mts --run 1`
-   (then `--run 2`, `--run 3`) → appends to `run-results.jsonl` / `raw-proposals.jsonl`.
-   Expected shape: one JSONL line per (run, session) with `windows`, `providerCalls == 3 × windows`,
-   `degraded` (null on a clean pass), `resolved`, `unresolved`, `floor`.
-3. `node_modules/.bin/tsx qa/evidence/u2-4-phase3-precision-regate-2026-09-22/05-score.mjs`
-   → prints the five bars + `ISS255: n/4`; writes `measurement-summary.json`.
-4. `node_modules/.bin/tsx qa/probes/iss104-rederive.mts` → `--- refused 17/20` (ISS-104 by id).
-5. Floor regression: `node scripts/sync-speakers.mjs --dry-run` → `positional turns: 494;
-   attributable by deterministic resolution: 42 (8.5%)`, 2 speaker documents
-   (`person:jubin-thakkar`, `person:ruby`), no collisions, no Mongo connection — the phase-1
-   block floor unchanged. (78/494 was the pre-phase-1 LABEL-WIDE number; the phase-1
-   block/turn-based re-measure is 42/494, and the eval's per-session `floor` fields re-derive
-   the same 42 independently.)
+Measurement harness (evidence dir, committed after 6497719):
+- `04-regate-eval.mts`:
+  - The corpus is PINNED to the `gold-labels.json` session list (ISS-284). A 2026-09-24 Zoho
+    ingest had grown directory discovery to 12 sessions.
+  - `--runs 1,2,3` runs the outer runs in sequence in one process.
+  - Resumable: a (run, session) already in the results file is skipped.
+  - Per-call `AbortSignal.timeout`, default 180 s. A hung call fails its window, not the run.
+  - `--tag c1` writes `run-results.c1.jsonl` / `raw-proposals.c1.jsonl` and leaves the cycle-0
+    files untouched.
+- `05-score.mjs`: `--tag c1` reads the tagged files and writes `measurement-summary.c1.json`.
+
+ISS-284 evidence-completeness:
+- Files in the evidence dir from before this cycle that cycle 0 did not list: `07-per-block.mjs`
+  and `per-block-results.json` (the cycle-0 per-block breakdown helper and its output).
+- New this cycle: `run-results.c1.jsonl`, `raw-proposals.c1.jsonl`, `eval-c1.stdout.log`,
+  `eval-c1.stderr.log`, and (at completion) `measurement-summary.c1.json`.
+- `measurement-summary.json` was regenerated in place by the cycle-0 checker's re-run of `05-score.mjs`.
+
+Known limitation (an open question from the review, not reproduced): `citesNameAsHandover` accepts
+a handover marker anywhere in the 40 chars before the name, not anchored to it. It is only ever
+applied to a turn immediately before the claimed label's block, and the run will measure it.
+
+## Experiment (running, detached)
+
+- Command (PowerShell, worktree root):
+  `Start-Process node_modules\.bin\tsx.cmd -ArgumentList "qa/evidence/u2-4-phase3-precision-regate-2026-09-22/04-regate-eval.mts","--runs","1,2,3","--tag","c1","--timeout-ms","180000" -WindowStyle Hidden -RedirectStandardOutput <evidence>\eval-c1.stdout.log -RedirectStandardError <evidence>\eval-c1.stderr.log`
+  with `OLLAMA_BASE_URL=http://127.0.0.1:11434`, model `qwen3:8b` digest `500a1f067a9f` (verified via `/api/tags`).
+- PIDs: 40276 (cmd wrapper) → 35812 (node) → 38476 (node, eval). Started 2026-09-24T22:18:13+05:30.
+  A first launch at 22:17:34 (PID 32396) died on a harness syntax error before any provider call.
+  It was fixed and relaunched.
+- Rate from the first calls: 27 calls in 90 s (~3.3 s/call). The run makes 2,340 calls in total
+  (260 windows × 3 agreement runs × 3 outer runs).
+- **ETA: about 2.2 h, around 2026-09-25 00:30 +05:30.**
+- Resume if killed: rerun the same command. Chunks already flushed for a (run, session) are skipped.
+- Progress:
+  - `wc -l qa/evidence/u2-4-phase3-precision-regate-2026-09-22/raw-proposals.c1.jsonl` counts calls, out of 2,340.
+  - `run-results.c1.jsonl` gets one line per finished (run, session), 33 at completion.
+- **Scoring command (run only after 33 lines):**
+  `node_modules/.bin/tsx qa/evidence/u2-4-phase3-precision-regate-2026-09-22/05-score.mjs --tag c1`
+
+## How to verify (exact commands)
+
+From `D:/KnowledgeBase-lanes/u2-4-phase3-fix`:
+1. `pnpm -C packages/index test` → `tests 226 / pass 226 / fail 0`
+2. `pnpm -C packages/index typecheck` → exit 0
+3. `node scripts/lint-loc.mjs` → `lint-loc: OK (291 file(s) within budget)`
+4. `cd packages/index && node --test --test-reporter=spec --import tsx src/pipeline/speakers-windows.test.ts` → 11 ISS-282 tests ✔
+5. `node_modules/.bin/tsx qa/probes/iss104-rederive.mts` → `--- refused 17/20`
+6. After the run completes: the scoring command above.
 
 ## Actual outputs
 
-### Corpus measurement (step 1)
+### Regression tests BEFORE the fix (tests added first, source unmodified — `c527207` code)
 
 ```
-$ node qa/evidence/u2-4-phase3-precision-regate-2026-09-22/01-block-stats.mjs
-affected sessions: 11
-  2026-04-21-visa-blueprint-part2-italy-france-nz | turns 291 | positional 196 | blocks 17 | label-pairs 3
-  2026-05-20-telling-your-brand-story-better | turns 31 | positional 13 | blocks 13 | label-pairs 4
-  2026-05-23-uniaccess-atlas-skilltech | turns 8 | positional 8 | blocks 3 | label-pairs 2
-  2026-05-28-in-focus-1 | turns 59 | positional 7 | blocks 6 | label-pairs 1
-  2026-07-15-creative-futures | turns 269 | positional 78 | blocks 48 | label-pairs 2
-  2026-07-22-uniaccess-cept-university | turns 56 | positional 1 | blocks 1 | label-pairs 1
-  2026-07-28-metrics-and-mingling | turns 83 | positional 3 | blocks 3 | label-pairs 2
-  2026-07-30-in-focus-3 | turns 96 | positional 80 | blocks 41 | label-pairs 7
-  2026-08-03-uk-beyond-offer-letters | turns 46 | positional 3 | blocks 3 | label-pairs 1
-  2026-08-24-uniaccess-leeds-arts-university | turns 102 | positional 102 | blocks 102 | label-pairs 4
-  2026-08-27-in-focus-4 | turns 51 | positional 3 | blocks 3 | label-pairs 2
-TOTAL positional: 494 | blocks: 240 | session/label pairs: 29
+ℹ tests 17
+ℹ pass 6
+ℹ fail 11
+✖ ISS-282 #1/8: 2026-05-23-uniaccess-atlas-skilltech spk:0 -> "Sonal" via t007 is refused
+✖ ISS-282 #2/8: 2026-07-15-creative-futures spk:0 -> "Priyanka Roy" via t267 is refused
+✖ ISS-282 #3/8: 2026-07-30-in-focus-3 spk:1 -> "Shithij" via t022 is refused
+✖ ISS-282 #4/8: 2026-07-30-in-focus-3 spk:2 -> "Anisha" via t094 is refused
+✖ ISS-282 #5/8: 2026-08-03-uk-beyond-offer-letters spk:4 -> "Bhavya" via t042 is refused
+✖ ISS-282 #6/8: 2026-08-24-uniaccess-leeds-arts-university spk:1 -> "Jubin" via t088 is refused
+✖ ISS-282 #7/8: 2026-08-24-uniaccess-leeds-arts-university spk:3 -> "Jubin" via t088 is refused
+✖ ISS-282 #8/8: 2026-05-23-uniaccess-atlas-skilltech spk:0 -> "Sonal" via t007 is refused
+✖ ISS-282: a handover by ANOTHER speaker binds the label whose block immediately FOLLOWS it
+✖ ISS-282: one evidence turn never binds two labels
+✖ ISS-282: the label's OWN self-identifying turn binds, scoped to that ONE block (never label-wide)
 ```
-The gate's own evidence numbers reproduce exactly. Gold labels completed for all 240 blocks
-(`gold-labels.json`, per-block provenance): 144 gold-named (21 session|person pairs), 96 gold-unnamed.
+No mutant was used: the "before" is the genuine pre-fix source.
 
-### Eval run (steps 2-3): per-session outputs, OUTER RUN 1 (all 11 chunks, none degraded)
+### AFTER the fix (6497719)
 
 ```
-[run 1] 2026-04-21-visa-blueprint-part2-italy-france-nz: 428022ms, calls=111, resolved=0, unresolved=3
-    FLOOR spk:2 -> "Ruby" ev=t206 blocks=[205-245]            (block 6 = spk:2 = Ruby ✓ gold)
-[run 1] 2026-05-20-telling-your-brand-story-better: 86928ms, calls=39, resolved=0
-[run 1] 2026-05-23-uniaccess-atlas-skilltech: 24891ms, calls=9, resolved=1
-    ACCEPTED spk:0 -> "Sonal" ev=t007 blocks=[]                (WRONG — see bar-2)
-[run 1] 2026-05-28-in-focus-1: 61577ms, calls=18, resolved=0
-[run 1] 2026-07-15-creative-futures: 495691ms, calls=144, resolved=1
-    ACCEPTED spk:0 -> "Priyanka Roy" ev=t267 blocks=[]         (WRONG — label-wide)
-[run 1] 2026-07-22-uniaccess-cept-university: 7231ms, calls=3, resolved=0
-[run 1] 2026-07-28-metrics-and-mingling: 33407ms, calls=9, resolved=0
-[run 1] 2026-07-30-in-focus-3: 456558ms, calls=123, resolved=2
-    ACCEPTED spk:1 -> "Shithij" ev=t022 blocks=[]              (WRONG — host's own intro turn)
-    ACCEPTED spk:2 -> "Anisha" ev=t094 blocks=[]               (WRONG — gratitude address)
-[run 1] 2026-08-03-uk-beyond-offer-letters: 31037ms, calls=9, resolved=1
-    ACCEPTED spk:4 -> "Bhavya" ev=t042 blocks=[]               (WRONG — gratitude address)
-[run 1] 2026-08-24-uniaccess-leeds-arts-university: 1029227ms, calls=306, resolved=2
-    ACCEPTED spk:1 -> "Jubin" ev=t088 blocks=[]                (WRONG — "Hi, Jubin" address)
-    ACCEPTED spk:3 -> "Jubin" ev=t088 blocks=[]                (WRONG — same turn, second label)
-    FLOOR spk:0 -> "Jubin Thakkar" ev=t006 blocks=[5-5]        (self-naming, block 6 ✓ gold)
-[run 1] 2026-08-27-in-focus-4: 12916ms, calls=9, resolved=0
+✔ ISS-282 #1/8 … #8/8 (all 8 refused)
+✔ ISS-282: a handover by ANOTHER speaker binds the label whose block immediately FOLLOWS it
+✔ ISS-282: one evidence turn never binds two labels
+✔ ISS-282: the label's OWN self-identifying turn binds, scoped to that ONE block (never label-wide)
+ℹ tests 17 / pass 17 / fail 0          (speakers-windows.test.ts)
+ℹ tests 226 / pass 226 / fail 0        (whole @lkb/index suite; 215/215 before this cycle)
+TYPECHECK_OK
+lint-loc: OK (291 file(s) within budget)
+--- refused 17/20                      (qa/probes/iss104-rederive.mts, unchanged)
 ```
 
-(runs 2-3 appended below at close of run)
+Fresh-context review (senior-software-engineer agent, read-only): **Approve**. It re-ran 226/226
+and typecheck clean. Its one open question is the unanchored handover marker (see Known limitation).
 
-## Capability coverage
+### Scoring (pending)
 
-Measurement artifact — **NO ISOLATING FALSIFICATION -- measurement artifact; the re-run is the
-discriminator**. Each claimed number is reproduced by its command; a checker re-run of the same
-commands is the falsifier. Pasted verdicts:
-
-| # | Claimed number | Reproducing command | Pasted verdict |
-|---|---|---|---|
-| 1 | corpus = 494 positional / 240 blocks / 29 session-label pairs | `node qa/evidence/u2-4-phase3-precision-regate-2026-09-22/01-block-stats.mjs` | `TOTAL positional: 494 \| blocks: 240 \| session/label pairs: 29` (above) |
-| 2 | accepted identities + evidence + blocks (per run/session) | `04-regate-eval.mts --run N` | per-session ACCEPTED/FLOOR lines (above + runs 2-3 below) |
-| 3 | bar 1-5 + ISS-255 n/4 | `node_modules/.bin/tsx ...05-score.mjs` | JSON summary (below) |
-| 4 | ISS-104 17/20 | `node_modules/.bin/tsx qa/probes/iss104-rederive.mts` | `--- refused 17/20` (below) |
-| 5 | floor unchanged 42/494 (8.5%), 2 speakers, no collisions | `node scripts/sync-speakers.mjs --dry-run` | `positional turns: 494; attributable by deterministic resolution: 42 (8.5%) / speaker documents to write: 2 / no cross-session collisions` (below) |
-| 6 | raw-layer instability (ISS-255 class) | inspect `raw-proposals.jsonl` (per internal run reconstruction) | spk:0 -> 9 distinct names on the visa session; spk:0 -> ~20 names on leeds incl. fabrications ("Dr. Sarah Thompson", "Mr. Damien Hirst") |
-
-Every number in "Actual outputs" is re-derivable by re-running the named command; nothing here
-relies on the executor's self-attestation. The three outer runs are themselves the stability
-discriminator for bar 4.
+The score JSON is appended here verbatim when the run completes. No bar is claimed before then.
 
 ## D-015 measurement (by issue id)
 
-- **ISS-255: `n/4`** — its recorded live evidence (visa session run 1 vs runs 2-3 instability,
-  the t205 handover inversion, same-label-multi-name, zero-valid-citation fabrications) is inside
-  the measured corpus by construction: the visa session is one of the 11 corpus sessions, and
-  every one of its 37 windows × 3 internal agreement runs × 3 outer runs was executed. Case
-  verdicts are in `measurement-summary.json` `iss255.cases[]`:
-  1. handover inversion (spk:0 -> "Ruby" via t205) refused — the visa session accepted ZERO
-     identities; no accepted identity links any label other than spk:2 to "Ruby".
-  2. shipped-layer accepted set stable across outer runs 1-3 (the recorded run 1 vs 2-3
-     instability at the shipped layer is gone).
-  3. same-label-multi-name persists AT THE RAW LAYER (recorded class: spk:0 -> {Kshitij Garg,
-     Shagun Handa, Ruby Thomas, Rashi, Ruby, spk:0, IVS Global, Kanchan, Bhakti} in internal
-     run 1; run 1 vs runs 2-3 differ — 18/111 unparseable, 50/111 empty) but is contained at the
-     shipped layer: at most one name per label accepted, everything else refused (2-of-3 voting
-     + contradiction refusal — exactly the containment the run-agreement unit claimed).
-  4. every accepted evidence pair re-verified: verbatim containment + cue in the cited turn.
-- **ISS-104: `17/20 refused`** — re-derived live against current `speaker-name-rules.ts` via the
-  shipped probe `qa/probes/iss104-rederive.mts`: 17/20 refused; the 3 residues (India, Mumbai,
-  Google) are the gazetteer class pinned by standing tests (checker cycle-2 re-derivation), and
-  "English" is now refused (ISS-097). ISS-104 remains OPEN on those three; not this unit's seam.
+- **ISS-282: 8/8 refused.** The ledger evidence records 8 wrong identities
+  (`measurement-summary.json` `wrongLinkList`: 7 distinct plus the run-2 repeat of Sonal/t007).
+  Each is replayed verbatim (real transcript, same label/name/turn, 3/3 votes), and all 8 are
+  refused. The live precision and addition bars are NOT claimed until the c1 run is scored.
+- **ISS-283:** handled in process. There is no stability or precision narrative; the score JSON
+  will be pasted verbatim.
+- **ISS-284:** the corpus is pinned to the 11 gold session ids, and the previously unlisted files
+  are listed above.
+- **ISS-104: 17/20 refused.** The probe result is unchanged, because the probe checks the cue
+  predicate, not the new relation.
+
+## Capability coverage
+
+| # | Claim | Isolating falsification | Result |
+|---|---|---|---|
+| 1 | Own-turn third-party address/intro no longer binds the speaking label | 8 ISS-282 reproductions on pre-fix source | FAIL before (8/8 shipped) → PASS after (8/8 refused) |
+| 2 | A handover before a block binds the FOLLOWING label; thanks do not | handover test on pre-fix source | FAIL before → PASS after |
+| 3 | Accepted blocks derive from evidence, not label-wide | own-block test with an LLM-only cue ("Ruby here") on pre-fix source | FAIL before (blocks `[]`) → PASS after (`[{2,3}]`) |
+| 4 | One evidence turn never binds two labels | dual-claim test on pre-fix source | FAIL before → PASS after |
+| 5 | Existing guards (verbatim, shape, discourse, ISS-255 handover inversion, 2-of-3) intact | full suite | 226/226 |
+| 6 | Phase-3 bars (precision, zero wrong links, floor, stability, ≥1 addition) | c1 run + `05-score.mjs --tag c1` | **unmeasured — run in progress** |
+
+## Contract note for the checker
+
+`qa/contracts/speaker-resolution-llm.md` ("Why this is a separate contract") says this path admits
+greeting and handover evidence, and [I4] says pre-existing tests keep passing. ISS-282 narrows the
+admitted class: only a handover that comes right before the label's block counts, and an address
+no longer identifies the speaker who makes it. That supersedes two ISS-094 rows and one ISS-093
+residue row, as listed above.
+- [I2] holds: `speakers.ts` is byte-unmodified.
+- [I3] holds: nothing is persisted.
 
 ## Live browser evidence
 
-`Not UI-touching — no surface changed` (paths: `packages/index/src/**`, `apps/api/src/**`,
-`config/**`, `schema/**` all untouched; no UI surface exists in this unit).
-
-## Status: ready-for-check
+Not UI-touching — no surface changed (`packages/index/src/pipeline/**` + qa evidence only).

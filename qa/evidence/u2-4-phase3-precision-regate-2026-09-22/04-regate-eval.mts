@@ -53,8 +53,7 @@ const RES = join(OUT, TAG ? `run-results.${TAG}.jsonl` : "run-results.jsonl");
 // data/toc-migrated (a later ingest -- the 2026-09-24 Zoho webinar -- silently grew it to 12).
 const SESSIONS: string[] = JSON.parse(readFileSync(join(OUT, "gold-labels.json"), "utf8")).sessions.map((g) => g.session);
 // Resumable: a (run, session) already flushed to RES is skipped, so a killed process restarts clean.
-const DONE = new Set(existsSync(RES) ? readFileSync(RES, "utf8").trim().split("
-").filter(Boolean).map((l) => { const j = JSON.parse(l); return `${j.outerRun}|${j.session}`; }) : []);
+const DONE = new Set(existsSync(RES) ? readFileSync(RES, "utf8").trim().split("\n").filter(Boolean).map((l) => { const j = JSON.parse(l); return `${j.outerRun}|${j.session}`; }) : []);
 let runNo = RUNS[0];
 
 let calls = 0;
