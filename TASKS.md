@@ -110,5 +110,32 @@ Meeting-Bot pages (apps/web) are open follow-up work, not yet started.
 | U2.6 | open | Real graph_edges rows + merge at the route boundary | do NOT reshape flatten-graph.ts â€” map in routes/graph.ts |
 | U3.2 | open | Search page / global search bar | builds on U0.7 + U1.5 |
 | U4.1 | open | Recording/file upload wired to a real transcribe worker | workers/transcribe is a 3-line placeholder; packages/ingest recording adapter is real but unwired |
-| U4.2 | open | ONE real meeting-bot joiner (browser/Meet); quarantine the other two | three stubs + a package imported by nothing is negative-value inventory |
+| U4.2 | in_progress | ONE real meeting-bot joiner (browser/Meet); quarantine the other two | 2026-09-24: real browser joiner (SeleniumBase Chrome + OBS) live-run on a Zoho webinar, D-027; awaiting /checker (T-033) |
+
+## Webinar bot (D-027, roadmap: docs/meeting-bot-roadmap.md)
+
+| ID | Status | Task | Notes |
+|---|---|---|---|
+| T-029 | open | Auto-reconnect on "connection interrupted" (reload + rejoin, gap logged) | seen live 2026-09-24 ~16:03, fixed by hand |
+| T-030 | open | Status alerts to Telegram (joined / dropped / silent / done + summary) | Umesh had to ask for status on the first live run |
+| T-031 | open | Live audio watchdog via OBS meters (>2 min silence → alert + reconnect) | depends T-029 |
+| T-032 | open | OBS guard: Safe Mode / websocket-down detection + normal restart | force-killed OBS relaunched in Safe Mode on 2026-09-24 |
+| T-033 | open | Tests (fake OBS client failure paths, audioPath) + /checker PASS for the phase-0 bot | closes U4.2 |
+| T-034 | open | In-browser tab capture (extension + MediaRecorder); OBS becomes fallback | removes OBS; enables parallel meetings |
+| T-035 | open | Lean video (720p, low fps) — target <400 MB/hour | live run measured ~2.7 GB/hour |
+| T-036 | open | Discovery: Gmail + Calendar webinar-link scan incl. Zoho/OnAir/YouTube Live | extends apps/api gws-gmail.ts / gws-calendar.ts |
+| T-037 | open | Auto-join rules (sender/domain/platform, approve-once, opt-out) | Read AI pattern |
+| T-038 | open | Scheduler service (5-min poller → selectEventsToAutoJoin → record; overlaps) | replaces one-off Windows tasks; depends T-034, T-036, T-037 |
+| T-039 | open | "Send bot now" to a live meeting (CLI/API/web) |  |
+| T-040 | open | Post-processing: summary, facts, Q&A, action items with timestamp citations |  |
+| T-041 | open | Slide keyframes → OCR → attached to turns by time | video capture proven live 2026-09-24 |
+| T-042 | open | Speaker naming for webinar turns (Zoho tile names + intros + sync-speakers) | relates U2.4 |
+| T-043 | open | Index webinar sessions into the KB (/ask across webinars) |  |
+| T-044 | open | Transcript QA: timestamp drift clamp + hallucination spot-check | measured 223 s of turns on 186 s of audio |
+| T-045 | open | More sources: OnAir on-demand, YouTube via yt-dlp, Meet/Teams/Zoom via browser bot |  |
+| T-046 | open | Retention policy for raw video (D-008) + real /meeting-bot web page |  |
+| T-047 | open | Record controller must survive console close: run hidden/detached, plus a finalize-on-restart watchdog (detect OBS still recording with no controller → finalize) | 2026-09-24: controller died 16:30:56 (console closed, Ctrl+C exit); OBS + bot kept going; recovered by hand with `lkb finalize --stop-obs` |
+| T-049 | open | Langfuse self-hosted tracing on every Gemini call (transcribe, extract, ask): latency, tokens, cost, retries, failures | Vidysea standard rule 5 (brain `patterns/agentic-architecture-standard.md`): self-hosted only, TELEMETRY_ENABLED=false, no enterprise key; approved by Umesh 2026-09-24 |
+| T-050 | open | Pipeline as a thin LangGraph 1.x workflow (capture → transcribe → extract → index) with checkpoint/resume + a job queue; /ask router as a graph | standard: graph = wiring only, logic stays in functions/skills; multi-agent (Deep Agents) only for the counsellor (T-013); approved by Umesh 2026-09-24 |
+| T-048 | open | Make gemini-3.8-flash single-call the default for recordings ≤ ~90 min; keep chunking as fallback | D-028: one call fixed speaker attribution + no gaps; first re-run one TOC session to compare |
 

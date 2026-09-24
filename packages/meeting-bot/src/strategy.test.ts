@@ -18,6 +18,11 @@ test("routes webex to browser (not in Vexa's supported-platform list)", () => {
   assert.equal(selectJoinStrategy("webex"), "browser");
 });
 
+test("routes zoho and cloudonair to the local browser joiner", () => {
+  assert.equal(selectJoinStrategy("zoho"), "browser");
+  assert.equal(selectJoinStrategy("cloudonair"), "browser");
+});
+
 test("routes unknown to system-audio (universal fallback)", () => {
   assert.equal(selectJoinStrategy("unknown"), "system-audio");
 });

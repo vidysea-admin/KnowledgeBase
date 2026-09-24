@@ -4,7 +4,9 @@
  * qa/contracts/meeting-bot-capture.md C1): Meet, Teams, Zoom, Webex, else `unknown`.
  */
 
-export type Platform = "meet" | "teams" | "zoom" | "webex" | "unknown";
+/** `zoho` (Zoho Webinar/Meeting web client) and `cloudonair` (Google Cloud Weeklies) are web-only
+ * clients no meeting-bot vendor supports; they route to the local browser joiner (strategy.ts). */
+export type Platform = "meet" | "teams" | "zoom" | "webex" | "zoho" | "cloudonair" | "unknown";
 
 /** Pattern-matches real URL shapes. Never throws — an unparseable URL is just `unknown`. */
 export function detectPlatform(url: string): Platform {
@@ -28,6 +30,8 @@ export function detectPlatform(url: string): Platform {
     return "zoom";
   }
   if (host === "webex.com" || host.endsWith(".webex.com")) return "webex";
+  if (/^(webinar|meeting)\.zoho\.(in|com|eu|com\.au|jp)$/.test(host)) return "zoho";
+  if (host === "cloudonair.withgoogle.com") return "cloudonair";
 
   return "unknown";
 }

@@ -61,3 +61,8 @@ qa/dispatch/
 
 # ephemeral chrome CDP profiles used for live-proof screenshots
 qa/evidence/*/cdp-profile/
+
+# meeting-bot: logged-in bot browser profile (cookies!) + webinar recordings
+data/bot-profile/
+raw/webinars/
+**/downloaded_files/

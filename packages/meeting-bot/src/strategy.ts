@@ -28,7 +28,11 @@ export function selectJoinStrategy(platform: Platform): JoinStrategy {
       // Vexa's verified native support (see file header).
       return "vexa";
     case "webex":
-      // Not in Vexa's supported list — falls to the browser-join stub (T-024b).
+    case "zoho":
+    case "cloudonair":
+      // Not in Vexa's supported list — joined by the local bot browser (joiners/browser-joiner.ts
+      // with capture/obs-windows.ts deps). Zoho/cloudonair added 2026-09-24: no open-source bot
+      // supports them, and both are plain web clients.
       return "browser";
     case "unknown":
       // Grill's blindspot resolution: system-audio is the universal fallback.

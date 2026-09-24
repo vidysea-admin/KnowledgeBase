@@ -1,0 +1,71 @@
+{
+  "sessionId": "2026-09-24-zoho-next-european-study-destinations",
+  "tenantId": "toc",
+  "title": "The Next European Study Destinations to Watch: New Choices for Your Europe Portfolio",
+  "date": "2026-09-24",
+  "t0": "2026-09-24T15:59:44+05:30",
+  "platform": "zoho-webinar",
+  "hostOrg": "Zoho webinar (partner webinar for counsellors)",
+  "capturedBy": { "id": "user:umesh-sugara", "name": "Umesh Sugara", "via": "LKB webinar bot" },
+  "people": [
+    {
+      "label": "Devanshi",
+      "personId": "person:devanshi",
+      "aliases": ["Devanshi", "Divanshi"],
+      "role": "host / moderator",
+      "org": null,
+      "confidence": 0.8,
+      "note": "name as addressed by panelists; spelling unconfirmed"
+    },
+    {
+      "label": "Anjum",
+      "personId": "person:anjum",
+      "aliases": ["Anjum", "Ms. Anjum"],
+      "role": "Regional Head (India, Africa, Middle East)",
+      "org": "org:ibs",
+      "confidence": 0.95
+    },
+    {
+      "label": "Sagar",
+      "personId": "person:sagar",
+      "aliases": ["Sagar", "Mr. Sagar"],
+      "role": "representative",
+      "org": "org:hau",
+      "confidence": 0.95
+    }
+  ],
+  "orgs": [
+    { "id": "org:ibs", "name": "International Business School (IBS)", "aliases": ["IBS", "IBS Budapest"], "countries": ["country:hungary", "country:austria"] },
+    { "id": "org:hau", "name": "Hellenic American University (HAU)", "aliases": ["HAU", "HEU", "Hellenic American University"], "countries": ["country:greece", "country:usa"] },
+    { "id": "org:university-of-buckingham", "name": "University of Buckingham", "aliases": ["Buckingham"], "countries": ["country:uk"], "partnerOf": "org:ibs", "pattern": "Buckingham" },
+    { "id": "org:dublin-business-school", "name": "Dublin Business School", "aliases": ["DBS"], "countries": ["country:ireland"], "partnerOf": "org:ibs", "pattern": "Dublin Business School" },
+    { "id": "org:de-montfort-university", "name": "De Montfort University", "aliases": ["DMU"], "countries": ["country:uk"], "partnerOf": "org:ibs", "pattern": "De ?Montfort" },
+    { "id": "org:bhms", "name": "BHMS Switzerland", "aliases": ["BHMS"], "countries": ["country:switzerland"], "partnerOf": "org:ibs", "pattern": "BHMS" }
+  ],
+  "countries": {
+    "country:hungary": "Hungary|Budapest|Hungarian",
+    "country:greece": "Greece|Athens|Greek",
+    "country:austria": "Austria|Vienna",
+    "country:usa": "\\bUSA?\\b|United States|Nashua|New Hampshire|American",
+    "country:uk": "\\bUK\\b|United Kingdom",
+    "country:ireland": "Ireland|Dublin",
+    "country:india": "India|Indian"
+  },
+  "topics": {
+    "topic:scholarships": "scholarship",
+    "topic:post-study-work": "\\bPSW\\b|post.?study|work permit",
+    "topic:proof-of-funds": "\\bfunds?\\b|bank statement|show money|ITR",
+    "topic:placements-careers": "placement|salary|salaries|job|career|internship",
+    "topic:cost-of-living": "cost of living|living expense|groceries|accommodation",
+    "topic:admission-gaps-age": "\\bgaps?\\b|age limit|backlog",
+    "topic:dual-degree": "dual degree|double degree|Buckingham",
+    "topic:english-taught": "English[- ]taught|mode of instruction|\\bMOI\\b|language barrier",
+    "topic:visa": "\\bvisa\\b|embassy",
+    "topic:spouse-dependants": "spouse|dependent|unification",
+    "topic:intakes": "intake",
+    "topic:accreditation": "accredit|NECHE",
+    "topic:us-campus-transfer": "US campus|campus transfer|Nashua",
+    "topic:psychology-programs": "psycholog",
+    "topic:permanent-residency": "\\bPR\\b|permanent resid"
+  }
+}

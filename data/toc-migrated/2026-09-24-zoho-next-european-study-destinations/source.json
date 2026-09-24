@@ -1,0 +1,36 @@
+{
+  "_id": "2026-09-24-zoho-next-european-study-destinations-src",
+  "tenantId": "toc",
+  "kind": "recording",
+  "hash": "a7a3356b33474dc4d5aae09718c094c9b8d3236361a556871b57f268c126412f",
+  "captureMode": "silent",
+  "title": "The Next European Study Destinations to Watch",
+  "platform": "zoho",
+  "path": "raw/webinars/2026-09-24 15-55-54.mkv",
+  "audioPath": "raw/webinars/2026-09-24-zoho-europe-trimmed.m4a",
+  "audioLevel": {
+    "maxDb": 0,
+    "meanDb": -19.2,
+    "silent": false
+  },
+  "consent": {
+    "given": true,
+    "recordedBy": "Umesh Sugara (registered attendee) via LKB bot",
+    "note": "attendee-side capture for internal KB use; organizer recording not available to attendees",
+    "confirmedNoAlternative": true
+  },
+  "createdAt": "2026-09-24T11:47:18.364Z",
+  "audioTrim": {
+    "fromSec": 230,
+    "toSec": 3935,
+    "t0Ist": "2026-09-24T15:59:44+05:30",
+    "reason": "drop pre-start and post-end silence; Gemini invented turns over the post-end silence"
+  },
+  "knownGaps": [
+    {
+      "fromSec": 195,
+      "toSec": 258,
+      "reason": "Zoho connection interrupted ~16:03; page reloaded by operator"
+    }
+  ]
+}

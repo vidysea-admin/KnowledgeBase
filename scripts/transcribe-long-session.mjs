@@ -32,7 +32,8 @@ import { Agent, setGlobalDispatcher } from "undici";
 import { findAudioFile } from "./lib/find-audio-file.mjs";
 import { realUploadTransport } from "./lib/real-upload-transport.mjs";
 
-setGlobalDispatcher(new Agent({ headersTimeout: 600_000, bodyTimeout: 600_000 }));
+// 30 min: a single-call transcription of a ~60-min recording can exceed 10 min before headers (2026-09-24).
+setGlobalDispatcher(new Agent({ headersTimeout: 1_800_000, bodyTimeout: 1_800_000 }));
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA_DIR = join(ROOT, "data", "toc-migrated");
@@ -108,7 +109,8 @@ async function main() {
     if (state !== "ACTIVE") {
       throw new Error(`file never became ACTIVE (last state: ${state}) after ${MAX_POLLS} polls`);
     }
-    return transcribeUploadedAudio(fileUri, realUploadTransport, apiKey);
+    // GEMINI_STT_MODEL overrides the adapter default (e.g. gemini-3.8-flash for single-call long audio).
+    return transcribeUploadedAudio(fileUri, realUploadTransport, apiKey, process.env.GEMINI_STT_MODEL || undefined);
   }
 
   /** Returns turns local to `spanStart` (tStart/tEnd relative to the span itself, not the

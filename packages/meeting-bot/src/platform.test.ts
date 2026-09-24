@@ -26,6 +26,19 @@ test("detects webex.com URLs", () => {
   assert.equal(detectPlatform("https://acme.webex.com/acme/j.php?MTID=abc123"), "webex");
 });
 
+test("detects Zoho webinar/meeting URLs", () => {
+  assert.equal(
+    detectPlatform("https://webinar.zoho.in/meeting/register/join?registerKey=abc&sessionId=1370765131"),
+    "zoho",
+  );
+  assert.equal(detectPlatform("https://meeting.zoho.com/meeting/join?key=123"), "zoho");
+  assert.equal(detectPlatform("https://zoho.in.evil.example/meeting"), "unknown");
+});
+
+test("detects Google Cloud OnAir (Weeklies) URLs", () => {
+  assert.equal(detectPlatform("https://cloudonair.withgoogle.com/events/weeklies-x"), "cloudonair");
+});
+
 test("falls back to unknown for an unrecognized platform", () => {
   assert.equal(detectPlatform("https://example.com/some-other-video-call/123"), "unknown");
 });
