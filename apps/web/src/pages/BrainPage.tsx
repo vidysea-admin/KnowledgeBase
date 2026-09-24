@@ -1,223 +1,300 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import ForceGraph2D from "react-force-graph-2d";
+/**
+ * apps/web/src/pages/BrainPage.tsx — /brain, rebuilt as a readable, drill-down, self-refreshing
+ * knowledge graph (U-BRAIN, qa/contracts/brain-knowledge-graph.md).
+ *
+ * What changed and why, in one place:
+ * - [C1] the payload is now the UNION of `tree_index` and the 94 real `graph_edges` rows (people,
+ *   orgs, countries, dates), which no route used to read.
+ * - [C2] the renderer is SVG (`brain/GraphSvg.tsx`), not canvas, so every node carries a real
+ *   `<text>` label. The measured before-state was 13 shapes / 0 labels.
+ * - [C3] the panel is `brain/NodePanel.tsx`: neighbours grouped by edge type, each clickable and
+ *   re-centring the graph, plus a link to the exact turn that evidences a relationship.
+ * - [C5] filters (kind, session, label search) live in the URL, so a view is shareable.
+ * - [C7] sessions that exist but are not in the graph are COUNTED on screen, never hidden.
+ * - [C8] the API's 404 becomes an explanatory empty state instead of a bare error line.
+ */
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.js";
 import { loadGraph } from "../api/graph.js";
 import { getSession } from "../api/sessions.js";
 import { ApiError } from "../api/client.js";
-import type { Graph, GraphNode, SessionDetail } from "../api/types.js";
+import type { Graph, GraphNodeKind, SessionDetail } from "../api/types.js";
+import { GraphSvg, NODE_COLOR } from "./brain/GraphSvg.js";
+import { NodePanel } from "./brain/NodePanel.js";
+import { layoutGraph, MAX_LAID_OUT_NODES, type Point } from "./brain/force-layout.js";
+import { activeFilterCount, filterGraph, highestDegreeSubgraph, neighboursByType, nodeIndex } from "./brain/graph-model.js";
 
-const NODE_COLOR: Record<GraphNode["kind"], string> = {
-  session: "#2554ff",
-  topic: "#0b8a5c",
-  org: "#b7791f",
-};
-
-interface LinkedSession { id: string; label: string; }
-
-interface SidePanelState {
-  kind: "session" | "topic" | "org";
-  id: string;
-  label: string;
-  detail?: SessionDetail;
-  linkedSessions?: LinkedSession[];
-  loading?: boolean;
-  error?: string;
-}
+const CANVAS = { width: 1100, height: 700 };
+const KIND_ORDER: GraphNodeKind[] = ["session", "topic", "org", "person", "country", "date", "month", "user", "other"];
 
 export function BrainPage(): React.ReactElement {
   const { apiKey } = useAuth();
   const [graph, setGraph] = useState<Graph | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [panel, setPanel] = useState<SidePanelState | null>(null);
-  // ForceGraph2D auto-sizes to its container via its own ResizeObserver, but that measurement
-  // races the side panel's layout on first mount (real bug found live: the canvas locked in at
-  // the full-card width taken *before* the panel's flex space was accounted for, then never
-  // re-measured, permanently overlapping the panel). Measuring the container ourselves and
-  // passing explicit width/height removes that race entirely.
-  const graphWrapRef = useRef<HTMLDivElement | null>(null);
-  const [graphSize, setGraphSize] = useState({ width: 0, height: 520 });
+  const [error, setError] = useState<{ message: string; notFound: boolean } | null>(null);
+  const [detail, setDetail] = useState<SessionDetail | null>(null);
+  const [detailState, setDetailState] = useState<{ loading: boolean; error: string | null }>({ loading: false, error: null });
+  const [loadedAt, setLoadedAt] = useState<string | null>(null);
+  const [params, setParams] = useSearchParams();
+  const [viewBox, setViewBox] = useState({ x: 0, y: 0, w: CANVAS.width, h: CANVAS.height });
+  const reloadRef = useRef(0);
 
-  useEffect(() => {
-    const el = graphWrapRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (!entry) return;
-      // Rounded, and no-op updates dropped. This is hygiene, NOT the node-click fix: the raw
-      // contentRect width is fractional (682.391px), so the observer re-fired after mount and
-      // re-sized force-graph's canvas for no visible gain. Kept because pointless resizes are
-      // pointless; see nodePointerAreaPaint below for what actually made nodes clickable.
-      const width = Math.round(entry.contentRect.width);
-      setGraphSize((prev) => (prev.width === width && prev.height === 520 ? prev : { width, height: 520 }));
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [graph]);
+  const selectedId = params.get("node");
+  const query = params.get("q") ?? "";
+  const sessionFilter = params.get("session");
+  const kindParam = params.get("kinds") ?? "";
+  const kinds = useMemo(
+    () => new Set(kindParam.split(",").filter(Boolean) as GraphNodeKind[]),
+    [kindParam],
+  );
 
+  const refresh = useCallback(() => {
+    reloadRef.current += 1;
+    setParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("r", String(reloadRef.current));
+      return next;
+    }, { replace: true });
+  }, [setParams]);
+
+  const reloadToken = params.get("r") ?? "0";
   useEffect(() => {
     let cancelled = false;
     loadGraph(apiKey)
-      .then((data) => { if (!cancelled) setGraph(data); })
-      .catch((err: unknown) => { if (!cancelled) setError(err instanceof ApiError ? err.message : "failed to load graph"); });
+      .then((data) => {
+        if (cancelled) return;
+        setGraph(data);
+        setError(null);
+        setLoadedAt(new Date().toLocaleTimeString());
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        const notFound = err instanceof ApiError && err.status === 404;
+        setError({ message: err instanceof ApiError ? err.message : "failed to load graph", notFound });
+      });
     return () => { cancelled = true; };
-  }, [apiKey]);
+  }, [apiKey, reloadToken]);
 
-  const nodeById = useMemo(() => {
-    const map = new Map<string, GraphNode>();
-    for (const n of graph?.nodes ?? []) map.set(n.id, n);
-    return map;
-  }, [graph]);
+  // [C6] "isko update bhi krte rhna hai" — a tab left open picks up newly ingested sessions when
+  // it is focused again, instead of showing a graph that silently aged out.
+  useEffect(() => {
+    const onFocus = (): void => refresh();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [refresh]);
 
-  function selectSession(id: string, label: string): void {
-    setPanel({ kind: "session", id, label, loading: true });
-    getSession(apiKey, id)
-      .then((detail) => setPanel({ kind: "session", id, label, detail }))
-      .catch((err: unknown) => setPanel({ kind: "session", id, label, error: err instanceof ApiError ? err.message : "failed to load session" }));
-  }
+  const index = useMemo(() => nodeIndex(graph), [graph]);
+  const selectedNode = selectedId ? index.get(selectedId) ?? null : null;
 
-  function selectNode(id: string): void {
-    const graphNode = nodeById.get(id);
-    if (!graphNode || !graph) return;
-
-    if (graphNode.kind === "session") {
-      selectSession(id, graphNode.label);
+  useEffect(() => {
+    if (!selectedNode || selectedNode.kind !== "session" || !selectedNode.ref) {
+      setDetail(null);
+      setDetailState({ loading: false, error: null });
       return;
     }
+    let cancelled = false;
+    setDetail(null);
+    setDetailState({ loading: true, error: null });
+    getSession(apiKey, selectedNode.ref)
+      .then((d) => { if (!cancelled) { setDetail(d); setDetailState({ loading: false, error: null }); } })
+      .catch((err: unknown) => {
+        if (!cancelled) setDetailState({ loading: false, error: err instanceof ApiError ? err.message : "failed to load session" });
+      });
+    return () => { cancelled = true; };
+  }, [apiKey, selectedNode]);
 
-    // topic/org: no dedicated detail route -- derive linked sessions from the edges already in
-    // the graph payload we already have, no extra fetch (plan §8b phase 2 drill-down design).
-    // Each linked session is itself clickable, so a topic/org node is a real entry point into
-    // its actual content, not a dead end (the "Obsidian-style" ask: a node click opens content,
-    // and every linked note is itself a link, not plain text).
-    const linkedIds = graph.edges
-      .filter((e) => e.source === id || e.target === id)
-      .map((e) => (e.source === id ? e.target : e.source));
-    const linkedSessions: LinkedSession[] = linkedIds
-      .map((linkedId) => nodeById.get(linkedId))
-      .filter((n): n is GraphNode => n?.kind === "session")
-      .map((n) => ({ id: n.id, label: n.label }));
-    setPanel({ kind: graphNode.kind, id, label: graphNode.label, linkedSessions });
+  const filtered = useMemo(
+    () => (graph ? filterGraph(graph, { kinds, sessionId: sessionFilter, query }) : { nodes: [], edges: [] }),
+    [graph, kinds, sessionFilter, query],
+  );
+  const shown = useMemo(
+    () => highestDegreeSubgraph(filtered.nodes, filtered.edges, MAX_LAID_OUT_NODES),
+    [filtered],
+  );
+  const positions = useMemo<Map<string, Point>>(
+    () => layoutGraph(shown.nodes, shown.edges, { ...CANVAS, seed: 20260924 }),
+    [shown],
+  );
+
+  const setParam = useCallback((key: string, value: string | null) => {
+    setParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (value === null || value === "") next.delete(key);
+      else next.set(key, value);
+      return next;
+    }, { replace: true });
+  }, [setParams]);
+
+  const select = useCallback((id: string) => {
+    setParam("node", id);
+    const p = positions.get(id);
+    if (p) setViewBox((v) => ({ ...v, x: p.x - v.w / 2, y: p.y - v.h / 2 }));
+  }, [positions, setParam]);
+
+  /** ONE `setParams` call, not three. Three sequential `setParam(…, null)` calls all read the
+   * same render's `prev` under React batching, so the last one re-adds the keys the first two
+   * deleted — caught by the "clearing filters restores the whole graph" test. */
+  const clearFilters = useCallback(() => {
+    setParams((prev) => {
+      const next = new URLSearchParams(prev);
+      for (const key of ["kinds", "session", "q"]) next.delete(key);
+      return next;
+    }, { replace: true });
+  }, [setParams]);
+
+  function toggleKind(kind: GraphNodeKind): void {
+    const next = new Set(kinds);
+    if (next.has(kind)) next.delete(kind); else next.add(kind);
+    setParam("kinds", [...next].join(","));
   }
 
-  function handleNodeClick(node: { id?: string | number }): void {
-    selectNode(String(node.id ?? ""));
+  function zoom(factor: number): void {
+    setViewBox((v) => {
+      const w = Math.min(CANVAS.width * 2, Math.max(150, v.w * factor));
+      const h = Math.min(CANVAS.height * 2, Math.max(95, v.h * factor));
+      return { x: v.x + (v.w - w) / 2, y: v.y + (v.h - h) / 2, w, h };
+    });
   }
+
+  const missing = graph?.stats.sessionsMissing ?? [];
+  const filters = { kinds, sessionId: sessionFilter, query };
+  const sessionNodes = useMemo(
+    () => (graph?.nodes ?? []).filter((n) => n.kind === "session").sort((a, b) => a.label.localeCompare(b.label)),
+    [graph],
+  );
 
   return (
     <>
       <div className="page-header">
         <h1>Brain</h1>
         <p>
-          Sessions, topics, and orgs from the real knowledge tree. Solid lines are real membership;
-          dashed lines are a derived "these topics showed up together" signal, not literal data.
-          Click any node to read its real content — every link in the panel is itself clickable.
+          Every session, topic, org, person, country and date the knowledge base actually holds, and
+          how they connect. Solid lines are stated relationships; dashed lines are derived
+          (co-occurrence, or a keyword match below full confidence). Click any node to drill in —
+          every neighbour is itself clickable, and evidence links open the exact turn.
         </p>
       </div>
-      {error && <div className="card error-note">{error}</div>}
-      {!error && graph === null && <div className="card empty-note">Loading&hellip;</div>}
-      {graph && graph.nodes.length === 0 && (
-        <div className="card empty-note">No tree index built for this tenant yet.</div>
-      )}
-      {graph && graph.nodes.length > 0 && (
-        <div className="card" style={{ display: "flex", gap: "1rem", padding: 0, overflow: "hidden" }}>
-          <div ref={graphWrapRef} style={{ flex: 1, minWidth: 0, minHeight: 520 }}>
-            {graphSize.width > 0 && (
-              <ForceGraph2D
-                graphData={{
-                  nodes: graph.nodes.map((n) => ({ ...n })),
-                  links: graph.edges.map((e) => ({ ...e })),
-                }}
-                nodeId="id"
-                nodeLabel="label"
-                nodeColor={(n: unknown) => NODE_COLOR[(n as GraphNode).kind]}
-                /**
-                 * THE ACTUAL FIX for "clicking a node does nothing" (measured 2026-09-09).
-                 *
-                 * Nothing was broken in code: `onNodeClick` fired correctly whenever a click
-                 * genuinely landed on a node. The problem was that almost none did. Measured on
-                 * the real page: of 2601 grid points across the canvas only 32 were over a node —
-                 * **1.2%** — with a hittable radius of **5px** for ~180 nodes. A person aiming at
-                 * a dot they can plainly see misses it, repeatedly, and concludes the page is dead.
-                 *
-                 * `nodePointerAreaPaint` paints the PICKING layer independently of the visible
-                 * one, so the target can be generous while the dot stays small and the graph stays
-                 * readable. `globalScale` is the current zoom: dividing by it keeps the target a
-                 * constant size in SCREEN pixels, so zooming out does not shrink it back to
-                 * unhittable.
-                 */
-                nodePointerAreaPaint={(node: unknown, color: string, ctx: CanvasRenderingContext2D, globalScale: number) => {
-                  const n = node as GraphNode & { x?: number; y?: number };
-                  if (n.x === undefined || n.y === undefined) return;
-                  const HIT_RADIUS_PX = 10;
-                  ctx.fillStyle = color;
-                  ctx.beginPath();
-                  ctx.arc(n.x, n.y, HIT_RADIUS_PX / globalScale, 0, 2 * Math.PI);
-                  ctx.fill();
-                }}
-                linkColor={(l: unknown) => ((l as { inferred?: boolean }).inferred ? "rgba(20,24,31,0.15)" : "rgba(20,24,31,0.35)")}
-                linkLineDash={(l: unknown) => ((l as { inferred?: boolean }).inferred ? [2, 2] : null)}
-                onNodeClick={handleNodeClick}
-                width={graphSize.width}
-                height={graphSize.height}
-              />
-            )}
-          </div>
-          {/* Always visible, Obsidian-style side pane -- a placeholder before any click rather
-              than nothing, so the panel reads as part of the page, not a hidden feature. */}
-          <div style={{ width: 320, flexShrink: 0, borderLeft: "1px solid var(--line)", padding: "1rem", overflowY: "auto", maxHeight: 520 }}>
-            {!panel && (
-              <div className="empty-note">Click a session, topic, or org node to read its real content here.</div>
-            )}
-            {panel && (
-              <>
-                <div className="section-title">{panel.kind}</div>
-                <div className="row-title">{panel.label}</div>
-                {panel.loading && <div className="empty-note">Loading&hellip;</div>}
-                {panel.error && <div className="error-note">{panel.error}</div>}
-                {panel.detail && (
-                  <>
-                    <p style={{ fontSize: "0.85rem" }}>{panel.detail.page?.summary ?? "(no summary yet)"}</p>
-                    {panel.detail.claims.length > 0 && (
-                      <>
-                        <div className="section-title">Claims ({panel.detail.claims.length})</div>
-                        <ul style={{ paddingLeft: "1.1rem", margin: 0, fontSize: "0.8rem" }}>
-                          {panel.detail.claims.slice(0, 8).map((c) => (
-                            <li key={c._id} style={{ marginBottom: "0.4rem" }}>{c.text}</li>
-                          ))}
-                        </ul>
-                        {panel.detail.claims.length > 8 && (
-                          <div className="row-meta">+{panel.detail.claims.length - 8} more</div>
-                        )}
-                      </>
-                    )}
-                    <div className="row-meta" style={{ marginTop: "0.5rem" }}>{panel.detail.turns.length} turn(s) transcribed</div>
-                    <Link to={`/sessions/${encodeURIComponent(panel.id)}`} className="row-meta" style={{ color: "var(--accent)", display: "inline-block", marginTop: "0.5rem" }}>
-                      View full session &rarr;
-                    </Link>
-                  </>
-                )}
-                {panel.linkedSessions && (
-                  <>
-                    <div className="section-title">Linked sessions ({panel.linkedSessions.length})</div>
-                    {panel.linkedSessions.length === 0 && <div className="empty-note">None.</div>}
-                    {panel.linkedSessions.map((s) => (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => selectSession(s.id, s.label)}
-                        className="row-meta"
-                        style={{ display: "block", background: "none", border: "none", padding: 0, marginBottom: "0.3rem", color: "var(--accent)", cursor: "pointer", textAlign: "left", font: "inherit" }}
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                  </>
-                )}
-              </>
-            )}
-          </div>
+
+      {error && error.notFound && (
+        <div className="card empty-note" data-testid="graph-empty-state">
+          No knowledge graph for this tenant yet — nothing has been indexed into `tree_index` and no
+          `graph_edges` rows exist. Ingest a session (or run the webinar sync) and this page fills
+          itself; it will not need a manual re-index.
         </div>
+      )}
+      {error && !error.notFound && <div className="card error-note">{error.message}</div>}
+      {!error && graph === null && <div className="card empty-note">Loading&hellip;</div>}
+
+      {graph && (
+        <>
+          {missing.length > 0 && (
+            <div className="card" data-testid="staleness-note" style={{ borderLeft: "3px solid var(--warn)" }}>
+              <div className="row-title">{missing.length} session(s) exist but are not in this graph</div>
+              <div className="row-meta">
+                {missing.slice(0, 5).map((m) => m.title).join(" · ")}
+                {missing.length > 5 ? ` · +${missing.length - 5} more` : ""}
+                {" — "}they have neither a tree-index entry nor any graph edges yet.
+              </div>
+            </div>
+          )}
+
+          <div className="card" data-testid="graph-filters" style={{ display: "flex", flexWrap: "wrap", gap: "0.6rem", alignItems: "center" }}>
+            <label style={{ fontSize: "0.8rem" }}>
+              Search&nbsp;
+              <input
+                type="search"
+                aria-label="Search node labels"
+                value={query}
+                onChange={(e) => setParam("q", e.target.value)}
+                placeholder="label…"
+                style={{ padding: "0.25rem 0.4rem", border: "1px solid var(--line)", borderRadius: 6 }}
+              />
+            </label>
+            <label style={{ fontSize: "0.8rem" }}>
+              Session&nbsp;
+              <select aria-label="Filter by session" value={sessionFilter ?? ""} onChange={(e) => setParam("session", e.target.value || null)} style={{ padding: "0.25rem", border: "1px solid var(--line)", borderRadius: 6 }}>
+                <option value="">all sessions</option>
+                {sessionNodes.map((n) => <option key={n.id} value={n.id}>{n.label}</option>)}
+              </select>
+            </label>
+            {KIND_ORDER.filter((k) => graph.nodes.some((n) => n.kind === k)).map((k) => (
+              <button
+                key={k}
+                type="button"
+                aria-pressed={kinds.has(k)}
+                onClick={() => toggleKind(k)}
+                className="badge"
+                style={{
+                  cursor: "pointer", border: `1px solid ${NODE_COLOR[k]}`,
+                  background: kinds.has(k) ? NODE_COLOR[k] : "transparent",
+                  color: kinds.has(k) ? "#fff" : NODE_COLOR[k],
+                }}
+              >
+                {k}
+              </button>
+            ))}
+            <span className="row-meta" data-testid="filter-count">{activeFilterCount(filters)} filter(s) active</span>
+            {activeFilterCount(filters) > 0 && (
+              <button type="button" onClick={clearFilters} style={{ fontSize: "0.75rem", cursor: "pointer", border: "1px solid var(--line)", borderRadius: 6, background: "var(--card)", padding: "0.2rem 0.5rem" }}>
+                Clear filters
+              </button>
+            )}
+            <span style={{ flex: 1 }} />
+            <button type="button" onClick={() => zoom(0.75)} aria-label="Zoom in" style={{ cursor: "pointer" }}>+</button>
+            <button type="button" onClick={() => zoom(1.35)} aria-label="Zoom out" style={{ cursor: "pointer" }}>&minus;</button>
+            <button type="button" onClick={() => setViewBox({ x: 0, y: 0, w: CANVAS.width, h: CANVAS.height })} style={{ cursor: "pointer", fontSize: "0.75rem" }}>Fit</button>
+            <button type="button" onClick={refresh} style={{ cursor: "pointer", fontSize: "0.75rem" }}>Refresh</button>
+          </div>
+
+          <div className="card" style={{ display: "flex", gap: "1rem", padding: 0, overflow: "hidden" }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="row-meta" style={{ padding: "0.5rem 0.75rem 0" }} data-testid="graph-counts">
+                showing {shown.nodes.length} of {graph.nodes.length} node(s) · {shown.edges.length} of {graph.edges.length} relationship(s)
+                {graph.stats.edgeSources.entityEdges > 0 ? ` · ${graph.stats.edgeSources.entityEdges} from graph_edges, ${graph.stats.edgeSources.treeIndex} from tree_index` : ""}
+                {loadedAt ? ` · loaded ${loadedAt}` : ""}
+              </div>
+              {filtered.nodes.length > MAX_LAID_OUT_NODES && (
+                <div className="row-meta" style={{ padding: "0 0.75rem", color: "var(--warn)" }} data-testid="degraded-note">
+                  Past the {MAX_LAID_OUT_NODES}-node layout ceiling — showing the {MAX_LAID_OUT_NODES} most connected nodes. Filter to see the rest.
+                </div>
+              )}
+              {shown.nodes.length === 0 ? (
+                <div className="empty-note" style={{ padding: "1rem" }} data-testid="no-match-note">
+                  No nodes match these filters.
+                </div>
+              ) : (
+                <GraphSvg
+                  nodes={shown.nodes}
+                  edges={shown.edges}
+                  positions={positions}
+                  width={CANVAS.width}
+                  height={520}
+                  viewBox={viewBox}
+                  selectedId={selectedId}
+                  onSelect={select}
+                />
+              )}
+            </div>
+            <div style={{ width: 340, flexShrink: 0, borderLeft: "1px solid var(--line)", padding: "1rem", overflowY: "auto", maxHeight: 560 }}>
+              {!selectedNode && (
+                <div className="empty-note">
+                  Click any node — or tab to one and press Enter — to see what it connects to and the
+                  turns that prove it.
+                </div>
+              )}
+              {selectedNode && graph && (
+                <NodePanel
+                  node={selectedNode}
+                  neighbours={neighboursByType(graph, selectedNode.id)}
+                  detail={detail}
+                  detailLoading={detailState.loading}
+                  detailError={detailState.error}
+                  onSelect={select}
+                />
+              )}
+            </div>
+          </div>
+        </>
       )}
     </>
   );

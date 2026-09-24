@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.js";
 import { getSession } from "../../api/sessions.js";
 import { ApiError } from "../../api/client.js";
 import type { SessionDetail } from "../../api/types.js";
 
 const MAX_TURNS_SHOWN = 200;
+
+// U-BRAIN [C3]: /brain's evidence links are `/sessions/<id>#turn-<turnId>`. Every turn therefore
+// needs a real DOM id, and arriving with that hash must scroll to it and mark it — otherwise the
+// "graph -> the exact turn that proves it" path dead-ends at the top of a 200-turn transcript.
+function turnDomId(turnId: string): string {
+  return `turn-${turnId}`;
+}
 
 // Real gap found live (2026-09-04) testing Ingest end-to-end: `tStart`/`tEnd` mean different
 // units depending on how a turn was produced -- real seconds for an audio transcript, but a
@@ -33,9 +40,11 @@ function speakerColor(ref: string): string {
 
 export function SessionDetailPage(): React.ReactElement {
   const { id } = useParams<{ id: string }>();
+  const { hash } = useLocation();
   const { apiKey } = useAuth();
   const [detail, setDetail] = useState<SessionDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const highlightedTurn = hash.startsWith("#turn-") ? decodeURIComponent(hash.slice("#turn-".length)) : null;
 
   useEffect(() => {
     if (!id) return;
@@ -47,6 +56,13 @@ export function SessionDetailPage(): React.ReactElement {
       .catch((err: unknown) => { if (!cancelled) setError(err instanceof ApiError ? err.message : "failed to load session"); });
     return () => { cancelled = true; };
   }, [apiKey, id]);
+
+  // Runs after the transcript has rendered, which is why it depends on `detail`: the anchor does
+  // not exist at mount time, so a browser's own hash handling lands on nothing.
+  useEffect(() => {
+    if (!detail || !highlightedTurn) return;
+    document.getElementById(turnDomId(highlightedTurn))?.scrollIntoView({ block: "center" });
+  }, [detail, highlightedTurn]);
 
   if (error) return <div className="card error-note">{error}</div>;
   if (!detail) return <div className="card empty-note">Loading&hellip;</div>;
@@ -85,9 +101,11 @@ export function SessionDetailPage(): React.ReactElement {
             {detail.turns.slice(0, MAX_TURNS_SHOWN).map((t) => (
               <div
                 key={t._id}
+                id={turnDomId(t._id)}
+                data-turn-id={t._id}
                 style={{
-                  background: "var(--card-bg, #f7f7f5)",
-                  border: "1px solid var(--border, #e5e5e0)",
+                  background: t._id === highlightedTurn ? "var(--warn-bg)" : "var(--card-bg, #f7f7f5)",
+                  border: `1px solid ${t._id === highlightedTurn ? "var(--warn)" : "var(--border, #e5e5e0)"}`,
                   borderRadius: "8px",
                   padding: "0.5rem 0.75rem",
                   maxWidth: "70%",
@@ -109,7 +127,13 @@ export function SessionDetailPage(): React.ReactElement {
           detail.turns.slice(0, MAX_TURNS_SHOWN).map((t) => {
             const unit = timeUnitLabel(t.speakerRef);
             return (
-              <div key={t._id} className="row-card">
+              <div
+                key={t._id}
+                id={turnDomId(t._id)}
+                data-turn-id={t._id}
+                className="row-card"
+                style={t._id === highlightedTurn ? { borderColor: "var(--warn)", background: "var(--warn-bg)" } : undefined}
+              >
                 <div className="row-title">{t.speakerRef} &middot; {t.tStart}{unit}&ndash;{t.tEnd}{unit}</div>
                 <div>{t.text}</div>
               </div>

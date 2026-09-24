@@ -8,6 +8,8 @@ export { extractTopicRefs, type ExtractTopicRefs } from "./tree/extract-topics.j
 export { regenerate } from "./tree/regenerate.js";
 export { promoteTreeEntities, topicRefsForSession, type PromotedEntities, type PromotedTopic, type PromotedOrg } from "./tree/promote-entities.js";
 export { flattenTreeToGraph, type Graph, type GraphNode, type GraphEdge } from "./tree/flatten-graph.js";
+export { buildKnowledgeGraph, type BuildKnowledgeGraphInput, type KnowledgeGraphSessionRef } from "./graph/build-graph.js";
+export type { KnowledgeGraph, KnowledgeGraphNode, KnowledgeGraphEdge, KnowledgeGraphEvidence, KnowledgeGraphNodeKind, KnowledgeGraphSource, KnowledgeGraphStats } from "./graph/types.js";
 
 export { cosineSimilarity, rankByCosine, rankSessionsByCosine, type ScorableChunk, type ScoredChunk } from "./vector/cosine.js";
 export { createVectorRetriever, type VectorRetrieverOptions } from "./vector/retriever.js";

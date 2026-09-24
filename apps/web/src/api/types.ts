@@ -57,17 +57,49 @@ export interface Gap {
   status: "open" | "received" | "expired";
 }
 
+/**
+ * `GET /graph` — the UNION payload (U-BRAIN [C1]). Mirrors `@lkb/index`'s `KnowledgeGraph*`
+ * types by hand, per this file's boundary rule. Ids are canonical `<kind>:<slug>`; `ref` carries
+ * the raw entity id so a session node can deep-link to `/sessions/<ref>`. NOTE the edge field is
+ * `type` (the `graph_edges` field name), not the pre-union `kind`.
+ */
+export type GraphNodeKind =
+  | "session" | "topic" | "org" | "person" | "country" | "date" | "month" | "user" | "other";
+
 export interface GraphNode {
   id: string;
   label: string;
-  kind: "session" | "topic" | "org";
+  kind: GraphNodeKind;
+  ref?: string;
+  sources: ("tree_index" | "graph_edges")[];
+}
+
+export interface GraphEvidence {
+  turnId: string;
+  sessionId?: string;
+  tStart?: number;
+  occurredAt?: string;
 }
 
 export interface GraphEdge {
   source: string;
   target: string;
-  kind: "session-topic" | "session-org" | "topic-cooccurrence";
+  type: string;
+  /** Derived rather than asserted — tree co-occurrence, or any row with `confidence` < 1. */
   inferred: boolean;
+  confidence?: number;
+  weight?: number;
+  sessionRef?: string;
+  evidence?: GraphEvidence[];
+  origin: "tree_index" | "graph_edges";
+}
+
+/** [C7] — what the graph does NOT contain, so /brain can say so instead of looking complete. */
+export interface GraphStats {
+  sessionsTotal: number;
+  sessionsInGraph: number;
+  sessionsMissing: { id: string; title: string }[];
+  edgeSources: { treeIndex: number; entityEdges: number };
 }
 
 export interface UpcomingMeeting {
@@ -94,6 +126,7 @@ export interface MeetingCandidate {
 export interface Graph {
   nodes: GraphNode[];
   edges: GraphEdge[];
+  stats: GraphStats;
 }
 
 /**

@@ -14,13 +14,13 @@ import { fileURLToPath } from "node:url";
 import {
   getDb, createEvalRun, recordScore as recordEvalRunScore,
   sessions as sessionsColl, sources as sourcesColl, gaps as gapsColl,
-  claims as claimsColl, turns as turnsColl, sessionPages as sessionPagesColl,
+  claims as claimsColl, turns as turnsColl, sessionPages as sessionPagesColl, graphEdges as graphEdgesColl,
   listAll as listAllMeetingCandidates, createIfNew as createMeetingCandidateIfNew,
   decide as decideMeetingCandidate, get as getTrustedSender, recordApproval as recordSenderApproval,
 } from "@lkb/db";
 import type { ApiKeys, Jobs, TreeIndexNode, TreeIndexRootDocument } from "@lkb/core";
 import type { WriteJobFn } from "@lkb/ai";
-import { flattenTreeToGraph, treeIndexRootFilter, type Graph } from "@lkb/index";
+import { buildKnowledgeGraph, treeIndexRootFilter, type KnowledgeGraph } from "@lkb/index";
 import type { ApiKeyStore, VerifiedKey } from "./auth.js";
 import type { TreeStore } from "./routes/ask.js";
 import type { EvalRunStore } from "./routes/compete.js";
@@ -137,14 +137,17 @@ export function createMongoCitationsDeps(): CitationsDeps {
   };
 }
 
-/** Real `GraphReadDeps` (routes/graph.ts) — reuses the exact same `treeIndexRootFilter` query
- * `createMongoTreeStore` already uses, then flattens it with `@lkb/index`'s pure
- * `flattenTreeToGraph`. No new Mongo access pattern. */
+/** Real `GraphReadDeps` — unions the `tree_index` root (same `treeIndexRootFilter` as
+ * `createMongoTreeStore`) with the real `graph_edges` rows and `sessions`, via `@lkb/index`'s pure
+ * `buildKnowledgeGraph`. Both new reads use `packages/db` `coll(tenantId)`, so [I1] holds by
+ * construction; full disclosure of what is and is not read lives in `routes/graph.ts`. */
 export function createMongoGraphReadDeps(): GraphReadDeps {
   return {
-    async loadGraph(tenantId): Promise<Graph | null> {
-      const root = await getDb().collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
-      return root ? flattenTreeToGraph(root) : null;
+    async loadGraph(tenantId): Promise<KnowledgeGraph | null> {
+      const treeRootP = getDb().collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
+      const [treeRoot, entityEdges, sessionDocs] = await Promise.all([treeRootP, graphEdgesColl(tenantId).find({}).toArray(), sessionsColl(tenantId).find({}).toArray()]);
+      if (!treeRoot && entityEdges.length === 0) return null;
+      return buildKnowledgeGraph({ treeRoot, entityEdges, sessions: sessionDocs });
     },
   };
 }

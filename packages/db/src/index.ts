@@ -12,3 +12,6 @@ export * from "./collections/watched-sources.js";
 export * from "./collections/gaps.js";
 export * from "./collections/meeting-candidates.js";
 export * from "./collections/trusted-senders.js";
+// U-BRAIN [C1]: `GET /graph` reads the real `graph_edges` rows; the accessor existed since
+// plan §10 U0.9 but was never exported, which is part of why no route could read them.
+export * from "./collections/graph-edges.js";

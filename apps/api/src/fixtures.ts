@@ -180,18 +180,25 @@ export function fakeSearchDeps(overrides: Partial<SearchDeps> = {}): SearchDeps 
   };
 }
 
-/** An in-memory `GraphReadDeps` — tests never touch Mongo. One session/topic node + edge so
- * both the empty-graph and non-empty-graph shapes are reachable from a default fixture. */
+/** An in-memory `GraphReadDeps` — tests never touch Mongo. Carries one node from EACH source
+ * (a `tree_index` session/topic pair and a `graph_edges` person edge) plus the `stats` block, so
+ * the union shape U-BRAIN put on the wire is exercised by the default fixture, and both the
+ * empty-graph and non-empty-graph shapes stay reachable. */
 export function fakeGraphReadDeps(overrides: Partial<GraphReadDeps> = {}): GraphReadDeps {
   return {
     loadGraph: async (tenantId) =>
       tenantId === "tenant-1"
         ? {
             nodes: [
-              { id: "session-1", label: "Fixture Session", kind: "session" },
-              { id: "visas", label: "Visas", kind: "topic" },
+              { id: "session:session-1", label: "Fixture Session", kind: "session", ref: "session-1", sources: ["tree_index"] },
+              { id: "topic:visas", label: "Visas", kind: "topic", ref: "visas", sources: ["tree_index"] },
+              { id: "person:anita", label: "Anita", kind: "person", ref: "anita", sources: ["graph_edges"] },
             ],
-            edges: [{ source: "session-1", target: "visas", kind: "session-topic", inferred: false }],
+            edges: [
+              { source: "session:session-1", target: "topic:visas", type: "session-topic", inferred: false, origin: "tree_index" },
+              { source: "person:anita", target: "session:session-1", type: "spoke_in", inferred: false, confidence: 1, sessionRef: "session-1", evidence: [{ turnId: "t1", sessionId: "session-1" }], origin: "graph_edges" },
+            ],
+            stats: { sessionsTotal: 1, sessionsInGraph: 1, sessionsMissing: [], edgeSources: { treeIndex: 1, entityEdges: 1 } },
           }
         : null,
     ...overrides,
