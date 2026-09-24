@@ -186,4 +186,4 @@ backend module (`lkb record`) with no UI surface.
   matches the task's own dedupe-per-flapping-connection intent (within one live run) rather than
   cross-process dedupe, which was not asked for.
 
-## Status: ready-for-check
+## Status: checked-PASS — qa/verdicts/t-030-telegram-alerts.md (Cycle checked: 0, peer checker knowledgebase-ff, d3cefbf); merged to master; meeting-bot 115/115 + tsc clean on merged tree; live phone delivery + silence trigger (T-031) remain stated debt
