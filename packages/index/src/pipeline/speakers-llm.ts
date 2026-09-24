@@ -2,30 +2,20 @@
  * packages/index/src/pipeline/speakers-llm.ts â€” U2.4 (catalogue B3/B10), the LLM half.
  *
  * `speakers.ts` resolves 78/494 positional turns (15.8%) from explicit self-naming alone. This is
- * the path to the other ~84%, and it inherits `claims.ts`'s posture wholesale: the model is asked
- * to cite real turn ids, and its output is NEVER trusted blind.
+ * the path to the other ~84%, inheriting `claims.ts`'s posture: the model must cite real turn ids,
+ * and its output is NEVER trusted blind. Unlike a claim, a speaker name must actually have been
+ * SPOKEN, so every shipped `displayName` appears verbatim in every evidence turn (plan section 10):
+ * a summary's "Juben Thakur" for the transcript's "Jubin Thakkar" must never ship as a cited fact.
  *
- * One guard here has no counterpart in `claims.ts`, and it is the reason this module exists in
- * this shape. A claim is prose the model composes, so it can only be checked for *provenance*. A
- * speaker name is a string that must actually have been SPOKEN â€” so it can be checked for
- * *identity*, and it is: every `displayName` must appear verbatim in every turn cited as its
- * evidence (plan Â§10, "zero speaker name that does not appear verbatim in a cited turn").
- *
- * That check is not theoretical. The generated summary for one real session says "Juben Thakur"
- * while its transcript says "Jubin Thakkar" â€” a normalisation the summarizer introduced. A model
- * given the same corpus can reach the same wrong spelling honestly. Without this guard a
- * plausible, well-formed, completely unspoken name would ship as a cited fact about a real person.
- *
- * Degradation is deliberate and follows Â§10's "keep the regex as the degradation fallback": if the
- * provider call fails or returns junk, this falls back to the deterministic pass rather than
- * returning an empty result that a caller would mistake for "no speakers in this session"
- * (the ISS-056 failure mode that made `claims.ts` grow its own `degraded` flag).
+ * Degradation is deliberate (section 10, "keep the regex as the degradation fallback"): a failed
+ * or junk provider call falls back to the deterministic pass, never to an empty result a caller
+ * would read as "no speakers in this session" (ISS-056).
  */
 import type { Turns } from "@lkb/core";
 import type { CompleteResult, Job } from "@lkb/ai";
 import { parseJsonLoose } from "@lkb/ai";
 import { personIdFor, resolveSpeakers, type ResolvedSpeaker } from "./speakers.js";
-import { looksLikeAName, isDiscourseOnly, citesNameAsSelfIdentification, citesNameAsHandover } from "./speaker-name-rules.js";
+import { looksLikeAName, isDiscourseOnly, containsNameVerbatim, citesNameAsSelfIdentification, citesNameAsHandover, citesNameAsThanks } from "./speaker-name-rules.js";
 
 export type SpeakersCompleteFn = (job: Job) => Promise<CompleteResult>;
 
@@ -167,6 +157,24 @@ export function buildSpeakerWindows(turns: Turns[]): SpeakerWindow[] {
 }
 
 /**
+ * ISS-282: the turns that NAME `label` as `name` for ONE block, by relation to it: the block's own
+ * self-identification; the turn just BEFORE it handing over / greeting / calling on the name; or
+ * the turn just AFTER it thanking the name. A block that mentions the name itself in the third
+ * person ("I think Sonal is not having any questions") is talking ABOUT that person, so only its
+ * own self-identification can bind it. Every returned turn contains the name verbatim.
+ */
+function namingTurns(turns: Turns[], label: string, name: string, b: { startTurnIndex: number; endTurnIndex: number }): number[] {
+  const text = (k: number) => turns[k]?.text ?? "";
+  const inBlock = Array.from({ length: b.endTurnIndex - b.startTurnIndex + 1 }, (_, k) => b.startTurnIndex + k);
+  const own = inBlock.filter((k) => citesNameAsSelfIdentification(text(k), name));
+  if (inBlock.some((k) => !own.includes(k) && containsNameVerbatim(text(k), name))) return own;
+  const [before, after] = [b.startTurnIndex - 1, b.endTurnIndex + 1];
+  const fwd = turns[before] && turns[before].speakerRef !== label && citesNameAsHandover(text(before), name) ? [before] : [];
+  const back = turns[after] && turns[after].speakerRef !== label && citesNameAsThanks(text(after), name) ? [after] : [];
+  return [...fwd, ...own, ...back];
+}
+
+/**
  * Speaker identities for one session's positional labels, via the injected LLM `complete`.
  *
  * Never throws. Every returned `displayName` is verbatim-present in every turn it cites, every
@@ -176,19 +184,12 @@ export function buildSpeakerWindows(turns: Turns[]): SpeakerWindow[] {
 export async function extractSpeakers(turns: Turns[], complete: SpeakersCompleteFn): Promise<SpeakerExtractionResult> {
   if (turns.length === 0) return { resolved: [], unresolved: [], degraded: null };
 
-  const byId = new Map(turns.map((t) => [t._id, t]));
   const labels = new Set(positionalLabels(turns));
 
-  // Segment-aware (gate Option A, phase 2): one bounded window per contiguous block instead of
-  // one session-wide prompt. A window whose provider call fails is recorded; if EVERY window
-  // fails the whole extraction degrades to the deterministic floor. A partially-failing session
-  // keeps its successful windows and reports the failures via `degraded.reason`.
-  //
-  // ISS-255 fix_direction (2): single-run acceptance is NOT stable — the live eval measured the
-  // same session accepting different name sets across runs despite temperature 0 + seed. So the
-  // windows are sampled THREE times and only the identities that agree in >=AGREE_OF runs
-  // proceed to the filters. A label that resolves differently across runs is left unresolved —
-  // the module's stated contract, now backed by voting rather than hope.
+  // Segment-aware (gate Option A, phase 2): one bounded window per contiguous block. If EVERY window
+  // call fails, degrade to the deterministic floor; partial failures are kept and reported in
+  // `degraded.reason`. ISS-255 (2): single runs were unstable despite temperature 0 + seed, so the
+  // windows are sampled AGREEMENT_RUNS times and only identities agreed in >=2 runs proceed.
   const windows = buildSpeakerWindows(turns);
   const runRaw: unknown[][] = [];
   const windowFailures: string[] = [];
@@ -221,9 +222,8 @@ export async function extractSpeakers(turns: Turns[], complete: SpeakersComplete
     return fallback(turns, "speakers responses were not JSON arrays in any window");
   }
 
-  // Count how many RUNS proposed each (label, name) pair with surviving evidence; only pairs
-  // proposed in >=AGREEMENT_THRESHOLD runs carry on to the claims map. Votes are keyed on
-  // (speakerRef, lowercased displayName) — casing variants of the same name vote together.
+  // Count how many RUNS proposed each (label, name) pair; only pairs proposed in >=AGREEMENT_THRESHOLD
+  // runs carry on. Keyed on (speakerRef, lowercased displayName): casing variants vote together.
   const votes = new Map<string, number>();
   for (const run of runRaw) {
     const seenThisRun = new Set<string>();
@@ -241,7 +241,7 @@ export async function extractSpeakers(turns: Turns[], complete: SpeakersComplete
 
   // label -> name -> evidence (+ the blocks it binds). Kept per-name so a contradiction is visible.
   type Block = { startTurnIndex: number; endTurnIndex: number };
-  const claims = new Map<string, Map<string, { turnId: string; sessionId: string; block: Block }[]>>();
+  const claims = new Map<string, Map<string, { turnId: string; sessionId: string; block: Block; i: number }[]>>();
   const indexById = new Map(turns.map((t, i) => [t._id, i]));
   const blockMap = labelBlocks(turns);
   const blockAt = (label: string, i: number): Block | undefined =>
@@ -267,28 +267,29 @@ export async function extractSpeakers(turns: Turns[], complete: SpeakersComplete
     // Shape says "could be a name"; this says "is not a discourse word". Different questions.
     if (isDiscourseOnly(name)) continue;
 
+    // ISS-282 fix cycle 1b: the model cites the turns a person SPOKE (the block), almost never the
+    // turn that NAMES them -- c1 replay: 0 of 30 correct adjacent namings were cited. So a real cited
+    // turn only LOCATES a block of this label (its own, or the one it sits next to); the evidence
+    // shipped is whichever turn `namingTurns` finds naming the block, verbatim, in the right direction.
     const cited = Array.isArray(entry.turnIds) ? entry.turnIds : [];
-    const evidence: { turnId: string; sessionId: string; block: Block }[] = [];
+    const evidence: { turnId: string; sessionId: string; block: Block; i: number }[] = [];
     for (const id of cited) {
       if (typeof id !== "string") continue;
-      const t = byId.get(id);
-      const i = indexById.get(id);
-      if (!t || i === undefined) continue;               // fabricated turn id
-      // THE RULE (whole-word containment inside a naming cue) now also binds by RELATION (ISS-282):
-      // the label's OWN turn naming ITSELF, or another speaker's handover immediately before one of
-      // the label's blocks. A turn naming a third party evidences that person exists, never who spoke.
-      const own = t.speakerRef === speakerRef && citesNameAsSelfIdentification(t.text ?? "", name);
-      const handover = !own && t.speakerRef !== speakerRef && turns[i + 1]?.speakerRef === speakerRef &&
-        citesNameAsHandover(t.text ?? "", name);
-      const block = own || handover ? blockAt(speakerRef, own ? i : i + 1) : undefined;
-      if (!block || evidence.some((e) => e.turnId === id)) continue;
-      evidence.push({ turnId: id, sessionId: t.sessionId, block });
+      const i = indexById.get(id) ?? indexById.get(id.replace(/^id:/, "")); // the prompt's [id:...] prefix, copied
+      if (i === undefined) continue;                     // fabricated turn id
+      const other = turns[i]?.speakerRef !== speakerRef;
+      for (const block of [blockAt(speakerRef, i), other ? blockAt(speakerRef, i + 1) : undefined, other ? blockAt(speakerRef, i - 1) : undefined]) {
+        for (const j of block ? namingTurns(turns, speakerRef, name, block) : []) {
+          const t = turns[j];
+          if (t && !evidence.some((e) => e.turnId === t._id)) evidence.push({ turnId: t._id, sessionId: t.sessionId, block: block!, i: j });
+        }
+      }
     }
     if (evidence.length === 0) continue;                 // nothing survived -- the speaker does not ship
 
     // Merge across runs WITHOUT duplicating evidence: the same (label, name) pair is filtered
     // in every run, so its surviving turns recur verbatim. One copy per turn id.
-    const byName = claims.get(speakerRef) ?? new Map<string, { turnId: string; sessionId: string; block: Block }[]>();
+    const byName = claims.get(speakerRef) ?? new Map<string, { turnId: string; sessionId: string; block: Block; i: number }[]>();
     const merged = [...(byName.get(name) ?? [])];
     for (const e of evidence) if (!merged.some((m) => m.turnId === e.turnId)) merged.push(e);
     byName.set(name, merged);
@@ -305,7 +306,7 @@ export async function extractSpeakers(turns: Turns[], complete: SpeakersComplete
     if (!entry) continue;
     const [displayName, bound] = entry;
     if (bound.some((e) => (labelsByTurn.get(e.turnId)?.size ?? 0) > 1)) continue;
-    const evidence = bound.map(({ turnId, sessionId }) => ({ turnId, sessionId }));
+    const evidence = [...bound].sort((a, b) => a.i - b.i).map(({ turnId, sessionId }) => ({ turnId, sessionId }));
     // Segment-aware scope (speaker-segment-identity gate): the block(s) each cited turn BINDS. ISS-282:
     // the old scoping re-ran the deterministic floor, whose lookup returned [] for every LLM-only
     // identity -- so each shipped label-wide. Blocks now come from the evidence itself.

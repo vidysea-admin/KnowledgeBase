@@ -75,8 +75,9 @@ const ISS_093_CORPUS: [string, string][] = [
 /**
  * The ISS-093 cases that remain open by design -- proper nouns, not discourse words. ISS-282 closed
  * "Mumbai": "Coming up next, Mumbai" is not the SPEAKER naming itself, so it no longer binds spk:0.
+ * ISS-282 c1b closed "India": "This is India speaking" -- "X speaking" binds only when X opens a clause.
  */
-const ISS_093_GAZETTEER = new Set(["India", "Google"]);
+const ISS_093_GAZETTEER = new Set(["Google"]);
 
 for (const [text, name] of ISS_093_CORPUS) {
   const expectedRefusal = !ISS_093_GAZETTEER.has(name);

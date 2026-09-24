@@ -15,11 +15,8 @@
  *   containsNameVerbatim  the turn contains it as a whole name      (rejects "Ruby" in "Ruby-Anne")
  *   citesNameAsAnIntroduction  the turn is NAMING someone           (rejects passing mentions)
  *
- * The history is worth keeping: cycle 1 had containment only, and "Juben Thakur" -- a spelling the
- * summarizer invented for a real person -- would have shipped. Cycle 2 added shape, and 20 of 20
- * fabricated people still shipped because shape tests capitalisation, not nameness. Cycle 3 added
- * the discourse denylist and made the cues person-directed. Each cycle's fix was necessary and
- * none was sufficient.
+ * History: containment alone shipped "Juben Thakur"; shape alone shipped 20/20 fabricated people;
+ * the discourse denylist and person-directed cues followed. Each was necessary, none sufficient.
  */
 
 /**
@@ -54,15 +51,9 @@ export function looksLikeAName(name: string): boolean {
 /**
  * Does `text` contain `name` as a whole name?
  *
- * Two guards failed open before. A bare `includes()` let "Ruby" match "Rubykumar Shah" (ISS-092's
- * ancestor). Then a letters-and-digits boundary let "Ruby" match "Ruby-Anne Smith" -- because this
- * function treated "-" as a boundary while `looksLikeAName` admits "-" INSIDE a name. Two
- * contradictory definitions of where a name ends, and the containment side is the one that fails
- * open, so it is the one that had to move.
- *
- * `NAME_JOINERS` is therefore shared by both: a character that can sit inside a name can never
- * simultaneously mark its edge. "." is deliberately NOT a joiner here -- it ends far more sentences
- * than it joins names, and treating it as one would refuse "My name is Ruby."
+ * A bare `includes()` let "Ruby" match "Rubykumar Shah"; a letters-and-digits boundary let it match
+ * "Ruby-Anne Smith". `NAME_JOINERS` is shared with `looksLikeAName`: a character that can sit inside
+ * a name never marks its edge. "." is NOT a joiner -- that would refuse "My name is Ruby."
  *
  * Deliberately not a RegExp: it would have to be built from a model-supplied string, and a
  * mis-escape fails OPEN by widening what matches. indexOf has no escaping surface.
@@ -80,21 +71,6 @@ export function containsNameVerbatim(text: string, name: string): boolean {
   }
 }
 
-/**
- * Cue phrases that mark an act of NAMING, checked immediately adjacent to the candidate.
- *
- * ISS-091: `looksLikeAName` tests capitalisation, not nameness, and transcript prose capitalises
- * nearly every sentence start -- so "Welcome", "Thanks", "Okay" and even the bare pronoun "I" all
- * shipped as people. "Good morning" was caught only because English lowercases "morning". Shape is
- * necessary, not sufficient.
- *
- * A naming cue is used rather than a stopword list because a stopword list is unbounded and
- * language-specific, while a cue is positive evidence that this turn introduces or addresses
- * someone -- which is exactly what the LLM path's prompt asks the model to find. It also costs
- * recall on purpose: a name mentioned with no cue in that turn is refused rather than guessed at.
- *
- * These are fixed constants, never model-supplied, so a RegExp here carries no injection surface.
- */
 /**
  * Discourse words that are never a person, as a WHOLE candidate.
  *
@@ -145,7 +121,8 @@ export function isDiscourseOnly(name: string): boolean {
 }
 
 /**
- * Cue phrases that mark a PERSON-DIRECTED act of naming.
+ * Cue phrases that mark a PERSON-DIRECTED act of naming. ISS-091: shape tests capitalisation, not
+ * nameness ("Welcome", "Thanks", "I" all shipped), so a name with no adjacent cue is refused.
  *
  * ISS-093 also showed the cue list itself was too loose: bare "welcome" / "hi" / "thanks" precede
  * objects and greetings at least as often as people ("Welcome Diwali celebrations", "Hi Team"), so
@@ -198,7 +175,6 @@ const NAMING_CUES_AFTER = ["here", "speaking", "from", "with us", "joining us"];
 /** Interrogatives that follow a direct address: "Prasanti, what do you think?" */
 const ADDRESS_FOLLOWERS = ["what", "how", "would", "could", "do you", "can you", "any", "your", "please", "over to you"];
 
-/** Is the occurrence of `name` at `at` a person-directed act of naming, not a passing mention? */
 /**
  * Words that may follow `speaking` in the self-identification idiom: prepositions, conjunctions
  * and adverbs. Anything NOT here and not punctuation is taken to be a noun that `speaking` is
@@ -233,19 +209,10 @@ function hasNamingCue(text: string, name: string, at: number): boolean {
   const rawAfter = text.slice(at + name.length, at + name.length + 28);
   const after = rawAfter.toLowerCase().replace(/^[\s,:;."'\u2019()\u2014-]+/u, "");
   if (NAMING_CUES_AFTER.some((cue) => cue !== "speaking" && after.startsWith(cue))) return true;
-  // `speaking` is the self-identification idiom -- Ruby speaking. -- but it is also a plain
-  // participial modifier: English speaking students may apply would otherwise ship
-  // person:english (ISS-097). The distinction is syntactic and candidate-independent:
-  // Prasanti speaking students may apply is not a naming construction either.
-  //
-  // ISS-098: the first attempt inverted the rule. It ALLOWLISTED nine prepositions and refused
-  // everything else, dropping ten recorded self-introductions -- speaking here, speaking and I
-  // lead admissions, speaking again, speaking as the panel chair, speaking over Zoom -- and it
-  // did so with an unconditional early return that vetoed every LATER cue branch too.
-  //
-  // Both were wrong. The discriminator is a following NOUN (the thing speaking would modify);
-  // end of clause, punctuation, a conjunction, an adverb or ANY preposition all mean the idiom.
-  // And a non-match must fall through, never veto the predicate.
+  // `speaking` is the self-identification idiom (Ruby speaking.) but also a participle: "English
+  // speaking students" shipped person:english (ISS-097); allowlisting what may follow dropped ten
+  // real introductions (ISS-098). The discriminator is a following NOUN; end of clause,
+  // punctuation, a conjunction, an adverb or ANY preposition mean the idiom. A non-match falls through.
   const SPEAKING_AT = /^[\s,:;.'"()\u2019-]*speaking\b/iu;
   if (SPEAKING_AT.test(rawAfter)) {
     const tail = rawAfter.replace(SPEAKING_AT, "");
@@ -288,28 +255,61 @@ export function citesNameAsAnIntroduction(text: string, name: string): boolean {
  * wrong identity was a third party ("Thank you, Sonal", "Let me first introduce Shithij") credited
  * to the speaking label. These split it by DIRECTION; `speakers-llm.ts` pairs each with a relation.
  */
-/** Forward cues only: the named person speaks NEXT. Thanks and greetings look backward — absent. */
+/** Forward cues: the named person speaks NEXT. Thanks look backward (`citesNameAsThanks`). */
 const HANDOVER_CUES_BEFORE = ["over to", "hand over to", "handing over to", "introduce", "introducing",
   "please welcome", "joined by", "next presenter is", "next up is", "speaker is", "presenter is"];
 const HANDOVER_FOLLOWERS = ["please go ahead", "go ahead", "over to you", "the stage is yours", "the floor is yours"];
 const tidyBefore = (text: string, at: number): string => text.slice(Math.max(0, at - 40), at).toLowerCase().replace(/[\s,:;."'’()—-]+$/u, "");
 const tidyAfter = (text: string, name: string, at: number): string => text.slice(at + name.length, at + name.length + 28).toLowerCase().replace(/^[\s,:;."'’()—-]+/u, "");
 
+/**
+ * "X here" / "X speaking" / "X this side" name the speaker only when X OPENS a clause ("Hi all,
+ * Ruby here"). After a verb it is that verb's object: "I do see Ankit here" is the host spotting a
+ * panelist (c1 replay: spk:0 -> Ankit, gold Jubin Thakkar, 3/3 runs).
+ */
+const opensClause = (text: string, at: number): boolean =>
+  /(^|[.!?,;:—-]|\b(hi|hello|hey|yes|yeah|okay|ok))\s*$/iu.test(text.slice(Math.max(0, at - 40), at));
+
 /** The speaker names ITSELF: "my name is X", "this side X", "X here", "X speaking.", "This is X Y". */
 export function citesNameAsSelfIdentification(text: string, name: string): boolean {
   return nameOccurrences(text, name).some((at) => {
     const [before, after] = [tidyBefore(text, at), tidyAfter(text, name, at)];
     const speaking = /^speaking\b\s*([\p{L}']+)?/u.exec(after);
+    const afterCue = after.startsWith("here") || after.startsWith("this side") || (!!speaking && (!speaking[1] || FUNCTION_FOLLOWERS.has(speaking[1])));
     return hasNamingCue(text, name, at) && ([...SELF_NAMING_CUES, "this side"].some((c) => before.endsWith(c)) ||
-      after.startsWith("here") || after.startsWith("this side") || (!!speaking && (!speaking[1] || FUNCTION_FOLLOWERS.has(speaking[1]))) ||
-      (name.trim().split(/\s+/).length > 1 && before.endsWith("this is")));
+      (afterCue && opensClause(text, at)) || (name.trim().split(/\s+/).length > 1 && before.endsWith("this is")));
   });
 }
 
-/** The speaker hands the floor TO the named person: "over to X", "I invite ... X", "X, please go ahead". */
+/**
+ * Forward address: the named person speaks NEXT. A handover ("over to X", "I invite ... X",
+ * "X, please go ahead"), or -- only in the turn's closing stretch, where the floor is handed on --
+ * a greeting ("Hi, Nikhil.") or a question calling on them ("Rashi, I'll pass it on back to you").
+ * Mid-turn the same shapes are quoted or rhetorical: everybody ask me, "Jubin, what is a good
+ * portfolio?" / "Shweta, any more takers" (exhaustive 240-block check, fix cycle 1b).
+ */
+const CLOSING = 200;
+const GREETING_BEFORE = /(^|\W)(hi|hello|hey|welcome|good (morning|afternoon|evening))$/u;
+const CALLED_ON = ["what", "how", "would", "could", "can you", "do you", "did you", "any ", "your", "please", "i'll pass", "i will pass"];
 export function citesNameAsHandover(text: string, name: string): boolean {
-  return nameOccurrences(text, name).some((at) =>
-    HANDOVER_CUES_BEFORE.some((c) => tidyBefore(text, at).endsWith(c)) ||
-    HANDOVER_MARKERS.some((m) => text.slice(Math.max(0, at - 40), at).toLowerCase().includes(m)) ||
-    (/^\s*,/u.test(text.slice(at + name.length)) && HANDOVER_FOLLOWERS.some((c) => tidyAfter(text, name, at).startsWith(c))));
+  return nameOccurrences(text, name).some((at) => {
+    const [before, after, rest] = [tidyBefore(text, at), tidyAfter(text, name, at), text.slice(at + name.length)];
+    return HANDOVER_CUES_BEFORE.some((c) => before.endsWith(c)) ||
+      HANDOVER_MARKERS.some((m) => text.slice(Math.max(0, at - 40), at).toLowerCase().includes(m)) ||
+      (text.length - at <= CLOSING && GREETING_BEFORE.test(before) && /^\s*[,.!]/u.test(rest)) ||
+      (text.length - at <= CLOSING && /^\s*,/u.test(rest) && [...HANDOVER_FOLLOWERS, ...CALLED_ON].some((c) => after.startsWith(c)));
+  });
+}
+
+/**
+ * Backward address: "Thank you, X" / "Thanks so much X, for ..." OPENING a turn thanks the person
+ * who JUST spoke. A turn thanking two people ("Thank you, Kshitij. Thanks, Anisha", "thank you
+ * Bhakti, thank you TOC team") does not say which of them spoke last, so it binds neither.
+ */
+const THANKED = /\b[Tt]hank(?:s| you)(?: (?:so|very) much| a lot)?[\s,]+(\p{Lu}[\p{L}'’-]*)/gu;
+export function citesNameAsThanks(text: string, name: string): boolean {
+  const first = name.trim().split(/\s+/)[0] ?? "";
+  if ([...text.matchAll(THANKED)].some((m) => m[1] !== first && !isDiscourseOnly(m[1] ?? ""))) return false;
+  return nameOccurrences(text, name).some((at) => at <= 120 &&
+    /(thank you|thanks)( (so|very) much| a lot)?$/u.test(tidyBefore(text, at)) && /^(\s*[,.!?]|\s*$|\s+for\b)/u.test(text.slice(at + name.length)));
 }
