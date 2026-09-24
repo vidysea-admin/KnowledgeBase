@@ -251,3 +251,15 @@ test("c1b: a mid-turn quoted call is not a handover; a turn thanking two people 
   const ok = await extractSpeakers(one, replies([{ speakerRef: "spk:3", displayName: "Kshitij", turnIds: ["t1"] }]));
   assert.deepEqual(ok.resolved.map((r) => r.displayName), ["Kshitij"], "a single opening thank-you names who just spoke");
 });
+
+test("c1b review: quoted or reported speech names nobody, even in a SHORT turn (no length accident)", async () => {
+  const quote = [turn("t1", "spk:0", 'Everybody keeps asking me, "Priya, what do you think about this?"'), turn("t2", "spk:1", "Well, the market is strong.")];
+  const q = await extractSpeakers(quote, replies([{ speakerRef: "spk:1", displayName: "Priya", turnIds: ["t1"] }]));
+  assert.deepEqual(q.resolved, [], "a quoted call is not a handover");
+  const said = [turn("t1", "spk:3", "Here is my final point."), turn("t2", "Host", "Thank you, Kshitij, said the intern earlier today.")];
+  const s = await extractSpeakers(said, replies([{ speakerRef: "spk:3", displayName: "Kshitij", turnIds: ["t1"] }]));
+  assert.deepEqual(s.resolved, [], "a narrated thank-you is not addressed to the previous speaker");
+  const ton = [turn("t1", "spk:3", "That is all."), turn("t2", "Host", "Thank you, Kshitij. Thanks a ton, Anisha, too.")];
+  const t = await extractSpeakers(ton, replies([{ speakerRef: "spk:3", displayName: "Kshitij", turnIds: ["t1"] }]));
+  assert.deepEqual(t.resolved, [], "'thanks a ton, X' is a second thanked person");
+});

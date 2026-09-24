@@ -31,13 +31,9 @@ const NAME_PARTICLES = new Set([
 /**
  * Is this string shaped like a person's name at all?
  *
- * The model supplies `displayName`, so "it appears in the transcript" is not sufficient -- a
- * greeting appears in the transcript too. The cycle-1 checker got `"Good morning"` shipped as
- * `person:good-morning` on exactly that gap. Requiring each token to be capitalised (bar interior
- * particles) rejects prose while keeping real names.
- *
- * Deliberately conservative, consistent with "leave low-confidence speakers unresolved rather than
- * guessing": an all-lowercase real name, or one longer than four tokens, is refused not guessed.
+ * A greeting appears in the transcript too: `"Good morning"` once shipped as person:good-morning.
+ * Each token must be capitalised (bar interior particles). Deliberately conservative: an
+ * all-lowercase real name, or one over four tokens, is refused, not guessed.
  */
 export function looksLikeAName(name: string): boolean {
   const tokens = name.trim().split(/\s+/).filter(Boolean);
@@ -161,12 +157,9 @@ const HANDOVER_MARKERS = [
 /** Cues whose subject is the SPEAKER THEMSELF — the only ones that survive a handover context. */
 const SELF_NAMING_CUES = ["my name is", "my name's", "i am", "i'm", "call me"];
 /**
- * Demonstratives point at anything -- "This is India calling.", "This is Wednesday.", "This is
- * Great news." A bare demonstrative plus ONE capitalised token is not evidence of a person, so it
- * counts only for a multi-token name ("This is Makrand Rajadhyaksha"). Single-token candidates
- * need a cue that is specifically about a person: an explicit self-naming, a handover, or a direct
- * address. This is the last of the ISS-093 attacks and the only one a closed-class list cannot
- * reach, since telling a country from a person is a gazetteer problem, not a pattern problem.
+ * Demonstratives point at anything ("This is India calling.", "This is Great news."), so a bare
+ * demonstrative counts only for a multi-token name ("This is Makrand Rajadhyaksha"). Telling a
+ * country from a person is a gazetteer problem, not a pattern problem (ISS-093's last attack).
  */
 const DEMONSTRATIVE_CUES = ["this is", "that is", "that's"];
 /** Address greetings: only a cue when the name is followed by address punctuation (see below). */
@@ -282,11 +275,20 @@ export function citesNameAsSelfIdentification(text: string, name: string): boole
 }
 
 /**
+ * Quoted or reported speech names someone the SPEAKER is not addressing (c1b review PoCs):
+ * `Everybody keeps asking me, "Priya, what do you think?"` and `Thank you, Kshitij, said the intern`.
+ * Inside an open quote, after "asks me / told us / said", or before "said / asked", it binds nobody.
+ */
+const reported = (text: string, name: string, at: number): boolean =>
+  (text.slice(0, at).match(/["“”]/gu) ?? []).length % 2 === 1 ||
+  /\b((asks?|asked|asking|tells?|told) (me|us)|said|says)$/u.test(tidyBefore(text, at)) ||
+  /^[\s,]*(said|says|told|asked|replied|wrote)\b/iu.test(text.slice(at + name.length, at + name.length + 24));
+
+/**
  * Forward address: the named person speaks NEXT. A handover ("over to X", "I invite ... X",
  * "X, please go ahead"), or -- only in the turn's closing stretch, where the floor is handed on --
  * a greeting ("Hi, Nikhil.") or a question calling on them ("Rashi, I'll pass it on back to you").
- * Mid-turn the same shapes are quoted or rhetorical: everybody ask me, "Jubin, what is a good
- * portfolio?" / "Shweta, any more takers" (exhaustive 240-block check, fix cycle 1b).
+ * Mid-turn the same shapes are rhetorical ("Shweta, any more takers"); quotes are `reported`.
  */
 const CLOSING = 200;
 const GREETING_BEFORE = /(^|\W)(hi|hello|hey|welcome|good (morning|afternoon|evening))$/u;
@@ -294,10 +296,10 @@ const CALLED_ON = ["what", "how", "would", "could", "can you", "do you", "did yo
 export function citesNameAsHandover(text: string, name: string): boolean {
   return nameOccurrences(text, name).some((at) => {
     const [before, after, rest] = [tidyBefore(text, at), tidyAfter(text, name, at), text.slice(at + name.length)];
-    return HANDOVER_CUES_BEFORE.some((c) => before.endsWith(c)) ||
+    return !reported(text, name, at) && (HANDOVER_CUES_BEFORE.some((c) => before.endsWith(c)) ||
       HANDOVER_MARKERS.some((m) => text.slice(Math.max(0, at - 40), at).toLowerCase().includes(m)) ||
       (text.length - at <= CLOSING && GREETING_BEFORE.test(before) && /^\s*[,.!]/u.test(rest)) ||
-      (text.length - at <= CLOSING && /^\s*,/u.test(rest) && [...HANDOVER_FOLLOWERS, ...CALLED_ON].some((c) => after.startsWith(c)));
+      (text.length - at <= CLOSING && /^\s*,/u.test(rest) && [...HANDOVER_FOLLOWERS, ...CALLED_ON].some((c) => after.startsWith(c))));
   });
 }
 
@@ -306,10 +308,10 @@ export function citesNameAsHandover(text: string, name: string): boolean {
  * who JUST spoke. A turn thanking two people ("Thank you, Kshitij. Thanks, Anisha", "thank you
  * Bhakti, thank you TOC team") does not say which of them spoke last, so it binds neither.
  */
-const THANKED = /\b[Tt]hank(?:s| you)(?: (?:so|very) much| a lot)?[\s,]+(\p{Lu}[\p{L}'’-]*)/gu;
+const THANKED = /\b[Tt]hank(?:s| you)(?: (?:so|very) much| a lot| a ton| a bunch| again| also)?(?: to)?[\s,]+(\p{Lu}[\p{L}'’-]*)/gu;
 export function citesNameAsThanks(text: string, name: string): boolean {
   const first = name.trim().split(/\s+/)[0] ?? "";
   if ([...text.matchAll(THANKED)].some((m) => m[1] !== first && !isDiscourseOnly(m[1] ?? ""))) return false;
-  return nameOccurrences(text, name).some((at) => at <= 120 &&
-    /(thank you|thanks)( (so|very) much| a lot)?$/u.test(tidyBefore(text, at)) && /^(\s*[,.!?]|\s*$|\s+for\b)/u.test(text.slice(at + name.length)));
+  return nameOccurrences(text, name).some((at) => at <= 120 && !reported(text, name, at) &&
+    /(thank you|thanks)( (so|very) much| a lot| a ton| a bunch| again)?$/u.test(tidyBefore(text, at)) && /^(\s*[,.!?]|\s*$|\s+for\b)/u.test(text.slice(at + name.length)));
 }
