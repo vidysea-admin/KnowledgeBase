@@ -5,9 +5,8 @@
  * an injected ingest Source, while the real transcriber (Gemini File API) lives behind @lkb/ai,
  * which this package may not import — so transcription runs as scripts/transcribe-long-session.mjs.
  */
-import { createHash } from "node:crypto";
-import { spawn, spawnSync, execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { spawn, spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { OBSWebSocket } from "obs-websocket-js";
@@ -17,19 +16,17 @@ import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
 import { getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
 import { createObsBrowserDeps, type ObsClientLike } from "./obs-windows.js";
-import { collectGapEvent, gapsForSourceDoc, type GapWindow } from "./reconnect-gaps.js";
-import { createTelegramNotifier, readTurnCount, type TelegramNotifier } from "./telegram-alerts.js";
+import { collectGapEvent, type GapWindow } from "./reconnect-gaps.js";
+import { createTelegramNotifier, type TelegramNotifier } from "./telegram-alerts.js";
+import { finalizeRecordingWith } from "./record-finalize.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-
 
 const REPO_ROOT = path.resolve(HERE, "..", "..", "..", "..");
 const BOT_PROFILE_DIR = path.join(REPO_ROOT, "data", "bot-profile");
 const RECORD_DIR = path.join(REPO_ROOT, "raw", "webinars");
 const JOIN_SCRIPT = path.join(HERE, "..", "..", "py", "sb_join.py");
 const OBS_EXE = "C:\\Program Files\\obs-studio\\bin\\64bit\\obs64.exe";
-/** Below this peak level the capture heard nothing (digital silence measured at -91 dB). */
-const SILENCE_MAX_DB = -50;
 
 function flag(rest: string[], name: string): string | undefined {
   const i = rest.indexOf(name);
@@ -48,8 +45,6 @@ function todayAt(hhmm: string): Date {
 function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
 }
-
-const toPosix = (p: string) => p.split(path.sep).join("/");
 
 /** `login [url]`: open the bot browser (no clicks, no recording) so the user can sign in once. */
 export async function runLogin(rest: string[]): Promise<void> {
@@ -176,117 +171,14 @@ export async function runRecord(rest: string[]): Promise<void> {
   }
 }
 
-/** Strictly-below-threshold predicate the finalize path applies to ffmpeg's measured max_volume.
- * Exported for tests (T-033): AT the boundary (-50) is not silent, below it (-50.1) is. */
-export function isSilentCapture(maxDb: number): boolean {
-  return maxDb < SILENCE_MAX_DB;
-}
-
-function defaultExtractAudio(video: string, audioOut: string): void {
-  execFileSync("ffmpeg", ["-y", "-hide_banner", "-loglevel", "error", "-i", video, "-vn", "-ac", "1",
-    "-c:a", "aac", "-b:a", "96k", audioOut], { stdio: "inherit" });
-}
-
-function defaultMeasureVolume(audioPath: string): { maxDb: number; meanDb: number } {
-  // Silence gate. Measured 2026-09-24: a silent (-91 dB) capture sent to Gemini came back as 18
-  // fluent, invented turns. A KB must never ingest that, so silent audio is never transcribed.
-  const vd = spawnSync("ffmpeg", ["-hide_banner", "-i", audioPath, "-af", "volumedetect", "-f", "null", "-"],
-    { encoding: "utf8" });
-  const maxDb = Number(/max_volume:\s*(-?[\d.]+) dB/.exec(vd.stderr ?? "")?.[1] ?? "-999");
-  const meanDb = Number(/mean_volume:\s*(-?[\d.]+) dB/.exec(vd.stderr ?? "")?.[1] ?? "-999");
-  return { maxDb, meanDb };
-}
-
-function defaultRunTranscription(sessionId: string): void {
-  execFileSync("node", [path.join(REPO_ROOT, "scripts", "transcribe-long-session.mjs"), sessionId],
-    { cwd: REPO_ROOT, stdio: "inherit" });
-}
-
-/** Test seam (T-033, ISS-300): every field defaults to REAL production behaviour unchanged. Tests
- * drive `finalizeRecordingWith` directly (below) rather than adding a param to `finalizeRecording`
- * itself — its own param list (now T-030's 8, `wave/t-030-telegram-alerts`/883c7b2, merged
- * 1649da9) is left untouched on purpose: putting this unit's seam in a differently-named function
- * keeps the two concerns from ever colliding in one parameter list again. */
-export interface FinalizeRecordingOverrides {
-  extractAudio?: (video: string, audioOut: string) => void;
-  measureVolume?: (audioPath: string) => { maxDb: number; meanDb: number };
-  runTranscription?: (sessionId: string) => void;
-  repoRoot?: string; // a test's temp dir, so nothing is ever written into the real repo tree
-}
-
-/** Recording file → m4a → silence gate → source.json → (optional) transcript → T-030 Telegram
- * "finished" summary. Shared by `record` and `finalize` (the recovery path when the controlling
- * process died mid-run). This is the real implementation; `finalizeRecording` below is a thin
- * pass-through with today's defaults, kept param-list-stable for T-030 (see
- * `FinalizeRecordingOverrides` doc above). */
-export async function finalizeRecordingWith(
-  overrides: FinalizeRecordingOverrides,
-  video: string, sessionId: string, title: string, platform: string, transcribe: boolean,
-  gaps: GapWindow[] = [], // T-029: [] on the `finalize` recovery path — no live event stream to draw from there
-  // T-030: defaults to a fresh notifier when called from the `finalize` recovery path (runFinalize
-  // never builds its own — record-commands.ts loads TELEGRAM_* from .env before either call).
-  // A test never sets TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID, so the default notifier is `enabled:
-  // false` and every call below is a guaranteed no-op — never a live send (contract C6/D-030).
-  telegram: TelegramNotifier = createTelegramNotifier(),
-  durationSec?: number, // T-030: unknown (0) on the `finalize` recovery path — no live startedAt there
-): Promise<void> {
-  const root = overrides.repoRoot ?? REPO_ROOT;
-  const recordDir = overrides.repoRoot ? path.join(root, "raw", "webinars") : RECORD_DIR;
-  const extractAudio = overrides.extractAudio ?? defaultExtractAudio;
-  const measureVolume = overrides.measureVolume ?? defaultMeasureVolume;
-  const runTranscription = overrides.runTranscription ?? defaultRunTranscription;
-
-  const audio = path.join(recordDir, `${sessionId}.m4a`);
-  extractAudio(video, audio);
-  console.log(`[bot] audio → ${audio}`);
-
-  const { maxDb, meanDb } = measureVolume(audio);
-  const silent = isSilentCapture(maxDb);
-  console.log(`[bot] audio level: max ${maxDb} dB, mean ${meanDb} dB${silent ? "  ← SILENT" : ""}`);
-
-  const dataDir = path.join(root, "data", "toc-migrated", sessionId);
-  mkdirSync(dataDir, { recursive: true });
-  const sourceDoc = {
-    _id: `${sessionId}-src`,
-    tenantId: "vidysea",
-    kind: "recording",
-    // schema/sources.schema.json requires hash (unique index {tenantId, hash}).
-    hash: createHash("sha256").update(readFileSync(audio)).digest("hex"),
-    captureMode: "silent",
-    title,
-    platform,
-    path: toPosix(path.relative(root, video)),
-    audioPath: toPosix(path.relative(root, audio)),
-    audioLevel: { maxDb, meanDb, silent },
-    gaps: gapsForSourceDoc(gaps), // T-029: forced-disconnect windows recovered mid-run, if any
-    consent: {
-      given: true,
-      recordedBy: "Umesh Sugara (registered attendee) via LKB bot",
-      note: "attendee-side capture for internal KB use; organizer recording not available to attendees",
-      confirmedNoAlternative: true,
-    },
-    createdAt: new Date().toISOString(),
-  };
-  writeFileSync(path.join(dataDir, "source.json"), JSON.stringify(sourceDoc, null, 2) + "\n");
-  console.log(`[bot] registered session ${sessionId}`);
-
-  if (silent) {
-    throw new Error(`recording is silent (max ${maxDb} dB) — not transcribing; the capture did not hear the bot window`);
-  }
-  const turnsPath = path.join(dataDir, "turns.json");
-  if (transcribe) {
-    runTranscription(sessionId);
-  }
-  // T-030: finished + transcript-ready summary — no LLM call, turnCount is turns.json's own length.
-  telegram.notifyFinished({
-    title, sessionId, durationSec: durationSec ?? 0, gapCount: gaps.length,
-    transcriptPath: transcribe ? toPosix(path.relative(root, turnsPath)) : undefined,
-    turnCount: transcribe ? readTurnCount(turnsPath) : undefined,
-  });
-}
+// finalizeRecordingWith / isSilentCapture / FinalizeRecordingOverrides live in record-finalize.ts
+// (T-033, ISS-300) — split out to stay under this file's own 300-LOC budget (import above);
+// re-exported here so existing import sites (this package's tests) don't need to know the split.
+export { isSilentCapture, type FinalizeRecordingOverrides } from "./record-finalize.js";
+export { finalizeRecordingWith };
 
 /** Unchanged param list (T-030's own shape, 883c7b2/1649da9) — delegates to the real,
- * test-seamed implementation above with today's defaults. */
+ * test-seamed implementation in record-finalize.ts with today's defaults. */
 export async function finalizeRecording(
   video: string, sessionId: string, title: string, platform: string, transcribe: boolean,
   gaps: GapWindow[] = [],
