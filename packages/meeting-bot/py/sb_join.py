@@ -64,6 +64,25 @@ def emit(event, **kw):
     print(json.dumps({"event": event, "t": time.time(), **kw}), flush=True)
 
 
+def click_gate(clicks, now, started, extra_click_until, last_click, no_click):
+    """Pure predicate for whether this tick may attempt a click (C2, meeting-bot-live-capture
+    contract): `clicks` is a single run-long counter — T-029's reload path only ever widens
+    *when* clicking is still allowed (`extra_click_until`), never *how many* clicks are allowed
+    (`MAX_CLICKS` stays the one global cap for the whole run, across any number of reloads)."""
+    return (not no_click and clicks < MAX_CLICKS
+            and (now - started < CLICK_WINDOW_S or now < extra_click_until)
+            and now - last_click > 5)
+
+
+def apply_reload(clicks, now):
+    """Called from main() on a T-029 "reload" action, after the page has been reloaded and
+    rejoined. Returns (clicks, extra_click_until). C2 requires MAX_CLICKS to bound the WHOLE
+    run: a reload widens the click time window (extra_click_until = now + CLICK_WINDOW_S) but
+    MUST return `clicks` unchanged — resetting it here would let a run with enough reloads click
+    past MAX_CLICKS total, one fresh allowance per reload instead of one for the whole run."""
+    return clicks, now + CLICK_WINDOW_S
+
+
 def detect_trouble(body_lower, online):
     """Pure, browser-free: does this page state look like a dropped connection? `body_lower` is
     document.body.innerText.lower() (the caller already computes it for the join/end-phrase
@@ -218,9 +237,7 @@ def main():
                 if real_title != a.title:
                     sb.execute_script(f"document.title = {pinned};")
                 now = time.time()
-                if (not a.no_click and clicks < MAX_CLICKS
-                        and (now - started < CLICK_WINDOW_S or now < extra_click_until)
-                        and now - last_click > 5):
+                if click_gate(clicks, now, started, extra_click_until, last_click, a.no_click):
                     hit = sb.execute_script(CLICK_JS, JOIN_TEXTS)
                     if hit:
                         clicks += 1
@@ -245,7 +262,7 @@ def main():
                     emit("reconnect-reload", reason=reconnect.reason, attempt=reconnect.reload_count)
                     try:
                         sb.uc_open_with_reconnect(a.url, 4)
-                        extra_click_until = time.time() + CLICK_WINDOW_S
+                        clicks, extra_click_until = apply_reload(clicks, time.time())
                         emit("reconnect-rejoined")
                     except Exception as e:
                         emit("warn", error=f"reload failed: {str(e)[:200]}")

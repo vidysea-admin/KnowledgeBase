@@ -274,5 +274,171 @@ No orphan Chrome left running afterward (`Get-CimInstance Win32_Process ... -lik
    roadmap row (which only names the 20s threshold). Chosen to bound reload storms without
    giving up too early on a webinar that's still recoverable; open to adjustment.
 
+## Amendment (2026-09-25, T-024b C2/C10)
+
+**Why:** T-024b's adoption (`qa/contracts/meeting-bot-live-capture.md`, ADOPTED 2026-09-25, binds
+meeting-bot units from this date) requires this unit's C2/C10 evidence to be re-verified against
+the adopted (not draft) criteria. A previous amendment builder had started this work and died
+mid-edit; the uncommitted diff it left (`sb_join.py` +25/-4, `test_sb_join.py` +77) was reviewed
+and found sound — kept and finished rather than discarded.
+
+### 1. [C2] Cap holds across reloads
+
+**What changed:**
+- `packages/meeting-bot/py/sb_join.py:67-84` — extracted the inline click-eligibility check into a
+  pure `click_gate(clicks, now, started, extra_click_until, last_click, no_click)` predicate, and
+  the reload path's window-widening into a pure `apply_reload(clicks, now) -> (clicks,
+  extra_click_until)`. `apply_reload` returns `clicks` **unchanged** — a reload widens *when*
+  clicking is still allowed (`extra_click_until`), never *how many* clicks the whole run gets.
+  `MAX_CLICKS = 8` (`sb_join.py:33`) stays the single run-long cap.
+- `sb_join.py:240` (click-gate call site) and `sb_join.py:265` (reload call site) now call these
+  two functions instead of the inline conditional / inline `extra_click_until = ...` assignment —
+  behaviourally identical to what was already there (the prior code never reset `clicks` either;
+  this makes that property explicit, named, and independently testable instead of implicit in an
+  inline expression).
+- `packages/meeting-bot/py/test_sb_join.py:14-22,141-211` — imports `CLICK_WINDOW_S`, `MAX_CLICKS`,
+  `apply_reload`, `click_gate`; adds three tests:
+  - `test_click_gate_exhausts_at_max_clicks_inside_initial_window` — 20 eligible ticks inside the
+    initial window still stop at `MAX_CLICKS`.
+  - `test_total_clicks_capped_across_multiple_reloads` — the amendment's required scenario: initial
+    window exhausts the cap, then **3 separate reloads** each go through `apply_reload()` and each
+    open a fresh widened window; asserts `total_click_events == MAX_CLICKS` across the whole run
+    (tracked separately from `clicks` so a mutant that resets `clicks` per reload, which would still
+    show `clicks == MAX_CLICKS` at the end of each window, is still caught on the cumulative count).
+  - `test_apply_reload_widens_window_but_returns_clicks_unchanged` — direct unit test on the exact
+    function `main()` calls on reload.
+
+**How to verify:**
+```bash
+cd D:/KnowledgeBase-lanes/t-029-reconnect
+python -m pytest packages/meeting-bot/py/test_sb_join.py -v
+```
+
+**Actual output:**
+```
+collected 17 items
+... (14 pre-existing) ...
+test_click_gate_exhausts_at_max_clicks_inside_initial_window PASSED
+test_total_clicks_capped_across_multiple_reloads PASSED
+test_apply_reload_widens_window_but_returns_clicks_unchanged PASSED
+============================= 17 passed in 0.12s ==============================
+```
+
+**Falsification (D-020 safe: byte backup, `trap restore EXIT INT TERM ERR`, `timeout 60`, `cmp`
+verify after restore) — single-hunk mutation of `apply_reload`'s return to `return 0, now +
+CLICK_WINDOW_S` (resets the click budget on every reload):**
+```
+=== MUTATION applied: apply_reload resets clicks -> 0 each reload; FULL suite ===
+collected 17 items
+... (15 pre-existing + test_click_gate_exhausts_at_max_clicks_inside_initial_window PASSED) ...
+test_total_clicks_capped_across_multiple_reloads FAILED
+    AssertionError: C2: MAX_CLICKS must bound the WHOLE run's total click actions across reloads,
+    not just the current window's counter value; got 32 total clicks after an exhausted initial
+    window + 3 reloads (would be up to 32 if apply_reload() reset the counter on each reload)
+    assert 32 == 8
+test_apply_reload_widens_window_but_returns_clicks_unchanged FAILED
+    AssertionError: assert 0 == 5
+2 failed, 15 passed in 0.67s
+[restore] OK: sb_join.py byte-identical to backup
+mutant exit: 1 (expect non-zero = a test caught it)
+
+=== FINAL: confirm working tree restored, tests green again ===
+17 passed in 0.07s
+```
+`git diff --stat packages/meeting-bot/py/sb_join.py` immediately after: unchanged from the intended
+edit (21 insertions, 4 deletions) — no mutation residue landed.
+
+**Allowlist check (task item 4):** `JOIN_TEXTS` (`sb_join.py:24-28`) is untouched by this amendment
+and contains none of `share`/`unmute`/`raise hand`/`allow`/`enable` as a standalone match.
+
+### 2 & 3. [C10] Full no-regression set + python tests, from worktree root
+
+Run from `D:/KnowledgeBase-lanes/t-029-reconnect` (this unit's worktree, base `784df67`):
+
+```
+$ pnpm -r typecheck
+Scope: 10 of 11 workspace projects
+packages/core typecheck: Done
+apps/web typecheck: Done
+packages/db typecheck: Done
+packages/ai typecheck: Done
+packages/ask typecheck: Done
+packages/ingest typecheck: Done
+packages/index typecheck: Done
+packages/meeting-bot typecheck: Done
+apps/api typecheck: Done
+(exit 0, all Done, 0 errors)
+
+$ pnpm -r test
+packages/core   : tests 7   pass 7   fail 0
+packages/db     : tests 14  pass 14  fail 0
+packages/ai     : tests 74  pass 74  fail 0
+packages/ask    : tests 50  pass 50  fail 0
+packages/ingest : tests 97  pass 97  fail 0
+packages/index  : tests 228 pass 228 fail 0
+packages/meeting-bot : tests 88  pass 88  fail 0
+apps/api        : tests 175 pass 175 fail 0
+apps/web        : Done (no test script)
+(exit 0)
+
+$ pnpm gen:types --check
+OK: 24 generated type file(s) + index.ts match schema/
+(exit 0)
+
+$ python schema/validate.py
+PASS: 24 collection schema(s) validated correctly.
+(exit 0)
+
+$ python -m pytest packages/meeting-bot/py -q
+17 passed in 0.10s
+(exit 0)
+
+$ pnpm lint:structure
+lint-loc: OK (314 file(s) within budget)
+lint-dirsize: OK (87 dir(s) within budget)
+lint-root: FAIL — 1 violation(s)
+  root has 16 loose files (budget 15): .dependency-cruiser.cjs .dockerignore .env.example
+  .gitignore .gitmodules AGENTS.md ARCHITECTURE.md docker-compose.yml
+  Living-Knowledge-Base-Architecture.html migrate-mongo-config.cjs package.json pnpm-lock.yaml
+  pnpm-workspace.yaml structure.config.json TASKS.md tsconfig.base.json
+(exit 1)
+```
+
+**The `lint:structure` FAIL is `ISS-248`** ("the runtime-created untracked AGENTS.md makes the
+repository's structure gate fail in every Codex/Claude session" — status: open), and it is
+reproduced identically on base commit `784df67`: a throwaway `git worktree add <scratch>/base-check
+784df67 --detach` (outside `D:/KnowledgeBase`, per instructions), run there:
+
+```
+$ node scripts/lint-root.mjs
+lint-root: FAIL — 1 violation(s)
+  root has 16 loose files (budget 15): .dependency-cruiser.cjs .dockerignore .env.example
+  .gitignore .gitmodules AGENTS.md ARCHITECTURE.md docker-compose.yml
+  Living-Knowledge-Base-Architecture.html migrate-mongo-config.cjs package.json pnpm-lock.yaml
+  pnpm-workspace.yaml structure.config.json TASKS.md tsconfig.base.json
+(exit 1)
+```
+Identical file list and count — same pre-existing failure, not a regression from this unit. This
+also matches the adopted contract's own C10 wording: "except a failure reproduced identically on
+the unit's base commit, which must be named with its issue id in the manifest." The base worktree
+was removed after the check (`git worktree remove --force`).
+
+**Result: C10 clean except the named, reproduced, pre-existing ISS-248.**
+
+## Capability coverage — added row (cross-reload click cap, C2)
+
+| # | capability | the check that covers it | the falsifying edit | observed (pasted runner output) |
+|---|---|---|---|---|
+| 16 | `MAX_CLICKS` bounds total clicks across the WHOLE run, including across multiple reloads (not a fresh budget per reload) | `test_total_clicks_capped_across_multiple_reloads`, `test_apply_reload_widens_window_but_returns_clicks_unchanged` | single-hunk edit: `apply_reload` returns `0, now + CLICK_WINDOW_S` instead of `clicks, now + CLICK_WINDOW_S` | PASS before: `17 passed in 0.12s` (both tests green). FAIL after: `test_total_clicks_capped_across_multiple_reloads` → `assert 32 == 8`; `test_apply_reload_widens_window_but_returns_clicks_unchanged` → `assert 0 == 5`. Restored + `cmp`-verified byte-identical; `17 passed in 0.07s` after restore. |
+
+## Live browser evidence (amendment)
+
+Not UI-touching — the amendment's changed paths are `packages/meeting-bot/py/sb_join.py` (pure
+function extraction, no new Selenium calls, no new selectors) and
+`packages/meeting-bot/py/test_sb_join.py` (pure unit tests, no browser). The unit's original "Live
+browser evidence" section above (offline headed-Chrome proof against a local fixture) is unchanged
+and still stands; this amendment did not touch the reload/click behaviour observed there, only
+extracted it into named, independently-tested functions.
+
 Fix cycle: 0
 Status: ready-for-check
