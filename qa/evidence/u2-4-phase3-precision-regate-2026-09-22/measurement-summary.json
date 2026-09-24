@@ -1,0 +1,756 @@
+{
+  "measuredAt": "2026-09-24T16:29:18.852Z",
+  "corpus": {
+    "sessions": 11,
+    "blocks": 240
+  },
+  "bar1_acceptedIdentityPrecision": {
+    "accepted": 8,
+    "correct": 0,
+    "precision": 0,
+    "bar": 1,
+    "holds": false
+  },
+  "bar2_wrongLinks": {
+    "wrongIdentityCount": 8,
+    "wrongEvidencePairs": 8,
+    "bar": 0,
+    "wrongLinkList": [
+      {
+        "session": "2026-05-23-uniaccess-atlas-skilltech",
+        "outerRun": 1,
+        "speakerRef": "spk:0",
+        "displayName": "Sonal",
+        "evidenceTurns": [
+          "2026-05-23-uniaccess-atlas-skilltech-t007"
+        ],
+        "reasons": [
+          "empty blocks = label-wide identity over a recurring label",
+          "label-wide claim contradicted at block 1 (gold unnamed)",
+          "label-wide claim contradicted at block 3 (gold unnamed)"
+        ]
+      },
+      {
+        "session": "2026-07-15-creative-futures",
+        "outerRun": 1,
+        "speakerRef": "spk:0",
+        "displayName": "Priyanka Roy",
+        "evidenceTurns": [
+          "2026-07-15-creative-futures-t267"
+        ],
+        "reasons": [
+          "empty blocks = label-wide identity over a recurring label",
+          "label-wide claim contradicted at block 21 (gold unnamed)",
+          "label-wide claim contradicted at block 23 (gold unnamed)",
+          "label-wide claim contradicted at block 25 (gold unnamed)",
+          "label-wide claim contradicted at block 44 (gold unnamed)",
+          "label-wide claim contradicted at block 45 (gold unnamed)",
+          "label-wide claim contradicted at block 47 (gold unnamed)"
+        ]
+      },
+      {
+        "session": "2026-07-30-in-focus-3",
+        "outerRun": 1,
+        "speakerRef": "spk:1",
+        "displayName": "Shithij",
+        "evidenceTurns": [
+          "2026-07-30-in-focus-3-t022"
+        ],
+        "reasons": [
+          "empty blocks = label-wide identity over a recurring label",
+          "label-wide claim contradicted at block 1 (gold Nikhil)",
+          "label-wide claim contradicted at block 2 (gold Nikhil)",
+          "label-wide claim contradicted at block 9 (gold Nikhil)",
+          "label-wide claim contradicted at block 10 (gold Nikhil)",
+          "label-wide claim contradicted at block 11 (gold Nikhil)",
+          "label-wide claim contradicted at block 12 (gold Nikhil)",
+          "label-wide claim contradicted at block 13 (gold Nikhil)",
+          "label-wide claim contradicted at block 14 (gold Nikhil)",
+          "label-wide claim contradicted at block 15 (gold Nikhil)"
+        ]
+      },
+      {
+        "session": "2026-07-30-in-focus-3",
+        "outerRun": 1,
+        "speakerRef": "spk:2",
+        "displayName": "Anisha",
+        "evidenceTurns": [
+          "2026-07-30-in-focus-3-t094"
+        ],
+        "reasons": [
+          "empty blocks = label-wide identity over a recurring label",
+          "label-wide claim contradicted at block 3 (gold unnamed)",
+          "label-wide claim contradicted at block 21 (gold unnamed)",
+          "label-wide claim contradicted at block 23 (gold Nikhil)",
+          "label-wide claim contradicted at block 25 (gold Nikhil)",
+          "label-wide claim contradicted at block 27 (gold unnamed)",
+          "label-wide claim contradicted at block 29 (gold unnamed)",
+          "label-wide claim contradicted at block 31 (gold unnamed)",
+          "label-wide claim contradicted at block 33 (gold unnamed)",
+          "label-wide claim contradicted at block 39 (gold unnamed)",
+          "label-wide claim contradicted at block 41 (gold unnamed)"
+        ]
+      },
+      {
+        "session": "2026-08-03-uk-beyond-offer-letters",
+        "outerRun": 1,
+        "speakerRef": "spk:4",
+        "displayName": "Bhavya",
+        "evidenceTurns": [
+          "2026-08-03-uk-beyond-offer-letters-t042"
+        ],
+        "reasons": [
+          "empty blocks = label-wide identity over a recurring label",
+          "label-wide claim contradicted at block 1 (gold Bhakti)",
+          "label-wide claim contradicted at block 2 (gold Bhakti)",
+          "label-wide claim contradicted at block 3 (gold Bhakti)"
+        ]
+      },
+      {
+        "session": "2026-08-24-uniaccess-leeds-arts-university",
+        "outerRun": 1,
+        "speakerRef": "spk:1",
+        "displayName": "Jubin",
+        "evidenceTurns": [
+          "2026-08-24-uniaccess-leeds-arts-university-t088"
+        ],
+        "reasons": [
+          "empty blocks = label-wide identity over a recurring label",
+          "label-wide claim contradicted at block 1 (gold unnamed)",
+          "label-wide claim contradicted at block 3 (gold unnamed)",
+          "label-wide claim contradicted at block 5 (gold unnamed)",
+          "label-wide claim contradicted at block 7 (gold unnamed)",
+          "label-wide claim contradicted at block 9 (gold unnamed)",
+          "label-wide claim contradicted at block 18 (gold Sangeeta)",
+          "label-wide claim contradicted at block 22 (gold unnamed)",
+          "label-wide claim contradicted at block 25 (gold unnamed)",
+          "label-wide claim contradicted at block 33 (gold unnamed)",
+          "label-wide claim contradicted at block 35 (gold unnamed)",
+          "label-wide claim contradicted at block 61 (gold unnamed)",
+          "label-wide claim contradicted at block 63 (gold unnamed)",
+          "label-wide claim contradicted at block 65 (gold unnamed)",
+          "label-wide claim contradicted at block 67 (gold unnamed)",
+          "label-wide claim contradicted at block 69 (gold unnamed)",
+          "label-wide claim contradicted at block 73 (gold unnamed)",
+          "label-wide claim contradicted at block 78 (gold unnamed)",
+          "label-wide claim contradicted at block 80 (gold unnamed)",
+          "label-wide claim contradicted at block 82 (gold unnamed)",
+          "label-wide claim contradicted at block 86 (gold unnamed)",
+          "label-wide claim contradicted at block 88 (gold unnamed)",
+          "label-wide claim contradicted at block 90 (gold unnamed)",
+          "label-wide claim contradicted at block 94 (gold unnamed)",
+          "label-wide claim contradicted at block 96 (gold unnamed)",
+          "label-wide claim contradicted at block 99 (gold unnamed)",
+          "label-wide claim contradicted at block 101 (gold unnamed)"
+        ]
+      },
+      {
+        "session": "2026-08-24-uniaccess-leeds-arts-university",
+        "outerRun": 1,
+        "speakerRef": "spk:3",
+        "displayName": "Jubin",
+        "evidenceTurns": [
+          "2026-08-24-uniaccess-leeds-arts-university-t088"
+        ],
+        "reasons": [
+          "empty blocks = label-wide identity over a recurring label",
+          "label-wide claim contradicted at block 14 (gold Sheetal)",
+          "label-wide claim contradicted at block 16 (gold Sheetal)",
+          "label-wide claim contradicted at block 24 (gold Bhakti)",
+          "label-wide claim contradicted at block 27 (gold Bhakti)",
+          "label-wide claim contradicted at block 29 (gold Bhakti)",
+          "label-wide claim contradicted at block 31 (gold Bhakti)",
+          "label-wide claim contradicted at block 49 (gold Supriya)",
+          "label-wide claim contradicted at block 51 (gold Supriya)",
+          "label-wide claim contradicted at block 59 (gold Bhakti)",
+          "label-wide claim contradicted at block 62 (gold unnamed)",
+          "label-wide claim contradicted at block 64 (gold unnamed)",
+          "label-wide claim contradicted at block 70 (gold unnamed)",
+          "label-wide claim contradicted at block 72 (gold unnamed)",
+          "label-wide claim contradicted at block 74 (gold unnamed)",
+          "label-wide claim contradicted at block 76 (gold unnamed)",
+          "label-wide claim contradicted at block 79 (gold unnamed)",
+          "label-wide claim contradicted at block 81 (gold unnamed)",
+          "label-wide claim contradicted at block 83 (gold unnamed)",
+          "label-wide claim contradicted at block 85 (gold Bhakti)",
+          "label-wide claim contradicted at block 87 (gold unnamed)",
+          "label-wide claim contradicted at block 92 (gold unnamed)",
+          "label-wide claim contradicted at block 102 (gold unnamed)"
+        ]
+      },
+      {
+        "session": "2026-05-23-uniaccess-atlas-skilltech",
+        "outerRun": 2,
+        "speakerRef": "spk:0",
+        "displayName": "Sonal",
+        "evidenceTurns": [
+          "2026-05-23-uniaccess-atlas-skilltech-t007"
+        ],
+        "reasons": [
+          "empty blocks = label-wide identity over a recurring label",
+          "label-wide claim contradicted at block 1 (gold unnamed)",
+          "label-wide claim contradicted at block 3 (gold unnamed)"
+        ]
+      }
+    ]
+  },
+  "bar3_floorPreservation": {
+    "floorTurnsCovered": 2,
+    "floorBlockCoveredTurns": 42,
+    "floorSpeakerLabels": 2,
+    "floorList": [
+      {
+        "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "speakerRef": "spk:2",
+        "displayName": "Ruby",
+        "evidence": [
+          "2026-04-21-visa-blueprint-part2-italy-france-nz-t206"
+        ],
+        "blocks": [
+          {
+            "startTurnIndex": 205,
+            "endTurnIndex": 245
+          }
+        ]
+      },
+      {
+        "session": "2026-08-24-uniaccess-leeds-arts-university",
+        "speakerRef": "spk:0",
+        "displayName": "Jubin Thakkar",
+        "evidence": [
+          "2026-08-24-uniaccess-leeds-arts-university-t006"
+        ],
+        "blocks": [
+          {
+            "startTurnIndex": 5,
+            "endTurnIndex": 5
+          }
+        ]
+      }
+    ],
+    "contradictedByAccepted": [],
+    "presence": [
+      {
+        "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "speakerRef": "spk:2",
+        "displayName": "Ruby",
+        "presentInAccepted": false
+      },
+      {
+        "session": "2026-08-24-uniaccess-leeds-arts-university",
+        "speakerRef": "spk:0",
+        "displayName": "Jubin Thakkar",
+        "presentInAccepted": false
+      }
+    ]
+  },
+  "bar4_stability": {
+    "perSession": [
+      {
+        "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "outerRuns": 2,
+        "stable": true,
+        "acceptedSets": [
+          "[]",
+          "[]"
+        ]
+      },
+      {
+        "session": "2026-05-20-telling-your-brand-story-better",
+        "outerRuns": 2,
+        "stable": true,
+        "acceptedSets": [
+          "[]",
+          "[]"
+        ]
+      },
+      {
+        "session": "2026-05-23-uniaccess-atlas-skilltech",
+        "outerRuns": 2,
+        "stable": true,
+        "acceptedSets": [
+          "[\"spk:0|sonal\"]",
+          "[\"spk:0|sonal\"]"
+        ]
+      },
+      {
+        "session": "2026-05-28-in-focus-1",
+        "outerRuns": 2,
+        "stable": true,
+        "acceptedSets": [
+          "[]",
+          "[]"
+        ]
+      },
+      {
+        "session": "2026-07-15-creative-futures",
+        "outerRuns": 1,
+        "stable": false,
+        "acceptedSets": [
+          "[\"spk:0|priyanka roy\"]"
+        ]
+      },
+      {
+        "session": "2026-07-22-uniaccess-cept-university",
+        "outerRuns": 1,
+        "stable": false,
+        "acceptedSets": [
+          "[]"
+        ]
+      },
+      {
+        "session": "2026-07-28-metrics-and-mingling",
+        "outerRuns": 1,
+        "stable": false,
+        "acceptedSets": [
+          "[]"
+        ]
+      },
+      {
+        "session": "2026-07-30-in-focus-3",
+        "outerRuns": 1,
+        "stable": false,
+        "acceptedSets": [
+          "[\"spk:1|shithij\",\"spk:2|anisha\"]"
+        ]
+      },
+      {
+        "session": "2026-08-03-uk-beyond-offer-letters",
+        "outerRuns": 1,
+        "stable": false,
+        "acceptedSets": [
+          "[\"spk:4|bhavya\"]"
+        ]
+      },
+      {
+        "session": "2026-08-24-uniaccess-leeds-arts-university",
+        "outerRuns": 1,
+        "stable": false,
+        "acceptedSets": [
+          "[\"spk:1|jubin\",\"spk:3|jubin\"]"
+        ]
+      },
+      {
+        "session": "2026-08-27-in-focus-4",
+        "outerRuns": 1,
+        "stable": false,
+        "acceptedSets": [
+          "[]"
+        ]
+      }
+    ],
+    "allStable": false
+  },
+  "bar5_correctAdditions": {
+    "additions": [],
+    "count": 0
+  },
+  "iss255": {
+    "corpusContainsVisaSession": true,
+    "cases": [
+      {
+        "id": 1,
+        "name": "handover inversion (spk:0 -> 'Ruby' via t205) refused",
+        "pass": true,
+        "wrongVisaLinks": []
+      },
+      {
+        "id": 2,
+        "name": "accepted set stable across outer runs 1-3 (recorded run 1 vs 2-3 instability)",
+        "pass": false,
+        "acceptedSets": [
+          "[]",
+          "[]"
+        ]
+      },
+      {
+        "id": 3,
+        "name": "same label -> multiple names within one raw run (recorded: spk:0 -> Kshitij Garg AND Shagun AND spk:0)",
+        "rawMultiNameObservationsVisa": 12,
+        "rawMultiNameObservationsCorpus": 75,
+        "shippedContainmentEveryLabelAtMostOneAcceptedName": true,
+        "pass": true
+      },
+      {
+        "id": 4,
+        "name": "every accepted evidence pair carries the name verbatim in a cue-shaped turn",
+        "pass": true,
+        "evidencePairs": 8,
+        "invalidCount": 0,
+        "invalid": []
+      }
+    ],
+    "verdict": "3/4"
+  },
+  "perRun": [
+    {
+      "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "outerRun": 1,
+      "windows": 37,
+      "providerCalls": 111,
+      "ms": 428022,
+      "degraded": null,
+      "accepted": [],
+      "unresolved": [
+        "spk:0",
+        "spk:1",
+        "spk:2"
+      ]
+    },
+    {
+      "session": "2026-05-20-telling-your-brand-story-better",
+      "outerRun": 1,
+      "windows": 13,
+      "providerCalls": 39,
+      "ms": 86928,
+      "degraded": null,
+      "accepted": [],
+      "unresolved": [
+        "spk:0",
+        "spk:1",
+        "spk:2",
+        "spk:3"
+      ]
+    },
+    {
+      "session": "2026-05-23-uniaccess-atlas-skilltech",
+      "outerRun": 1,
+      "windows": 3,
+      "providerCalls": 9,
+      "ms": 24891,
+      "degraded": null,
+      "accepted": [
+        {
+          "speakerRef": "spk:0",
+          "displayName": "Sonal",
+          "evidenceTurns": [
+            "2026-05-23-uniaccess-atlas-skilltech-t007"
+          ],
+          "identityCorrect": false,
+          "reasons": [
+            "empty blocks = label-wide identity over a recurring label",
+            "label-wide claim contradicted at block 1 (gold unnamed)",
+            "label-wide claim contradicted at block 3 (gold unnamed)"
+          ]
+        }
+      ],
+      "unresolved": [
+        "spk:1"
+      ]
+    },
+    {
+      "session": "2026-05-28-in-focus-1",
+      "outerRun": 1,
+      "windows": 6,
+      "providerCalls": 18,
+      "ms": 61577,
+      "degraded": null,
+      "accepted": [],
+      "unresolved": [
+        "spk:0"
+      ]
+    },
+    {
+      "session": "2026-07-15-creative-futures",
+      "outerRun": 1,
+      "windows": 48,
+      "providerCalls": 144,
+      "ms": 495691,
+      "degraded": null,
+      "accepted": [
+        {
+          "speakerRef": "spk:0",
+          "displayName": "Priyanka Roy",
+          "evidenceTurns": [
+            "2026-07-15-creative-futures-t267"
+          ],
+          "identityCorrect": false,
+          "reasons": [
+            "empty blocks = label-wide identity over a recurring label",
+            "label-wide claim contradicted at block 21 (gold unnamed)",
+            "label-wide claim contradicted at block 23 (gold unnamed)",
+            "label-wide claim contradicted at block 25 (gold unnamed)",
+            "label-wide claim contradicted at block 44 (gold unnamed)",
+            "label-wide claim contradicted at block 45 (gold unnamed)",
+            "label-wide claim contradicted at block 47 (gold unnamed)"
+          ]
+        }
+      ],
+      "unresolved": [
+        "spk:1"
+      ]
+    },
+    {
+      "session": "2026-07-22-uniaccess-cept-university",
+      "outerRun": 1,
+      "windows": 1,
+      "providerCalls": 3,
+      "ms": 7231,
+      "degraded": null,
+      "accepted": [],
+      "unresolved": [
+        "spk:2"
+      ]
+    },
+    {
+      "session": "2026-07-28-metrics-and-mingling",
+      "outerRun": 1,
+      "windows": 3,
+      "providerCalls": 9,
+      "ms": 33407,
+      "degraded": null,
+      "accepted": [],
+      "unresolved": [
+        "spk:0",
+        "spk:1"
+      ]
+    },
+    {
+      "session": "2026-07-30-in-focus-3",
+      "outerRun": 1,
+      "windows": 41,
+      "providerCalls": 123,
+      "ms": 456558,
+      "degraded": null,
+      "accepted": [
+        {
+          "speakerRef": "spk:1",
+          "displayName": "Shithij",
+          "evidenceTurns": [
+            "2026-07-30-in-focus-3-t022"
+          ],
+          "identityCorrect": false,
+          "reasons": [
+            "empty blocks = label-wide identity over a recurring label",
+            "label-wide claim contradicted at block 1 (gold Nikhil)",
+            "label-wide claim contradicted at block 2 (gold Nikhil)",
+            "label-wide claim contradicted at block 9 (gold Nikhil)",
+            "label-wide claim contradicted at block 10 (gold Nikhil)",
+            "label-wide claim contradicted at block 11 (gold Nikhil)",
+            "label-wide claim contradicted at block 12 (gold Nikhil)",
+            "label-wide claim contradicted at block 13 (gold Nikhil)",
+            "label-wide claim contradicted at block 14 (gold Nikhil)",
+            "label-wide claim contradicted at block 15 (gold Nikhil)"
+          ]
+        },
+        {
+          "speakerRef": "spk:2",
+          "displayName": "Anisha",
+          "evidenceTurns": [
+            "2026-07-30-in-focus-3-t094"
+          ],
+          "identityCorrect": false,
+          "reasons": [
+            "empty blocks = label-wide identity over a recurring label",
+            "label-wide claim contradicted at block 3 (gold unnamed)",
+            "label-wide claim contradicted at block 21 (gold unnamed)",
+            "label-wide claim contradicted at block 23 (gold Nikhil)",
+            "label-wide claim contradicted at block 25 (gold Nikhil)",
+            "label-wide claim contradicted at block 27 (gold unnamed)",
+            "label-wide claim contradicted at block 29 (gold unnamed)",
+            "label-wide claim contradicted at block 31 (gold unnamed)",
+            "label-wide claim contradicted at block 33 (gold unnamed)",
+            "label-wide claim contradicted at block 39 (gold unnamed)",
+            "label-wide claim contradicted at block 41 (gold unnamed)"
+          ]
+        }
+      ],
+      "unresolved": [
+        "spk:0",
+        "spk:3",
+        "spk:4",
+        "spk:5",
+        "spk:6"
+      ]
+    },
+    {
+      "session": "2026-08-03-uk-beyond-offer-letters",
+      "outerRun": 1,
+      "windows": 3,
+      "providerCalls": 9,
+      "ms": 31037,
+      "degraded": null,
+      "accepted": [
+        {
+          "speakerRef": "spk:4",
+          "displayName": "Bhavya",
+          "evidenceTurns": [
+            "2026-08-03-uk-beyond-offer-letters-t042"
+          ],
+          "identityCorrect": false,
+          "reasons": [
+            "empty blocks = label-wide identity over a recurring label",
+            "label-wide claim contradicted at block 1 (gold Bhakti)",
+            "label-wide claim contradicted at block 2 (gold Bhakti)",
+            "label-wide claim contradicted at block 3 (gold Bhakti)"
+          ]
+        }
+      ],
+      "unresolved": []
+    },
+    {
+      "session": "2026-08-24-uniaccess-leeds-arts-university",
+      "outerRun": 1,
+      "windows": 102,
+      "providerCalls": 306,
+      "ms": 1029227,
+      "degraded": null,
+      "accepted": [
+        {
+          "speakerRef": "spk:1",
+          "displayName": "Jubin",
+          "evidenceTurns": [
+            "2026-08-24-uniaccess-leeds-arts-university-t088"
+          ],
+          "identityCorrect": false,
+          "reasons": [
+            "empty blocks = label-wide identity over a recurring label",
+            "label-wide claim contradicted at block 1 (gold unnamed)",
+            "label-wide claim contradicted at block 3 (gold unnamed)",
+            "label-wide claim contradicted at block 5 (gold unnamed)",
+            "label-wide claim contradicted at block 7 (gold unnamed)",
+            "label-wide claim contradicted at block 9 (gold unnamed)",
+            "label-wide claim contradicted at block 18 (gold Sangeeta)",
+            "label-wide claim contradicted at block 22 (gold unnamed)",
+            "label-wide claim contradicted at block 25 (gold unnamed)",
+            "label-wide claim contradicted at block 33 (gold unnamed)",
+            "label-wide claim contradicted at block 35 (gold unnamed)",
+            "label-wide claim contradicted at block 61 (gold unnamed)",
+            "label-wide claim contradicted at block 63 (gold unnamed)",
+            "label-wide claim contradicted at block 65 (gold unnamed)",
+            "label-wide claim contradicted at block 67 (gold unnamed)",
+            "label-wide claim contradicted at block 69 (gold unnamed)",
+            "label-wide claim contradicted at block 73 (gold unnamed)",
+            "label-wide claim contradicted at block 78 (gold unnamed)",
+            "label-wide claim contradicted at block 80 (gold unnamed)",
+            "label-wide claim contradicted at block 82 (gold unnamed)",
+            "label-wide claim contradicted at block 86 (gold unnamed)",
+            "label-wide claim contradicted at block 88 (gold unnamed)",
+            "label-wide claim contradicted at block 90 (gold unnamed)",
+            "label-wide claim contradicted at block 94 (gold unnamed)",
+            "label-wide claim contradicted at block 96 (gold unnamed)",
+            "label-wide claim contradicted at block 99 (gold unnamed)",
+            "label-wide claim contradicted at block 101 (gold unnamed)"
+          ]
+        },
+        {
+          "speakerRef": "spk:3",
+          "displayName": "Jubin",
+          "evidenceTurns": [
+            "2026-08-24-uniaccess-leeds-arts-university-t088"
+          ],
+          "identityCorrect": false,
+          "reasons": [
+            "empty blocks = label-wide identity over a recurring label",
+            "label-wide claim contradicted at block 14 (gold Sheetal)",
+            "label-wide claim contradicted at block 16 (gold Sheetal)",
+            "label-wide claim contradicted at block 24 (gold Bhakti)",
+            "label-wide claim contradicted at block 27 (gold Bhakti)",
+            "label-wide claim contradicted at block 29 (gold Bhakti)",
+            "label-wide claim contradicted at block 31 (gold Bhakti)",
+            "label-wide claim contradicted at block 49 (gold Supriya)",
+            "label-wide claim contradicted at block 51 (gold Supriya)",
+            "label-wide claim contradicted at block 59 (gold Bhakti)",
+            "label-wide claim contradicted at block 62 (gold unnamed)",
+            "label-wide claim contradicted at block 64 (gold unnamed)",
+            "label-wide claim contradicted at block 70 (gold unnamed)",
+            "label-wide claim contradicted at block 72 (gold unnamed)",
+            "label-wide claim contradicted at block 74 (gold unnamed)",
+            "label-wide claim contradicted at block 76 (gold unnamed)",
+            "label-wide claim contradicted at block 79 (gold unnamed)",
+            "label-wide claim contradicted at block 81 (gold unnamed)",
+            "label-wide claim contradicted at block 83 (gold unnamed)",
+            "label-wide claim contradicted at block 85 (gold Bhakti)",
+            "label-wide claim contradicted at block 87 (gold unnamed)",
+            "label-wide claim contradicted at block 92 (gold unnamed)",
+            "label-wide claim contradicted at block 102 (gold unnamed)"
+          ]
+        }
+      ],
+      "unresolved": [
+        "spk:0",
+        "spk:2"
+      ]
+    },
+    {
+      "session": "2026-08-27-in-focus-4",
+      "outerRun": 1,
+      "windows": 3,
+      "providerCalls": 9,
+      "ms": 12916,
+      "degraded": null,
+      "accepted": [],
+      "unresolved": [
+        "spk:0",
+        "spk:4"
+      ]
+    },
+    {
+      "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "outerRun": 2,
+      "windows": 37,
+      "providerCalls": 111,
+      "ms": 442761,
+      "degraded": null,
+      "accepted": [],
+      "unresolved": [
+        "spk:0",
+        "spk:1",
+        "spk:2"
+      ]
+    },
+    {
+      "session": "2026-05-20-telling-your-brand-story-better",
+      "outerRun": 2,
+      "windows": 13,
+      "providerCalls": 39,
+      "ms": 84871,
+      "degraded": null,
+      "accepted": [],
+      "unresolved": [
+        "spk:0",
+        "spk:1",
+        "spk:2",
+        "spk:3"
+      ]
+    },
+    {
+      "session": "2026-05-23-uniaccess-atlas-skilltech",
+      "outerRun": 2,
+      "windows": 3,
+      "providerCalls": 9,
+      "ms": 24070,
+      "degraded": null,
+      "accepted": [
+        {
+          "speakerRef": "spk:0",
+          "displayName": "Sonal",
+          "evidenceTurns": [
+            "2026-05-23-uniaccess-atlas-skilltech-t007"
+          ],
+          "identityCorrect": false,
+          "reasons": [
+            "empty blocks = label-wide identity over a recurring label",
+            "label-wide claim contradicted at block 1 (gold unnamed)",
+            "label-wide claim contradicted at block 3 (gold unnamed)"
+          ]
+        }
+      ],
+      "unresolved": [
+        "spk:1"
+      ]
+    },
+    {
+      "session": "2026-05-28-in-focus-1",
+      "outerRun": 2,
+      "windows": 6,
+      "providerCalls": 18,
+      "ms": 58551,
+      "degraded": null,
+      "accepted": [],
+      "unresolved": [
+        "spk:0"
+      ]
+    }
+  ]
+}

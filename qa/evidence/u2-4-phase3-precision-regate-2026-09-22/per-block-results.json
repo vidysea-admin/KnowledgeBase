@@ -1,0 +1,3561 @@
+[
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 1,
+    "label": "spk:0",
+    "goldPerson": "Rashi",
+    "prov": "address-adjacent",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t001",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t002",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t003",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t004",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t005",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t006",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t007",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t008",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t009",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t010",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t011",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t012",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t013",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t014",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t015",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t016",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t017",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t018",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t019",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t020",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t021",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t022",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t023",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t024",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t025",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t026",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t027",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t028",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t029",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t030",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t031",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t032",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t033",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t034",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t035"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 2,
+    "label": "spk:1",
+    "goldPerson": "Kshitij",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t081",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t082",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t083",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t084",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t085",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t086",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t087",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t088",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t089",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t090",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t091",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t092",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t093",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t094",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t095",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t096",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t097",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t098",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t099",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t100",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t101",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t102",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t103",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t104",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t105",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t106",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t107",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t108",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t109",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t110",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t111",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t112",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t113",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t114",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t115",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t116",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t117",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t118",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t119",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t120",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t121",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t122",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t123",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t124",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t125",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t126",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t127",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t128",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t129",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t130",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t131",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t132",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t133",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t134",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t135",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t136",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t137",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t138",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t139",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t140",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t141"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 3,
+    "label": "spk:0",
+    "goldPerson": "Rashi",
+    "prov": "address-adjacent",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t142",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t143",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t144"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 4,
+    "label": "spk:1",
+    "goldPerson": "Shagun",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t181",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t182",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t183",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t184",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t185",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t186",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t187",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t188",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t189",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t190",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t191",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t192",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t193",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t194",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t195",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t196",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t197",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t198",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t199",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t200",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t201",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t202",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t203",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t204"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 5,
+    "label": "spk:0",
+    "goldPerson": "Rashi",
+    "prov": "address-adjacent",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t205"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 6,
+    "label": "spk:2",
+    "goldPerson": "Ruby",
+    "prov": "self-naming",
+    "confidence": "direct",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t206",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t207",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t208",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t209",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t210",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t211",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t212",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t213",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t214",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t215",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t216",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t217",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t218",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t219",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t220",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t221",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t222",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t223",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t224",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t225",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t226",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t227",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t228",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t229",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t230",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t231",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t232",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t233",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t234",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t235",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t236",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t237",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t238",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t239",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t240",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t241",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t242",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t243",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t244",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t245",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t246"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 7,
+    "label": "spk:0",
+    "goldPerson": "Ruby",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t247",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t248",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t249",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t250",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t251",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t252",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t253",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t254",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t255",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t256",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t257",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t258",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t259",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t260",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t261",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t262",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t263",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t264"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 8,
+    "label": "spk:1",
+    "goldPerson": "Rashi",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t265"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 9,
+    "label": "spk:0",
+    "goldPerson": "Ruby",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t266"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 10,
+    "label": "spk:1",
+    "goldPerson": "Rashi",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t267",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t268",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t269"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 11,
+    "label": "spk:1",
+    "goldPerson": "Rashi",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t271"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 12,
+    "label": "spk:1",
+    "goldPerson": "Rashi",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t273"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 13,
+    "label": "spk:1",
+    "goldPerson": "Rashi",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t275",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t276"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 14,
+    "label": "spk:0",
+    "goldPerson": "Ruby",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t281"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 15,
+    "label": "spk:0",
+    "goldPerson": "Ruby",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t283"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 16,
+    "label": "spk:1",
+    "goldPerson": "Rashi",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t289"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "block": 17,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "confidence": "direct",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-t291"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-20-telling-your-brand-story-better",
+    "block": 1,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-20-telling-your-brand-story-better-t001"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-20-telling-your-brand-story-better",
+    "block": 2,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-20-telling-your-brand-story-better-t007"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-20-telling-your-brand-story-better",
+    "block": 3,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-20-telling-your-brand-story-better-t009"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-20-telling-your-brand-story-better",
+    "block": 4,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-20-telling-your-brand-story-better-t011"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-20-telling-your-brand-story-better",
+    "block": 5,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-20-telling-your-brand-story-better-t013"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-20-telling-your-brand-story-better",
+    "block": 6,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-20-telling-your-brand-story-better-t015"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-20-telling-your-brand-story-better",
+    "block": 7,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-20-telling-your-brand-story-better-t017"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-20-telling-your-brand-story-better",
+    "block": 8,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-20-telling-your-brand-story-better-t021"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-20-telling-your-brand-story-better",
+    "block": 9,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-20-telling-your-brand-story-better-t023"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-20-telling-your-brand-story-better",
+    "block": 10,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-20-telling-your-brand-story-better-t024"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-20-telling-your-brand-story-better",
+    "block": 11,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-20-telling-your-brand-story-better-t026"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-20-telling-your-brand-story-better",
+    "block": 12,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-20-telling-your-brand-story-better-t028"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-20-telling-your-brand-story-better",
+    "block": 13,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-20-telling-your-brand-story-better-t030"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-23-uniaccess-atlas-skilltech",
+    "block": 1,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-05-23-uniaccess-atlas-skilltech-t001",
+      "2026-05-23-uniaccess-atlas-skilltech-t002",
+      "2026-05-23-uniaccess-atlas-skilltech-t003",
+      "2026-05-23-uniaccess-atlas-skilltech-t004",
+      "2026-05-23-uniaccess-atlas-skilltech-t005"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-23-uniaccess-atlas-skilltech",
+    "block": 2,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-05-23-uniaccess-atlas-skilltech-t006"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-23-uniaccess-atlas-skilltech",
+    "block": 3,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-05-23-uniaccess-atlas-skilltech-t007",
+      "2026-05-23-uniaccess-atlas-skilltech-t008"
+    ],
+    "evidenceTurnIds": [
+      "spk:0->Sonal"
+    ]
+  },
+  {
+    "session": "2026-05-28-in-focus-1",
+    "block": 1,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-28-in-focus-1-t027"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-28-in-focus-1",
+    "block": 2,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-28-in-focus-1-t039"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-28-in-focus-1",
+    "block": 3,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-28-in-focus-1-t046"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-28-in-focus-1",
+    "block": 4,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-28-in-focus-1-t051"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-28-in-focus-1",
+    "block": 5,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-28-in-focus-1-t053",
+      "2026-05-28-in-focus-1-t054"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-05-28-in-focus-1",
+    "block": 6,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-05-28-in-focus-1-t058"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 1,
+    "label": "spk:0",
+    "goldPerson": "Priyanka",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t001"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 2,
+    "label": "spk:0",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t003"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 3,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "confidence": "direct",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t025",
+      "2026-07-15-creative-futures-t026",
+      "2026-07-15-creative-futures-t027"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 4,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "confidence": "direct",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t032",
+      "2026-07-15-creative-futures-t033",
+      "2026-07-15-creative-futures-t034"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 5,
+    "label": "spk:0",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t045",
+      "2026-07-15-creative-futures-t046"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 6,
+    "label": "spk:0",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t048"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 7,
+    "label": "spk:0",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t054",
+      "2026-07-15-creative-futures-t055"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 8,
+    "label": "spk:0",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t059"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 9,
+    "label": "spk:0",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t065"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 10,
+    "label": "spk:0",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t067"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 11,
+    "label": "spk:0",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t075"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 12,
+    "label": "spk:0",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t080"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 13,
+    "label": "spk:1",
+    "goldPerson": "Priyanka",
+    "prov": "address-adjacent",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t081",
+      "2026-07-15-creative-futures-t082",
+      "2026-07-15-creative-futures-t083"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 14,
+    "label": "spk:1",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t085",
+      "2026-07-15-creative-futures-t086",
+      "2026-07-15-creative-futures-t087",
+      "2026-07-15-creative-futures-t088",
+      "2026-07-15-creative-futures-t089",
+      "2026-07-15-creative-futures-t090",
+      "2026-07-15-creative-futures-t091",
+      "2026-07-15-creative-futures-t092"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 15,
+    "label": "spk:1",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t181"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 16,
+    "label": "spk:1",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t184",
+      "2026-07-15-creative-futures-t185"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 17,
+    "label": "spk:1",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t189"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 18,
+    "label": "spk:1",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t193"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 19,
+    "label": "spk:1",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t199"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 20,
+    "label": "spk:1",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t201",
+      "2026-07-15-creative-futures-t202"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 21,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t203",
+      "2026-07-15-creative-futures-t204",
+      "2026-07-15-creative-futures-t205"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 22,
+    "label": "spk:1",
+    "goldPerson": "Priyanka",
+    "prov": "address-adjacent",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t206"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 23,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t207"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 24,
+    "label": "spk:1",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t208"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 25,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t209"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 26,
+    "label": "spk:1",
+    "goldPerson": "Priyanka",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t210",
+      "2026-07-15-creative-futures-t211"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 27,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "called-on",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t215"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 28,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "direct",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t218"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 29,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t220",
+      "2026-07-15-creative-futures-t221"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 30,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t224",
+      "2026-07-15-creative-futures-t225",
+      "2026-07-15-creative-futures-t226",
+      "2026-07-15-creative-futures-t227"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 31,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t229"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 32,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t231",
+      "2026-07-15-creative-futures-t232",
+      "2026-07-15-creative-futures-t233",
+      "2026-07-15-creative-futures-t234"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 33,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t236",
+      "2026-07-15-creative-futures-t237",
+      "2026-07-15-creative-futures-t238"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 34,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t240",
+      "2026-07-15-creative-futures-t241"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 35,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t245"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 36,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t247"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 37,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t249"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 38,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t251"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 39,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t253"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 40,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t255"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 41,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t257"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 42,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t259"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 43,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t261"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 44,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t262"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 45,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t264"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 46,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t265"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 47,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t266"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-15-creative-futures",
+    "block": 48,
+    "label": "spk:1",
+    "goldPerson": "Sumit Saurabh",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-15-creative-futures-t268"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-22-uniaccess-cept-university",
+    "block": 1,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-07-22-uniaccess-cept-university-t006"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-28-metrics-and-mingling",
+    "block": 1,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-07-28-metrics-and-mingling-t003"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-28-metrics-and-mingling",
+    "block": 2,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-07-28-metrics-and-mingling-t005"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-28-metrics-and-mingling",
+    "block": 3,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "no-accepted-identity"
+    },
+    "turnIds": [
+      "2026-07-28-metrics-and-mingling-t080"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 1,
+    "label": "spk:1",
+    "goldPerson": "Nikhil",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t001"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 2,
+    "label": "spk:1",
+    "goldPerson": "Nikhil",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t003"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 3,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t004"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 4,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t006"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 5,
+    "label": "spk:4",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t007"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 6,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t008"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 7,
+    "label": "spk:4",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t009"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 8,
+    "label": "spk:5",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t010"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 9,
+    "label": "spk:1",
+    "goldPerson": "Nikhil",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t012"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 10,
+    "label": "spk:1",
+    "goldPerson": "Nikhil",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t014"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 11,
+    "label": "spk:1",
+    "goldPerson": "Nikhil",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t016"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 12,
+    "label": "spk:1",
+    "goldPerson": "Nikhil",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t018"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 13,
+    "label": "spk:1",
+    "goldPerson": "Nikhil",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t020"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 14,
+    "label": "spk:1",
+    "goldPerson": "Nikhil",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t022"
+    ],
+    "evidenceTurnIds": [
+      "spk:1->Shithij"
+    ]
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 15,
+    "label": "spk:1",
+    "goldPerson": "Nikhil",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t030"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 16,
+    "label": "spk:6",
+    "goldPerson": "Bhakti",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t031"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 17,
+    "label": "spk:6",
+    "goldPerson": "Bhakti",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t033"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 18,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t034",
+      "2026-07-30-in-focus-3-t035",
+      "2026-07-30-in-focus-3-t036"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 19,
+    "label": "spk:1",
+    "goldPerson": "Kshitij",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t037",
+      "2026-07-30-in-focus-3-t038",
+      "2026-07-30-in-focus-3-t039",
+      "2026-07-30-in-focus-3-t040",
+      "2026-07-30-in-focus-3-t041",
+      "2026-07-30-in-focus-3-t042",
+      "2026-07-30-in-focus-3-t043"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 20,
+    "label": "spk:0",
+    "goldPerson": "Nikhil",
+    "prov": "inferred-chain",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t044",
+      "2026-07-30-in-focus-3-t045"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 21,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t046"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 22,
+    "label": "spk:0",
+    "goldPerson": "Nikhil",
+    "prov": "address-adjacent",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t047"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 23,
+    "label": "spk:2",
+    "goldPerson": "Nikhil",
+    "prov": "address-adjacent",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t048"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 24,
+    "label": "spk:1",
+    "goldPerson": "Kshitij",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t049",
+      "2026-07-30-in-focus-3-t050",
+      "2026-07-30-in-focus-3-t051",
+      "2026-07-30-in-focus-3-t052",
+      "2026-07-30-in-focus-3-t053",
+      "2026-07-30-in-focus-3-t054",
+      "2026-07-30-in-focus-3-t055"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 25,
+    "label": "spk:2",
+    "goldPerson": "Nikhil",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t056"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 26,
+    "label": "spk:1",
+    "goldPerson": "Kshitij",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t057",
+      "2026-07-30-in-focus-3-t058",
+      "2026-07-30-in-focus-3-t059",
+      "2026-07-30-in-focus-3-t060",
+      "2026-07-30-in-focus-3-t061",
+      "2026-07-30-in-focus-3-t062",
+      "2026-07-30-in-focus-3-t063"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 27,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t064",
+      "2026-07-30-in-focus-3-t065"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 28,
+    "label": "spk:0",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t066",
+      "2026-07-30-in-focus-3-t067",
+      "2026-07-30-in-focus-3-t068",
+      "2026-07-30-in-focus-3-t069"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 29,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t070",
+      "2026-07-30-in-focus-3-t071"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 30,
+    "label": "spk:1",
+    "goldPerson": "Kshitij",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t072",
+      "2026-07-30-in-focus-3-t073",
+      "2026-07-30-in-focus-3-t074",
+      "2026-07-30-in-focus-3-t075"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 31,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t076",
+      "2026-07-30-in-focus-3-t077"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 32,
+    "label": "spk:1",
+    "goldPerson": "Kshitij",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t078",
+      "2026-07-30-in-focus-3-t079",
+      "2026-07-30-in-focus-3-t080",
+      "2026-07-30-in-focus-3-t081",
+      "2026-07-30-in-focus-3-t082",
+      "2026-07-30-in-focus-3-t083",
+      "2026-07-30-in-focus-3-t084"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 33,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t085"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 34,
+    "label": "spk:1",
+    "goldPerson": "Kshitij",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t086",
+      "2026-07-30-in-focus-3-t087"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 35,
+    "label": "spk:3",
+    "goldPerson": "Kshitij",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t088"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 36,
+    "label": "spk:1",
+    "goldPerson": "Kshitij",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t089"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 37,
+    "label": "spk:4",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t090"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 38,
+    "label": "spk:1",
+    "goldPerson": "Kshitij",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t091"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 39,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t092"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 40,
+    "label": "spk:1",
+    "goldPerson": "Kshitij",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t093"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-07-30-in-focus-3",
+    "block": 41,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-07-30-in-focus-3-t094",
+      "2026-07-30-in-focus-3-t095",
+      "2026-07-30-in-focus-3-t096"
+    ],
+    "evidenceTurnIds": [
+      "spk:2->Anisha"
+    ]
+  },
+  {
+    "session": "2026-08-03-uk-beyond-offer-letters",
+    "block": 1,
+    "label": "spk:4",
+    "goldPerson": "Bhakti",
+    "prov": "inferred-chain",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-08-03-uk-beyond-offer-letters-t030"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-03-uk-beyond-offer-letters",
+    "block": 2,
+    "label": "spk:4",
+    "goldPerson": "Bhakti",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-08-03-uk-beyond-offer-letters-t033"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-03-uk-beyond-offer-letters",
+    "block": 3,
+    "label": "spk:4",
+    "goldPerson": "Bhakti",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {
+      "1": "none-citing-this-block"
+    },
+    "turnIds": [
+      "2026-08-03-uk-beyond-offer-letters-t042"
+    ],
+    "evidenceTurnIds": [
+      "spk:4->Bhavya"
+    ]
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 1,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t001"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 2,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "self-naming+address",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t002"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 3,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t003"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 4,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t004"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 5,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t005"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 6,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "self-naming",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t006"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 7,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t007"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 8,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t008"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 9,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t009"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 10,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t010"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 11,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t011"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 12,
+    "label": "spk:2",
+    "goldPerson": "Alka",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t012"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 13,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t013"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 14,
+    "label": "spk:3",
+    "goldPerson": "Sheetal",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t014"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 15,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t015"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 16,
+    "label": "spk:3",
+    "goldPerson": "Sheetal",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t016"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 17,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t017"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 18,
+    "label": "spk:1",
+    "goldPerson": "Sangeeta",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t018"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 19,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t019"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 20,
+    "label": "spk:2",
+    "goldPerson": "Nupur",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t020"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 21,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t021"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 22,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t022"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 23,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t023"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 24,
+    "label": "spk:3",
+    "goldPerson": "Bhakti",
+    "prov": "cluster+address",
+    "confidence": "inferred",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t024"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 25,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t025"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 26,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t026"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 27,
+    "label": "spk:3",
+    "goldPerson": "Bhakti",
+    "prov": "cluster+address",
+    "confidence": "inferred",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t027"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 28,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t028"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 29,
+    "label": "spk:3",
+    "goldPerson": "Bhakti",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t029"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 30,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t030"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 31,
+    "label": "spk:3",
+    "goldPerson": "Bhakti",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t031"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 32,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t032"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 33,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t033"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 34,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t034"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 35,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t035"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 36,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t036"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 37,
+    "label": "spk:2",
+    "goldPerson": "Poonam",
+    "prov": "called-on",
+    "confidence": "inferred",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t037"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 38,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t038"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 39,
+    "label": "spk:2",
+    "goldPerson": "Poonam",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t039"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 40,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t040"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 41,
+    "label": "spk:2",
+    "goldPerson": "Sangeeta",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t041"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 42,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t042"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 43,
+    "label": "spk:2",
+    "goldPerson": "Ritu",
+    "prov": "called-on",
+    "confidence": "inferred",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t043"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 44,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t044"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 45,
+    "label": "spk:2",
+    "goldPerson": "Ritu",
+    "prov": "called-on",
+    "confidence": "inferred",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t045"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 46,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t046"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 47,
+    "label": "spk:2",
+    "goldPerson": "Ritu",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t047"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 48,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t048"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 49,
+    "label": "spk:3",
+    "goldPerson": "Supriya",
+    "prov": "called-on",
+    "confidence": "inferred",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t049"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 50,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t050"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 51,
+    "label": "spk:3",
+    "goldPerson": "Supriya",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t051"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 52,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t052"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 53,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t053"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 54,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t054"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 55,
+    "label": "spk:2",
+    "goldPerson": "Ankit",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t055"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 56,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t056"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 57,
+    "label": "spk:2",
+    "goldPerson": "Ankit",
+    "prov": "speech-continuation",
+    "confidence": "inferred",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t057"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 58,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t058"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 59,
+    "label": "spk:3",
+    "goldPerson": "Bhakti",
+    "prov": "called-on",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t059"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 60,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t060"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 61,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t061"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 62,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t062"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 63,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t063"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 64,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t064"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 65,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t065"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 66,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t066"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 67,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t067"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 68,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t068"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 69,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t069"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 70,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t070"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 71,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t071"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 72,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t072"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 73,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t073"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 74,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t074"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 75,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t075"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 76,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t076"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 77,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t077"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 78,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t078"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 79,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t079"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 80,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t080"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 81,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t081"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 82,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t082"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 83,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t083"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 84,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t084"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 85,
+    "label": "spk:3",
+    "goldPerson": "Bhakti",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t085"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 86,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t086"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 87,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t087"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 88,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t088"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 89,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t089"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 90,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t090"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 91,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t091"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 92,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t092"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 93,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t093"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 94,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t094"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 95,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t095"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 96,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t096"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 97,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t097"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 98,
+    "label": "spk:2",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t098"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 99,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t099"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 100,
+    "label": "spk:0",
+    "goldPerson": "Jubin Thakkar",
+    "prov": "role-continuity",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t100"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 101,
+    "label": "spk:1",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t101"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-24-uniaccess-leeds-arts-university",
+    "block": 102,
+    "label": "spk:3",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-24-uniaccess-leeds-arts-university-t102"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-27-in-focus-4",
+    "block": 1,
+    "label": "spk:0",
+    "goldPerson": "Bhakti",
+    "prov": "address-adjacent",
+    "confidence": "direct",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-27-in-focus-4-t002"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-27-in-focus-4",
+    "block": 2,
+    "label": "spk:0",
+    "goldPerson": "Bhakti",
+    "prov": "role-continuity",
+    "confidence": "inferred",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-27-in-focus-4-t004"
+    ],
+    "evidenceTurnIds": []
+  },
+  {
+    "session": "2026-08-27-in-focus-4",
+    "block": 3,
+    "label": "spk:4",
+    "goldPerson": null,
+    "prov": "none",
+    "perRun": {},
+    "turnIds": [
+      "2026-08-27-in-focus-4-t027"
+    ],
+    "evidenceTurnIds": []
+  }
+]

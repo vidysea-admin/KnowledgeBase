@@ -1,0 +1,93 @@
+{
+  "rows": [
+    {
+      "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "turns": 291,
+      "positional": 196,
+      "blocks": 17,
+      "sessionLabelPairs": 3
+    },
+    {
+      "session": "2026-05-20-telling-your-brand-story-better",
+      "turns": 31,
+      "positional": 13,
+      "blocks": 13,
+      "sessionLabelPairs": 4
+    },
+    {
+      "session": "2026-05-23-uniaccess-atlas-skilltech",
+      "turns": 8,
+      "positional": 8,
+      "blocks": 3,
+      "sessionLabelPairs": 2
+    },
+    {
+      "session": "2026-05-28-in-focus-1",
+      "turns": 59,
+      "positional": 7,
+      "blocks": 6,
+      "sessionLabelPairs": 1
+    },
+    {
+      "session": "2026-07-15-creative-futures",
+      "turns": 269,
+      "positional": 78,
+      "blocks": 48,
+      "sessionLabelPairs": 2
+    },
+    {
+      "session": "2026-07-22-uniaccess-cept-university",
+      "turns": 56,
+      "positional": 1,
+      "blocks": 1,
+      "sessionLabelPairs": 1
+    },
+    {
+      "session": "2026-07-28-metrics-and-mingling",
+      "turns": 83,
+      "positional": 3,
+      "blocks": 3,
+      "sessionLabelPairs": 2
+    },
+    {
+      "session": "2026-07-30-in-focus-3",
+      "turns": 96,
+      "positional": 80,
+      "blocks": 41,
+      "sessionLabelPairs": 7
+    },
+    {
+      "session": "2026-08-03-uk-beyond-offer-letters",
+      "turns": 46,
+      "positional": 3,
+      "blocks": 3,
+      "sessionLabelPairs": 1
+    },
+    {
+      "session": "2026-08-24-uniaccess-leeds-arts-university",
+      "turns": 102,
+      "positional": 102,
+      "blocks": 102,
+      "sessionLabelPairs": 4
+    },
+    {
+      "session": "2026-08-27-in-focus-4",
+      "turns": 51,
+      "positional": 3,
+      "blocks": 3,
+      "sessionLabelPairs": 2
+    },
+    {
+      "session": "2026-09-24-zoho-next-european-study-destinations",
+      "turns": 80,
+      "positional": 2,
+      "blocks": 2,
+      "sessionLabelPairs": 1
+    }
+  ],
+  "totals": {
+    "positional": 496,
+    "blocks": 242,
+    "pairs": 30
+  }
+}
