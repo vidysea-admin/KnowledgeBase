@@ -1,13 +1,18 @@
 /**
  * packages/meeting-bot/src/joiners/browser-joiner.ts — T-024 C3. Browser-profile join joiner
- * (for platforms without native Vexa support — currently just Webex, see strategy.ts).
+ * (for platforms without native Vexa support — webex, zoho, cloudonair; see strategy.ts).
  *
- * TODO(T-024b): this is a STUB. `launch` is injected as a Playwright-shaped function
- * (`(url, opts) => Promise<{sessionHandle, mediaStream}>`) rather than importing `playwright`
- * directly — no real browser is launched here. Real implementation (persistent browser profile,
- * actual join-page automation, audio-track capture from the browser tab) is explicitly
- * follow-up work per ARCHITECTURE §4's `packages/meeting-bot/{profile,join,record,consent}.ts`
- * sketch, not this unit's.
+ * `launch`/`stop` are injected as a Playwright-shaped interface
+ * (`(url, opts) => Promise<{sessionHandle, mediaStream}>`) so this file never imports a browser
+ * driver directly. As of T-024b (2026-09-24, D-027/D-028) the real implementation satisfying
+ * that interface is `createObsBrowserDeps` in `../capture/obs-windows.ts`: it spawns
+ * `py/sb_join.py` (a headed SeleniumBase-UC Chrome on a persistent profile) for the actual
+ * join-page automation, then drives OBS over obs-websocket v5 (window_capture +
+ * wasapi_process_output_capture matched by window title) for per-process audio/video capture —
+ * not an in-browser audio track, which is why `mediaStream` isn't a literal browser MediaStream.
+ * See `qa/contracts/meeting-bot-live-capture.md` (T-024b, DRAFT) for the criteria this now meets.
+ * `vexa-joiner.ts` and `system-audio-joiner.ts` remain stubs; this file's own interface is
+ * unchanged by T-024b — only what satisfies it changed.
  */
 import type { Joiner, JoinOpts, JoinResult } from "../joiner.js";
 

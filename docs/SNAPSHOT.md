@@ -52,6 +52,7 @@ a client of that API — with the long-range goal of beating top human counsello
   - `schema/fixtures/`
 - `scripts/`
   - `scripts/lib/`
+  - `scripts/webinar/`
 - `sources/` — Data and source repos
   - `sources/whatsapp_msg/`
 - `workers/`

@@ -17,7 +17,7 @@
     "lint:structure": "node scripts/lint-loc.mjs && node scripts/lint-dirsize.mjs && node scripts/lint-root.mjs && node scripts/lint-dupes.mjs && node scripts/lint-migrations.mjs && node scripts/snapshot.mjs --check && node --test scripts/lint.test.mjs && node scripts/tracker-audit.mjs --gate g1,g4 && depcruise --config .dependency-cruiser.cjs packages apps workers",
     "lint:score": "node scripts/catalogue-score.mjs --check",
     "test": "pnpm -r test",
-    "test:lint": "node --test scripts/lint.test.mjs scripts/snapshot.test.mjs scripts/catalogue.test.mjs scripts/catalogue-cli.test.mjs scripts/lib/tracker-audit.test.mjs scripts/lib/mutate.test.mjs",
+    "test:lint": "node --test scripts/lint.test.mjs scripts/snapshot.test.mjs scripts/catalogue.test.mjs scripts/catalogue-cli.test.mjs scripts/lib/tracker-audit.test.mjs scripts/lib/mutate.test.mjs scripts/lib/find-audio-file.test.mjs",
     "typecheck": "pnpm -r typecheck"
   },
   "devDependencies": {

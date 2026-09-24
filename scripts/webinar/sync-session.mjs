@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 /**
- * scripts/sync-webinar-session.mjs — pushes ONE bot-captured webinar session into Mongo and builds
- * its knowledge-graph edges (2026-09-24, first live run; D-027). The TOC sessions came in through
- * seed-toc.mjs + sync-real-turns.mjs; a webinar also carries people, orgs, countries and a capture
- * user, so it gets its own idempotent sync.
+ * scripts/webinar/sync-session.mjs (moved from scripts/sync-webinar-session.mjs 2026-09-24,
+ * fix cycle 1 — lint-dirsize budget: scripts/ was 33/32, this was the only new file in the diff,
+ * ISS-285) — pushes ONE bot-captured webinar session into Mongo and builds its knowledge-graph
+ * edges (2026-09-24, first live run; D-027). The TOC sessions came in through seed-toc.mjs +
+ * sync-real-turns.mjs; a webinar also carries people, orgs, countries and a capture user, so it
+ * gets its own idempotent sync.
  *
  * Inputs: data/toc-migrated/<id>/{source.json, turns.json, meta.json}. meta.json is the
  * hand-checked people/org/country/topic list for the session.
@@ -20,7 +22,7 @@
  *   date-in_month-month · user-captured-session
  * Re-running replaces this session's turns and edges; it never touches other sessions.
  *
- * Usage: node scripts/sync-webinar-session.mjs <sessionId> [--dry-run]
+ * Usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run]
  */
 import { readFileSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
@@ -28,11 +30,11 @@ import { fileURLToPath } from "node:url";
 import "dotenv/config";
 import { register } from "tsx/esm/api";
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const sessionId = process.argv[2];
 const DRY_RUN = process.argv.includes("--dry-run");
 if (!sessionId) {
-  console.error("usage: node scripts/sync-webinar-session.mjs <sessionId> [--dry-run]");
+  console.error("usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run]");
   process.exit(1);
 }
 const dir = join(ROOT, "data", "toc-migrated", sessionId);
@@ -145,14 +147,14 @@ if (DRY_RUN) {
 }
 
 register();
-const { connect, close } = await import("../packages/db/src/client.js");
-const { sources } = await import("../packages/db/src/collections/sources.js");
-const { sessions } = await import("../packages/db/src/collections/sessions.js");
-const { turns: turnsColl } = await import("../packages/db/src/collections/turns.js");
-const { speakers } = await import("../packages/db/src/collections/speakers.js");
-const { orgs } = await import("../packages/db/src/collections/orgs.js");
-const { topics } = await import("../packages/db/src/collections/topics.js");
-const { graphEdges } = await import("../packages/db/src/collections/graph-edges.js");
+const { connect, close } = await import("../../packages/db/src/client.js");
+const { sources } = await import("../../packages/db/src/collections/sources.js");
+const { sessions } = await import("../../packages/db/src/collections/sessions.js");
+const { turns: turnsColl } = await import("../../packages/db/src/collections/turns.js");
+const { speakers } = await import("../../packages/db/src/collections/speakers.js");
+const { orgs } = await import("../../packages/db/src/collections/orgs.js");
+const { topics } = await import("../../packages/db/src/collections/topics.js");
+const { graphEdges } = await import("../../packages/db/src/collections/graph-edges.js");
 
 const upsert = (coll, doc) => {
   const { _id, ...rest } = doc;
