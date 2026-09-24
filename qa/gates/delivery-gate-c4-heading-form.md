@@ -60,3 +60,7 @@ ISS-205.
 
 **Links:** ISS-205, ISS-206, ISS-207; `qa/contracts/delivery-gate.md` [C4] and [I2];
 `qa/manifests/delivery-gate-manifest-blindness.md`
+
+---
+
+**Answered:** 2026-09-25 — **A** — amend C4 to drop the heading form. Answered by Umesh in session (AskUserQuestion, 2026-09-25). Verdicts standardise on an own-line `**Cycle checked:** N`; both live sessions already do this. Next: DECISIONS entry carrying Approved-by: Umesh, then the checker amends C4.

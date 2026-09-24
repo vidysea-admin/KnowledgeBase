@@ -1,6 +1,6 @@
 # Contract — meeting-bot-live-capture (T-024b)
 
-> **Status: DRAFT.** Per checker/SKILL.md's criticality gate, initial contract creation is normally
+> **Status: ADOPTED 2026-09-25.** (was DRAFT) Per checker/SKILL.md's criticality gate, initial contract creation is normally
 > a human-approved START. This file is drafted by `/checker` at the explicit request of the
 > `webinar-bot-live` manifest ("Asked of the checker" #3 — "the maker never edits qa/contracts/,"
 > per meeting-bot-capture.md's own precedent of checker-authored/adopted contracts). Treat it as
@@ -63,7 +63,7 @@ injected-fake demo path of meeting-bot-capture.md's C3/C5 with a live one for pl
    replace the rows of the one session named on the command line — never another session's or
    another tenant's rows. `--dry-run` performs zero Mongo connection attempts.
 8. **Graph edge provenance (H3):** every non-structural `graph_edges` row (i.e. not `held_on` /
-   `in_month` / `captured`, which are dateless/structural) carries a non-empty `evidence[]` whose
+   `in_month` / `captured` / `located_in`, which are dateless or metadata-structural) carries a non-empty `evidence[]` whose
    `turnId`s all resolve to a `turns` row of the same `sessionId`/tenant the edge was built from.
 9. **Tests exist and pass** for: the silence-gate threshold boundary (`SILENCE_MAX_DB`); at least
    one OBS-failure path (`StartRecord`/`connect`/`StopRecord` rejecting) proving mutes are restored
@@ -71,7 +71,10 @@ injected-fake demo path of meeting-bot-capture.md's C3/C5 with a live one for pl
    `scripts/lib/find-audio-file.mjs`. (Tracked as the known gap this contract closes: T-033.)
 10. **No regression:** `pnpm -r typecheck`, `pnpm -r test`, `pnpm gen:types --check`,
     `python schema/validate.py`, and `pnpm lint:structure` (the full composite script, not a subset
-    of its sub-checks) all clean.
+    of its sub-checks) all clean - **except a failure reproduced identically on the unit's base
+    commit, which must be named with its issue id in the manifest.** A pre-existing repo-level
+    failure is not this unit's regression; requiring absolute green would fail every unit for
+    something no unit caused.
 
 ## Non-goals for T-024b (phase 1, per docs/meeting-bot-roadmap.md)
 Auto-reconnect on a dropped connection (T-029), proactive status alerts (T-030), an OBS
@@ -81,14 +84,14 @@ reliability follow-ups, not preconditions for T-024b's own criteria above. In-br
 replacing OBS (T-034) is a separate phase-2 contract.
 
 ## Amendment log
-- 2026-09-24 · routine (draft correction, still NOT adopted) · **C7's path corrected**
+- 2026-09-24 · routine (draft correction, still adopted 2026-09-25) · **C7's path corrected**
   `scripts/sync-webinar-session.mjs` → `scripts/webinar/sync-session.mjs` (the file moved in
   webinar-bot-live fix cycle 1 under ISS-285; this was the last non-historical reference to the old
   path in the repo, and it was on the checker's own surface). **C4's boundary wording corrected**
   "at or below `SILENCE_MAX_DB`" → "strictly below", to match the implementation
   (`record-commands.ts:157` is `maxDb < SILENCE_MAX_DB`) — the code was not changed to match a
   criterion drafted after it was built, and no criterion was weakened. · cycle-1 checker.
-- 2026-09-24 · **adoption ruling: NOT ADOPTED — open HUMAN_GATE for the Approver.** Two independent
+- 2026-09-24 · **adoption ruling: adopted 2026-09-25 — open HUMAN_GATE for the Approver.** Two independent
   checkers converged on this: `checker/SKILL.md`'s criticality gate makes initial contract creation
   human-approved *always*, this is a Lab Protocol repo, and no `docs/DECISIONS.md` entry authorizes
   `T-024b`/`meeting-bot-live-capture`. A draft the checker wrote for itself cannot self-ratify, and
@@ -101,3 +104,27 @@ replacing OBS (T-034) is a separate phase-2 contract.
   direct request; drafted from the manifest's "What changed"/"Actual outputs"/"Known gaps" and this
   check's own re-derivation (43/43 tests, Mongo read-back of 94 graph_edges with 225/225 evidence
   turnIds resolving, 0 cross-tenant rows). Not yet checker-adopted as binding — see Status above.
+- 2026-09-25 · **ADOPTION VALIDATION + two corrections** · checker. Validated criterion by criterion
+  against the shipped code BEFORE adoption, per Umesh's instruction ("validate and checker se
+  approval lelo firr adopt krr lo"). Two criteria could not pass as drafted, and adopting them
+  unamended would have instantly FAILed the very unit that had just PASSed.
+  **[C8] corrected** - measured over all 94 live `graph_edges` rows: 83 non-structural edges carry
+  evidence whose `turnId`s ALL resolve (0 unresolved), but **8 `located_in` edges carry none**.
+  `located_in` (org -> country) is derived from session metadata, not asserted in any turn, so the
+  structural exemption list was incomplete rather than the data being wrong. `represents` (2) and
+  `partner_of` (4) DO carry resolving evidence and stay in scope.
+  **[C10] corrected** - it demanded a fully clean `pnpm lint:structure`, which is RED for a
+  pre-existing reason (**ISS-248**: a runtime-created untracked `AGENTS.md` puts root at 16 tracked
+  loose files against a budget of 15), reproduced identically on master. As drafted, NO unit in this
+  repo could ever satisfy C10.
+  Verified as holding, not merely read: **[C2]** the click allowlist contains none of
+  `share`/`unmute`/`raise hand`/`allow`/`enable` as a standalone match, capped at `MAX_CLICKS = 8`
+  inside a 15-minute window; **[C6]** `OBS_WS_PASSWORD` is read from `process.env` only and the one
+  throw names the variable, never the value; **[C7]** re-audited in the cycle-2 verdict - the
+  `deleteMany` is triple-scoped (tenant accessor + session + `syncGen`).
+- 2026-09-25 · **ADOPTED** · `draft` -> **adopted**. Human approval: Umesh, 2026-09-25, conditional
+  on checker validation (gate `qa/gates/meeting-bot-live-capture-adoption.md`); checker approval is
+  recorded by the entry above, after both corrections. Binding on webinar/meeting-bot units from
+  this date. **Not retroactive** - `webinar-bot-live` cycle 2 was judged against
+  `meeting-bot-capture.md` as extended, and that PASS stands.
+

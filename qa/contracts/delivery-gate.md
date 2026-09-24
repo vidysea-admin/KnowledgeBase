@@ -35,9 +35,19 @@ instead of silently absent.
 - **[C3] Cycle numbers are the HIGHEST recorded, never the first.** A verdict accumulates one
   section per cycle; a landed cycle-N verdict must not read as cycle 1 forever. Same rule for
   `Fix cycle` in a manifest that discusses its earlier cycles.
-- **[C4] A cycle stamp is found wherever the checker actually writes it** — on its own line
-  (`**Cycle checked:** 3`) **and inside a verdict heading**
-  (`# Verdict — <slug> · **Cycle checked: 3**`). Both forms are in the live corpus.
+- **[C4] A cycle stamp is written on its OWN LINE** (`**Cycle checked:** 3`), and that is the only
+  form the gate is required to read. **Amended 2026-09-25 by D-030 (`Approved-by: Umesh`), on the
+  answered gate `qa/gates/delivery-gate-c4-heading-form.md` (option A).** The heading form
+  (`# Verdict - <slug> · **Cycle checked: 3**`) is DROPPED from this criterion: it separates the
+  stamp from its label with a middle dot or em dash, which forces a non-ASCII boundary into the
+  gate's pattern and made the gate's answer depend on how PowerShell decodes the file — two
+  independent measurements disagreed about which reader mangles it. Measured cost of keeping it:
+  on 2026-09-25 the gate reported `1 check(s) pending` for `u2-4-phase3-precision-regate`, whose
+  verdict IS stamped, because the stamp sat mid-line behind a middle dot; that false positive
+  blocked two working sessions twice in one evening. All four verdicts using the heading form are
+  closed, so nothing live is lost, and encoding independence (232 files × 3 decoders, 0 decision
+  changes) is kept. A verdict MAY still carry a decorative heading; it just must not be the only
+  place the stamp appears.
 - **[C5] The fixture suite pins each predicate against the form the REAL corpus uses**, not
   only against a form the implementation was written to satisfy. A fixture authored from the
   fix rather than from the corpus is the defect this criterion exists to prevent.
