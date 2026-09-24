@@ -18,6 +18,7 @@ import { selectJoinStrategy } from "../strategy.js";
 import { getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
 import { createObsBrowserDeps, type ObsClientLike } from "./obs-windows.js";
 import { collectGapEvent, gapsForSourceDoc, type GapWindow } from "./reconnect-gaps.js";
+import { createTelegramNotifier, readTurnCount, type TelegramNotifier } from "./telegram-alerts.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
@@ -90,6 +91,9 @@ export async function runRecord(rest: string[]): Promise<void> {
 
   let endedAt: number | undefined;
   const gaps: GapWindow[] = []; // T-029: filled from "gap" events on sb_join.py's stdout stream
+  // T-030: reads TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID from the .env already loaded above; disabled
+  // (one log line, never throws) when either is missing.
+  const telegram = createTelegramNotifier();
   const bot = createObsBrowserDeps({
     obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455",
     obsPassword,
@@ -102,12 +106,14 @@ export async function runRecord(rest: string[]): Promise<void> {
     onEvent: (_h, ev) => {
       if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
       collectGapEvent(gaps, ev);
+      telegram.onBotEvent(ev); // T-030: disconnected (reconnect-reload) / recovered (closed gap)
     },
   });
   const joiner = createBrowserJoiner(bot.deps);
 
   const startedAt = Date.now();
   const { sessionHandle } = await joiner.join(url, { tenantId: "vidysea", consentNote: title });
+  telegram.notifyJoined(title, platform); // T-030
   let gone = false;
   void bot.browserExited(sessionHandle)?.then(() => (gone = true));
 
@@ -163,7 +169,8 @@ export async function runRecord(rest: string[]): Promise<void> {
       video = newest;
     }
     if (!video || !existsSync(video)) throw new Error(`no recording file produced (${video ?? "none"})`);
-    await finalizeRecording(video, sessionId, title, platform, rest.includes("--transcribe"), gaps);
+    await finalizeRecording(video, sessionId, title, platform, rest.includes("--transcribe"), gaps,
+      telegram, (Date.now() - startedAt) / 1000);
   } finally {
     removeControllerState(RECORD_DIR);
   }
@@ -197,10 +204,9 @@ function defaultRunTranscription(sessionId: string): void {
 
 /** Test seam (T-033, ISS-300): every field defaults to REAL production behaviour unchanged. Tests
  * drive `finalizeRecordingWith` directly (below) rather than adding a param to `finalizeRecording`
- * itself — its own 6-param list is left untouched on purpose: T-030 (sibling lane,
- * wave/t-030-telegram-alerts, commit 883c7b2) independently exports `finalizeRecording` and
- * appends its own trailing `telegram`/`durationSec` params to it. Putting this unit's seam in a
- * differently-named function keeps the two concerns from colliding in one parameter list. */
+ * itself — its own param list (now T-030's 8, `wave/t-030-telegram-alerts`/883c7b2, merged
+ * 1649da9) is left untouched on purpose: putting this unit's seam in a differently-named function
+ * keeps the two concerns from ever colliding in one parameter list again. */
 export interface FinalizeRecordingOverrides {
   extractAudio?: (video: string, audioOut: string) => void;
   measureVolume?: (audioPath: string) => { maxDb: number; meanDb: number };
@@ -208,14 +214,21 @@ export interface FinalizeRecordingOverrides {
   repoRoot?: string; // a test's temp dir, so nothing is ever written into the real repo tree
 }
 
-/** Recording file → m4a → silence gate → source.json → (optional) transcript. Shared by `record`
- * and `finalize` (the recovery path when the controlling process died mid-run). This is the real
- * implementation; `finalizeRecording` below is a thin pass-through with today's defaults, kept
- * param-list-stable for T-030 (see `FinalizeRecordingOverrides` doc above). */
+/** Recording file → m4a → silence gate → source.json → (optional) transcript → T-030 Telegram
+ * "finished" summary. Shared by `record` and `finalize` (the recovery path when the controlling
+ * process died mid-run). This is the real implementation; `finalizeRecording` below is a thin
+ * pass-through with today's defaults, kept param-list-stable for T-030 (see
+ * `FinalizeRecordingOverrides` doc above). */
 export async function finalizeRecordingWith(
   overrides: FinalizeRecordingOverrides,
   video: string, sessionId: string, title: string, platform: string, transcribe: boolean,
   gaps: GapWindow[] = [], // T-029: [] on the `finalize` recovery path — no live event stream to draw from there
+  // T-030: defaults to a fresh notifier when called from the `finalize` recovery path (runFinalize
+  // never builds its own — record-commands.ts loads TELEGRAM_* from .env before either call).
+  // A test never sets TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID, so the default notifier is `enabled:
+  // false` and every call below is a guaranteed no-op — never a live send (contract C6/D-030).
+  telegram: TelegramNotifier = createTelegramNotifier(),
+  durationSec?: number, // T-030: unknown (0) on the `finalize` recovery path — no live startedAt there
 ): Promise<void> {
   const root = overrides.repoRoot ?? REPO_ROOT;
   const recordDir = overrides.repoRoot ? path.join(root, "raw", "webinars") : RECORD_DIR;
@@ -260,18 +273,27 @@ export async function finalizeRecordingWith(
   if (silent) {
     throw new Error(`recording is silent (max ${maxDb} dB) — not transcribing; the capture did not hear the bot window`);
   }
+  const turnsPath = path.join(dataDir, "turns.json");
   if (transcribe) {
     runTranscription(sessionId);
   }
+  // T-030: finished + transcript-ready summary — no LLM call, turnCount is turns.json's own length.
+  telegram.notifyFinished({
+    title, sessionId, durationSec: durationSec ?? 0, gapCount: gaps.length,
+    transcriptPath: transcribe ? toPosix(path.relative(root, turnsPath)) : undefined,
+    turnCount: transcribe ? readTurnCount(turnsPath) : undefined,
+  });
 }
 
-/** Unchanged param list (T-030 appends its own trailing params to this exact declaration on its
- * own branch) — delegates to the real, test-seamed implementation above with today's defaults. */
+/** Unchanged param list (T-030's own shape, 883c7b2/1649da9) — delegates to the real,
+ * test-seamed implementation above with today's defaults. */
 export async function finalizeRecording(
   video: string, sessionId: string, title: string, platform: string, transcribe: boolean,
   gaps: GapWindow[] = [],
+  telegram: TelegramNotifier = createTelegramNotifier(),
+  durationSec?: number,
 ): Promise<void> {
-  return finalizeRecordingWith({}, video, sessionId, title, platform, transcribe, gaps);
+  return finalizeRecordingWith({}, video, sessionId, title, platform, transcribe, gaps, telegram, durationSec);
 }
 
 /**

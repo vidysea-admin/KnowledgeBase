@@ -117,7 +117,7 @@ Meeting-Bot pages (apps/web) are open follow-up work, not yet started.
 | ID | Status | Task | Notes |
 |---|---|---|---|
 | T-029 | done | Auto-reconnect on "connection interrupted" (reload + rejoin, gap logged) | seen live 2026-09-24 ~16:03, fixed by hand (PASS 9eb5307, merged dd07aa2) |
-| T-030 | open | Status alerts to Telegram (joined / dropped / silent / done + summary) | Umesh had to ask for status on the first live run |
+| T-030 | done | Status alerts to Telegram (joined / dropped / silent / done + summary) | Umesh had to ask for status on the first live run (PASS d3cefbf; live phone delivery pending human-approved run) |
 | T-031 | open | Live audio watchdog via OBS meters (>2 min silence → alert + reconnect) | depends T-029 |
 | T-032 | done | OBS guard: Safe Mode / websocket-down detection + normal restart | force-killed OBS relaunched in Safe Mode on 2026-09-24 (PASS 0c310b2, merged 6b8caef) |
 | T-033 | open | Tests (fake OBS client failure paths, audioPath) + /checker PASS for the phase-0 bot | closes U4.2 |
