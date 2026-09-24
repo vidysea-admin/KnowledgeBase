@@ -207,3 +207,7 @@ and the manifest's own "Known gaps" section disclosed several of these before th
 
 ## Live browser evidence
 Not a web-UI change. The live-run evidence is the Zoho participant page read over CDP at 16:07/16:42, a frame showing 4 panelists (16:05), and Zoho's "Thank you for attending" email at 17:09.
+
+## Fix-cycle-1 addendum (orchestrator, 2026-09-24 22:40)
+- `.goal/goal.json`: registered T-029…T-050 (22 tasks) that cycle 0 added to TASKS.md without goal rows (tracker-audit G1 row-set, a regression this unit caused); U4.2 and U2.6 moved pending → in_progress with a note citing D-027/D-028 (closes the substance of ISS-288, medium, same file). Goal monitor re-run to refresh progress totals.
+- `node scripts/tracker-audit.mjs` after: `2 finding(s)` — both G2 and NOT caused by this unit: `1 unparseable line` = the ISS-288 ledger row written by the 22:10 sweep-consolidation checker (ledger is checker-owned; asked the checker below to repair it) and `125 issue(s) "fixed" with no verified_date` (pre-existing).

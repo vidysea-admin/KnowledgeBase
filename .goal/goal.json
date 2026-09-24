@@ -4,15 +4,15 @@
   "north_star": "Build the Vidysea Living Knowledge Base as the brain for an AI virtual counsellor that matches and then beats every living top human counsellor in head-to-head evaluation (public championship, AlphaGo-style). Phase 1 exit: POST /ask over the 23 TOC sessions returns speaker+timestamp-cited internal answers, with web-fallback for off-corpus questions.",
   "status": "active",
   "created": "2026-09-03T07:01:15",
-  "updated": "2026-09-21T18:31:11",
+  "updated": "2026-09-24T22:25:03",
   "progress": {
-    "total": 62,
+    "total": 84,
     "done": 43,
-    "in_progress": 2,
+    "in_progress": 4,
     "blocked": 0,
-    "pending": 17,
+    "pending": 37,
     "current": "U2.4",
-    "percent": 69
+    "percent": 51
   },
   "tasks": [
     {
@@ -627,13 +627,13 @@
     {
       "id": "U2.6",
       "title": "Real graph_edges rows + merge at the route boundary",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [
         "U2.1"
       ],
       "criticality": "critical",
-      "note": "do NOT reshape flatten-graph.ts — map in routes/graph.ts"
+      "note": "do NOT reshape flatten-graph.ts — map in routes/graph.ts | 2026-09-24: live evidence D-027/D-028; awaiting checker (webinar-bot-live) — ISS-288"
     },
     {
       "id": "U3.1",
@@ -667,13 +667,211 @@
     {
       "id": "U4.2",
       "title": "ONE real meeting-bot joiner (browser/Meet); quarantine the other two",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [
         "U4.1"
       ],
       "criticality": "low",
-      "note": "three stubs + a package imported by nothing is negative-value inventory"
+      "note": "three stubs + a package imported by nothing is negative-value inventory | 2026-09-24: live evidence D-027/D-028; awaiting checker (webinar-bot-live) — ISS-288"
+    },
+    {
+      "id": "T-029",
+      "title": "Auto-reconnect on \"connection interrupted\" (reload + rejoin, gap logged)",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "seen live 2026-09-24 ~16:03, fixed by hand"
+    },
+    {
+      "id": "T-030",
+      "title": "Status alerts to Telegram (joined / dropped / silent / done + summary)",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "Umesh had to ask for status on the first live run"
+    },
+    {
+      "id": "T-031",
+      "title": "Live audio watchdog via OBS meters (>2 min silence → alert + reconnect)",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "depends T-029"
+    },
+    {
+      "id": "T-032",
+      "title": "OBS guard: Safe Mode / websocket-down detection + normal restart",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "force-killed OBS relaunched in Safe Mode on 2026-09-24"
+    },
+    {
+      "id": "T-033",
+      "title": "Tests (fake OBS client failure paths, audioPath) + /checker PASS for the phase-0 bot",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "closes U4.2"
+    },
+    {
+      "id": "T-034",
+      "title": "In-browser tab capture (extension + MediaRecorder); OBS becomes fallback",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "removes OBS; enables parallel meetings"
+    },
+    {
+      "id": "T-035",
+      "title": "Lean video (720p, low fps) — target <400 MB/hour",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "live run measured ~2.7 GB/hour"
+    },
+    {
+      "id": "T-036",
+      "title": "Discovery: Gmail + Calendar webinar-link scan incl. Zoho/OnAir/YouTube Live",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "extends apps/api gws-gmail.ts / gws-calendar.ts"
+    },
+    {
+      "id": "T-037",
+      "title": "Auto-join rules (sender/domain/platform, approve-once, opt-out)",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "Read AI pattern"
+    },
+    {
+      "id": "T-038",
+      "title": "Scheduler service (5-min poller → selectEventsToAutoJoin → record; overlaps)",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "replaces one-off Windows tasks; depends T-034, T-036, T-037"
+    },
+    {
+      "id": "T-039",
+      "title": "\"Send bot now\" to a live meeting (CLI/API/web)",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027"
+    },
+    {
+      "id": "T-040",
+      "title": "Post-processing: summary, facts, Q&A, action items with timestamp citations",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027"
+    },
+    {
+      "id": "T-041",
+      "title": "Slide keyframes → OCR → attached to turns by time",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "video capture proven live 2026-09-24"
+    },
+    {
+      "id": "T-042",
+      "title": "Speaker naming for webinar turns (Zoho tile names + intros + sync-speakers)",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "relates U2.4"
+    },
+    {
+      "id": "T-043",
+      "title": "Index webinar sessions into the KB (/ask across webinars)",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027"
+    },
+    {
+      "id": "T-044",
+      "title": "Transcript QA: timestamp drift clamp + hallucination spot-check",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "measured 223 s of turns on 186 s of audio"
+    },
+    {
+      "id": "T-045",
+      "title": "More sources: OnAir on-demand, YouTube via yt-dlp, Meet/Teams/Zoom via browser bot",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027"
+    },
+    {
+      "id": "T-046",
+      "title": "Retention policy for raw video (D-008) + real /meeting-bot web page",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027"
+    },
+    {
+      "id": "T-047",
+      "title": "Record controller must survive console close: run hidden/detached, plus a finalize-on-restart watchdog (detect OBS still recording with no controller → finalize)",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "2026-09-24: controller died 16:30:56 (console closed, Ctrl+C exit); OBS + bot kept going; recovered by hand with `lkb finalize --stop-obs`"
+    },
+    {
+      "id": "T-049",
+      "title": "Langfuse self-hosted tracing on every Gemini call (transcribe, extract, ask): latency, tokens, cost, retries, failures",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "Vidysea standard rule 5 (brain `patterns/agentic-architecture-standard.md`): self-hosted only, TELEMETRY_ENABLED=false, no enterprise key; approved by Umesh 2026-09-24"
+    },
+    {
+      "id": "T-050",
+      "title": "Pipeline as a thin LangGraph 1.x workflow (capture → transcribe → extract → index) with checkpoint/resume + a job queue; /ask router as a graph",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "standard: graph = wiring only, logic stays in functions/skills; multi-agent (Deep Agents) only for the counsellor (T-013); approved by Umesh 2026-09-24"
+    },
+    {
+      "id": "T-048",
+      "title": "Make gemini-3.8-flash single-call the default for recordings ≤ ~90 min; keep chunking as fallback",
+      "status": "pending",
+      "base_criticality": "MEDIUM",
+      "deps": [],
+      "criticality": "low",
+      "note": "D-028: one call fixed speaker attribution + no gaps; first re-run one TOC session to compare"
     }
   ],
   "decisions": [],
@@ -749,8 +947,8 @@
     "risk_tolerance": "conservative"
   },
   "analytics": {
-    "velocity_per_day": 1.19,
-    "eta_days": 16.0
+    "velocity_per_day": 1.02,
+    "eta_days": 40.2
   },
-  "last_deterministic_tick": "2026-09-21T18:31:11"
+  "last_deterministic_tick": "2026-09-24T22:25:03"
 }
