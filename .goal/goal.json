@@ -4,15 +4,15 @@
   "north_star": "Build the Vidysea Living Knowledge Base as the brain for an AI virtual counsellor that matches and then beats every living top human counsellor in head-to-head evaluation (public championship, AlphaGo-style). Phase 1 exit: POST /ask over the 23 TOC sessions returns speaker+timestamp-cited internal answers, with web-fallback for off-corpus questions.",
   "status": "active",
   "created": "2026-09-03T07:01:15",
-  "updated": "2026-09-25T02:26:43",
+  "updated": "2026-09-25T04:46:03",
   "progress": {
     "total": 84,
-    "done": 47,
+    "done": 49,
     "in_progress": 2,
     "blocked": 0,
-    "pending": 35,
+    "pending": 33,
     "current": "U2.4",
-    "percent": 56
+    "percent": 58
   },
   "tasks": [
     {
@@ -680,20 +680,22 @@
     {
       "id": "T-029",
       "title": "Auto-reconnect on \"connection interrupted\" (reload + rejoin, gap logged)",
-      "status": "pending",
+      "status": "done",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "seen live 2026-09-24 ~16:03, fixed by hand"
+      "note": "seen live 2026-09-24 ~16:03, fixed by hand",
+      "completed": "2026-09-25T04:41:23"
     },
     {
       "id": "T-030",
       "title": "Status alerts to Telegram (joined / dropped / silent / done + summary)",
-      "status": "pending",
+      "status": "done",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "Umesh had to ask for status on the first live run"
+      "note": "Umesh had to ask for status on the first live run",
+      "completed": "2026-09-25T04:41:17"
     },
     {
       "id": "T-031",
@@ -951,8 +953,8 @@
     "risk_tolerance": "conservative"
   },
   "analytics": {
-    "velocity_per_day": 1.19,
-    "eta_days": 31.1
+    "velocity_per_day": 1.28,
+    "eta_days": 27.3
   },
-  "last_deterministic_tick": "2026-09-25T02:26:43"
+  "last_deterministic_tick": "2026-09-25T04:46:03"
 }

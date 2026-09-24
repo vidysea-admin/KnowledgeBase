@@ -1,4 +1,101 @@
-# QUEUE — checker Mode B sweep 2026-09-25T02:xx+05:30 (3-shard wave, consolidated)
+# QUEUE — checker Mode B sweep 2026-09-25T04:4x+05:30 (3-shard wave, consolidated)
+
+> Bound to `D:/KnowledgeBase`, master @ `7eb55f7` at dispatch; sweep writer runs solo (a parallel
+> `/maker` session, knowledgebase-b6, is live in the same tree, and a Mode A checker for t-030 may
+> run goal_cli.py on `.goal/goal.json` concurrently — this consolidation touched only checker
+> surfaces + a narrow commit). **Terminal state: FINDINGS: 2 new (ISS-302 medium: u2-4 live-eval
+> pause has no durable per-unit marker; ISS-303 low, file-dont-fix: `reconnect-gaps.ts` bare
+> `Number()` coercion, dormant) + evidence added to 3 existing rows (ISS-178 recurrence on
+> t-030-telegram-alerts; ISS-300 worsening with an in-progress fix; ISS-301 refreshed
+> `opus_sub_share` 0.409, down from 0.53) + 1 row moved `open → verified`** (ISS-299 — T-047 now
+> reads `done` in both `TASKS.md:137` and `.goal/goal.json`) + `.goal/goal.json` **T-029 closed**
+> via `goal_cli.py done` (re-derived: PASS `9eb5307`, merge `dd07aa2`, close-out `2299de5`, TASKS.md
+> flip `7eb55f7` — all four already on disk before this sweep touched anything).
+>
+> **Concurrency note, RESOLVED while writing this sweep:** `.goal/goal.json` picked up a
+> **T-030 → done** close (`completed: 2026-09-25T04:41:17`) mid-sweep that this sweep did **not**
+> make. At first observation `qa/verdicts/` had no `t-030-telegram-alerts.md` and `TASKS.md:120`
+> still read `open`, so this sweep correctly declined to reopen it (a live Mode A checker
+> mid-committing is not a bypass, and the setup note explicitly anticipated the race) rather than
+> risk a write-collision. HEAD then moved `7eb55f7 → c9959bf` before this sweep's own commit:
+> `d3cefbf` (checker PASS t-030-telegram-alerts cycle 0, 9/9 capability rows re-verified, C6/C10
+> held), `1649da9` (merge), `c9959bf` (close-out, TASKS.md:120 now `done`). The earlier flag is
+> now moot — the close was earned, not premature. **The dead-checker evidence added to ISS-178
+> still stands on its own facts** (a real checker attempt on this unit did die with no verdict and
+> no dispatch marker, per the shard's own re-derivation before this later checker was dispatched
+> to replace it) and is left as a recurrence record, not retracted.
+>
+> **Verified and closed, re-derived from disk:**
+> - **T-029** — cycle-0 PASS (`9eb5307`), merge (`dd07aa2`), close-out (`2299de5`), TASKS.md flip
+>   (`7eb55f7`) all present at HEAD. `.goal/goal.json` T-029 still read `pending`. Closed by this
+>   sweep via `goal_cli.py done --task-id T-029`.
+> - **ISS-299** — T-047's tracker gap (the prior sweep's own finding) is now fully closed:
+>   `TASKS.md:137` reads `done` (maker commit `5842d1f`) and `.goal/goal.json` T-047 already read
+>   `done` (closed by the prior sweep). Moved `open → verified`.
+>
+> **Shard findings verified and folded (not filed as new ids):**
+> - **(a) t-030-telegram-alerts dispatch gap** — real: manifest committed to
+>   `wave/t-030-telegram-alerts` (`883c7b2`, Fix cycle 0, `Status: ready-for-check`), no verdict
+>   file at any cycle, no `qa/dispatch/` marker (only `golden-set-sibling-ambiguity.json` present),
+>   `TASKS.md:120` still `open`. Added as a `RECURRENCE` note directly on **ISS-178** (the row this
+>   defect class already owns), not a new id.
+> - **(b) u2-4 fix-cycle-2 live-eval pause durability** — real: `qa/.last-tick` records the pause
+>   in prose only (lines 31/33/35), no `qa/.paused.<unit>` marker exists (the only pause-shaped file
+>   on disk, `qa/.paused.lifted-2026-09-24`, is unrelated — 0 bytes, a different already-lifted
+>   repo-wide pause). Filed as **new medium ISS-302**, not appended to ISS-250: ISS-250 is
+>   specifically a HUMAN_GATE-decision durability defect (needs an `Answered` field); this is
+>   operational pause-state durability (needs a resume-condition marker) — same class, different
+>   fix shape, and this ledger's own precedent (ISS-276/288/299) is to file same-class instances
+>   as separate ids rather than conflate them.
+> - **Clean, verified:** bypass — none in `aa220b4..7eb55f7` (9 commits, all covered by
+>   PASS/merge/close-out or the prior sweep's own consolidation commit); t-029/t-032 cycle stamps
+>   consistent; feedback-inbox has 0 fresh unfolded entries (last folded 2026-09-25, the D-030
+>   c4-heading-form note); contracts unchanged in range; `qa/.last-tick` liveness current (last
+>   line 2026-09-25T04:33:39, ADVANCED).
+> - **135 fixed vs 72 verified, judged NOT worsening** — re-derived at `aa220b4` (prior sweep) the
+>   union was 136 fixed / 64 verified (gap 72); at `7eb55f7` (this sweep, before its own edits) it
+>   was 135 fixed / 72 verified (gap 63). The gap shrank by 9 as this sweep's own re-verifications
+>   (ISS-288 and 7 others → `verified` at the prior sweep, ISS-299 → `verified` at this one) moved
+>   through it. No low row filed.
+>
+> **Structural + spend signals (never a blocker):**
+> - **ISS-300 (medium, structural-erosion), WORSENING** — `record-commands.ts` gained two more
+>   touching units since the prior sweep (t-029 `+6/-1`, t-030 `+20/-2`, both untested) but a fix is
+>   now in flight: the t-033 lane (uncommitted, `wave/t-033-bot-tests`) has added a 147-line
+>   `record-commands.test.ts` naming ISS-300 in its own header.
+> - **ISS-301 (low, token-spend)** — `opus_sub_share` improved to 0.409 (from 0.53), still over the
+>   25% signal threshold; `sub_agents` up to 50.
+> - **ISS-303 (low, file-dont-fix)** — `reconnect-gaps.ts` `collectGapEvent`'s bare `Number()`
+>   coercion on a gap event's start/end silently produces `NaN`, which later throws inside
+>   `finalizeRecording` rather than failing at the source. Dormant today: the only emitter
+>   (`sb_join.py`) always sets both fields.
+>
+> Token line appended 04:35:20 (main 564.6M / sub 526.4M, `opus_sub_share` 0.409, `sub_agents` 50,
+> compactions 2, outages 0). `.last-sweep` stamped at HEAD `c9959bf` (the true tip at write time,
+> after the concurrent t-030-telegram-alerts PASS/merge/close-out landed — this sweep's own commit
+> touched only checker surfaces + `.goal/goal.json`'s T-029 close, no code).
+
+## Current top 3 (backlog-priority order, refreshed 2026-09-25T04:4x sweep)
+
+1. **[tier 3 — roadmap]** `T-031` — "Live audio watchdog via OBS meters" — unblocked: `T-030`
+   (its stated dependency) closed for real during this sweep (checker PASS `d3cefbf`, merge
+   `1649da9`, close-out `c9959bf`). Next in the T-047 → T-029 → T-030 → T-032 → T-033 sequence's
+   remaining roadmap item once T-033 lands.
+2. **[tier 2 — open critical ledger issue] ISS-104** — speaker-resolution-llm, critical, still
+   `open`: the cycle-2 naming-cue rule does not close C2b. HELD on the same-file collision with the
+   in-flight `u2-4-phase3-fix` cycle (currently paused mid-cycle-2 live eval, per the user's RAM
+   request) — pick up once that unit's live-eval run resumes and lands, per this repo's own
+   speaker-seam precedent.
+3. **[tier 3 — roadmap, mandatory]** `T-033` — building now (lane `wave/t-033-bot-tests`, already
+   has an uncommitted `record-commands.test.ts` addressing ISS-300 — merge must re-run against the
+   now-merged `t-030-telegram-alerts` tree per `qa/.last-tick`'s own note on `finalizeRecording`'s
+   changed signature).
+
+**Also open, not in the top 3:** `u2-4-phase3-fix` cycle 2's live eval remains **paused by the
+user** (RAM ceiling, per `qa/.last-tick`; durability of that pause state is now tracked as
+**ISS-302**) — resume is a maker/human call, not a checker action.
+
+## Prior sweep header (2026-09-25T02:xx+05:30, 3-shard wave, superseded as routing; kept for its own findings below)
 
 > Bound to `D:/KnowledgeBase`, master @ `b60b9fc` at dispatch; sweep writer runs solo (a parallel
 > `/maker` session, knowledgebase-ef, is live in the same tree — this consolidation touched only
@@ -176,7 +273,7 @@
   default while the north star's Phase-1 exit requires off-corpus web fallback; wire-it-or-sign-the-honest-limit
   is an Approver amendment (ISS-274)
 
-## Current top 3 (backlog-priority order, refreshed 2026-09-24 sweep)
+## Prior top 3 (backlog-priority order, refreshed 2026-09-24 sweep; superseded by the 2026-09-25T04:4x list above)
 
 1. **Maker duty — handshake, u2-4-phase3-precision-regate FAIL (cycle 0, same day)** — respond to
    ISS-282 (critical: gate's own precision/wrong-link/addition bars all fail on re-run), ISS-283
