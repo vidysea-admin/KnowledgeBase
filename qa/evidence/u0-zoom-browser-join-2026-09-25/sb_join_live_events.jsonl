@@ -1,0 +1,5 @@
+{"event": "starting", "t": 1790315002.5586274}
+{"event": "opened", "t": 1790315015.7709165, "url": "https://zoom.us/w/95194691654?tk=<redacted>&uuid=<redacted>#success"}
+{"event": "clicked", "t": 1790315043.0738876, "text": "join from browser"}
+{"event": "heartbeat", "t": 1790315043.209848, "url": "https://app.zoom.us/wc/95194691654/join?ref_from=launch&tk=<redacted>&_x_zm_rtaid=<redacted>&_x_zm_rhtaid=702&fromPWA=1", "page_title": "Join from Zoom Workplace app - Zoom"}
+{"event": "closed", "t": 1790315045.2112062}
