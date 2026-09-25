@@ -342,4 +342,4 @@ gemini-file-upload.ts` + its test (shared library bugfix, no UI surface).
   `2026-08-12-*`, `2026-08-27-*`) and the 2026-09-24 webinar's `captureMode: "silent"` fails the
   D-008 `"provided"` check — all pre-existing, none touching any file this unit changed.
 
-## Status: ready-for-check
+## Status: checked-PASS — qa/verdicts/u1-toc-sept-catchup.md (Cycle checked: 0, 9c52a27); merged to master; @lkb/ai 75/75 on merged tree; debt ISS-U1-2 (main-tree breach, no damage), ISS-U1-3 (10 embedded timestamp fragments, cosmetic), ISS-U1-4 (retrieval miss on rephrased query)
