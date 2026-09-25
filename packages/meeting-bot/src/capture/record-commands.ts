@@ -5,9 +5,8 @@
  * an injected ingest Source, while the real transcriber (Gemini File API) lives behind @lkb/ai,
  * which this package may not import — so transcription runs as scripts/transcribe-long-session.mjs.
  */
-import { createHash } from "node:crypto";
-import { spawn, spawnSync, execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { spawn, spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { OBSWebSocket } from "obs-websocket-js";
@@ -16,20 +15,18 @@ import { createBrowserJoiner } from "../joiners/browser-joiner.js";
 import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
 import { getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
-import { createObsBrowserDeps } from "./obs-windows.js";
-import { collectGapEvent, gapsForSourceDoc, type GapWindow } from "./reconnect-gaps.js";
-import { createTelegramNotifier, readTurnCount, type TelegramNotifier } from "./telegram-alerts.js";
+import { createObsBrowserDeps, type ObsClientLike } from "./obs-windows.js";
+import { collectGapEvent, type GapWindow } from "./reconnect-gaps.js";
+import { createTelegramNotifier, type TelegramNotifier } from "./telegram-alerts.js";
+import { finalizeRecordingWith } from "./record-finalize.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-
 
 const REPO_ROOT = path.resolve(HERE, "..", "..", "..", "..");
 const BOT_PROFILE_DIR = path.join(REPO_ROOT, "data", "bot-profile");
 const RECORD_DIR = path.join(REPO_ROOT, "raw", "webinars");
 const JOIN_SCRIPT = path.join(HERE, "..", "..", "py", "sb_join.py");
 const OBS_EXE = "C:\\Program Files\\obs-studio\\bin\\64bit\\obs64.exe";
-/** Below this peak level the capture heard nothing (digital silence measured at -91 dB). */
-const SILENCE_MAX_DB = -50;
 
 function flag(rest: string[], name: string): string | undefined {
   const i = rest.indexOf(name);
@@ -48,8 +45,6 @@ function todayAt(hhmm: string): Date {
 function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
 }
-
-const toPosix = (p: string) => p.split(path.sep).join("/");
 
 /** `login [url]`: open the bot browser (no clicks, no recording) so the user can sign in once. */
 export async function runLogin(rest: string[]): Promise<void> {
@@ -176,70 +171,21 @@ export async function runRecord(rest: string[]): Promise<void> {
   }
 }
 
-/** Recording file → m4a → silence gate → source.json → (optional) transcript. Shared by `record`
- * and `finalize` (the recovery path when the controlling process died mid-run). */
+// finalizeRecordingWith / isSilentCapture / FinalizeRecordingOverrides live in record-finalize.ts
+// (T-033, ISS-300) — split out to stay under this file's own 300-LOC budget (import above);
+// re-exported here so existing import sites (this package's tests) don't need to know the split.
+export { isSilentCapture, type FinalizeRecordingOverrides } from "./record-finalize.js";
+export { finalizeRecordingWith };
+
+/** Unchanged param list (T-030's own shape, 883c7b2/1649da9) — delegates to the real,
+ * test-seamed implementation in record-finalize.ts with today's defaults. */
 export async function finalizeRecording(
   video: string, sessionId: string, title: string, platform: string, transcribe: boolean,
-  gaps: GapWindow[] = [], // T-029: [] on the `finalize` recovery path — no live event stream to draw from there
-  // T-030: defaults to a fresh notifier when called from the `finalize` recovery path (runFinalize
-  // never builds its own — record-commands.ts loads TELEGRAM_* from .env before either call).
+  gaps: GapWindow[] = [],
   telegram: TelegramNotifier = createTelegramNotifier(),
-  durationSec?: number, // T-030: unknown (0) on the `finalize` recovery path — no live startedAt there
+  durationSec?: number,
 ): Promise<void> {
-  const audio = path.join(RECORD_DIR, `${sessionId}.m4a`);
-  execFileSync("ffmpeg", ["-y", "-hide_banner", "-loglevel", "error", "-i", video, "-vn", "-ac", "1",
-    "-c:a", "aac", "-b:a", "96k", audio], { stdio: "inherit" });
-  console.log(`[bot] audio → ${audio}`);
-
-  // Silence gate. Measured 2026-09-24: a silent (-91 dB) capture sent to Gemini came back as 18
-  // fluent, invented turns. A KB must never ingest that, so silent audio is never transcribed.
-  const vd = spawnSync("ffmpeg", ["-hide_banner", "-i", audio, "-af", "volumedetect", "-f", "null", "-"],
-    { encoding: "utf8" });
-  const maxDb = Number(/max_volume:\s*(-?[\d.]+) dB/.exec(vd.stderr ?? "")?.[1] ?? "-999");
-  const meanDb = Number(/mean_volume:\s*(-?[\d.]+) dB/.exec(vd.stderr ?? "")?.[1] ?? "-999");
-  const silent = maxDb < SILENCE_MAX_DB;
-  console.log(`[bot] audio level: max ${maxDb} dB, mean ${meanDb} dB${silent ? "  ← SILENT" : ""}`);
-
-  const dataDir = path.join(REPO_ROOT, "data", "toc-migrated", sessionId);
-  mkdirSync(dataDir, { recursive: true });
-  const sourceDoc = {
-    _id: `${sessionId}-src`,
-    tenantId: "vidysea",
-    kind: "recording",
-    // schema/sources.schema.json requires hash (unique index {tenantId, hash}).
-    hash: createHash("sha256").update(readFileSync(audio)).digest("hex"),
-    captureMode: "silent",
-    title,
-    platform,
-    path: toPosix(path.relative(REPO_ROOT, video)),
-    audioPath: toPosix(path.relative(REPO_ROOT, audio)),
-    audioLevel: { maxDb, meanDb, silent },
-    gaps: gapsForSourceDoc(gaps), // T-029: forced-disconnect windows recovered mid-run, if any
-    consent: {
-      given: true,
-      recordedBy: "Umesh Sugara (registered attendee) via LKB bot",
-      note: "attendee-side capture for internal KB use; organizer recording not available to attendees",
-      confirmedNoAlternative: true,
-    },
-    createdAt: new Date().toISOString(),
-  };
-  writeFileSync(path.join(dataDir, "source.json"), JSON.stringify(sourceDoc, null, 2) + "\n");
-  console.log(`[bot] registered session ${sessionId}`);
-
-  if (silent) {
-    throw new Error(`recording is silent (max ${maxDb} dB) — not transcribing; the capture did not hear the bot window`);
-  }
-  const turnsPath = path.join(dataDir, "turns.json");
-  if (transcribe) {
-    execFileSync("node", [path.join(REPO_ROOT, "scripts", "transcribe-long-session.mjs"), sessionId],
-      { cwd: REPO_ROOT, stdio: "inherit" });
-  }
-  // T-030: finished + transcript-ready summary — no LLM call, turnCount is turns.json's own length.
-  telegram.notifyFinished({
-    title, sessionId, durationSec: durationSec ?? 0, gapCount: gaps.length,
-    transcriptPath: transcribe ? toPosix(path.relative(REPO_ROOT, turnsPath)) : undefined,
-    turnCount: transcribe ? readTurnCount(turnsPath) : undefined,
-  });
+  return finalizeRecordingWith({}, video, sessionId, title, platform, transcribe, gaps, telegram, durationSec);
 }
 
 /**
@@ -249,7 +195,15 @@ export async function finalizeRecording(
  * flush, unmutes OBS's global desktop/mic inputs (the dead run never restored them) and closes
  * the bot Chrome; then the normal finalize steps run.
  */
-export async function runFinalize(rest: string[]): Promise<void> {
+/** Test seam (T-033, ISS-300 / contract C5): defaults to a real `new OBSWebSocket()`, so every
+ * in-repo caller (`cli.ts`, no 2nd arg) is exactly today's code path. A test injects a client
+ * whose `connect` rejects to drive the "OBS unreachable" recovery-failure path without a real
+ * network attempt (avoids a hang risk on an unreachable host/port). */
+export interface RunFinalizeOverrides {
+  obs?: ObsClientLike;
+}
+
+export async function runFinalize(rest: string[], overrides: RunFinalizeOverrides = {}): Promise<void> {
   const sessionId = flag(rest, "--session-id");
   const title = flag(rest, "--title");
   if (!sessionId || !title) throw new Error("usage: lkb finalize --session-id ID --title T [--platform P] [--stop-obs] [--video PATH] [--transcribe]");
@@ -259,7 +213,7 @@ export async function runFinalize(rest: string[]): Promise<void> {
   if (rest.includes("--stop-obs")) {
     const envFile = path.join(REPO_ROOT, ".env");
     if (existsSync(envFile)) process.loadEnvFile(envFile);
-    const obs = new OBSWebSocket();
+    const obs = overrides.obs ?? (new OBSWebSocket() as unknown as ObsClientLike);
     await obs.connect(process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455", process.env.OBS_WS_PASSWORD);
     const status = await obs.call("GetRecordStatus");
     if (status.outputActive) {

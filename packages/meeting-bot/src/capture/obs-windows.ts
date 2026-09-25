@@ -30,6 +30,13 @@ export interface BotEvent {
   [k: string]: unknown;
 }
 
+/** Minimal `OBSWebSocket` shape used here. Test seam (T-033, ISS-300) for injecting a fake client. */
+export interface ObsClientLike {
+  connect: (url: string, password?: string) => Promise<unknown>;
+  call: (request: string, args?: unknown) => Promise<any>;
+  disconnect: () => Promise<void>;
+}
+
 export interface ObsBrowserConfig {
   obsUrl: string;
   obsPassword: string;
@@ -112,7 +119,7 @@ function forceKillObsNeverCall(): never {
   throw new Error("BUG: the OBS guard must never force-kill OBS (T-032 — see obs-guard.ts).");
 }
 
-function createRealObsGuardProbes(cfg: ObsBrowserConfig, obs: OBSWebSocket, log: (msg: string) => void): ObsGuardProbes {
+function createRealObsGuardProbes(cfg: ObsBrowserConfig, obs: ObsClientLike, log: (msg: string) => void): ObsGuardProbes {
   return {
     isObsRunning: isObsProcessRunning,
     connectWebsocket: async () => {
@@ -127,21 +134,40 @@ function createRealObsGuardProbes(cfg: ObsBrowserConfig, obs: OBSWebSocket, log:
   };
 }
 
-export function createObsBrowserDeps(cfg: ObsBrowserConfig) {
+/** Test seam (T-033, ISS-300): defaults = today's real behaviour unchanged, so a test can avoid a
+ * real OBS process / `Get-Process chrome` poll / tasklist+powershell+obs64.exe recovery flow while
+ * still driving the real mute-restore / bot-Chrome-termination logic in `launch`/`stop`. */
+export interface ObsBrowserDepsOverrides {
+  obs?: ObsClientLike; // defaults to a real `new OBSWebSocket()`
+  connectObs?: () => Promise<void>; // defaults to ensureObsReady + system-probe recovery
+  confirmBotWindow?: (wantTitle: string) => Promise<boolean>; // defaults to the real chrome-window poll
+}
+
+export function createObsBrowserDeps(cfg: ObsBrowserConfig, overrides: ObsBrowserDepsOverrides = {}) {
   const log = cfg.log ?? ((m: string) => console.log(`[bot] ${m}`));
-  const obs = new OBSWebSocket();
+  const obs = overrides.obs ?? (new OBSWebSocket() as unknown as ObsClientLike);
   const runs = new Map<string, Run>();
   let connected = false;
 
   async function connectObs(): Promise<void> {
     if (connected) return;
-    await ensureObsReady(createRealObsGuardProbes(cfg, obs, log));
+    if (overrides.connectObs) await overrides.connectObs();
+    else await ensureObsReady(createRealObsGuardProbes(cfg, obs, log));
     connected = true;
   }
 
+  async function confirmBotWindowDefault(want: string): Promise<boolean> {
+    // One PowerShell process polling internally (spawning one per check cost ~3s each).
+    const r = spawnSync("powershell", ["-NoProfile", "-Command",
+      `$w='${want}'; for($i=0;$i -lt 60;$i++){ if((Get-Process chrome -EA SilentlyContinue).MainWindowTitle -contains $w){'FOUND';exit}; Start-Sleep -Milliseconds 500 }`],
+      { encoding: "utf8", timeout: 45_000 });
+    return (r.stdout ?? "").includes("FOUND");
+  }
+  const confirmBotWindow = overrides.confirmBotWindow ?? confirmBotWindowDefault;
+
   async function upsertInput(inputName: string, inputKind: string, inputSettings: Record<string, unknown>) {
     const { inputs } = await obs.call("GetInputList");
-    if (inputs.some((i) => i.inputName === inputName)) {
+    if (inputs.some((i: { inputName?: string }) => i.inputName === inputName)) {
       await obs.call("SetInputSettings", { inputName, inputSettings: inputSettings as never, overlay: true });
       try {
         await obs.call("GetSceneItemId", { sceneName: SCENE, sourceName: inputName });
@@ -156,7 +182,7 @@ export function createObsBrowserDeps(cfg: ObsBrowserConfig) {
   /** `muted` is filled as inputs are muted, so a caller's catch can restore a partial run. */
   async function prepareScene(title: string, muted: string[]): Promise<void> {
     const { scenes } = await obs.call("GetSceneList");
-    if (!scenes.some((s) => s.sceneName === SCENE)) await obs.call("CreateScene", { sceneName: SCENE });
+    if (!scenes.some((s: { sceneName?: string }) => s.sceneName === SCENE)) await obs.call("CreateScene", { sceneName: SCENE });
     const window = windowSpec(title);
     await upsertInput(VIDEO_INPUT, "window_capture", {
       window, priority: WINDOW_PRIORITY_TITLE, method: 2, cursor: false, capture_audio: false,
@@ -245,11 +271,7 @@ export function createObsBrowserDeps(cfg: ObsBrowserConfig) {
       // OBS matches the window by exact title; recording before the pin lands records black +
       // silence (what the first smoke run produced). Confirm the window exists first.
       const want = `${title} - Google Chrome`;
-      // One PowerShell process polling internally (spawning one per check cost ~3s each).
-      const r = spawnSync("powershell", ["-NoProfile", "-Command",
-        `$w='${want}'; for($i=0;$i -lt 60;$i++){ if((Get-Process chrome -EA SilentlyContinue).MainWindowTitle -contains $w){'FOUND';exit}; Start-Sleep -Milliseconds 500 }`],
-        { encoding: "utf8", timeout: 45_000 });
-      const seen = (r.stdout ?? "").includes("FOUND");
+      const seen = await confirmBotWindow(want);
       if (!seen) throw new Error(`bot window '${want}' never appeared — OBS would record nothing`);
       log(`bot window confirmed: '${want}'`);
       await connectObs();
