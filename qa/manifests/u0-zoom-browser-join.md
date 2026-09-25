@@ -203,4 +203,4 @@ own live-verified fix once a signed-in session is reachable to test against.
   Zoom Workplace app" / "Join from browser"); adding an unverified string would violate this
   task's own "verify against the REAL page, not memory" instruction.
 
-## Status: ready-for-check
+## Status: checked-PASS — qa/verdicts/u0-zoom-browser-join.md (Cycle checked: 0, e6f0b72); merged to master; meeting-bot 142/142 + pytest 22/22 on merged tree; open debt ISS-U0-1 (iframe traversal, needs signed-in session), ISS-U0-2 (HUMAN_GATE zoom-bot-signin), ISS-U0-3 (duplicate screenshot)
