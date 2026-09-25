@@ -200,4 +200,4 @@ green (`RESTORED_OK` + a `cmp` diff of zero) before moving to the next row.
   safely (returns `undefined` for any channel where index 1 isn't a finite number, and the
   watchdog's own "no meter data = fail loud" design still fires after 120s either way).
 
-## Status: ready-for-check
+## Status: checked-PASS — qa/verdicts/t-031-audio-watchdog.md (Cycle checked: 0, 4c87be0); merged to master bf653fe; meeting-bot 141/141 + pytest 20/20 + pnpm -r typecheck clean on merged tree; debt ISS-T-031-1 (low, tracker-audit G4 self-reference); live muted-tab-on-real-meeting check pending human-approved run
