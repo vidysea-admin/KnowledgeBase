@@ -14,8 +14,9 @@ import { OBSWebSocket } from "obs-websocket-js";
 import { createBrowserJoiner } from "../joiners/browser-joiner.js";
 import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
+import { createAudioWatchdog, createRealLevelSource } from "./audio-watchdog.js";
 import { getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
-import { createObsBrowserDeps, type ObsClientLike } from "./obs-windows.js";
+import { AUDIO_INPUT, createObsBrowserDeps, type ObsClientLike } from "./obs-windows.js";
 import { collectGapEvent, type GapWindow } from "./reconnect-gaps.js";
 import { createTelegramNotifier, type TelegramNotifier } from "./telegram-alerts.js";
 import { finalizeRecordingWith } from "./record-finalize.js";
@@ -112,6 +113,23 @@ export async function runRecord(rest: string[]): Promise<void> {
   let gone = false;
   void bot.browserExited(sessionHandle)?.then(() => (gone = true));
 
+  // T-031: live audio watchdog — alerts + forces one reload per silent stretch (>2min of the
+  // bot's own capture reading below the silence threshold, e.g. a muted-but-still-connected tab).
+  // Stopped unconditionally in the outer `finally` below so no exit path leaves its 1s tick timer
+  // or InputVolumeMeters listener dangling.
+  const audioWatchdog = createAudioWatchdog({
+    now: () => Date.now(),
+    subscribeLevel: createRealLevelSource({ obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455", obsPassword, inputName: AUDIO_INPUT }),
+    scheduleTick: (fn, ms) => {
+      const id = setInterval(fn, ms);
+      return () => clearInterval(id);
+    },
+    notifySilence: (durationSec) => telegram.notifySilence(durationSec), // T-030's own notifier
+    reconnect: () => bot.triggerReload(sessionHandle),
+    log: (m) => console.log(`[bot] ${m}`),
+  });
+  audioWatchdog.start();
+
   // T-047: written now, removed only once cleanup below actually runs to completion. If this
   // process is killed out from under OBS (console closed — the 2026-09-24 16:30:56 failure),
   // this file is left behind with a pid that's no longer alive; `lkb watchdog` uses exactly that
@@ -144,6 +162,7 @@ export async function runRecord(rest: string[]): Promise<void> {
         await new Promise((r) => setTimeout(r, 5000));
       }
     } finally {
+      audioWatchdog.stop(); // T-031: before joiner.stop — recording is ending, no more reconnects
       try {
         await joiner.stop(sessionHandle);
       } catch (e) {
@@ -167,6 +186,7 @@ export async function runRecord(rest: string[]): Promise<void> {
     await finalizeRecording(video, sessionId, title, platform, rest.includes("--transcribe"), gaps,
       telegram, (Date.now() - startedAt) / 1000);
   } finally {
+    audioWatchdog.stop(); // idempotent — belt-and-suspenders if the inner finally was never reached
     removeControllerState(RECORD_DIR);
   }
 }

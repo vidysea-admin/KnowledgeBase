@@ -7,6 +7,7 @@ system Python; no repo-level pytest config exists yet, none needed for a single 
 """
 import os
 import sys
+import tempfile
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -20,6 +21,7 @@ from sb_join import (  # noqa: E402
     apply_reload,
     click_gate,
     detect_trouble,
+    should_force_reload,
 )
 
 
@@ -209,6 +211,25 @@ def test_apply_reload_widens_window_but_returns_clicks_unchanged():
     clicks, extra_click_until = apply_reload(5, 1000.0)
     assert clicks == 5  # unchanged
     assert extra_click_until == 1000.0 + CLICK_WINDOW_S
+
+
+# ---- should_force_reload — T-031 audio-watchdog control channel ------------
+
+def test_should_force_reload_false_when_no_reload_file_configured():
+    assert should_force_reload(None) is False
+
+
+def test_should_force_reload_false_when_file_does_not_exist():
+    with tempfile.TemporaryDirectory() as d:
+        assert should_force_reload(os.path.join(d, ".reload-missing")) is False
+
+
+def test_should_force_reload_true_when_sentinel_file_exists():
+    with tempfile.TemporaryDirectory() as d:
+        p = os.path.join(d, ".reload-abc")
+        with open(p, "w", encoding="utf-8") as f:
+            f.write("reload")
+        assert should_force_reload(p) is True
 
 
 if __name__ == "__main__":
