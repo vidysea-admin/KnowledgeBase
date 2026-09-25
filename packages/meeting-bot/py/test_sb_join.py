@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from sb_join import (  # noqa: E402
     CLICK_WINDOW_S,
+    JOIN_TEXTS,
     MAX_CLICKS,
     MAX_RECONNECTS,
     RECONNECT_COOLDOWN_S,
@@ -230,6 +231,36 @@ def test_should_force_reload_true_when_sentinel_file_exists():
         with open(p, "w", encoding="utf-8") as f:
             f.write("reload")
         assert should_force_reload(p) is True
+
+
+# ---- JOIN_TEXTS — C2 forbidden-word guarantee (meeting-bot-live-capture contract) ----------
+# C2 is binding: "the allowlist MUST NOT contain, and no future edit may add, any of `share`,
+# `unmute`, `raise hand`, `allow` (or `enable`) as a standalone matched string." This test did NOT
+# exist before U0 (2026-09-25) despite the contract's amendment log claiming it was "verified as
+# holding" — that verification was a manual read, never a regression test. Written now so a future
+# edit that adds e.g. "allow" while chasing a new platform's button text is caught automatically.
+# CLICK_JS matches on the FULL trimmed, lowercased text — so this checks standalone-string
+# equality (an entry that merely CONTAINS "share" as a substring inside a longer safe phrase,
+# e.g. none currently do, would not by itself defeat C2's "exact match" click semantics — but the
+# contract's own wording is "as a standalone string", so this test enforces exactly that: no
+# JOIN_TEXTS entry, once lowercased, equals one of the forbidden words).
+
+C2_FORBIDDEN_STANDALONE = {"share", "unmute", "raise hand", "allow", "enable"}
+
+
+def test_join_texts_never_contains_a_c2_forbidden_word_standalone():
+    lowered = {t.lower() for t in JOIN_TEXTS}
+    hit = lowered & C2_FORBIDDEN_STANDALONE
+    assert not hit, f"C2 violation: JOIN_TEXTS contains forbidden standalone entr(y/ies): {hit}"
+
+
+def test_join_texts_contains_the_verified_zoom_web_client_button():
+    """U0 live probe (2026-09-25, Ashoka Educator Dialogues real join URL): the Zoom `/w/<id>`
+    landing page's actual button is 'Join from browser' (exact case-insensitive text, confirmed
+    via DOM read against the real page) — not 'join from your browser', which the task brief
+    guessed and which was already present but does not match this button. This test pins the
+    real string so a future edit can't accidentally remove it while 'cleaning up' near-duplicates."""
+    assert "join from browser" in {t.lower() for t in JOIN_TEXTS}
 
 
 if __name__ == "__main__":

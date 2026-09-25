@@ -47,6 +47,21 @@ function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
 }
 
+/** U0 (2026-09-25): which `browser`-routed platforms get sb_join.py's auto-click enabled. Pure
+ * so the selection is unit-testable without spinning up runRecord's OBS/python side effects.
+ * Verified live against a real Zoom webinar join URL (Ashoka Educator Dialogues, 2026-09-25
+ * probe): the `/w/<id>` landing page's "Join from browser" button lives in the TOP document
+ * (not an iframe) and is already in sb_join.py's JOIN_TEXTS, so autoClick genuinely advances the
+ * zoom flow one real step — clicking it navigates to `app.zoom.us/wc/<id>/join` with no human
+ * click. Everything past that (name field / Join button / "Join Audio by Computer") renders
+ * inside a same-origin iframe that sb_join.py's CLICK_JS does not yet traverse — filed as
+ * ISS-U0-1, not fixed here (unverifiable end-to-end: this probe's webinar also requires Zoom
+ * account sign-in, which blocks reaching that screen regardless — see ISS-U0-2/HUMAN_GATE in the
+ * u0-zoom-browser-join manifest). zoho keeps its original T-024b behavior unchanged. */
+export function shouldAutoClick(platform: string): boolean {
+  return platform === "zoho" || platform === "zoom";
+}
+
 /** `login [url]`: open the bot browser (no clicks, no recording) so the user can sign in once. */
 export async function runLogin(rest: string[]): Promise<void> {
   const url = rest[0] ?? "https://accounts.google.com";
@@ -98,7 +113,7 @@ export async function runRecord(rest: string[]): Promise<void> {
     joinScript: JOIN_SCRIPT,
     profileDir: BOT_PROFILE_DIR,
     recordDir: RECORD_DIR,
-    autoClick: platform === "zoho",
+    autoClick: shouldAutoClick(platform),
     onEvent: (_h, ev) => {
       if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
       collectGapEvent(gaps, ev);

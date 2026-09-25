@@ -16,7 +16,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { finalizeRecordingWith, isSilentCapture, runFinalize } from "./record-commands.js";
+import { finalizeRecordingWith, isSilentCapture, runFinalize, shouldAutoClick } from "./record-commands.js";
 import type { ObsClientLike } from "./obs-windows.js";
 
 // Same derivation record-commands.ts uses for its own REPO_ROOT (this file lives in the same
@@ -29,6 +29,18 @@ test("isSilentCapture: -50 dB (the boundary) is NOT silent, -50.1 dB IS", () => 
   assert.equal(isSilentCapture(-50), false, "AT the boundary must not be silent");
   assert.equal(isSilentCapture(-50.1), true, "strictly below the boundary must be silent");
   assert.equal(isSilentCapture(-49.9), false, "above the boundary must not be silent");
+});
+
+// --- shouldAutoClick: U0 zoom autoClick selection (pure) ----------------------------------------
+
+test("shouldAutoClick: zoom and zoho get autoClick, everything else does not", () => {
+  assert.equal(shouldAutoClick("zoho"), true, "T-024b baseline — must not regress");
+  assert.equal(shouldAutoClick("zoom"), true, "U0 — the new capability this unit adds");
+  assert.equal(shouldAutoClick("webex"), false);
+  assert.equal(shouldAutoClick("cloudonair"), false);
+  assert.equal(shouldAutoClick("meet"), false);
+  assert.equal(shouldAutoClick("teams"), false);
+  assert.equal(shouldAutoClick("unknown"), false);
 });
 
 // --- finalizeRecordingWith: silence gate + source.json registration ---------------------------
