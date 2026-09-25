@@ -201,4 +201,4 @@ capture/{obs-windows.ts,obs-windows.test.ts,fake-join-fixture.mjs,record-command
 record-commands.test.ts,record-finalize.ts}`. `obs-windows.test.ts` drives a real (but headless,
 tiny) Node child process standing in for the bot browser — never an actual Chrome/webinar page.
 
-## Status: ready-for-check
+## Status: checked-PASS — qa/verdicts/t-033-bot-tests.md (Cycle checked: 0, f0b9c91); merged to master 5262deb (ledger conflict on ISS-300 resolved by 3-way field merge); meeting-bot 123/123 + pnpm -r typecheck clean on merged tree; debt ISS-T-033-1 (D-020 git-checkout restore), ISS-T-033-2 (uncleared 120s launch() timer)

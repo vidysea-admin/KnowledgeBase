@@ -120,7 +120,7 @@ Meeting-Bot pages (apps/web) are open follow-up work, not yet started.
 | T-030 | done | Status alerts to Telegram (joined / dropped / silent / done + summary) | Umesh had to ask for status on the first live run (PASS d3cefbf; live phone delivery pending human-approved run) |
 | T-031 | open | Live audio watchdog via OBS meters (>2 min silence → alert + reconnect) | depends T-029 |
 | T-032 | done | OBS guard: Safe Mode / websocket-down detection + normal restart | force-killed OBS relaunched in Safe Mode on 2026-09-24 (PASS 0c310b2, merged 6b8caef) |
-| T-033 | open | Tests (fake OBS client failure paths, audioPath) + /checker PASS for the phase-0 bot | closes U4.2 |
+| T-033 | done | Tests (fake OBS client failure paths, audioPath) + /checker PASS for the phase-0 bot | closes U4.2 (PASS f0b9c91, merged 5262deb) |
 | T-034 | open | In-browser tab capture (extension + MediaRecorder); OBS becomes fallback | removes OBS; enables parallel meetings |
 | T-035 | open | Lean video (720p, low fps) — target <400 MB/hour | live run measured ~2.7 GB/hour |
 | T-036 | open | Discovery: Gmail + Calendar webinar-link scan incl. Zoho/OnAir/YouTube Live | extends apps/api gws-gmail.ts / gws-calendar.ts |
