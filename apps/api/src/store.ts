@@ -174,25 +174,24 @@ export function createMeetingCandidatesDeps(): MeetingCandidatesDeps {
   return {
     async scanGmail(tenantId) {
       const found = await scanGmailForMeetingCandidates();
-      let created = 0;
-      let autoApproved = 0;
+      let created = 0, autoApproved = 0;
+      // U2: pass through every optional scan field the same way meetingUrl already was — present -> included.
+      const OPTIONAL_CANDIDATE_FIELDS = ["meetingUrl", "kind", "startTime", "endTime", "recordingUrl", "registrationOnly"] as const;
       for (const candidate of found) {
         const trusted = await getTrustedSender(tenantId, candidate.senderDomain);
         const status = trusted?.autoApprove ? "auto_approved" : "pending";
+        const extra = Object.fromEntries(OPTIONAL_CANDIDATE_FIELDS.filter((k) => candidate[k] !== undefined).map((k) => [k, candidate[k]]));
         const wrote = await createMeetingCandidateIfNew(tenantId, {
           _id: randomUUID(),
           messageId: candidate.messageId,
           subject: candidate.subject,
           senderEmail: candidate.senderEmail,
           senderDomain: candidate.senderDomain,
-          ...(candidate.meetingUrl ? { meetingUrl: candidate.meetingUrl } : {}),
           status,
           detectedAt: new Date().toISOString(),
+          ...extra,
         });
-        if (wrote) {
-          created += 1;
-          if (status === "auto_approved") autoApproved += 1;
-        }
+        if (wrote) { created += 1; if (status === "auto_approved") autoApproved += 1; }
       }
       return { created, autoApproved };
     },

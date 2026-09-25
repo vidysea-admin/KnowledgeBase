@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://watch_state",
+  "title": "watch_state",
+  "description": "U2 source-watcher. One row per (tenantId, sourceType, sourceId) already seen by scripts/watch/run-watch.mjs — the dedup record that makes a watch run idempotent. `_id` is the composite key `<tenantId>:<sourceType>:<sourceId>`. A Drive recording is 'new' iff no row exists here for it AND it is not already present in the ingested-session manifest (see run-watch.mjs).",
+  "type": "object",
+  "required": ["_id", "tenantId", "sourceType", "sourceId", "status", "seenAt"],
+  "properties": {
+    "_id": { "type": "string", "minLength": 1 },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "sourceType": { "type": "string", "enum": ["drive", "gmail", "calendar"] },
+    "sourceId": { "type": "string", "minLength": 1, "description": "Drive file id, Gmail message id, or a stable calendar-row key (date+agenda slug)." },
+    "status": { "type": "string", "enum": ["seen", "ingested", "failed"] },
+    "seenAt": { "type": "string", "format": "date-time" },
+    "ingestedAt": { "type": "string", "format": "date-time" },
+    "failedAt": { "type": "string", "format": "date-time" },
+    "failureReason": { "type": "string" },
+    "sessionId": { "type": "string", "description": "The data/toc-migrated session id this row's recording was ingested into, once status is 'ingested'." }
+  },
+  "additionalProperties": true
+}

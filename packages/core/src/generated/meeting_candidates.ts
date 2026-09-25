@@ -22,5 +22,22 @@ export interface MeetingCandidates {
   status: "pending" | "approved" | "rejected" | "auto_approved";
   detectedAt: string;
   decidedAt?: string;
+  /**
+   * U2 source-watcher: whether the body's own links/text describe a recording of a session already held, or an invite to one still to come.
+   */
+  kind?: "past-recording" | "upcoming";
+  /**
+   * U2: parsed from the body's own stated date/time (e.g. 'Day & Date: ... Time: 11:00 AM - 12:00 PM IST'). Absent when the body states no time.
+   */
+  startTime?: string;
+  endTime?: string;
+  /**
+   * U2: a Drive/YouTube/Zoom-recording link found in the body, distinct from meetingUrl (the live join link).
+   */
+  recordingUrl?: string;
+  /**
+   * U2: true when the body carries only a registration link and no direct join link — stays a human decision (webinar registration forms are never auto-submitted).
+   */
+  registrationOnly?: boolean;
   [k: string]: unknown;
 }

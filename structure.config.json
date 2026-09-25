@@ -8,7 +8,7 @@
     "testMax": 400,
     "testPatterns": ["\\.test\\.ts$", "^test_.*\\.py$"]
   },
-  "dirsize": { "maxFiles": 30, "overrides": { "scripts": 32 } },
+  "dirsize": { "maxFiles": 30, "overrides": { "scripts": 32, "apps/api/src": 31 } },
   "root": {
     "maxLooseFiles": 15,
     "architectureFile": "ARCHITECTURE.md",

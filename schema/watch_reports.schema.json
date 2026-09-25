@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://watch_reports",
+  "title": "watch_reports",
+  "description": "U2 source-watcher. One row per scripts/watch/run-watch.mjs run (non-dry-run) — the Mongo mirror of the qa/watch/<date>.md digest, so a dashboard or later run can read 'what happened last time' without parsing markdown.",
+  "type": "object",
+  "required": ["_id", "tenantId", "runAt", "mode", "digestPath"],
+  "properties": {
+    "_id": { "type": "string", "minLength": 1 },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "runAt": { "type": "string", "format": "date-time" },
+    "mode": { "type": "string", "enum": ["watch", "ingest"] },
+    "digestPath": { "type": "string", "minLength": 1 },
+    "driveNewFound": { "type": "number" },
+    "driveIngested": { "type": "number" },
+    "driveFailed": { "type": "number" },
+    "gmailPastRecordingPending": { "type": "number" },
+    "upcomingCount": { "type": "number" },
+    "errors": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}
