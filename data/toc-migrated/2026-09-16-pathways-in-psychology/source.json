@@ -1,0 +1,16 @@
+{
+  "_id": "2026-09-16-pathways-in-psychology-src",
+  "tenantId": "toc",
+  "kind": "recording",
+  "captureMode": "provided",
+  "title": "Dear Psychology, What Can't You Do?",
+  "path": "raw/TOC/TOC-Materials/Recordings/September/16th Sep- Dear Psychology, What Can't You Do-.mp4",
+  "audioPath": "raw/TOC/TOC-Materials/Audio/16th-September-Pathways-in-Psychology.m4a",
+  "hash": "04ed67020735656c8e4a688aa1126f314c28434169f26c8cee487130969d15ed",
+  "consent": {
+    "given": true,
+    "recordedBy": "The Outreach Collective (TOC)",
+    "note": "recording provided by TOC via members Drive folder (raw/TOC/TOC-Materials/Recordings/September/_drive-manifest.json), not captured by Vidysea"
+  },
+  "createdAt": "2026-09-25T00:00:00.000Z"
+}

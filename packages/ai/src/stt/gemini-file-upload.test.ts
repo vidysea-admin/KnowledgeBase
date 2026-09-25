@@ -135,6 +135,22 @@ test("parseDiarizedTranscript real bug repro: an implausibly long speaker captur
   assert.match(turns[1]!.text, /It is ciao, bonjour, and kia ora\.$/);
 });
 
+test("parseDiarizedTranscript real bug repro (u1-toc-sept-catchup, 2026-09-25): a speaker capture of EXACTLY MAX_PLAUSIBLE_SPEAKER_LABEL_LENGTH (60) chars is still recovered as text, not kept as a fake speakerRef", () => {
+  // Off-by-one found live in data/toc-migrated/2026-09-16-pathways-in-psychology/turns.json
+  // (t280): the guard was `speakerRef.length > 60`, so an exactly-60-char garbled capture
+  // ("through any of the three intakes in a year. [32:41] Anuradha") slipped through as a real
+  // speakerRef. A genuine speaker label is never anywhere near 60 chars, so the boundary itself
+  // must count as implausible, not just anything past it.
+  const garbled = "through any of the three intakes in a year. [32:41] Anuradha";
+  assert.equal(garbled.length, 60, "fixture must reproduce the exact boundary length");
+  const text = `[00:00] Anuradha: intro text here. [00:05] ${garbled}: Psychology would only have one intake.`;
+  const turns = parseDiarizedTranscript(text);
+  assert.equal(turns.length, 2);
+  assert.equal(turns[1]!.speakerRef, "Anuradha", "a 60-char capture must inherit the previous turn's real speaker, not stay as a sentence fragment");
+  assert.match(turns[1]!.text, /^through any of the three intakes in a year\. \[32:41\] Anuradha: /, "the swallowed text is recovered into the turn's own content");
+  assert.match(turns[1]!.text, /Psychology would only have one intake\.$/);
+});
+
 test("parseDiarizedTranscript: a normal short speaker label right after the first marker is unaffected by the length guard", () => {
   const text = "[00:00] Dr. Priya Sharma: Welcome everyone to this session.";
   const turns = parseDiarizedTranscript(text);

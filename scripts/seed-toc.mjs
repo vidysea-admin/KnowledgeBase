@@ -24,6 +24,16 @@ import { register } from "tsx/esm/api";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA_DIR = join(ROOT, "data", "toc-migrated");
 const DRY_RUN = process.argv.includes("--dry-run");
+// --sessions <id1,id2,...> (u1-toc-sept-catchup): scope the run to exactly the named session
+// directories instead of every directory under data/toc-migrated/. seed-toc.mjs uses plain
+// insertOne (no upsert, by design — T-002), so re-running it over the WHOLE directory once
+// sessions are already live would throw on the first duplicate _id. This is what makes it safe
+// to onboard a small new batch without touching sessions already seeded. Omitted, behavior is
+// unchanged: every directory, exactly as before.
+const sessionsArgIdx = process.argv.indexOf("--sessions");
+const ONLY_SESSIONS = sessionsArgIdx >= 0 && process.argv[sessionsArgIdx + 1]
+  ? process.argv[sessionsArgIdx + 1].split(",").map((s) => s.trim()).filter(Boolean)
+  : null;
 
 register(); // let subsequent dynamic import()s of packages/db's .ts sources resolve
 
@@ -38,10 +48,18 @@ function withoutTenant(doc) {
 }
 
 function loadSessionDocs() {
-  const sessionIds = readdirSync(DATA_DIR, { withFileTypes: true })
+  let sessionIds = readdirSync(DATA_DIR, { withFileTypes: true })
     .filter((d) => d.isDirectory())
     .map((d) => d.name)
     .sort();
+
+  if (ONLY_SESSIONS) {
+    const missing = ONLY_SESSIONS.filter((id) => !sessionIds.includes(id));
+    if (missing.length > 0) {
+      throw new Error(`--sessions named ${missing.length} id(s) with no data/toc-migrated/ directory: ${missing.join(", ")}`);
+    }
+    sessionIds = ONLY_SESSIONS;
+  }
 
   const docs = { sources: [], sessions: [], turns: [], session_pages: [], claims: [] };
   for (const sessionId of sessionIds) {
@@ -93,7 +111,7 @@ async function main() {
   const { sessionIds, docs } = loadSessionDocs();
 
   if (DRY_RUN) {
-    console.log(`seed-toc --dry-run: ${sessionIds.length} session(s) under data/toc-migrated/`);
+    console.log(`seed-toc --dry-run: ${sessionIds.length} session(s)${ONLY_SESSIONS ? " (--sessions scoped)" : " under data/toc-migrated/"}`);
     console.log(`  sources:       ${docs.sources.length}`);
     console.log(`  sessions:      ${docs.sessions.length}`);
     console.log(`  turns:         ${docs.turns.length}`);

@@ -1,0 +1,16 @@
+{
+  "_id": "2026-09-21-uniaccess-japan-src",
+  "tenantId": "toc",
+  "kind": "recording",
+  "captureMode": "provided",
+  "title": "UniAccess: Japan",
+  "path": "raw/TOC/TOC-Materials/Recordings/September/video1968958572.mp4",
+  "audioPath": "raw/TOC/TOC-Materials/Audio/21st-September-UniAccess-Japan.m4a",
+  "hash": "ae73657c5dfec60f8bc374288d72ded86fb797f0bc69552f7005102c256d558d",
+  "consent": {
+    "given": true,
+    "recordedBy": "The Outreach Collective (TOC)",
+    "note": "recording provided by TOC via members Drive folder (raw/TOC/TOC-Materials/Recordings/September/_drive-manifest.json, createdTime 2026-09-22T11:33:54.275Z; original filename video1968958572.mp4, uploaded unnamed). Identity confirmed from transcript content, not filename: 'Japan' appears 160x, 'Tokyo' 22x, 'Osaka' 3x, and the session opens with the presenter saying members of TOC went to Japan and that the session covers what studying in Japan looks like -- matches raw/TOC/TOC-Materials/_csv/calendar1.csv September row '21.0, UniAccess : Japan'. Checked against every other unassigned September row (24 In-Focus, 28 Scholarships 101, 30 Neurodivergent advocacy): zero hits in the transcript for 'in focus', 'neurodivergent', 'learning disabilit', 'adhd', 'autism', 'dyslexia'. 'scholarship' appears 47x but only in the context of Japanese-university scholarships, part of the Japan session's own stated agenda (universities, programs, courses, language requirements, pathways), not the separate Scholarships 101 session. Drive createdTime 2026-09-22 (the day after the 2026-09-21 18:00 IST event) is consistent with next-day upload."
+  },
+  "createdAt": "2026-09-25T00:00:00.000Z"
+}
