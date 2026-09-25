@@ -38,7 +38,18 @@ import { ingestOneDriveFile } from "./lib/ingest-chain.mjs";
 
 register(); // let subsequent dynamic import()s of packages/*'s .ts sources resolve
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+// u2-fix1: `LKB_MAIN_TREE_ROOT` already existed as a best-effort SECOND read location
+// (`loadIngestedDriveIds`) for exactly this reason — `raw/`/`data/` are gitignored per-worktree,
+// so a fix branch built in a worktree has none of the real production files a live repair needs
+// to act on. Promoted here to a full ROOT override: when set, EVERY path this script touches
+// (Recordings/Audio/data/lock/watch digest) resolves against the real tree, not the worktree's
+// own copy — the mechanism the u2-fix1-ingest-guards manifest's live repair (ISS-304/305/306)
+// runs under, so the FIXED CODE (committed only in the worktree, per this unit's hard rule) can
+// still act on production data/raw/Mongo exactly as a normal `--ingest` run would. Unset (the
+// default), behavior is identical to before this change.
+const ROOT = process.env.LKB_MAIN_TREE_ROOT
+  ? resolve(process.env.LKB_MAIN_TREE_ROOT)
+  : resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const TENANT = "toc";
 const DRIVE_ROOT_FOLDER_ID = "1STZ-ctQbiy_zV82xbqnbeJRHhmGemewh";
 const RECORDINGS_DIR = join(ROOT, "raw", "TOC", "TOC-Materials", "Recordings");
@@ -49,6 +60,17 @@ const WATCH_DIR = join(ROOT, "qa", "watch");
 const LOCK_PATH = join(ROOT, "data", ".watch.lock");
 const DRY_RUN = process.argv.includes("--dry-run");
 const INGEST = process.argv.includes("--ingest");
+const REINGEST_IDX = process.argv.indexOf("--reingest");
+const REINGEST_DRIVE_ID = REINGEST_IDX >= 0 ? process.argv[REINGEST_IDX + 1] : null;
+// The db name every OTHER entry point in this repo defaults to (apps/api/src/index.ts,
+// scripts/webinar/sync-session.mjs, scripts/seed-toc.mjs, scripts/backfill.mjs, ...) when
+// MONGODB_DB isn't set. ISS-305's root cause: this file was the one caller in the whole repo that
+// omitted the fallback, so `connect(url, undefined)` fell through to whatever database the
+// connection STRING itself defaults to — silently a different database than "lkb", where
+// seed-toc.mjs (every other caller's same fallback) had actually written the turns. `indexSession`
+// then queried an empty collection and printed "no chunkable turns" for a session that had 27 real
+// ones, just in the other database.
+const MONGODB_DB = process.env.MONGODB_DB ?? "lkb";
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -108,6 +130,25 @@ async function main() {
   const { parseTocCalendar, upcomingTocEvents } = await import("../../packages/ingest/src/sources/toc-calendar.ts");
   const { buildDigest } = await import("./lib/digest.mjs");
 
+  // u2-fix1: parsed once, up front, and hoisted (was scoped inside step 3's own try block) so
+  // `--ingest`/`--reingest` can hand the SAME calendar rows to `deriveSessionDateAndTitle`
+  // (ISS-306) that step 3 below uses for the "upcoming" digest section — one parse, one source of
+  // truth, never a second copy that could drift from what a human reading the digest just saw.
+  let calendarEvents = [];
+  if (existsSync(CALENDAR_CSV)) {
+    try {
+      calendarEvents = parseTocCalendar(readFileSync(CALENDAR_CSV, "utf8"), CALENDAR_FIRST_YEAR);
+    } catch {
+      // step 3 below re-attempts the same read/parse and records the error properly; this
+      // pre-parse is best-effort only (id derivation degrades to its own createdTime fallback).
+    }
+  }
+
+  if (REINGEST_DRIVE_ID) {
+    await runReingest(gdrive, REINGEST_DRIVE_ID, calendarEvents, now);
+    return;
+  }
+
   const findings = {
     runAt: now.toISOString(),
     mode: DRY_RUN ? "dry-run" : INGEST ? "ingest" : "watch",
@@ -165,9 +206,12 @@ async function main() {
   // --- 3. TOC calendar CSV ---
   try {
     if (existsSync(CALENDAR_CSV)) {
-      const csvText = readFileSync(CALENDAR_CSV, "utf8");
-      const events = parseTocCalendar(csvText, CALENDAR_FIRST_YEAR);
-      const upcoming = upcomingTocEvents(events, now, 14);
+      // Re-derived only if the pre-parse above (now hoisted `calendarEvents`) came up empty —
+      // normally this is just reusing that same array, not a second parse.
+      if (calendarEvents.length === 0) {
+        calendarEvents = parseTocCalendar(readFileSync(CALENDAR_CSV, "utf8"), CALENDAR_FIRST_YEAR);
+      }
+      const upcoming = upcomingTocEvents(calendarEvents, now, 14);
       for (const e of upcoming) {
         findings.upcoming.push({ date: e.date, agenda: e.agenda, source: "toc-calendar", membersZoom: (e.mode || "").toLowerCase() === "virtual" && (e.location || "").toLowerCase() === "zoom" });
       }
@@ -192,7 +236,9 @@ async function main() {
         const monthName = MONTHS[now.getUTCMonth()];
         for (const file of newDriveFiles) {
           try {
-            const sessionId = await ingestOneDriveFile(gdrive, runGws, file, monthName, { ROOT, RECORDINGS_DIR, AUDIO_DIR, TENANT });
+            const sessionId = await ingestOneDriveFile(gdrive, runGws, file, monthName, {
+              ROOT, RECORDINGS_DIR, AUDIO_DIR, TENANT, calendarEvents, programYearFirstYear: CALENDAR_FIRST_YEAR,
+            });
             findings.driveIngested.push({ id: file.id, name: file.name, sessionId });
             await markDriveState(file.id, "ingested", { sessionId });
           } catch (err) {
@@ -239,7 +285,7 @@ async function main() {
 async function loadSeenDriveIds() {
   const { connect } = await import("../../packages/db/src/client.js");
   const { listSeenIds } = await import("../../packages/db/src/collections/watch-state.js");
-  await connect(process.env.MONGODB_URL, process.env.MONGODB_DB);
+  await connect(process.env.MONGODB_URL, MONGODB_DB);
   return listSeenIds(TENANT, "drive");
 }
 
@@ -254,6 +300,125 @@ async function markDriveState(sourceId, status, extra) {
     ...(status === "failed" ? { failedAt: new Date().toISOString() } : {}),
     ...extra,
   });
+}
+
+/**
+ * `--reingest <driveFileId>` — the u2-fix1 live repair for ISS-304/305/306. NOT the normal
+ * `--ingest` diff path (that path's own `watch_state`/manifest exclusion rules would just skip a
+ * file already marked "ingested" or already present in U1's drive-manifest — by design, so a
+ * daily watch run never re-does old work). This is a deliberate, targeted, idempotent re-run of
+ * ONE already-(mis)ingested file: delete its bad rows under the tenant `toc` (scoped to the exact
+ * old sessionId only — never a wider tenant purge), remove its `data/toc-migrated/<oldId>` dir,
+ * then re-run the SAME `ingestOneDriveFile` chain a normal ingest would, now producing the
+ * corrected id/coverage/chunks.
+ *
+ * Idempotent: if the CORRECT session (by the id this run would derive right now) already exists
+ * on disk with real chunks in Mongo, this returns `action: "already-repaired"` and touches
+ * NOTHING — no delete, no download, no re-transcription, no Gemini spend. A second run against
+ * the same driveFileId after a successful repair is a no-op for exactly this reason.
+ */
+async function runReingest(gdrive, driveFileId, calendarEvents, now) {
+  const { connect } = await import("../../packages/db/src/client.js");
+  const { findWatchState } = await import("../../packages/db/src/collections/watch-state.js");
+  const db = await connect(process.env.MONGODB_URL, MONGODB_DB);
+  console.log(`--reingest ${driveFileId}: connected to Mongo db "${db.databaseName}"`);
+
+  const monthFolder = await findCurrentMonthFolder(gdrive, now);
+  if (!monthFolder) throw new Error(`--reingest: no Drive subfolder found for ${MONTHS[now.getUTCMonth()]}`);
+  const files = await gdrive.listDriveFiles(monthFolder.id, { run: runGws });
+  const file = files.find((f) => f.id === driveFileId);
+  if (!file) throw new Error(`--reingest: Drive file ${driveFileId} not found in ${MONTHS[now.getUTCMonth()]}'s folder`);
+  console.log(`--reingest: found "${file.name}" (${driveFileId})`);
+
+  const { deriveSessionDateAndTitle, slugSessionId } = await import("./lib/session-skeleton.mjs");
+  const { date, title } = deriveSessionDateAndTitle({
+    rawName: file.name, createdTime: file.createdTime, calendarEvents, programYearFirstYear: CALENDAR_FIRST_YEAR,
+  });
+  const correctSessionId = slugSessionId(date, title);
+  console.log(`--reingest: corrected id would be "${correctSessionId}" (date=${date}, title="${title}")`);
+
+  const newDir = join(ROOT, "data", "toc-migrated", correctSessionId);
+  if (existsSync(join(newDir, "turns.json"))) {
+    const turnCount = await db.collection("turns").countDocuments({ tenantId: TENANT, sessionId: correctSessionId });
+    const chunkCount = await db.collection("chunks").countDocuments({ tenantId: TENANT, sourceRef: correctSessionId });
+    if (turnCount > 0 && chunkCount > 0) {
+      console.log(`--reingest: "${correctSessionId}" already exists with ${turnCount} turns and ${chunkCount} chunks — nothing to do (idempotent no-op).`);
+      return;
+    }
+  }
+
+  const priorRow = await findWatchState(TENANT, "drive", driveFileId);
+  console.log(`--reingest: prior watch_state row (in db "${db.databaseName}"): ${priorRow ? JSON.stringify({ status: priorRow.status, sessionId: priorRow.sessionId }) : "none"}`);
+  // Prefer the authoritative Mongo link (sources._id -> sessions.sourceId) over watch_state's own
+  // sessionId: this unit's own first live run hit ISS-305's SAME root cause a second way — the
+  // watch_state row it wrote landed in whatever db `MONGODB_DB` fell through to at the time (not
+  // necessarily "lkb", where the real ingested rows live), so a repair that only trusted
+  // watch_state could find no row at all and skip the delete phase despite real bad data sitting
+  // in "lkb". A session's `sourceId` pointing back at this exact Drive file's source doc is true
+  // regardless of which database `watch_state` itself ended up in.
+  const oldSource = await db.collection("sources").findOne({ tenantId: TENANT, _id: `gdrive-${driveFileId}` });
+  const oldSessionFromMongo = oldSource
+    ? (await db.collection("sessions").findOne({ tenantId: TENANT, sourceId: oldSource._id }))?._id ?? null
+    : null;
+  const oldSessionId = oldSessionFromMongo ?? priorRow?.sessionId ?? null;
+  console.log(`--reingest: old sessionId resolved to "${oldSessionId ?? "(none)"}" (via ${oldSessionFromMongo ? "sources->sessions link" : priorRow?.sessionId ? "watch_state fallback" : "neither — nothing found"})`);
+
+  const before = {};
+  const after = {};
+  if (oldSessionId) {
+    const filters = {
+      sources: { tenantId: TENANT, _id: `gdrive-${driveFileId}` },
+      sessions: { tenantId: TENANT, _id: oldSessionId },
+      turns: { tenantId: TENANT, sessionId: oldSessionId },
+      session_pages: { tenantId: TENANT, sessionId: oldSessionId },
+      claims: { tenantId: TENANT, "evidence.sessionId": oldSessionId },
+      chunks: { tenantId: TENANT, sourceRef: oldSessionId },
+    };
+    for (const [coll, filter] of Object.entries(filters)) before[coll] = await db.collection(coll).countDocuments(filter);
+    // tree_index has no per-session row (one root doc per tenant, built FROM all sessions) —
+    // there is nothing scoped to this sessionId to delete here; `indexSession`'s own
+    // `regenerate()` call, reached via the re-ingest below, folds the corrected session back into
+    // it. Reported for visibility only, never targeted for deletion.
+    before.tree_index = await db.collection("tree_index").countDocuments({ tenantId: TENANT });
+
+    console.log(`--reingest: before-delete counts for old sessionId "${oldSessionId}":`, before);
+    if (oldSessionId !== correctSessionId) {
+      for (const [coll, filter] of Object.entries(filters)) {
+        const res = await db.collection(coll).deleteMany(filter);
+        after[coll] = before[coll] - res.deletedCount;
+      }
+      after.tree_index = before.tree_index;
+      const oldDir = join(ROOT, "data", "toc-migrated", oldSessionId);
+      if (existsSync(oldDir)) {
+        const { rmSync } = await import("node:fs");
+        rmSync(oldDir, { recursive: true, force: true });
+        console.log(`--reingest: removed ${oldDir}`);
+      }
+    } else {
+      for (const coll of Object.keys(filters)) after[coll] = before[coll];
+    }
+    console.log(`--reingest: after-delete counts:`, after);
+  } else {
+    console.log("--reingest: no prior watch_state row/sessionId — nothing to delete, proceeding straight to re-ingest.");
+  }
+
+  // No intermediate "pending" marker here: `watch_state.schema.json`'s `status` enum is
+  // `["seen", "ingested", "failed"]` — a real, deliberate contract other readers (the diff,
+  // `listSeenIds`) rely on, and this repair is not the place to widen it for a transient state a
+  // single synchronous call doesn't need. The row is only touched again once the outcome is known.
+  const monthName = MONTHS[now.getUTCMonth()];
+  try {
+    const sessionId = await ingestOneDriveFile(gdrive, runGws, file, monthName, {
+      ROOT, RECORDINGS_DIR, AUDIO_DIR, TENANT, calendarEvents, programYearFirstYear: CALENDAR_FIRST_YEAR,
+    });
+    await markDriveState(driveFileId, "ingested", { sessionId, repairedFrom: oldSessionId });
+    console.log(`--reingest: DONE. driveFileId=${driveFileId} oldSessionId=${oldSessionId ?? "(none)"} newSessionId=${sessionId}`);
+    console.log(`--reingest: before=${JSON.stringify(before)} after=${JSON.stringify(after)}`);
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    await markDriveState(driveFileId, "failed", { failureReason: reason });
+    throw err;
+  }
 }
 
 async function recordReport(findings, digestPath, errors) {

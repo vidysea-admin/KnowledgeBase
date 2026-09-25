@@ -21,6 +21,18 @@ export async function listSeenIds(tenantId: string, sourceType: WatchState["sour
   return new Set(rows.map((r) => r.sourceId));
 }
 
+/** The row for one (tenantId, sourceType, sourceId), or `null`. Read-only counterpart to
+ * `markWatchState` — u2-fix1's `--reingest` needs to recover the `sessionId` a PRIOR ingest wrote
+ * for a Drive file (so it knows exactly what to delete), not just the boolean-only membership
+ * `listSeenIds` gives a diff. */
+export async function findWatchState(
+  tenantId: string,
+  sourceType: WatchState["sourceType"],
+  sourceId: string,
+): Promise<WatchState | null> {
+  return watchState(tenantId).findOne({ _id: watchStateId(tenantId, sourceType, sourceId) });
+}
+
 /** Upserts one row by its composite id — safe to call twice with the same (tenantId,
  * sourceType, sourceId): the second call just refreshes status/timestamps, never duplicates. */
 export async function markWatchState(
