@@ -5,3 +5,4 @@
 **Options:** (a) Umesh closes unused VS Code windows / Chrome / WSL / idle Claude sessions → maker dispatches T-031 automatically on the next check; (b) say "T-031 anyway" → maker overrides the ceiling (risk: Win32 error 1455 / OOM seen at 02:40); (c) say "ruk jao" → /maker pause.
 **Answer format:** free the RAM (no reply needed), or reply "T-031 anyway" / "ruk jao".
 **Blocks:** T-031 (lane D:/KnowledgeBase-lanes/t-031-audio-watchdog ready off 986fcd8); u2-4 fix cycle 2 (qa/.paused.u2-4-phase3-precision-regate); ISS-104 (behind u2-4).
+Answered: 2026-09-25T06:45:16+05:30 — (b) T-031 anyway — Umesh in chat: 'bhai itne mai run ho jayegaa' (free RAM 2.7 GB); ceiling overridden for ONE builder, u2-4 eval (>=8 GB) stays paused
