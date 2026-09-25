@@ -20,6 +20,12 @@ export interface MeetingCandidate {
   status: "pending" | "approved" | "rejected" | "auto_approved";
   detectedAt: string;
   decidedAt?: string;
+  // U2 source-watcher — additive fields from the extended Gmail scan (gws-gmail.ts).
+  kind?: "past-recording" | "upcoming";
+  startTime?: string;
+  endTime?: string;
+  recordingUrl?: string;
+  registrationOnly?: boolean;
 }
 
 export interface MeetingCandidatesDeps {

@@ -16,7 +16,12 @@
     "eventDate": { "type": "string", "format": "date-time" },
     "status": { "type": "string", "enum": ["pending", "approved", "rejected", "auto_approved"] },
     "detectedAt": { "type": "string", "format": "date-time" },
-    "decidedAt": { "type": "string", "format": "date-time" }
+    "decidedAt": { "type": "string", "format": "date-time" },
+    "kind": { "type": "string", "enum": ["past-recording", "upcoming"], "description": "U2 source-watcher: whether the body's own links/text describe a recording of a session already held, or an invite to one still to come." },
+    "startTime": { "type": "string", "format": "date-time", "description": "U2: parsed from the body's own stated date/time (e.g. 'Day & Date: ... Time: 11:00 AM - 12:00 PM IST'). Absent when the body states no time." },
+    "endTime": { "type": "string", "format": "date-time" },
+    "recordingUrl": { "type": "string", "description": "U2: a Drive/YouTube/Zoom-recording link found in the body, distinct from meetingUrl (the live join link)." },
+    "registrationOnly": { "type": "boolean", "description": "U2: true when the body carries only a registration link and no direct join link — stays a human decision (webinar registration forms are never auto-submitted)." }
   },
   "additionalProperties": true
 }

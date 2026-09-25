@@ -85,6 +85,8 @@ a client of that API — with the long-range goal of beating top human counsello
 | tree_index | tenantId | no |
 | trusted_senders | _id, tenantId, senderDomain, approvalCount, autoApprove | no |
 | turns | _id, tenantId, sessionId, speakerRef, tStart, tEnd, text | no |
+| watch_reports | _id, tenantId, runAt, mode, digestPath | no |
+| watch_state | _id, tenantId, sourceType, sourceId, status, seenAt | no |
 | watched_sources | _id, tenantId, url, reputationTier, checkIntervalHours, active | no |
 
 ## Recent feature events (last 20)

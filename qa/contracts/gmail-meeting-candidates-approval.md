@@ -37,9 +37,11 @@ Same `gws` CLI as the calendar unit — already OAuth'd as `umeshsugara@vidysea.
    `AUTO_APPROVE_THRESHOLD = 3`, never flips it back off). Both exported from `@lkb/db`.
 5. **`apps/api/src/gws-gmail.ts`** — `scanGmailForMeetingCandidates()`: a real, server-side
    Gmail search (`q: "newer_than:14d (meet.google.com OR zoom.us OR teams.microsoft.com)"`), then
-   `format=metadata` fetch per match (Subject/From only, never full body). `meetingUrl` extracted
-   ONLY when a literal URL substring matches one of the three hosts in the message snippet — never
-   fabricated when absent. Never throws (same failure contract as `gws-calendar.ts`).
+   ~~`format=metadata` fetch per match (Subject/From only, never full body)~~ **superseded 2026-09-25
+   by Amendment 1 below — `format=full`, body read.** `meetingUrl` extracted ONLY when a literal URL
+   substring matches one of the three hosts ~~in the message snippet~~ **in the decoded body text
+   (falling back to the snippet) — see Amendment 1** — never fabricated when absent. Never throws
+   (same failure contract as `gws-calendar.ts`).
 6. **`apps/api/src/routes/meeting-candidates.ts`** — `POST /gmail/scan`, `GET
    /meeting-candidates`, `POST /meeting-candidates/:id/approve`, `POST
    /meeting-candidates/:id/reject`, all `requireScope("gmail")`. `scanGmail`'s real deps
@@ -156,3 +158,23 @@ $ python -c "... db.trusted_senders.find_one({'tenantId':'toc','senderDomain':'v
    have `gws` authenticated the same way — if not reachable, this criterion may instead be
    verified by reading the code path + the maker's real evidence above, same disclosed-limitation
    allowance as the calendar unit).
+
+## Amendment log
+
+- **2026-09-25 · routine (this contract's own preamble: "/checker adopts or amends on first
+  check") · Amend [C5]: `format=metadata` → `format=full`; `meetingUrl` now matched against the
+  decoded body first, snippet as fallback · Why:** u2-source-watcher (T-028 lineage) needed a
+  session's stated start/end time and recording/registration links, which real invite/recap mail
+  states only in the body ("Day & Date: ... Time: ..."), never in the Subject or the short
+  snippet metadata originally fetched. This was Umesh's own explicit direction in the authorizing
+  plan (`C:/Users/Lenovo/.claude/plans/what-is-the-update-vivid-donut.md` §U2: "Read the body,
+  not just the snippet"), not a maker-chosen widening — flagged here because the original text
+  wrote the metadata-only restriction as a data-minimization-shaped criterion ("Subject/From
+  only, never full body") and a widening of that shape is exactly the class this contract's
+  criticality gate reserves for human sign-off; the plan text is read as that sign-off, made
+  explicit in this entry rather than left as a silent divergence between contract and code.
+  Scope stays the same real Gmail account (`umeshsugara@vidysea.com`, `gmail.readonly`, already
+  granted) reading Umesh's own inbox for Umesh's own digest — no new account, no external
+  transmission, no student/applicant data. Verified by u2-source-watcher's checker unit check
+  (`qa/verdicts/u2-source-watcher.md`, cycle 0): existing callers/tests unaffected (195/195
+  `@lkb/api`, up from 193), `meetingUrl` extraction still never fabricates.
