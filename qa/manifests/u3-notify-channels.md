@@ -212,4 +212,4 @@ Not UI-touching — no browser-rendered surface changed. This unit touches only
 `packages/meeting-bot/src/capture/*.ts` (library code, no UI), `packages/meeting-bot/src/index.ts`
 (package exports), and `.env.example` (documentation).
 
-## Status: ready-for-check
+## Status: checked-PASS — qa/verdicts/u3-notify-channels.md (Cycle checked: 0, a21bc16); merged to master; meeting-bot 177/177 on merged tree (typecheck re-run OOMed on merged tree under memory pressure — checker ran pnpm -r typecheck clean in-lane); debt ISS-U3-001/002 low
