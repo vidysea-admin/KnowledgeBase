@@ -344,4 +344,4 @@ Not UI-touching — no surface changed. Every file this unit touched is `package
 `docs/SNAPSHOT.md`. No `apps/web`, no `*.tsx/jsx/html/css`, no `routes/`/`pages/`/`components/`
 path was created or modified.
 
-## Status: ready-for-check
+## Status: checked-PASS — qa/verdicts/u2-source-watcher.md (Cycle checked: 0, 0b8c3cf); merged to master; migration 20260925090000-source-watcher applied 2026-09-25T07:39Z; first live --ingest started (24 Sep InFocus) to retire the UNVERIFIED ingest-chain debt; debt ISS-U2-1 (append_decision.ps1 UTF-8 mojibake in D-031)
