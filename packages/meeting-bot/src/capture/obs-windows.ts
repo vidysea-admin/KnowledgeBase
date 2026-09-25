@@ -1,6 +1,5 @@
 /**
- * packages/meeting-bot/src/capture/obs-windows.ts — the first REAL deps for
- * joiners/browser-joiner.ts (T-024b / U4.2, 2026-09-24). Windows-only.
+ * packages/meeting-bot/src/capture/obs-windows.ts — the first REAL deps for joiners/browser-joiner.ts (T-024b / U4.2, 2026-09-24). Windows-only.
  *
  * Join  = spawn py/sb_join.py: a headed SeleniumBase-UC Chrome with its own persistent profile
  *         (data/bot-profile/, logged in once by the user → the bot attends "as him"), which pins
@@ -55,7 +54,7 @@ export interface ObsBrowserConfig {
 }
 
 const SCENE = "LKB Bot";
-const AUDIO_INPUT = "LKB Bot Audio";
+export const AUDIO_INPUT = "LKB Bot Audio"; // T-031: also the InputVolumeMeters filter name
 const VIDEO_INPUT = "LKB Bot Window";
 const WINDOW_PRIORITY_TITLE = 1; // OBS window-helpers: CLASS=0, TITLE=1 ("title must match"), EXE=2
 
@@ -234,7 +233,8 @@ export function createObsBrowserDeps(cfg: ObsBrowserConfig, overrides: ObsBrowse
     const stopFile = path.join(cfg.recordDir, `.stop-${handle}`);
     rmSync(stopFile, { force: true });
 
-    const pyArgs = [cfg.joinScript, url, "--profile", cfg.profileDir, "--title", title, "--stop-file", stopFile];
+    // T-031: --reload-file mirrors --stop-file — the audio watchdog's forced-reload channel.
+    const pyArgs = [cfg.joinScript, url, "--profile", cfg.profileDir, "--title", title, "--stop-file", stopFile, "--reload-file", path.join(cfg.recordDir, `.reload-${handle}`)];
     if (!cfg.autoClick) pyArgs.push("--no-click");
     const child = spawn(cfg.python, pyArgs, { stdio: ["ignore", "pipe", "pipe"], windowsHide: false });
     const exited = new Promise<number | null>((r) => child.on("exit", (code) => r(code)));
@@ -321,6 +321,8 @@ export function createObsBrowserDeps(cfg: ObsBrowserConfig, overrides: ObsBrowse
     deps,
     outputPath: (handle: string) => runs.get(handle)?.outputPath,
     browserExited: (handle: string) => runs.get(handle)?.exited,
+    // T-031: writes the reload-file sentinel this handle's pyArgs passed above.
+    triggerReload: (handle: string) => runs.has(handle) && writeFileSync(path.join(cfg.recordDir, `.reload-${handle}`), "reload"),
     disconnect: async () => {
       if (connected) await obs.disconnect();
     },

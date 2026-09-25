@@ -155,6 +155,15 @@ class ReconnectState:
         return gap
 
 
+def should_force_reload(reload_file):
+    """T-031: pure check for the audio-watchdog's forced-reload sentinel (docs/meeting-bot-
+    roadmap.md T-031) — a file the Node controller drops when the live OBS meter has read silence
+    past its own threshold, independent of this file's own T-029 DOM-banner detection (a muted-
+    but-connected tab shows no banner at all). main() removes the file itself right after acting,
+    so this has no side effect and is trivially testable with a real temp file, no browser."""
+    return bool(reload_file) and os.path.exists(reload_file)
+
+
 def kill_orphans(profile):
     """A previous bot run that was killed leaves its Chrome holding the profile lock, and the
     next launch then hangs silently. Kill only processes whose command line names this profile."""
@@ -191,6 +200,8 @@ def main():
     ap.add_argument("--profile", required=True)
     ap.add_argument("--title", required=True)
     ap.add_argument("--stop-file", required=True)
+    ap.add_argument("--reload-file", default=None,
+                     help="T-031: sentinel; if present, force an immediate reload/rejoin then delete it")
     ap.add_argument("--no-click", action="store_true", help="never auto-click (login/dry-run mode)")
     a = ap.parse_args()
 
@@ -247,6 +258,22 @@ def main():
                 ended = next((p for p in END_PHRASES if p in body), None)
                 if ended:
                     emit("ended", reason=ended)
+
+                # T-031: forced reload from the Node-side audio watchdog — independent of T-029's
+                # own DOM-banner detection below (silence has no banner). No gap is recorded here:
+                # silence is not necessarily a connectivity gap (the whole "muted tab" case).
+                if should_force_reload(a.reload_file):
+                    try:
+                        os.remove(a.reload_file)
+                    except OSError:
+                        pass
+                    emit("watchdog-reload", reason="audio-silence")
+                    try:
+                        sb.uc_open_with_reconnect(a.url, 4)
+                        clicks, extra_click_until = apply_reload(clicks, time.time())
+                        emit("watchdog-rejoined")
+                    except Exception as e:
+                        emit("warn", error=f"watchdog reload failed: {str(e)[:200]}")
 
                 # T-029 auto-reconnect: detect a "trying to reconnect" banner or a hard net-error
                 # page, and if it persists past the threshold, reload and rejoin. Recording a
