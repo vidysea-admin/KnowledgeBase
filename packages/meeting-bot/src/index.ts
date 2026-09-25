@@ -20,3 +20,17 @@ export * from "./calendar/auto-join.js";
 // filter (no real Playwright wiring / UI yet).
 export * from "./profile/user-profile.js";
 export * from "./live-monitor.js";
+
+// U3 (plan §U3) — configurable multi-channel notifications: the generic channel/fan-out/digest
+// primitives, the Telegram + WhatsApp(stub) channel implementations, and the env/settings-driven
+// assembly (`createConfiguredNotifier` / `notifyDigest`). Re-exported here (this package's public
+// entry point, package.json `main`) so a consumer outside this package — e.g. U2's future
+// scripts/watch/run-watch.mjs, once it lists `@lkb/meeting-bot` as a workspace dependency — can
+// `import { notifyDigest } from "@lkb/meeting-bot"` without reaching into src/capture/ directly.
+// telegram-alerts.ts's own T-030 exports (createTelegramNotifier etc.) are intentionally NOT
+// re-exported here (they never were, pre-U3) — record-commands.ts/record-finalize.ts import them
+// by relative path within this package, same as before.
+export * from "./capture/notify-channels.js";
+export * from "./capture/telegram-channel.js";
+export * from "./capture/whatsapp-channel.js";
+export * from "./capture/configured-notifier.js";
