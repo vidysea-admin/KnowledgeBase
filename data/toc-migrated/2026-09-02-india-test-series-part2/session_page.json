@@ -1,0 +1,21 @@
+{
+  "_id": "2026-09-02-india-test-series-part2-page",
+  "tenantId": "toc",
+  "sessionId": "2026-09-02-india-test-series-part2",
+  "summary": "India Test Series – Part II: Navigating India's Top Entrance Exams — The Outreach Collective (TOC), 2026-09-02, transcribed via Gemini audio diarization (scripts/transcribe-long-session.mjs). 150 transcript turns across 4 distinct speaker label(s) (spk:0, spk:1, spk:2, spk:3), spanning ~73 min. No hand-written claims/insights this batch — real summary + evidence-checked claims come from the --index step (indexSession), same precedent as the 2026-09-24 webinar session.",
+  "keyInsights": [],
+  "evidence": [
+    {
+      "turnId": "2026-09-02-india-test-series-part2-t001",
+      "sessionId": "2026-09-02-india-test-series-part2"
+    },
+    {
+      "turnId": "2026-09-02-india-test-series-part2-t002",
+      "sessionId": "2026-09-02-india-test-series-part2"
+    },
+    {
+      "turnId": "2026-09-02-india-test-series-part2-t003",
+      "sessionId": "2026-09-02-india-test-series-part2"
+    }
+  ]
+}

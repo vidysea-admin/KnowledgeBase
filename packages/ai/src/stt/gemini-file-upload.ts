@@ -148,7 +148,7 @@ export function parseDiarizedTranscript(text: string): Turn[] {
     let turnText = text.slice(contentStart, contentEnd).trim();
     let speakerRef = speaker!.trim();
 
-    if (speakerRef.length > MAX_PLAUSIBLE_SPEAKER_LABEL_LENGTH) {
+    if (speakerRef.length >= MAX_PLAUSIBLE_SPEAKER_LABEL_LENGTH) {
       turnText = `${speakerRef}: ${turnText}`.trim();
       speakerRef = lastPlausibleSpeaker;
     } else {

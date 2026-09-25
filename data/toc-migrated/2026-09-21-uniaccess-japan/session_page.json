@@ -1,0 +1,21 @@
+{
+  "_id": "2026-09-21-uniaccess-japan-page",
+  "tenantId": "toc",
+  "sessionId": "2026-09-21-uniaccess-japan",
+  "summary": "UniAccess: Japan — The Outreach Collective (TOC), 2026-09-21, transcribed via Gemini audio diarization (scripts/transcribe-long-session.mjs). 553 transcript turns across 8 distinct speaker label(s) (spk:0, spk:1, Muskan, Kandarp, spk:2, spk:3, …), spanning ~72 min. No hand-written claims/insights this batch — real summary + evidence-checked claims come from the --index step (indexSession), same precedent as the 2026-09-24 webinar session.",
+  "keyInsights": [],
+  "evidence": [
+    {
+      "turnId": "2026-09-21-uniaccess-japan-t001",
+      "sessionId": "2026-09-21-uniaccess-japan"
+    },
+    {
+      "turnId": "2026-09-21-uniaccess-japan-t002",
+      "sessionId": "2026-09-21-uniaccess-japan"
+    },
+    {
+      "turnId": "2026-09-21-uniaccess-japan-t003",
+      "sessionId": "2026-09-21-uniaccess-japan"
+    }
+  ]
+}

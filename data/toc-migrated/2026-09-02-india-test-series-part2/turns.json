@@ -1,0 +1,1352 @@
+[
+  {
+    "_id": "2026-09-02-india-test-series-part2-t001",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 0,
+    "tEnd": 13,
+    "text": "Yeah. Hi, Rashi. How are you? I'm good. Lovely to see you here, bringing in the synergy. Thank you so much. Hi, Nicole. Good evening. Hi, guys."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t002",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 13,
+    "tEnd": 14,
+    "text": "Good evening."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t003",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 14,
+    "tEnd": 15,
+    "text": "Hello. Good evening."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t004",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 15,
+    "tEnd": 33,
+    "text": "Good evening, everybody. Hi, Payal. Hey, Bhakti. How's the weather there? Lovely, lovely. Hi,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t005",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 33,
+    "tEnd": 46,
+    "text": "Anadh. Good evening. Okay. I think Payal has also joined in. Hi, Poonam. Hi, Payal. Hi, everyone. Hi, Rashi. Hi, everyone."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t006",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 46,
+    "tEnd": 57,
+    "text": "Good evening. Good evening. Lovely to see you all. I think Ritesh, we'll wait another minute, and then"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t007",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 57,
+    "tEnd": 79,
+    "text": "we can kick off. Yeah. Yeah. I think, I think, I think let's wait for a couple of minutes maybe. Absolutely. Absolutely. So, before we get started, how frequently do you guys get to meet each other, Rashi? We get to meet each other for every offline event,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t008",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 79,
+    "tEnd": 94,
+    "text": "citywise, and the ones where everyone is coming together. So, recently, I think, pretty much, uh, 80% of us were there in the same room for the evening soiree. And, Which was, which was, incidentally, sort of supported by Sparkle."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t009",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 94,
+    "tEnd": 110,
+    "text": "Yes. Yes. You had lit up the evening, for sure. Ritesh, which is why, which is why I keep telling you you're missing so much by not coming to Bombay. This was what you missed. I, I know. I know. So, I think, I think, I think let's do another one, sometime soon, Sonia. I am always ready to party."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t010",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 110,
+    "tEnd": 127,
+    "text": "Party with a cause. Sonia, party with a cause. Absolutely. And with the right people. No. That's, that's most important. Definitely, definitely. Looking forward to another one of those, for sure. Right."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t011",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 127,
+    "tEnd": 146,
+    "text": "So, okay, so, Ritesh, if you're ready. Oh, I am. Absol- So, we'll kick it off. So, good evening, everybody. Welcome to today's session, India Test Series Part 2. And this session is hosted by TOC, as most of you know. TOC"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t012",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 146,
+    "tEnd": 162,
+    "text": "is uh Global South's leading educational professional development society as such and definitely has a lot of like minded people coming together, spending their evenings enjoying the learning and development"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t013",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 162,
+    "tEnd": 178,
+    "text": "and networking with a cause. With lots of learning opportunities available to all our members and a growing community each year, we're happy to welcome you all to today's learning and development session. And today's session is a very interesting one, definitely,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t014",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 178,
+    "tEnd": 197,
+    "text": "because uh today's session is going to be about, of course, navigating India's top entrance exams. Uh but the ones that we don't talk about that often, and the ones that, of course, are changing with the times, and we, as counselors, as university friends,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t015",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 197,
+    "tEnd": 213,
+    "text": "need a lot more clarity on. So, my name is Dr. Rashi Ahuja Dixit. I serve in the leadership representing the counselor point of view uh in the TOC for 26-27. And I'm joined by Ritesh Hemrajani, who is the CEO of Sparkle."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t016",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 213,
+    "tEnd": 231,
+    "text": "He has spent over 30 years, or sorry, exact 30 years this year, Ritesh, yes? That's right. in the field of supplementary education, and he brings with him a wealth of understanding. And he is our Nostradamus for the day because he has not just seen these exams birth in the Indian ecosystem,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t017",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 231,
+    "tEnd": 250,
+    "text": "and he has seen quite a few of them change their face and form. So, he is here to share his insight on the three exams that we are taking up today. And with that, I kickstart the session. So, first, let us have a quick show"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t018",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 250,
+    "tEnd": 270,
+    "text": "of hands. Just raise your hands, who has students who are already prepping for either CLAT or CUET or IPMAT. Just let's have a quick show of hands to see uh who are the stakeholders here. So, if you have a student at home, of course, or in your organization or in school who's preparing"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t019",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 270,
+    "tEnd": 289,
+    "text": "for either of these exams, that is CLAT, CUET, or IPMAT, lovely. So, I can see that quite a few interested parties are here joining the session today, for sure. So, let us understand that how these exams are changing, and why these exams have been picked, because,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t020",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 289,
+    "tEnd": 307,
+    "text": "as we know, CLAT is, of course, one of the exams that is taking place uh for the students right bang in the middle of Class 12, December, first uh Sunday of December. And other than that, if they are applying to law, liberal arts, or management,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t021",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 307,
+    "tEnd": 330,
+    "text": "each of these universities is taking either the IPMAT or the CUET or an exam that can be clubbed under a similar umbrella. So now, what we need to understand is that when most families are choosing one of these three exams, they, at first, are flying blind. They do not have the right amount of information before they're choosing these"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t022",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 330,
+    "tEnd": 356,
+    "text": "exams. Hi, Shivansh. And, when Hi. How are things? Going on, going on. Okay. Uh, Shivansh, a couple of things, uh. I do not know. All your classes have low ratings. Sonia, if we could. On the basis of, uh. On the basis of, uh. All right, okay. So, we continue."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t023",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 356,
+    "tEnd": 379,
+    "text": "Right. So, as I was saying that this, of course, is one of those sessions where we get to understand that the cutoffs are going to keep rising for these exams as the years progress. And we also have to ensure that our students and our counselors are not taking these decisions for the stakeholders"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t024",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 379,
+    "tEnd": 399,
+    "text": "with the confusion that currently exists around this ecosystem. So, over the next few slides, we'll try to break down these exams for you and hand it over to Ritesh to share the trends and the understanding of the numbers. So, with that, we start with our first exam. I know we have a lot of seasoned counselors sitting amongst us, but just quickly going"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t025",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 399,
+    "tEnd": 420,
+    "text": "through the basics of each of these exams, and we'll make sure that we keep it interesting. So, CLAT is still an offline exam. It's a pen and paper exam. It's a, you know, one of those exams that has, uh, you know, going to challenge the students that are going to take on the preparation for this 2 hours,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t026",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 420,
+    "tEnd": 440,
+    "text": "120 questions, 120 marks. Uh, huge weightage to GK and current affairs, 25%, legal reasoning, another 25%. They make up half of the paper, ensuring that a student that's well read with the newspaper is able to avoid the last minute cramming to get the marks required for this. Plus 1 in this exam"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t027",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 440,
+    "tEnd": 461,
+    "text": "for the right answer, minus 1 upon 4, that's minus 0.25. Uh, so, leaving out the smart guessing, leaving the question blank, between these two, the decision always should be leaving the question blank for the student. Uh, there is no upper age limit, and it is unusual compared to the IPMAT. And one thing worth flagging"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t028",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 461,
+    "tEnd": 485,
+    "text": "in this is that students can keep taking this exam beyond 2 or 3 years also to get to a better university, which is what many of the students also do. 26 National Law Universities participate in this exam and 60 plus affiliated law colleges in India also take the CLAT score to get get you a seat into their program."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t029",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 485,
+    "tEnd": 510,
+    "text": "Uh, the registrations uh, of course, start August 3rd, and by October end, they will close the registrations for each of the exam cycle. This year, the exam is going to be held on December 6, 2026. So, for your students, the window is open, of course, for this exam. The next exam on the table today is CUET. Now, CUET is 100%"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t030",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 510,
+    "tEnd": 531,
+    "text": "online, computer based test, a CBT. And it is a it is a useful uh exam for the students if they are applying to many of the liberal arts courses and the uh very specifically BAs, uh BScs, BComs. They can get the seats through this exam. Subject choice is definitely the real decision for this exam."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t031",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 531,
+    "tEnd": 552,
+    "text": "You can write up to five subjects, one being Section 1, being English, Section 3 being GT, that is general test, and Section 2 making up the domain subjects. Now, there is a lot of planning that needs to go in before the students select the subjects. This is where the counselors come in,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t032",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 552,
+    "tEnd": 576,
+    "text": "uh, helping them match the exams that they are writing for the CUET to the universities/courses that they wish to apply for. There is definitely, the marking is steeper than what CLAT is. There is a plus 5 mark for every correct answer and a minus 1 for every wrong guess. And that is why accuracy matters even more for the CUET takers."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t033",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 576,
+    "tEnd": 600,
+    "text": "Uh, yes, 2025, we saw a big change. Instead of uh the number of subjects that was allowed, they cut down the number of subjects each student could write for their exam. Plus six subjects, legal studies, entrepreneurship, fashion studies, tourism, teaching aptitude, and engineering graphics uh are no longer tested in the domain subjects, and you can apply through for these courses through the GAT,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t034",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 600,
+    "tEnd": 624,
+    "text": "that is the Section 3. And that is why uh being updated on this information helps making sure that the students are not making their plans around the outdated subject list. Each uh the reach is very, very, very good. 230 plus universities, uh including 48 central universities, which again includes Delhi University, JNU,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t035",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 624,
+    "tEnd": 647,
+    "text": "uh BHU, and Hyderabad University. The all the doors for these exam the courses to these university open through this exam. The timeline for this year's takers would tentatively be May 2027. And, but we have to keep a track for NTA to give out its notification, and"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t036",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 647,
+    "tEnd": 669,
+    "text": "having that Google Alert, very specifically for CUET, matters a lot because, yes, they change things, and they change things at the drop of the hat. With that, we have the third exam on the table, and that is our IPMAT. And IPMAT Indore, IPMAT Rohtak, and JIPMAT are three separate test, and not one exam"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t037",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 669,
+    "tEnd": 690,
+    "text": "with different centers. So, student needs to apply for all three of them because they target different IIMs. And one thing on the get go, when we talk about these three exams, we also want you to understand that each exam is an umbrella in itself which will have similar exams under it. So, when I say IPMAT, I also mean JIPMAT. I also mean"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t038",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 690,
+    "tEnd": 714,
+    "text": "IPMAT Rohtak. And I also mean the entrance for, let's say, the integrated course at SP Jain, which is also constructed on a similar format to IPMAT. So, how this format differs is that IIM Indore runs a strict 40 minute sections for quant, and uh MCQ quant, short answer, and verbal, whereas IIM Rohtak is a straight 120"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t039",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 714,
+    "tEnd": 735,
+    "text": "question MCQ paper. The section uh isn't test only. Why the selection is not just test only for this exam. Much like IIMs conduct three rounds of uh uh the funnel to get the right student for their master's program, they do something similar at the"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t040",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 735,
+    "tEnd": 759,
+    "text": "IPMAT level. So, this exam is going to include a minimum Class 12 percentage, and other than that, you need to also have not just the test marks, that is your IPMAT, which makes up the 65% weightage of your total score. 35% weightage is given to your 10th and 12th marks. Additionally, this will have three levels. They might also have a"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t041",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 759,
+    "tEnd": 785,
+    "text": "GDPI round for the students. That is Group Discussion and Personal Interview. So, it's the best thing about an IPMAT program is a student who is writing this exam has to know that there is a lock in period of 5 years. It is an integrated program. And right after Class 12, they do not need a separate undergraduate. After the 5 years, they will be granted an MBA from one of the IIMs that they choose."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t042",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 785,
+    "tEnd": 808,
+    "text": "Uh, now, one of the things that's changed this year. Math or applied math is compulsory at a few IIMs. For example, Shillong and Amritsar IIM have made math or applied math in the Indian curriculum compulsory. And it is something that will affect the choices of the students that have entered or will be entering Class 11 next year. So, one"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t043",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 808,
+    "tEnd": 832,
+    "text": "good thing to keep in mind here. And with that, we move to the changing landscape. Now, of course, there are a few trends worth noting here. There is no pattern changes for CLAT, and not just for this year, but even for 2027. So, it's a good news that all the prep material for the 26 NLUs, all the seats inside these National Law Universities,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t044",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 832,
+    "tEnd": 853,
+    "text": "means that your course mastery will become easy because there is going to be no change in the pattern and course, as such, as we see. And, next trend with the CUET being that 2025, the subject changes were there. But always, the changes are announced very last minute,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t045",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 853,
+    "tEnd": 876,
+    "text": "6 months before the exam, 4 months before the exam, also. So, it's, like I mentioned before, it's always good to keep your eye out and not just follow blindly the last year's syllabus or last year's choice of subjects. So, you need to be a little dynamic, little flexible as far as the students go. This is what you can tell them when they're making their decisions for CUET."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t046",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 876,
+    "tEnd": 899,
+    "text": "For the IPMAT, the footprint is growing. The number of students uh that are taking this exam is growing exponentially each year. The number of seats is also growing. So, which is a good thing, if the demand is growing, so is the supply here. Uh, many of the IIMs are now accepting the IPMAT Indore scores, which means that the chances for the risk-averse"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t047",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 899,
+    "tEnd": 924,
+    "text": "students to get into an IIM ecosystem early are getting better. The next trend that I would like to talk about here is that the students are portfolio shopping. What that means is that they are coming to offices of the counselors, and they are comparing CLAT, CUET, and IPMAT. The commerce and humanities students are weighing their options more sharply right now."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t048",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 924,
+    "tEnd": 947,
+    "text": "There exists a lot of information through the social media, through the website, through the skewed searches on ChatGPT and other AI platforms. So, yes, they are getting uh us a lot of information coming in with a lot of points. But that's, uh, exactly the mindset we wish to build with this session, that helping them compare means we also stay updated with the changes"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t049",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 947,
+    "tEnd": 973,
+    "text": "and knowing what could be the changes to expect for these exams. So, that brings us to inviting the stalwart in the industry, Ritesh, to take us through the next few slides and, uh, give us the information and share his wealth of knowledge with us. Over to you, Ritesh. Thank you, Ritesh. You don't have to add words like stalwart to put additional pressure. And, uh, this is okay as it is, all right."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t050",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 973,
+    "tEnd": 992,
+    "text": "Uh, thank you for the opportunity. And, uh, before sort of getting into specifics, just wanted to take a couple of slides to sort of run you guys through the broad lay of land. I'm sure a lot of this data is easily available, just putting it in perspective here."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t051",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 992,
+    "tEnd": 1013,
+    "text": "So, I've taken the CBSE Class 12 as the top of the funnel, uh, also as a proxy for the larger country per se. Now, if you look at what data tells you, CBSE each year is now about 18 lakh students writing the board exams."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t052",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1013,
+    "tEnd": 1035,
+    "text": "The spread is, above 90%, you have 5% kids. And 95% plus is only 1%. That's how CBSE is. Understand this now in the context of CUET, why CUET also came. Before CUET, all admission to universities, like Delhi University"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t053",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1035,
+    "tEnd": 1051,
+    "text": "or BHU undergraduate programs, which were non-technical, was on the basis of board exams. Now, obviously, the universities did try to normalize, but there was still a huge amount of variance. So, I think one reason for CUET was to have a standardized test."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t054",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1051,
+    "tEnd": 1073,
+    "text": "And which is where the bulk of CUET entrance takers, which is 11 lakhs, is coming from this particular pool. There is also a shift between the central and state spread. Right? The states, given their domicile requirements, given the local quotas. So, central universities typically would attract"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t055",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1073,
+    "tEnd": 1089,
+    "text": "people more from the CBSE diaspora. Now, the three exams which Rashi talked about, and the ones which we are trying to cover today, one, of course, is CLAT UG. Now, last year, the number has touched almost 100,000"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t056",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1089,
+    "tEnd": 1111,
+    "text": "students. So, for an entrance test at the plus two level, a very, very, very significant milestone. Having said that, in terms of, so, what you also have to see, what has been happening in every field of study, is historically we only had very"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t057",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1111,
+    "tEnd": 1135,
+    "text": "premium, government, oblique, government-aided institutes. But then, gradually, as we come down, the quality tends to drop. And which is where a lot of good work has been done by private institutions. So, here, also, when you look at CLAT UG, the typical, usual suspects, which every student, oblique, parent, or counselor would want as a success parameter, would be"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t058",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1135,
+    "tEnd": 1158,
+    "text": "Bangalore, Hyderabad, Jodhpur, Gandhinagar, and Bhopal, Kolkata, probably. Right? This would be the national law schools where everybody would ideally want to be. But the caveat being is, for general category, it's only till up to rank 500. You add another five, it's about thousand odd rank. So, that's as far as CLAT is concerned. IPMAT, this time, the three tests, IPMAT Indore,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t059",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1158,
+    "tEnd": 1182,
+    "text": "IPMAT Rohtak, and JIPMAT, put together has crossed 50,000 uh odd takers. One more addition which probably we can have here, Rashi, is the IIM Bangalore coming up with the UG program for the first time, which has commenced this year onwards. So, the first batch at UG program, IIM Bangalore, because with IIM Bangalore coming in, it has this"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t060",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1182,
+    "tEnd": 1206,
+    "text": "really upped the stakes. So, though they have very few seats on economics, data sciences, odd areas, but but but at least the direction seems to be that IPMAT, as Rashi was saying, the numbers are likely to have a far higher climb rate as compared to the other exams. Right? And, like it is for CAT, you can you can sort of safely assume IPMAT to be a"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t061",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1206,
+    "tEnd": 1229,
+    "text": "mini CAT or a pre-cursor to CAT for PG. You are looking at operating in the 95 to 99 percentile category. Now, the good part is, like CAT is accepted by a lot of private universities, the IPMAT also has some really decent universities for the undergraduate BBA/BMS"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t062",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1229,
+    "tEnd": 1251,
+    "text": "programs. So, universities like IIFT, universities like TAPMI, Shiv Nadar, a lot of them will gradually start adding on, because every private university needs numbers. Right? Some of them need numbers to fill in their seats, and some of them need numbers to select better. So, this is where, invariably, private universities more and more will catch on"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t063",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1251,
+    "tEnd": 1271,
+    "text": "to IPMAT for the BBA, BMS segment. Last, but not least, CUET, uh largely came in, as one of the driving force was the admission pathway to central universities, because of certain inefficiencies in the earlier method of selection."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t064",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1271,
+    "tEnd": 1292,
+    "text": "Now, again, to give you a sense, CUET will have tons and tons of colleges, universities, courses, and seats. Right? Now, I may just share, which may seem like a more Delhi-oriented perspective. Right? Given that Delhi University is the is the most sort of coveted or prioritized university in"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t065",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1292,
+    "tEnd": 1316,
+    "text": "the universities which accept the CUET. Now, if we are looking at the non-technical part, if we are looking at, let's say, the non-sciences part, invariably, there are three to four courses which are fancy of the audience, which typically are the BCom, economics, you have courses like psychology,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t066",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1316,
+    "tEnd": 1335,
+    "text": "to an extent, political science, history, and some languages. The coveted nature, again, is limited in terms of that premium. So, if I were to compare the premiumness, again, limited to about six colleges like SRCC, LSR, Hindu, Hansraj, Stephens,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t067",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1335,
+    "tEnd": 1355,
+    "text": "kind of stuff. So, in terms of the pure top percentage, the idea is to show that whichever test, whichever career path you look at, it's it's looking at only at the 95 percentile upwards. So, that is, unfortunately, the rule of the game, none of us can"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t068",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1355,
+    "tEnd": 1370,
+    "text": "change. So, this is just to give you a perspective in terms of how the landscape currently looks like. Rashi, can we move to the next slide? And this is something which I'm sure all of us have encountered in multiple aspects."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t069",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1370,
+    "tEnd": 1380,
+    "text": "Why I bring this up is from a counselor's perspective, at the end of the day, the distribution in students will be no different,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t070",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1380,
+    "tEnd": 1405,
+    "text": "whether it is a CUET or it is a CLAT or it is an IPMAT or a CLAT. The The variance can happen within these tests, but the distribution of students will, invariably, follow this particular pattern. Point to be noted is all the top colleges which we spoke about on the previous slide, the coveted ones, probably will sit towards the very end of this."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t071",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1405,
+    "tEnd": 1431,
+    "text": "Right? And and and it's that segment which, actually, is very intelligent, driven, self-motivated. I think our duty, and the kind of people, students, families we come across, is more towards the second segment, which is the 13.5%. Now, this segment has the potential. This segment may be confused. This segment can be tweaked, can be pushed. Right?"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t072",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1431,
+    "tEnd": 1454,
+    "text": "So, in terms of productivity or success as a counselor, I would feel that the sweet spot for all of us lies in the 85 percentile upwards of category, given any particular exam we are talking about. And, truth be told, below this, obviously, we have a duty to help anyone and everyone, but then it"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t073",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1454,
+    "tEnd": 1477,
+    "text": "starts becoming more of an uphill task the moment we climb down these segments. So, the rest In this context, it becomes, therefore, very, very, very easy for me to sort of juxtapose my advice, my guidance in conjunction with not just their academic performance. But if also,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t074",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1477,
+    "tEnd": 1500,
+    "text": "you have some sort of an idea what each of these exams is testing in spirit, not necessarily how it appears in paper, and then you can probably align the student to a slightly better level. Can we move, uh, next, Rashi? Also, uh, a lot of"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t075",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1500,
+    "tEnd": 1521,
+    "text": "talk and discussion about, so we we covered the three tests, but I think it's only fair that when we are talking non-technical, we also look at the so-called liberal arts courses, universities, etcetera. So, if you look at the entire landscape and look at it, uh, largely from the point of view of universities"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t076",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1521,
+    "tEnd": 1546,
+    "text": "which are non BBA, non law. So, there, one is the typical approach, that you have a structured program, you have a fixed curriculum, you start hitting the ground right on day one, and you start doing subjects the way you're meant to cover the course over the period of 3 or 4 years. That's how typically all the legacy universities, or even private universities like"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t077",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1546,
+    "tEnd": 1570,
+    "text": "Narsi Monjee or Symbiosis, would would largely follow. Then, you have certain new-age universities, like OP Jindal, Shiv Nadar University, they will allow you a certain level of cross-functionality. For example, an OP Jindal, uh, in their law program, thinking from a future perspective that a prospective student"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t078",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1570,
+    "tEnd": 1591,
+    "text": "could tomorrow work in the financial sector, may allow you to do certain courses in finance, on mergers acquisitions. So, they will allow you that kind of interdisciplinary approach. And then, the true liberal arts universities, you have universities like Ashoka, Flame, Krea, etcetera. Here, the objective is very clearly"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t079",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1591,
+    "tEnd": 1614,
+    "text": "that you you have to learn a few skills, you have to do a fair bit of commonality, and figure out your path. So, to that effect, it's liberal in the sense that when you enter, you have all the liberty to cover bits and pieces"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t080",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1614,
+    "tEnd": 1636,
+    "text": "of everything before you finally decide on your path. So, these are also the universities which actually find a lot of flavor with the Indian pathway-oriented, non-technical set of students. Right? And they will have their different process. And and one more test which probably we should talk, oblique, touch about, is"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t081",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1636,
+    "tEnd": 1658,
+    "text": "is the SAT. Right? So, for example, the universities you see here in in line two and three, one common part is all of them would accept the SAT as well. Right? They will have their own individual tests also. For example, SNU will have SNUSAT. Right? Your Flame will have FEAT. F E A T. Ashoka will have Ashoka"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t082",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1658,
+    "tEnd": 1682,
+    "text": "Assessment, temple templated on critical thinking test. OP Jindal will have JSAT. So, at some point of time, if you also intend minimizing the cognitive load on a child, maybe maybe as a part of our advice, it's also what gives us maximum return in terms of a particular prep. So, just"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t083",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1682,
+    "tEnd": 1708,
+    "text": "wanted to lay out these points. And, yeah, we can we can go further. Okay. So, going back 30 years, uh, if I look at my own academic journey, it always used to play on our mind that it was never just the college, nor was it ever just the course."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t084",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1708,
+    "tEnd": 1729,
+    "text": "Invariably, people wanted to optimize the college and course combination. Now, this holds very true in the context that all the audience you are currently dealing and talking with, a UG in all probability, unless and until it is something like law, or it is something like BBA plus MBA, where you're already pre-committed,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t085",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1729,
+    "tEnd": 1750,
+    "text": "otherwise, in UG, is, invariably, not the end point. Now, put this slide in context of the flow, that, yes, today the top priority, for example, if you look at law, will be these colleges which are mentioned. But beyond this, the profile, the university, the course,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t086",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1750,
+    "tEnd": 1772,
+    "text": "the private sector, will also come in there. So, it's not a uniform linear flow which you'll need to look at, depending on where your 13.5% kids are, you will have to probably take a call whether some of them can be pushed to get into the top 10 list or the top lists which you see in the first first part, which are largely government colleges,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t087",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1772,
+    "tEnd": 1796,
+    "text": "or they should also keep the private universities as a backup. So, the idea behind this was just to give you that it will never be linear. You'll have to have mix and match of private versus premium government institutions as a part of your advice. And at this point of time, whatever we've done, I think any question,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t088",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1796,
+    "tEnd": 1820,
+    "text": "if it's concerning any of the slides we have covered or tried to cover, we can take it as it comes also. Right. Definitely, uh, if you have a question, please feel free to raise your hand, drop it in the chat. We would love to take it up. As Ritesh said, we would love to keep answering questions here also. Uh, Ritesh, before we move forward, there was"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t089",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 1820,
+    "tEnd": 1850,
+    "text": "uh this very nice statement that you made two slides back and you said that we have to see the exams not just as per the sections or the questions that they're asking, but in the uh what are they testing, the spirit of what they are testing. If you could expand on that statement, and also tell us how does one exam, the three that we're talking about, each of them differ from the other as far as the spirit of what they are testing in the student. Sure. So, uh,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t090",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1850,
+    "tEnd": 1872,
+    "text": "let's begin with CLAT, Rashi. And, so, one thing is very clear, when you mentioned that 50% was current affairs and 50% was uh 50% was current affairs plus legal reasoning, and then there were the other sections of verbal, quant, and general awareness. Now, frankly speaking,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t091",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1872,
+    "tEnd": 1895,
+    "text": "an exam like CLAT will be very heavily focused on reading and comprehension, and hardly any, as far as the quantitative aptitude part of it was is concerned. What that tells us is the kind of profile it wants to select. So, they are not looking at people, on the other side, if I just flip it,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t092",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1895,
+    "tEnd": 1918,
+    "text": "if I look at it in conjunction with an IPMAT Indore, IPMAT Indore would be far far far higher pivoted towards the quant part of it. It also will test you for subjects uh topics in mathematics which are there in class 11th and 12th also. So, CLAT, per se, is essentially"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t093",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1918,
+    "tEnd": 1941,
+    "text": "looking at an audience which is good in language, which can comprehend dense pieces very well. It's not just about reading, it's about the depth, it's about the exposure across topics. Even stuff like legal reasoning and all, if you if you actually break it down year by year, yes, there are certain times when you need a certain legal lingo, oblique, updation"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t094",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1941,
+    "tEnd": 1964,
+    "text": "in terms of what has happened, either on a particular amendment in the Constitution or on a particular treaty, stuff like that. But largely, it is expecting you to have a great comprehension, a very, very, very strong language and reading background. That's as far as CLAT is concerned. IIM Indore, like CAT, would be more typical oriented towards the quant part. Yes, you will need VARC, but there,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t095",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1964,
+    "tEnd": 1987,
+    "text": "the focus may be a lot on grammar, a lot on sentence correction, etcetera, apart from comprehension. But maybe your nemesis, more often than not, might be the maths or the QA section. So, that's and CUET, CUET is different, as compared to the other two, because it is completely mirrored on the subjects which you have. So, starting this year,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t096",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 1987,
+    "tEnd": 2010,
+    "text": "it is now mandatory that you can only write CUET in subjects which you have in school. Right? So, I cannot mix and match other subjects. Why they've done earlier that I would also add I would study whatever I'm studying, but for the ease, I would add a physical education in my CUET exam. Right? So, they want to sort of avoid doing that. CUET, also, they have made"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t097",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 2010,
+    "tEnd": 2033,
+    "text": "fairly simple. I think all you guys need to understand, just maybe three, four lines of CUET, and that is, that one language is mandatory, which almost always for the audience you deal with will be English. Right? Almost always, if not always. The other part is, talking about commerce and economics,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t098",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 2033,
+    "tEnd": 2056,
+    "text": "these are courses which will definitely demand maths, oblique, applied maths, as one of the papers you have to choose. The other two papers can be any of the papers you want to write, provided you've had them in your Class 12 board exams. So, that's as far as the lay of CUET is concerned. One thing which stands out here is, there are certain universities, for example,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t099",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 2056,
+    "tEnd": 2079,
+    "text": "BHU, or certain colleges within Delhi University like Sukhdev College of Business Studies, they will also need an element of the GAT, the general ability test. So, which is a proxy for the aptitude testing part. So, they will have general knowledge, they will have quantitative aptitude. So, it is like a mini section on aptitude which is also"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t100",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 2079,
+    "tEnd": 2102,
+    "text": "there. So, if you are applying for BMS, business economics courses in, say, University of Delhi, you'll probably have to write one language, one general ability, and one subject. If you're looking at the standard courses like BCom, history, political science, economics, etcetera, you'll have to write one language,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t101",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 2102,
+    "tEnd": 2125,
+    "text": "for maths and economics, and BCom, you'll definitely need to take maths, for the others, you can take any other three subjects. So, largely, it is a four four-subject game, except for BBS, BMS, or BBE courses, and that's how the overall weightage is done. Rashi, I think I saw some questions on the I think,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t102",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 2125,
+    "tEnd": 2150,
+    "text": "uh, you've answered the length and breadth of it. And I'll add one, uh, observation from everything that you've said here, Ritesh, and please correct me if I'm wrong, that each of these exams, through the question or the weightage in which they are planning the papers, is actually testing the life skills required by the student to be competent in the course that they are going to be studying after clearing those exams, right?"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t103",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 2150,
+    "tEnd": 2171,
+    "text": "Absolutely. Absolutely. Absolute And also, just a layer of comprehension here, also. Hm. So, it's where it where it sort of starts differing from the board exams is, this is also now passage-based, this will be this will have elements of application, etcetera. So, so, so, I think your your ability in terms of reading and comprehension will come in very handy for CUET, also."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t104",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 2171,
+    "tEnd": 2191,
+    "text": "Also, I feel, if you look at the general set of students, typically, also, along with the timelines which we have, your CLAT will be the first one, which typically happens December, first Sunday of December, while the student is in Class 12, is when it usually happens. And,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t105",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 2191,
+    "tEnd": 2213,
+    "text": "after preparing, separately for CUET after the board exams. You get, invariably, a few-week uh window. Exactly. The, therefore, to my mind is, whether it is the CLAT or IPMAT, yeah, sorry. I think we are losing you for a bit there, I do not know why, uh. I think there's a bit of a lag in the video and audio there."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t106",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 2213,
+    "tEnd": 2236,
+    "text": "So, Am I am I audible now, Ritesh? Yes, yes, you are. You are. It's just lagging in between. So, uh, in the same breath, we have another question from our esteemed audience here, and it has been also supported by another audience. So, it's Poonam and Jyoti ma'am who have asked this question,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t107",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 2236,
+    "tEnd": 2261,
+    "text": "that how can an international board student prepare for these tests, and when is the right time for these students of international board to start, and especially for exams like IPMAT? Right. So, uh, one, CUET would be tough because most of the international curricula, if you look at IB as well as Cambridge,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t108",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 2261,
+    "tEnd": 2285,
+    "text": "there is a syllabus gap with respect to NCERT. So, when we analyze at Sparkle, so, that gap is actually about 20-22%. So, I would say CUET is a bit of a challenge to go after. Having said that, if you look at IPMAT, IPMAT is, at the end of the day, a pure aptitude test."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t109",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 2285,
+    "tEnd": 2309,
+    "text": "Right? Also, where it might come in handy for the international audience, okay. So, I'm just making a general observation here, what I've seen in the audience pursuing international curriculum, given the structure, they are they are sort of more structured in thinking, they are they're communication skills, invariably, tend to be slightly better."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t110",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 2309,
+    "tEnd": 2331,
+    "text": "They will do very well as far as the group discussion, or now they called it the WAT, the written ability test, and the personal interview. Their prepping for IPMAT will need a few months to say the minimum. So, it is, in terms of level of complexity, I would say it is above"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t111",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:3",
+    "tStart": 2331,
+    "tEnd": 2353,
+    "text": "the level of complexity of SAT. So, by the time you finish your DP1 or AS levels, you should have a window of 8, 10, 12 months, if you want to give it a great shot. But your prep will be no different, uh, than what it will be for a CBSE prep. Okay."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t112",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 2353,
+    "tEnd": 2375,
+    "text": "So, I hope that answers it for you, Poonam ma'am. Do you have any follow up question? Yes, okay. Perfect. So, we have one more question in the chat before we progress to some of the other questions we had prepared for you, Ritesh. Uh, what is the difference between CLAT UG and CLAT PG in terms of format, weightage, and content,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t113",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 2375,
+    "tEnd": 2405,
+    "text": "uh, in the Indian context? Yes. So, uh, I will feign a bit of ignorance as far as CLAT PG is concerned, uh, for the simple reason, uh, so, it's it's not an area one has sort of seen in detail. I can always sort of get back on that. So, largely, it has been CLAT UG, and which"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t114",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 2400,
+    "tEnd": 2436,
+    "text": "which we have sort of historically evaluated. See, it's for very it's for very specific cases where people are looking at doing masters. Or looking at doing the law at a PG level. Right. So, it's a it's a very different audience. It's a total test which is taken by about 10-12,000 students in total. Right. And it is the depth there with respect to the legal element is stronger. Right. That's something which I can tell you uh visa-a-vis, let's say, CLAT UG. So, CLAT UG is where, of course, the sections you talked about, Rashi,"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t115",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 2436,
+    "tEnd": 2466,
+    "text": "and the and the weightage is there in. That 25-25 for the current affairs and and general general reasoning and legal reasoning 25%, 20-20 for uh the two subject areas and 10 for the balance. Right. So, thank you, Rithesh, and I'm sure uh whatever details we have, whatever you're collating, we can share it with our audience in the group. They'll be happy to receive that. And with that, I come to one of the questions that actually came to my mind when I was planning for this session. And that is uh usually when I get students in my office, and like I said that mostly this is the choice, these three exams are a choice for our humanities, commerce, commerce with maths, commerce without maths students. And at times, the ones that are coming in have rejected that they will not take certain exams. Like they will say CA is not my cup of tea, I'm not made for accounts. Or they will come and say that, no, economics is not something that I can study in the long run. And then they come when on the onset of class 11th or when they're transitioning from 10th to 11th, they'll come and they want to discuss which of these three exams preparation they should start. So, with the overview of the industry that you have, the student diaspora that you've dealt with, what should a student actually weigh before choosing between the three exams, or rather, say, would you say they should choose one, focus on one, or also keep one more exam as the backup when they start their preparation? So, here uh uh Rashi in fact, that's the question which I also saw in the chat right now, and which is a very fair and uh correct observation that you cannot just leave it at one. Right. Given the nature of uh uncertainty and given the given the way numbers stack against you, so, almost always what you'll have to keep in mind is that CUET is different and comes later. Right. So, for a moment, see the other two separately and CUET separately. Right. And when I say the other two, you could also include SAT in that list. Yes. Only from domestic pathway perspective. Hm. I think it is important for you to figure out when we talked about that normal curve, right, where do you stand there? Hm. So, one observation, I will give you two, three proxies which you can choose. One is your academic record, say, in class 10th. Right. And when you're looking at that academic record in class 10th, maybe try to look at the mathematics and English in a bit more detail. Right. These are proxy data points which you can gather from a particular student. CLAT, like it is for medicine, you will also have lots of students who have a generation plus connect with the field wanting to do it. Right. Which is also where a lot of private colleges come in. But, typically, if you come across students who may be slightly shy or afraid of maths, but are very good in language, very good in writing, very eloquent, very uh sort of fluent, their thought process is uh cogent, there there nirvana might be more in a test like CLAT. On the other side, you will come across kids who are sort of naturally slightly more comfortable with maths, right. Quick with maths, they may not be very sort of articulate, eloquent in speaking etc., right, but they're very good with numbers, they're they're good at effort, they're good at mental calculations etc. Again, see it in juxtaposition of their school academic record. And if by chance you have access to any psychometric or cognitive assessment, that data point also will come in handy. So, one, just see which part of the normal curve the student belongs to. Within these two exams, the orientation, somebody who's very comfortable with reading, speaking, writing has been a a debater, versus somebody who's more on the mathematical calculation, good with numbers kind of a thing, I think is a broad proxy for help helping them choose between CLAT and IPMAT. Once you have taken a call, uh be rest assured, if the target is those top five, seven, 10 colleges obliging universities we are looking for, then it is going to be a 8, 10, 12 month affair. Now, you also have institutes offering a two-year program, right, but I think I think it's it's like uh killing killing an ant with a bullet, right. So, one year immediately after your class 12th, you'll have to start sort of pushing. In CLAT, you'll have to start probably slightly earlier. Also, the habits required, whether it is CLAT, in terms of reading, in terms of being on top of current affairs, in terms of updating what's happening in the legal world, I think 8, 10 months of solid prep is required for both, Rashi. Once you are done with it, and because it is the subjects you're choosing, believe me, your process of preparation for CLAT obliging IPMAT will make you a better test taker for CUET, also, because CUET, apart from the subject, is also testing you on doing those questions in a timed environment. So, that pressure with respect to application, speed, accuracy etc. is also there for CUET. So, I think that's how typically the choice should be. It should be CLAT or IPMAT. I think biting both might be a bit too much, and definitely adding CUET apart from it. SAT also, if you want to evaluate more options in liberal arts, is something you should definitely consider. So, I feel that you've answered the question that was asked by our audience in the chat that how should a student or what are the strategies you would recommend to a student who is preparing for multiple uh such competitive exam or standardized test. I have follow-up question there with what you answered, that one prep- preparation for one exam is going to assist them uh in the the way they are preparing for the next exam. But I have a hard sort of follow-up question, which is a burning question when many students are planning to take one or two exams or even three exams uh in India. How much of the course for each of them is overlapping? Okay. So, okay. So, you have to not look at it from a course perspective, right. I'll tell you what I mean by what I say. There'll be a fair bit of similarity between IPMAT and SAT. Okay. In terms of the the course structure per se, right. IPMAT will have an added complex layer of topics or chapters of maths in class 11th and 12th also, be it largely something which puts kids off is calculus, right. So, IPMAT Indore will test you on calculus also at times. SAT, the domain will remain English and maths per se. Now, you can look at them in terms of a structured flow like you would treat any aptitude test. CLAT, I think it's more about your reading in terms of the depth and the width what you need to go through. So, the GK part, see the other two tests don't have GK, right. They don't have current affairs. So, your 50% test is anyways completely different. Forget about the nuances within the similar sections. So, very different tests, very different prep required. The only hope you may have that if you are preparing for IPMAT, you may find the CLAT verbal and quant section a cake walk. Right. That's That's all there is to it, right. But, CLAT otherwise will require a different orientation altogether. You can still hope that your SAT or IPMAT prep can be largely from a common base and then closer to the exam date you could look at the exam related practice and try to do a max in each of these areas. Perfect. I think uh that's very helpful when we are talking to the students who are planning to stack their preparations and this would definitely guide them. And with that, we have our next question and that is what are the key skills and timelines uh that a student should consider when they are building their preparation plan? Like you said that it's uh like hitting uh an ant with a bullet if they are starting their preparation from class 11th. But, do you feel that for an exam like CLAT where the expanse of the GK and the introduction of an absolutely new subject like uh legal reasoning, uh does it warrant one year of preparation starting in class 11th, say, December? And uh also, uh if they are are from the international board for the different exam, uh how does their preparation differ? I think you have answered that but, again, how the timeline should differ for them if you could throw some light on that. Sure. So, I think uh we have to understand and what I'm going to say it's it's very easy to say, uh doesn't happen that way, unfortunately, more often than not. It's not about prepping for a test. It's about building a habit. Right. So, this habit, when you're talking about reading, right, this habit actually if you start in class 11th you're anyways late in the game. The habit of reading and habit of reading across relevant sources should start as early as possible, Rashi, but definitely not only with the intent that it's going to help you for the test. Right. That's the only way, as far as the language and comprehension section, that you can hope to get a significant delta over and above where you currently are. Right. So, this habit and the source reading must start as soon as you get to talk to the kid, right. There is only so much a prep will be. So, if you if you send a student to a prep, right, almost always, for example, when we talk to a student for an SAT, given the timeline we have we're almost able to predict the kind of delta we are able to add, right. Now, if that delta you are a smart kid, the delta even a small delta will sort of take you to the other side. It's perfectly fine. So, CLAT reading habits also for SAT and IPMAT, this should definitely start in class 11th. But a structured tutoring obliging test prep program is what I meant. You can look at taking a SAT more in terms of seeing where you are, especially after class 10th. See, it's also the window a student gets to prepare. The one comfortable window every student gets is after after MYP 5 or IGSE 10 or CBSE class 10. You get that window to have some prep time. Typically, apart from that, the next prep time is invariably one year thereafter. So, I think that use that initial window to assess yourself in terms of where you are and if you are able to judge that this student may need significant delta habit formation should begin as on yesterday at that point in time. The structured program also must then precede the preceding 12 months. So, a few months into your class 11th, you could look at starting for CLAT also. Or SAT also. Right. So, that's how typically it should be. I really like the fact that you introduced the concept of delta here because the advice will have to change depending on the student and the what their learning curve looks like. Right. And, I suppose, as counselors, as stakeholders, and when we are guiding the parents, this should be an important part of the discussion when we are talking about the preparation timeline. Thank you. I think that's that's going to be a great help and a great arsenal in, uh you know, great tool in our arsenal when we talk to parents. And with that, uh I come to the common mistakes. Uh when the students start preparing for these exams, what are their waterloos? What are their battles, you know? And uh I we as counselors of course have our own case studies that we can share ad nauseam. But, having that industry overview if you could tell us the ones uh common mistakes that are most avoidable, or rather the ones that are most ignored by the students until it is the very last minute. So, see, before before we started this meeting, uh you and I were casually chatting, Rashi, on the JEE NEET scenario. Right. Now, typically what happens with a significant minority is that a few months into the preparation, unfortunately, JEE NEET is intense, uh two-year prep, people do realize sometime into the program that they're not meant for it, right. So, one, I think depending on what skill a student has, it is important for him or her to start pegging for the right exam. Right. If you don't have reading as a habit, if you don't have language skills, no matter how hard you try, you will never really be able to get those premium colleges through CLAT. Right. So, how much can I actually bite? How much how much how much really am I able to cover? Again, the concept of delta there. So, that is that is one. Second, don't trivialize by treating both the exams as just an aptitude test. They are in my opinion more like a filtration process trying to test different skills where certain skills are overlapping. So, don't treat it under the common umbrella of an of a generic aptitude test. Rather look at each test separately. Second, uh good things don't come in a short period of time, right. So, the invariably the concept of mugging up, cramming, or heavy loading it towards the last stage doesn't help, right. It doesn't really help. Even GK, so, you can try to game it, right. You can be good in test taking, you can game it, that okay, I will I will cover the current affairs of these three particular quarters, right. So, if you if you find if you go on the internet, you will you will invariably get an advice that if the CLAT is happening in December, your sweet period is February to August. Okay. In terms of where they will ask you general awareness from. But, I think don't don't try to don't try to look for hacks, right. There is something which takes time to build and so be it. I think that's the that's how one is able to filter students out. So, I think don't confuse, they're testing different skills. Uh it'll take time. I think it's more about habit formation as soon as you get into class 11th in terms of reading, uh general awareness, language etc. And then a few months into is into it is where a rigorous structured program you will need if you are looking at the top tier. And this I am making an assumption we are talking about the kids who fall in that 13 and a half percent bracket. Yeah. Beyond this, the good and the bad part both is that your private options will start kicking in. Hm. Almost all of them take not a singularity point of view, but rather a holistic point of view of admissions. So, a child who may not fit into that category, but has a holistic personality, element etc. may actually thrive in a private school selection process. So, that also, I think, somewhere we need to be cognizant of. Perfect. Thank you for that. And, uh you know, I think, uh this we have already answered with the length and breadth of uh the session today. So, I'm going to quickly skip to our last question. And, uh that is beyond CLAT, CUET, and IPMAT, what other pathways should be on the students' radar? And, I think, you've already mentioned SAT. And, I'll tell you one thing that we at TOC are conducting a lot of information and capacity building sessions for SAT, ACT for our audience. So, our audience has a lot of, uh you know, they're very rich as far as the information about these exams go. But, I'm happy that you introduced the fact that they should SAT should also be considered in the same breath as CLAT, CUET, and IPMAT when they are considering the private university liberal arts universities. To sort of, uh further lessen the cognitive load of the students when they have to give the number of exams. But, yet again, so, with CLAT, CUET, IPMAT, what other exams should be on the students' horizon? So, see, beyond this, it will start getting slightly uh specific, Rashi. Uh there are people who are sort of So, fashion, design, are two areas where people fundamentally, when I say people, means students, fundamentally, who are sort of keen, who have that bent of mind, they also look at the NID, again, being that premium sort of institution. NIFT, again, some certain campuses being premium. So, these are two tests which they also do. Apart from that, as I said, the other liberal arts obliging private options, Ashoka, Flame, Krea, Shiv Nadar, you will have to consider it depending on where are you falling in that particular break up, right. And if if not anything else, you'll also have to probably look at their specific entrance tests also. Right. Whether it is an Ashoka uh assessment or a JSAT etc. Otherwise, uh fashion, design, in between, see, one more thing, right, we also have to understand somewhere is the the flavor of the season, right. There was a time after MasterChef, there was suddenly a huge demand for hotel management. Till till maybe last year or tot- till this year, huge demand for computer science driven by whatever has happened post Covid. So, you will always have certain flavors of the year. I think all you need to see is you have to classify your student in terms of his or her ability, where he or she is standing, the aspirational index, and I'm sure the audience or clients which you talk to, it is an element where pride of ownership is also very very very important for them. Right. So, just to uh it may sound funny but to say my my child is doing law at OP Jindal versus my child is studying B.Com. at Ramjas College, right, the pride of ownership element is also something which you have to understand, maybe counter, maybe maybe sort of appreciate, right. So, it is that added layer as well where we also have to make those subjective choices, I get. Absolutely, absolutely. And, uh with that, we have two questions, uh Rithesh, in the chat box before we open it up to our audience to interact, ask their questions. So, requesting the audience be ready. We are happy to answer any questions that you have. And, we start with the one that Prasanthi has left in the chat for us. And, she says that, uh could you re-share the three pointers to check for each students that helps them to decide the pathway, where they are suitable? One of course being the academic records if you could mention the other two. So, if you have access to any uh sort of score, be it in terms of a cognitive ability uh test or equivalent, right. The second is uh the academic score and within that if you are looking at, look at English and maths specifically, right. And and and, third, any kind of diagnostic, right, whether whether it's a diagnostic SAT or it is some other exam like that, will give you a good starting point. Even if you get the child to do a diagnostic IPMAT, right, you will get a fair bit of an idea about the potential. And, I think what we are trying to do through this process, Prasanthi, is the top two and a half percent will, invariably, figure out, right. They will know what to study, where to go, everything. The next 13 and a half percent, depending on which segment they come from, is where, I think, we'll be able to add most value as counselors. Right. And, beyond that, it'll get increasingly more and more difficult to get them to a college of their choice. Perfect. Uh, our next question we have from Anjali Goel here and she's requested if you could throw some light on the CUET PG for Indian students who have done their undergraduate outside of India. Like, if they've done their undergraduate abroad and they are coming back to India for uh their higher studies like the Masters. So, what kind of uh expectations they should have with the CUET PG route? So, again, uh my apologies, Rashi. So, it's my exposure obliging study is more at the UG level. Right. Uh, so, I I I would not want to sort of give you any information, but what I can do is I can request you for uh the person's email ID, or I would I would mail you both for CLAT PG as well as CUET PG. And, if they can be specific, see, I'll tell you what. Again, CUET PG will have requirements. You will have language. You will have a prior course of study. There will be a process of normalization if the need be. It would definitely have more intricacies, so, it's far more important to have exact sharp input there. So, if they can talk about the particular case they are alluding to, it'll be super helpful. All right. I think that should be great. Anjali, we would be happy to assist if you could drop us further details, either to Bijoya or on the group, we would be getting back to you with the details. Uh, sure. So, opening up the floor, any other questions, please feel free to unmute yourself, ask your questions. Rithesh is here. I think, Rithesh, you have conducted such a fabulous session that uh everybody is uh, you know, has has all the answers that they were looking for. No, I think I think I think everybody already had all the answers. It's it's it's sometimes just helps to listen to it from somebody else, right. It actually uh brought in a lot of clarity. Uh, Thank you so much for breaking it so well and then teaching the strategy of which could be clubbed together. Really, really uh grateful. Wonderful session. Thank you so much. Thank you, thank you so much, Nupur. And, I'll tell you one thing. When we started off uh planning for this session, and I think I was over a call with Rithesh, and I said, \"See, we as counselors know the first 10 questions about all the exams. Right. We have to start our session from the 11th question.\" Which is the question that we as counselors have to give our opinion and judgments to the stakeholders, the parents, the faculty, and the students who are sitting in our office. And, it is that 11th question, and the answer how we frame it for the students, that is the more decisive factors. Because, now, the first 10 questions, even an AI can answer for the student. Right? So, that was No, no, so that stuck. That that 11th onwards stuck and and and obviously, see, I also understand, right, when one talks to parents etc., not only are we trying to add value, the other responsibility all of us carry is that our word is likely to be taken as gospel. Right? So, we we better have that nuanced understanding if possible. I think that's where that's where my head is, right, I would sort of before telling any parent anything, uh I think I think that nuance is what probably one one can sort of always do with. Perfect, perfect. Uh, we have one more question. \"Does SAT work as a good option? I'm aware of the liberal arts colleges accepting SAT, but other than that, barring a few more private college colleges, does SAT make sense if one is applying only to Indian universities?\" Uh, question from Poonam. So, uh Poonam, look at it from two perspectives, right. Again, you, as a student, may not be equally good in each and every test that you take, right. So, everybody, ultimately, is wanting to put one's best foot forward. It just so may happen that my best foot forward could be CLAT but not SAT, but vice versa also. Second, the segment, you'll also look at it now with respect to who who are we talking about the kind of universities. See, where if the SAT score is going to be the differentiator and I think I can score well, I will take the SAT. There'll be lots of universities who just need a conduit to apply to, so, there it could act like a common denominator or a common factor rather than individually taking these tests. Right. So, instead of prepping for a JSAT, or Ashoka assessment, or an SNU SAT, or a Flame entrance test, I could just see if I am reasonably confident of a decent score, it just helps me apply to four places with one particular score. Yeah. Right. Also, in case that score doesn't happen, my option of writing the separate test is anyways there. Right. So, also you you are looking at multiple chances, right, for something which is important and uh sensitive, it will always It's not a bad idea, provided you can afford the time and the commitment required for it. Yeah. Got it. Uh, one thing I'd like to add here, Rithesh, and I tell this to my JEE students, who know that uh the exam pressure of do-or-die, which is usually how they frame it, on that one day of JEE Mains and Advanced is too much for them. I always tell them that during class 12th at least attempt the SAT once. Absolutely, Rashi, that's that's that's golden advice, actually. Uh, that score opens many many doors for them in the private universities. And, it also gives them an exact understanding of the exam conditions without the stakes being as high as the JEE Mains or Advanced for them. Absolutely. That if they have a backup option, they're also slightly relaxed when they're writing the JEE Mains. So, it it really works out for them this way also. So, and and and, it invariably happens that way, right. I'm sure if if we look at ourselves, right, somewhere along the journey, the path we ended up taking may not have been the first path we wanted to pursue in the first place, right. Very true. Very true. All right. So, any other questions? We would be happy to answer them. Rithesh is here with us, everybody. I think, Rithesh, you have conducted such a fabulous session that uh everybody is uh, you know, has has all the answers that they were looking for. No, I think I think I think everybody already had all the answers, it's it's it's sometimes just helps to listen to it from somebody else, right. It actually uh brought in a lot of clarity. Uh, Thank you so much for breaking it so well and then teaching the strategy of which could be clubbed together. Really, really uh grateful. Wonderful session. Thank you so much. Thank you, thank you so much, Nupur. And, I'll tell you one thing. When we started off uh planning for this session, and I think I was over a call with Rithesh, and I said, \"See, we as counselors know the first 10 questions about all the exams. Right. We have to start our session from the 11th question.\" Which is the question that we as counselors have to give our opinion and judgments to the stakeholders, the parents, the faculty, and the students who are sitting in our office. And, it is that 11th question, and the answer how we frame it for the students, that is the more decisive factors. Because, now, the first 10 questions, even an AI can answer for the student. Right? So, that was No, no, so that stuck. That that 11th onwards stuck and and and obviously, see, I also understand, right, when one talks to parents etc., not only are we trying to add value, the other responsibility all of us carry is that our word is likely to be taken as gospel. Right? So, we we better have that nuanced understanding if possible. I think that's where that's where my head is, right, I would sort of before telling any parent anything, uh I think I think that nuance is what probably one one can sort of always do with. Perfect, perfect. Uh, we have one more question. \"Does SAT work as a good option? I'm aware of the liberal arts colleges accepting SAT, but other than that, barring a few more private college colleges, does SAT make sense if one is applying only to Indian universities?\" Uh, question from Poonam. So, uh Poonam, look at it from two perspectives, right. Again, you, as a student, may not be equally good in each and every test that you take, right. So, everybody, ultimately, is wanting to put one's best foot forward. It just so may happen that my best foot forward could be CLAT but not SAT, but vice versa also. Second, the segment, you'll also look at it now with respect to who who are we talking about the kind of universities. See, where if the SAT score is going to be the differentiator and I think I can score well, I will take the SAT. There'll be lots of universities who just need a conduit to apply to, so, there it could act like a common denominator or a common factor rather than individually taking these tests. Right. So, instead of prepping for a JSAT, or Ashoka assessment, or an SNU SAT, or a Flame entrance test, I could just see if I am reasonably confident of a decent score, it just helps me apply to four places with one particular score. Yeah. Right. Also, in case that score doesn't happen, my option of writing the separate test is anyways there. Right. So, also you you are looking at multiple chances, right, for something which is important and uh sensitive, it will always It's not a bad idea, provided you can afford the time and the commitment required for it. Yeah. Got it. Uh, one thing I'd like to add here, Rithesh, and I tell this to my JEE students, who know that uh the exam pressure of do-or-die, which is usually how they frame it, on that one day of JEE Mains and Advanced is too much for them. I always tell them that during class 12th at least attempt the SAT once. Absolutely, Rashi, that's that's that's golden advice, actually. Uh, that score opens many many doors for them in the private universities. And, it also gives them an exact understanding of the exam conditions without the stakes being as high as the JEE Mains or Advanced for them. Absolutely. That if they have a backup option, they're also slightly relaxed when they're writing the JEE Mains. So, it it really works out for them this way also. So, and and and, it invariably happens that way, right. I'm sure if if we look at ourselves, right, somewhere along the journey, the path we ended up taking may not have been the first path we wanted to pursue in the first place, right. Very true. Very true. All right. So, any other questions? We would be happy to answer them. Rithesh is here with us, everybody. I think Ritu is asking uh that students who want to apply to a three-year LLB course. After completing bachelor's degree, what kind of prep is required for them? So, invariably, you you will have to So, I'll tell you what. So, again, may have a bit of a more North-centric flavor, right. Lucknow University, Chandigarh, Delhi University, all of them have, so, your typical standard universities everybody has a law faculty, right, invariably. And, they offer a typical LLB, BALLEB program which is after graduation. The process is similar in terms of the entrance test. And, uh you will you will have to make the cut there and there is So, certain universities there also have the PG element part which they have as a commonality. So, we do come across cases but very few. Right. If if that's the question. But, hardly any. In fact, Right. Uh, I I'll add one more thing here, that yes there are students who apply to the LLB program, but they are usually the students who did not from the onset, right after class 12th had that overview that it is law that they wanted to do. So, they've either gone into an economics or a psychology, or a commerce, and from there they have realized they have a passion for it, or it is something that can support them in their future career, and that is when they sort of go for that separate LLB degree because now it will be a four plus three years degree that will be a total of seven years. So, this is a commitment that usually the students make when they are taking a decision much later. For a student who's onset taking the decision they tend to go for the integrated programs in my opinion, if I'm not wrong, Rithesh. Perfect, perfectly put. Somebody who has deferred the decision or deciding later in the day. Exactly. Exactly, right. All right. Any other questions? Any other feedback? Happy to hear from all of you. All right. I think this has been a very very fruitful discussion. I'm going going back with so much of learning. Uh, Thank you so much, Rithesh, for joining us, for giving us your valuable time and sharing your insights. We all are leaving richer because we have now not just an understanding of the exams, but also comparative analysis of how to guide the students. And, thank you to our esteemed TOC audience for spending your evening with us, learning, growing, and exploring new topics each uh evening. Thank you so much for joining us. Thank you, Rithesh. Anything you would like to say to the audience? No, it was lovely catching up, and and and, as I said, you have the ability to put certain pressure. I take it as an opportunity to interact with uh, sort of, fellow community members, and also got the opportunity to refresh my own particular knowledge as well. Thanks to it. And, uh no, no, great great talking to you guys. And and, hopefully see you guys sometime soon. And, thank you so much. Thank you, Rithesh. And, we Thank you, Rashi. Bijoya and Bhakti, thank you, guys, and uh shall connect in the near future. Thank you so much. And Sonia, it's your job now to get Rithesh to our next meet-up, for sure. Definitely, definitely. Perfect. So, we wrap it up today. Thank you so much, everybody. All right, all right, bye. Bye, Rashi. Bye, Sonia. Catch you later. Bye, guys. Bye. Bye. Bye."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t116",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 2466,
+    "tEnd": 2539,
+    "text": "questions that actually came to my mind when I was planning for this session and that is, usually when I get students in my office and like I said that mostly this is the choice, these three exams are a choice for our humanities, commerce, commerce with math, commerce without math students, and at times, the ones that are coming in have rejected that they will not take certain exams, like they will say, \"CA is not my cup of tea. I'm not made for accounts.\" Or they will come and say that, \"No, economics is not something that I can study in the long run,\" and then they come when on the onset of class 11th or when they are transitioning from 10th to 11th, they'll come and they want to discuss which of these three exams preparation they should start. So with the overview of the industry that you have, the student diaspora that you've dealt with, what should a student actually weigh before choosing between the three exams or rather say, would you say they should choose one, focus on one or also keep one more exam as the backup when they start their preparation?"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t117",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 2539,
+    "tEnd": 2811,
+    "text": "So here, Rashi, in fact, that's the question which I also saw on the chat right now and which is a very fair and correct observation that you cannot just leave it at one, right? Given the nature of uncertainty and given the given the way numbers stack against you. So almost always what you will have to keep in mind is that CUET is different and comes later. Right? So for a moment, see the other two separately and CUET separately. Right? And when I say the other two, you could also include SAT in that list. Yes. Only from domestic pathway perspective. I think it is important for you to figure out when we talked about that normal curve, right? Where do you stand there? So one observation, I will give you two, three proxies which you can choose. One is your academic record say in class 10th, right? And when you're looking at that academic record in class 10th, maybe try to look at the mathematics and English in a bit more detail. Right? These are proxy data points which you can gather from a particular student. CLAT like it is for medicine, you will also have lots of students who have a generation plus connect with the field wanting to do it, right? Which is also where a lot of private colleges come in. But typically, if you come across students who may be slightly shy or afraid of maths, but are very good in language, very good in writing, very eloquent, very sort of fluent, their thought process is cogent, their their Nirvana might be more in a test like CLAT. On the other side, you will come across kids who are sort of naturally slightly more comfortable with maths, right? Quick with maths. They may not be very sort of articulate, eloquent in speaking, etc. Right? But they're very good with numbers. They're they're good at effort. They're good at mental calculations, etc. Again, see it in juxtaposition of their school academic record. And if by chance you have access to any psychometric or cognitive assessment, that data point also will come in handy. So one, just see which part of the normal curve the student belongs to. Within these two exams, the orientation somebody who's very comfortable with reading, speaking, writing, has been a a a debater versus somebody who's more on the mathematical calculation, good with numbers kind of a thing, I think is a broad proxy for help helping them choose between CLAT and IPMAT. Once you have taken a call, be rest assured if the target is those top five, seven, ten colleges public universities we are looking for, then it is going to be a eight, ten, twelve month affair. Now, you also have institutes offering a two-year program, right? But I think I think it's it's like it's like killing killing an ant with a bullet, right? So one year immediately after your class 12th, you'll have to start sort of pushing. In CLAT, you'll have to start probably slightly earlier. Also, the habits required whether it is CLAT in terms of reading, in terms of being on top of current affairs, in terms of updating what's happening in the legal world, I think eight, ten months of solid prep is required for both, Rashi. Once you are done with it and because it is the subjects you're choosing, believe me, your process of preparation for CLAT public IPMAT will make you a better test taker for CUET also. Because CUET, apart from the subject, is also testing you on doing those questions in a timed environment. So that pressure with respect to application, speed, accuracy, etc. is also there for CUET. So I think that's how typically the choice should be. It should be CLAT or IPMAT. I think biting both might be a bit too much. And definitely adding CUET apart from it. SAT also, if you want to evaluate more options in liberal arts is something you should definitely consider."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t118",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 2811,
+    "tEnd": 2855,
+    "text": "So I feel that you've answered the question that was asked by our audience in the chat that how should a student, what are the strategies you would recommend to a student who is preparing for multiple such competitive exams or standardized tests. I have follow-up question there. With what you answered that one preparation for one exam is going to assist them the way they are preparing for the next exam. But I have sort of follow-up question, which is a burning question when many students are planning to take one or two exams or even three exams. Sure. How much of the course for each of them is overlapping? Okay."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t119",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 2855,
+    "tEnd": 2962,
+    "text": "So okay, so you have to not look at it from a course perspective, right? I'll tell you what I mean by what I say. There'll be a fair bit of similarity between IPMAT and SAT. Okay, in terms of the the course structure per se, right? IPMAT will have an added complex layer of topics or chapters of maths in class 11th and 12th also. Be it largely, something which puts kids off is calculus, right? So IPMAT Indore will test you on calculus also at times. SAT the domain will remain English and maths per se. Now, you can look at them in terms of a structured flow like you would treat any aptitude test. CLAT, I think it's more about your reading in terms of the depth and the width what you need to go through. So the GK part, see the other two tests don't have GK, right? They don't have current affairs. So your 50% test is anyways completely different. Forget about the nuances within the similar sections. So very different tests, very different prep required. The only hope you may have that if you are preparing for IPMAT, you may find the CLAT verbal and quant section a cake walk. Right? That's that's all there is to it, right? But CLAT otherwise will require a different orientation altogether. You can still hope that your SAT or IPMAT prep can be largely from a common base and then closer to the exam date, you could look at the exam related practice and try to do a max in each of these areas."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t120",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 2962,
+    "tEnd": 3019,
+    "text": "Perfect. I think that's very helpful when we are talking to the students who are planning to stack their preparations and this would definitely guide them. And with that we have our next question and that is, what are the key skills and timelines that a student should consider when they are building their preparation plan? Like you said that it's like hitting an ant with a bullet if they are starting their preparation from class 11th. But do you feel that for an exam like CLAT where the expanse of the GK and the introduction of an absolutely new subject like legal reasoning, does it warrant one year of preparation starting in class 11th say December? And also, if they are from the international boards for the different exam, how does their preparation differ? I think you have answered that, but again, how the timeline should differ for them if you could throw some light on that. Sure."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t121",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 3019,
+    "tEnd": 3170,
+    "text": "So I think we have to understand and what I'm going to say is, it's very easy to say. Doesn't happen that way unfortunately, more often than not. It's not about prepping for a test, it's about building a habit. Right? So this habit when you're talking about reading, right? This habit actually if you start in class 11th, you're anyways late in the game. The habit of reading and habit of reading across relevant sources should start as early as possible, Rashi, but definitely not only with the intent that it's going to help you for the test, right? That's the only way as far as the language and comprehension section that you can hope to get a significant delta over and above where you currently are, right? So this habit and the source reading must start as soon as you get to talk to the kid, right? There is only so much a prep will be. So if you if you send a student to a prep, right, almost always, for example, when we talk to a student for an SAT, given the timeline we have, you're almost able to predict the kind of delta we are able to add, right? Now, if that delta you are a smart kid, the delta even a small delta will sort of take you to the other side, it's perfectly fine. So CLAT reading habits also for SAT and IPMAT this should definitely start in class 11th, but a structured tutoring public test prep program is what I meant. You can look at taking a SAT more in terms of seeing where you are, especially after class 10th. See, it's also the window a student gets to prepare. The one comfortable window every student gets is after after MYP 5 or IGCSE 10 or CBSE class 10. You get that window to have some prep time. Typically, apart from that, the next prep time is invariably one year there after. So I think that use that initial window to assess yourself in terms of where you are and if you are able to judge that this student may need significant delta, habit formation should begin as on yesterday at that point in time. The structured program also must then proceed the preceding 12 months. So a few months into class 11th, you could look at starting for CLAT also or SAT also. Right? So that's how typically it should be."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t122",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 3170,
+    "tEnd": 3230,
+    "text": "I really like the fact that you introduced the concept of delta here because the advice will have to change depending on the student and what their learning curve looks like. Right. And I suppose as counselors, as stakeholders and when we are guiding the parents, this should be an important part of the discussion when we are talking about the preparation timeline. Thank you. I think that's that's going to be a great help and a great arsenal in, you know, great tool in our arsenal when we talk to parents. And with that, I come to the common mistakes. When the students start preparing for these exams, what are their Waterloos? What are their battles, you know? And we as counselors of course have our own case studies that we can share ad nauseam, but having that industry overview if you could tell us the ones common mistakes that are most avoidable or rather the ones that are most ignored by the students until it is the very last minute."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t123",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 3230,
+    "tEnd": 3426,
+    "text": "So see before before we started this meeting, you and I were casually chatting, Rashi, on the JEE/NEET scenario, right? Now, typically, what happens with a significant minority is that a few months into the preparation, unfortunately, JEE/NEET is intense, two year prep, people do realize some time into the program that they're not meant for it, right? So one, I think, depending on what skill a student has, it is important for him or her to start pegging for the right exam. Right? If you don't have reading as a habit, if you don't have language skills, no matter how hard you try, you will never really be able to get those premium colleges through CLAT, right? So how much can I actually bite? How much how much how much really am I able to cover, again, the concept of delta there? So that is that is one. Second, don't trivialize by treating both the exams as just an aptitude test. They are in my opinion, more like a filtration process trying to test different skills where certain skills are overlapping. So don't treat it under the common umbrella of a of a generic aptitude test. Rather, look at each test separately. Second, good things don't come in a short period of time, right? So the invariably, the concept of mugging up, cramming or heavy loading it towards the last stage doesn't help. Right? It doesn't really help. Even GK, see you can try to game it, right? You can be good in test taking, you can game it, that okay, I will I will I will cover the current affairs of these three particular quarters, right? So if you if you find if you go on the internet, you will you will invariably get an advice that if the CLAT is happening in December, your sweet period is February to August. Okay? In terms of where they will ask you general awareness from. But I think don't don't try to don't try to look for hacks, right? There is something which takes time to build and so be it. I think that's the that's how one is able to filter students out. So I think don't confuse that they're testing different skills, it'll take time. I think it's more about habit formation as soon as you get into class 11th in terms of reading, general awareness, language, etc. and then a few months into is into it is where a rigorous structured program you will need if you are looking at the top tier. And this, I'm making an assumption we are talking about the kids who fall in that 13 and a half percent bracket. Yeah. Beyond this, the good and the bad part both is that your private options will start kicking in. Almost all of them take not a singularity point of view, but rather a holistic point of view of admissions. So a child who may not fit into that category, but has a holistic personality element, etc. may actually thrive in a private school selection process. So that also, I think somewhere we need to be cognizant of."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t124",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 3426,
+    "tEnd": 3490,
+    "text": "Perfect. Thank you for that. And you know, I think this we have already answered with the length and breadth of the session today. So I'm going to quickly skip to our last question. And that is beyond CLAT, CUET and IPMAT, what other pathways should be on the students' radar? And I think you've already mentioned SAT. And I'll tell you one thing that we at TOC are conducting a lot of information and capacity building sessions for SAT, ACT for our audience. So our audience has a lot of, you know, they're very rich as far as the information about these exams go. But I'm happy that you introduced the fact that they should, SAT should also be considered in the same breath as CLAT, CUET and IPMAT when they are considering the private university, liberal arts universities to sort of further lessen the cognitive load of the students when they have to give the number of exams. But yet again, so with CLAT, CUET, IPMAT, what other exams should be on the students' horizon?"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t125",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 3490,
+    "tEnd": 3621,
+    "text": "So see beyond this, it'll start getting slightly specific, Rashi. There are people who are sort of, so fashion, design. Right? Are two areas where people fundamentally, when I say people, means students fundamentally, who are sort of keen, who have that bent of mind, they also look at the NID, again, being being that premium sort of institution. NIFT, again, some certain campuses being premium. So these are two tests which they also do. Apart from that as I said, the other liberal arts public private options, Ashoka, FLAME, Krea, Shiv Nadar, you'll have to consider it depending on where are you falling in that particular breakup, right? And if if not anything else, you'll also have to probably look at their specific entrance tests also, right? Whether it is an Ashoka assessment or a JSAT, etc. Otherwise, fashion, design. In between, see one more thing, right? We also have to understand somewhere is the the flavor of the season, right? There was a time after MasterChef, there was suddenly a huge demand for hotel management. Till till maybe last year or till this year, huge demand for computer science driven by whatever has happened post Covid. So you will always have certain flavors of the year. I think all you need to see is you have to classify your student in terms of his or her ability, where he or she is standing, the aspirational index and I'm sure the audience or clients which you talk to, it is an element where pride of ownership is also very, very, very important for them. Right? So just to just it may sound funny, but to say my my child is doing law at OP Jindal versus my child is studying B.Com at Ramjas College, right? The pride of ownership element is also something which you have to understand, maybe counter, maybe maybe sort of appreciate, right? So it's that added layer as well where we also have to make those subjective choices, I get."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t126",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 3621,
+    "tEnd": 3655,
+    "text": "Absolutely. Absolutely. And with that, we have two questions, Ritesh, in the chat box before we open it up to our audience to interact, ask their questions. So requesting the audience be ready, we are happy to answer any questions that you have. And we start with the one that Prasanthi has left in the chat for us and she says that could you re-share the three pointers to check for each students that helps them to decide the pathway where they are suitable, one of course being the academic records. If you could mention the other two."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t127",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 3655,
+    "tEnd": 3725,
+    "text": "So if you have access to any sort of score, be it in terms of a cognitive ability test or equivalent, right? The second is the academic score and within that, if you are looking at, look at English and maths specifically, right? And and and third, any kind of diagnostic, right? Whether whether it's a diagnostic SAT or it is some other exam like that, will give you a good starting point. Even if you get the child to do a diagnostic IPMAT, right? You will get a fair bit of an idea about the potential. And I think what we are trying to do through this process, Prasanthi, is the top two and a half percent will invariably figure out, right? They will know what to study, where to go, everything. The next 13 and a half percent, depending on which segment they come from is where I think we'll be able to add most value as counselors. Right? And beyond that, it'll get increasingly more and more difficult to get them to a college of their choice."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t128",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 3725,
+    "tEnd": 3752,
+    "text": "Perfect. Our next question we have from Anjali Goel here and she's requested if you could throw some light on the CUET PG for Indian students who have done their undergraduate outside of India. Like if they've done their undergraduate abroad and they are coming back to India for their higher studies like the Masters. So what kind of expectations they should have and with the CUET PG route?"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t129",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 3752,
+    "tEnd": 3801,
+    "text": "So again, my apologies, Rashi. So it's my exposure public study is more at the UG level. Right? So I I would not want to sort of give you any information, but what I can do is I can request you for the person's email ID or I would I would mail you both for CLAT PG as well as CUET PG. And if they can be specific, see I'll tell you what. Again, CUET PG will have requirements. You will have language. You will have a prior course of study. There will be a process of normalization if the need be. It will definitely have more intricacies. So it's far more important to have exact sharp input there. So if they can talk about the particular case they are alluding to, it'll be super helpful."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t130",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 3801,
+    "tEnd": 3859,
+    "text": "All right, I think that should be great. Anjali, we would be happy to assist if you could drop us further details either to Bijoya or on the group, we would be getting back to you with the details. Sure. So opening up the floor, any other questions, please feel free to unmute yourself, ask your questions. Ritesh is here. I think, Ritesh, you have conducted such a fabulous session that everybody is, you know, has has all the answers that they were looking for. No, I think I think I think everybody already had all the answers. It's it's it's sometimes just helps to listen to it from somebody else, right? It's It actually brought in a lot of clarity. Thank you so much for breaking it so well and then teaching the strategy of which could be clubbed together. Really, really grateful. Wonderful session, thank you so much."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t131",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 3859,
+    "tEnd": 3861,
+    "text": "Thank you. Thank you so much, Nupur."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t132",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 3861,
+    "tEnd": 3930,
+    "text": "And I'll I'll tell you one thing, when we started off planning for this session and I think I was over a call with Ritesh and I said, \"See, we as counselors know the first 10 questions about all the exams. Right. We have to start our session from the 11th question. Which is the question that we as counselors have to give our opinion and judgments to the stakeholders, the parents, the faculty, and the students who are sitting in our office. And it is that 11th question and the answer how we frame it for the students, that is the more decisive factors. Because now, the first 10 questions even an AI can answer for the student, right? Exactly. So that was that stuck. That that 11th onward stuck and and and obviously, see, I also understand, right? When one talks to parents, etc. Not only are we trying to add value, the other responsibility all of us carry is that our word is likely to be taken as gospel. Right? So we we better have that nuanced understanding if possible. I think that's where that's where my head is, right? I would sort of, before telling any parent anything, I think I think that nuance is what probably one one can sort of always do with."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t133",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 3930,
+    "tEnd": 3949,
+    "text": "Perfect. Perfect. We have one more question. \"Does SAT work as a good option? I'm aware of the liberal arts colleges accepting SAT, but other than that barring a few more private colleges, does SAT make sense if one is applying only to Indian universities?\" Question from Poonam."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t134",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 3949,
+    "tEnd": 4048,
+    "text": "So Poonam, look at it from two perspectives, right? Again, you as a student may not be equally good in each and every test that you take, right? So everybody ultimately is wanting to put one's best foot forward. It just so may happen that my best foot forward could be CLAT but not SAT, but vice versa also. Second, the segment, you'll also look at it now with respect to who who are we talking about, the kind of universities? See, where if the SAT score is going to be the differentiator and I think I can score well, I will take the SAT. There'll be lots of universities who just need a conduit to apply to. So there it could act like a common denominator or a common factor rather than individually taking these tests. Right? So instead of prepping for a JSAT or Ashoka assessment or an SNU SAT or a FLAME entrance test, I could just see if I am reasonably confident of a decent score. It just helps me apply to four places with one particular score. Yeah. Right? Also, in case that score doesn't happen, my option of writing the separate test is anyways there. Right? So also, you you are looking at multiple chances, right? For something which is important and sensitive. It will always, it's not a bad idea, provided you can afford the time and the commitment required for it. Yeah."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t135",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 4048,
+    "tEnd": 4095,
+    "text": "Got it. One thing I'd like to add here, Ritesh, and I tell this to my JEE students who know that the exam pressure of do or die, which is usually how they frame it, on that one day of JEE Mains and Advanced is too much for them. Right. I always tell them that during class 12th, at least attempt the SAT once. Absolutely, Rashi. That's that's that's golden advice actually. Because that score opens many, many doors for them in the private universities and it also gives them an exact understanding of the exam conditions without the stakes being as high as the JEE Mains or Advanced for them. Absolutely. That if they have a backup option, they are also slightly relaxed when they are writing the JEE Mains. So it it really works out for them this way also."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t136",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 4095,
+    "tEnd": 4110,
+    "text": "So and and and and it invariably happens that way, right? I'm sure if if we look at ourselves, right, somewhere along the journey, the path we ended up taking may not have been the first path we wanted to pursue in the first place, right?"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t137",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 4110,
+    "tEnd": 4121,
+    "text": "Very true. Very true. All right, so any other questions? We would be happy to answer them. Ritesh is here with us, everybody."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t138",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 4121,
+    "tEnd": 4129,
+    "text": "I think Ritu is asking that students who want to apply to a three-year LLB course."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t139",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 4129,
+    "tEnd": 4133,
+    "text": "After completing the Bachelors degree, what kind of prep is required for them?"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t140",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 4133,
+    "tEnd": 4184,
+    "text": "So invariably, you you will have to, so I'll tell you what. So again, may have a bit of a more North centric flavor, right? Lucknow University, Chandigarh, Delhi University, all of them have, so your typical standard universities everybody has a law faculty, right, invariably. And they offer a typical LLB, BA LLB program which is after graduation. The process is similar in terms of the entrance test. And you will you will have to make the cut there and there is, so certain universities there also have the PG element part which they have as a commonality. So we do come across cases, but very few. Right? If that's the question, but hardly any in fact."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t141",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 4184,
+    "tEnd": 4232,
+    "text": "Right. I'll add one more thing here, that yes, there are students who apply to the LLB program, but they are usually the students who did not from the onset, right after class 12th, had that overview that it is law that they wanted to do. So they've either gone into an economics or a psychology or a commerce and from there, they have realized they have a passion for it or it is something that can support them in their future career, and that is when they sort of go for that separate LLB degree. Because now, it will be a four plus three years degree. That'll be a total of seven years. So this is a commitment that usually the students make when they are taking a decision much later. For a student whose onset taking the decision, they tend to go for the integrated programs in my opinion, if I'm not wrong."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t142",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 4232,
+    "tEnd": 4239,
+    "text": "Perfectly perfectly put. Yes. Somebody who's deferred the decision or deciding later in the day. Exactly."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t143",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 4239,
+    "tEnd": 4291,
+    "text": "Exactly, right. All right, any other questions? Any other feedback? Happy to hear from all of you. All right. I think this has been a very, very fruitful discussion. I'm going back with so much of learning. thank you so much, Ritesh, for joining us, for giving us your valuable time and sharing your insights. We all are leaving richer because we have now not just an understanding of the exams, but also a comparative analysis of how to guide the students. And thank you to our esteemed TOC audience for spending your evening with us, learning, growing, and exploring new topics each evening. Thank you so much for joining us. Thank you, Ritesh. Anything you would like to say to the audience?"
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t144",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 4291,
+    "tEnd": 4315,
+    "text": "No, it was it was lovely catching up and and as I said, you have the ability to put certain pressure. I take it as an opportunity to interact with sort of fellow community members and also got the opportunity to refresh my own particular knowledge as well. Thanks to it and no, no, great great talking to you guys and and hopefully see you guys sometime soon and thank you so much."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t145",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 4315,
+    "tEnd": 4323,
+    "text": "Thank you, Ritesh. And thank you, Rashi, Bijoya and Bhakti, thank you, guys, and shall connect in the near future."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t146",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 4323,
+    "tEnd": 4327,
+    "text": "Thank you so much. And Sonia, it's your job now to get Ritesh to our next meetup for sure."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t147",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 4327,
+    "tEnd": 4329,
+    "text": "Definitely, definitely."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t148",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:0",
+    "tStart": 4329,
+    "tEnd": 4332,
+    "text": "Perfect. So we wrap it up today. Thank you so much, everyone."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t149",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:1",
+    "tStart": 4332,
+    "tEnd": 4334,
+    "text": "All right, all right. Bye, bye, Rashi. Bye, Sonia. Catch you later."
+  },
+  {
+    "_id": "2026-09-02-india-test-series-part2-t150",
+    "tenantId": "toc",
+    "sessionId": "2026-09-02-india-test-series-part2",
+    "speakerRef": "spk:2",
+    "tStart": 4334,
+    "tEnd": 4364,
+    "text": "Bye, guys, see ya. Bye. Bye."
+  }
+]
