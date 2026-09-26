@@ -59,6 +59,16 @@ export interface SpeakerWindow {
   turns: Turns[];
 }
 
+interface WindowFailure {
+  label: string;
+  startTurnIndex: number;
+  detail: string;
+}
+
+function distinctWindowCount(failures: WindowFailure[]): number {
+  return new Set(failures.map((f) => `${f.label}@${f.startTurnIndex}`)).size;
+}
+
 const SPEAKERS_SYSTEM_PROMPT = [
   "You identify who each anonymous speaker in a transcript actually is. Each line is one turn,",
   "prefixed with its real turn id and its anonymous speaker label, e.g. [id:t12] [spk:0] ...",
@@ -191,7 +201,8 @@ export async function extractSpeakers(turns: Turns[], complete: SpeakersComplete
   // the module's stated contract, now backed by voting rather than hope.
   const windows = buildSpeakerWindows(turns);
   const runRaw: unknown[][] = [];
-  const windowFailures: string[] = [];
+  const windowFailures: WindowFailure[] = [];
+  const junkFailures: WindowFailure[] = [];
   for (let run = 1; run <= AGREEMENT_RUNS; run++) {
     const raws: unknown[] = [];
     for (const w of windows) {
@@ -204,16 +215,20 @@ export async function extractSpeakers(turns: Turns[], complete: SpeakersComplete
           ],
         });
         const parsed = completion.json ?? parseJsonLoose(completion.text);
+        // ISS-270: a non-array response is unparseable provider output, not a legitimate "no
+        // speaker" (that is an empty array). It is recorded with the same window accounting as a
+        // thrown call so `degraded` is non-null whenever ANY window returned junk.
+        if (!Array.isArray(parsed)) junkFailures.push({ label: w.label, startTurnIndex: w.startTurnIndex, detail: "response was not a JSON array" });
         raws.push(parsed);
       } catch (err) {
-        windowFailures.push(`run${run} ${w.label}@${w.startTurnIndex}: ${err instanceof Error ? err.message : String(err)}`);
+        windowFailures.push({ label: w.label, startTurnIndex: w.startTurnIndex, detail: err instanceof Error ? err.message : String(err) });
       }
     }
     runRaw.push(raws);
   }
   const allRaw = runRaw.flat();
   if (allRaw.length === 0 && windowFailures.length > 0) {
-    return fallback(turns, `speakers provider call failed on all ${windows.length * AGREEMENT_RUNS} window call(s); first: ${windowFailures[0]}`);
+    return fallback(turns, `speakers provider call failed on all ${windows.length * AGREEMENT_RUNS} window call(s); first: ${windowFailures[0]?.detail}`);
   }
 
   const raw: unknown = allRaw.flat();
@@ -303,13 +318,25 @@ export async function extractSpeakers(turns: Turns[], complete: SpeakersComplete
   resolved.sort((a, b) => a.speakerRef.localeCompare(b.speakerRef));
 
   const named = new Set(resolved.map((r) => r.speakerRef));
+  const totalCalls = windows.length * AGREEMENT_RUNS;
+  const failedWindows = distinctWindowCount([...windowFailures, ...junkFailures]);
+  const failedCalls = windowFailures.length + junkFailures.length;
+  let reason: string | null = null;
+  if (failedWindows > 0) {
+    // ISS-269: the numerator is DISTINCT windows (never exceeds windows.length), and the failed
+    // CALL count over the total calls over all agreement runs is reported separately -- a window
+    // failing in all 3 runs is 1 window / 3 calls, three windows failing once each is 3 windows.
+    reason = `${failedWindows} of ${windows.length} speaker window(s) failed (${failedCalls} of ${totalCalls} calls across ${AGREEMENT_RUNS} runs)`;
+    if (windowFailures.length > 0) reason += `: ${windowFailures[0]?.detail}`;
+    if (junkFailures.length > 0) {
+      const first = junkFailures[0];
+      reason += `; ${junkFailures.length} call(s) returned junk (first: ${first?.label}@${first?.startTurnIndex})`;
+    }
+  }
   return {
     resolved,
     unresolved: [...labels].filter((l) => !named.has(l)).sort(),
-    degraded:
-      windowFailures.length > 0
-        ? { reason: `${windowFailures.length} of ${windows.length} speaker window(s) failed their provider call: ${windowFailures[0]}` }
-        : null,
+    degraded: reason ? { reason } : null,
   };
 }
 

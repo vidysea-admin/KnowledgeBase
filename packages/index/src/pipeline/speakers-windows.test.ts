@@ -92,6 +92,73 @@ test("a window's provider failure degrades THAT extraction; total failure degrad
   assert.equal(r2.degraded.reason.includes("flaky"), true);
 });
 
+test("ISS-269: one window failing in ALL runs counts as ONE distinct window, never more", async () => {
+  const turns = [
+    turn("t1", "spk:0", "My name is Ruby."),
+    turn("t2", "Bhakti", "Welcome."),
+    turn("t3", "spk:1", "Hello."),
+  ];
+  // 2 windows (spk:0, spk:1), 3 runs -> 6 calls. spk:0's window fails in every run.
+  const mixed: SpeakersCompleteFn = async (job) => {
+    const user = job.messages.at(-1)?.content ?? "";
+    if (user.includes("[spk:1]")) return completion("", []);
+    throw new Error("down");
+  };
+  const { degraded } = await extractSpeakers(turns, mixed);
+  assert.ok(degraded);
+  assert.match(degraded.reason, /1 of 2 speaker window\(s\) failed \(3 of 6 calls across 3 runs\)/);
+  const m = degraded.reason.match(/^(\d+) of (\d+) speaker window/);
+  assert.ok(m);
+  assert.equal(Number(m[1]), 1, "one window failing thrice is ONE failed window");
+  assert.ok(Number(m[1]) <= Number(m[2]), "numerator never exceeds the denominator");
+});
+
+test("ISS-269: three different windows failing once each count as THREE distinct windows", async () => {
+  const turns = [
+    turn("t1", "spk:0", "Hello."),
+    turn("t2", "Anchor", "Welcome."),
+    turn("t3", "spk:1", "Hi."),
+    turn("t4", "Host", "Thanks."),
+    turn("t5", "spk:2", "Hey."),
+  ];
+  const seen = new Map<string, number>();
+  const onceEach: SpeakersCompleteFn = async (job) => {
+    const user = job.messages.at(-1)?.content ?? "";
+    const key = user.includes("[spk:0]") ? "spk:0" : user.includes("[spk:1]") ? "spk:1" : "spk:2";
+    const n = (seen.get(key) ?? 0) + 1;
+    seen.set(key, n);
+    if (n === 1) throw new Error("flaky");
+    return completion("", []);
+  };
+  const { degraded } = await extractSpeakers(turns, onceEach);
+  assert.ok(degraded);
+  assert.match(degraded.reason, /3 of 3 speaker window\(s\) failed \(3 of 9 calls across 3 runs\)/);
+});
+
+test("ISS-270: a window returning non-array junk is recorded as degraded, not silently skipped", async () => {
+  const turns = [
+    turn("t1", "spk:0", "My name is Ruby."),
+    turn("t2", "Bhakti", "Welcome."),
+    turn("t3", "spk:1", "Hello."),
+  ];
+  const junkOne: SpeakersCompleteFn = async (job) => {
+    const user = job.messages.at(-1)?.content ?? "";
+    if (user.includes("[spk:0]")) return completion("", { not: "an array" });
+    return completion("", []);
+  };
+  const { degraded } = await extractSpeakers(turns, junkOne);
+  assert.ok(degraded, "partial junk must be reported, not left as a legitimate 'no speaker'");
+  assert.match(degraded.reason, /junk/);
+  assert.match(degraded.reason, /spk:0/);
+});
+
+test("ISS-270: an empty-array response is a legitimate 'no speaker', NOT degraded", async () => {
+  const turns = [turn("t1", "spk:0", "Hello there.")];
+  const { degraded, resolved } = await extractSpeakers(turns, replies([]));
+  assert.equal(degraded, null, "an honest empty array must not look like a failure");
+  assert.deepEqual(resolved, []);
+});
+
 test("ISS-255 (2): an identity proposed in fewer than 2 of 3 runs never ships", async () => {
   const turns = [
     turn("t1", "spk:0", "My name is Ruby."),
