@@ -225,3 +225,14 @@ collections/watch-state.ts`, and their tests.
 verification against production data) requires a human to run the command in "STATUS" above from a
 shell with permission for a main-tree/production-Mongo write. Do NOT dispatch a checker until that
 run has happened and this manifest is updated with its real before/after evidence.
+
+## Live repair run — 2026-09-27 (approved by Umesh; gate qa/gates/u2-live-repair.md Answered + Confirmed first-hand)
+Command (detached, main tree root, lane code 87df8e8): `run-watch.mjs --reingest 1mJI5wuOvDuNu7A_sBj191Pe6-Olm18ri`. Full log: `D:/KnowledgeBase/qa/watch/reingest-2026-09-24-in-focus.log` (175 lines).
+- Delete: old `2026-09-25-infocu` rows removed (sources/sessions/turns/session_pages 1/1/27/1 → 0) and its data dir removed. **`tree_index: 1` survived the delete** → orphan row (filed ISS-309).
+- Duration: ffprobe `Duration: 00:41:14.69` → **2474.7 s real audio**. The 2939.6 s figure behind ISS-304's "84.5%" does not match this file; the first ingest's 2485 s tEnd was ~full coverage. ISS-304's guard is still worth keeping, but its recorded measurement needs the checker's re-read.
+- Transcription: 40-min threshold → long path, 2 chunks, 41 turns, `coverage 100.9%`, `no internal gaps`. New id **`2026-09-24-in-focus`** (ISS-306 fix confirmed live).
+- Seed: `Inserted: { sources: 1, sessions: 1, turns: 41, session_pages: 1, claims: 0 }`.
+- **Index: FAILED loudly** — `Error: Mongo not connected — call connect() first` at `apps/api/src/indexing/session.ts:156` via `production.ts:86` ← `ingest-chain.mjs:162`. Cause: lane-environment artefact — run-watch connects `../../packages/db` (lane copy) while `indexSession` imports `@lkb/db`, which resolved through the `apps/api/node_modules` junction to the MAIN tree's `packages/db` (a second, unconnected module instance). In a normal checkout both resolve to one file. Filed ISS-308. The run exited non-zero instead of reporting success — the ISS-304/305 "never report a broken ingest as success" property held live.
+- Remaining to finish the repair: index `toc / 2026-09-24-in-focus` from a checkout where both imports resolve to one instance (e.g. after this branch merges, `node scripts/watch/run-watch.mjs --reingest 1mJI5wuOvDuNu7A_sBj191Pe6-Olm18ri` from D:/KnowledgeBase — idempotent). A one-off indexing script was refused by the auto-mode classifier on 2026-09-27; not re-routed.
+
+Status unchanged: BLOCKED (live proof incomplete: chunks still 0).
