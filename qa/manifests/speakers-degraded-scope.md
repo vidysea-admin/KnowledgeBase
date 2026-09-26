@@ -102,4 +102,4 @@ Not UI-touching — no surface changed. Changed paths:
 - `packages/index/src/pipeline/speakers-windows.test.ts`
 - `qa/manifests/speakers-degraded-scope.md` (this file)
 
-## Status: ready-for-check
+## Status: checked-PASS — qa/verdicts/speakers-degraded-scope.md (Cycle checked: 0, 8d8ac20); merged to master
