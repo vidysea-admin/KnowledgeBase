@@ -158,3 +158,6 @@ gmail-meeting-candidates-approval.md [C5] instead) — not re-filed here, alread
 
 ## 2026-09-26T23:54:34+05:30 — Umesh: U5 auto-record policy APPROVED
 Verbatim: "go on i approve", then ticked "U5 auto-record policy" (option text: "bot auto-joins meetings from trusted senders as you, without asking you each time") in a checker-session AskUserQuestion. Recorded by /checker knowledgebase-7a. Maker: build U5 within that scope; real outward sends still per the unit contract.
+
+## 2026-09-26T23:56:41+05:30 — Umesh confirmed first-hand in maker session
+Verbatim selection: "Run the InFocus repair, U5 fully automatic, Write DECISIONS entries" (maker session AskUserQuestion). U5 = bot auto-joins meetings from trusted senders as Umesh without per-meeting approval; registration forms stay human; real Telegram/WhatsApp sends still need their own approval.

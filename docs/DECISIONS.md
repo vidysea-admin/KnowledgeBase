@@ -401,3 +401,45 @@ sweep, open); `D:/ai_os/audits/2026-09-09-delivery-gate-browser-predicate.md` H1
 **Why:** U2 (source-watcher) added `apps/api/src/gws-gmail.test.ts` â€” the first unit test for `gws-gmail.ts` (T-028, previously untested), covering the new body-decode/date-extraction/kind-classification pure functions the unit added. That is the 31st file directly under `apps/api/src`, one over the global budget. The alternative â€” moving `gws-gmail.ts`/`gws-calendar.ts` into a new subdirectory to keep the top-level count down â€” was rejected for this unit: it touches every import site across `store.ts`, routes, and tests for a directory-hygiene reason unrelated to U2's own scope, under time pressure that favors a small, reviewable diff over a wider mechanical refactor. `scripts/lint-dirsize.mjs`'s own doc comment names exactly this path: "a directory must be NAMED to get extra space, so accretion shows up in a diff and in DECISIONS rather than hiding behind a raised global."
 **Result:** `pnpm lint:structure`'s `lint-dirsize` step passes with `apps/api/src` at 31 files, override at 31. No other directory's budget changed. A future cleanup (splitting `apps/api/src` into subdirectories the way `indexing/`/`routes/` already are) remains open and is not blocked by this entry â€” it would let the override be removed again.
 **Links:** U2 (plan `C:/Users/Lenovo/.claude/plans/what-is-the-update-vivid-donut.md` Â§U2); `qa/manifests/u2-source-watcher.md`; D-017 (the `scripts: 32` override this mirrors); `scripts/lint-dirsize.mjs`
+
+## D-032 | 2026-09-26 | type: decision | status: ACTIVE
+
+**What:** Adopt the maker PLAN phase (maker SKILL.md tick step 2b, rule dated 2026-09-26) for this repo by the backfill path: the 149 manifests that existed when the rule landed are recorded as in-flight in `qa/gates/plan-approved.md` (Backfilled line), and `docs/intent.md` -- drafted from `.goal/goal.json`, ARCHITECTURE.md, the contracts, DECISIONS and Umesh's own words in `qa/feedback-inbox.md` -- is APPROVED as the project intent (6 user types, audience internal-tool). `docs/spec.md` and `docs/plan.md` follow the same backfill path and need their own approval lines before any new build unit starts.
+
+**Why:** The rule says no new build without an approved intent/spec/plan, so that work stops going straight from a brief into code. This project predates the rule and has 149 manifests; a full grill would re-ask what the contracts and DECISIONS already answer, so the rule's backfill path (one approval of a drafted intent) is used instead. Umesh approved in two places: "go on i approve" in checker session knowledgebase-7a (scribed d780a93), then confirmed first-hand in maker session knowledgebase-ed on 2026-09-26 by selecting "Write DECISIONS entries" in an AskUserQuestion.
+
+**Result:** `qa/gates/plan-approved.md` carries `Answered: 2026-09-26T23:53:04+05:30 -- intent` plus a first-hand `Confirmed:` line; `docs/intent.md` status flipped to APPROVED (f964935). Spec and plan remain open on that gate.
+
+**Changes-authorized:** `docs/intent.md` (status line only), `qa/gates/plan-approved.md`
+
+**Approved-by:** Umesh
+
+**Links:** `qa/gates/plan-approved.md` - `docs/intent.md` - commits d780a93, f964935, 8eb1867 - maker SKILL.md tick step 2b
+
+## D-033 | 2026-09-26 | type: fix | status: ACTIVE
+
+**What:** Correct the Result line of D-023 only. D-023 says "Protection is unchanged and was verified by parity test". That is false as a general claim: the parity test probed exactly three paths (`docs/DECISIONS.md`, `.claude/settings.json`, `.claude/hooks/*.ps1`), all of which route through the guard's Lab check that was ported verbatim. Paths that fall through to the config check were never probed, and six enforcement-shaped paths measured afterwards went from `ask` to `silent`, including `sources/whatsapp_msg/.claude/settings.json` (a submodule with its own Lab Protocol repo). Those six are fixed and harness-pinned (ISS-165). D-023's What and Changes-authorized stay correct and are untouched.
+
+**Why:** A fix measured against a corpus its own author chose, asserted in the log as if it were general, is the D-015 failure recorded in the decision log itself. The log is read forever while manifests are closed and forgotten, so the correction belongs here. Gate `qa/gates/d023-supersede.md` option A.
+
+**Supersedes:** D-023 -- only D-023's Result sentence is replaced: the parity test covered three Lab-check paths, not the config-check fall-through, so "protection is unchanged" was untested for six paths that did regress (ISS-160) and were later fixed and pinned (ISS-165); D-023's What and Changes-authorized remain in force.
+
+**Result:** D-023's effective Result is now: protection unchanged for the three Lab-check paths probed; six config-check paths regressed from ask to silent and were fixed in ISS-165 with a pinned fixture in `D:/ai_os/.claude/hooks/tests/hook-fixtures.ps1`.
+
+**Approved-by:** Umesh
+
+**Links:** `qa/gates/d023-supersede.md` (Answered 2026-09-26, option A; confirmed first-hand in maker session) - D-023 - ISS-160, ISS-165, ISS-168 - D-015 - `qa/manifests/write-guard-enforcement-gaps.md`
+
+## D-034 | 2026-09-26 | type: fix | status: ACTIVE
+
+**What:** Authorise a narrow pattern fix in two Lab enforcement hooks so they see bolded manifest status lines: in `.claude/hooks/mc-sessionstart.ps1` (line ~15) and `.claude/hooks/mc-precommit.ps1` (line ~43) replace the bare literal `'Status: ready-for-check'` with a pattern that tolerates markdown emphasis and a leading list/heading marker (so `**Status:** ready-for-check` and `## Status: ready-for-check` both match), and in `mc-sessionstart.ps1` (line ~19) take the MAXIMUM matched verdict cycle instead of the first. Nothing else: no change to what either hook prints, when it fires, or what it blocks.
+
+**Why:** Measured 2026-09-09 (gate `qa/gates/mc-hooks-manifest-blindness.md`): the session-start directive reported a unit as pending that was not, and missed the two that were; the pre-commit guard cannot refuse a commit that leaves a bolded handshake dangling. The same one-line class is already fixed and mutation-pinned in `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1`. ISS-307 (the stall check reading the first line of qa/.last-tick) is a separate defect in the same file and is NOT authorised by this entry.
+
+**Result:** Pending implementation through maker-checker; `/aios-config-auditor` runs over the diff before commit, and the checker verifies with both bolded and unbolded fixtures plus a max-cycle fixture.
+
+**Changes-authorized:** .claude/hooks/mc-sessionstart.ps1 (status and cycle patterns only) - .claude/hooks/mc-precommit.ps1 (status pattern only)
+
+**Approved-by:** Umesh
+
+**Links:** `qa/gates/mc-hooks-manifest-blindness.md` (Answered 2026-09-26, option A; confirmed first-hand in maker session knowledgebase-ed) - ISS-176, ISS-183 - `qa/manifests/delivery-gate-manifest-blindness.md` - `qa/contracts/delivery-gate.md` [C7]

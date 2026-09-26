@@ -72,3 +72,4 @@ Say A or B here. On A the maker prepares the entry and you run
 `qa/contracts/delivery-gate.md` [C7]
 
 Answered: 2026-09-26T23:54:34+05:30 — APPROVED (fix the hooks; the authorizing DECISIONS entry must carry **Approved-by:** Umesh, citing this line; run /aios-config-auditor before commit) — Umesh via AskUserQuestion in checker session knowledgebase-7a (multi-select, all four ticked), following his chat message "go on i approve". Scribed by /checker (check 6).
+Confirmed: 2026-09-26T23:56:41+05:30 — Umesh first-hand in maker session knowledgebase-ed (AskUserQuestion: 'Run the InFocus repair, U5 fully automatic, Write DECISIONS entries') — acting on it

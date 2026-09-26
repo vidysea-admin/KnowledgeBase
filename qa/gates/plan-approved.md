@@ -8,3 +8,4 @@ Backfilled: 2026-09-26T23:28:21+05:30 — api-server-env-config-fix, ask-body-te
 
 Answered: 2026-09-26T23:53:04+05:30 — intent — Umesh in chat to checker session knowledgebase-ff, verbatim "go on i approve", in reply to the status list whose item 2 was "Approve docs/intent.md — the plan-approved gate blocks all new builds until you do". Scribed by /checker (check 6: gate answered off-disk). Scope: intent only; spec + plan still follow the backfill path. Lab repo: the DECISIONS entry via scripts/append_decision.ps1 is still owed by the maker.
 Correction (2026-09-26T23:55:07+05:30): the intent Answered line above names the session "knowledgebase-ff"; the session was knowledgebase-7a. Content unchanged.
+Confirmed: 2026-09-26T23:56:41+05:30 — Umesh first-hand in maker session knowledgebase-ed (AskUserQuestion: 'Run the InFocus repair, U5 fully automatic, Write DECISIONS entries') — acting on it
