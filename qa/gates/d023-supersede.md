@@ -45,3 +45,5 @@ Say A or B here. On A the maker drafts the entry and you run
 `**Approved-by:** Umesh`.
 
 **Links:** ISS-160, ISS-165, ISS-168; D-023; `qa/manifests/write-guard-enforcement-gaps.md`
+
+Answered: 2026-09-26T23:54:34+05:30 — APPROVED (supersede D-023 via a new DECISIONS entry with a reasoned Supersedes field; old entry untouched) — Umesh via AskUserQuestion in checker session knowledgebase-7a (multi-select, all four ticked), following his chat message "go on i approve". Scribed by /checker (check 6).

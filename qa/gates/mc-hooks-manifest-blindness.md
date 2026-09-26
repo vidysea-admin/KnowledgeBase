@@ -70,3 +70,5 @@ Say A or B here. On A the maker prepares the entry and you run
 
 **Links:** ISS-176, ISS-183; `qa/manifests/delivery-gate-manifest-blindness.md`;
 `qa/contracts/delivery-gate.md` [C7]
+
+Answered: 2026-09-26T23:54:34+05:30 — APPROVED (fix the hooks; the authorizing DECISIONS entry must carry **Approved-by:** Umesh, citing this line; run /aios-config-auditor before commit) — Umesh via AskUserQuestion in checker session knowledgebase-7a (multi-select, all four ticked), following his chat message "go on i approve". Scribed by /checker (check 6).

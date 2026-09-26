@@ -13,3 +13,5 @@ Effect: deletes ONLY tenant toc rows for sessionId 2026-09-25-infocu (+ its data
 **Options:** (a) run the command above; (b) allow this action class for Claude in permission settings, then say "run the repair"; (c) leave the bad session as is (it stays 84% + unsearchable).
 **Blocks:** U2 fix-cycle close-out → merge → U6 scheduled watcher (must not schedule a watcher known to mis-ingest); U4 dashboard data.
 **Also open (same session):** qa/gates/zoom-bot-signin.md (before Sun 10:00) · U5 auto-record blocked by classifier (per-meeting approval vs fully automatic).
+
+Answered: 2026-09-26T23:54:34+05:30 — APPROVED (run the live repair as scoped above: delete only toc rows for 2026-09-25-infocu + its data/toc-migrated dir, re-transcribe under 2026-09-24-in-focus with coverage + chunk guards) — Umesh via AskUserQuestion in checker session knowledgebase-7a (multi-select, all four ticked), following his chat message "go on i approve". Scribed by /checker (check 6).
