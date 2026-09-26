@@ -1,4 +1,41 @@
-# QUEUE — checker Mode B sweep 2026-09-25T04:4x+05:30 (3-shard wave, consolidated)
+# QUEUE — checker Mode B sweep 2026-09-26T23:0x+05:30 (3-shard wave, consolidated)
+
+> Bound to `D:/KnowledgeBase`, range `c9959bf..802c52c` (HEAD `802c52c`) at dispatch; sweep writer
+> runs solo (a parallel `/maker` session may be live in the same tree — this consolidation re-read
+> every writable surface immediately before each edit and touched only checker surfaces + a narrow
+> commit). **Terminal state: FINDINGS: 3 new (ISS-308 medium ledger-schema: 210 fixed/verified
+> ledger rows across the union — 137 fixed + 73 verified, re-derived by direct grep — carry no
+> `regression_check` field at all; ISS-309 medium delegation-health: `qa/delegation-ledger.jsonl`
+> absent while `qa/manifests/` has had 9 units built since 2026-09-22; ISS-310 medium
+> plan-gate-uninitialised: `qa/gates/plan-approved.md` absent, one finding per SKILL 1d rather than
+> a per-manifest check) + evidence appended to 2 existing open rows rather than minting new ids
+> (ISS-054 RECURRENCE: the maker heartbeat went silent ~33h after the u2-live-repair HUMAN_GATE
+> with ZERO `MISSED_WAKEUP` lines — vs 5 for the prior gate — though re-derived that every
+> reachable unit is currently gated, so this reads closer to correctly-idle than asleep-with-work-
+> waiting; ISS-276 NEW INSTANCE: the vivid-donut plan's U0-U3 units shipped+merged
+> (e6f0b72/9c52a27/0b8c3cf/a21bc16, all confirmed present) with no TASKS.md/goal.json id at all —
+> a different divergence shape than ISS-276's original status-mismatch — and U4-U6 remain equally
+> untracked) + 2 `.goal/goal.json` tasks closed via `goal_cli.py done` (T-031, T-033 — re-derived
+> against PASS/merge commits `4c87be0`/`bf653fe` and `f0b9c91`/`5262deb`, both already `done` in
+> TASKS.md at :121/:123 before this sweep touched goal.json) + 1 feedback-inbox entry marked
+> folded (the 2026-09-25T11:3x Umesh source-watcher request — addressed by the U0-U3 build; U4-U6
+> remain open per the ISS-276 note above; the fresh 2026-09-26 /rlcd suggestion is left unfolded,
+> a maker-owned decision, not a build item yet).**
+>
+> **Verified, not filed:** no new bypass in `c9959bf..802c52c`; `qa/adapter.json` still absent
+> (data-boundary check out of scope by design); no fix-cycle reached 3 in this window; no new
+> silent-failure/erosion finding beyond what shard 3 already had on file (`ingest-chain.mjs:87`
+> unchecked indexer return = ISS-305's root cause, fix `87df8e8` unmerged pending u2-live-repair;
+> `notify-channels` fire-and-forget is documented design, not a defect). ISS-301 (opus share)
+> gets a fresh evidence note only: `opus_sub_share` 0.0 this window, improved from 0.409 — not
+> closed, its criteria don't ask for a single-window read. Gates confirmed still unanswered:
+> `d023-supersede` (17d), `mc-hooks-manifest-blindness` (17d), `u2-live-repair` (1.5d),
+> `zoom-bot-signin` (URGENT — Ashoka Educator Dialogues webinar, deadline Sun 2026-09-27 ~10:00
+> IST). `qa/gates/ram-for-t-031.md` and `qa/gates/meeting-bot-phase-2-start.md` both already carry
+> `Answered:` lines — no off-disk-answer action needed there. Token line appended verbatim from
+> shard 3 (`opus_sub_share` 0.0, `sub_agents` 3, 0 classifier outages, 2 auto-compactions).
+
+## Prior sweep header (2026-09-25T04:4x+05:30, 3-shard wave, superseded as routing; kept for its own findings below)
 
 > Bound to `D:/KnowledgeBase`, master @ `7eb55f7` at dispatch; sweep writer runs solo (a parallel
 > `/maker` session, knowledgebase-b6, is live in the same tree, and a Mode A checker for t-030 may
@@ -75,25 +112,27 @@
 > after the concurrent t-030-telegram-alerts PASS/merge/close-out landed — this sweep's own commit
 > touched only checker surfaces + `.goal/goal.json`'s T-029 close, no code).
 
-## Current top 3 (backlog-priority order, refreshed 2026-09-25T04:4x sweep)
+## Current top 3 (backlog-priority order, refreshed 2026-09-26T23:0x sweep)
 
-1. **[tier 3 — roadmap]** `T-031` — "Live audio watchdog via OBS meters" — unblocked: `T-030`
-   (its stated dependency) closed for real during this sweep (checker PASS `d3cefbf`, merge
-   `1649da9`, close-out `c9959bf`). Next in the T-047 → T-029 → T-030 → T-032 → T-033 sequence's
-   remaining roadmap item once T-033 lands.
-2. **[tier 2 — open critical ledger issue] ISS-104** — speaker-resolution-llm, critical, still
-   `open`: the cycle-2 naming-cue rule does not close C2b. HELD on the same-file collision with the
-   in-flight `u2-4-phase3-fix` cycle (currently paused mid-cycle-2 live eval, per the user's RAM
-   request) — pick up once that unit's live-eval run resumes and lands, per this repo's own
-   speaker-seam precedent.
-3. **[tier 3 — roadmap, mandatory]** `T-033` — building now (lane `wave/t-033-bot-tests`, already
-   has an uncommitted `record-commands.test.ts` addressing ISS-300 — merge must re-run against the
-   now-merged `t-030-telegram-alerts` tree per `qa/.last-tick`'s own note on `finalizeRecording`'s
-   changed signature).
+1. **[HUMAN_GATE, URGENT]** `zoom-bot-signin` — the Ashoka Educator Dialogues Zoom webinar
+   (2026-09-27 ~10:00 IST) requires an authenticated Zoom account to join past the web-client wall
+   (ISS-U0-2); the bot has no Zoom credentials anywhere. Only Umesh can resolve (sign the bot's
+   profile in, or ask the host to disable the auth requirement) — deadline is tomorrow morning.
+2. **[HUMAN_GATE]** `u2-live-repair` — classifier refused live repair on the u2-4-phase3-fix seam;
+   root causes of ISS-304/305/306 (source-watcher truncated-transcript, unindexed-session,
+   session-id derivation bugs) are already found and a fix (`87df8e8`) exists unmerged. This gate
+   also blocks the U4 dashboard and U6 units of the vivid-donut plan. Unanswered 1.5 days.
+3. **[tier 2 — open critical ledger issue] ISS-104** — speaker-resolution-llm, critical, still
+   `open`, HELD behind the paused `u2-4-phase3-fix` (needs ≥8 GB RAM per the user's standing
+   request) — same seam as the U5 auto-record classifier block, also awaiting Umesh.
 
-**Also open, not in the top 3:** `u2-4-phase3-fix` cycle 2's live eval remains **paused by the
-user** (RAM ceiling, per `qa/.last-tick`; durability of that pause state is now tracked as
-**ISS-302**) — resume is a maker/human call, not a checker action.
+**Also open, not in the top 3:** two long-standing Approver gates remain unanswered —
+`d023-supersede` (17 days) and `mc-hooks-manifest-blindness` (17 days) — both pre-date this
+sweep's window and are re-confirmed still open, not re-filed. `u2-4-phase3-fix` cycle 2's live
+eval remains **paused by the user** (RAM ceiling; durability tracked as **ISS-302**) — resume is
+a maker/human call, not a checker action. Tier-3 roadmap (`T-031`/`T-033`) is now closed —
+see the goal.json closes above; next roadmap item is whatever `qa/QUEUE.md`'s maker-owned
+TODO rows or the T-047→T-029→T-030→T-032→T-033 sequence's successor names.
 
 ## Prior sweep header (2026-09-25T02:xx+05:30, 3-shard wave, superseded as routing; kept for its own findings below)
 

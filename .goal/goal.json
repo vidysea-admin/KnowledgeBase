@@ -4,15 +4,15 @@
   "north_star": "Build the Vidysea Living Knowledge Base as the brain for an AI virtual counsellor that matches and then beats every living top human counsellor in head-to-head evaluation (public championship, AlphaGo-style). Phase 1 exit: POST /ask over the 23 TOC sessions returns speaker+timestamp-cited internal answers, with web-fallback for off-corpus questions.",
   "status": "active",
   "created": "2026-09-03T07:01:15",
-  "updated": "2026-09-25T04:46:03",
+  "updated": "2026-09-26T23:16:19",
   "progress": {
     "total": 84,
-    "done": 49,
+    "done": 51,
     "in_progress": 2,
     "blocked": 0,
-    "pending": 33,
+    "pending": 31,
     "current": "U2.4",
-    "percent": 58
+    "percent": 61
   },
   "tasks": [
     {
@@ -700,11 +700,12 @@
     {
       "id": "T-031",
       "title": "Live audio watchdog via OBS meters (>2 min silence → alert + reconnect)",
-      "status": "pending",
+      "status": "done",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "depends T-029"
+      "note": "depends T-029",
+      "completed": "2026-09-26T23:09:57"
     },
     {
       "id": "T-032",
@@ -719,11 +720,12 @@
     {
       "id": "T-033",
       "title": "Tests (fake OBS client failure paths, audioPath) + /checker PASS for the phase-0 bot",
-      "status": "pending",
+      "status": "done",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "closes U4.2"
+      "note": "closes U4.2",
+      "completed": "2026-09-26T23:10:00"
     },
     {
       "id": "T-034",
@@ -953,8 +955,8 @@
     "risk_tolerance": "conservative"
   },
   "analytics": {
-    "velocity_per_day": 1.28,
-    "eta_days": 27.3
+    "velocity_per_day": 1.27,
+    "eta_days": 26.0
   },
-  "last_deterministic_tick": "2026-09-25T04:46:03"
+  "last_deterministic_tick": "2026-09-26T23:16:19"
 }
