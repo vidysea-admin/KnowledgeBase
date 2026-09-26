@@ -1,7 +1,6 @@
 # Intent — Living Knowledge Base
 
-Status: DRAFT — backfilled 2026-09-26 by maker for one-approval (maker SKILL.md tick step 2b). Not
-approved until qa/gates/plan-approved.md carries `Answered: … — intent`.
+Status: APPROVED (intent) — Umesh 2026-09-26T23:53 "go on i approve", recorded qa/gates/plan-approved.md (d780a93). Backfilled 2026-09-26 by maker (tick step 2b).
 
 <!-- PLAN phase, step 1, backfilled for a project that predates the rule (D-000, 2026-09-03).
      Sourced from .goal/goal.json, ARCHITECTURE.md, docs/SNAPSHOT.md, TASKS.md, qa/contracts/,
@@ -10,7 +9,7 @@ approved until qa/gates/plan-approved.md carries `Answered: … — intent`.
      cites its source. -->
 
 **Originator:** Umesh · **Date:** 2026-09-03 (project start) / 2026-09-26 (this backfill) ·
-**Status:** draft (see plan-approved gate above)
+**Status:** approved (intent) — see qa/gates/plan-approved.md
 
 ## Problem
 
