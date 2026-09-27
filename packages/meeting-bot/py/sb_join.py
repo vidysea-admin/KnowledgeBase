@@ -46,17 +46,72 @@ RECONNECT_THRESHOLD_S = 20  # banner/offline must persist this long before we ac
 RECONNECT_COOLDOWN_S = 30  # minimum gap between successive reload attempts
 MAX_RECONNECTS = 5  # give up reloading after this many in one run; keep holding the window
 
-CLICK_JS = """
-const wanted = arguments[0];
-const els = [...document.querySelectorAll('button, a, [role=button], input[type=button], input[type=submit]')];
-for (const el of els) {
-  const t = (el.innerText || el.value || el.getAttribute('aria-label') || '').trim().toLowerCase();
-  if (!t || t.length > 40) continue;
-  const r = el.getBoundingClientRect();
-  if (r.width === 0 || r.height === 0 || el.disabled) continue;
-  if (wanted.includes(t)) { el.click(); return t; }
+# ISS-U0-1: Zoom's web-client join UI (name field, Join button, "Join Audio by Computer",
+# waiting-for-host / end-of-webinar text) renders inside a same-origin <iframe> the top document
+# never contains directly. Both CLICK_JS and BODY_TEXT_JS below recurse into every same-origin
+# iframe (and iframes nested inside those, arbitrarily deep) via a shared `walk(doc)` helper.
+# `frame.contentDocument` throws (or returns null, depending on browser) for a cross-origin
+# frame — that access is wrapped in try/catch so a cross-origin ad/tracker iframe is silently
+# skipped rather than raising out of execute_script. Zoho/Meet pages that have no iframe at all
+# take the exact same code path: `doc.querySelectorAll('iframe')` returns an empty list, `walk`
+# recurses zero times, and behaviour is unchanged from before this fix.
+_IFRAME_WALK_JS = """
+function walkFrames(doc, visit) {
+  visit(doc);
+  let frames;
+  try {
+    frames = [...doc.querySelectorAll('iframe')];
+  } catch (e) {
+    return;
+  }
+  for (const frame of frames) {
+    let inner;
+    try {
+      inner = frame.contentDocument;
+    } catch (e) {
+      inner = null;  // cross-origin: SecurityError — skip silently, never throw
+    }
+    if (!inner) continue;
+    walkFrames(inner, visit);
+  }
 }
-return null;
+"""
+
+CLICK_JS = _IFRAME_WALK_JS + """
+const wanted = arguments[0];
+let hit = null;
+walkFrames(document, (doc) => {
+  if (hit) return;
+  let els;
+  try {
+    els = [...doc.querySelectorAll('button, a, [role=button], input[type=button], input[type=submit]')];
+  } catch (e) {
+    return;
+  }
+  for (const el of els) {
+    const t = (el.innerText || el.value || el.getAttribute('aria-label') || '').trim().toLowerCase();
+    if (!t || t.length > 40) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0 || el.disabled) continue;
+    if (wanted.includes(t)) { el.click(); hit = t; return; }
+  }
+});
+return hit;
+"""
+
+# ISS-U0-1: same traversal for the body-text read main() uses for END_PHRASES/RECONNECT_PHRASES/
+# OFFLINE_PAGE_PHRASES detection — text living only inside an iframe (e.g. "waiting for the host
+# to start this webinar") was previously invisible to those checks.
+BODY_TEXT_JS = _IFRAME_WALK_JS + """
+let parts = [];
+walkFrames(document, (doc) => {
+  try {
+    if (doc.body) parts.push(doc.body.innerText || '');
+  } catch (e) {
+    // ignore
+  }
+});
+return parts.join(' ');
 """
 
 
@@ -254,7 +309,7 @@ def main():
                         clicks += 1
                         last_click = now
                         emit("clicked", text=hit)
-                body = (sb.execute_script("return document.body ? document.body.innerText : ''") or "").lower()
+                body = (sb.execute_script(BODY_TEXT_JS) or "").lower()
                 ended = next((p for p in END_PHRASES if p in body), None)
                 if ended:
                     emit("ended", reason=ended)

@@ -1,0 +1,13 @@
+<!doctype html>
+<!-- ISS-U0-1 fixture: the Zoom web-client's own join UI, as it would render inside the
+     same-origin iframe: a name field, a Join button, a "Computer Audio" button (matches the
+     JOIN_TEXTS entry "computer audio"), and a waiting-for-host phrase. -->
+<html>
+<head><title>inner</title></head>
+<body>
+  <p id="status">Please wait, the host will let you in soon. Connection interrupted, trying to reconnect.</p>
+  <input type="text" id="name" placeholder="Your Name">
+  <button onclick="this.textContent = this.textContent + ' (clicked)';">Join</button>
+  <button onclick="this.textContent = this.textContent + ' (clicked)';">Computer Audio</button>
+</body>
+</html>
