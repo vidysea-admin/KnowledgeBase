@@ -2,19 +2,83 @@
 **Contract:** qa/contracts/speaker-resolution-llm.md (criterion **[C2b]**; **[C12]** is why refusal is the safe error)
 **Goal task:** U2.4 (catalogue B3 — speaker identity resolution)
 **Date:** 2026-09-28
-**Fix cycle:** 0 of max 3
+**Fix cycle:** 1 of max 3
 **Dual check:** required (ISS-104 is severity `critical`)
-**Persona walk:** skip (no user-facing surface exists in the diff — both changed files are
+**Persona walk:** skip (no user-facing surface exists in the diff — cycle 0's two changed files are
 `packages/index/src/pipeline/*.ts`: one a pure predicate module exporting `looksLikeAName`,
 `containsNameVerbatim`, `isDiscourseOnly` and `citesNameAsAnIntroduction`, the other its test file.
-No route, view, template, API handler or persisted document is touched, so no user type can observe
-a difference. Checkable against the diff: `git show --stat` on this unit's commits lists exactly
-those two paths.)
-**Issues addressed:** ISS-104 (partially — see "What ISS-104 still has open"; no other id is claimed)
+Cycle 1 adds two more non-runtime files — a probe script (`scripts/lib/audit-closed-class.mjs`) and
+its data file (`packages/index/src/pipeline/closed-class-audit-words.json`) — neither imported by
+any shipped code path. No route, view, template, API handler or persisted document is touched by
+either cycle, so no user type can observe a difference. Checkable against the diff: `git show --stat`
+on this unit's commits.)
+**Issues addressed:** ISS-104 (partially — see "What ISS-104 still has open"); ISS-104CC-1 (cycle 1,
+closed — see "Cycle 1" section below; no other id is claimed)
 **Executor:** claude-sonnet-subagent
 **Executor rationale:** a single-file predicate change plus its regression corpus; the hard part was
 the enumeration and the measurement discipline, neither of which needed a larger model or an
 external tool.
+
+---
+
+## Cycle 1 — C13 closed: the audit is now a committed, re-runnable artifact
+
+Cycle 0's checker verdict (`qa/verdicts/iss-104-closed-class-function-words.md`) FAILed on exactly one
+finding, C13, severity medium:
+
+> The manifest's headline closed-class audit ("406 words enumerated; 277 absent from
+> `NEVER_A_PERSON`, all 277 shipped a fabricated person; after: 0/406") is not independently
+> re-derivable — no script or word-list artifact is committed ... Fix direction: commit the probing
+> script + word-enumeration data file ... used to produce these numbers, to the same standard already
+> met by the other two corpora.
+
+Fixed by committing both artifacts, colocated with this seam's other scripts/tests per repo
+convention (`scripts/tracker-audit.mjs` + `scripts/lib/tracker-audit.mjs` is the existing pattern
+for a probe-script-plus-data-file pair):
+
+- `packages/index/src/pipeline/closed-class-audit-words.json` — the enumeration data, with its own
+  method + exclusion rationale in its header fields.
+- `scripts/lib/audit-closed-class.mjs` — the probe. Runs the real module (`extractSpeakers`, the
+  same `"I am <Word> sure about that."` shape and offline `replies()` fake-completion pattern the
+  test suite already uses — no network, no LLM) over every enumerated word and reports the live
+  bypass count. Run it yourself: `node scripts/lib/audit-closed-class.mjs --base 2bda2f4`.
+
+**Re-deriving the audit from scratch — rather than reusing cycle 0's uncommitted numbers, which no
+longer exist anywhere to check against — gives a corrected headline.** Cycle 0's own script was never
+committed, so there is no way to know exactly what it enumerated; this cycle's enumeration is
+independently built by parsing `NEVER_A_PERSON` itself and excluding the 12 collective-address words
+(`guys`, `folks`, `team`, `people`, `friends`, `members`, `gentlemen`, `ladies`, `audience`,
+`participants`, `attendees`, `colleagues` — open-class nouns, not part of either SET A's closed
+grammar or SET B's four role sets; see the data file's `excludedCollectiveAddress` field). Per this
+cycle's own brief: *"a corrected number is a fine outcome; a fabricated match is not."* The real,
+re-run numbers:
+
+| | cycle 0 claimed (uncommitted, unverifiable) | cycle 1 re-derived (committed, `node scripts/lib/audit-closed-class.mjs --base 2bda2f4`) |
+|---|---|---|
+| words enumerated | 406 | **409** (SET A 299 + SET B 110) |
+| missing from `NEVER_A_PERSON` at base, all shipping a fabricated person | 277 | **276** |
+| already present at base | 129 | **133** |
+| live bypasses now | 0 / 406 | **0 / 409** |
+
+The base-commit run in the table above (`--base 2bda2f4`) doesn't just diff word lists — it actually
+swaps in the base-commit `speaker-name-rules.ts` behind the unchanged `speakers-llm.ts` harness and
+re-runs `extractSpeakers` for real, so "all 276 shipped a fabricated person at base" is a measured
+fact, not an inference. The **0/409 now** figure is the operative claim this unit stands on; the
+before/after gap (276) is closer to the original 277 than the total (409 vs 406) is to 406, which is
+consistent with cycle 0 having enumerated almost the same set but through a different, unrecorded
+method. The three occurrences of "406/277" and one of "147" further down this document are cycle 0's
+original, uncorrected prose, left as the historical record of what was claimed at the time; this
+table is the corrected, re-derivable figure.
+
+Also corrected (verdict, low severity): the base-commit `NEVER_A_PERSON` size below is stated as
+"147 entries" — the actual count at `2bda2f4` is **146** (145 unique + 1 pre-existing duplicate,
+`everyone`, which predates this cycle). The "+276 words" delta in "What changed" below is now
+**+276** exactly matching (422 − 146 = 276), so that arithmetic still holds; only the stated
+absolute baseline was off by one, as the checker found.
+
+**Issues addressed (cycle 1):** ISS-104CC-1 (closed — the audit is now committed and re-derivable).
+Not addressed and not claimed: ISS-104 itself remains at 17/20 (unchanged, see "What ISS-104 still
+has open"); no words were added, no behaviour changed, per this cycle's brief.
 
 ---
 
@@ -32,7 +96,8 @@ the cycle: **enumerate the class rather than add the word you were shown.**
 
 ## The real defect, measured
 
-`NEVER_A_PERSON` held 147 entries, and every one of them was there because some issue had named it —
+`NEVER_A_PERSON` held 147 entries [corrected in cycle 1: the actual base-commit count is **146**,
+see "Cycle 1" above], and every one of them was there because some issue had named it —
 `not` from ISS-095, `to`/`so`/`back` from ISS-093. The list was never *wrong*; it was never
 *finished*, and nothing in it said which words were still missing. Six rounds on this seam each
 added the word they were shown.
@@ -59,7 +124,8 @@ reproducible and auditable rather than a dump:
 **Measurement, before the change.** 406 words enumerated; 277 of them absent from `NEVER_A_PERSON`;
 **all 277 shipped a fabricated person** — every single one through the very
 `"I am <Word> sure about that."` shape ISS-104 recorded for `Not`. The defect was never the word. It
-was the sampling.
+was the sampling. [Corrected in cycle 1, with a committed, re-runnable script: **409 enumerated, 276
+missing-and-shipped, 133 already present** — see "Cycle 1" above.]
 
 **After the change: 0 of 406.** The audit also caught a transcription slip in this unit's own first
 pass — `via` was in the enumeration and missing from what actually got written to the file, and the
@@ -123,10 +189,21 @@ so the count cannot rot in either direction. **What closing them would actually 
   (`speakers-llm.ts`, `sb_join.py`, `obs-windows.ts`, `run-watch.mjs`) and **not**
   `speaker-name-rules.ts`
 - `node scripts/lib/mutate.mjs assert-clean` → expected `MUTATIONS CLEAN: none outstanding`
+- **(cycle 1)** `node scripts/lib/audit-closed-class.mjs --base 2bda2f4` → expected:
+  ```
+  enumeration: 409 words (SET A 299 + SET B 110)
+  AFTER  (current tree): LIVE BYPASSES: 0 / 409
+  BEFORE (2bda2f4):    LIVE BYPASSES: 276 / 409
+  ```
+  (the `--base` flag is optional and slower — it swaps in the base-commit `speaker-name-rules.ts`
+  in a scratch copy and re-runs the real module against it; omit it for a fast AFTER-only check,
+  which is what a re-check of "0 live bypasses now" actually needs)
 
 Note for the checker: this worktree had no `node_modules` on arrival; `pnpm install --frozen-lockfile`
-at the worktree root is needed before any test command, or every suite fails with
-`Cannot find package 'tsx'`.
+at the worktree root is needed before any test command. If `pnpm test` fails with
+`Cannot find package 'esbuild'` from inside `tsx/dist/*.mjs` (a broken/partial pnpm link, hit during
+cycle 1, unrelated to any code in this diff), `pnpm install --force` at the worktree root repairs it;
+re-ran clean afterward at `pass 285 / fail 0`.
 
 ## Actual outputs (from maker's own run)
 
