@@ -12,12 +12,17 @@ $pending = @(); $unclosed = @()
 if (Test-Path 'qa/manifests') {
   foreach ($m in Get-ChildItem 'qa/manifests' -Filter *.md -ErrorAction SilentlyContinue) {
     $v = "qa/verdicts/" + $m.Name
-    if (-not (Select-String -Path $m.FullName -Pattern 'Status: ready-for-check' -Quiet)) { continue }
+    if (-not (Select-String -Path $m.FullName -Pattern '^\s*(?:[-*]\s+)?(?:#{1,6}\s+)?[*_]{0,3}Status:[*_]{0,3}\s+ready-for-check' -Quiet)) { continue }
     if (-not (Test-Path $v)) { $pending += $m.BaseName; continue }
     $mc = 0; $a = Select-String -Path $m.FullName -Pattern 'Fix cycle[:*\s]+(\d+)' | Select-Object -First 1
     if ($a) { $mc = [int]$a.Matches[0].Groups[1].Value }
-    $vc = -1; $b = Select-String -Path $v -Pattern '(Cycle checked|Fix cycle judged)[:*\s]+(\d+)' | Select-Object -First 1
-    if ($b) { $vc = [int]$b.Matches[0].Groups[2].Value }
+    $vc = -1
+    foreach ($bm in (Select-String -Path $v -Pattern '(Cycle checked|Fix cycle judged)[:*\s]+(\d+)')) {
+      foreach ($mm in $bm.Matches) {
+        $cv = [int]$mm.Groups[2].Value
+        if ($cv -gt $vc) { $vc = $cv }
+      }
+    }
     if ($vc -lt $mc) { $pending += $m.BaseName; continue }
     if (Select-String -Path $v -Pattern 'VERDICT:\s*PASS' -Quiet) { $unclosed += $m.BaseName }
   }
