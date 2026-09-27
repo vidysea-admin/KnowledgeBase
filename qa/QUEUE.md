@@ -1,4 +1,132 @@
-# QUEUE — checker Mode B sweep 2026-09-27T17:1x+05:30 (3-shard wave, consolidated)
+# QUEUE — checker Mode B sweep 2026-09-28T00:0x+05:30 (3-shard wave, consolidated)
+
+> Bound to `D:/KnowledgeBase`, range `8669919..3c4d0d5` for shards 1-2; shard 3 ran against an
+> **older, already-superseded range** (`213d2ac..3869c83`) because it was dispatched in a prior
+> tick and only just returned. Invoked directly by Umesh, 3 read-only shards + this consolidation
+> as single writer. **Terminal state: 1 new id (ISS-352, medium); 1 `checker_note` appended
+> (ISS-348); 3 shard-3 findings REJECTED as stale duplicates of already-filed/already-fixed work;
+> 1 shard ruling CONFIRMED (handshake-canonical-field's [C7]-by-extension citation); shard 1's one
+> flagged-unverified item (the 577-vs-320 additivity trace) independently RE-VERIFIED and found
+> already reconciled.**
+>
+> **Shard 1 (pair-state/bypass/enforcement liveness) — CLEAN, re-confirmed.** All four unresolved
+> units (`delivery-gate-stamp-adoption` owing fix cycle 2, `u2-4-phase3-precision-regate` paused,
+> `delivery-gate-manifest-blindness` + `write-guard-enforcement-gaps` STALLED 3/3 with debug
+> reports) are legitimately disclosed, not new findings. The one thing shard 1 did NOT
+> independently re-execute — the cycle-1 checker's "577 vs the manifest's claimed 320" additivity
+> line-count trace on the handshake backfill — **was re-executed here**: `git show -S"Handshake
+> status" --all -- qa/manifests` finds exactly one commit that ever introduced the field,
+> `1fe83d7`, at `160 files changed, 577 insertions(+), 2 deletions(-)`. `qa/verdicts/
+> handshake-canonical-field.md:25-28` already traces this: the manifest's own pre-commit `320 2`
+> measurement excluded its own not-yet-`git add`ed 257-line self (untracked files are invisible to
+> `git diff`), and `257 + 320 = 577` exactly. D-042's "159 files, +320, -2" is therefore CORRECT —
+> 159 pre-existing manifests, excluding the handshake unit's own manifest file, which is the 160th.
+> No discrepancy; nothing to file.
+>
+> **Shard 2 (adapter/loop-spec/gates/GRILL) — two findings, both verified independently.**
+> - **Finding A (gate-status staleness) CONFIRMED, but folded into existing ISS-348, not a new id.**
+>   Read `qa/gates/ledger-shard-union-hook.md:48` directly: `**Gate status:** OPEN` sits above a
+>   real, dated `Answered:` line (50) backed by **D-041**. Two MORE live instances of the identical
+>   disease were found while checking Umesh's four gate answers this tick: `qa/gates/
+>   enforcement-hooks-unauthorized-and-live-regressed.md:166` still reads OPEN though **D-043**
+>   states it "is answered and closed by this entry", and `qa/gates/
+>   iss-122-round-cap-breach.md:78` still reads OPEN though **D-044** states it "is answered by
+>   this entry and closes". This is exactly ISS-348's own fix_direction (c)/(d) — a static field
+>   where a computed one is needed — recurring three times with today's own decisions. Filed as a
+>   `checker_note` on ISS-348, not a new row (same defect, same fix; the gate FILES themselves are
+>   being re-stamped by the Approver's session this tick, so no re-stamp requested here). **Count
+>   these three as ANSWERED/CLOSED for this tick's queue ranking below, not OPEN.**
+> - **Finding B (loop.md BACKLOG_EMPTY unqualified) CONFIRMED NEW — filed ISS-352 (medium).**
+>   `qa/loop.md:45-47`'s Stop line defines `BACKLOG_EMPTY` by unqualified "no open issues";
+>   project `.claude/CLAUDE.md`'s D-013 override reads "no open critical/high/medium issues ...
+>   open low issues do not keep the loop alive". Verified distinct from ISS-249 (fixed 2026-09-10 —
+>   that row was the missing-roadmap-tier clause, which the current text still has correctly).
+>   `.claude/CLAUDE.md` wins on conflict per its own header, so this is not currently a live
+>   mis-stop, but it is the same documentation-drift class as ISS-348/350, and 45 open low rows
+>   make the divergence a live, non-hypothetical state right now.
+> - **Handshake-canonical-field's "[C7] applies by extension" contract citation — shard 2's ruling
+>   CONFIRMED, not overturned.** Read `qa/manifests/handshake-canonical-field.md:3-4` directly: the
+>   citation is disclosed reasoning, not a blank field, and is legitimately different from
+>   ISS-328/329/341 (those units had NO contract anywhere for their domain per a `grep -rl` across
+>   all 71 `qa/contracts/*.md`; this unit's format is explicitly named as future work in **ISS-350's
+>   own fix_direction (a)**: "record the vocabulary in qa/contracts/ so it is checker-owned rather
+>   than convention"). No new `contract-not-cited` row opened; cite ISS-350 if this resurfaces.
+> - **Unverified, flagged rather than assumed:** the 22 gates carrying an inline `Answered:` line
+>   were NOT each cross-checked against a matching DECISIONS entry this tick (budget) — shard 2's
+>   own caveat, re-stated, not cleared.
+>
+> **Shard 3 (sibling-defect hunt) — ALL THREE findings REJECTED as stale duplicates.** Shard 3 ran
+> against an older range and did not see later work. Independently verified against HEAD:
+> - **"Finding C" (obs-windows.ts `launchObsNormally` unhandled spawn error) is ALREADY FILED AND
+>   ALREADY FIXED.** It is **ISS-337** (high, filed 2026-09-27, status `fixed`), built and merged as
+>   `wave/obs-launch-error` (`fed722b`, checked-PASS cycle 0, verdict `9a0174f`). Read
+>   `packages/meeting-bot/src/capture/obs-windows.ts:115-127` at HEAD: `launchObsNormally` now
+>   takes an `onError` callback and calls `child.on("error", (err) => onError?.(err))` before
+>   `.unref()`, with an inline comment citing ISS-337 by id. Shard 3's own `grep -rn
+>   launchObsNormally qa/issues*.jsonl` returning nothing was against its stale range's tree, not
+>   HEAD's. Two follow-on rows already track the residue of that same fix: **ISS-343** (medium,
+>   `obs-windows.ts` grew past its lint-loc budget, 352->359, disclosed) and **ISS-344** (low, an
+>   inert `setImmediate` yield in `obs-guard.ts`, filed by the maker on its own PASS report).
+> - **"Finding D" (demo-live.mjs spawn, no error handling) is ALREADY FILED** as **ISS-338** (low,
+>   file-don't-fix), verbatim.
+> - **"Finding E" (record-commands.ts `runLogin` spawn, no error handling) is ALREADY FILED** as
+>   **ISS-339** (low, file-don't-fix), verbatim.
+> - Shard 3's "not siblings" rulings (`task-scheduler.ts:131`, `gws-calendar.ts:53-60`,
+>   `ai-transport.ts:62-71`, `controller-state.ts:86-90`) and its ISS-334 mechanism confirmation
+>   (`delivery-gate-stop.ps1:376` independent-predicate co-firing) match the ledger's existing
+>   record — re-confirmed, not re-filed.
+> - Churn ratio (4.39->4.40, "flat") is informational only, not independently re-derived this tick;
+>   carried forward as shard 3's own reading, unverified-but-plausible per the prior sweep's own
+>   caveat on this exact metric.
+>
+> **This session's four Approver rulings (D-041, D-043, D-044, D-045) change what counts as
+> buildable.** D-043 authorizes (Approved-by Umesh) three named fixes to
+> `delivery-gate-stop.ps1`/`mc-sessionstart.ps1` and retro-ratifies `4a71633`/`e5402d6`; its own
+> Result explicitly sequences ISS-346's mechanical round-cap check FIRST, because it is what
+> D-044's waiver depends on existing before the exception it supervises repeats. D-044 waives the
+> D-014 round cap once, narrowly, for `wave/vector-gap-durability`/ISS-122, conditioned on ISS-346
+> landing first and a fresh checker PASS before merge. D-045 consents to the new file
+> `scripts/watch/install-tasks.ps1` and Windows Scheduled Task registration for U6, dry-run-first
+> and idempotent. None of these are self-executing — each still owes its own manifest -> checker ->
+> verdict handshake; the decisions remove blockers, not ceremony.
+
+## Ranked top 3 (this consolidation, D-013 tier order)
+
+**Tier 1** (`QUEUE.md` TODO rows): still empty. **Tier 2** (open critical/high): both open
+criticals stay not-pullable, unchanged (ISS-104 round-capped file-don't-fix; ISS-282 deliberately
+paused) — but this session's Approver rulings put fresh, unblocked HIGH-severity enforcement work
+at the top, ahead of everything else open at that severity. **Tier 3** (next unblocked roadmap
+task) is still "not optional, not last" per D-013 — named at #3 below, not omitted.
+
+1. **ISS-346 (high) — the D-014 round-cap mechanical check, authorized D-043 item 2, explicitly
+   sequenced FIRST.** No pull-selection step today counts prior PASSed verdicts per seam; D-044's
+   waiver for `wave/vector-gap-durability` is conditioned on this landing before that exception is
+   exercised again. Freely buildable now: `.claude/hooks/delivery-gate-stop.ps1` change is
+   Approved-by Umesh under D-043.
+2. **`delivery-gate-stamp-adoption` fix cycle 2 (D-043 item 1) — the Fix-cycle predicate + ISS-205
+   stripper clause.** Owed since the cycle-1 FAIL; ISS-267 raised this class of gap to high on
+   measured consequence (a fix-gapped unit invisible to the session-start hook for 3 days). Same
+   enforcement path, same Approved-by authorization as #1 — sequence together or immediately after.
+3. **U4.1 (tier 3, roadmap — TASKS.md:112 / goal.json, `open`/`pending`, no deps) — Recording/file
+   upload wired to a real transcribe worker.** Still genuinely unblocked: `workers/transcribe` is a
+   3-line placeholder; the real `packages/ingest` recording adapter exists and is unwired. Named
+   per D-013's rule that this tier is never skipped in favor of continuing tier 2 alone.
+
+**Also newly unblocked, not in the top 3:** (a) `mc-sessionstart.ps1` reading `**Handshake
+status:**` (D-043 item 3 / ISS-350 repro 2) — third in the D-043 sequence, after #1-#2 above; (b)
+`wave/vector-gap-durability`/ISS-122 merge sequence (D-044) — file the manifest citing D-044 once
+#1 lands, dispatch a fresh checker, merge only on PASS; (c) U6
+(`scripts/watch/install-tasks.ps1`, D-045) — still gated on U4's own plan/spec gates per the
+feature rule, D-045 only clears the new-file and machine-state blockers.
+
+**Open-issue counts, union of `qa/issues.jsonl` + `qa/issues.*.jsonl`, re-derived this tick:** 397
+rows total, 153 open — **2 critical / 30 high / 76 medium / 45 low**. (Both open criticals remain
+gated per above, not pullable.)
+
+- GRILL: web-fallback vs Phase-1 exit — still open, no ruling this tick, carried forward unchanged
+  (ISS-274).
+
+## Prior sweep (2026-09-27T17:1x+05:30, 3-shard wave, consolidated — superseded by the list above)
 
 > Bound to `D:/KnowledgeBase`, range `213d2ac..3869c83` (HEAD moved on to `dcf2b47`/`a99140f` by a
 > live maker session during this sweep; not this range's concern). Invoked directly by Umesh
@@ -93,7 +221,7 @@
   default while the north star's Phase-1 exit requires off-corpus web fallback; wire-it-or-sign-the-honest-limit
   is an Approver amendment (ISS-274). **Still open, 5+ days, no ruling** — carried forward unchanged.
 
-## Current top 3 (backlog-priority order, refreshed 2026-09-27T17:1x sweep)
+## Prior top 3 (backlog-priority order, refreshed 2026-09-27T17:1x sweep; superseded by the 2026-09-28 list above)
 
 Tier stated per this repo's rule. **Tier 1** (top clear `QUEUE.md` TODO row): empty — 0 TODO rows.
 **Tier 2** (open critical/high) has live, freely-buildable material this time, so it governs picks
