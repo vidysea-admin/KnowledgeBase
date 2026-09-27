@@ -45,6 +45,7 @@ import { createBrowserJoiner } from "./joiners/browser-joiner.js";
 import { createSystemAudioJoiner } from "./joiners/system-audio-joiner.js";
 import { runFinalize, runLogin, runRecord } from "./capture/record-commands.js";
 import { runWatchdog } from "./capture/watchdog.js";
+import { runScheduleTick } from "./calendar/schedule-tick.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_FIXTURE_PATH = path.join(HERE, "..", "fixtures", "sample-recording.wav");
@@ -161,6 +162,7 @@ async function main(): Promise<void> {
   if (argv[0] === "finalize") return runFinalize(argv.slice(1));
   if (argv[0] === "login") return runLogin(argv.slice(1));
   if (argv[0] === "watchdog") return runWatchdog(argv.slice(1));
+  if (argv[0] === "schedule-tick") return runScheduleTick(argv.slice(1));
   const args = parseArgs(argv);
 
   const consent: ConsentContext = {
