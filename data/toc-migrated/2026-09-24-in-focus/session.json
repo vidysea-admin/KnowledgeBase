@@ -1,0 +1,12 @@
+{
+  "_id": "2026-09-24-in-focus",
+  "tenantId": "toc",
+  "sourceId": "gdrive-1mJI5wuOvDuNu7A_sBj191Pe6-Olm18ri",
+  "title": "In-Focus",
+  "date": "2026-09-24",
+  "org": "toc",
+  "status": {
+    "transcribe": "done",
+    "index": "pending"
+  }
+}

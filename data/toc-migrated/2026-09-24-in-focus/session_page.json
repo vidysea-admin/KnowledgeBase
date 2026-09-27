@@ -1,0 +1,37 @@
+{
+  "_id": "2026-09-24-in-focus-page",
+  "tenantId": "toc",
+  "sessionId": "2026-09-24-in-focus",
+  "summary": "In-Focus — TOC session recorded 2026-09-24, auto-ingested by the source watcher (U2). 41 transcript turns across 7 distinct speaker label(s): spk_0, Muskaan, Rajat, spk:0, spk:1, spk:2, spk:3. This summary is a MECHANICAL placeholder (turn/speaker counts only) — no LLM or human enrichment pass has run on this session yet.",
+  "keyInsights": [],
+  "evidence": [
+    {
+      "turnId": "2026-09-24-in-focus-t001",
+      "sessionId": "2026-09-24-in-focus"
+    },
+    {
+      "turnId": "2026-09-24-in-focus-t002",
+      "sessionId": "2026-09-24-in-focus"
+    },
+    {
+      "turnId": "2026-09-24-in-focus-t012",
+      "sessionId": "2026-09-24-in-focus"
+    },
+    {
+      "turnId": "2026-09-24-in-focus-t032",
+      "sessionId": "2026-09-24-in-focus"
+    },
+    {
+      "turnId": "2026-09-24-in-focus-t033",
+      "sessionId": "2026-09-24-in-focus"
+    },
+    {
+      "turnId": "2026-09-24-in-focus-t037",
+      "sessionId": "2026-09-24-in-focus"
+    },
+    {
+      "turnId": "2026-09-24-in-focus-t038",
+      "sessionId": "2026-09-24-in-focus"
+    }
+  ]
+}

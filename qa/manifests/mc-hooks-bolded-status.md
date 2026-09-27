@@ -195,4 +195,4 @@ that state.
 - ISS-183's live-corpus reproduction can't be re-run verbatim (inputs moved on); flagged above rather
   than silently substituted, per D-015.
 
-**Status:** ready-for-check
+**Status:** checked-PASS (Cycle checked: 1, verdict `qa/verdicts/mc-hooks-bolded-status.md`, VERDICT: PASS, ISSUES-WRITTEN: none; wave/mc-hooks-bolded-status already merged into master) — closed out by /maker 2026-09-27

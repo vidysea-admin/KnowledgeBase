@@ -1,0 +1,371 @@
+[
+  {
+    "_id": "2026-09-24-in-focus-t001",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk_0",
+    "tStart": 0,
+    "tEnd": 87,
+    "text": "Hey, good to see you. Hi Muskaan. So, welcome everyone to the next session in the series of In-focus where we get to see, we get to meet some fantastic founders and individuals who run some wonderful programs. This is an opportunity for all of us to discover, connect, and explore what's possible within TOC. And joining us today, we have two fantastic programs. The first one is being run by Muskaan. Muskaan runs Grad Pilots, which is a higher-ed guidance platform for supporting students from career discovery and university selection all the way to post-admissions planning. And Muskaan will tell us more about that in a few minutes. The second one is VerySeek Education, which bridges the gap between academic learning and real-world professional skills. So, again, both sound very, very interesting. And I just had a chance to speak with Muskaan earlier this week or last week, I think, and it was fantastic to learn about what you do, Muskaan. So, I am again looking forward to learning more about Grad Pilots and the work that you are doing. Over to you."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t002",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Muskaan",
+    "tStart": 87,
+    "tEnd": 173,
+    "text": "Great. Thank you so much, Divyesh. And yeah, we're really happy to be here. TOC has genuinely really contributed to our growth and partnerships a lot, because I'm not someone who belongs to the industry, it's just been a couple of years. And I have learned and known about so many wonderful people through TOC itself. So, I think if it didn't exist, I'm not sure, you know, where we would have found our footing in this industry. But I will very quickly share my screen. Try to keep it within the 10-12 minutes slot that I have. And yeah, we'll open it up for questions after. All right. Let's Okay. So, essentially just talking about the journey that we've marked so far. We are a startup which began operations back in 2024. We're based out of Chandigarh, but we work with students all over India, and we just started working with a student who's from Dubai. So, that's our first student outside of India. And we work mainly with three different types of verticals, one is directly with schools, second, with counselors, and third, with students."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t003",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk_0",
+    "tStart": 173,
+    "tEnd": 178,
+    "text": "Muskaan, the slides are not moving. You are in the Canva frame. Yeah."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t004",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Muskaan",
+    "tStart": 178,
+    "tEnd": 181,
+    "text": "Now can you see the second slide?"
+  },
+  {
+    "_id": "2026-09-24-in-focus-t005",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk_0",
+    "tStart": 181,
+    "tEnd": 183,
+    "text": "No. You are in the Canva frame only."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t006",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Muskaan",
+    "tStart": 183,
+    "tEnd": 208,
+    "text": "Okay. Let me try to share this. Okay. I think is this"
+  },
+  {
+    "_id": "2026-09-24-in-focus-t007",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk_0",
+    "tStart": 208,
+    "tEnd": 210,
+    "text": "Yes, perfect, perfect, super."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t008",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Muskaan",
+    "tStart": 210,
+    "tEnd": 448,
+    "text": "Great. So, yeah, there we have students, counselors, institutions. So, why did we start this? Just a little bit of context about me. I was very happily settled and living in New York in since COVID, and I really enjoyed my job. And as many students were facing challenges now, I too faced the visa problem challenge with the H-1B lottery and had to come back to India. And when I came back, I landed up in Chandigarh, a city I had never ever been to before in my life. And it really, I think it's Destiny's play that I got involved with the education sector. But I genuinely felt, and I heard a lot of students complaining about two or three options. And the time I came back, it actually coincided with AI and Chat GPT really coming into the frame. So, first we had, you know, with Donald Trump coming in, students are like, oh we don't want to go to the US, what should we do? Second, with AI coming in, parents were just like, oh we have so many options now, but, you know, what careers are safe from AI, what kind of jobs are there for our kids. Like, there was just so much anxiety. And even without all this, I realized that students were still not even aware of more than five or six career options. And we did our own sampling about this in every school that we went to. And we made students from every stream really talk about careers that they knew of, and none of them could name more than six or seven. And also we realized that within school, first, there are some schools who invest in career counseling resourced people, some don't. But the ones that even do that are still short-staffed in the sense that the ratio of counselors to the number of students is very, very high. So, it's actually humanly impossible for one counselor to know every single detail and give that personalized attention to a student just because of the insane workload that they have to manage. And we thought, what is the one way in which we can try to solve at least some, if not all, of these problems? And we are not, we call ourselves EdTech, but the technology basically is just something we've created to assist students. So, we're an education company that is leveraging technology to reach a larger audience of students. And how do we do this? So, I'm going to take us through this very complex slide, one after the other. We run programs within schools through our platform, which helps us reach schools which are not even within our physical vicinity. We call our proprietary program Career Select. It is an entire session plan that we curate with schools, all the way from ninth grade till 12th grade. The second is, we help career counselors. So, we work with select career counselors who are mentors and veterans in their fields and specialize in different areas of service. Third, because we were doing all this, some students just organically found us on our website, and they were like, \"Oh, we also want to do career counseling. What services do you provide?\" And that's how our organic, kind of, student channel started in, where, organically, we get students who have signed up on our platform, and we help connect them with the correct sort of career counselors. And finally, we work with service providers, a lot of whom we found on TOC, to help deliver sessions both within our school network and also to students who are looking for these opportunities. So, really quickly, I'm going to make us take us through the dashboard that we've created. Let me know, Divyesh, if my screen is still visible."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t009",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk_0",
+    "tStart": 448,
+    "tEnd": 451,
+    "text": "Yes, it is. And now we are seeing the dashboard."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t010",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Muskaan",
+    "tStart": 451,
+    "tEnd": 1009,
+    "text": "Okay, great. So, I'm going to log in and just very quickly show you as a student if you, you know, just found us online what you will be seeing. So, welcome to the Grad Pilots dashboard. We have a couple of very cool features, and I'm going to take you just through the main ones. First, we have College Discovery. I think everybody has a college discovery. However, I think we are the first, and I never want to say first or not because there are so many people innovating, but I think we are the first to start a Direct Apply in India. So, we have a bunch of Indian universities that we have partners with, and students who are willing to apply to these universities, especially the new IBCs that have come in, can come onto the platform, look at the different kind of information that they want from these universities, where they're based, where they're located, if there's any ranking, what are some courses offered by them, and directly save them and send out an application form via this portal. Second, we have something which I was mentioning earlier, our Mentor Select, which is, let's say, I'm a student, I don't know where I want to go, what I want to do, I want some personalized help. We want to bring transparency into the process. So, we have some people we met through TOC, and some we met organically. But we want to give students enough information to know whether this counselor is genuine or not. So, we ask our counselors who we partner with to create their bios, give us, you know, some sort of testimonials of students who have worked with them, give us their credentials, right? If you're a career counselor, you'd have to put out your own credentials. You're not, essentially, a sales person or a consultant per se. So, we put everything transparently out for students. And then, they send in connection requests to counselors, and we help facilitate that conversation. Third, something very, very cool. We have a bunch of features, but the one that I'm particularly very proud of is our ROI Calculator. This is just a fun game we play, or make our students do, in which we actually help them calculate. By the way, we have a really cool calculator that our R&D head, who's currently pursuing her PhD in the US, has helped us create. Now, let's say, I want to-- let's find a better university. What about Boston? Let's do Boston University. No scholarships. I'm going to live on campus. And I want my ROI. So, we help students understand what is really the investment, or the finances, behind the kind of decisions they are going to be making. So, this is just one of many features. We have blogs that we put out with our mentors, with students, with different sort of providers, like, about scholarships, fees. We have so many different, different people who've come and helped us really get information out to students. And we try to categorize them as much as possible. And finally, something cool that we do for students is, the students who are part of our school network, we get their profiles filled out, and then we anonymously help some of our partner universities who are part of this direct-apply channel look into them, and pre-select and offer scholarships to a certain number of students who have either performed really well, or have some amazing extracurricular awards and experiences. And we just launched this feature, and I'm proud to say that we're already facilitating this process for three out of eight of our partner schools. And they're all very excited. And 1st of October is when the first round of results for these students are going to come out. So, yeah, that is the student kind of portal, and what students do on Grad Pilots. And apart from this, coming back to the presentation, for schools, we facilitate workshops, through our proprietary program called Career Select, in which we give schools an opportunity to really tailor the program based on the inputs, suggestions, and data that we collect from the students' preferences. So, I'll give you an example of this. A recent school that we worked with in Karnal, around 80% of students saved colleges from Australia, Dubai, and India in their college list. And in November, the next session that is happening is we are inviting universities only from these three countries in the school, because that's what students have given us information on that they are interested in. Plus, in another school that we're working with in Mohali, students there really took psychometric tests and showed an interest and inclination towards entrepreneurship, including students in the science section. So, next month, we're facilitating a session for these students on AI and entrepreneurship. So, each session plan gets revised as per the needs and requirements of the school and students. So, it's not like, you know, one stick like some plan that we are doing five sessions, and these are the five people coming. We have a certain number of fixed sessions, but we also keep the flexibility to tailor it according to the needs of the school. And finally, coming to our favorite, IEC community. So, we have our own student management and mentoring platform, which is separate from the student portal I showed you. And I'm not, in the interest of time, I'm not going to take you through it. But it is a really cool platform, and we're very happy to talk to IECs about it. We don't charge any money at all for IECs to use that platform, number one. Number two, we are very, very, very particular about data privacy, because we're working with schools, minors' data, and I know it is a very, very big point of concern for a lot of IECs. So, we take our data privacy very seriously. That is something that you can check with some of the counselors that we're already working with. And finally, what we really do is we facilitate visibility for IECs in front of our student community, number one. And number two, we allow them to utilize technology to assist them in their work, without really having them to pay anything for it. Finally, what would be like, or how would we like to give back to the TOC community? We have put down two case studies out of the three from TOC that we work with. So, in terms of counselors, Charushilla Mam, who's from University Connection, we found her through TOC, we partner with her, we work with her, she's our specialist for UK and Europe. For service providers and university partners, we recently, even VerySeek we have worked with, who is about, who is supposed to be presenting here. And we have InnoWeeek and the Career Foundry. So, we facilitated trails, internships, by getting them, you know, be part of certain sessions, and also through some students who have come to us organically. Our school leaders and school professionals or counselors in the school community, we've not really worked with through TOC, but, yes, if there are any counselors from schools here, we'd love to initiate conversations and see if we are the right fit for your students. And finally, in terms of partnerships, we really believe that, you know, in this ecosystem, the only way to grow is to partner with people who have the right kind of mindset, value system, and mission as you. And I think TOC already does that layer of vetting where they bring people together who are genuinely interested and care about students. So, we always have an open call for partnerships from any person who has a TOC reference for us. These are the four types of collaborations that we're open to and initiating conversations. Of course, schools and counselors, education organizations, or even individual IECs. Finally, university partners whom we work with and see if there are opportunities for schools to invite them in order to present and talk to their students. And finally, skill-building and service provider professionals whom we work with to, you know, give on-ground sessions, or on-ground visibility in front of our students, or referrals. So, yeah, that's us, that's Grad Pilots, two years in and many more years to go, hopefully. And we're really, really happy to be here and have the opportunity to present to all of you."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t011",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk_0",
+    "tStart": 1009,
+    "tEnd": 1055,
+    "text": "Fantastic, super. Thank you so much, Muskaan, that's wonderful. And, I can vouch for you, I think, the kind of work that you are doing is very, very interesting. May I also request you to put your email in the chat, email, and, of course, you are on the group, but feel free to put your phone number in the chat so that the participants can reach out to you for more information. Joining us now, we have our second speaker, Rajat. Rajat runs VerySeek, and Rajat, are you here? I thought he was here. Okay, okay, now he is back. Hi Rajat. Rajat, hi, can you hear me?"
+  },
+  {
+    "_id": "2026-09-24-in-focus-t012",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Rajat",
+    "tStart": 1055,
+    "tEnd": 1057,
+    "text": "Yes, I can. How are you?"
+  },
+  {
+    "_id": "2026-09-24-in-focus-t013",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk_0",
+    "tStart": 1057,
+    "tEnd": 1073,
+    "text": "Perfect, perfect. Super, super. Welcome. So, we look forward to learning more about VerySeek Education and the kind of programs that you run bridging the gap between academic learning and the real-world professional skills. Over to you, Rajat. Thank you so much."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t014",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Rajat",
+    "tStart": 1073,
+    "tEnd": 2072,
+    "text": "Thank you, and first, could I at least thank Muskaan? I think it was a wonderful session. Uh so, uh thanks a lot Muskaan, really appreciated that. And, thank you. Uh I love the ROI calculator, by the way. Uh so, uh again, thanks everyone, um I know um, you know, it's, it's precious time for everyone so I'm not going to take too much time. Uh but I hope everyone can hear me clearly. Uh I also have a video to share with me, oh, amazing. So what we're going to do is, uh I'm going to take, uh you know, a very, very brief uh time to just do a very general talk, and then I'm going to take you through, I think, maybe, at best, two or three slides. Uh and I'm promising you the entire thing will not take more than 10 minutes. Uh but, happy to connect with everyone post this session uh if some of you believe that this might be useful uh for any of the students that you're interacting with. Uh so very quickly, I have my colleague Ayush here with me as well, and my name is Rajat. And, uh I don't know whether I should be saying it out loud or not, but, uh I'm not from the education industry, so that's why every interaction I have here is a bit of a learning opportunity for me. I'm actually a fund manager, I run a fund. Um as a background, uh I'm a qualified chartered accountant, a rank-holder chartered accountant. I have been, um uh I also did my MBA from the Wharton School. I, uh then, worked with McKinsey for a bit. I, then, have been the CXO, and COO, and CEO uh for a, you know, reasonably large number of companies including, uh heading divisions for Arvind Fashion, Star Television, uh Snapdeal, Cardekho, uh prominently being some of the, the few names. Uh I've also been a teacher. I take guest lectures at some, um, universities. Uh, and the only reason we're doing whatever we're doing is because a bunch of us, uh, including some friends from other B-schools, etc, just, just thought that, you know, it's our way of giving back, or giving forward, uh, to the community, uh, basis whatever we got out when we were roughly at that age. So, what does VerySeek VerySeek Education do, and what is it that we're about? We're a bunch of industry guys, um, primarily trying to take real-age kind of learning uh to students at school level. Uh we'd also want to do something at college, but I think school is probably where people need to start getting a sense of whatever they're learning in school and how it's going to be applied in life, or whatever they're not learning in school and what they should be learning in school. Uh all of us have been through the age where, where we've mugged up math formulas without really knowing where it's leading us. Uh or, in my case, since I was a commerce student, I, you know, I was learning accounting without really knowing what to do after that. Uh similarly, there are a bunch of skills that I think, uh our school system, and irrespective of which board you belong to, is not very well-equipped to teach us. For example, uh critical thinking, structured thinking, you know, these are nice little buzz words that we use all the time, but how are these, then, applied to a business situation? How does, for example, a CEO use these skills? How does, for example, a consultant use these skills? How does, for example, in my case, I'm an investor, how do I use these skills? And how these skills remain relevant for you throughout this life? So, uh whatever we're trying to do is our attempt to familiarize the students from Class 9 to 12 uh to some of these skills and how these skills get applied to real life. So, rather than someone just finding themselves in deep waters, uh just after doing graduation, this is our attempt to make it, um, uh slightly more familiar by the time they already hit college. Okay. Uh, so let me sort of put things in a little bit more perspective. Uh, we run a program, or rather we run two flagship, kind of, programs. One of them, and thank you, Ayush, you've been kind enough to actually uh put up the slides. Uh, we run two events. One's called Sharkathon, and another one's called Spark. Sharkathon is in the form of a competition which we run from Class 9 to 12 students. Uh Spark is not really a competition. Spark is a learning program where we do a slightly longer-term engagement with, with schools or students uh who actually want to learn-learn, as opposed to compete. Uh, so what is Sharkathon? And let me sort of just talk about Sharkathon. Now, Sharkathon, uh, is a program that's meant for Class 9 to 12 students. It's open to all streams. Um, you know, it doesn't matter whether you're doing arts, or science, or commerce. It we focus on taking students through three separate ways or three separate layers of thinking, and we believe none of them is really taught well in schools, uh, the way the curriculum are designed. There's a lot to cover in schools, nothing against the schools, but there has to be this extra that we're able to bring in, which is what the attempt is. So, the competition comes into three rounds, and three rounds test or train you on different ways of thinking. The first round is all about critical thinking. What do I mean by critical thinking? Uh, we have a bunch of, uh, multiple-choice questions all set in business situations. Um, for example, uh, and we will go through some of the, the questions. So the idea is, if, uh, if your colleague is telling you something, saying, \"Hey, listen, let's increase our marketing budget because, you know, there's a direct correlation uh between our competitors' marketing budget and the sales they do.\" Uh, would you agree with that or not? Uh, right? Now, and then we give you multiple choices around that, and the trick is for you to be able to figure out whether, uh, this statement that I just made, uh, holds water or not, because a correlation doesn't necessarily assume causation. Um, and then, these are the way the questions are designed. The idea being can we train you for skills where, if you're given a statement, do you have what it takes to be able to question the statement and go underneath before you take a decision? Uh, the second round, now, tests you on a completely different kind of thinking skills, and which is equally important as you learn to even enter the corporate world. Uh, it's, it's a skill in high demand. Uh, and this skill is structured thinking. So what do we do, and how do we engrain people in it? Uh, this, for this skill, we give you a, a very unstructured case study. So, we uh, give you the kind of case study that you'll typically get in a Harvard Business School, or, or, or, or, or what, or whatever else. So, it'll be a two-pager written thing, you know. CEO's worried, you know, XYZ things are happening, the business is not doing well, etc., etc. And then, we give you a lot of data. And somewhere in the 10 pages of data, there might be some bit of information that is actually helpful for you to solve the CEO's problem, or maybe not solve it. And the question you have to ask yourself, or the question we try to train people on, is, do you have the techniques of how you end up reaching that particular piece of information rather than reading everything line by line by line by line by line, because that's what school expects you to do. Structured thinking expects you to start very differently, follow a very completely different way of thinking, called hypothesis creation, and then work backwards to figure out, hey, if I wish I had these three pieces of information which would help me solve the question, and now you start looking for that information in the data pack that we've already given you, and life becomes much easier for you. Those people who are able to get it, uh, do a fantastic job, not only in the exam, but later on, uh, I'm hoping in their careers as well. Now that we've taught you critical thinking, now that we've taught you, or at least introduced you to structured thinking, the third round is, uh, okay, can you actually put all this in practice? Now, a lot of schools help their students, um, get exposed to, uh, various kinds of speaking competitions, etc. You know, they send them to a lot of MUNs. Uh, there are also entrepreneurship challenges, etc. And I've been a judge in a lot of them, and what I've realized is that even as I'm judging, uh, what I end up judging, uh, honestly, is not the depth of thought, but the conviction uh with which someone speaks and the elocution of the person. Right? Because at the end of the day, if someone speaks to you for, for 5 minutes, and then you get 1 or 2 minutes to counter-question the person, there's hardly much you're doing as a judge, uh, to be able to actually understand the depth of thinking someone brings. So, we decided to sort of change it on its head. And we said, okay, what we're going to do is we're going to make the students the investors, and one of our faculty is going to come and be a, uh, a hypothetical entrepreneur, and I'm going to make a pitch at you. And let me see if you know enough, and we, we actually present numbers on the screen as well. Let me see if you know enough about what business is all about for you to actually figure out if what the entrepreneur is saying is right or not. Can you see that there are certain numbers that look great, or not look great, etc., etc.? And can you question the entrepreneur enough for you to actually extract more information from him and then take the right decision? Now, this is again a very different kind of thinking skill where you know and you should know enough to know that you don't know enough, and therefore can you ask the right questions to be able to elicit more information before rushing to a decision. Again, this is very different from what we're usually taught where most of the information that's presented to you is already information, uh, that helps you fully in, um, answering a question. Right? You don't have to really go outside the question to, to answer the information. So, that's the, um, third round in Sharkathon. Okay. Um, for preparing for these rounds, there's also books that are provided. So, we know that these skills are not usually taught in school, so we also Thank you. I don't think those are the books. Uh, so there are three books on each of them, which actually introduce you to concepts that are otherwise never taught in school. So, for example, uh, you don't have to join McKinsey, for example, to be able to learn a concept of mutually, uh, MECE, or, uh, mutually exclusive, or completely exhaustive. Uh, similarly, you don't have to be an investment banker for you to at least know the basics of the time value of money. Similarly, you don't have to be a, a genuine CEO to actually establish critical thinking skills. So, all these are actually presented in age-appropriate format to the students as well. Uh, so, that's, that's hopefully, for the right students, going to be a lot of value-add right there. And then, to judge these competitions, we have two rounds which are online. The third round is actually a mix of online and offline. Uh, and for those of us who may have, um, actually seen the offline round, I'd sent an invite out on this group. Um, we had industry leaders judging it. Uh, we had people who were, again, Ivy League Alums, or founders of companies, etc. Um, Pramath, um, of course, uh, who's founded both ISB and Ashoka, was kind enough to spend an hour joining online and, and sharing his words with the students. So, uh, overall, I think for the students who came, it was just a genuinely great learning experience, what really, um, the books are on the screen now. Uh, those are the three books which help you prepare for the three rounds. For me, what is heartening was the fact that, uh, the judges who, who we'd called, uh, actually on their own volition, actually requested us, uh, to actually keep them updated on the journeys of at least the top 10 people, uh, who had at least in the top 10 in, in Sharkathon. So, that's, that's one format. Uh, the other format, which Ayush is trying to bring on the screen, is something called Spark. Um, it's a fancy acronym for some of these same skills that we're talking about, right? Uh, for me, or for you, or for anyone else who's from industry, what are the kind of things that we look for in a person, right? So, Spark is our attempt at trying to sort of, uh, instill all these skills through, uh, a slightly, um, deeper engagement with students, uh, in schools. Uh, it's the similar kind of skills, except, uh, that we sort of want to engage with students from Class 8, 9, 10, 11, and 12 and teach them particular kinds of skills in limited modules in each of the years, right? So, we're going all the way from, say, speaking, um, to communications, and critical thinking, structured thinking, some of the stuff we talked about earlier. Uh, risk-taking, now risk-taking is something which we really stay away from in school, and it's really, really a useful skill to have in life. Uh, and similarly, applying that risk-taking mindset, uh, to, uh, to entrepreneurship as well, where we throw you into slightly tougher situations and see, you know, um, or even introduce you to failure, I think that's an important skill to learn as well. Uh, so, so that's the slightly more detailed version of what the competition was trying to, uh, give people a glimpse of, right? Uh, so, yeah, I mean, um, it's, it's, uh, an initiative by some of us in industry who just wanted to give forward, um, we've we've kept a very nominal pricing for this, uh, for example, Sharkathon this year, uh, the fee was 5,000 bucks for a person, which allowed them to, uh, get the books, um, take all these tests, etc., learn, listen to industry sessions. Incidentally, I forgot to say, uh, for about six weeks before the competition, every hour, uh, someone or the other from the industry would come and talk about some of these concepts in action. So, for example, there would be someone, um, helping people through a live case using structured thinking approach. There would be another person on another day talking about how they look at a company and what they look for while investing in it, why, so that people don't get, you know, fancy and taken in by fancy terms, uh, that they actually start realizing that this is actually not as much of a rocket science and it's pretty fun to do. Uh, so, yeah. Uh, so, I think I'm probably over time, I guess, I'm, so I'm going to stop here. If someone can quickly, um, show one or two examples, we're fine, but, uh, these are the two programs we run. We've just finished two editions of Sharkathon. We've had about 400-500 students who benefited from it. Um, the winners get letters of recommendation from industry guys or Ivy League guys. Uh, we love to sort of follow them in their careers as well. Uh, the top three also get to intern with either me or another fund, um, run by other, uh, people. These were the, this is the founding team behind it, uh, essentially, um, an IIT gold-med- MIT, I'm from Wharton, uh, Sidharth is both a teacher and, and an ISB gold-medalist, uh, and among us we bring in a, we've we've covered a lot of, um, companies we've worked in. So, I'm going to stop there. Um, I don't know if Ayush has any other slides, but, um, happy to be in touch for anyone who thinks that the kids can benefit from this."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t015",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk_0",
+    "tStart": 2072,
+    "tEnd": 2107,
+    "text": "Uh, thank you so much, Rajat, for sharing all that wonderful, uh, wonderful programs that you're running. Uh, are there the, do you have some dates associated with them, if there's a slide which can show us the dates, etc., for these programs? And, uh, I saw that the email and the phone number was mentioned on the slide, so if you could also, uh, Ayush, if you could share that on the chat, that would be helpful, so that everyone can get in touch with you."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t016",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Rajat",
+    "tStart": 2107,
+    "tEnd": 2110,
+    "text": "Sure. So, while Ayush shares that, sorry, please carry on."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t017",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk_0",
+    "tStart": 2110,
+    "tEnd": 2113,
+    "text": "Go ahead, go ahead, please, go ahead."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t018",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Rajat",
+    "tStart": 2113,
+    "tEnd": 2195,
+    "text": "Uh so while Ayush shares that, let me at least um, uh, you know, answer your first question. So, Sharkathon per se, which is the competition, as of now, happens once a year. We just finished our second edition, as I was saying, you know. Um, love to have uh some of the industry leaders judge it, uh who are investors or, or senior industry leaders, as I said Pramath was also there. Uh, we finished, it usually happens in July and August. Uh, I would really prefer it if people are serious about it. Uh, they should at least uh have enrolled uh before the school closes for summer break, which I'm thinking is about April and May, because some of the sessions we do happen through the summer break as well, right? So, I'm assuming that if someone wants to register, March, April, May would probably be uh, uh a really good time. Uh, Spark, on the other hand, because it's uh school-specific, doesn't have this particular time frame or date in mind. We can do it, uh, depending on, uh, what each school wants, because it's kind of tailored to the requirements of a school. Uh, we are thinking, but we haven't really got one yet, we're thinking of an online version where it becomes school-agnostic. But as of now, we don't have that, uh, that program yet."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t019",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk_0",
+    "tStart": 2195,
+    "tEnd": 2236,
+    "text": "Okay, super. Uh, fantastic, uh, and I see Ayush has also shared the contact details in the chat, so please feel free to reach out to them. Uh, we have a couple more minutes before we close, so this is the time where you can ask your questions, so everyone who is here, please feel free to unmute yourself, ask questions to Muskaan, uh, and Rajat, and I'm sure they'll be happy to answer those. Or, if there are no questions, please, any parting notes, any final comments from both of you? Uh, whoever wants to go first, anything else that you want to share that you thought you could not share?"
+  },
+  {
+    "_id": "2026-09-24-in-focus-t020",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Muskaan",
+    "tStart": 2236,
+    "tEnd": 2274,
+    "text": "Uh, I would actually just like to say, Rajat, I recently uh worked with Ayush, I think, back in April when we were getting some students to sign up, and we took some feedback. So, they genuinely really loved the program, and uh I think, smaller cities, like we're based out of Chandigarh, um it's great exposure for kids to actually be able to go to Delhi, and the fact that you do it in person, I, I quite like that model uh because it gives students a sense of belonging and, you know, meeting each other. So, yeah, they had really good things to say about it."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t021",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Rajat",
+    "tStart": 2274,
+    "tEnd": 2286,
+    "text": "Thank you so much Muskaan, means a lot. I'm saying it's our way of at least trying to expose people. That's about it."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t022",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Muskaan",
+    "tStart": 2286,
+    "tEnd": 2292,
+    "text": "Yeah, I think everyone wants to be a startup entrepreneur without knowing what that really means."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t023",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Rajat",
+    "tStart": 2292,
+    "tEnd": 2309,
+    "text": "Precisely, right? Because Shark Tank has made it so, like, you know, you speak for two minutes and you get a check. No, it's not that, yeah. It's much, much, much, much more, if only life were that simple. And this is our way of telling people, you know, the journeys people have to do to be able to, um, to be there and do that."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t024",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Muskaan",
+    "tStart": 2309,
+    "tEnd": 2310,
+    "text": "Absolutely."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t025",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Rajat",
+    "tStart": 2310,
+    "tEnd": 2316,
+    "text": "And give these skills in the process. But, yeah, thank you so much."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t026",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk_0",
+    "tStart": 2316,
+    "tEnd": 2325,
+    "text": "Any final words from you, Rajat, anything else that you want to add here before we close for the day?"
+  },
+  {
+    "_id": "2026-09-24-in-focus-t027",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Rajat",
+    "tStart": 2325,
+    "tEnd": 2372,
+    "text": "Uh no, I think I'm good. Uh again, my request is that, uh, you know, while a lot of people, uh, look at what we offer as a profile-building thing, and, you know, rightfully so, that's what they should be doing, and it does build a profile, I mean, um, these are good letters of recommendation to have, um, in the resume and the arsenal. I think the other way of also looking at this is, um, is that it gives you a sense of real skill-building which is, uh, useful in various walks of life. Uh, whether you want to join, say, a firm like ours or any other, I think it's just useful in your interviews and in your personal development overall period. So, it'll be nice if, uh, at least the students are made aware about it."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t028",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk_0",
+    "tStart": 2372,
+    "tEnd": 2381,
+    "text": "Super. Fantastic. Uh, great to hear both of you, and, uh, I'm sure there'll be many of, many students from"
+  },
+  {
+    "_id": "2026-09-24-in-focus-t029",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Rajat",
+    "tStart": 2381,
+    "tEnd": 2384,
+    "text": "I do, sorry, could I add one, could I add one more thing?"
+  },
+  {
+    "_id": "2026-09-24-in-focus-t030",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk_0",
+    "tStart": 2384,
+    "tEnd": 2387,
+    "text": "Yes, yes, absolutely."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t031",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "Rajat",
+    "tStart": 2387,
+    "tEnd": 2417,
+    "text": "Uh, you know, what I forgot to mention, and I hope Pramath keeps his word on this, uh since he saw what was happening with the finalists, you know, one of the things he said was, \"Hey, listen, I, I'd love to sort of offer some, uh, special, this thing.\""
+  },
+  {
+    "_id": "2026-09-24-in-focus-t032",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk:0",
+    "tStart": 2400,
+    "tEnd": 2417,
+    "text": "for Ashoka University. For the, whatever. And I said, you know, give it a high level, but I think people will say, yeah, he said, \"Yeah, I'm I'm pretty sure that can be worked out.\" So, I just hope he keeps his word, because he was pretty impressed with the kind of stuff that the students were doing. So, let's see."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t033",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk:1",
+    "tStart": 2417,
+    "tEnd": 2437,
+    "text": "Wow, that would be great. That would be fantastic. I mean, if a student uh goes through the whole program and eventually ends up winning, like, getting funding, plus actually a scholarship at uh Ashoka, I mean, it's nothing like it. So, fingers crossed and, yeah. Okay, so it's uh"
+  },
+  {
+    "_id": "2026-09-24-in-focus-t034",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk:1",
+    "tStart": 2437,
+    "tEnd": 2439,
+    "text": "sorry. Go ahead. You're saying something, Rajat, yes?"
+  },
+  {
+    "_id": "2026-09-24-in-focus-t035",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk:0",
+    "tStart": 2439,
+    "tEnd": 2456,
+    "text": "No, no, no. I'm saying uh thank you uh for the opportunity. Really appreciate it. Uh and I'm sorry if I was fast, or I'm sorry if uh there were parts that I missed, but happy to be in touch. Uh the name and number is um in the chat."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t036",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk:1",
+    "tStart": 2456,
+    "tEnd": 2458,
+    "text": "Fantastic. Thank you so much. Thank you, Rajat."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t037",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk:2",
+    "tStart": 2458,
+    "tEnd": 2462,
+    "text": "Thank you, Muskaan. Thank you, Rajat."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t038",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk:3",
+    "tStart": 2462,
+    "tEnd": 2463,
+    "text": "Thank you. Thank you."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t039",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk:1",
+    "tStart": 2463,
+    "tEnd": 2465,
+    "text": "Thank you, Muskaan. Thank you, Rajat. And thank you, Bijoya, for"
+  },
+  {
+    "_id": "2026-09-24-in-focus-t040",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk:2",
+    "tStart": 2465,
+    "tEnd": 2468,
+    "text": "And thank you, Divisha, as usual, and Bijoya, both of you."
+  },
+  {
+    "_id": "2026-09-24-in-focus-t041",
+    "tenantId": "toc",
+    "sessionId": "2026-09-24-in-focus",
+    "speakerRef": "spk:1",
+    "tStart": 2468,
+    "tEnd": 2498,
+    "text": "Thanks, Anirudh. Thank you so much. Bye, everyone. Thank you."
+  }
+]

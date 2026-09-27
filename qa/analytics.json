@@ -1,0 +1,52 @@
+{
+  "generated": "2026-09-27T08:01:36.283844+00:00",
+  "root": "D:\\KnowledgeBase",
+  "days": 14,
+  "classes": {
+    "ts-bugfix": {
+      "gateway/fast-cheap": {
+        "n": 1,
+        "pending": 1,
+        "model": [
+          "claude-sonnet-5",
+          "deepseek-v4.1-flash"
+        ],
+        "pass_at_1": 0.0,
+        "expected": 1.0,
+        "mean_cycles": 1.0,
+        "median_wall_s": 668.6,
+        "cost_per_unit": 0.0,
+        "tokens_per_unit": 480505.0,
+        "tokens_per_pass": 480505.0,
+        "cached_share": 0.883,
+        "last": "2026-09-26"
+      }
+    },
+    "ts-feature": {
+      "claude-opus-subagent": {
+        "n": 1,
+        "pending": 0,
+        "model": [
+          "claude-opus-subagent"
+        ],
+        "pass_at_1": 0.0,
+        "expected": 1.0,
+        "mean_cycles": 2.0,
+        "median_wall_s": 0,
+        "cost_per_unit": null,
+        "tokens_per_unit": null,
+        "tokens_per_pass": null,
+        "cached_share": null,
+        "last": "2026-09-27"
+      }
+    }
+  },
+  "cost_context": {
+    "claude_units": 1,
+    "ollama_units": 1,
+    "ollama_tokens": 480505,
+    "main_tokens": 909884945,
+    "sub_tokens": 1476028874,
+    "opus_sub_share": 0.148
+  }
+}

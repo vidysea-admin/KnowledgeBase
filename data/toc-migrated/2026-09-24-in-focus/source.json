@@ -1,0 +1,14 @@
+{
+  "_id": "gdrive-1mJI5wuOvDuNu7A_sBj191Pe6-Olm18ri",
+  "tenantId": "toc",
+  "kind": "recording",
+  "captureMode": "provided",
+  "path": "raw/TOC/TOC-Materials/Audio/24th Sep - InFocus.m4a",
+  "hash": "gdrive-1mJI5wuOvDuNu7A_sBj191Pe6-Olm18ri",
+  "consent": {
+    "given": true,
+    "recordedBy": "u2-source-watcher",
+    "note": "organizer-provided TOC Drive recording, auto-detected by scripts/watch/run-watch.mjs"
+  },
+  "createdAt": "2026-09-26T18:30:16.253Z"
+}
