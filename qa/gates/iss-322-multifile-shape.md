@@ -85,4 +85,42 @@ record today. Authentication will not change whether Ashoka is trusted; it chang
 `Answered: <ISO> - <choice> - <where>` here, and under option (a) or (c) an authorizing DECISIONS
 entry is written before any file is touched.
 
+---
+
+## The open sub-question is now settled (maker, 2026-09-27 — read-only, no files touched)
+
+The gate said the depcruise question had not been checked "because the answer only matters under
+option (a)". It has now been checked, so option (a) can be priced honestly rather than approved blind.
+
+**1. Yes, depcruise forbids it, at `error` severity.** `.dependency-cruiser.cjs:27-31`, rule
+`apps-only-ask-ingest-index-ai-db-core`, allows `apps/*` to import only
+`packages/{ask,ingest,index,ai,db,core}`. `packages/meeting-bot` is not on that list, so
+`apps/api/src/.../store.ts` importing `auto-record-policy.ts` would fail `pnpm run lint:structure`.
+Not a style preference — a build break.
+
+**2. `packages/core` is genuinely reachable from both sides.** `apps/*` → `core` is allowed by the rule
+above; `packages/meeting-bot` → `core` is allowed by `meeting-bot-only-ingest-core`
+(`.dependency-cruiser.cjs:55-59`, allows `ingest|core`). And `core-imports-nothing` (line 48) means
+anything placed there must be pure — which a header parser is.
+
+**3. The new file is the documented convention here, not improvisation — this is the part that should
+change how you read option (a).** `packages/core/src/index.ts:2` states the rule in the repo's own
+words: *"Pure domain functions (no I/O) go in `src/domain/<concept>.ts` (D-003) — auto re-exported
+below."* There is already exactly one such file, `packages/core/src/domain/purge-policy.ts` (85
+non-blank lines, with its own `purge-policy.test.ts`), following that pattern precisely. So option (a)
+needs `packages/core/src/domain/sender-authentication.ts` plus one `export * from` line in
+`index.ts` — the fifth file is D-003's prescribed shape, with a working precedent, and it lands in the
+one package with room (core's whole non-generated surface is 114 non-blank lines against a 300 budget).
+
+**What this does and does not change.** It does not touch the security question or the recommendation:
+(a) is still the only option that closes routes (2) and (3), and (b) still ships a fix whose headline
+claim is false. What it changes is the cost you are being asked to approve — **4 edits + 1 new file
+that the architecture already specifies the location and shape of**, rather than an unpriced "the
+parser needs a home somewhere". The new file still needs your word, because the anti-drift rule
+reserves new files for you regardless of how well-precedented they are.
+
+**Answer format unchanged:** `iss-322-multifile-shape: a` (or b / c). Under (a), please also say
+`new file ok` so the `packages/core/src/domain/sender-authentication.ts` creation is authorized
+explicitly rather than inferred from the shape approval.
+
 **Answered:** (pending)
