@@ -61,6 +61,13 @@ export function AskPage(): React.ReactElement {
 
   const internal = result?.sources.internal ?? [];
   const web = result?.sources.web ?? [];
+  // ISS-274: the seam is now wired unconditionally (apps/api/src/production.ts), so
+  // `web_used: false` no longer means "no fallback was configured" -- it can also mean "the
+  // fallback was reached and honestly failed" (e.g. no TAVILY_API_KEY yet). ask-v2.ts logs that
+  // case as an `ask.web_fallback_unavailable` audit entry; without checking for it here, this
+  // page would keep telling the person "no web fallback is configured" even once one is wired,
+  // which is the exact "far from the DOM" UI regression this unit was told to watch for.
+  const webFallbackUnavailable = result?.auditLog.some((e) => e.step.startsWith("web_fallback_unavailable")) ?? false;
 
   return (
     <>
@@ -98,7 +105,11 @@ export function AskPage(): React.ReactElement {
             {result.insufficient_coverage && (
               <div className="empty-note">
                 The router judged internal coverage insufficient for this question
-                {result.web_used ? " and fell back to the web." : "; no web fallback is configured."}
+                {result.web_used
+                  ? " and fell back to the web."
+                  : webFallbackUnavailable
+                    ? "; the web fallback was reached but is currently unavailable."
+                    : "; no web fallback is configured."}
               </div>
             )}
             <div className="row-meta">

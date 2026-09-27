@@ -164,3 +164,55 @@ Verbatim selection: "Run the InFocus repair, U5 fully automatic, Write DECISIONS
 
 ## 2026-09-27T08:15:37+05:30 — Umesh: Zoom bot account
 Verbatim: "so take umeshsugara@vidysea for now". The bot's Chrome profile signs in with umeshsugara@vidysea.com for now; a dedicated bot account (e.g. recorder@vidysea.com) is deferred, not rejected. Follow-ups for maker: (1) session-expiry detection + alert asking for re-login before a scheduled join; (2) server deploy note: copy data/bot-profile/ or sign in once on the server; (3) later: switch to a dedicated bot account. Recorded by /checker knowledgebase-7a.
+
+## 2026-09-28 — maker (iss-274-wire-web-fallback unit, lane wave/iss-274-web-fallback-wire) — CONTRACT CONFLICT, checker to reconcile
+This unit implements D-041 ruling 2 (docs/DECISIONS.md, Umesh/Approver, verbatim): "WEB FALLBACK:
+build it, do not amend the north star. ISS-274 is resolved as wire-it, not sign-the-honest-limit.
+The Phase-1 exit clause stands as written and off-corpus questions must reach a web search path."
+The maker brief for this unit was explicit that it may READ `qa/contracts/ask-web-fallback-tavily.md`
+but may NEVER edit it, and must append any conflict here verbatim for the checker to resolve.
+
+**The conflict, verbatim from the existing contract:**
+- Criterion 1 (line 32): "When `tavilySearchFn` is omitted (today's production default), behavior
+  is byte-identical to before this unit."
+- Disclosed limitation section (lines 55, 59-61): "`TAVILY_API_KEY` is empty in `.env` — no real
+  Tavily account exists yet... `production.ts` omits `tavilySearchFn` entirely in this state, so
+  `/ask`'s current, already-shipped behavior (`insufficient_coverage: true` on ambiguous/incorrect
+  with no fallback) is completely unchanged until Umesh adds a real key."
+
+That is precisely the state ISS-274 was filed against (qa/issues.jsonl id ISS-274): an omitted
+`tavilySearchFn` means the seam is never even ATTEMPTED for an off-corpus question in production
+today, which the checker-sweep note on that issue and .goal/goal.json's Phase-1 exit clause both
+name as a goal-vs-contract conflict only the Approver could settle. D-041 ruling 2 is that
+settlement, and it says wire it — not "ship the byte-identical no-fallback default and call that
+the honest limit."
+
+**What this unit built instead (contradicts the contract's stated criterion 1 and disclosed
+limitation, by design, per the ruling above):**
+- `apps/api/src/ask-web-fallback.ts` — `createTavilySearchFn()` NO LONGER returns `undefined` when
+  `TAVILY_API_KEY` is unset. It always returns a real function. With no key, that function throws
+  a new `TavilyUnavailableError` on every call — it is reached, not absent.
+- `apps/api/src/production.ts` — `tavilySearchFn` is now wired into `askDeps` UNCONDITIONALLY (the
+  old `...(tavilySearchFn ? { tavilySearchFn } : {})` spread-conditional is gone). Production no
+  longer omits it in any state.
+- `packages/ask/src/ask-v2.ts` — the `tavilySearchFn` call is now wrapped in try/catch. A thrown
+  error (no key, or a real Tavily HTTP/network failure) is caught, logged via a new
+  `ask.web_fallback_unavailable` audit entry (`recordJob` `status: "failed"`, real `error` message
+  attached) and `insufficient_coverage`/`web_used` are left exactly as `ask()` computed them —
+  never silently flipped to a false "resolved", never left to crash `askV2` (verified: removing
+  the try/catch makes the new ISS-274 test in `ask-v2.test.ts` throw uncaught).
+- Net effect: with no real `TAVILY_API_KEY` (today's actual state), an off-corpus question now
+  REACHES the web-fallback seam on every request and gets an honestly-logged "unavailable" outcome,
+  instead of the seam being invisible to the request entirely. `insufficient_coverage` can still end
+  up `true` in that state (there genuinely was no web result), which is NOT the same claim as
+  "the fallback path was never reached" — the audit log now distinguishes the two, which it could
+  not before.
+
+**Ask of the checker:** the contract's criterion 1 line and its "Disclosed limitation" section (as
+quoted above) now describe behavior this unit deliberately does NOT preserve, on the Approver's own
+instruction (D-041 ruling 2). Per this repo's contract-ownership rule, only /checker may amend
+`qa/contracts/ask-web-fallback-tavily.md` — I have not touched it. Please reconcile it: either amend
+those lines to describe the new "always-wired, honest-unavailable-on-no-key" behavior, or explain
+why the old wording should stand alongside the new code if I've misread the ruling's scope. Full
+capability-coverage table + isolating falsifications are in
+`qa/manifests/iss-274-wire-web-fallback.md`.

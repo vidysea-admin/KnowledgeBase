@@ -153,10 +153,12 @@ export function buildProductionDeps(): ServerDeps {
           (job) => routeComplete("evaluator", job, { chains, providers, write: jobWrite, tenantId: ROUTER_TENANT_ID }),
         ),
         treeSearchFn: treeSearch,
-        // ISS-010: real Tavily web-supplement, only when TAVILY_API_KEY is actually set (it's
-        // empty in .env today) -- createTavilySearchFn() returns undefined in that case, so
-        // /ask's insufficient_coverage:true behavior is unchanged until a real key exists.
-        ...(tavilySearchFn ? { tavilySearchFn } : {}),
+        // ISS-010 / ISS-274: ALWAYS wired now. createTavilySearchFn() (ask-web-fallback.ts) no
+        // longer returns undefined when TAVILY_API_KEY is empty -- it returns a real function that
+        // throws TavilyUnavailableError, so every off-corpus question actually reaches the
+        // web-fallback seam (D-041 ruling 2) and ask-v2.ts's catch logs the honest
+        // "unavailable" degradation instead of the seam being silently absent from askDeps.
+        tavilySearchFn,
         write: jobWrite,
       },
     },
