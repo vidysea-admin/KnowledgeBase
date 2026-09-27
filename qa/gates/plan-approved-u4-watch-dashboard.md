@@ -1,0 +1,28 @@
+# PLAN gate — u4-watch-dashboard (feature scope)
+
+**Opened:** 2026-09-27 by the maker on a human-invoked tick. **Owner:** Umesh (Approver).
+**Blocks:** plan unit 11 (`u4-watch-dashboard`) and, behind it, unit U6 (`scripts/watch/install-tasks.ps1`).
+Per maker SKILL.md, a feature that adds a screen or a navigation path is not buildable until
+`docs/features/<slug>/{intent,spec,plan}.md` exist and are approved. This file is that record.
+
+## What is being asked
+
+`docs/features/u4-watch-dashboard/intent.md` is drafted and carries a **3-question mini-grill**.
+Nothing is built until question 2 in particular is answered, because (a) and (b) produce different
+screens and (b) may make the screen the smaller half of the feature.
+
+The draft also reports that **the plan row for unit 11 is stale**: `/sessions`, `/sessions/:id` and
+the approve/reject flow on `/calendar` already exist, so the real gap is that
+`GET|POST /watched-sources` and `POST /watched-sources/run` have **no UI consumer whatsoever**
+(`apps/api/src/routes/watched-sources.ts:67,100,107` vs no `apps/web/src/api/watched-sources.ts`).
+Approving the intent also means accepting that narrowed scope.
+
+## Answer format
+
+`u4-intent: 1=<who> 2=<a|b> 3=<visible|actionable>`
+
+Then, after the maker writes them from those answers, one line each for spec and plan.
+
+**Answered: intent —** (pending)
+**Answered: spec —** (pending)
+**Answered: plan —** (pending)
