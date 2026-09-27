@@ -30,6 +30,22 @@ function treeRoot(): TreeIndexNode {
   return root;
 }
 
+/**
+ * ISS-C-TOPICREFS-ARG-001. `treeRoot()`'s one topic spans BOTH s1 and s2, so passing either session
+ * id to `topicRefsForSession` yields the same result — no fixture built from `treeRoot()` can tell
+ * which `sessionId` a caller actually passed. This root adds a second topic whose `sessionRefs`
+ * EXCLUDES s1, so the two sessions surface different topic sets and the argument's value becomes
+ * observable in the write it produces.
+ */
+function treeRootExclusiveTopics(): TreeIndexNode {
+  const root = node("tenant:t", "t", "root");
+  root.children.push(node("tenant:t/2026/06/session:s1/topic:visa-rules", "Visa Rules", "topic",
+    { sessionRef: "s1", sessionRefs: ["s1"] }));
+  root.children.push(node("tenant:t/2026/06/session:s2/topic:funding", "Funding", "topic",
+    { sessionRef: "s2", sessionRefs: ["s2"] }));
+  return root;
+}
+
 const writes = (calls: Call[], coll: string) => calls.filter((c) => c.coll === coll && c.op === "updateOne");
 
 test("ISS-126: topics and orgs are UPSERTED — a mutation to upsert:false must not pass unnoticed", async () => {
@@ -282,6 +298,29 @@ test("ISS-C-TARGETING: topic and org upserts target their own _id, not an open f
   await promoteAndPersistEntities("t", "s1", treeRoot(), db);
   assert.equal((writes(calls, "topics")[0]!.filter as Record<string, unknown>)._id, "t:visa-rules");
   assert.equal((writes(calls, "orgs")[0]!.filter as Record<string, unknown>)._id, "t:acme");
+});
+
+/* ── ISS-C-TOPICREFS-ARG-001: the claims write is keyed to the ARGUMENT sessionId, not any topic ──
+ * `tagClaimsForSession` calls `topicRefsForSession(sessionId, topics)` — every prior test in this
+ * file called it through `treeRoot()`, whose single topic's `sessionRefs` is `["s1","s2"]`, so s1
+ * and s2 both resolve to the SAME topic set and no assertion here could tell which value the
+ * argument actually carried. A checker's mutation to a hard-coded "s2" reproduced this: apps/api
+ * stayed green. `treeRootExclusiveTopics()` gives the two sessions disjoint topic sets so the
+ * argument's value is load-bearing in the write it produces.
+ */
+test("ISS-C-TOPICREFS-ARG-001: a claim is tagged with the INDEXED session's topics, not the other session's", async () => {
+  const { db, calls } = fakeDb({
+    claims: [{ _id: "c1", tenantId: "t", evidence: [{ turnId: "t1", sessionId: "s1" }] }],
+  });
+  const res = await promoteAndPersistEntities("t", "s1", treeRootExclusiveTopics(), db);
+
+  const claimWrites = calls.filter((c) => c.coll === "claims" && c.op === "updateOne");
+  assert.equal(claimWrites.length, 1);
+  const set = (claimWrites[0]!.update as Record<string, Record<string, unknown>>).$set!;
+  assert.deepEqual(set.topicRefs, [entityId("t", "visa-rules")],
+    "s1 only surfaced 'visa-rules' — 'funding' is s2-exclusive and must not appear; a hard-coded " +
+      "or swapped sessionId argument would write [\"t:funding\"] here instead");
+  assert.equal(res.claimsTagged, 1);
 });
 
 /* ── C6: corpus-wide entity ids must not collide across tenants ────────────────────────────────
