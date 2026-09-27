@@ -135,6 +135,35 @@ const NEVER_A_PERSON = new Set([
   "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
   "january", "february", "march", "april", "may", "june", "july", "august", "september",
   "october", "november", "december",
+  // ISS-104 cycle 4 — the ENUMERATION replacing the anecdote. Every word above went in because an issue named it (`not` from ISS-095; `to`/`so`/`back` from ISS-093):
+  // never wrong, only never FINISHED, and nothing in it said what was still missing. SET A is enumerated from the grammatically CLOSED classes of English — closed =
+  // membership does not grow with the language, and that property, not diligence, makes it completable. SET B is the four sets C2b names by ROLE not grammar, bounded
+  // by enumeration only: a later gap in SET B is a real finding, one in SET A means the enumeration was done wrong. Method, the measurement that all 277 then-missing
+  // words shipped a fabricated person, and the `will`/`can`/`dare`/`need`/`day`/`true` name-collision cost knowingly accepted here (bare "Will" refused; "Will Smith"
+  // untouched — isDiscourseOnly needs EVERY token): qa/manifests/iss-104-closed-class-function-words.md
+  "thou", "thee", "ye", "mine", "yours", "hers", "ours", "theirs", "myself", "yourself", "himself", "herself", "itself", "oneself", "ourselves", "yourselves", "themselves",  // pron: personal/possessive/reflexive
+  "everything", "something", "anything", "anybody", "nothing", "either", "neither", "another", "other", "others", "much", "enough", "such", "one", "ones",  // pron: indefinite
+  "who", "whom", "whose", "what", "which", "whatever", "whichever", "whoever", "whomever", "whether",  // pron/det: interrogative + relative
+  "yet", "because", "although", "though", "while", "whereas", "unless", "until", "till", "since", "once", "lest", "whereupon", "however", "therefore", "thus",  // conj + conjunctive adverbs
+  "hence", "moreover", "furthermore", "nevertheless", "nonetheless", "otherwise", "meanwhile", "besides", "anyway",
+  "onto", "underneath", "above", "across", "after", "against", "along", "alongside", "among", "amongst", "around", "before", "behind", "below", "beneath",  // prepositions
+  "beside", "between", "beyond", "concerning", "despite", "during", "except", "inside", "like", "near", "outside", "past", "per", "regarding", "through",
+  "throughout", "toward", "towards", "unto", "upon", "within", "amid", "amidst", "notwithstanding", "barring", "via",
+  "am", "is", "are", "was", "were", "be", "been", "being", "do", "does", "did", "done", "have", "has", "had", "having", "will", "would", "shall", "should",  // auxiliary + modal verbs
+  "can", "could", "might", "must", "ought", "need", "dare", "let", "going", "gonna",
+  "away", "forward", "ahead", "aside", "apart", "together", "onward", "onwards",  // adverbial particles
+  "nowhere", "nope", "nah",  // negators
+  "rather", "almost", "nearly", "hardly", "barely", "scarcely", "only", "merely", "simply", "totally", "completely", "entirely", "fairly", "pretty",  // degree + focusing adverbs
+  "somewhat", "more", "less", "least",
+  "when", "where", "why", "how", "tonight", "noon", "midnight", "soon", "later", "already", "ever", "always", "sometimes", "often",  // deictic + temporal adverbs
+  "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "twenty", "thirty", "hundred", "thousand", "million", "billion",  // numerals + ordinals
+  "twice", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth",
+  "hiya", "howdy", "greetings", "namaste", "namaskar", "salaam", "bye", "goodbye", "ciao", "adios", "hola", "regards", "cheers",  // SET B: greetings + farewells
+  "pardon", "excuse", "alright", "sure", "exactly", "indeed", "absolutely", "definitely", "certainly", "correct", "true", "agreed", "understood", "noted",  // SET B: acknowledgements
+  "yep", "yup", "congrats", "congratulations", "bravo",
+  "um", "uh", "er", "erm", "hmm", "hm", "ah", "aha", "oh", "ooh", "oops", "wow", "huh", "eh", "alas", "ouch", "hurray", "hooray", "literally",  // SET B: interjections + fillers
+  "nice", "cool", "fine", "super", "lovely", "wonderful", "amazing", "awesome", "excellent", "perfect", "brilliant",  // SET B: evaluative responses
+  "week", "weekend", "month", "year", "day", "hour", "minute",  // SET B: calendar terms
 ]);
 
 /** Is every token of this candidate a discourse word? Then it is not a person, whatever the cue. */
