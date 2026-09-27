@@ -443,3 +443,13 @@ sweep, open); `D:/ai_os/audits/2026-09-09-delivery-gate-browser-predicate.md` H1
 **Approved-by:** Umesh
 
 **Links:** `qa/gates/mc-hooks-manifest-blindness.md` (Answered 2026-09-26, option A; confirmed first-hand in maker session knowledgebase-ed) - ISS-176, ISS-183 - `qa/manifests/delivery-gate-manifest-blindness.md` - `qa/contracts/delivery-gate.md` [C7]
+
+## D-035 | 2026-09-27 | type: decision | status: ACTIVE
+
+**What:** Approve the PLAN-phase backfill documents docs/spec.md and docs/plan.md, completing qa/gates/plan-approved.md (intent was approved in D-032). New build units may now start, including U5 auto-record (fully automatic, approved 2026-09-26).
+
+**Why:** The maker PLAN rule (tick step 2b) blocks any new build until intent, spec and plan each carry an Answered line. Umesh approved spec and plan first-hand in maker session knowledgebase-ed (AskUserQuestion answer "Approve both (Recommended)"). Known gap carried forward, not hidden: the spec marks notifications (intent O4) as NO CONTRACT; that contract is owed before U3 notify-channels is re-checked.
+
+**Result:** spec.md and plan.md status lines flipped to APPROVED; plan-approved gate carries Answered lines for intent, spec and plan.
+
+**Links:** qa/gates/plan-approved.md - docs/spec.md - docs/plan.md - D-032 - commits 5fae5e7, 3ab3ba0

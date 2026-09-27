@@ -1,10 +1,10 @@
 # Spec — Living Knowledge Base (PLAN backfill)
 
-Status: DRAFT — backfilled 2026-09-26 by maker (tick step 2b) from qa/contracts + approved intent.
+Status: APPROVED 2026-09-27 (Umesh first-hand, maker session knowledgebase-ed, AskUserQuestion "Approve both"; D-035) — backfilled 2026-09-26 by maker (tick step 2b) from qa/contracts + approved intent.
 Not approved until qa/gates/plan-approved.md carries `Answered: … — spec`.
 
 **Intent:** docs/intent.md (approved 2026-09-26, Umesh "go on i approve", gate `d780a93`) ·
-**Status:** draft
+**Status:** approved
 
 <!-- Every requirement cites: (a) the intent outcome it serves — O1..O6 (docs/intent.md
      "Proposed outcome") — and (b) the qa/contracts/*.md file(s) that are its de-facto acceptance

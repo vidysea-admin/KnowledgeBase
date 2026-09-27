@@ -1,6 +1,6 @@
 # Plan — Living Knowledge Base
 
-Status: DRAFT — backfilled 2026-09-26 by maker (tick step 2b). Not approved until
+Status: APPROVED 2026-09-27 (Umesh first-hand, maker session knowledgebase-ed, AskUserQuestion "Approve both"; D-035) — backfilled 2026-09-26 by maker (tick step 2b). Not approved until
 qa/gates/plan-approved.md carries `Answered: … — plan`.
 
 **Spec:** docs/spec.md (drafted concurrently by a sibling agent, 2026-09-26 — not yet approved;
