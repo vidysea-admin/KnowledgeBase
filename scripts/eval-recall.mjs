@@ -10,7 +10,7 @@
 // fell back to localhost and failed with ECONNREFUSED against a host that was never the target.
 import "dotenv/config";
 import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
-import { join, dirname, resolve } from "node:path";
+import { basename, join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { register } from "tsx/esm/api";
 
@@ -32,6 +32,47 @@ register(); // let subsequent dynamic import()s of packages/index's .ts sources 
 
 function loadJson(path) {
   return JSON.parse(readFileSync(path, "utf8"));
+}
+
+/**
+ * ISS-271: pure filterBias decision — testable without Mongo/network. `measured: false` fires
+ * ONLY when `rejectedPathExists` is false (the old bug: absence fell through to a bare `null`,
+ * indistinguishable from "measured, no bias found"). `computeRejected`/`computeCombined` are
+ * thunks, called only when `rejectedQs` is non-empty, so this function has no I/O of its own.
+ */
+export function computeFilterBias({ rejectedPathExists, rejectedQs, keptResult, computeRejected, computeCombined }) {
+  if (!rejectedPathExists) {
+    return {
+      measured: false,
+      note:
+        "NOT MEASURED — data/eval/golden-set-rejected.json is absent, so the ISS-092 filter-bias " +
+        "check did not run on this report. This is not a claim of zero bias; re-run " +
+        "scripts/gen-golden-set.mjs to produce the rejected-candidates file, then re-run this " +
+        "script to measure it.",
+    };
+  }
+  if (rejectedQs.length === 0) {
+    return {
+      measured: true,
+      note:
+        "0 candidates rejected, so the kept set IS the candidate set and the filter introduces " +
+        "no selection bias on this run — kept === combined by construction",
+      kept: { n: keptResult.total, recallAtK: keptResult.recallAtK },
+      rejected: { n: 0, recallAtK: null },
+      combined: { n: keptResult.total, recallAtK: keptResult.recallAtK },
+    };
+  }
+  const rejectedResult = computeRejected();
+  const combined = computeCombined();
+  return {
+    measured: true,
+    note:
+      "the post-filter removes questions the retriever tends to answer, so `kept` is a " +
+      "downward-biased floor; `combined` is the pre-filter figure",
+    kept: { n: keptResult.total, recallAtK: keptResult.recallAtK },
+    rejected: { n: rejectedResult.total, recallAtK: rejectedResult.recallAtK },
+    combined: { n: combined.total, recallAtK: combined.recallAtK },
+  };
 }
 
 /**
@@ -197,44 +238,33 @@ async function main() {
    * moves with the filter. So score the rejected questions too and publish all three. This turns
    * a reviewer's one-off observation into a figure that is recomputed on every run.
    */
-  let filterBias = null;
+  let rejectedQs = [];
   if (existsSync(REJECTED_PATH)) {
     const rejectedRaw = loadJson(REJECTED_PATH);
-    const rejectedQs = rejectedRaw.map((r, i) => ({
+    rejectedQs = rejectedRaw.map((r, i) => ({
       id: `rejected-${String(i + 1).padStart(3, "0")}`,
       question: r.question,
       expectedSessionId: r.sessionId,
     }));
-    if (rejectedQs.length === 0) {
-      // Distinguish "no bias" from "not measured". A null here would read as the latter, and the
-      // whole point of ISS-092 was that an unstated bias is worse than a stated one.
-      filterBias = {
-        note:
-          "0 candidates rejected, so the kept set IS the candidate set and the filter introduces " +
-          "no selection bias on this run — kept === combined by construction",
-        kept: { n: result.total, recallAtK: result.recallAtK },
-        rejected: { n: 0, recallAtK: null },
-        combined: { n: result.total, recallAtK: result.recallAtK },
-      };
-      console.log("filter bias: none — 0 candidates rejected, so kept === combined");
-    } else {
-      const rejectedResult = computeRecallAtK(rejectedQs, retrieve, K);
-      const combined = computeRecallAtK([...questions, ...rejectedQs], retrieve, K);
-      filterBias = {
-        note:
-          "the post-filter removes questions the retriever tends to answer, so `kept` is a " +
-          "downward-biased floor; `combined` is the pre-filter figure",
-        kept: { n: result.total, recallAtK: result.recallAtK },
-        rejected: { n: rejectedResult.total, recallAtK: rejectedResult.recallAtK },
-        combined: { n: combined.total, recallAtK: combined.recallAtK },
-      };
-      console.log(
-        `filter bias: kept ${result.recallAtK.toFixed(3)} (n=${result.total}) | ` +
-          `rejected ${rejectedResult.recallAtK.toFixed(3)} (n=${rejectedResult.total}) | ` +
-          `combined ${combined.recallAtK.toFixed(3)} (n=${combined.total}) ` +
-          `— kept is a FLOOR, not an unbiased estimate`,
-      );
-    }
+  }
+  const filterBias = computeFilterBias({
+    rejectedPathExists: existsSync(REJECTED_PATH),
+    rejectedQs,
+    keptResult: result,
+    computeRejected: () => computeRecallAtK(rejectedQs, retrieve, K),
+    computeCombined: () => computeRecallAtK([...questions, ...rejectedQs], retrieve, K),
+  });
+  if (!filterBias.measured) {
+    console.log("filter bias: NOT MEASURED — golden-set-rejected.json is absent (see filterBias.measured)");
+  } else if (filterBias.rejected.n === 0) {
+    console.log("filter bias: none — 0 candidates rejected, so kept === combined");
+  } else {
+    console.log(
+      `filter bias: kept ${filterBias.kept.recallAtK.toFixed(3)} (n=${filterBias.kept.n}) | ` +
+        `rejected ${filterBias.rejected.recallAtK.toFixed(3)} (n=${filterBias.rejected.n}) | ` +
+        `combined ${filterBias.combined.recallAtK.toFixed(3)} (n=${filterBias.combined.n}) ` +
+        `— kept is a FLOOR, not an unbiased estimate`,
+    );
   }
 
   console.log(`recall@${K} = ${result.recallAtK.toFixed(3)} (${result.hits}/${result.total} hits)`);
@@ -275,7 +305,11 @@ async function main() {
   console.log(`wrote ${useHybrid ? HYBRID_REPORT_PATH : useVector ? VECTOR_REPORT_PATH : REPORT_PATH}`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exitCode = 1;
-});
+// Guarded (same pattern as scripts/lint-loc.mjs): a test file that imports `computeFilterBias`
+// must not also trigger the real Mongo/tree-build/network run just by importing this module.
+if (process.argv[1] && import.meta.url.endsWith(basename(process.argv[1]))) {
+  main().catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  });
+}
