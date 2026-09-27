@@ -1,0 +1,10 @@
+# Append-only JSONL ledgers: two lanes appending different rows is NOT a conflict.
+# Without merge=union, every parallel wave that files an issue conflicts on the ledger and a
+# human resolves it by hand -- which is how rows get dropped. D-019 makes the lane shards
+# (qa/issues.<lane>.jsonl) shards of ONE ledger, so they need the same treatment as the
+# canonical file. Union keeps both sides' lines; it does NOT fix duplicate id ALLOCATION
+# (that is D-019's per-lane ISS-<LANE>-NNN rule) -- it only stops the merge itself losing rows.
+qa/issues.jsonl        merge=union
+qa/issues.*.jsonl      merge=union
+qa/token-ledger.jsonl  merge=union
+docs/FEATURES.jsonl    merge=union
