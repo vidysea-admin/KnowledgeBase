@@ -40,16 +40,20 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
 def fixture_server():
     server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
     port = server.server_address[1]
-    # cross_origin_outer.html's iframe src needs the real port; write it once we know it, before
-    # any test requests it. 127.0.0.1 vs "localhost" below is a different origin (different
-    # hostname) even though both are served by this one process on this one port — no second
-    # server process needed just to get a real cross-origin case.
-    src_path = os.path.join(FIXTURES_DIR, "cross_origin_outer.html")
-    with open(src_path, encoding="utf-8") as f:
+    # cross_origin_outer.html's iframe src needs the real (randomly-assigned) port. The checked-in
+    # fixture keeps the literal "__PORT__" placeholder forever; we never rewrite it in place (that
+    # would leave a stale port baked into git after the first local run and break repeatability —
+    # caught in review). Instead we render a throwaway sibling file with the placeholder swapped
+    # for this run's actual port, serve THAT, and delete it when the server shuts down. 127.0.0.1
+    # vs "localhost" below is a different origin (different hostname) even though both are served
+    # by this one process on this one port — no second server process needed for a real
+    # cross-origin case.
+    template_path = os.path.join(FIXTURES_DIR, "cross_origin_outer.html")
+    rendered_path = os.path.join(FIXTURES_DIR, "_cross_origin_outer.rendered.html")
+    with open(template_path, encoding="utf-8") as f:
         template = f.read()
-    if "__PORT__" in template:
-        with open(src_path, "w", encoding="utf-8") as f:
-            f.write(template.replace("__PORT__", str(port)))
+    with open(rendered_path, "w", encoding="utf-8") as f:
+        f.write(template.replace("__PORT__", str(port)))
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
@@ -57,6 +61,10 @@ def fixture_server():
     finally:
         server.shutdown()
         server.server_close()
+        try:
+            os.remove(rendered_path)
+        except OSError:
+            pass
 
 
 @pytest.fixture(scope="module")
@@ -110,7 +118,7 @@ def test_click_js_and_body_text_js_traverse_nested_iframe(sb, fixture_server):
 # ---- cross-origin iframe is skipped silently, never throws ----------------
 
 def test_cross_origin_iframe_is_skipped_without_throwing(sb, fixture_server):
-    sb.driver.get(_url(fixture_server, "cross_origin_outer.html", host="localhost"))
+    sb.driver.get(_url(fixture_server, "_cross_origin_outer.rendered.html", host="localhost"))
     sb.wait_for_ready_state_complete()
     # must not raise (a bare contentDocument access on a cross-origin frame throws a
     # SecurityError in the browser, which would surface here as a WebDriverException)
