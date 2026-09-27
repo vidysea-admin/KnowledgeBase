@@ -427,3 +427,42 @@ TICK 2026-09-28T05:25:00Z ADVANCED tier=2(ISS-350 reader half) wave=3 concurrent
     Told the 2 running builders to ff-merge master + pnpm install --offline. Fix the dispatch template.
   SERIAL: u4b waits on u4a (shared telegram-alerts.ts) - real edge, and u4a is not yet PASSed
   SERIAL: D-043 items 1+2 wait on the machine-wide scope gate - a human decision, not a ceiling
+
+=== TICK 2026-09-28 (maker, human-invoked) — STATE: ADVANCED ===
+Tier: 3 (roadmap — U4 watch-dashboard, the capture wave Umesh chose to finish first).
+
+CLOSED OUT THIS TICK:
+- u4a-watch-failure-alerts  -> checked-PASS cycle 0 (verdict a91fe90, merge 958a71f, close-out 7b4ce6f)
+- u4c-watch-page            -> checked-PASS cycle 0 (verdict 18d00c3, merge 47663ad, close-out c2f339b)
+
+DISPATCHED THIS TICK:
+- /checker on u4b-watch-heartbeat-alert cycle 0 (branch worktree-agent-ade446ac412280463, f4d90c3).
+  Built partial by design: 5 pure heartbeat functions + notifyWatchSilent + 4 tests. R2 itself UNMET.
+
+GATES OPENED THIS TICK (both need Umesh):
+- qa/gates/iss-358-alert-and-page-disjoint.md   (high) R1 alerts off watch_state; R4's page reads only
+  watched_sources + meeting-candidates. Disjoint collections, zero code overlap. The motivating incident
+  alerts correctly and deep-links to a page blind to it. NOT a u4c build defect -- D-046 approved R4-R8
+  against watched_sources by name. Spec-level premise spanning all three U4 units; the maker wrote that
+  spec. Maker recommends (a), a U4d giving the page watch_state visibility.
+- qa/gates/u4b-watch-heartbeat-collection.md    D-046 chose a NEW watch_heartbeat collection AND capped
+  new files at exactly three (all U4c's). ARCHITECTURE.md requires 4 files per collection (schema,
+  generated type, scoped accessor, migration) -- none authorized. Builder stopped at the boundary rather
+  than hand-rolling untyped db.collection() calls, which would have shipped R8 tenancy without the
+  scoped-accessor machinery (ISS-078 class). Correct call.
+
+PATTERN WORTH NAMING: two units in a row could not commit a test for new logic because test files are new
+files (ISS-357 on U4a, the 5 run-watch.mjs functions on U4b). A new-file cap set to stop scope creep is
+now specifically blocking tests. Item 4 of the u4b gate proposes the conventional fix.
+
+STILL OPEN AND GATED (no work possible without Umesh):
+- qa/gates/d043-machine-wide-scope.md      -> blocks D-043 items 1+2, so delivery-gate-stamp-adoption
+  fix cycle 2 AND the ISS-346 cap check, which D-044 requires BEFORE wave/vector-gap-durability.
+- qa/gates/iss-355-codex-hooks-disposition.md -> measurement taken: .codex/hooks.json is live-wired and
+  the Codex CLI is installed, so ISS-355 is live wrong, not latent. Maker recommends (c) links, (b) as
+  fallback.
+- qa/gates/ui-surfaces-test-file-exclusion.md -> oldest live gate (2026-09-09). Directly relevant to the
+  test-file pattern above.
+
+PARALLELISM: wave=1 concurrent peak=1 (the u4b checker). SERIAL: everything else waits on a named human
+gate, not on a dependency edge -- four of the five available units are gate-blocked.
