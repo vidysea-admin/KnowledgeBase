@@ -171,3 +171,33 @@ MISSED_WAKEUP 2026-09-27T09:44:00+05:30
   than a dead line of code, because the next reader trusts it.
 - checker also filed ISS-343 (medium): ISS-340 still names the stale 352 LOC figure, not 359.
 - ledger: 342 rows, all valid JSON. ISS-337 open → fixed.
+
+### SERIAL declarations for this session (delivery-gate SERIAL-MC block, answered with counts)
+
+The hook counted 6 maker/checker agents, 3 of them running alone. Two different causes, and only one
+of them is a real shortfall:
+
+- **SERIAL: checker(obs-launch-error) waits on maker(obs-launch-error)** — a named dependency edge, not
+  a choice. A checker cannot check a manifest that does not exist yet; this unit's manifest was written
+  in the same turn the checker was dispatched (no-dangling rule). Same for the sweep-consolidator
+  earlier: **SERIAL: sweep-consolidation waits on shards 1-3** — single-writer by design, which is why
+  the 3 shards themselves DID run as one parallel wave.
+- **SERIAL: golden-set-silent-fabrication waits on gate inventory (measured ceiling, not a dependency)**
+  — this is the honest one. Wave size was 1 because it was the only ungated buildable item, not because
+  parallelism was overlooked. Counted just now across the ledger UNION (D-019): **33 open
+  critical+high**, of which **22** are enforcement-path or governance rows (delivery-gate 10,
+  maker-checker-governance 5, maker-checker-handshake 2, write-guard 2, maker-liveness 1, pair-handshake
+  1, plus ISS-C-UNRUN-WRITERS-005) that cannot be built without an authorizing DECISIONS entry carrying
+  `Approved-by: Umesh`; 4 are speaker-resolution (ISS-282 paused by Umesh, ISS-104 class-capped, ISS-283
+  and ISS-289 behind the same pause); ISS-322 + ISS-333 are behind iss-322-multifile-shape; ISS-340
+  behind obs-windows-loc-split; ISS-274 says in its own title that only the Approver can settle it;
+  ISS-U0-2 is itself a HUMAN_GATE. **That leaves exactly ISS-271 and ISS-272 — the two rows this wave
+  took.** The wave was not under-filled; the buildable inventory is one unit deep.
+
+**The finding that matters more than the SERIAL bookkeeping:** two thirds of this project's open
+high-severity backlog is governance work about its own enforcement hooks, and all of it is blocked on
+one signature. The loop cannot parallelize its way out of that, and adding agents would not help — it
+is the same structural problem D-013 was written for, in a new place: the reachable backlog is thin
+not because the work is done but because the gates are unanswered. Nine items are queued for Umesh;
+the two with the widest unblocking effect are `iss-322-multifile-shape: a` + `new file ok` and
+`obs-windows-loc-split: a|b|c`.
