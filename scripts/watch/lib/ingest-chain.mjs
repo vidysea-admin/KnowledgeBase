@@ -60,6 +60,62 @@ export function assertIndexed(sessionId, turnsCount, chunkResult) {
   );
 }
 
+/**
+ * Pure. Decides what `run-watch.mjs`'s `--reingest` should do next, given only counts/ids it has
+ * already read — never touches disk or Mongo itself (ISS-314).
+ *
+ * `turnsExist` mirrors the caller's own `existsSync(join(newDir, "turns.json"))` check for the
+ * CORRECT session id. Outcomes:
+ *  - no turns.json under the correct id at all -> "reingest" (normal path: resolve old id,
+ *    delete-if-different, run the full ingest chain — unchanged from before this fix).
+ *  - turns.json exists, turnCount>0, chunkCount>0 -> "already-repaired" (existing idempotent
+ *    no-op — unchanged from before this fix).
+ *  - turns.json exists, turnCount>0, chunkCount===0, AND the old and correct session ids are the
+ *    SAME -> "reindex-only". This is the ISS-314 case: a prior run already transcribed/seeded
+ *    this exact session under its correct id and then failed (or was interrupted) before
+ *    indexing. Re-running the full chain would re-download/re-transcribe into a FORKED id
+ *    (ingest-chain's own dir-exists check) while the old `sources._id` row is still there, and
+ *    seed-toc's insert then hits E11000 on that unchanged _id. The repair here is narrower and
+ *    correct: index the session that is already on disk/in Mongo, nothing else.
+ *  - turns.json exists, turnCount>0, chunkCount===0, but old/correct ids DIFFER (or there is no
+ *    prior row) -> "reingest" (falls through to the normal delete-if-different + full chain;
+ *    that 0-chunk session belongs to a stale/wrong id being cleaned up, not the one being kept).
+ */
+export function decideReingestAction({ turnsExist, turnCount, chunkCount, oldSessionId, correctSessionId }) {
+  if (turnsExist && turnCount > 0 && chunkCount > 0) return { action: "already-repaired" };
+  if (turnsExist && turnCount > 0 && chunkCount === 0 && oldSessionId === correctSessionId) {
+    return { action: "reindex-only" };
+  }
+  return { action: "reingest" };
+}
+
+/**
+ * Pure. Resolves the session id `ingestOneDriveFile` should write under, given whether a
+ * directory already exists for the naively-derived `sessionId` and (if so) which Drive file the
+ * existing directory's `source.json` names.
+ *
+ * ISS-314: the old rule forked on ANY existing directory, which conflated two different
+ * situations — a genuinely different Drive file that happens to share the same date+title (fork
+ * IS correct there, and stays exactly as before), and THIS SAME Drive file already sitting on
+ * disk under this exact id mid-repair (0 chunks) — forking that one re-transcribes into a new id
+ * while the old `sources._id === "gdrive-<fileId>"` row is untouched, and seed-toc's insert then
+ * collides on that unchanged _id (E11000). The second case now throws a clear, named error
+ * instead of silently forking; `--reingest` (via `decideReingestAction` above) is the intended
+ * repair path for it.
+ */
+export function resolveSessionIdForIngest(sessionId, dirExists, existingDriveFileId, fileId) {
+  if (!dirExists) return sessionId;
+  if (existingDriveFileId === fileId) {
+    throw new Error(
+      `ingest id guard: "${sessionId}" already exists on disk for this exact Drive file (${fileId}) — ` +
+        `refusing to fork a new id and re-ingest a duplicate. If this session needs repair (e.g. 0 ` +
+        `chunks), use --reingest, which detects and repairs an existing same-id session by re-indexing ` +
+        `only — no re-download/re-transcribe/re-seed.`,
+    );
+  }
+  return `${sessionId}-${fileId.slice(0, 6).toLowerCase()}`;
+}
+
 function safeFileName(name) {
   return name.replace(/[<>:"/\\|?*]/g, "-").trim();
 }
@@ -129,7 +185,24 @@ export async function ingestOneDriveFile(gdrive, gwsRun, file, monthName, deps) 
     programYearFirstYear,
   });
   let sessionId = slugSessionId(date, title);
-  if (existsSync(join(ROOT, "data", "toc-migrated", sessionId))) sessionId = `${sessionId}-${file.id.slice(0, 6).toLowerCase()}`;
+  const candidateDir = join(ROOT, "data", "toc-migrated", sessionId);
+  const dirExists = existsSync(candidateDir);
+  let existingDriveFileId = null;
+  if (dirExists) {
+    const existingSourcePath = join(candidateDir, "source.json");
+    if (existsSync(existingSourcePath)) {
+      try {
+        const existingSource = JSON.parse(readFileSync(existingSourcePath, "utf8"));
+        existingDriveFileId =
+          typeof existingSource?._id === "string" && existingSource._id.startsWith("gdrive-")
+            ? existingSource._id.slice("gdrive-".length)
+            : null;
+      } catch {
+        existingDriveFileId = null; // unreadable/corrupt source.json — treat as unknown, fall through to fork below
+      }
+    }
+  }
+  sessionId = resolveSessionIdForIngest(sessionId, dirExists, existingDriveFileId, file.id);
   const finalDataDir = join(ROOT, "data", "toc-migrated", sessionId);
   mkdirSync(finalDataDir, { recursive: true });
 
