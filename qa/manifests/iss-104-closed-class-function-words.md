@@ -365,4 +365,45 @@ ISS-104's `fix_direction` is now enumerated rather than sampled, measured at 277
 across 406 enumerated words, and D-015's measurement rule is enforced by the suite instead of by
 intention.
 
-## Status: ready-for-check
+## Status: checked-PASS
+
+**Handshake status:** checked-PASS (Cycle checked: 1, verdict
+`qa/verdicts/iss-104-closed-class-function-words.md` committed 95a43fe, VERDICT: PASS, SCOREBOARD
+19/19, CAPABILITY-COVERAGE 3/3 rows reproduced independently this cycle, LIVE-BROWSER
+not-applicable, ISSUES-WRITTEN: none new) - closed out 2026-09-28.
+
+**Read the verdict file from the BOTTOM.** It carries TWO `VERDICT:` lines: `## VERDICT: FAIL` at
+line 12 (cycle 0) and `## VERDICT: PASS` at line 174 (cycle 1, the operative one). Cycle 0's block
+is byte-intact, as the protocol requires. A reader who greps for the first match gets the wrong
+answer.
+
+**What this PASS does and does not close - stated precisely, because the gap is the point.**
+
+- **Closed:** C13 only, i.e. ISS-104CC-1, the cycle-0 failure. The 409-word audit is now
+  independently re-derivable: `scripts/lib/audit-closed-class.mjs` and
+  `packages/index/src/pipeline/closed-class-audit-words.json` are committed, and the checker
+  re-derived `409 (SET A 299 + SET B 110)`, `AFTER 0/409` and `BEFORE (2bda2f4) 276/409` itself
+  rather than reading them here.
+- **NOT closed: ISS-104 itself, which remains `open` and `severity: critical` in the canonical
+  ledger.** This unit changed no behavior at all - `git diff 4f3fd9f..0a3463c` over
+  `speaker-name-rules.ts` and `speaker-name-rules.test.ts` is empty. The speaker seam that D-041
+  ruling 4 ordered worked "until it is clean" is therefore NOT clean; only the measurement of it
+  is now trustworthy. Nothing here may be cited as progress on the fabrication defect.
+- **NOT closed: ISS-104CC-2**, the worktree file-reversion anomaly found in cycle 0. Left open
+  deliberately - it is a process/environment hazard, not this unit's scope. Root cause is already
+  diagnosed (a `trap ... EXIT INT TERM ERR` whose byte backup was captured before the fix rather
+  than before each mutation; a trap on EXIT fires on normal exit too, so shell teardown restored
+  pre-fix content over finished work). D-020 as written permits that shape, which is the real
+  finding.
+
+**Corrections this cycle made to its own earlier record, rather than quietly restating:**
+
+- The headline numbers moved `406 -> 409` enumerated and `277 -> 276` missing-at-base. Cycle 0's
+  figures were produced by a script that was never committed and are therefore unverifiable; they
+  are labelled that way throughout instead of being overwritten.
+- The `147 entries` baseline was wrong; the real figure is 146.
+
+**Standing constraint carried forward:** `speaker-name-rules.ts` sits at exactly 300 non-blank
+lines, which is the `loc.max` ceiling with zero headroom - independently counted by the checker.
+The next word cannot be added to that file. Extracting `NEVER_A_PERSON` into a data module is the
+obvious move and is NOT authorized here; it needs its own unit.
