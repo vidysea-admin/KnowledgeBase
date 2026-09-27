@@ -32,8 +32,11 @@ export interface ObsGuardProbes {
   /** Clears the OBS unclean-shutdown sentinel so the next launch boots normally instead of
    * offering Safe Mode (the documented replacement for OBS 32's removed --disable-shutdown-check). */
   clearShutdownSentinel: () => void;
-  /** Launches OBS as a normal (non-Safe-Mode) process. */
-  launchObs: () => void;
+  /** Launches OBS as a normal (non-Safe-Mode) process. `onError` receives a spawn failure
+   * (ENOENT on a missing/moved obsExe, EACCES, ...). Node emits that event ASYNCHRONOUSLY, so it
+   * cannot be caught by a try/catch around this call — passing the callback is the only way to
+   * observe it, and an unobserved 'error' event with no listener crashes the process (ISS-337). */
+  launchObs: (onError?: (err: Error) => void) => void;
   /** MUST NEVER be called by ensureObsReady — present only so a test can assert it stays uninvoked. */
   forceKillObs: () => void;
   sleep: (ms: number) => Promise<void>;
@@ -48,12 +51,18 @@ const CONNECT_BACKOFF_MS = Array.from({ length: 10 }, () => 3000);
 /** Bounded wait after a graceful-close request before giving up on it and launching anyway. */
 const CLOSE_WAIT_MS = Array.from({ length: 10 }, () => 1000);
 
-async function connectWithBackoff(probes: ObsGuardProbes): Promise<boolean> {
+async function connectWithBackoff(
+  probes: ObsGuardProbes,
+  launchFailure: () => Error | undefined = () => undefined,
+): Promise<boolean> {
   for (const delay of CONNECT_BACKOFF_MS) {
     try {
       await probes.connectWebsocket();
       return true;
     } catch {
+      // OBS never started at all — waiting out the rest of the backoff cannot help, and the
+      // operator is owed the spawn error rather than a generic websocket timeout (ISS-337).
+      if (launchFailure()) return false;
       await probes.sleep(delay);
     }
   }
@@ -100,10 +109,24 @@ export async function ensureObsReady(probes: ObsGuardProbes): Promise<void> {
     probes.log("OBS is not running — starting it");
   }
   probes.clearShutdownSentinel();
-  probes.launchObs();
+  let launchFailure: Error | undefined;
+  probes.launchObs((err) => {
+    launchFailure = err;
+    probes.log(`OBS failed to start: ${err.message}`);
+  });
 
-  const ok = await connectWithBackoff(probes);
+  const ok = await connectWithBackoff(probes, () => launchFailure);
   if (!ok) {
+    // A spawn 'error' queued on the last attempt would otherwise lose the race against this throw
+    // and the operator would get the generic websocket message for a missing exe. One turn of the
+    // event loop is enough for an already-emitted event to be delivered.
+    await new Promise((resolve) => setImmediate(resolve));
+    if (launchFailure) {
+      throw new Error(
+        `OBS could not be started: ${launchFailure.message} — check that OBS_EXE points at an ` +
+          "existing obs64.exe (no force-kill was attempted).",
+      );
+    }
     throw new Error(
       "OBS websocket never came up after a guarded restart — check Tools -> WebSocket Server " +
         "Settings is enabled and the port/password match OBS_WS_URL/OBS_WS_PASSWORD " +

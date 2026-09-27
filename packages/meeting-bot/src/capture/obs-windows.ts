@@ -109,14 +109,21 @@ function clearObsShutdownSentinel(): void {
   rmSync(path.join(process.env.APPDATA, "obs-studio", ".sentinel"), { force: true, recursive: true });
 }
 
-function launchObsNormally(cfg: ObsBrowserConfig): void {
+/** Exported only as a test seam for ISS-337: the `child.on("error")` attachment below cannot be
+ * observed through `createObsBrowserDeps` without spawning the whole bot, and a test that fakes the
+ * callback would pass even with the listener removed. */
+export function launchObsNormally(cfg: ObsBrowserConfig, onError?: (err: Error) => void): void {
   // --disable-shutdown-check kept for older OBS where it still works; clearObsShutdownSentinel
   // above is the part that actually works on OBS 32 (see obs-guard.ts header).
-  spawn(cfg.obsExe, ["--minimize-to-tray", "--disable-shutdown-check", "--disable-updater"], {
+  const child = spawn(cfg.obsExe, ["--minimize-to-tray", "--disable-shutdown-check", "--disable-updater"], {
     cwd: path.dirname(cfg.obsExe),
     detached: true,
     stdio: "ignore",
-  }).unref();
+  });
+  // ISS-337: a spawn failure arrives as an async 'error' event. With no listener an EventEmitter
+  // throws it, which killed the whole controller on the unattended cold-start path.
+  child.on("error", (err: Error) => onError?.(err));
+  child.unref();
 }
 
 function forceKillObsNeverCall(): never {
@@ -131,7 +138,7 @@ function createRealObsGuardProbes(cfg: ObsBrowserConfig, obs: ObsClientLike, log
     },
     requestGracefulClose: async () => requestObsGracefulClose(),
     clearShutdownSentinel: clearObsShutdownSentinel,
-    launchObs: () => launchObsNormally(cfg),
+    launchObs: (onError) => launchObsNormally(cfg, onError),
     forceKillObs: forceKillObsNeverCall,
     sleep,
     log,
