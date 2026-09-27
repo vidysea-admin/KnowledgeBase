@@ -156,6 +156,69 @@ def test_hidden_iframe_subtree_is_never_clicked_or_merged(sb, fixture_server, fi
     assert "back" in body
 
 
+# ---- ISS-U0-6 (checker cycle 2 FAIL): an ancestor that clips its OWN box to zero size via
+# overflow:hidden -- while the iframe itself keeps an explicit nonzero width/height -- must be
+# treated exactly like an ancestor display:none, not missed by it -------------------------------
+
+def test_zerosize_overflow_hidden_ancestor_iframe_is_never_clicked_or_merged(sb, fixture_server):
+    sb.driver.get(_url(fixture_server, "zerosize_ancestor_top.html"))
+    sb.wait_for_ready_state_complete()
+    hit = sb.execute_script(CLICK_JS, JOIN_TEXTS)
+    assert hit is None, (
+        f"zerosize_ancestor_top.html: CLICK_JS clicked {hit!r} inside a zero-size, "
+        "overflow:hidden ancestor's iframe (ISS-U0-6)"
+    )
+    body = sb.execute_script(BODY_TEXT_JS).lower()
+    assert "webinar has ended" not in body, (
+        "zerosize_ancestor_top.html: BODY_TEXT_JS leaked clipped-ancestor iframe text (ISS-U0-6)"
+    )
+    assert "back" in body
+
+
+# ---- ISS-U0-7 (checker cycle 2, medium): opacity:0 and off-screen absolute positioning must
+# also gate the same way ------------------------------------------------------------------------
+
+@pytest.mark.parametrize("fixture_name", [
+    "opacity_zero_top.html",  # iframe itself opacity:0, otherwise nonzero on-screen size
+    "offscreen_top.html",     # iframe itself position:absolute;left/top:-9999px, nonzero size
+])
+def test_opacity_or_offscreen_iframe_is_never_clicked_or_merged(sb, fixture_server, fixture_name):
+    sb.driver.get(_url(fixture_server, fixture_name))
+    sb.wait_for_ready_state_complete()
+    hit = sb.execute_script(CLICK_JS, JOIN_TEXTS)
+    assert hit is None, (
+        f"{fixture_name}: CLICK_JS clicked {hit!r} inside an opacity:0/offscreen iframe (ISS-U0-7)"
+    )
+    body = sb.execute_script(BODY_TEXT_JS).lower()
+    assert "webinar has ended" not in body, (
+        f"{fixture_name}: BODY_TEXT_JS leaked opacity:0/offscreen iframe text (ISS-U0-7)"
+    )
+    assert "back" in body
+
+
+# ---- cycle-3 happy path: the geometric visible-area rewrite must not overcorrect into treating
+# a genuinely visible, real-world-shaped iframe as invisible ------------------------------------
+
+@pytest.mark.parametrize("fixture_name", [
+    "happy_fullviewport_top.html",         # position:fixed;inset:0;width:100%;height:100%
+    "happy_scrollable_container_top.html",  # visible iframe inside an on-screen overflow:auto div
+])
+def test_happy_path_visible_iframe_still_clicked_and_read(sb, fixture_server, fixture_name):
+    sb.driver.get(_url(fixture_server, fixture_name))
+    sb.wait_for_ready_state_complete()
+    body_before = sb.execute_script(BODY_TEXT_JS).lower()
+    assert "please wait, the host will let you in soon" in body_before, (
+        f"{fixture_name}: a genuinely visible iframe's text must still be read"
+    )
+    hit = sb.execute_script(CLICK_JS, JOIN_TEXTS)
+    assert hit == "join", (
+        f"{fixture_name}: a genuinely visible iframe's Join button must still be clicked, got {hit!r}"
+    )
+    body_after = sb.execute_script(BODY_TEXT_JS).lower()
+    assert "join (clicked)" in body_after
+    assert "back" in body_after  # top document's own text must still be present (merge, not replace)
+
+
 # ---- regression: a page with no iframe at all behaves exactly as before ---
 
 def test_no_iframe_page_click_and_body_text_regression(sb, fixture_server):

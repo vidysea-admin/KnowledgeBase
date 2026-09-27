@@ -1,0 +1,11 @@
+<!doctype html>
+<!-- ISS-U0-7 fixture (checker cycle 2, medium): same-origin iframe with its own explicit nonzero
+     size, positioned off the visible viewport via position:absolute;left:-9999px;top:-9999px --
+     no prior check compared the frame's rect against the viewport at all. -->
+<html>
+<head><title>offscreen-top</title></head>
+<body>
+  <a href="#">Back</a>
+  <iframe id="wc" src="hidden_leaf.html" style="position:absolute;left:-9999px;top:-9999px;width:640px;height:480px;border:0;"></iframe>
+</body>
+</html>

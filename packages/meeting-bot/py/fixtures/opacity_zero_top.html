@@ -1,0 +1,12 @@
+<!doctype html>
+<!-- ISS-U0-7 fixture (checker cycle 2, medium): same-origin iframe with its own explicit nonzero
+     size but opacity:0 -- fully transparent, so nothing is visually on screen, but neither the
+     cycle-1/cycle-2 getClientRects/getBoundingClientRect checks nor the visibility:hidden walk
+     ever looked at computed opacity. -->
+<html>
+<head><title>opacity-zero-top</title></head>
+<body>
+  <a href="#">Back</a>
+  <iframe id="wc" src="hidden_leaf.html" style="width:640px;height:480px;border:0;opacity:0;"></iframe>
+</body>
+</html>
