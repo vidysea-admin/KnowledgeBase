@@ -11,7 +11,7 @@ three ISS rows themselves — see "Issues addressed")
 
 ## STATUS — read this first
 
-**Status:** ready-for-check
+**Status:** checked-PASS (verdict qa/verdicts/u2-fix1-ingest-guards.md, cycle 1, e41cdef/153366c; ISS-304/305/306 stay open until post-merge reingest shows chunks > 0)
 
 **Status update 2026-09-27T07:30+05:30 (maker):** moved to ready-for-check on the code claim only. Umesh chose first-hand (AskUserQuestion "Wait for merge (Recommended)") to run the live index step from D:\KnowledgeBase AFTER this branch merges, because the lane run hit the ISS-308 two-module-instance artefact (see "Live repair run - 2026-09-27" below). Checker: judge the three fixes on the unit evidence; ISS-304/305/306 stay OPEN in the ledger until the post-merge `--reingest` shows chunks > 0 against the issues' own reproductions (D-015). The history below is kept as written.
 
