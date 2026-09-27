@@ -162,3 +162,30 @@ under one ISS-323(c) claim — both are correct, but a future regression in just
 (e.g. a title with spaces) would not by itself reintroduce the `&`-splitting symptom, and vice
 versa; worth knowing if either is ever touched separately. Neither rises above low severity or
 changes the verdict.
+
+## ADDENDUM (same session, before hand-off) — cycle 1 landed while this verdict was in progress
+
+While writing this verdict, commit `f01b47a` landed on this branch: a fresh-context
+`senior-software-engineer` review of `c8cbbf4` found that cycle 0's quoting
+(`'"' + ($_ -replace '"', '\"') + '"'`) is **not** correct `CommandLineToArgvW` escaping — an
+argument ending in a backslash produces an undoubled backslash immediately before the closing
+quote, which escapes that quote instead of closing the argument, silently swallowing every
+argument after it (their repro: a title ending in `\` lost `--until 12:30` entirely). This is
+real: I independently confirmed the character-level mechanism is exactly as described by reading
+the pre/post diff, and it is the **same silent-argv-corruption class ISS-323 exists to close**,
+reintroduced by cycle 0's own fix. My own capability-coverage falsification above tested an
+embedded double-quote (which does round-trip correctly) but never tried a **trailing backslash**,
+so I did not independently catch this. Filed by the maker as `ISS-LIVE-RECORD-REPAIR-002` (high)
+and `-003` (medium, the openCapMs branch never being exercised at cap=20s — also correct, and also
+something my own reading missed), and already fixed in the same commit
+(`Quote-Win32Argv` — proper Win32 backslash-run doubling).
+
+**This does not change the PASS verdict above**, which was scoped to cycle 0 at `c8cbbf4` exactly
+as dispatched, and every claim I evidenced for that commit was true of that commit. It does mean:
+cycle 0's quoting fix, while it fixed the two ledger issues' recorded reproductions, **itself
+carried a real high-severity regression of the same class**, caught by the very next fresh-context
+review rather than by this check. Recorded here so nobody reads this verdict later and assumes
+cycle 0's quoting was fully correct. **Cycle 1 (`f01b47a`, manifest now at `Fix cycle: 1`,
+`ready-for-check`) has NOT been checked by me** — it needs its own Mode A dispatch. I did not
+self-assign it: it is a different, newer submission than the one I was bound to, and Mode A
+checkers do not race ahead of their dispatch.
