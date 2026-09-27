@@ -2,4 +2,5 @@
 # maker step 4b reads THIS, never the raw manifests.
 # class · executor · n · pass@1 · pass@<=3 · med_wall_s · $/unit · rank · last
 
-ts-bugfix · gateway/fast-cheap [->claude-sonnet-5] · n=1 (+1 pending) · pass@1=0% · pass@<=3=100% · 669s · $0.0000 · rank=1.00 · 2026-09-26
+ts-feature · claude-opus-subagent [->claude-opus-subagent] · n=1 · pass@1=0% · pass@<=3=100% · 0s · $? · rank=0.85 · 2026-09-27
+ts-bugfix · gateway/fast-cheap [->claude-sonnet-5] · n=1 (+1 pending) · pass@1=0% · pass@<=3=100% · 669s · $0.0000 · rank=0.80 · 2026-09-26

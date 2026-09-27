@@ -1,4 +1,120 @@
-# QUEUE — checker Mode B sweep 2026-09-26T23:0x+05:30 (3-shard wave, consolidated)
+# QUEUE — checker Mode B sweep 2026-09-27T13:4x+05:30 (3-shard wave, consolidated)
+
+> Bound to `D:/KnowledgeBase`, range `97674cb..213d2ac` (HEAD `213d2ac`, 45 commits), sweep due on
+> both triggers (`.last-sweep` 351 min old AND HEAD moved off its recorded SHA). Invoked directly by
+> Umesh ("you are the /checker"), 3 read-only shards + this consolidation as single writer. Mode A
+> not run: **no manifest sits at `ready-for-check` with a missing or lower-cycle verdict**, so there
+> was no unit to check. **Terminal state: FINDINGS: 6 new (ISS-325 high `close-out-skipped`; ISS-326
+> medium `untracked-manifest`; ISS-327 medium `verified-stagnant`; ISS-328 medium `contract-gap` U5;
+> ISS-329 medium `contract-gap` notify-channels; ISS-330 low file-don't-fix delegation row) + evidence
+> appended to 8 existing open rows (ISS-129, ISS-274, ISS-275, ISS-276, ISS-301, ISS-307, ISS-310,
+> ISS-311) rather than minting new ids.**
+>
+> **The finding worth reading first — ISS-325.** `mc-hooks-bolded-status` is PASS cycle 1 and merged
+> (`86ba98d`), but its close-out commit `6558508` is a ONE-LINE diff that edited a **prose example at
+> line 22** instead of the manifest's real `**Status:**` line at **line 198**, which still reads
+> `ready-for-check`. So the session-start hook's "PASS not closed out: 1" is **correct**. The irony is
+> load-bearing, not decorative: this unit's whole subject was Status-line parsing, and line 22 was its
+> record of which forms used to be invisible to the hooks — that record is now false. Likely root
+> cause: a close-out that string-replaces `ready-for-check` hits the FIRST occurrence, which in a
+> manifest *about status strings* is a fixture. The fix is the same anchoring D-034 gave the hooks.
+>
+> **ISS-307 mechanism corrected mid-sweep.** The dispatch brief asserted the hook reads line 1 =
+> `MISSED_WAKEUP`. Shard 2 disproved that: `qa/.last-tick` is append-only **oldest-first**, so
+> `mc-sessionstart.ps1:47`'s `-TotalCount 1` reads the 2026-09-24 tick, whose prose embeds the
+> substring `... STALLED (HUMAN_GATE)`; line 49's regex fires on that substring and line 48's
+> `($lt -split '\s+')[2]` yields `ADVANCED`. So it is **two** compounding bugs (oldest-line read +
+> substring match inside prose), and the row's title captures only the first. `STALL UNDIAGNOSED:
+> ADVANCED` is a **false positive** — no `/agent-debugger` run is owed, and the one genuinely STALLED
+> unit already has its report at `qa/debug/delivery-gate-manifest-blindness-cycle3.md`.
+>
+> **Verified, not filed.** Pair-state clean across all 18–19 units in range, reading every verdict's
+> FULL cycle history rather than its first `VERDICT:` line (u5 FAIL-c1→PASS-c2, u0-zoom-iframe
+> FAIL-c1→FAIL-c2→PASS-c3, t-047-controller FAIL-c0→PASS-c1 all match their manifests): no
+> check-pending, no fix-gap, no bypass, no unmanifested code merge. Maker **not** asleep (ticks
+> ADVANCED/HUMAN_GATE through 12:47 today; the 09:44 `MISSED_WAKEUP` self-recovered by 09:57) — no
+> ISS-054 recurrence. Enforcement liveness **CLEAN**, including the one thing that looks broken and
+> is not: the project-level DECISIONS guard is deliberately absent per **D-023** (Approved-by Umesh,
+> latency), and the user-level `aios-write-guard.ps1` was independently confirmed registered and
+> emitting the identical `deny` — a documented consolidation, not a dead gate, so **no
+> `approval-required` finding** under the Lab Protocol clause. `qa/adapter.json` absent → data-boundary
+> check **out of scope by design**, no PII scan run. Delegation: 6 rows, every `(task_class, executor)`
+> at n=1, far below the 10-unit floor → **no QUARANTINE**; the one `ollama/*` manifest
+> (`speakers-degraded-scope`) has a real `run` dispatch row → **no delegation-bypass**. `qa/loop.md`
+> lists all seven terminal states verbatim. Checks 7 and 9 both returned **zero** new rows:
+> `task-scheduler.ts`/`schedule-tick.ts`/`sync-session.mjs`/`run-watch.mjs` all propagate or surface
+> failures (no sibling of ISS-323's exit-0 mask), and this window's `BrainPage.tsx`/`CalendarPage.tsx`
+> churn is **convergent extraction into newly-tested modules**, which is the opposite of erosion.
+> ISS-310's precondition is now RESOLVED (`qa/gates/plan-approved.md` exists, 3 `Answered:` lines,
+> 149-slug `Backfilled:`; 0 `built-before-plan`, 0 `feature-without-plan`) but the row is **left open
+> on purpose** — closing it needs a `regression_check`, the only honest one is a file-existence
+> assertion, and that is in neither allowed form, so inventing one is exactly the D-015 substitution.
+>
+> **Three gates genuinely unanswered, searched for an off-disk answer and found none** (so no
+> `gate-answered-off-disk` finding, which requires an actual answer): `d015-generalisation-scope.md`
+> **18d**, `handshake-liveness-contract-start.md` **18d**, `ledger-shard-union-hook.md` **19d** — the
+> last of which is the direct blocker on ISS-129, since `mc-sessionstart.ps1:5` still hardcodes
+> `$LEDGER = 'qa/issues.jsonl'` and therefore undercounts by exactly **20 open rows** (union: 366 rows
+> / 138 open at dispatch vs the hook's 118).
+>
+> **`.goal/goal.json` deliberately NOT touched this sweep.** U5 PASSed and merged while `TASKS.md:126-128`
+> and `goal.json` both still read T-036/T-037/T-038 open/pending. Prior sweeps closed a goal task only
+> where `TASKS.md` **already** agreed; closing `goal.json` alone here would manufacture the mirror
+> divergence, so it is recorded as ISS-276 evidence and left to the maker to close in both trackers.
+> Token line appended verbatim from shard 3 (`opus_sub_share` **0.0**, 31 sub_agents, 0 classifier
+> outages, 6 auto-compactions).
+
+- GRILL: web-fallback vs Phase-1 exit — ask-web-fallback-tavily records the unwired seam as production
+  default while the north star's Phase-1 exit requires off-corpus web fallback; wire-it-or-sign-the-honest-limit
+  is an Approver amendment (ISS-274). **Re-confirmed live this sweep, 5 days open, no ruling.**
+
+## Current top 3 (backlog-priority order, refreshed 2026-09-27T13:4x sweep)
+
+Derivation, stated per this repo's rule that every tick names its tier. **Tier 1** (top clear
+`QUEUE.md` TODO row): empty — 0 TODO rows. **Tier 2** (open critical/high) therefore governs, and
+Umesh chose strict severity order over a live-failure override this sweep. Both open **criticals**
+resolve to *not pullable*, which is why the list below is all high:
+
+- **ISS-282** (critical, phase-3 precision re-gate) — its unit is deliberately paused
+  (`qa/.paused.u2-4-phase3-precision-regate`), i.e. gated, not neglected. See ISS-326 for the real
+  defect there (the manifest is untracked).
+- **ISS-104** (critical, naming-cue fabrication, `speaker-resolution-llm`) — **round-capped**. It is
+  a correctness/fabrication finding, not D-014 security class, and that seam already carries ≥6
+  PASSed verdicts (`speaker-resolution-llm`, `-deterministic`, `-whitespace-guard`, `speaker-apply-write`,
+  `speaker-denylist-ledger-corpus`, `speakers-degraded-scope`) against a cap of 2. Per D-014 it is
+  `file-don't-fix`; if it is judged unsafe to ship at 5/20 attacks still resolving, the route is a
+  **HUMAN_GATE**, never round N+1.
+
+1. **ISS-323 (high, today) — `start-record-detached.ps1` fails silently and exits 0.**
+   `Start-Process -FilePath pnpm` (line 38) resolves the pnpm **sh shim** ("%1 is not a valid Win32
+   application"), still prints `started detached record: pid <empty>`, and exits 0; separately any
+   `.cmd` shim re-parses argv through `cmd.exe`, so an unquoted `&` in a Zoom join URL splits the
+   command. First in the chain — nothing downstream can run until the launcher reports honestly.
+   Security-adjacent only in the argv sense; the **exit-0 mask** is the defect. Shard 3 swept for
+   siblings of this pattern across the record path and found **none**, so it is contained to this file.
+2. **ISS-324 (high, today) — `lkb record` dies with "bot browser did not open the page (timeout)".**
+   On the live Ashoka run, with correct argv, 5 GB RAM free and no leftover bot-profile Chrome —
+   while the *same* `data/bot-profile` opened `zoom.us/myhome` fine under `SB(uc=True, headed=True)`
+   at 08:30. Suspect the page-open wait in the record controller or `sb_join.py`'s startup handshake.
+   **This is the one that cost a real recording**: the Ashoka Educator Dialogues webinar of
+   2026-09-27 was NOT captured.
+3. **ISS-322 (high, today) — no sender authentication upstream of the trusted-sender policy.**
+   `gws-gmail.ts`'s `extractEmail(header(headers,'From'))` carries **all four** default trusted
+   entries with no SPF/DKIM/DMARC check, so any spoofed `From` delivered to the scanned inbox is
+   fully trusted. Umesh already answered its gate (a) *email authentication*. Couples directly to
+   **ISS-328** (filed this sweep): U5 shipped with no contract at all, so this invariant is currently
+   written down nowhere.
+
+**Cheap maker chore, not a unit:** ISS-325 is a two-line manifest repair (flip line 198 to
+`checked-PASS`, restore line 22's prose example). It clears the "PASS not closed out: 1" banner and
+should ride along with whatever tick runs next — the checker cannot do it (never edits a manifest).
+
+**Contracts owed, both human-gated as initial creations:** ISS-328 (U5 auto-record — cite Umesh's
+2026-09-26T23:54:34 "go on i approve" rather than re-asking the policy; what needs sign-off is
+whether ISS-322's sender authentication is a hard `[I*]`) and ISS-329 (notify-channels — D-035 says
+it was owed *before* U3 was re-checked, and U3 has already PASSed and merged).
+
+## Prior sweep header (2026-09-26T23:0x+05:30, 3-shard wave, superseded as routing; kept for its own findings below)
 
 > Bound to `D:/KnowledgeBase`, range `c9959bf..802c52c` (HEAD `802c52c`) at dispatch; sweep writer
 > runs solo (a parallel `/maker` session may be live in the same tree — this consolidation re-read
@@ -112,7 +228,7 @@
 > after the concurrent t-030-telegram-alerts PASS/merge/close-out landed — this sweep's own commit
 > touched only checker surfaces + `.goal/goal.json`'s T-029 close, no code).
 
-## Current top 3 (backlog-priority order, refreshed 2026-09-26T23:0x sweep)
+## Prior top 3 (backlog-priority order, refreshed 2026-09-26T23:0x sweep; superseded by the 2026-09-27T13:4x list above)
 
 1. **[HUMAN_GATE, URGENT]** `zoom-bot-signin` — the Ashoka Educator Dialogues Zoom webinar
    (2026-09-27 ~10:00 IST) requires an authenticated Zoom account to join past the web-client wall

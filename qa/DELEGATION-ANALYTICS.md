@@ -5,8 +5,9 @@
 # class · lane [exact model(s)] · n · pass@1 · done_as_expected(<=2cyc) · mean_cyc · med_wall_s · $/unit · tok/unit · last
 
 ts-bugfix · gateway/fast-cheap [claude-sonnet-5,deepseek-v4.1-flash] · n=1 (+1 pending) · pass@1=0% · expected=100% · 1.0cyc · 669s · $0.0000 · 480,505tok · cache=88% · 2026-09-26
+ts-feature · claude-opus-subagent [claude-opus-subagent] · n=1 · pass@1=0% · expected=100% · 2.0cyc · 0s · $? · ?tok · 2026-09-27
 
 ## Cost context (last 14 days)
 External lanes (Ollama plan credits, metered by token): scored units 1 · worker tokens 480,505 · 480,505 tok/PASS
-Claude lanes cost tokens · main=799,291,049 · subagents=1,260,914,428 (incl. checkers)
-Opus share of subagent tokens: 17%  (Sonnet builds are ~5x cheaper)
+Claude lanes cost tokens · main=909,884,945 · subagents=1,476,028,874 (incl. checkers) · ~>=1,476,028,874/Claude-build (overcounts: checkers included)
+Opus share of subagent tokens: 15%  (Sonnet builds are ~5x cheaper)
