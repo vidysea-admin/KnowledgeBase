@@ -1,4 +1,132 @@
-# QUEUE — checker Mode B sweep 2026-09-27T13:4x+05:30 (3-shard wave, consolidated)
+# QUEUE — checker Mode B sweep 2026-09-27T17:1x+05:30 (3-shard wave, consolidated)
+
+> Bound to `D:/KnowledgeBase`, range `213d2ac..3869c83` (HEAD moved on to `dcf2b47`/`a99140f` by a
+> live maker session during this sweep; not this range's concern). Invoked directly by Umesh
+> ("you are /checker running the CONSOLIDATION pass"), 3 read-only shards + this consolidation as
+> single writer, ids starting at ISS-337 per dispatch (maker had already taken ISS-335/336). Mode A
+> not run: no manifest sat at `ready-for-check` with a missing/lower-cycle verdict at dispatch time
+> (a live maker session was concurrently writing `qa/gates/*.md`, `docs/features/u4-watch-dashboard/*`
+> and `qa/.last-tick` — none of those paths were touched by this sweep). **Terminal state: FINDINGS: 6
+> new (ISS-337 high `spawn-error-unhandled`; ISS-338 low file-don't-fix; ISS-339 low file-don't-fix;
+> ISS-340 high `gate-bypassed-and-untracked`; ISS-341 medium `contract-not-cited`; ISS-342 medium
+> `pause-violation`, closed-self-corrected) + evidence appended to ISS-214 (one half now stale, one
+> half still open) + ISS-326 flipped open→fixed (its manifest is now tracked).**
+>
+> **The finding worth reading first — ISS-337.** `packages/meeting-bot/src/capture/obs-windows.ts:112-120`
+> `launchObsNormally` spawns OBS with `{detached:true, stdio:"ignore"}).unref()` and registers no
+> `.on("error", ...)`; its only caller, `obs-guard.ts:87-114` `ensureObsReady`, calls it at line 103
+> with no surrounding try/catch. Node emits spawn `'error'` asynchronously, so a synchronous
+> try/catch could not have caught it anyway, and an unhandled `'error'` event crashes the process.
+> Verified independently (not accepted on the shard's say-so): `git diff 3368454^1 3368454^2 --
+> packages/meeting-bot/src/capture/obs-windows.ts` shows the merge that just fixed ISS-324 added
+> exactly this handler (`child.on("error", ...)` at line 253) to the SIBLING `launch()` function and
+> left `launchObsNormally` completely untouched. `grep -rn launchObsNormally qa/issues*.jsonl`
+> returns nothing pre-sweep. Filed **HIGH**, not medium, on the shard's own reasoning: it is the
+> unattended cold-start/reinstall path a scheduled recording depends on, same defect family as the
+> bug that already cost the Ashoka recording, surviving the very unit that hardened its sibling.
+>
+> **ISS-340 — a gate breach the maker's own DECISIONS entry disclosed but never ledgered.**
+> `qa/gates/obs-windows-loc-split.md` states plainly it **blocks** merging `wave/live-record-repair`
+> with a green `lint:structure`; the merge (`3368454`) happened anyway (D-039), the gate still has
+> no `Answered:` line (`grep -n Answered` — no match), and `node scripts/lint-loc.mjs` at HEAD
+> confirms 4 violations, the new one being `obs-windows.ts:352` (budget 300) — exactly what the gate
+> predicted (300→352). D-039 discloses the lint-loc failure in prose ("still fails with exactly the
+> 4 declared C1 violations") but no ledger row existed for it. This is the mirror of "gate answered
+> off-disk" (check 6): a gate left OPEN while the state it blocks landed anyway, narrated where no
+> ledger reader looks.
+>
+> **ISS-341 — adjudicating shard 1 vs shard 2's disagreement, explicitly, per the dispatch's ask.**
+> Shard 2 proposed folding `live-record-repair`'s missing-contract gap into the same pattern as
+> ISS-328/ISS-329 (both "no contract exists anywhere for this domain"). Shard 1 disagreed: fix-only
+> work under an existing contract's domain. **Ruled for shard 1.** `qa/contracts/meeting-bot-live-capture.md`
+> is STATUS: ADOPTED (2026-09-25) and its C3/C9/C10 already cover exactly the surface this unit
+> touched (`obs-windows.ts`, `obs-windows.test.ts`, `lint:structure`) — unlike ISS-328/329, where
+> `grep -rl` across all 71 `qa/contracts/*.md` for the relevant domain terms returned nothing at all.
+> The real, narrower defect: the manifest never cites the contract or maps its changes to C3/C9/C10,
+> so a PASS ships without a reader being able to tell what it was actually graded against. Filed
+> medium, type `contract-not-cited`, distinct from the `contract-gap` type ISS-328/329 use.
+>
+> **ISS-342 — adjudicating shard 1's punted question ("is a pause violation a ledger class here?").**
+> Ruled **yes**. D-038 fully self-documents the maker launching a paused eval (`qa/.paused.u2-4-phase3-precision-regate`,
+> "free RAM >= 8 GB", actual 1.71→0.52 GB) and its own clean self-correction (killed within ~35 min,
+> no contamination, unit left paused) — but a DECISIONS narrative is not what Mode B's own
+> bypass/liveness checks read, and D-038 itself names the failure mode ("writing the clause is
+> mistaken for making the call"). Filed **closed-self-corrected**: the point is a baseline for a
+> future recurrence, not chasing a defect that's already fixed.
+>
+> **ISS-214 evidence corrected, not duplicated.** Its `ledger-shard-union-hook.md` half is still
+> genuinely unanswered (19 days). Its `mc-hooks-manifest-blindness.md` half is now stale — that gate
+> carries `Answered: 2026-09-26T23:54:34+05:30 — APPROVED` — appended as a `checker_note`, row stays
+> open on the remaining half.
+>
+> **ISS-326 flipped open→fixed.** `qa/manifests/u2-4-phase3-precision-regate.md` is now tracked
+> (`git ls-files` confirms; landed in `72c212f`) — no longer one `git clean` from deletion. The
+> manifest legitimately stays paused; that is unrelated and unchanged.
+>
+> **Verified-safe from Shard 3, not filed:** `task-scheduler.ts:131` (already ISS-317, jobKey
+> regex-validated), `gws-calendar.ts:53-60` (array args, internal values), `ai-transport.ts:62-71`
+> (shell:false + error handler), `controller-state.ts:86-90` (documented intentional fallback).
+> `demo-live.mjs`'s `--up` path and `record-commands.ts`'s `runLogin` are real but LOW, filed
+> file-don't-fix (ISS-338/339) per D-013 — never pulled as units on their own.
+>
+> **Gate ages re-confirmed, nothing new filed:** `d015-generalisation-scope.md` 18d,
+> `handshake-liveness-contract-start.md` 18d, `ledger-shard-union-hook.md` 19d,
+> `obs-windows-loc-split.md` 0d (now ledgered as ISS-340), `iss-322-multifile-shape.md` 0d (fresh
+> HUMAN_GATE on the ISS-322/333 fix shape, status `pending`). `.goal/goal.json`'s uncommitted diff
+> is `updated`/`last_deterministic_tick` timestamps only — confirmed by `git diff`, north_star
+> unchanged since `9841ec9` — **not** goal drift. `qa/.regrill-due` confirmed absent.
+> `qa/gates/plan-approved-u4-watch-dashboard.md` — the live-recording... no, the **U4 plan** gate the
+> maker opened this turn for `u4-watch-dashboard` — confirmed **exists** (was mid-write by the
+> concurrent maker session; not touched or judged by this sweep).
+>
+> **Token line + qa-prose ratio.** Re-ran `token_scan.py` myself rather than trusting the pasted
+> figure (checker discipline: re-derive, don't trust): **main 226.4M / sub 347.0M / opus_sub_share
+> 0.0 / 40 sub_agents / 8 auto-compactions / 0 classifier outages** at 2026-09-27T17:07:16 (appended
+> to `qa/token-ledger.jsonl`), a few minutes later than shard 3's own 219.6M/337.8M/39 reading and
+> consistent with continued session activity in between — not a discrepancy. The qa-prose-to-source
+> ratio ("flat 4.39→4.40") was **not** independently reproduced with shard 3's exact method (a quick
+> re-derivation using a different file-glob got 2.69, almost certainly a denominator-set difference,
+> not a contradiction) — reported here as **unverified-but-plausible**, not re-derived fact. Code-graph
+> check confirmed **SKIP**, not zero: `python -c "import graphify"` → `ModuleNotFoundError`.
+
+- GRILL: web-fallback vs Phase-1 exit — ask-web-fallback-tavily records the unwired seam as production
+  default while the north star's Phase-1 exit requires off-corpus web fallback; wire-it-or-sign-the-honest-limit
+  is an Approver amendment (ISS-274). **Still open, 5+ days, no ruling** — carried forward unchanged.
+
+## Current top 3 (backlog-priority order, refreshed 2026-09-27T17:1x sweep)
+
+Tier stated per this repo's rule. **Tier 1** (top clear `QUEUE.md` TODO row): empty — 0 TODO rows.
+**Tier 2** (open critical/high) has live, freely-buildable material this time, so it governs picks
+1–2. Both open **criticals** remain not-pullable, unchanged from last sweep: **ISS-104**
+(round-capped at ≥6 PASSes on a non-security seam, file-don't-fix per D-014) and **ISS-282**
+(deliberately paused). **Tier 3 (next unblocked roadmap task) is stated per D-013's "not optional,
+not last"** — pick 3 below.
+
+1. **ISS-337 (high, new this sweep) — `launchObsNormally` (obs-windows.ts:112-120) can crash the
+   controller on an unattended cold start.** No `.on("error", ...)` on the spawned OBS process, no
+   try/catch at its only call site (`obs-guard.ts:103`). Freely buildable now — no gate blocks it.
+   Same defect family as ISS-323/324, in the same file the unit that fixed those just hardened, on
+   the sibling function nobody touched.
+2. **HUMAN_GATE: `obs-windows-loc-split.md` (ISS-340, high, new this sweep).** Blocks resolving the
+   live structural-lint regression (`obs-windows.ts:352` vs budget 300) the `live-record-repair`
+   merge left on master. Umesh's answer (a/b/c) is the only way to close it; option (a), the file
+   split, is the maker's own recommendation.
+3. **U4.1 (tier 3, roadmap — TASKS.md:112, goal.json, status `open`/`pending`, no deps) — Recording/
+   file upload wired to a real transcribe worker.** Genuinely unblocked: `workers/transcribe` is a
+   3-line placeholder, the real `packages/ingest` recording adapter already exists and is unwired.
+   Named per D-013's rule that this tier is never skipped in favor of only continuing tier 2.
+
+**Also gated, not neglected:** ISS-333/ISS-322 (the sender-spoofing fix) sits behind a *fresh*
+(0-day) HUMAN_GATE `qa/gates/iss-322-multifile-shape.md` — Umesh already answered the policy
+question; this second gate asks where in the code to enforce it (a 3-file, edit-in-place shape).
+Not yet answered; not stale enough to be a governance problem the way the 18–19-day gates are.
+
+**Footnote, not filed:** `.goal/goal.json` U0.10 reads `status: pending` while `TASKS.md:93` reads
+`in_progress` — the same tracker-divergence shape ISS-276 already tracks; left for that row's next
+refresh rather than minting a duplicate, since this sweep's dispatch did not ask for a fresh
+tracker audit.
+
+## Superseded top block (2026-09-27T13:4x+05:30 sweep — kept for its own findings below)
 
 > Bound to `D:/KnowledgeBase`, range `97674cb..213d2ac` (HEAD `213d2ac`, 45 commits), sweep due on
 > both triggers (`.last-sweep` 351 min old AND HEAD moved off its recorded SHA). Invoked directly by
@@ -68,7 +196,7 @@
   default while the north star's Phase-1 exit requires off-corpus web fallback; wire-it-or-sign-the-honest-limit
   is an Approver amendment (ISS-274). **Re-confirmed live this sweep, 5 days open, no ruling.**
 
-## Current top 3 (backlog-priority order, refreshed 2026-09-27T13:4x sweep)
+## Prior top 3 (backlog-priority order, refreshed 2026-09-27T13:4x sweep; superseded by the 2026-09-27T17:1x list above)
 
 Derivation, stated per this repo's rule that every tick names its tier. **Tier 1** (top clear
 `QUEUE.md` TODO row): empty — 0 TODO rows. **Tier 2** (open critical/high) therefore governs, and
