@@ -194,4 +194,35 @@ $ npx tsc --noEmit -p tsconfig.json
 **Still not proven, unchanged from cycle 0:** no live run. The review did not change that, and said
 so — it re-ran the two relevant suites, not a browser.
 
-**Status:** ready-for-check (cycle 1)
+**Status:** checked-PASS (cycle 1)
+
+## Close-out — 2026-09-27 15:5x
+
+`/checker` PASSed cycle 1 (`qa/verdicts/live-record-repair.md`, **Cycle checked: 1**, commit
+`2bbb37c`), verifying at `f01b47a` and confirming no source drift since. It reproduced both lane
+rows independently, then falsified each in throwaway copies: reverting the quoter to the naive
+scheme failed exactly the new trailing-backslash test and nothing else, and stubbing the cap branch
+to `if (false && ...)` failed exactly the `/cap/` attribution assertion. Seven hostile inputs were
+run through the real launcher — 6/6 non-degenerate cases round-tripped byte-identical; the empty
+string never reaches the quoter (filtered upstream by the pre-existing `if ($Title)`).
+
+A fresh `senior-software-engineer` review of `f01b47a` returned **Approve, no findings** — the same
+reviewer class that found the cycle-0 quoting defect, hand-tracing all seven requested edge cases
+and confirming unconditional quoting is harmless for every argument this script builds (no
+`--flag=value` forms exist here, and `$node` goes through `-FilePath`, not the quoter).
+
+ISS-LIVE-RECORD-REPAIR-002 and -003 moved `fixed` → `verified`.
+
+**Still NOT closed, and not claimed:** no live browser/OBS run has proved this end-to-end. The
+suite injects a fake node child (`obs-windows.test.ts:111`), which is structurally why 250 green
+tests missed the bug that lost the Ashoka recording. The proof method is a HUMAN_GATE for Umesh
+(throwaway Zoom vs next real webinar). 251/251 + 4/4 + 8/8 + 35 pytest + clean `tsc` is the ceiling
+this harness can reach, not evidence the webinar would record.
+
+**Disclosed, not filed (low, EXPLANATION only):** under concurrent CPU load two timing-sensitive
+tests flake — the ISS-323(a,b) liveness wait and a pre-existing ISS-324 timing test. Both 8/8 and
+5/5 in isolation; a pre-existing tight-budget property, not introduced here.
+
+**Gated, non-blocking:** `node scripts/lint-loc.mjs` still fails with exactly the 4 declared C1
+violations (`speakers-llm.ts:313`, `sb_join.py:437`, `obs-windows.ts:352`, `run-watch.mjs:447`) —
+the state `qa/gates/obs-windows-loc-split.md` is waiting on Umesh to resolve.
