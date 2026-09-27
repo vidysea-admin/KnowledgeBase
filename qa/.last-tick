@@ -406,3 +406,24 @@ TICK 2026-09-28T04:40:00Z ADVANCED tier=3(roadmap: U4 capture wave) wave=2 concu
   dispatched wave: u4a-watch-failure-alerts + u4c-watch-page in parallel worktrees (different files, no shared surface)
   SERIAL: u4b-watch-heartbeat-alert waits on u4a - both touch telegram-alerts.ts (named dependency edge)
   SERIAL: vector-gap-durability waits on the ISS-346 mechanical check - D-044 requires the mechanism first
+2026-09-28T01:59:16+05:30 · ADVANCED · reconcile CLEAN (0 pending, 0 unclosed, 0 TODO) · sweep skipped (0 min old, fresh) · tier 2 (open critical/high; tier 1 empty) · wave=2 · concurrent peak=2 · dispatched: iss-104-closed-class-function-words (opus, worktree wave/iss-104-speaker-closedclass, D-041 ruling 4 overrides D-014 round cap), iss-274-wire-web-fallback (sonnet, worktree wave/iss-274-web-fallback-wire, D-041 ruling 2) · SERIAL: ISS-346 round-cap-check waits on enforcement-path contention (D-043 sequences it; it edits mc-sessionstart.ps1 which this session changed last tick -- two lanes on one enforcement path is the named collision) · SERIAL: ISS-282 waits on qa/.paused.u2-4-phase3-precision-regate · ceiling: none binding (2 units, 16 worktrees already resident) · also shipped 8cf88fc .gitattributes merge=union (config, not enforcement path) · ISS-307 false STALL banner still printing, needs its own Approved-by entry
+TICK 2026-09-28T05:25:00Z ADVANCED tier=2(ISS-350 reader half) wave=3 concurrent peak=3
+  SCOPE ERROR FOUND IN MY OWN QUESTION: delivery-gate-stop.ps1 is NOT in this repo - it is at
+    D:/ai_os/.claude/hooks/ registered in USER-level settings.json:124, so it fires in EVERY project.
+    D-043 is a KnowledgeBase decision and cannot authorize it. Items 1+2 HELD, item 3 proceeds.
+    Opened qa/gates/d043-machine-wide-scope.md against my own framing rather than proceeding on it.
+  root cause of the miss: the authorization rule names enforcement paths by FILENAME PATTERN
+    (.claude/hooks/*), not by resolved location, so a shared hook reads as repo-local. Rule defect.
+  u4a-watch-failure-alerts built (f642611, worktree) -> checker dispatched SAME TURN (no-dangling)
+  u4a disclosed 2 gaps rather than working around them: R3 selection-reason approximated (real
+    decision lives in schedule-tick.ts, unauthorized for it), and no test for run-watch.mjs call sites
+  dispatched: handshake-field-reader (mc-sessionstart.ps1 + dispatch-state.mjs, D-043 item 3 only)
+  consolidation addendum landed 2bda2f4: ISS-355 (high, .codex/hooks born stale) + ISS-350 census note
+  it REFUTED one claim I relayed: zero of 161 manifests are actually in the canonical-field-only blind
+    state; u2-4-phase3-precision-regate has ## Status: at line 159. Code blindness real, data latent.
+    My commit message on 2a0d5f7 says "reproduced live" - that wording is wrong and is corrected here.
+  opened qa/gates/iss-355-codex-hooks-disposition.md (remove vs parity-lint vs symlink) + ISS-268
+  DISPATCH DEFECT: worktrees branch from stale master and have no node_modules - contract files absent.
+    Told the 2 running builders to ff-merge master + pnpm install --offline. Fix the dispatch template.
+  SERIAL: u4b waits on u4a (shared telegram-alerts.ts) - real edge, and u4a is not yet PASSed
+  SERIAL: D-043 items 1+2 wait on the machine-wide scope gate - a human decision, not a ceiling
