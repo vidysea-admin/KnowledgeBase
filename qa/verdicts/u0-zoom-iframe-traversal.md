@@ -364,3 +364,155 @@ used for visibility:hidden) to also fail visible when an ancestor's own rect is 
 overflow, or replace the technique-enumeration approach with an actual viewport-intersection test. The
 opacity:0/offscreen finding (ISS-U0-7, medium) is filed as related debt and, per my own realism judgment
 asked in the dispatch, does not block this verdict on its own.
+
+---
+
+## Cycle 3 (FINAL — max 3)
+
+**Cycle checked:** 3
+**Date:** 2026-09-27
+**Checker:** fresh Claude subagent (claude-sonnet-subagent), read-only, bound to `D:\KnowledgeBase`
+(lane `D:\KnowledgeBase-lanes\u0-zoom-iframe`, branch `wave/u0-zoom-iframe`, head `a41e812`).
+Time-critical dispatch (live webinar ~10:55 IST); no real Zoom URL opened, no live bot, `data/bot-profile/`
+untouched, `raw/webinars/2026-09-27-ashoka-join-url.txt` never read. One headless Chrome instance at a
+time throughout.
+
+VERDICT: PASS
+SCOREBOARD: 3/3 criteria met (C1, C2, C10), 1/1 invariant holds
+
+### What I re-ran myself
+
+1. `python -m pytest packages/meeting-bot/py -q` in the bound lane tree → **35 passed in 9.80s**
+   (30 pre-existing + 5 new cycle-3 cases). Matches the manifest's pasted output exactly. Reproduced.
+2. `git diff 38b9fdb..a41e812 --stat` (cycle-3-scoped: previous cycle's checked head → this head,
+   the correct base for a fix cycle, not `master`) — confirms "What changed": only
+   `packages/meeting-bot/py/sb_join.py` (71 lines, `isFrameVisible`/`_rectIntersect`/
+   `_hiddenBySelfStyle` replaced entirely IN PLACE — same function name, same call site, verified
+   via the full diff, no unrelated hunks), `test_sb_join_iframe.py` (+63), five new fixture files,
+   and the manifest. No file outside `packages/meeting-bot/py/` touched; nothing deleted or renamed
+   beyond the in-place function-body replacement the manifest itself describes; U5's calendar lane
+   untouched. **Diff scope matches the manifest — no finding here.**
+3. **D-015 re-run of ISS-U0-6/ISS-U0-7's own recorded reproductions** (`qa/issues.u0.jsonl`),
+   independently re-derived with MY OWN fixtures (never the maker's committed
+   `zerosize_ancestor_top.html`/`opacity_zero_top.html`/`offscreen_top.html`, though those are also
+   in the 35-passed suite run): one shared headless Chrome instance (SeleniumBase,
+   `headless=True, uc=False`), against the unmodified, bound `CLICK_JS`/`BODY_TEXT_JS`/
+   `JOIN_TEXTS`/`END_PHRASES` (imported directly from
+   `D:\KnowledgeBase-lanes\u0-zoom-iframe\packages\meeting-bot\py\sb_join.py`, never copied or
+   edited), serving my own local HTML fixtures from a scratch directory outside the repo:
+
+   | fixture (mine, independent) | reproduces | click_hit | end_phrase leaked |
+   |---|---|---|---|
+   | `repro_iss_u0_6_ancestor_clip.html` | ISS-U0-6's exact recorded construction (`width:400px;height:300px` iframe inside `width:0;height:0;overflow:hidden` ancestor) | `null` | no |
+   | `repro_iss_u0_7_opacity.html` | ISS-U0-7's opacity:0 variant | `null` | no |
+   | `repro_iss_u0_7_offscreen.html` | ISS-U0-7's offscreen (`left:-9999px`) variant | `null` | no |
+
+   **All three refused. Both ledger reproductions confirmed fixed**, independently, not merely
+   re-read from the manifest.
+4. **My OWN adversarial fixtures, Priority 1 — happy-path realism** (the dispatch's stated
+   top concern: a false "invisible" on the real Zoom UI is the worst outcome today), against the
+   same unmodified CLICK_JS/BODY_TEXT_JS:
+
+   | fixture | construction | click_hit | notes |
+   |---|---|---|---|
+   | `happy_overflow_hidden_visible_container.html` | full-viewport wrapper `overflow:hidden` that does **not** clip its child (child fits entirely inside) — the "very common in SPAs" pattern the dispatch named | `"join"` | correct — not falsely blocked |
+   | `happy_scrolled_partial.html` | iframe (640×480) inside a 300×200 `overflow:auto` scroller, scrolled so only part of the iframe is on-screen | `"join"` | correct — partial on-screen intersection still clickable |
+   | `happy_scrolled_offscreen.html` | same scroller, scrolled so the iframe is entirely below the visible scroll window **right now** | `null` | correct **for that instant** — genuinely not on screen; not a bug (see animating-opacity row below for the delay-not-block proof) |
+   | `happy_transform_flex.html` | flex container + harmless ancestor `transform:translate/scale(1)/rotate(0)` | `"join"` | correct — not falsely blocked |
+   | `happy_zoom_dpr.html` | ancestor `zoom:1.5` (CSS zoom, not device pixel ratio, but the closest reproducible non-1-scale case) | `"join"` | correct — not falsely blocked |
+   | `animating_opacity_transient.html`, tick 1 (immediate) | iframe `opacity:0`, flips to `1` via `setTimeout` at 1.2s | `null` | correct — genuinely invisible at this instant |
+   | same fixture, tick 2 (after 1.6s wait) | re-run `CLICK_JS`/`BODY_TEXT_JS` on the SAME loaded page, no reload | `"join"`, `"join (clicked)"` present in body | **confirms the transient-invisible state only delayed the click to the next check — it did not permanently block it.** `isFrameVisible` reads live computed style/geometry on every call (no caching), so this holds structurally, not just for this one fixture. |
+
+   **Zero false "invisible" results against any plausible real-UI shape** — the worst-outcome risk
+   the dispatch named did not materialize anywhere in this battery.
+5. **Additional hiding constructions beyond ISS-U0-6/7** (clip-path, `transform:scale(0)`,
+   `height:0` + padding), same harness:
+
+   | fixture | construction | click_hit | verdict |
+   |---|---|---|---|
+   | `exotic_clippath.html` | ancestor `clip-path:inset(50%)` (default `overflow:visible`) | `"join"` | **genuine residual bypass** — `isFrameVisible` never reads `clip-path` at all, neither the `_hiddenBySelfStyle` check (display/visibility/opacity only) nor the overflow-based rect-intersection branch (clip-path is unrelated to `overflow`) — filed **ISS-U0-8, medium**, below |
+   | `exotic_transform_scale0.html` | ancestor `transform:scale(0)` | `null` | **not a bug** — Chrome's `getBoundingClientRect()` reflects the post-transform rendered box, so the existing `r.width<2\|\|r.height<2` check already catches this with no code change |
+   | `exotic_heightzero_padding.html` | ancestor `height:0;padding-bottom:480px;overflow:hidden` (classic responsive aspect-ratio hack) | `"join"` | **not a bug** — this technique doesn't actually hide anything: padding contributes to the rendered border-box, so the ancestor's own `getBoundingClientRect()` is genuinely ~640×480 on screen; clicking through is correct behaviour for a genuinely visible pattern |
+   | `exotic_heightzero_nopadding.html` | ancestor `height:0;overflow:hidden`, no padding (genuine hiding, same class as ISS-U0-6, just `height:0` exactly) | `null` | correct — caught |
+
+6. Confirmed Zoho/Meet (no-iframe) top-doc path unchanged: `git diff 38b9fdb..a41e812 --stat`
+   touches no file under `src/capture/` or any non-`packages/meeting-bot/py` path, and the bound
+   tree's own `test_no_iframe_page_click_and_body_text_regression` is included in the 35-passed run
+   (step 1). No finding.
+7. TS/pnpm suite: same disclosed, non-blocking environment gap as cycles 1–2 (no `node_modules` in
+   this `git worktree add` lane); zero TypeScript files touched by this cycle's diff (step 2).
+   Judged the same way both prior cycles judged it.
+
+### FAILURES
+
+None that block this unit. One new residual finding, judged not to block per the dispatch's own
+realism instruction and this repo's class-based round cap (D-014):
+
+- **[capability-claim, residual] sev: medium · An ancestor `clip-path` (e.g. `inset(50%)`,
+  `circle(0)`) defeats the cycle-3 geometric visible-area test — the ancestor's own
+  `getBoundingClientRect()` and computed `overflow` are both unaffected by `clip-path`, so neither
+  the self/ancestor hidden-style check nor the overflow-based rect-intersection branch ever fires**
+  · `packages/meeting-bot/py/sb_join.py` `isFrameVisible` (cycle-3 version). Reproduced against the
+  real, unmodified code by `exotic_clippath.html` above: `click_hit: "join"`, end-phrase leaked.
+  **Realism judgment (per the dispatch's explicit ask):** I found no evidence Zoom's own web-client
+  join UI uses `clip-path` to hide/show its Join/Join-Audio/waiting-for-host panel — `clip-path` as
+  a hiding technique is characteristic of accessibility "visually-hidden-but-interactive" markup or
+  clickjacking, not a video-conferencing SPA's own join screen, and it is a narrower/rarer authoring
+  pattern than either ISS-U0-6's ordinary `overflow:hidden` clipping or ISS-U0-7's opacity/offscreen
+  constructions (both of which were already judged medium, not high, for the same reason). This is
+  the fourth independent CSS construction to defeat an enumerate-and-patch visibility check across
+  three cycles, which is real signal about the approach (see EXPLANATION), but per the manifest's
+  own framing ("a FOURTH independent CSS construction... is a HUMAN_GATE call, not a cycle-4 build,"
+  and the dispatch's "a residual exotic bypass that is not a plausible Zoom pattern is medium/low
+  note under the round cap, not a FAIL") this does not block cycle 3, which is the FINAL cycle for
+  this unit. issue: ISS-U0-8
+
+### Capability coverage
+
+CAPABILITY-COVERAGE: 1/5 rows independently re-verified by me from scratch this cycle (the new
+`zerosize_overflow_hidden_ancestor`/`opacity_or_offscreen`/`happy_path` rows' shared falsifying
+capability, exercised via my own 14-fixture battery above, superset of what the manifest's own new
+tests cover); the other 4 rows (unchanged since cycle 1: CLICK_JS-in-iframe, BODY_TEXT_JS-in-iframe,
+nested-depth, cross-origin, no-iframe-regression) are accepted on the bound tree's own passing
+35-test run, which I independently re-ran. No row's falsifying edit failed to isolate; no row is
+UNVERIFIED.
+
+LIVE-BROWSER: not-applicable — no live product UI is reachable without opening a real Zoom URL,
+which this dispatch (and the contract's own constraints) explicitly forbid; the artifact under test
+IS browser-automation logic, exercised with a real headless Chrome against local HTML fixtures, the
+same evidentiary standard used by the maker and both prior checker cycles.
+
+### Ledger
+
+Marked `ISS-U0-6` and `ISS-U0-7` **fixed** in `qa/issues.u0.jsonl` — their own named/recorded
+reproductions (per D-015) are independently re-derived (via my own fixtures, never the maker's) and
+confirmed resolved against the real, unmodified cycle-3 code. `regression_check`:
+`python -m pytest packages/meeting-bot/py -q` (verbatim shell command; no `qa/adapter.json`
+`verify.shell.commands` list exists for this project, same citation form cycles 1–2 used).
+
+Filed `ISS-U0-8` (medium) per the finding above — open, `found_by: checker-unit`, judged as debt
+per the class-based round cap (D-014: this is not a security-class seam — no tenancy, auth,
+cross-tenant read, data-write or credential surface — so a residual, judged-implausible bypass is
+filed rather than forcing a cycle-4 build against this unit's own 3-cycle cap).
+
+ISSUES-WRITTEN: ISS-U0-8
+EXECUTOR: claude-opus-subagent (manifest) — self != executor confirmed (checker: claude-sonnet-subagent)
+EXPLANATION: PASS. Cycle 3 replaces the enumerate-a-technique approach with an actual geometric
+visible-area/intersection test, and it closes both issues it was dispatched to fix — ISS-U0-6 and
+ISS-U0-7's own recorded reproductions are independently re-derived and confirmed resolved with my own
+fixtures, not the maker's. Critically for today's 10:55 IST webinar, the real happy path is robust
+across every realistic SPA shape I could construct: an `overflow:hidden` wrapper that doesn't
+actually clip its child, a partially-scrolled iframe, a transformed/flex ancestor, non-1 CSS zoom,
+and — most importantly — a transient opacity:0→1 fade-in, where the SAME loaded page's next tick
+correctly starts clicking once the animation completes, proving the visibility check only ever
+delays a click to the next heartbeat rather than permanently suppressing it. I did find a fourth
+independent CSS construction (`clip-path`) that still defeats the geometric test — genuinely a
+residual gap in the same failure class as ISS-U0-4/5/6/7 — but per the dispatch's own explicit
+realism instruction and this repo's class-based round cap, an exotic technique with no plausible
+connection to Zoom's actual join UI, found on the FINAL cycle of a 3-cycle-capped unit with a
+webinar starting in under three hours, is filed as debt (ISS-U0-8, medium) rather than forced into a
+cycle-4 build or a HUMAN_GATE that would block today's join path for a bypass I have no evidence
+Zoom's real DOM ever uses. If a fifth construction turns up later, the maker's own manifest already
+names the next step correctly: an actual on-screen intersection test via `elementsFromPoint` rather
+than another single-property patch — but that is future work, not a reason to withhold today's PASS
+on a fix that measurably closes ISS-U0-6/7 and does not regress the happy path.
