@@ -1,6 +1,6 @@
 # Manifest — live-record-repair: the Ashoka 2026-09-27 recording failure (ISS-323 + ISS-324)
 
-Fix cycle: 0 · Issues addressed: ISS-323 (high), ISS-324 (high) · Executor: claude-opus-5 (maker, in-session)
+Fix cycle: 1 · Issues addressed: ISS-323 (high), ISS-324 (high) · Executor: claude-opus-5 (maker, in-session)
 · Executor rationale: the root cause was already isolated read-only in this session; delegating would
 have re-derived it. Goal task: T-047 / U5 (capture path) · Lane: `wave/live-record-repair`
 · Backlog tier: **2** (open critical/high) — the data-capture path, so full ceremony regardless of severity.
@@ -146,4 +146,52 @@ The test suite writes only to OS temp dirs and cleans the `raw/webinars/record-*
   **Pre-existing** — the pnpm version carried identical redirects. Not fixed here: a clean fix trades
   against the ISS-323 liveness gate, which requires waiting on the child. Needs a design call.
 
-**Status:** ready-for-check (cycle 0)
+## Fix cycle 1 — the fresh-context review's own findings (2026-09-27)
+
+The `senior-software-engineer` agent reviewed c8cbbf4 in fresh context, re-ran both new suites
+itself rather than trusting this manifest, and returned **VERDICT: Warning** with one *reproduced*
+defect in code this unit introduced. Both of its findings are fixed in this cycle.
+
+- **ISS-LIVE-RECORD-REPAIR-002 (high) — the ISS-323 fix had re-introduced the very bug class it
+  exists to close.** Cycle 0's per-argument quoting escaped only the quote character, which is not
+  `CommandLineToArgvW` escaping: an argument ending in a backslash emits an undoubled run, so that
+  backslash escapes the closing quote we added and the argument never closes. The reviewer's
+  standalone repro merged three arguments into one and **lost `--until 12:30` entirely** — the same
+  silent-argv-corruption shape as ISS-323(c), reachable because the title is partly
+  email/candidate-sourced free text (ISS-317 note, `task-scheduler.ts:16-30`). Fixed by
+  `Quote-Win32Argv` (`start-record-detached.ps1:95-118`), which implements the real algorithm.
+  The same repro also established that Windows PowerShell 5.1's `Start-Process -ArgumentList` joins
+  the array into one raw command line with **no escaping of its own**, so exactness here is not
+  optional. Cycle 0's containment claim holds and is worth recording: the new liveness gate turns
+  this into a *loud* `launch FAILED` rather than the silent success ISS-323 was about.
+- **ISS-LIVE-RECORD-REPAIR-003 (medium) — the absolute `openCapMs` branch had no test.** All four
+  cycle-0 ISS-324 tests set `openCapMs: 20_000`, so only `opened` and `stalled` were ever executed.
+  The cap is the one mechanism stopping a child that emits progress faster than `openStallMs` from
+  resetting the budget forever — i.e. exactly the evasion the reviewer probed. Now covered.
+
+Also **confirmed by the review, not by me**: `settled` cannot let the polling loop outlive the
+outcome by more than one ≤1s tick; the cap is checked independently of the stall reset; `_EMIT_LOCK`
+covers the only `print(` in `sb_join.py`; the bring-up daemon thread dies via the `except` +
+`sys.exit(1)` at `sb_join.py:469-474`; `env: { ...process.env, ... }` changes nothing but the one
+variable; and `-CliEntry` is unreachable from Task Scheduler (`task-scheduler.ts:131`).
+
+### Cycle 1 outputs
+
+```
+$ node --test scripts/webinar/start-record-detached.test.mjs
+i tests 4 | pass 4 | fail 0        (includes the trailing-backslash regression)
+
+$ node --test --import tsx src/capture/obs-windows.test.ts
+i tests 8 | pass 8 | fail 0        (includes the openCapMs cap branch; ends in 1.33s against a 1.2s cap)
+
+$ node --test --import tsx "src/**/*.test.ts"
+i tests 251 | pass 251 | fail 0
+
+$ npx tsc --noEmit -p tsconfig.json
+(no output, exit 0)
+```
+
+**Still not proven, unchanged from cycle 0:** no live run. The review did not change that, and said
+so — it re-ran the two relevant suites, not a browser.
+
+**Status:** ready-for-check (cycle 1)

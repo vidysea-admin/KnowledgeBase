@@ -41,9 +41,9 @@ function cleanupNewLogs(before) {
   }
 }
 
-function runLauncher({ env = {}, extraArgs = [], livenessSeconds = 1 } = {}) {
+function runLauncher({ env = {}, extraArgs = [], livenessSeconds = 1, title = TITLE } = {}) {
   const args = ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", SCRIPT,
-    "-Url", ZOOM_URL, "-Until", "23:59", "-Title", TITLE,
+    "-Url", ZOOM_URL, "-Until", "23:59", "-Title", title,
     "-CliEntry", FIXTURE, "-LivenessSeconds", String(livenessSeconds), ...extraArgs];
   try {
     const stdout = execFileSync("powershell", args, {
@@ -101,6 +101,38 @@ test("ISS-323: the happy path still reports a real pid and exits 0", () => {
     const { status, stdout } = runLauncher({ env: { LKB_ARGV_DUMP: join(dir, "a.json") } });
     assert.equal(status, 0, `expected success; got:\n${stdout}`);
     assert.match(stdout, /started detached record: pid \d+/, "a live launch must report a real pid");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+    cleanupNewLogs(before);
+  }
+});
+
+// Found by the fresh-context senior review of c8cbbf4, reproduced standalone before this test
+// existed: the first quoting pass wrapped each argument and escaped only `"`, so an argument ending
+// in a backslash emitted `...\"` — the backslash escaped our own closing quote, the argument stayed
+// open, and every argument after it was swallowed into it. The review's repro lost `--until 12:30`
+// entirely. Same silent-argv-corruption class as ISS-323 itself, and reachable: the title is
+// partly email/candidate-sourced free text (see the ISS-317 note in
+// packages/meeting-bot/src/calendar/task-scheduler.ts), so a pasted path fragment ending in `\`
+// is ordinary input. Not in the ISS-323 ledger row, so it is an ADDITION to that corpus, never a
+// substitution for it (D-015).
+test("review finding: a title ending in a backslash (and one holding a quote) must not swallow the arguments after it", () => {
+  const before = logsBefore();
+  const dir = mkdtempSync(join(tmpdir(), "lkb-argv-bs-"));
+  const dump = join(dir, "argv.json");
+  const nasty = 'Ashoka \"Educator\" Dialogues C:\\share\\';
+  try {
+    const { status, stdout } = runLauncher({ env: { LKB_ARGV_DUMP: dump }, title: nasty });
+    assert.equal(status, 0, `launcher should succeed; got:\n${stdout}`);
+    assert.ok(existsSync(dump), `recorder was never launched (no argv dump). Output:\n${stdout}`);
+    const argv = JSON.parse(readFileSync(dump, "utf8"));
+
+    assert.equal(argv[argv.indexOf("--title") + 1], nasty,
+      "the trailing backslash and the embedded quotes must survive as ONE argument");
+    assert.equal(argv[argv.indexOf("--until") + 1], "23:59",
+      "`--until` and its value must still be their own argv entries — they used to be absorbed");
+    assert.deepEqual(argv.slice(0, 2), ["record", ZOOM_URL],
+      "the URL must still arrive intact alongside the hostile title");
   } finally {
     rmSync(dir, { recursive: true, force: true });
     cleanupNewLogs(before);

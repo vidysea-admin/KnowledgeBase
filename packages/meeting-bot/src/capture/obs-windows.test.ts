@@ -284,6 +284,34 @@ test("obs-windows launch(): ISS-324 — a genuinely wedged bring-up fails naming
   }
 });
 
+// Gap named by the fresh-context senior review of c8cbbf4: the four tests above all set
+// openCapMs: 20_000, far past any test's runtime, so the absolute-cap branch was never executed --
+// and it is precisely the branch that stops a CHATTY but never-opening bring-up from resetting the
+// stall budget forever. A cap that only exists on inspection is a cap that can be deleted silently.
+test("obs-windows launch(): ISS-324 — a child that reports progress forever cannot outlive the absolute cap", async () => {
+  const cfg = stagesCfg(() => {}, { openStallMs: 400, openCapMs: 1_200 });
+  const { obs } = makeFakeObs({ specialInputs: { m: "Mic/Aux" } });
+  try {
+    // ticks far exceed the cap, at an interval well inside the stall window: every tick resets
+    // lastProgressAt, so ONLY the cap can end this run.
+    await withFixtureMode("progress-then-open", { LKB_FIXTURE_TICK_MS: "100", LKB_FIXTURE_TICKS: "10000" }, async () => {
+      const { deps } = createObsBrowserDeps(cfg, {
+        obs, connectObs: async () => undefined, confirmBotWindow: async () => true,
+      });
+      const started = Date.now();
+      const err = await deps.launch("https://example.com/meet", { tenantId: "t1" })
+        .then(() => null, (e: Error) => e);
+      assert.ok(err, "endless progress must still fail once the absolute cap is reached");
+      assert.match(err!.message, /cap/, `must attribute the failure to the cap, not the stall window: ${err!.message}`);
+      assert.ok(Date.now() - started < 10_000,
+        "the cap must fire near openCapMs — a stall-only implementation would never end here");
+      assert.match(err!.message, /last stage: bootstrapping/, "must name the stage it was stuck reporting");
+    });
+  } finally {
+    cleanupCfg(cfg);
+  }
+});
+
 test("obs-windows launch(): ISS-324 — the child's stderr reaches the thrown error instead of being discarded", async () => {
   const cfg = stagesCfg(() => {});
   const { obs } = makeFakeObs({ specialInputs: { m: "Mic/Aux" } });

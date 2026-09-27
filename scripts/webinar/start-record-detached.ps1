@@ -85,8 +85,40 @@ if ($EndNotBefore) { $cliArgs += @("--end-not-before", $EndNotBefore) }
 if ($ExtraArgs) { $cliArgs += ($ExtraArgs -split ' ' | Where-Object { $_ -ne "" }) }
 
 # Quote every argument so neither PowerShell's argument joining nor any downstream re-parse can
-# split a URL on `&` or a title on spaces.
-$quoted = $cliArgs | ForEach-Object { '"' + ($_ -replace '"', '\"') + '"' }
+# split a URL on `&` or a title on spaces. Windows PowerShell 5.1's `Start-Process -ArgumentList`
+# joins the array into ONE raw command line with spaces and does no escaping of its own, so the
+# whole burden is here and it must follow CommandLineToArgvW's rules exactly: a backslash run is
+# literal unless it precedes a quote (or the closing quote we add), in which case it must be
+# doubled. Wrapping in quotes and escaping only the quote character is NOT enough -- an argument
+# ending in a backslash would emit BACKSLASH-QUOTE, whose backslash escapes our own closing quote
+# and merges every following argument into it (reviewer-reproduced on this machine: a title ending
+# in a backslash swallowed `--until 12:30` entirely). Same silent-argv-corruption class as ISS-323.
+function Quote-Win32Argv([string]$s) {
+  $out = New-Object System.Text.StringBuilder
+  [void]$out.Append('"')
+  $i = 0
+  while ($i -lt $s.Length) {
+    $slashes = 0
+    while ($i -lt $s.Length -and $s[$i] -eq [char]92) { $slashes++; $i++ }
+    if ($i -ge $s.Length) {
+      # trailing run: doubled so it stays literal and does not escape the closing quote
+      [void]$out.Append([string][char]92 * ($slashes * 2))
+      break
+    }
+    if ($s[$i] -eq [char]34) {
+      [void]$out.Append([string][char]92 * ($slashes * 2 + 1))
+      [void]$out.Append('"')
+    } else {
+      [void]$out.Append([string][char]92 * $slashes)
+      [void]$out.Append($s[$i])
+    }
+    $i++
+  }
+  [void]$out.Append('"')
+  return $out.ToString()
+}
+
+$quoted = $cliArgs | ForEach-Object { Quote-Win32Argv $_ }
 
 $proc = Start-Process -FilePath $node -ArgumentList $quoted -WorkingDirectory $repoRoot `
   -WindowStyle Hidden -RedirectStandardOutput $log -RedirectStandardError $errLog -PassThru
