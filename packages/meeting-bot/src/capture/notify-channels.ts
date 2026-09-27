@@ -15,6 +15,13 @@
  *  - Throttling is per `key` (e.g. "joined", "digest") across the WHOLE send call, not per
  *    channel — a throttled key skips every channel this call, matching T-030's existing
  *    behaviour when there is exactly one channel.
+ *  - U4a's two new bot-status alerts (telegram-alerts.ts's `notifyPollFailed` / `pollFailed:*`
+ *    keys, `notifyUpcomingRecording` / `upcoming:*` keys) route through this exact `send()` —
+ *    no change was needed here for them. R1's real dedup ("one alert, then silence until it
+ *    changes state") is state-based, not time-based, so it is NOT this file's per-key time
+ *    throttle alone — the caller (run-watch.mjs) only invokes `notifyPollFailed` on a genuine
+ *    transition into `status: "failed"`; this module's throttle is just the same defensive
+ *    backstop every other alert kind already gets.
  *  - Per-channel secrets are NEVER this module's problem: each channel implementation is
  *    responsible for redacting its own secret out of any error it throws (telegram-channel.ts
  *    does this) before this module's catch handler logs it. That keeps this file channel-
