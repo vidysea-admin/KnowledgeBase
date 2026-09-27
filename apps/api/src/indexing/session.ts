@@ -236,7 +236,10 @@ export async function indexSession(
   const chunks = deps.embed
     ? await writeSessionChunks(tenantId, sessionId, turns, deps.embed, db)
     : { written: 0, skipped: "no-embedder" as const };
-  await recordVectorGap(tenantId, sessionId, chunks, db);
+  // ISS-122: the write can fault same as anything else that touches Mongo, and `recordVectorGap`'s
+  // own catch never rethrows (ISS-121) — so without capturing this, a gap-write fault was
+  // observable only via a console.warn nobody asserts on, the exact ISS-118 shape one level down.
+  const gapRecorded = await recordVectorGap(tenantId, sessionId, chunks, db);
   const [allSessions, allPages, existingRoot] = await Promise.all([
     sessionsColl(tenantId).find({}).toArray() as Promise<Sessions[]>,
     sessionPagesColl(tenantId).find({}).toArray() as Promise<SessionPages[]>,
@@ -265,7 +268,7 @@ export async function indexSession(
 
   await sessionsColl(tenantId).updateOne({ _id: sessionId }, { $set: { "status.index": "done" } });
 
-  return { sessionId, chunks, entities };
+  return { sessionId, chunks, entities, gapRecorded };
 }
 
 export type IndexSessionFn = typeof indexSession;

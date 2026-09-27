@@ -44,12 +44,21 @@ export function vectorGapId(tenantId: string, sessionId: string): string {
   return `vector-pending:${tenantId}:${sessionId}`;
 }
 
+/**
+ * @returns whether the gap bookkeeping write actually landed (ISS-122). The catch below is
+ *          deliberately never rethrown (see its comment), which is exactly why a `console.warn`
+ *          alone was not a guarantee: ISS-118's own fix disabled that identical warn on both
+ *          ingest paths and the whole suite stayed green. A `boolean` return is a surface a test
+ *          can assert on without a log-scraping fixture, mirroring `writeSessionChunks`'s
+ *          `ChunkWriteResult` and `promoteAndPersistEntities`'s `PromotionResult` — this was the
+ *          one degrade-safe function in this file that reported nothing to its caller at all.
+ */
 export async function recordVectorGap(
   tenantId: string,
   sessionId: string,
   chunks: ChunkWriteResult,
   db: Pick<Db, "collection">,
-): Promise<void> {
+): Promise<boolean> {
   const gapsColl = scopedCollection<Gaps>(db as never, "gaps");
   const _id = vectorGapId(tenantId, sessionId);
   // NEVER THROWS (ISS-121, the half that actually bit). This runs inside `indexSession` BEFORE the
@@ -75,7 +84,7 @@ export async function recordVectorGap(
         } as never,
         { upsert: true },
       );
-      return;
+      return true;
     }
     // Resolved. `updateOne` without upsert: a session that never failed must not gain a
     // "received" gap row describing a problem it never had.
@@ -83,10 +92,12 @@ export async function recordVectorGap(
       { _id, status: "open" } as never,
       { $set: { status: "received" } } as never,
     );
+    return true;
   } catch (err) {
     console.warn(
       `recordVectorGap(${tenantId}/${sessionId}): gap bookkeeping failed, indexing continues: ` +
         `${err instanceof Error ? err.message : String(err)}`,
     );
+    return false;
   }
 }

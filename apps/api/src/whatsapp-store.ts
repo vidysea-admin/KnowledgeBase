@@ -174,6 +174,14 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer): WhatsAppRo
                 "it will not be reachable by vector search",
             );
           }
+          // ISS-122, same reasoning as ingest-store: a gap-write fault leaves this session doubly
+          // invisible (no vectors AND no gap row recording that fact).
+          if (!res.gapRecorded) {
+            console.warn(
+              `ingestGroup: session ${sessionId} vector-gap bookkeeping FAILED — it may have no ` +
+                "vectors with no gap row to show for it; check the gaps collection manually",
+            );
+          }
         } catch (err) {
           console.error(`ingestGroup: indexing failed for session ${sessionId} (raw content still stored):`, err);
         }

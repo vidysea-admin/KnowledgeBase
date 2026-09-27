@@ -26,4 +26,11 @@ export interface IndexSessionResult {
   /** U2.1 entity promotion. `null` when no tree root was produced, so there was nothing to promote
    * — distinct from a promotion that ran and failed, which reports `skipped`. */
   entities: { topics: number; orgs: number; claimsTagged: number; skipped: "promotion-failed" | null } | null;
+  /** Whether `recordVectorGap`'s own write landed (ISS-122). `false` means the gap bookkeeping
+   * itself faulted (its `catch` never rethrows, so indexing still completed and `status.index`
+   * still flipped to "done") — a session can be BOTH missing vectors AND missing the gap row that
+   * would have surfaced that, and this is the only surface that distinguishes it from the normal
+   * "recorded fine" case. Mirrors `chunks.skipped`/`entities.skipped`, the two other degrade-safe
+   * signals this result already carries. */
+  gapRecorded: boolean;
 }

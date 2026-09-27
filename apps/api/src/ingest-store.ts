@@ -77,6 +77,15 @@ export function createMongoIngestDeps(indexSession?: BoundIndexer): IngestDeps {
                 "it will not be reachable by vector search",
             );
           }
+          // ISS-122: the gap row above is what makes a missing-vectors session findable via
+          // GET /gaps — if ITS write also faulted, this session is doubly invisible (no vectors
+          // AND no gap record), and that combination needs its own boundary-level surface.
+          if (!res.gapRecorded) {
+            console.warn(
+              `ingestUrl: session ${sessionId} vector-gap bookkeeping FAILED — it may have no ` +
+                "vectors with no gap row to show for it; check the gaps collection manually",
+            );
+          }
         } catch (err) {
           console.error(`ingestUrl: indexing failed for session ${sessionId} (raw content still stored):`, err);
         }

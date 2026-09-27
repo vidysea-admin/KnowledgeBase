@@ -9,6 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { indexSession } from "./session.js";
+import { recordVectorGap } from "./vector-gap.js";
 import { fakeDb, completeWith, embedOk, assertUpdateBodyConfined, type Call } from "./testutils.js";
 
 /* ── ISS-118: the DURABLE record of a missing vector index ────────────────────────────────────
@@ -106,7 +107,7 @@ test("ISS-121: a FAILING gap write must not strand the session — the tree and 
       return { ...real, updateOne: async () => { throw new Error("E11000 duplicate key"); } };
     },
   } as never;
-  await indexSession("t", "s1", {
+  const res = await indexSession("t", "s1", {
     complete: completeWith() as never,
     embed: async () => { throw new Error("down"); },
     db: exploding,
@@ -114,4 +115,46 @@ test("ISS-121: a FAILING gap write must not strand the session — the tree and 
   assert.ok(calls.some((c) => c.coll === "tree_index"), "the tree must still be updated");
   const flip = calls.find((c) => c.coll === "sessions" && c.op === "updateOne");
   assert.ok(flip, "status.index must still be flipped — a stranded session is worse than a missing gap row");
+  // ISS-122: the strand-prevention above is only half safe. Nothing distinguished THIS run (no
+  // vectors AND a gap-write fault) from a normal "no vectors, gap recorded fine" run until this
+  // field existed — `indexSession`'s return is the honest surface, threaded all the way from
+  // `recordVectorGap`'s own catch.
+  assert.equal(res.gapRecorded, false, "the caller must be able to see that the gap bookkeeping itself faulted");
+});
+
+/* ── ISS-122: recordVectorGap's own catch had no durable, testable surface ─────────────────────
+ * ISS-118's fix made a missing-vectors session observable via a `gaps` row; ISS-121 made the
+ * bookkeeping itself degrade-safe (never strand a session). But the bookkeeping's OWN failure was
+ * still only a `console.warn` — exactly the surface ISS-118 proved is not a guarantee (the U1.0b
+ * checker disabled that class of warn on both ingest paths at once and the suite stayed green).
+ * These tests call `recordVectorGap` directly — the real seam, not `indexSession`'s aggregate
+ * result — so a mutation that makes the return value lie (e.g. hard-coding `true`) is caught here
+ * even if every higher-level assertion happens to still pass.
+ */
+test("ISS-122: recordVectorGap returns true when the OPEN gap-write lands", async () => {
+  const { db } = fakeDb();
+  const ok = await recordVectorGap("t", "s1", { written: 0, skipped: "embedding-failed" }, db);
+  assert.equal(ok, true);
+});
+
+test("ISS-122: recordVectorGap returns true when the RESOLVED gap-write lands", async () => {
+  const { db } = fakeDb();
+  const ok = await recordVectorGap("t", "s1", { written: 3, skipped: null }, db);
+  assert.equal(ok, true);
+});
+
+test("ISS-122: recordVectorGap returns false when the OPEN gap-write THROWS", async () => {
+  const exploding = {
+    collection: () => ({ updateOne: async () => { throw new Error("E11000 duplicate key"); } }),
+  } as never;
+  const ok = await recordVectorGap("t", "s1", { written: 0, skipped: "embedding-failed" }, exploding);
+  assert.equal(ok, false);
+});
+
+test("ISS-122: recordVectorGap returns false when the RESOLVE gap-write THROWS", async () => {
+  const exploding = {
+    collection: () => ({ updateOne: async () => { throw new Error("network blip"); } }),
+  } as never;
+  const ok = await recordVectorGap("t", "s1", { written: 3, skipped: null }, exploding);
+  assert.equal(ok, false);
 });
