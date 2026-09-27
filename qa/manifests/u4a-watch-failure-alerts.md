@@ -6,7 +6,7 @@
 tests per R1/R3, incl. the throttle key; assert no alert on a healthy run", criticality medium.
 `qa/gates/plan-approved-u4-watch-dashboard.md` — Answered: intent/spec/plan, all 2026-09-27/28.
 **Fix cycle:** 0 of max 3
-**Status:** ready-for-check (cycle 0)
+**Status:** checked-PASS (cycle 0)
 **Persona walk:** skip — plan.md's own U4a row says "skip (no screen)"; this unit adds no UI.
 **Backlog tier:** dispatched directly by the orchestrator per D-046's Result ("U4a and U4c are
 dispatched as a parallel wave this tick").
@@ -278,4 +278,4 @@ $ git status --short
 ```
 No file outside these four was modified. No file was created or deleted.
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS — closed out 2026-09-28 against verdict cycle 0 (VERDICT: PASS, commit a91fe90). ISS-356 and ISS-357 remain OPEN in the ledger; per D-042 unit-status and issue-status are separate axes.
