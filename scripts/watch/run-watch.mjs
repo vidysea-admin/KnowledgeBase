@@ -34,7 +34,7 @@ import { fileURLToPath } from "node:url";
 import { execFile } from "node:child_process";
 import "dotenv/config";
 import { register } from "tsx/esm/api";
-import { ingestOneDriveFile } from "./lib/ingest-chain.mjs";
+import { ingestOneDriveFile, decideReingestAction, assertIndexed } from "./lib/ingest-chain.mjs";
 
 register(); // let subsequent dynamic import()s of packages/*'s .ts sources resolve
 
@@ -337,16 +337,6 @@ async function runReingest(gdrive, driveFileId, calendarEvents, now) {
   const correctSessionId = slugSessionId(date, title);
   console.log(`--reingest: corrected id would be "${correctSessionId}" (date=${date}, title="${title}")`);
 
-  const newDir = join(ROOT, "data", "toc-migrated", correctSessionId);
-  if (existsSync(join(newDir, "turns.json"))) {
-    const turnCount = await db.collection("turns").countDocuments({ tenantId: TENANT, sessionId: correctSessionId });
-    const chunkCount = await db.collection("chunks").countDocuments({ tenantId: TENANT, sourceRef: correctSessionId });
-    if (turnCount > 0 && chunkCount > 0) {
-      console.log(`--reingest: "${correctSessionId}" already exists with ${turnCount} turns and ${chunkCount} chunks — nothing to do (idempotent no-op).`);
-      return;
-    }
-  }
-
   const priorRow = await findWatchState(TENANT, "drive", driveFileId);
   console.log(`--reingest: prior watch_state row (in db "${db.databaseName}"): ${priorRow ? JSON.stringify({ status: priorRow.status, sessionId: priorRow.sessionId }) : "none"}`);
   // Prefer the authoritative Mongo link (sources._id -> sessions.sourceId) over watch_state's own
@@ -362,6 +352,47 @@ async function runReingest(gdrive, driveFileId, calendarEvents, now) {
     : null;
   const oldSessionId = oldSessionFromMongo ?? priorRow?.sessionId ?? null;
   console.log(`--reingest: old sessionId resolved to "${oldSessionId ?? "(none)"}" (via ${oldSessionFromMongo ? "sources->sessions link" : priorRow?.sessionId ? "watch_state fallback" : "neither — nothing found"})`);
+
+  const newDir = join(ROOT, "data", "toc-migrated", correctSessionId);
+  const turnsExist = existsSync(join(newDir, "turns.json"));
+  let turnCount = 0;
+  let chunkCount = 0;
+  if (turnsExist) {
+    turnCount = await db.collection("turns").countDocuments({ tenantId: TENANT, sessionId: correctSessionId });
+    chunkCount = await db.collection("chunks").countDocuments({ tenantId: TENANT, sourceRef: correctSessionId });
+    console.log(`--reingest: "${correctSessionId}" already has turns.json on disk — ${turnCount} turns, ${chunkCount} chunks in Mongo.`);
+  }
+
+  const decision = decideReingestAction({ turnsExist, turnCount, chunkCount, oldSessionId, correctSessionId });
+  console.log(`--reingest: decision = ${decision.action}`);
+
+  if (decision.action === "already-repaired") {
+    console.log(`--reingest: "${correctSessionId}" already exists with ${turnCount} turns and ${chunkCount} chunks — nothing to do (idempotent no-op).`);
+    return;
+  }
+
+  // ISS-314: turns/seed already succeeded under the CORRECT id (oldSessionId === correctSessionId)
+  // but indexing didn't (0 chunks) — e.g. a prior run failed/was interrupted between seed-toc and
+  // buildIndexer. Re-running the full chain here would hit ingest-chain's own dir-exists guard,
+  // which now REFUSES to fork a duplicate id for this exact Drive file (resolveSessionIdForIngest)
+  // rather than silently forking + re-transcribing into E11000. So instead of calling
+  // ingestOneDriveFile at all, repair narrowly: index the session that is already there, nothing
+  // else — no re-download, no re-transcribe, no re-seed, and no rows deleted below.
+  if (decision.action === "reindex-only") {
+    console.log(
+      `--reingest: "${correctSessionId}" has ${turnCount} turns but 0 chunks under its own correct id — ` +
+        `repairing by re-indexing only (no re-download/re-transcribe/re-seed).`,
+    );
+    const { buildIndexer } = await import("../../apps/api/src/production.ts");
+    const indexResult = await buildIndexer()(TENANT, correctSessionId);
+    assertIndexed(correctSessionId, turnCount, indexResult.chunks);
+    await markDriveState(driveFileId, "ingested", { sessionId: correctSessionId, repairedFrom: oldSessionId });
+    console.log(
+      `--reingest: DONE (reindex-only). driveFileId=${driveFileId} sessionId=${correctSessionId} ` +
+        `chunks=${indexResult.chunks.written}`,
+    );
+    return;
+  }
 
   const before = {};
   const after = {};
