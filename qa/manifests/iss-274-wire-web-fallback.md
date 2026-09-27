@@ -197,4 +197,49 @@ stating this as a GAP, not deleting the section or claiming "not UI-touching":
   contract's own disclosed limitation — remote Mongo host `13.202.206.101:27017` — may or may not
   still apply; not re-checked this session since no code in this unit touches Mongo connectivity).
 
-## Status: ready-for-check
+## Status: checked-PASS
+
+**Handshake status:** checked-PASS (Cycle checked: 0, verdict `qa/verdicts/iss-274-wire-web-fallback.md`,
+VERDICT: PASS, SCOREBOARD 5/5 criteria + 4/4 invariants, CAPABILITY-COVERAGE 4/5 rows reproduced,
+LIVE-BROWSER `qa/evidence/browser-iss-274-wire-web-fallback-2026-09-28-checker/`) -- closed out 2026-09-28.
+
+**Read the verdict file from the BOTTOM.** It carries TWO `VERDICT:` lines: the Mode A pass ended
+`FAIL` at line 13 solely because the shared Playwright profile was locked, and the appended
+`## MODE D RE-DISPATCH (cycle 0)` section at line 203 carries the operative `VERDICT: PASS`. A reader
+going top-down -- or a tool grepping the first match -- sees the superseded FAIL. Filed under the
+ISS-350 class (handshake state cannot be computed from the file's surface form).
+
+**No fix cycle was charged.** The Mode A FAIL was environmental (browser lock), not a defect; the
+checker protocol's own rule is that an unexecutable check returns BLOCKED and never bills the maker.
+The maker changed nothing between the FAIL and the PASS -- same commit `d23d464`, same Fix cycle 0.
+Only Mode D was re-dispatched.
+
+**The `Dual check: required` line above is WRONG and was not honoured.** It was derived from ledger
+`severity: high`; the rule (maker SKILL.md 7b) keys on the bound `.goal` task carrying
+`criticality: critical`, and `.goal/goal.json` has zero tasks matching this slug. Single checker was
+correct. Filed as ISS-274WIRE-1 (low).
+
+**Scope of the live evidence, stated honestly.** This worktree has no `.env`, so the real
+`apps/api/src/index.ts` entrypoint cannot start (it awaits a Mongo `connect()` before listening). The
+checker therefore drove the real, unmodified `createServer` / `askV2` / `createTavilySearchFn` through
+a checker-owned harness that fakes only the Mongo + LLM retrieval layer this unit never touches, over
+live HTTP into a real headless Chromium against the real unmodified `AskPage.tsx`. That is a genuine
+browser round trip through this unit's actual code -- it is NOT a full production deployment check,
+and it does not retire the contract's standing remote-Mongo limitation.
+
+**Carried forward, none fixed here:**
+- **ISS-274WIRE-1** (low) -- the mis-derived `Dual check` field, described above.
+- **ISS-274WIRE-2** (low) -- this manifest's own capability-coverage row 4 used a TWO-FILE falsifying
+  edit, which is inadmissible; the checker rejected the cell as CONTRACT_MISMATCH and reconfirmed the
+  capability with its own compliant single-file mutation. The capability is real; the evidence cell
+  for it was not.
+- **ISS-274WIRE-3** (low, downgraded) -- `apps/web/src/App.tsx` declares `/ask` TWICE (line 27 ->
+  AskPage, line 35 -> DashboardPage). The browser settled it: React Router resolves to AskPage, so
+  this is dead-code cleanup, not a reachability defect. It was an open reachability QUESTION until a
+  browser actually looked.
+
+**Contract amended by the checker, not by this unit.** `qa/contracts/ask-web-fallback-tavily.md`
+criteria 1-3, 5 and its disclosed-limitation section were rewritten from "an omitted `tavilySearchFn`
+is today's production default" to "always-wired, honest-unavailable on no key", authority D-041
+ruling 2 (`Approved-by: Umesh`), commit `02b8343`, with a dated amendment-log entry. The maker
+correctly did not touch the contract and routed the conflict to `qa/feedback-inbox.md` instead.
