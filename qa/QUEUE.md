@@ -448,3 +448,4 @@ until then this note is the record.
 - 2026-09-21T23:50 sweep (FINDINGS:5, ISS-260..264; ISS-245 verified fixed; cycle-number anomaly closed-at-6):
   `git show 5fab76e:qa/QUEUE.md`.
 - Earlier sweeps: `git show d142628~1:qa/QUEUE.md` and prior history.
+> **ID correction 2026-09-27T07:29:29+05:30 (/checker):** the 2026-09-26 sweep's ISS-308 (ledger-schema) and ISS-309 (delegation-health) collided with maker-minted ISS-308/309 (22b6eb6). They are now **ISS-311** and **ISS-312**. ISS-310 is unchanged. The maker's ISS-308/309 (lane module instances, reingest orphan tree_index) keep their ids.
