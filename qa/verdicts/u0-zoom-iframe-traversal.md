@@ -1,8 +1,8 @@
 # Verdict — u0-zoom-iframe-traversal
 
-**Cycle checked:** 1
+**Cycle checked:** 2
 **Date:** 2026-09-27
-**Checker:** fresh Claude subagent (claude-sonnet-subagent), read-only, bound to `D:\KnowledgeBase`
+**Checker (cycle 1):** fresh Claude subagent (claude-sonnet-subagent), read-only, bound to `D:\KnowledgeBase`
 (lane `D:\KnowledgeBase-lanes\u0-zoom-iframe`, branch `wave/u0-zoom-iframe`, head `cae512d`).
 
 VERDICT: FAIL
@@ -176,3 +176,191 @@ fix introduces (the old, top-doc-only code had no way to reach hidden content at
 severity given today's live webinar depends on this exact path, and both have a narrow, well-scoped
 fix (gate frame recursion on the `<iframe>` element's OWN visibility in its parent document before
 visiting/clicking/reading its content) that should fit a short cycle-2 turnaround.
+
+---
+
+## Cycle 2
+
+**Cycle checked:** 2
+**Date:** 2026-09-27
+**Checker:** fresh Claude subagent (claude-sonnet-subagent), read-only, bound to `D:\KnowledgeBase`
+(lane `D:\KnowledgeBase-lanes\u0-zoom-iframe`, branch `wave/u0-zoom-iframe`, head `7cfe7fd`).
+Time-critical dispatch (live webinar ~10:55 IST); no real Zoom URL opened, no live bot, `data/bot-profile/`
+untouched, `raw/webinars/2026-09-27-ashoka-join-url.txt` never read. One headless Chrome instance at a
+time throughout.
+
+VERDICT: FAIL
+SCOREBOARD: 2/3 criteria met (C1 n/a — untouched by this unit), 1/1 invariant holds with a new caveat
+
+### What I re-ran myself
+
+1. `python -m pytest packages/meeting-bot/py -q` in the bound lane tree → **30 passed in 6.11s**
+   (27 pre-existing + 3 new hidden-iframe cases). Matches the manifest's pasted output. Reproduced.
+2. Capability-coverage RED/GREEN for the cycle-2 claim, in my OWN throwaway copy (plain directory copy
+   of `packages/meeting-bot/py` outside the bound tree — the bound tree was never touched, not even
+   reverted): swapped in `git show cae512d:packages/meeting-bot/py/sb_join.py` (the cycle-1, checker-
+   FAILed code) and ran `test_sb_join_iframe.py -k hidden_iframe` → **3 failed** (`hidden_zerosize_top`,
+   `hidden_displaynone_top`, `hidden_in_displaynone_div_top`), the exact defects ISS-U0-4/ISS-U0-5 name.
+   RED confirmed against real, unmodified cycle-1 code. The bound tree's own fixed copy independently
+   verified GREEN via #1 above. Row genuinely isolates the fix.
+3. `git show 7cfe7fd --stat` — confirms "What changed": only
+   `packages/meeting-bot/py/sb_join.py` (+28), `packages/meeting-bot/py/test_sb_join_iframe.py` (+25),
+   four new fixture files, and the manifest. No file outside `packages/meeting-bot/py/`/the manifest
+   touched; nothing deleted or renamed; U5's calendar lane untouched. **Diff scope matches the
+   manifest — no finding here.**
+4. **D-015 re-run of ISS-U0-4/ISS-U0-5's own recorded reproductions** (their `reproduction` field,
+   `qa/issues.u0.jsonl`): both named cases (0-size iframe, `display:none` iframe) — verified via the
+   maker's own parametrized tests (step 1/2 above) AND my own independent fixtures below. **Both
+   ledger reproductions no longer trigger against the fixed code: confirmed fixed.**
+5. **My OWN adversarial fixtures** (not the maker's five, not the cycle-1 checker's two), one shared
+   headless Chrome instance (SeleniumBase, `headless=True, uc=False`), against the unmodified, bound
+   `CLICK_JS`/`BODY_TEXT_JS`/`JOIN_TEXTS`/`END_PHRASES` (imported directly from
+   `D:\KnowledgeBase-lanes\u0-zoom-iframe\packages\meeting-bot\py\sb_join.py`, never copied or edited),
+   serving my own local HTML fixtures from a scratch directory outside the repo:
+
+   | fixture | construction | click_hit | end_phrase leaked | top text present |
+   |---|---|---|---|---|
+   | `vishidden_self_top.html` | iframe itself `visibility:hidden` | `null` | no | yes |
+   | `vishidden_ancestor_top.html` | ancestor `<div>` `visibility:hidden` | `null` | no | yes |
+   | `opacity_zero_top.html` | iframe itself `opacity:0` (nonzero size) | **`"join"`** | **yes** | yes |
+   | `offscreen_top.html` | iframe `position:absolute;left:-9999px;top:-9999px` (nonzero size) | **`"join"`** | **yes** | yes |
+   | `happy_path_top.html` | **REAL HAPPY PATH** — visible, full-viewport (`position:fixed;100vw;100vh`) same-origin iframe with Join / Join Audio by Computer / waiting-for-host text | `"join"` (correct — must click) | yes (fixture always contains this text; expected) | yes |
+   | `nested_visible_outer.html` | two levels of fully visible nested same-origin iframes | `"join"` (correct — must click, 2 levels deep) | yes (expected) | yes |
+   | `zerosize_ancestor_top.html` | iframe has its OWN explicit nonzero `width:400px;height:300px`, nested inside ancestor `<div style="width:0;height:0;overflow:hidden;">` | **`"join"`** | **yes** | yes |
+
+   Raw results (abbreviated, full JSON produced by the run):
+   ```
+   vishidden_self_top.html:      {"click_hit": null, "end_phrase_matched": null, "top_text_present": true}
+   vishidden_ancestor_top.html:  {"click_hit": null, "end_phrase_matched": null, "top_text_present": true}
+   opacity_zero_top.html:        {"click_hit": "join", "end_phrase_matched": "webinar has ended", ...}
+   offscreen_top.html:           {"click_hit": "join", "end_phrase_matched": "webinar has ended", ...}
+   happy_path_top.html:          {"click_hit": "join", "end_phrase_matched": "webinar has ended", ...}
+   nested_visible_outer.html:    {"click_hit": "join", "end_phrase_matched": "webinar has ended", ...}
+   zerosize_ancestor_top.html:   {"click_hit": "join", "end_phrase_matched": "webinar has ended", ...}
+   ```
+6. Confirmed Zoho/Meet (no-iframe) top-doc path unchanged: `git show 7cfe7fd --stat` touches no file
+   under `src/capture/` or any non-`packages/meeting-bot/py` path, and the bound tree's own
+   `test_no_iframe_page_click_and_body_text_regression` is included in the 30-passed run. No finding.
+7. TS/pnpm suite: confirmed this lane (`git worktree add`) has no `node_modules` at
+   `packages/meeting-bot/` or repo root (same environment gap the manifest discloses). Zero
+   TypeScript files touched by this cycle's diff (step 3). Judged, same as cycle 1: a disclosed,
+   non-blocking gap, not this unit's regression to own — installing `node_modules` mid-check under
+   today's time budget was not attempted.
+
+### What genuinely works (credit where earned)
+
+- **ISS-U0-4 and ISS-U0-5's own recorded reproductions are fixed** — 3/3 refused each, independently
+  re-derived (RED on cycle-1 code, GREEN on the fix), not merely re-read from the manifest.
+- **The `visibility:hidden` case — both on the iframe itself AND via an ancestor element — is
+  genuinely handled**, confirmed by my own two fixtures the maker's suite does not cover (`click_hit:
+  null`, no leaked text, both cases). This was an explicit dispatch ask and it holds.
+- **The real happy path still works**: a normally visible, full-viewport same-origin iframe containing
+  Join / Join Audio by Computer / waiting-for-host content is still traversed, clicked, and read
+  correctly — the fix has not become so strict that it would break today's actual join. Nested visible
+  frames (two levels) also still traverse and click correctly.
+- Diff scope is clean; Zoho/Meet is unaffected; the full suite is green and repeatable.
+
+### FAILURES
+
+- **[capability-claim, same class as ISS-U0-4/ISS-U0-5] sev: high · An ancestor that clips its own
+  box to zero size via `overflow:hidden` (while the iframe itself keeps an explicit, nonzero
+  `width`/`height`) defeats the cycle-2 visibility gate exactly like ISS-U0-4/ISS-U0-5, via a
+  construction the fix's own fixture set never tried** · `sb_join.py:74-85` (`isFrameVisible`): the
+  `frame.getClientRects().length === 0` check (comment: "catches `display:none` on the iframe itself
+  or ANY ancestor") is true for an ancestor `display:none` (which removes the whole subtree from
+  layout, so the iframe generates zero client rects) but **false** for an ancestor `width:0;
+  height:0; overflow:hidden` — that CSS only clips rendering; it does not remove the child from the
+  layout tree or zero the child's own box, so a replaced element like `<iframe>` with its own explicit
+  size keeps a nonzero `getBoundingClientRect()`/`getClientRects()` regardless of the ancestor. My
+  `zerosize_ancestor_top.html` fixture reproduced this against the real, unmodified, cycle-2-fixed
+  code: `click_hit: "join"`, `end_phrase_matched: "webinar has ended"` — the exact same observable
+  bypass ISS-U0-4/ISS-U0-5 described, just via a different, equally ordinary CSS technique (clipping
+  via a zero-size overflow-hidden ancestor is at least as common a "hide this element" pattern as
+  `display:none`). This directly contradicts the manifest's own claim that
+  `getClientRects().length===0` "also covers 'iframe nested inside a display:none div' without a
+  separate ancestor walk for that case" — it covers display:none ancestors, not clipping ancestors.
+  Fix direction: at each ancestor in the existing `parentElement` walk (already used for
+  `visibility:hidden`), also check that ancestor's OWN `getBoundingClientRect()` for
+  width/height === 0 combined with a computed `overflow`/`overflow-x`/`overflow-y` of `hidden`/`clip`
+  — or, more robustly, replace the enumerate-each-technique approach with an actual on-screen
+  intersection test (the iframe's rect against the running intersection of every ancestor's own
+  clipped rect) since three independent CSS constructions have now produced the same
+  visually-invisible-but-code-visible state (ISS-U0-4, ISS-U0-5, this finding). issue: ISS-U0-6
+
+### Additional finding (does not independently block, judged realistically per the dispatch's ask)
+
+- **[capability-claim, related] sev: medium · `opacity:0` and off-screen absolute positioning
+  (`left:-9999px`, nonzero size) also defeat the same gate** · `sb_join.py:74-85`: neither computed
+  `opacity` nor actual viewport intersection is checked. My `opacity_zero_top.html` and
+  `offscreen_top.html` fixtures both reproduced `click_hit: "join"` + leaked end-phrase against the
+  real, unmodified code. **Realism judgment asked of me by the dispatch:** I found no evidence Zoom's
+  own web-client join UI uses either pattern for its real Join/Join-Audio/waiting-for-host content —
+  both are more characteristic of clickjacking/ad-hiding or transient CSS-transition states than a
+  video-conferencing SPA's join screen, which is why this is medium rather than high (contrast
+  ISS-U0-6's ancestor-clipping construction, an ordinary layout technique with no such connotation).
+  Filed as debt, not a blocker for this unit's grade on its own. issue: ISS-U0-7
+
+### Judgment on the dispatch's specific asks
+
+- **0-size / display:none / display:none-ancestor iframe:** all three refused, independently
+  re-derived (RED/GREEN). Confirmed.
+- **visibility:hidden ancestor:** refused, independently confirmed via my own two fixtures (not
+  covered by the maker's five). Confirmed working.
+- **opacity:0 iframe:** defeats the gate; judged medium severity (realism note above), filed
+  ISS-U0-7, not a blocker.
+- **Offscreen-positioned iframe (nonzero size) — "does it get clicked? judge severity realistically":**
+  yes, it gets clicked and its text leaks. Folded into ISS-U0-7 (medium) alongside opacity:0, same
+  root cause (no viewport-intersection check), same realism judgment.
+- **Real happy path (visible, full-viewport same-origin iframe) — must still work:** confirmed working,
+  both click and text-read, via my own independent fixture, not the maker's `top.html`.
+- **Nested visible frames:** confirmed working via my own two-level fixture, independent of the
+  maker's `nested_outer.html`/`nested_middle.html`.
+- **Zoho/Meet top-doc path unchanged by diff:** confirmed via `git show 7cfe7fd --stat` (step 6 above)
+  and the passing no-iframe regression test.
+
+### Capability coverage
+
+CAPABILITY-COVERAGE: 1/5 rows independently re-verified by me from scratch this cycle (the new
+hidden-iframe row's shared falsifying edit, in my own throwaway copy — see "What I re-ran myself" #2);
+the other 4 rows (unchanged from cycle 1: CLICK_JS-in-iframe, BODY_TEXT_JS-in-iframe, nested-depth,
+cross-origin, no-iframe-regression) are accepted on the bound tree's own passing 30-test run, which I
+independently re-ran, plus my own 7 adversarial fixtures above covering ground neither the maker's
+five nor the cycle-1 checker's two touched. No row's falsifying edit failed to isolate.
+
+LIVE-BROWSER: not-applicable — no live product UI is reachable without opening a real Zoom URL, which
+this dispatch (and the contract's own constraints) explicitly forbid; the artifact under test IS
+browser-automation logic, exercised with a real headless Chrome against local HTML fixtures, the same
+evidentiary standard used by the maker, the cycle-1 checker, and this cycle.
+
+### Ledger
+
+Marked `ISS-U0-4` and `ISS-U0-5` **fixed** — their own named/recorded reproductions (per D-015) are
+independently RED/GREEN-confirmed resolved, same treatment cycle-1 gave ISS-U0-1 while still FAILing
+the unit overall for issues found beyond the ledger's existing rows. `regression_check`:
+`python -m pytest packages/meeting-bot/py -q` (verbatim shell command; no `qa/adapter.json`
+`verify.shell.commands` list exists for this project, so citing the command itself per the ledger
+schema's second allowed form — same citation cycle-1 used).
+
+Filed `ISS-U0-6` (high) and `ISS-U0-7` (medium) per the findings above — both open, both
+`found_by: checker-unit`.
+
+ISSUES-WRITTEN: ISS-U0-6, ISS-U0-7
+EXECUTOR: claude-opus-subagent (manifest) — self != executor confirmed (checker: claude-sonnet-subagent)
+EXPLANATION: Cycle 2 genuinely fixes both issues it was dispatched to fix — ISS-U0-4 and ISS-U0-5's own
+recorded reproductions are independently RED/GREEN-confirmed resolved, and the fix correctly extends to
+the visibility:hidden case (self and ancestor) that neither ledger issue named. The real happy path
+(a visible, full-viewport same-origin iframe with Zoom's actual join UI shape) still works, and nested
+visible frames and the Zoho/Meet no-iframe path are unaffected — this fix has not overcorrected into
+breaking today's join. But my own adversarial fixtures, built independently of the maker's five and the
+cycle-1 checker's two, found a THIRD CSS construction — an ancestor that clips its own box to zero size
+via `overflow:hidden` while the iframe itself keeps an explicit nonzero size — that produces the exact
+same observable bypass ISS-U0-4/ISS-U0-5 named, and that the manifest's own fix comment claims (incorrectly)
+is already covered by the `display:none`-ancestor check. That is a same-class capability gap, not a new
+exotic edge case, and per this pair's own rule ("never soften a criterion because an artifact is
+failing it") I cannot pass a frame-visibility fix that a routine CSS clipping technique still defeats,
+one live webinar and one fix cycle before this exact code path is asked to do it for real. Cycle 3 (max
+3 per the manifest header) has room for a narrow, well-scoped fix: extend the existing ancestor walk (already
+used for visibility:hidden) to also fail visible when an ancestor's own rect is zero-size with hidden/clip
+overflow, or replace the technique-enumeration approach with an actual viewport-intersection test. The
+opacity:0/offscreen finding (ISS-U0-7, medium) is filed as related debt and, per my own realism judgment
+asked in the dispatch, does not block this verdict on its own.
