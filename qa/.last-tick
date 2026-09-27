@@ -315,3 +315,33 @@ the two with the widest unblocking effect are `iss-322-multifile-shape: a` + `ne
   or self-certify. That is the behaviour the pair exists to produce.
 - in flight: checkers for `topicrefs-arg-guard` and `jobkey-collision-detection`.
 - SERIAL: `vector-gap-durability` has no checker by DECISION, not by ceiling — see the gate.
+
+## 2026-09-27 ~19:3x IST — maker tick — state: ADVANCED (both checkers PASS, both merged)
+- `jobkey-collision-detection` (ISS-321): **PASS cycle 0** (12f6bb3), `ISSUES-WRITTEN: none` → merged.
+  Re-verified on master: meeting-bot calendar **80 pass / 0 fail**; lint-loc unchanged at 4.
+  The checker verified the orphan claim **on the real host** rather than reasoning about it: ran
+  `schtasks /query` filtered on `lkb-autorecord` (zero), confirmed no `raw/webinars/scheduled/` exists,
+  no log mentions `schedule-tick`, and `cli.ts` wires the subcommand but nothing invokes it yet. It also
+  ruled the lost `null` rejection harmless on a **caller census** — one production caller, branching only
+  on truthiness — not on plausibility. And it extended past a re-run: reverted all six files to the
+  pre-fix commit, re-ran `tsc`, diffed, and got byte-identical 17 pre-existing errors, which is what
+  turns "pre-existing" from a claim into a measurement.
+- `topicrefs-arg-guard`: **PASS cycle 0** (176c26a), `ISSUES-WRITTEN: none` → merged. Re-verified on
+  master: promote-entities **19 pass / 0 fail**.
+  It explicitly **upheld the builder's reframing and marked my brief wrong** — the row says verbatim
+  "Cause is the FIXTURE, not the assertions" and "the shipped argument is correct", so the guard my
+  brief asked for would have repeated ISS-333. Already recorded as D-040.
+  Its own value was the part a paste could have faked: it checked out the **pre-fix** test file
+  (`333c7f1^`, 364 vs 403 lines) and armed the mutation against it → **18/18 GREEN**, reproducing the
+  historical blindness fresh, then re-armed against the fixed file → **RED 18/1**. For a test-only unit
+  that pair IS the deliverable.
+  One honest qualification it added: the `entity-promotion.md` **C4 citation is an extension one layer
+  in** — C4's examples are about a filter choosing which document a write hits, this defect is a
+  predicate choosing which values the body carries. I2 matches directly. Stated because a citation that
+  does not hold up is worse than none (ISS-341).
+- the concurrent uncommitted ledger edit one checker flagged has since been committed by the other; the
+  main tree is clean apart from the pre-existing `.goal/goal.json` change present at session start.
+- carried forward, not closed: once U6's poller exists, `deps.log` needs a real consumer, or the
+  collision refusal becomes the same "looked like it worked" class ISS-271/272 closed today.
+- open at tier 2/4 that is freely buildable: **0**. Three units merged this tick; the fourth
+  (`vector-gap-durability`) is held at `qa/gates/iss-122-round-cap-breach.md` by the round cap.
