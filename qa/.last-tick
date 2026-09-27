@@ -201,3 +201,29 @@ is the same structural problem D-013 was written for, in a new place: the reacha
 not because the work is done but because the gates are unanswered. Nine items are queued for Umesh;
 the two with the widest unblocking effect are `iss-322-multifile-shape: a` + `new file ok` and
 `obs-windows-loc-split: a|b|c`.
+
+## 2026-09-27 ~18:3x IST — maker tick — state: ADVANCED (second unit closed)
+- golden-set-silent-fabrication: verdict **PASS cycle 0** (8c33117), `ISSUES-WRITTEN: none` →
+  manifest **checked-PASS** → lane merged --no-ff. ISS-271, ISS-272 open → fixed. Tier **2**.
+- re-verified ON MASTER: new tests 8/8 · lint-loc still 4 violations (**no 5th** — the claim checked
+  out) · `scripts/` still 32 files, i.e. the ceiling is unchanged, not quietly raised.
+- `ISSUES-WRITTEN: none` is recorded here as a **complete and creditable check**, per this repo's
+  verdict rule. The checker did not trust the maker's mutation table — it wrote its OWN mutations
+  reverting each function to its old sentinel, and both went red on exactly the claimed assertions
+  and nothing else. That is what establishes the tests assert on the real computed field rather than
+  a value the test supplies, which is the failure mode the ISS-337 unit had to design around.
+- it also re-verified the 89/90 test:lint claim **on the base commit** in a throwaway worktree,
+  confirming the docs/SNAPSHOT.md staleness is pre-existing and not this unit's.
+- corrected in the manifest, not silently: the manifest said the two ledger rows carried
+  `reproductions: null`; parsed directly, those keys are **absent**. Same substance (nothing to
+  replay, so authoring a corpus was correct and not a D-015 substitution) but "absent" and "null"
+  are different claims about a row, and paraphrasing the ledger instead of parsing it is how a wrong
+  field slips through later.
+- filed **ISS-345 (low)**: `scripts/` is at exactly 32/32 against its lint-dirsize ceiling, which
+  already forced this unit to break the sibling-test convention. The checker saw it, judged the
+  workaround sound, and kept it an EXPLANATION note rather than a row — correct under its brief. The
+  row is the MAKER's call, not a correction of that judgement, and it is a decision for the Approver
+  (raise the override via D-017, or move a group of scripts into a subdirectory), never a pulled unit.
+- SERIAL: none — the checker followed its own build, a real dependency edge, and it was dispatched in
+  the turn the build returned. wave=1 · concurrent peak=1. The one-unit-deep ceiling recorded above
+  still holds: with ISS-271/272 now closed, the ungated buildable inventory at critical/high is **0**.
