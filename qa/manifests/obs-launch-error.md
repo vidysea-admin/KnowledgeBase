@@ -119,4 +119,28 @@ lines are the minimum the fix needs (the retained `ChildProcess`, the listener, 
 The file still needs the split Umesh has been asked about; this unit makes that need slightly more
 acute and resolves none of it.
 
-## Status: ready-for-check
+## Status: checked-PASS (cycle 0)
+
+Verdict: `qa/verdicts/obs-launch-error.md` (**Cycle checked: 0**, commit `9a0174f`) — **PASS**.
+
+The checker re-ran all four verify commands (and the full `pnpm run lint:structure` composite, not
+just the `lint-loc` sub-check this manifest ran), reproduced **both** capability-coverage mutations
+independently in a copy taken outside the bound root, re-read ISS-337's ledger row rather than
+trusting the quote above, and confirmed no other call site of `launchObsNormally`/`launchObs` exists.
+ISS-337 flipped `open -> fixed`; ISS-343 (medium) filed because ISS-340 still names the stale 352.
+
+### Correction to "What changed" — one claim above is overstated
+
+The bullet crediting the `setImmediate` yield in `ensureObsReady` with closing a race is **not
+supported**. The checker deleted that line on its own initiative and all 9 tests still passed: it has
+no capability-coverage row, and by the real timing (the in-loop `launchFailure()` check plus a 3000 ms
+backoff, against a sub-millisecond async spawn-error latency) there is no production window it
+protects either. It is inert, not wrong — it cannot cause a failure — but the sentence above claims a
+guarantee the code does not provide, and that is the kind of claim this repo's D-015 discipline exists
+to catch. **Filed as ISS-344 (low)** to be removed by the next unit that touches `obs-guard.ts`; not
+removed here, because changing code after a PASS without a new cycle is precisely the shortcut the
+handshake forbids.
+
+The honest version of that bullet: *`ensureObsReady` observes the launch failure, logs it, and throws
+a message naming the spawn error and `OBS_EXE`.* The race it also claimed to close was already closed
+by `connectWithBackoff` returning early — which **is** covered, by the second row of the table.
