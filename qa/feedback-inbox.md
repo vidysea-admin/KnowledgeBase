@@ -161,3 +161,6 @@ Verbatim: "go on i approve", then ticked "U5 auto-record policy" (option text: "
 
 ## 2026-09-26T23:56:41+05:30 — Umesh confirmed first-hand in maker session
 Verbatim selection: "Run the InFocus repair, U5 fully automatic, Write DECISIONS entries" (maker session AskUserQuestion). U5 = bot auto-joins meetings from trusted senders as Umesh without per-meeting approval; registration forms stay human; real Telegram/WhatsApp sends still need their own approval.
+
+## 2026-09-27T08:15:37+05:30 — Umesh: Zoom bot account
+Verbatim: "so take umeshsugara@vidysea for now". The bot's Chrome profile signs in with umeshsugara@vidysea.com for now; a dedicated bot account (e.g. recorder@vidysea.com) is deferred, not rejected. Follow-ups for maker: (1) session-expiry detection + alert asking for re-login before a scheduled join; (2) server deploy note: copy data/bot-profile/ or sign in once on the server; (3) later: switch to a dedicated bot account. Recorded by /checker knowledgebase-7a.

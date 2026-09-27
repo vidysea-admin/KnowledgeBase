@@ -7,3 +7,5 @@
 **Also blocking (fixable by maker after sign-in, ISS-U0-1):** Zoom's web client UI is inside a same-origin iframe the bot's click/end-phrase JS doesn't traverse yet — fix + live-verify needs a signed-in session to reach the waiting screen.
 **Deadline:** before Sun 2026-09-27 ~10:00 IST (bot must be scheduled for 10:55).
 **Blocks:** U0 live delivery; any future sign-in-required Zoom webinar (U5).
+
+Answered: 2026-09-27T08:15:37+05:30 — option (a): bot profile uses umeshsugara@vidysea.com "for now" — Umesh in chat to checker session knowledgebase-7a, verbatim "so take umeshsugara@vidysea for now" (after being offered a dedicated recorder@vidysea.com account). ACTION STILL PENDING: Umesh runs the login command himself (password/OTP cannot be entered by an agent). Scribed by /checker.
