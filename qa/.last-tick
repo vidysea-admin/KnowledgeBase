@@ -373,3 +373,10 @@ the two with the widest unblocking effect are `iss-322-multifile-shape: a` + `ne
   iss-322-multifile-shape · obs-windows-loc-split · live-recording-proof-method ·
   enforcement-hooks-unauthorized-and-live-regressed · d015-generalisation-scope ·
   ledger-shard-union-hook · handshake-liveness-contract-start · plan-approved-u4-watch-dashboard (PARTIAL).
+TICK 2026-09-27T17:25:53Z ADVANCED tier=0(handshake reconciliation) wave=0 concurrent peak=0
+  measured: 159 manifests, 3 Status forms (30 bold-field / 92 heading / 37 other), 2 VERDICT forms, verdicts ordered newest-cycle-first
+  unresolved: delivery-gate-stamp-adoption (fix cycle 2 owed, HELD on Approver) - u2-4-phase3-precision-regate (paused, RAM) - delivery-gate-manifest-blindness + write-guard-enforcement-gaps (STALLED c3, both have qa/debug reports)
+  no false PASS found: golden-set-regeneration + hybrid-merge cleared by hand (newest-first ordering, not stale FAILs)
+  filed: ISS-350 (high, handshake unreadable by any scan)
+  PASS item 5 of stamp-adoption already satisfied by a prior cycle (gate names all 3 commits) - no edit made
+  SERIAL: no wave dispatched - the only tier-0 unit is gated on Approved-by, tier-3 U4/U6 gated on plan approval + outward-facing install
