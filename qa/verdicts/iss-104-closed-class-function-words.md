@@ -154,3 +154,155 @@ point. This is a small, mechanical fix (commit the existing script), not a desig
 expect a fast cycle-1 PASS once it lands, without disturbing anything currently working.
 
 ## SCOREBOARD: 18/19 criteria+invariants met, 1 failed (C13); 3/3 capability-coverage rows reproduced
+
+---
+
+# CYCLE 1 CHECK (appended below the cycle-0 FAIL, which is left byte-intact above)
+
+**Cycle checked:** 1 (matches manifest `Fix cycle: 1 of max 3`)
+**Date:** 2026-09-28
+**Checker:** claude-sonnet-subagent (Mode A, fresh context, dispatched to the primary verdict path —
+no `.b.md` dispatch was received for this cycle, so this is the single check performed; the
+manifest's `Dual check: required` note is for the dispatcher, not something this session controls)
+**Contract:** qa/contracts/speaker-resolution-llm.md ([C2b], [C12], [C13])
+**Bound root:** `D:/KnowledgeBase-lanes/iss-104-speaker-closedclass` (branch
+`wave/iss-104-speaker-closedclass`, verified via `git -C D:/KnowledgeBase worktree list` — note the
+actual path differs from the one named in the dispatch (`.claude/worktrees/iss-104-speaker-closedclass`);
+the worktree-list lookup the dispatch itself required is what caught this). Base `2bda2f4`, cycle-0
+commit `4f3fd9f`, HEAD `0a3463c`.
+
+## VERDICT: PASS
+
+## C13 — re-derivability, the cycle-0 failure — CLOSED, re-derived myself
+
+Re-ran both audit commands the manifest names, independently:
+
+- `node scripts/lib/audit-closed-class.mjs` → `enumeration: 409 words (SET A 299 + SET B 110)` /
+  `AFTER (current tree): LIVE BYPASSES: 0 / 409` — exact match.
+- `node scripts/lib/audit-closed-class.mjs --base 2bda2f4` → `BEFORE (2bda2f4): LIVE BYPASSES: 276 / 409`
+  — exact match to the manifest's table (409 enumerated / 276 missing-at-base / 133 already-present /
+  0 live now).
+
+Read `scripts/lib/audit-closed-class.mjs` in full: it is not a shortcut dressed as a script.
+`probeCurrent`/`probeBase` both import the real `extractSpeakers` from `speakers-llm.ts` (the base run
+via `git show <ref>:...speaker-name-rules.ts` written to a scratch file behind the *current, unchanged*
+harness) and drive it through the same offline `replies()` fake-completion pattern the test suite uses —
+no network, no LLM, no hardcoded pass/fail table.
+
+**Independently verified the enumeration itself is not hand-picked to produce a nice number** — I
+extracted `NEVER_A_PERSON` straight from `speaker-name-rules.ts` myself (stripping `//` comments first,
+since a naive quote-regex over-counts by picking up quoted words inside comments): **422 total entries,
+421 unique, exactly 1 duplicate (`everyone`)** — matching both the manifest and the cycle-0 checker's
+independent count exactly. I then computed `421 unique − 12 excludedCollectiveAddress words = 409` and
+diffed that computed set against `closed-class-audit-words.json`'s 409 entries: **zero words missing,
+zero words extra, exact set equality.** The committed data file is provably `NEVER_A_PERSON` minus the
+declared exclusions, not an independently-authored list that happens to total 409.
+
+Also confirmed via `git diff 4f3fd9f..0a3463c --stat`: exactly 5 files changed, all the manifest names
+(`closed-class-audit-words.json` new, `audit-closed-class.mjs` new, `qa/issues.104cc.jsonl` +2 lines,
+the manifest itself, no verdict-file entry since that was already committed at `16e58ca`) — no
+surprises.
+
+## Claim 1 — speaker-name-rules.ts / .test.ts byte-identical since cycle 0
+
+`git diff 4f3fd9f..0a3463c -- packages/index/src/pipeline/speaker-name-rules.ts
+packages/index/src/pipeline/speaker-name-rules.test.ts` → **empty, both files.** Confirmed true: no
+words added, no behaviour changed. Every capability-coverage row and the D-015 test therefore stand on
+exactly the code cycle-0's checker already judged correct on the merits (recall-cost tradeoff, I2/I3,
+etc.) — cycle 1 only adds the two audit artifacts and corrects manifest prose.
+
+## Claim 2 — `pnpm install --force`, no source touched
+
+`git status --porcelain=v1` in the bound worktree: **empty**, clean tree at HEAD. `git diff
+2bda2f4...HEAD --name-only` shows no `pnpm-lock.yaml` change. Re-ran `pnpm test` in `packages/index`
+myself: **285/285**, matching the manifest exactly. The install repaired local `node_modules` only;
+nothing committed was touched by it.
+
+## Claim 3 — 300 non-blank lines, zero headroom
+
+`grep -c '.' packages/index/src/pipeline/speaker-name-rules.ts` → **300** (total physical lines: 313,
+so 13 blank/comment-boundary lines make up the difference — matches `loc.max: 300` in
+`structure.config.json` exactly). `node scripts/lint-loc.mjs` → same 4 pre-existing violations
+(`speakers-llm.ts:313`, `sb_join.py:437`, `obs-windows.ts:359`, `run-watch.mjs:447`);
+`speaker-name-rules.ts` absent from the violation list. Matches.
+
+## Claim 4 — cycle 0's 406/277/0 figures: honestly disclosed, not conflated
+
+The manifest's "Cycle 1" section puts the old and new numbers in one explicit table headed "cycle 0
+claimed (uncommitted, unverifiable)" vs. "cycle 1 re-derived (committed, ...)" and states in prose that
+the surviving "406/277"/"147" occurrences further down are "cycle 0's original, uncorrected prose, left
+as the historical record of what was claimed at the time." That is an accurate description of what is
+actually in the document — I read the surviving occurrences (`## The real defect, measured` etc.) and
+each one does carry an inline `[corrected in cycle 1: ...]` bracket pointing back to the real figure.
+Nothing is silently presented as if 409/276/133 were always the numbers.
+
+## Claim 5 — `mutate.mjs assert-clean`, `pnpm typecheck`
+
+`node scripts/lib/mutate.mjs assert-clean` → `MUTATIONS CLEAN: none outstanding`. `pnpm typecheck` in
+`packages/index` → exit 0, no diagnostics. Both clean, both re-run myself, not pasted-output trust.
+
+## Capability coverage: 3/3 rows reproduced (independently, by me, this cycle)
+
+The manifest's coverage table is unchanged from cycle 0 (no new capability claims — cycle 1 adds no
+runtime behavior), but per SKILL.md 4b "always" I reproduced all three rows myself rather than relying
+on cycle 0's checker's reproduction, in a **fresh throwaway copy** built via `git archive HEAD` into
+`<scratch>/iss104-row-d015-fast` (outside `D:/KnowledgeBase` entirely) with `node_modules` attached via
+Windows directory junctions (instant, avoids a slow full copy; junctions resolve to real files so the
+copy's own edits never touch the linked node_modules). Confirmed green-before (`87/87`) in the copy
+before every edit.
+
+| row | edit (single hunk, single file, in the throwaway copy only) | before | after | match |
+|---|---|---|---|---|
+| 1 — preposition guard | delete `speaker-name-rules.ts:149-151` (3 preposition lines) | 87/87 | **RED**: `tests 87 / pass 83 / fail 4` — exactly `Between`, `Despite`, `Towards`, `Via`; control (`auxiliary/modal: refuses "Should"`, D-015, all 3 collision-bound tests) stayed green | exact |
+| 3 — D-015 fidelity | shorten ledger row `"I am Not sure about that."` → `"I am Not sure."` in the test file | 87/87 | **RED**: `tests 87 / pass 86 / fail 1` — only the D-015 test, assertion text `"the in-file corpus must equal the ledger's own cases, in order — substituting a corpus is the D-015 defect"`; control `ISS-093 corpus: "Not" in "I am Not sure." is refused` **stayed green** — the exact point of the row | exact |
+| 5 — ALL-tokens bound | `speaker-name-rules.ts:173` `tokens.every(` → `tokens.some(` (line 173 only — line 48's unrelated `tokens.every` in a different function was left untouched, confirmed by line-scoped `sed`) | 87/87 | **RED**: `tests 87 / pass 84 / fail 3` — exactly `Will Smith`, `Doris Day`, `Can Ozturk`; control (`preposition: refuses "Between"`, collision cost) stayed green | exact |
+
+Also read `speaker-name-rules.test.ts:193-230` (the D-015 test) directly: it walks up from the test
+file to find the repo's `qa/` directory, reads every `qa/issues*.jsonl` shard (the D-019 ledger union,
+not a hardcoded copy), locates the real `ISS-104` row, regex-parses its `evidence` field for the 20
+`"TEXT"/"NAME"->person:` reproductions, and asserts the in-file `ISS_093_CORPUS` constant is
+`deepEqual` to that extraction. I independently located `ISS-104` in `qa/issues.jsonl` and confirmed
+its `evidence` field contains exactly the same 20 cases the test parses and the manifest's "Actual
+outputs" section pastes. Not a hardcoded copy dressed as a fidelity check.
+
+## Diff scope (4c) — clean, full unit
+
+`git diff 2bda2f4...HEAD --stat`: **7 files, 0 deletions** (`closed-class-audit-words.json` new,
+`speaker-name-rules.test.ts` +134, `speaker-name-rules.ts` +29, `qa/issues.104cc.jsonl` +2, the
+manifest +368, the verdict file +156, `audit-closed-class.mjs` new). No file outside the manifest's
+"What changed" (plus the expected ledger-shard and verdict paths) is touched. `speakers.ts` remains
+git-diff-empty against base (**[I2]** holds).
+
+## LIVE-BROWSER: not-applicable (cycle-1 changed paths: `packages/index/src/pipeline/closed-class-audit-words.json` (data), `scripts/lib/audit-closed-class.mjs` (node script, not imported by any shipped path), the manifest, and `qa/issues.104cc.jsonl` — no route/view/API/persistence surface, confirmed via `git diff 4f3fd9f..0a3463c --stat`)
+
+## Ledger
+
+- `ISS-104CC-1` → moved `open → fixed` (regression_check: `node scripts/lib/audit-closed-class.mjs`,
+  a real command that errors/mis-reports the moment the committed script or word-list drifts from
+  `NEVER_A_PERSON` — re-run in `qa/issues.104cc.jsonl`).
+- `ISS-104CC-2` (the worktree-file-reversion anomaly from cycle 0) — **left open, untouched.** This
+  unit neither claims nor could plausibly fix a concurrent-worktree-integrity hazard; it is out of
+  this unit's scope. Worth a human's attention independently of this verdict.
+- `ISS-104` itself stays exactly where the manifest leaves it (17/20, 3 open gazetteer cases) — this
+  unit does not claim to close it and I am not crediting it as closed.
+
+No new issues found. `ISSUES-WRITTEN: none` on a correct implementation is a complete and creditable
+check, not a lapse (project CLAUDE.md "Verdict rule") — I looked for a reason to doubt the
+re-derivability claim specifically (the one thing cycle 0 failed on) and could not find one after
+independently reproducing every number in the table.
+
+## EXECUTOR: claude-sonnet-subagent (manifest's Executor: claude-sonnet-subagent) (checker: claude-sonnet-subagent, fresh context, no memory of building either cycle)
+
+## EXPLANATION
+
+Cycle 1 does exactly what it claims and nothing more: two new, non-runtime artifacts (a data file and
+a probe script) that make C13's headline audit independently re-runnable, plus manifest prose
+corrections, with the two files that carry actual behavior (`speaker-name-rules.ts` and its test)
+proven byte-identical to the already-judged-correct cycle-0 state. I re-derived every number in the
+manifest's before/after table myself, confirmed the word-list is a provable, exact function of
+`NEVER_A_PERSON` (not a hand-tuned list), reproduced all three capability-coverage rows and their
+controls from scratch in an independent throwaway copy, and found the historical-vs-corrected numbers
+honestly distinguished rather than quietly swapped. The one open item from cycle 0 (ISS-104CC-2, a
+worktree-integrity anomaly) is unrelated to this unit's scope and is left open on the ledger.
+
+## SCOREBOARD (cycle 1): 19/19 criteria+invariants met (adds C13 to cycle 0's 18/19); 3/3 capability-coverage rows reproduced independently
