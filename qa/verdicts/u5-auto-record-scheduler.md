@@ -205,6 +205,240 @@ repo's severity gate, security-class findings on an outward-facing/auto-triggeri
 round-capped, so this is not "fix it next cycle" debt — it blocks PASS at cycle 1.
 ```
 
-## Delegation ledger
+## Delegation ledger (cycle 1)
 Appended the verdict/issues half of this unit's row to
 `D:\KnowledgeBase\qa\delegation-ledger.jsonl`.
+
+---
+
+# CYCLE 2 (this section governs — Cycle checked: 2)
+
+**Cycle checked:** 2
+**Date:** 2026-09-27
+**Checker:** fresh claude-sonnet-subagent (this session), bound to `D:\KnowledgeBase`. Lane
+`D:\KnowledgeBase-lanes\u5-auto-record`, branch `wave/u5-auto-record`, commit `43df5b8`
+(fix cycle 2, responding to this file's own cycle-1 FAIL at `83ff56d`).
+
+## Verify commands re-run (own runs, RAM-constrained scope per dispatch — targeted tests + tsc on
+meeting-bot only)
+```
+$ cd packages/meeting-bot && npx tsc --noEmit -p tsconfig.json
+(no output — exit 0)
+
+$ node --test --import tsx src/calendar/auto-join.test.ts src/calendar/schedule-state.test.ts \
+    src/calendar/task-scheduler.test.ts src/calendar/schedule-tick.test.ts \
+    src/capture/record-commands.test.ts
+ℹ tests 82
+ℹ pass 82
+ℹ fail 0
+```
+Matches the manifest's claimed output exactly (82/82).
+
+`lint-loc`/`depcruise`/full `pnpm -r test` were NOT re-run (same RAM-budget dispatch constraint as
+cycle 1 and as this cycle's own manifest). Manually re-derived line counts instead (`wc -l`):
+`task-scheduler.ts` 151, `schedule-state.ts` 108, `schedule-tick.ts` 220,
+`auto-record-policy.ts` 92, `record-commands.ts` 298 — matches the manifest's claim exactly, all
+at/under the 300-LOC budget. `UNVERIFIED-by-checker` for lint-loc/depcruise/full-suite, same as
+cycle 1.
+
+## PowerShell launcher — parse-check only (no execution; `Start-Process` would actually launch
+`pnpm`, forbidden by this cycle's dispatch constraints)
+```
+[PS] [System.Management.Automation.Language.Parser]::ParseFile(
+  'scripts\webinar\start-record-detached.ps1', [ref]$tokens, [ref]$errors)
+-> PARSE OK - 0 errors
+```
+Confirms the manifest's em-dash fix claim; independently re-run, not just re-read.
+
+## Backward-compatibility hard criterion — re-verified independently
+
+**`todayAt` bare `HH:MM` form, byte-for-byte vs. master's pre-U5 implementation** (`git show
+58a9f4c:packages/meeting-bot/src/capture/record-commands.ts`): wrote a standalone script that
+calls the REAL exported `todayAt` from this cycle's code and a byte-for-byte copy of master's
+`todayAt` side by side, for 8 `HH:MM` inputs including boundary cases (`00:00`, `23:59`) and an
+explicit "earlier than now" case (`now`'s hour − 2, wrapping). **All 8 + the earlier-than-now case
+match to the millisecond** (both resolve to the same instant, both anchor to *today* even when
+that lands in the past relative to `now` — i.e. no behavior change for a time earlier than now:
+still today, not tomorrow). Evidence:
+```
+00:00 master=2026-09-26T18:30:00.000Z new=2026-09-26T18:30:00.000Z MATCH
+00:45 ... MATCH   09:05 ... MATCH   12:00 ... MATCH   23:59 ... MATCH   23:30 ... MATCH   05:00 ... MATCH
+ALL MATCH
+earlier-than-now case: 07:00 master=2026-09-27T01:30:00.000Z new=2026-09-27T01:30:00.000Z MATCH
+Both resolve to TODAY (possibly in the past relative to now), not tomorrow: true
+```
+**MET** — the bare-`HH:mm` path is unchanged.
+
+**Direct invocation `-Url <join> -Until <HH:mm> -Title <t> -SessionId <id>`** (today's live-webinar
+usage): read-traced the full script. Master had `[Parameter(Mandatory=$true)]` on `-Url`/`-Until`;
+this cycle drops `Mandatory` and replaces it with an explicit
+`if (-not $Url -or -not $Until) { Write-Error <usage>; exit 1 }` check placed AFTER the `-Job`
+resolution block (so `-Job` can supply them) but BEFORE `New-Item`/`Start-Process`. For the exact
+direct-invocation shape named in this cycle's dispatch (`-Url`/`-Until`/`-Title`/`-SessionId`, no
+`-Job`): the `-Job` block is skipped entirely (falsy `$Job`), the mandatory-check passes since both
+are present, and `$cliArgs` construction (`@("--filter","@lkb/meeting-bot","cli","record",$Url,
+"--until",$Until)` + conditional `--title`/`--session-id` appends) is byte-for-byte unchanged from
+master. **MET — parameter binding and behavior for the existing manual path are unchanged.**
+
+**Neither `-Job` nor `-Url` given:** traced the same path — `$Job` falsy skips the resolution
+block, `$Url`/`$Until` stay `$null`, the mandatory-check fires, `Write-Error` + `exit 1`. **Fails
+loudly, never reaches `New-Item`/`Start-Process`, never launches with an empty url — matches the
+hard criterion exactly.**
+
+## Capability coverage (step 4b) — 3 real falsifying edits in a throwaway copy (own copy, own
+edits, never the bound tree)
+Copy made at `...\scratchpad\u5-c2-checker-copy` (`packages/meeting-bot/src` + a `node_modules`
+junction to the lane's own `node_modules` — never the bound tree itself), deleted after use.
+Green-before confirmed for each file first.
+
+- **ISS-317 row (jobKey validation gate)** — replaced `scheduleOnce`'s `if
+  (!JOB_KEY_RE.test(opts.jobKey))` with `if (false)` (single-hunk, single file). Green-before:
+  23/23 in `task-scheduler.test.ts`. Red-after: **exactly the 12 hostile-jobKey rejection tests
+  turn red** (`evil\"`, `a;rm -rf`, `$(whoami)`, `` `backtick` ``, `%VAR%`, `line\nbreak`,
+  `a&b|c`, `-Command`, `UPPER-CASE`, `has space`, `""`, 65-char), the other 11 stay green.
+  **Isolates correctly.**
+- **ISS-318 row (default trusted domains)** — restored `zoho.com`/`zoom.us` to
+  `DEFAULT_TRUSTED_SENDER_DOMAINS` (single-hunk, single file). Green-before: 33/33 in
+  `auto-join.test.ts`. Red-after: **exactly the 3 ISS-318-named tests turn red** (`falls back to
+  the fix-cycle-2 defaults`, `defaults no longer trust… zoho.com/zoom.us`, `a stranger on
+  zoho.com/zoom.us is untrusted`), the other 30 stay green. **Isolates correctly.**
+- **ISS-319 row (todayAt ISO/midnight handling)** — removed the ISO-datetime branch from
+  `todayAt`, leaving only the bare-`HH:mm` parse (single-hunk, single file). Green-before: 10/10 in
+  `record-commands.test.ts`. Red-after: **exactly the 2 ISS-319-named tests turn red** (`a full ISO
+  datetime is parsed directly`, `ISS-319's own reproduction — a session crossing midnight…`); the
+  other 8 in that file, and the unrelated `schedule-tick.test.ts` ISS-319 row (which asserts the
+  job-file's `until` field directly, independent of `todayAt`), stay green. **Isolates correctly.**
+
+**CAPABILITY-COVERAGE: 3/3 targeted rows reproduced with real falsifying edits, all isolate
+correctly; the remaining ~11 rows read-reviewed only (RAM/time budget, same discipline as cycle
+1) — `UNVERIFIED-by-checker` for those, not credited as independently re-derived.**
+
+## Diff scope (step 4c) — re-run myself
+`git diff 2277245..43df5b8 --stat`: 12 files — the 5 `packages/meeting-bot/src/calendar/*`
+production files + their 4 test files + `record-commands.ts`/`record-commands.test.ts` +
+`start-record-detached.ps1` + this manifest/verdict pair. Matches the manifest's own claimed file
+set exactly. Inspected every removed line (`git diff … | grep '^-[^-]'`) in
+`schedule-tick.ts`/`task-scheduler.ts`: every deletion is the vulnerable old API surface being
+replaced as part of the disclosed ISS-317 fix (`taskNameFor` helper, the old `command`/`args`-based
+`ScheduleOnceOptions` shape, the naive-escaping `taskRun` builder) — **no undisclosed deletion, no
+file outside the manifest's "What changed" touched.** **MET.**
+
+## D-015 measurement — each issue's own recorded reproduction, re-run by me, counts by id
+- **ISS-317** (schtasks `/tr` injection): re-ran the full `task-scheduler.test.ts` (23/23 pass,
+  independently) — covers every hostile-character class ISS-317's own `fix_direction` named
+  (quotes, backslash-quote, `&`, `|`, `;`, `$(...)`, backticks, `%VAR%`, newline) — plus my own
+  falsifying edit above (12/12 correctly isolated). **ISS-317: 23/23 re-run, 12/12 isolated —
+  fixed, verified.**
+- **ISS-318** (over-broad trust defaults): re-ran `auto-join.test.ts` (33/33 pass) + my own
+  falsifying edit (3/3 correctly isolated) + read-confirmed `DEFAULT_TRUSTED_SENDER_DOMAINS` no
+  longer contains `zoho.com`/`zoom.us`. **ISS-318: 33/33 re-run, 3/3 isolated — fixed, verified.**
+- **ISS-319** (midnight `-Until`): re-ran `record-commands.test.ts` (10/10 pass, includes ISS-319's
+  own named 23:30→00:45 reproduction) + my own falsifying edit (2/2 correctly isolated) + my own
+  independent `todayAt` byte-for-byte compat script (above). **ISS-319: 10/10 re-run, 2/2
+  isolated — fixed, verified.**
+- **ISS-320** (cross-source dedup, low, note-only): manifest correctly takes no action this cycle;
+  nothing to re-run.
+
+## New adversarial findings (beyond the three named issues) — filed, neither blocks this PASS
+
+### ISS-321 (medium, filed) — jobKey derivation collision
+`deriveJobKey`'s lossy collapse (`toLowerCase` + collapse-non-`[a-z0-9]`-to-`-`) makes distinct
+`sessionKey`s map to the SAME `jobKey` — reproduced with the real exported function:
+`deriveJobKey('gmail:abc_123') === deriveJobKey('gmail:abc-123')`, `deriveJobKey('gmail:ABC') ===
+deriveJobKey('GMAIL:ABC')`, `deriveJobKey('cal:ABC_DEF') === deriveJobKey('cal:abc-def')`, all
+`=== true`. Neither `writeScheduledJob` (unconditional `writeFileSync`) nor `scheduleOnce`'s
+`/create /f` detects or warns on a collision — a second session silently overwrites the first's
+job file and Scheduled Task. **Currently unreachable** (gmail `sessionKey`s are Mongo ObjectIds —
+already collision-free under this transform; calendar events are stubbed to `[]`, same
+reachability caveat this unit's own manifest discloses for calendar-sourced items) — same profile
+already accepted for ISS-320, so **not blocking this PASS**, filed for when Calendar OAuth lands.
+Per this repo's severity gate, a data-write-touching finding needs full ceremony once it's
+actionable, regardless of severity — noted for whoever picks it up.
+
+### ISS-322 (high, filed, out of this unit's diff — pre-existing T-028/U2 code) — no sender
+authentication anywhere in the trusted-sender pipeline
+Read `apps/api/src/gws-gmail.ts:114-116,278-280` (`extractEmail`/`FROM_RE`, `fetchOne`): `senderEmail`
+is a bare regex pull of the raw `From` header text Gmail returned — **no SPF/DKIM/DMARC check
+anywhere in this file**, no read of an `Authentication-Results` header, nothing. This predates and
+is outside this unit's diff (T-028/U2, untouched by U5) — cycle 1's checker already flagged the
+sibling "display-name spoofing" case as out-of-scope/read-only for the same reason, and I'm treating
+this the same way: **not re-tested live, not blocking this cycle's PASS** (D-015 scope discipline —
+ISS-317/318/319's own recorded reproductions are all independently satisfied above). What's new
+this cycle: `auto-record-policy.ts` now trusts `umeshsugara@vidysea.com` itself (the account being
+scanned) specifically because a self-forwarded invite's `senderEmail` equals that address — meaning
+a *spoofed* `From: umeshsugara@vidysea.com` header gets **identical** treatment to a genuine
+self-forward, with no authentication step distinguishing them. This is a systemic gap affecting all
+four default trust entries, not something this unit introduced, but adding the scanned account's own
+address as a trusted identity raises the stakes of that pre-existing gap. Flagged `HUMAN_GATE`-
+worthy in the filed issue: whether Umesh accepts this residual risk, or wants gws-gmail.ts to surface
+an authentication signal before U6 (the recurring poller) makes this pipeline run unattended.
+
+### Noted, not filed (below my >80%-confidence bar for a FAILURES line or a ledger row)
+Whether `start-record-detached.ps1`'s `Start-Process -FilePath "pnpm" -ArgumentList $cliArgs`
+(unchanged from pre-U5 T-047, now fed partially email-sourced `$Title`/`$Url` via the `-Job` path)
+has the same re-parse hazard as the old `/tr` string: architecturally these differ (schtasks's `/tr`
+is a single string re-parsed a SECOND time by Task Scheduler when the task fires — the actual
+ISS-317 bug; PowerShell's `-ArgumentList` array is quoted ONCE, directly into `CreateProcess`, no
+second untrusted re-parse boundary), so I don't have independent evidence this is actually exploitable,
+and confirming it empirically would require actually launching `pnpm` — forbidden by this cycle's
+dispatch constraints. Question for a future cycle/human, not a finding here.
+
+## Adversarial re-verification of items cycle 1 already checked (re-confirmed, not just re-read)
+- **Join token never in `/tr`**: confirmed via read — the fixed `/tr` shape
+  (`task-scheduler.ts:131`) contains only `launcherPath`/`jobKey`; the sensitive `url` lives only in
+  the per-job JSON file. **MET.**
+- **Job JSON under a gitignored path**: `git check-ignore -v raw/webinars/scheduled/abc.json` →
+  matched by `.gitignore:67` (`raw/webinars/`). **MET.**
+- **No `Invoke-Expression`, no string-built commands from JSON fields in the `-Job` path**: read the
+  full script — zero occurrences of `Invoke-Expression`; `$Url`/`$Title`/`$SessionId` (whether from
+  direct params or the job JSON) travel only as individual elements of the `$cliArgs` array handed
+  to `Start-Process -ArgumentList`, never string-concatenated into a shell command. **MET.**
+- **`-Job` regex re-validated in PowerShell, file read is safe**: confirmed the `$Job -notmatch
+  '^[a-z0-9-]{1,64}$'` check runs BEFORE `Test-Path`/`Get-Content` — a hostile `-Job` value is
+  refused before any file-system read, and the same shape blocks path traversal (no `.`/`/`/`\` in
+  the allowed character class). **MET.**
+- **`launcherPath` traversal**: `RECORD_LAUNCHER` is a fixed, repo-controlled constant
+  (`path.join(REPO_ROOT, "scripts", "webinar", "start-record-detached.ps1")`) — never built from any
+  candidate/sender/user input, so there is no external input surface for traversal here at all.
+  **MET.**
+- **Trust defaults now exactly partner orgs + named emails**: confirmed —
+  `DEFAULT_TRUSTED_SENDER_EMAILS = ["karunn@vidysea.com", "umeshsugara@vidysea.com"]`,
+  `DEFAULT_TRUSTED_SENDER_DOMAINS = ["theoutreachcollective.in", "ashoka.edu.in"]`. Whether adding
+  `umeshsugara@vidysea.com` is fully consistent with the approved policy is judged above (ISS-322) —
+  the *domains* half is unambiguously fixed exactly as ISS-318 demanded.
+
+## Ledger
+`ISS-317`, `ISS-318`, `ISS-319` → `fixed`, `regression_check` set to the exact re-run command,
+in `D:\KnowledgeBase\qa\issues.jsonl` (re-read max id across `qa/issues*.jsonl` as 320 before
+appending). `ISS-321` (medium, jobKey collision), `ISS-322` (high, sender-authentication gap,
+out-of-diff) filed new, both `open`, neither blocks this PASS per the reasoning above.
+
+```
+VERDICT: PASS
+SCOREBOARD: 3/3 named issues (ISS-317/318/319) independently confirmed fixed with regression
+coverage re-run by me; backward-compat hard criterion MET (todayAt byte-for-byte vs master + direct-
+invocation parameter binding unchanged + loud failure on neither -Job nor -Url); diff scope clean;
+3/3 targeted capability rows re-isolated with my own falsifying edits
+FAILURES: none
+CAPABILITY-COVERAGE: 3/3 targeted rows reproduced (real falsifying edits, all isolate correctly) |
+~11 UNVERIFIED-by-checker (read-reviewed only, same RAM/time budget as cycle 1)
+LIVE-BROWSER: not-applicable (CLI/scheduler unit, no new screen — matches manifest's "Persona walk:
+skip", unchanged from cycle 1)
+ISSUES-WRITTEN: ISS-321, ISS-322 (new, neither blocking); ISS-317/318/319 marked fixed
+EXECUTOR: claude-opus-subagent (manifest) — self != executor confirmed (checker: claude-sonnet-
+subagent, no ANTHROPIC_BASE_URL override)
+EXPLANATION: All three named security-class findings (ISS-317 command injection, ISS-318 over-broad
+trust defaults, ISS-319 midnight truncation) are genuinely fixed — I independently re-ran every test,
+applied my own falsifying edits (not the maker's), and re-derived the backward-compatibility hard
+criterion (todayAt byte-for-byte vs. master, direct-invocation binding unchanged, loud failure on
+missing input) from first principles rather than trusting the manifest's claims. Diff scope is clean.
+My own adversarial hunt found two more things (ISS-321 jobKey collisions, ISS-322 no sender
+authentication anywhere upstream) — both real, neither blocking: ISS-321 is currently unreachable
+(same profile as the already-accepted ISS-320), and ISS-322 is a pre-existing, out-of-this-unit's-diff
+gap in T-028/U2 code that adding umeshsugara@vidysea.com makes more consequential but did not create.
+Per D-015, this cycle is measured against ISS-317/318/319's own recorded reproductions, and all three
+are satisfied by evidence I produced myself, not evidence I merely re-read.
+```
+
+## Delegation ledger (cycle 2)
+Appended the verdict/issues half of this unit's row to `D:\KnowledgeBase\qa\delegation-ledger.jsonl`.
