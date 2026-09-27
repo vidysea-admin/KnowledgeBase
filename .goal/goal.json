@@ -4,7 +4,7 @@
   "north_star": "Build the Vidysea Living Knowledge Base as the brain for an AI virtual counsellor that matches and then beats every living top human counsellor in head-to-head evaluation (public championship, AlphaGo-style). Phase 1 exit: POST /ask over the 23 TOC sessions returns speaker+timestamp-cited internal answers, with web-fallback for off-corpus questions.",
   "status": "active",
   "created": "2026-09-03T07:01:15",
-  "updated": "2026-09-27T13:46:03",
+  "updated": "2026-09-27T14:26:04",
   "progress": {
     "total": 84,
     "done": 51,
@@ -955,8 +955,8 @@
     "risk_tolerance": "conservative"
   },
   "analytics": {
-    "velocity_per_day": 1.24,
-    "eta_days": 26.6
+    "velocity_per_day": 1.23,
+    "eta_days": 26.8
   },
-  "last_deterministic_tick": "2026-09-27T13:46:03"
+  "last_deterministic_tick": "2026-09-27T14:26:04"
 }
