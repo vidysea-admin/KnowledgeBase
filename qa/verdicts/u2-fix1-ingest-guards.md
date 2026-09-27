@@ -124,13 +124,18 @@ Not UI-touching — correctly marked n/a in the manifest (only `scripts/watch/*`
 
 ## Findings
 
-1. **Ledger duplicate ids (medium, ISS-311, filed this check).** `qa/issues.jsonl` has ISS-308 and
-   ISS-309 each assigned to two different rows — a 2026-09-26 checker-sweep pair (`ledger-schema`,
-   `delegation-health`) and a 2026-09-27 maker pair (`lane-environment`, `source-watcher`, commit
-   `22b6eb6`) that reused those ids without checking the ledger's actual max (which was already
-   ISS-310). Not this unit's defect — filed against the ledger, not the code — but worth a human
-   decision on which pair to renumber, since both are now externally cited (this very manifest and
-   dispatch cite the 2026-09-27 pair by these ids).
+1. **Ledger duplicate ids — found, then found already fixed concurrently (self-corrected).**
+   `qa/issues.jsonl` had ISS-308 and ISS-309 each assigned to two different rows (a 2026-09-26
+   checker-sweep pair vs. a 2026-09-27 maker pair, commit `22b6eb6`, that reused those ids without
+   checking the ledger's actual max). I first appended this as a new finding under id `ISS-311` —
+   but a **concurrent /checker session** had, moments earlier, already fixed the exact same
+   collision in commit `66ac88f` (renumbering the sweep pair to ISS-311/ISS-312), which meant my
+   own new row now collided with ITS ISS-311. Caught this on the next `git log`, renumbered my row
+   to the actually-free `ISS-313`, and marked it `wontfix`/`RESOLVED-CONCURRENTLY` since 66ac88f
+   already did the fix it was going to recommend (second commit, `5e624bf`). Confirmed
+   `qa/issues.jsonl` now has zero duplicate ids. Recorded here because it's a live example of
+   exactly the race D-019/the "concurrent verdict" rule exists for — worth the maker/checker pair
+   re-reading the max id immediately before every append, not just at the start of a check.
 2. Manifest's own "How to verify" section has a typo (`ingest-chain.mjs.test.mjs`, doesn't exist —
    the real file is `ingest-chain.test.mjs`); the "Actual outputs" section clearly used the correct
    filename, so this is cosmetic, not filed.
@@ -159,13 +164,15 @@ CAPABILITY-COVERAGE: 4/4 automated rows reproduced in a throwaway copy (green-be
   as a pass, not counted as a fail
 LIVE-BROWSER: not-applicable (scripts/watch/*, packages/db/src/collections/watch-state.ts only — no
   UI surface changed)
-ISSUES-WRITTEN: ISS-311
+ISSUES-WRITTEN: ISS-313 (self-corrected from a colliding ISS-311 — see Findings)
 EXECUTOR: claude-sonnet-subagent (checker: claude-sonnet-subagent, independent session — self != executor)
 EXPLANATION: All three ISS root causes are correctly diagnosed and fixed with pure, tested guards;
   I independently reproduced all 4 automated capability rows in a throwaway copy (not the bound
   tree) and cross-checked the maker's live-repair narrative against the already-committed log file
   rather than trusting the paste. ISS-304/305/306 correctly stay open pending post-merge proof
   (chunks > 0) — this manifest never claimed otherwise after its own status update, and that live
-  step is explicitly out of this check's scope per Umesh's decision. Filed ISS-311 for an unrelated
-  ledger-integrity defect (duplicate ISS-308/ISS-309 ids) found while reading the ledger.
+  step is explicitly out of this check's scope per Umesh's decision. Found an unrelated
+  ledger-integrity defect (duplicate ISS-308/ISS-309 ids), then found it already fixed by a
+  concurrent /checker between my discovery and my write — my own append had collided with THAT
+  fix's ISS-311, so I renumbered mine to ISS-313 and marked it resolved-concurrently.
 ```
