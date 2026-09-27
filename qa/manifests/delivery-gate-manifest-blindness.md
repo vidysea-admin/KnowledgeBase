@@ -4,10 +4,10 @@
 (status `proposed`) covers the sibling guard; judge whether this belongs under it or needs its own.
 **Goal task:** none (tier 2 — open high issue).
 **Date:** 2026-09-09
-**Fix cycle:** 3 of max 3
+**Fix cycle:** 0 of max 3 (reset 2026-09-28 per D-041 ruling 5 — see "Cycle reset" below)
 **Dual check:** no
 **Issues addressed:** **ISS-176** (high) + **ISS-184**, **ISS-185**, **ISS-186**, **ISS-187**. Gates **ISS-183**. Cycle 3: **ISS-192**, **ISS-193**, **ISS-194**, **ISS-195**, **ISS-186**. Corrects the record on **ISS-177**.
-**Status:** STALLED (cycle 3 of max 3)
+**Status:** reset-awaiting-rebuild (was STALLED at cycle 3 of max 3; reset 2026-09-28 per D-041 ruling 5)
 
 ## Why
 
@@ -456,3 +456,15 @@ and is a small regex change for the next unit that touches this block.
 Approver rules.
 
 **Handshake status:** STALLED — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree
+
+## Cycle reset — 2026-09-28 (D-041 ruling 5)
+
+Counter reset per **D-041 ruling 5** (Approved-by: Umesh) — the Approver chose fresh attempts
+over closing these as not-pursued, so the max-cycle cap no longer holds this unit shut.
+
+**But a cycle 4 is NOT the recovery, and the reset does not make it one.** This unit's own stall
+diagnosis `qa/debug/delivery-gate-manifest-blindness-cycle3.md:106-110` names the smallest
+recovery as **ISS-205, the only real code defect** (require the digits on the same line —
+the same-line whitespace class instead of `\s*` — and reject a label whose value was erased by stripping), and says
+verbatim that it *"belongs to whatever unit next touches the block, **not** a cycle 4."*
+So: pullable again, but the path is a fold-in, not a re-run of the same unit.

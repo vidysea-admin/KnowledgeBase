@@ -4,10 +4,10 @@
 `qa/contracts/write-guard.md` if you judge one is owed — this is the third unit to touch this seam.
 **Goal task:** none (tier 2 — open high issue).
 **Date:** 2026-09-09
-**Fix cycle:** 3 of max 3
+**Fix cycle:** 0 of max 3 (reset 2026-09-28 per D-041 ruling 5 — see "Cycle reset" below)
 **Dual check:** no
 **Issues addressed:** **ISS-160** (high) · **ISS-165**, **ISS-166**, **ISS-167** (high) · **ISS-168**.
-**Status:** STALLED (cycle 3 of max 3)
+**Status:** reset-awaiting-rebuild (was STALLED at cycle 3 of max 3; reset 2026-09-28 per D-041 ruling 5)
 
 ## Why
 
@@ -385,3 +385,17 @@ which is the same arithmetic that would have shipped ISS-078. So ISS-180 is a re
 this one. Stopping here is the cycle limit doing its job, not the defect being dismissed.
 
 **Handshake status:** STALLED — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree
+
+## Cycle reset — 2026-09-28 (D-041 ruling 5)
+
+Counter reset per **D-041 ruling 5** (Approved-by: Umesh) — fresh attempts rather than closing
+as not-pursued.
+
+**The reset alone cannot unblock this unit, and saying otherwise would be false.** Its stall
+diagnosis `qa/debug/write-guard-enforcement-gaps-cycle3.md:92-96` names the recovery as **one
+contract amendment first, then a small code change that follows from it** — amend C1 so existence
+stops being decisive, because as written C1 contradicts I2. The maker **cannot** make that
+amendment: `qa/contracts/` is checker-owned and read-only to the maker (project CLAUDE.md). And
+D-041 itself lists `write-guard-contract-contradiction` among the gates it explicitly did **not**
+settle. So this unit stays gated on a checker contract amendment plus that open gate; the counter
+reset only removes the cap, it resolves nothing.
