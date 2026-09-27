@@ -268,4 +268,34 @@ it directly as backlog-tier-4 unit `topicrefs-arg-guard`. Recording rather than 
 dispatch: this unit's only edit is to `promote-entities.test.ts` (the sibling of the exact file the
 row names), so it satisfies the row's own release condition either way.
 
-## Status: ready-for-check
+## Status: checked-PASS (cycle 0)
+
+Verdict: `qa/verdicts/topicrefs-arg-guard.md` (**Cycle checked: 0**, commit `176c26a`) — **PASS**,
+`ISSUES-WRITTEN: none`. ISS-C-TOPICREFS-ARG-001 flipped `open -> fixed`.
+
+**The reframing was upheld, and the orchestrator's brief was wrong.** The checker read the ledger row
+itself, in both tree copies, and confirmed it says verbatim "Cause is the FIXTURE, not the assertions"
+and "the shipped argument is correct". The dispatch brief had said "the sessionId argument is undefended
+— add a guard", derived from the row's title. A guard would have repeated the ISS-333 anti-pattern:
+defending a call that was never wrong. Recorded as **D-040** — dispatch briefs come from a row's
+`evidence` and `fix_direction`, never its title.
+
+**What earns this unit its PASS is the one thing that could have been faked.** The checker did not
+trust the pasted RED/GREEN. It reconstructed both halves from scratch inside the worktree: it checked
+out the **pre-fix** test file (`git show 333c7f1^`, 364 lines vs 403 — the exact 39-line delta), armed
+the `sessionId -> "s2"` mutation against it and got **18/18 GREEN**, reproducing the historical
+blindness fresh; then restored, re-armed the same mutation against the fixed test file and got **RED,
+18 pass / 1 fail**, `actual: ['t:funding']` vs `expected: ['t:visa-rules']`. For a test-only unit that
+pair *is* the deliverable, and it is now independently established rather than asserted.
+
+It also verified the three no-guard claims at their cited lines, upheld the decision to add
+`treeRootExclusiveTopics()` rather than mutate the shared `treeRoot()` (whose 18 pinned assertions stay
+untouched) as purpose-built rather than drift, and re-ran every pasted number.
+
+### One honest qualification the checker added to the contract citation
+
+`qa/contracts/entity-promotion.md` I2 matches directly. **C4 is an extension "one layer in"**: its
+worked examples concern a Mongo filter selecting which *document* a write hits, whereas this defect is
+a predicate selecting which *values* the write's body carries. Same shape, but the citation is a
+reading of C4 rather than a literal instance of it — worth stating, since a citation that does not hold
+up is worse than none (ISS-341).
