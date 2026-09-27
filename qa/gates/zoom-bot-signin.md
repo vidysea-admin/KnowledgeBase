@@ -9,3 +9,13 @@
 **Blocks:** U0 live delivery; any future sign-in-required Zoom webinar (U5).
 
 Answered: 2026-09-27T08:15:37+05:30 — option (a): bot profile uses umeshsugara@vidysea.com "for now" — Umesh in chat to checker session knowledgebase-7a, verbatim "so take umeshsugara@vidysea for now" (after being offered a dedicated recorder@vidysea.com account). ACTION STILL PENDING: Umesh runs the login command himself (password/OTP cannot be entered by an agent). Scribed by /checker.
+
+**ACTION DONE + VERIFIED (2026-09-27 ~08:30 IST, checker knowledgebase-7a):** Umesh signed in via
+Google in a *plain* Chrome launched on `--user-data-dir=data/bot-profile` (the SeleniumBase login
+window got Google OAuth 400 "malformed request" — Google rejects sign-in in automation-controlled
+Chrome; email+password path unavailable because the account is Google-login only). Checker then
+closed that Chrome and reopened the same profile through the bot's own driver path
+(`SB(uc=True, headed=True, user_data_dir=data/bot-profile)`) → `https://zoom.us/myhome` loaded,
+title "Home - Zoom", "Umesh Sugara" present, no redirect to signin. Session persists into the bot.
+Follow-up for maker (not blocking today): `cli login` should launch plain Chrome, not sb_join.py,
+so Google SSO works; plus session-expiry detection (feedback-inbox).
