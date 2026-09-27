@@ -374,4 +374,4 @@ No real Windows Scheduled Task created this session either (still a build-sessio
 Calendar events still always `[]`. Master-moved-during-build note from cycle 1 still applies —
 not re-verified against the current tip in this session (targeted-tests scope).
 
-**Status:** ready-for-check
+**Status:** checked-PASS (cycle 2, verdict b96d22e; merge HELD until after the 2026-09-27 12:50 live webinar run, launcher file shared)
