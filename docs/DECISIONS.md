@@ -607,3 +607,222 @@ not make anything read it.
 
 **Links:** ISS-350, ISS-351, ISS-348, ISS-176, ISS-183, D-019, D-015, ISS-304, ISS-305, ISS-306,
 qa/manifests/handshake-canonical-field.md, qa/verdicts/handshake-canonical-field.md, 1fe83d7, 50d7f7c
+
+## D-043 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** Umesh, as this repo's named Approver, authorizes changes to two enforcement paths --
+`.claude/hooks/delivery-gate-stop.ps1` and `.claude/hooks/mc-sessionstart.ps1` -- for three specific
+fixes, and retroactively ratifies two commits that already changed `delivery-gate-stop.ps1` without an
+authorizing entry.
+
+The three authorized fixes:
+
+1. **The delivery-gate `Fix cycle` predicate + the ISS-205 stripper clause** (`delivery-gate-stop.ps1`).
+   Held as PASS items 1-2 of `delivery-gate-stamp-adoption`, which owes fix cycle 2.
+2. **The round-cap mechanical check** (ISS-346): the unit-selection path must count prior PASSed
+   verdicts naming a seam and refuse to open a non-security unit at >= 2, rather than relying on the
+   maker noticing. The breach recorded in `qa/gates/iss-122-round-cap-breach.md` was caught by hand,
+   after the build, which is exactly the failure mode a mechanical check exists to remove.
+3. **The session-start hook reading the canonical handshake field** (ISS-350 reproduction 2, and the
+   reader half D-042 explicitly left undone): `mc-sessionstart.ps1` must compute `Checks pending` and
+   `PASS not closed out` from `**Handshake status:**` rather than from a single bolded-`Status` grep.
+
+Retroactively ratified: commits `4a71633` and `e5402d6`, both of which modified
+`delivery-gate-stop.ps1` with no authorizing entry, as recorded in
+`qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md`. Ratification is not absolution -- the
+gate file's account of how they landed stays as written, and the same gate's third instance ("this
+cycle") is covered by item 1 above.
+
+Out of scope: `scripts/append_decision.ps1` and `.claude/settings.json` are NOT authorized by this
+entry. Any change there needs its own entry with its own `Approved-by`.
+
+**Why:** Three separate fixes had been built or specified and then held, across multiple ticks, solely
+because they touch files this repo requires the Approver to authorize by name. That rule is correct and
+is not being weakened -- what it produced here, though, was a loop whose own miscounting was the thing
+it could not fix. The session-start hook printing `Checks pending: 0` over an unanswered cycle-1 FAIL
+(ISS-350) is a defect in the mechanism that decides what work exists; while it stands, every tick's
+inventory is computed by a reader that cannot see the contract. D-042 made the manifest side
+computable and said in terms that it did not make anything read it. This entry is what lets the readers
+be taught.
+
+The retro-ratification is the honest resolution of a worse state than either alternative. The gate file
+records that `delivery-gate-stop.ps1` ran uncommitted for a day and was modified three times without
+authorization; there is therefore no clean reviewed state to revert to, and reverting would restore a
+hook whose predicate is known to be wrong while leaving the repo pretending the history did not happen.
+Naming the two commits in an ACTIVE entry makes the unauthorized edits auditable, which is the property
+the authorization rule exists to protect.
+
+**Result:** Three fixes become buildable, each still subject to the normal manifest -> checker -> verdict
+handshake; authorization is not a PASS. Item 2 (ISS-346) is dispatched first, because it is the
+mechanical check that governs the D-044 cap waiver taken in the same session -- the check should exist
+before the exception it supervises is repeated. `qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md`
+is answered and closed by this entry. ISS-350 reproduction 2 becomes addressable; reproductions 3-4
+(the verdict-side `VERDICT:`/`Verdict:` split and newest-first ordering) remain open and touch no
+enforcement path.
+
+**Approved-by:** Umesh
+
+**Changes-authorized:** `.claude/hooks/delivery-gate-stop.ps1` (Fix-cycle predicate, ISS-205 stripper
+clause, round-cap mechanical check), `.claude/hooks/mc-sessionstart.ps1` (parse `**Handshake status:**`
+for the pending/closed-out counts)
+
+**Links:** D-042, D-014, ISS-346, ISS-350, ISS-205, ISS-176, ISS-183,
+qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md, qa/gates/iss-122-round-cap-breach.md,
+qa/manifests/delivery-gate-stamp-adoption.md, 4a71633, e5402d6
+
+## D-044 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** The D-014 class-based round cap is waived ONCE, for the `vector-gap-durability` work already
+built on branch `wave/vector-gap-durability` against ISS-122. That branch may enter the normal
+manifest -> checker -> verdict handshake and, on a PASS, merge -- even though ISS-122 sits on the
+`vector-gap.ts` seam at 2 prior PASSes, where D-014 caps non-security units, and even though a prior
+verdict directed that ISS-122 "must not be promoted into a round-3 unit on its own".
+
+This waiver is narrow and does not generalise:
+
+- It covers **this branch, this issue, this seam, once.** A further finding on `vector-gap.ts` is
+  capped exactly as before, and the next one raises a HUMAN_GATE rather than a round 4.
+- It does **not** waive the checker. The code is mutation-verified by its author, which is worth
+  nothing as certification -- only a fresh `/checker` can PASS it.
+- The **mechanical cap check authorized in D-043 (item 2) is built first.** The exception is not
+  permitted to precede the mechanism that would have caught it.
+
+**Why:** The breach was procedural and the maker's own: the unit was selected, built and
+mutation-verified before anyone counted the prior PASSes on the seam, and the maker caught it itself,
+filed ISS-346 and ISS-347, opened `qa/gates/iss-122-round-cap-breach.md`, and correctly left the branch
+unmerged with no manifest filed and no checker dispatched -- dispatching one would itself have been the
+round the cap forbids. Shard 1 of this session's sweep independently confirmed that account: the branch
+is not on master and nothing in the range merges it.
+
+So the choice was between two costs. Discarding correct, verified work to honour a cap whose purpose is
+to stop *grinding on a seam* -- seven rounds in one day on the search-store seam is what D-013/D-014
+were written against -- pays the cap's price without buying its benefit, since the grind already did not
+happen here. Waiving it once, with the reason recorded and the mechanical check landing alongside, keeps
+the work and makes the failure mode non-repeatable, which discarding the branch would not.
+
+What makes this safe to waive is specifically that D-014 is **class**-based: the cap exists because
+severity was assumed to decay with round count, and the one time that assumption mattered in this repo
+it was wrong in the *opposite* direction -- ISS-078, a cross-tenant read disclosure, surfaced at round 5
+after four consecutive PASSes. ISS-122 is a durability issue, not security class. Had it been tenancy,
+auth, a data write or credential handling, D-014 would not have capped it at all and there would be
+nothing to waive.
+
+**Result:** `wave/vector-gap-durability` is unblocked in this order: (1) build and check the ISS-346
+mechanical cap check under D-043; (2) file the `vector-gap-durability` manifest citing this entry as its
+authorization; (3) dispatch a fresh checker; (4) merge only on PASS. `qa/gates/iss-122-round-cap-breach.md`
+is answered by this entry and closes. ISS-346 stays open until its check ships; ISS-347 (the D-020
+trap-construct sandbox conflict) is untouched by this decision and remains open.
+
+**Approved-by:** Umesh
+
+**Links:** D-014, D-013, D-020, D-043, ISS-122, ISS-346, ISS-347, ISS-078,
+qa/gates/iss-122-round-cap-breach.md, wave/vector-gap-durability, 91ee4ae
+
+## D-045 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** Umesh consents to both things U6 needs that the maker cannot decide for itself:
+
+1. **A new file**, `scripts/watch/install-tasks.ps1`. This is the explicit "create a new file" authorization
+   the edit-in-place discipline requires. It goes in a NEW subdirectory `scripts/watch/` rather than
+   `scripts/` itself, because `scripts/` sits at exactly 32 of 32 entries against the C2 `lint-dirsize`
+   contract (ISS-345) and a 33rd entry there would fail the structure lint.
+2. **Registering Windows Scheduled Tasks on this machine** â€” an outward-facing action, in that it changes
+   machine state outside the repository and causes recordings to start with no human present.
+
+Constraints on the install path, which are part of the consent and not implementation detail:
+
+- **Dry-run first, always.** The script prints every task it would register -- name, trigger, command line,
+  working directory, run-as account -- and registers nothing without an explicit `-Apply`. The default
+  invocation is the preview.
+- **Idempotent.** Re-running it converges: an existing task with the same name is updated in place, never
+  duplicated, and the script reports created/updated/unchanged per task.
+- **Reversible by the script that created it.** A `-Remove` path unregisters exactly the tasks this script
+  owns, identified by a fixed name prefix, and touches nothing else in Task Scheduler.
+- **No credential capture.** Tasks run as the current interactive user; the script never prompts for or
+  stores a password, and never registers a task to run as SYSTEM.
+
+**Why:** U6 is the unit that makes the difference between capture that works and capture that happens.
+The Ashoka Educator Dialogues webinar on 2026-09-27 was not recorded, and the two defects behind it
+(ISS-323, ISS-324) were both in a path that only ever ran because a human remembered to run it. U4, the
+watch dashboard, tells Umesh what the system is doing; U6 is what removes the requirement that he be
+watching at all. Shipping U4 without U6 produces a dashboard whose honest reading is "nothing is
+scheduled".
+
+The consent is recorded rather than assumed because the maker is otherwise forbidden to take it. Creating
+a new file and changing machine state outside the repo are both gated to the human by construction, and
+an unattended recorder is precisely the kind of thing that should not appear on a machine because an
+autonomous loop judged it useful. The dry-run-by-default and `-Remove` constraints exist so that the first
+time it runs, its effect is legible before it is real, and so the consent can be withdrawn by running the
+same script.
+
+**Result:** U6 (`scripts/watch/install-tasks.ps1`) becomes buildable once U4's spec and plan gates are
+answered, per the feature rule -- this entry removes the new-file and machine-state blockers, not the plan
+gate. `qa/gates/u6-task-scheduler-consent.md` is opened and answered by this entry in the same motion. The
+install itself stays a human action: the maker may build and test the script and run it in preview, and
+Umesh runs `-Apply`. Verification is a registered task that fires on a throwaway schedule and produces a
+non-empty recording, which is also the live proof ISS-324 still owes.
+
+**Approved-by:** Umesh
+
+**Links:** D-032, ISS-323, ISS-324, ISS-345, U4, U6, docs/features/u4-watch-dashboard/,
+qa/gates/plan-approved-u4-watch-dashboard.md, qa/gates/u6-task-scheduler-consent.md,
+packages/meeting-bot/src/calendar/task-scheduler.ts
+
+## D-046 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** U4's spec and plan are approved, closing the PLAN gate
+(`qa/gates/plan-approved-u4-watch-dashboard.md`) that has blocked the capture wave. Four things are
+settled:
+
+1. **Spec approved as written**, all of R1-R8: alert on a failed poll (throttled per
+   `(tenantId, sourceType, sourceId)`), alert when polling stops happening at all, alert before a
+   recording starts, the `/watch` landing page with plain-language text on every state, read-only
+   "next up", "poll now" over the pre-existing `POST /watched-sources/run`, and tenant-scoped reads.
+2. **Plan approved**, all three units: U4a failure/upcoming alerts, U4b the heartbeat detector
+   (criticality high), U4c the `/watch` page. U4a and U4c dispatch as one parallel wave; U4b is
+   `after: U4a` because both touch `telegram-alerts.ts`, the only dependency edge.
+3. **New-file permission for exactly three files** â€” `apps/web/src/pages/WatchPage.tsx`,
+   `apps/web/src/pages/WatchPage.test.tsx`, `apps/web/src/api/watched-sources.ts`. `App.tsx` is edited
+   in place for the route and nav entry. No other new file is authorized.
+4. **U4b's heartbeat is a new `watch_heartbeat` collection**, one row per (tenant, source), overwritten
+   on each completed run â€” NOT a field on `watch_state`.
+
+**Why:** The wave has been unbuildable for several ticks because a new screen may not be built until
+intent, spec and plan are all approved, and the last two were pending. The alternatives were offered
+and declined: dropping R3, and building the page with no alerts. The second would have reversed the
+earlier alert-first answer and would not have caught the incident this feature exists for â€” a page
+someone must remember to visit is the same silence as no page.
+
+R2 is the requirement that carries the feature, and it is approved in full knowledge that it cannot be
+driven from `watch_state` rows, because the failure mode is the **absence** of rows. On 2026-09-27 the
+Ashoka Educator Dialogues webinar was not recorded, and the reason nobody noticed until afterwards is
+that a watcher which dies writes nothing, alerts nothing, and is indistinguishable from a quiet week.
+Detecting that requires a positive liveness signal and a separate reader of it.
+
+That is also the whole reason the heartbeat gets its own collection. A field on `watch_state` is
+cheaper today, and it couples liveness to per-poll history: a retention or pruning policy on that
+collection could then disable the silent-failure detector with nothing failing visibly. The one
+component in this feature that must never fail quietly is the one that detects quiet failure, so it
+does not share a lifecycle with data someone may reasonably decide to prune.
+
+**Result:** U4a and U4c are dispatched as a parallel wave this tick; U4b follows U4a. Each unit still
+owes its own manifest, a fresh checker and a verdict â€” approval is not a PASS â€” and U4c owes a Mode D
+live browser walk for both personas (`umesh-operator`, `vidysea-staff`), with every interaction
+asserted by its state change rather than by rendering. The gate file carries all three `Answered:`
+lines and `Gate status: ANSWERED`.
+
+Recorded in the same motion, because it changes what U6 may do: the live-recording proof method is
+answered as **wait for the next real webinar** (`qa/gates/live-recording-proof-method.md`). Umesh
+declined to stage a throwaway Zoom meeting. Two consequences are accepted deliberately â€” the next
+webinar must still be started **by a human, with instrumentation**, capturing the full progress-event
+chain and a non-empty file; and if that run fails, the webinar is lost too. U6 may therefore be built
+under D-045 but its `-Apply` install stays blocked until that proof exists. A green test suite is not
+evidence here: `obs-windows.test.ts:111` injects a fake node child, which is why the meeting-bot suite
+held 94/94 green through the period when live capture was broken.
+
+**Approved-by:** Umesh
+
+**Links:** D-045, D-032, D-024, D-014, ISS-323, ISS-324, ISS-078, ISS-335, ISS-336,
+qa/gates/plan-approved-u4-watch-dashboard.md, qa/gates/live-recording-proof-method.md,
+qa/gates/u6-task-scheduler-consent.md, docs/features/u4-watch-dashboard/spec.md,
+docs/features/u4-watch-dashboard/plan.md

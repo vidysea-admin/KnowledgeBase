@@ -73,6 +73,6 @@ unit is pulled.
 **Answer format:** reply `iss-122-round-cap: a` (or b / c). Under (a) or (c) an authorizing DECISIONS
 entry is written before the merge.
 
-**Answered:** (pending)
+**Answered:** 2026-09-28 — WAIVED ONCE, recorded as **D-044**. The built and mutation-verified `wave/vector-gap-durability` branch may enter the normal handshake and merge on a PASS, despite ISS-122 sitting on the `vector-gap.ts` seam at 2 prior PASSes. Three conditions, all from the entry: the ISS-346 mechanical cap check lands FIRST (the exception may not precede the mechanism that would have caught it); a fresh `/checker` must still PASS it, since the author's own mutation run certifies nothing; and the waiver covers this branch, this issue, this seam, once — a further finding on `vector-gap.ts` is capped as before and raises a HUMAN_GATE rather than a round 4. Safe to waive specifically because D-014 is class-based and ISS-122 is durability, not security class; had it been tenancy, auth, a data write or credentials, D-014 would not have capped it and there would be nothing to waive. Asked and answered in chat (AskUserQuestion, this session).
 
-**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file
+**Gate status:** ANSWERED — 2026-09-28, one-time waiver under D-044 (Approved-by: Umesh); ISS-346 check builds first

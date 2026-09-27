@@ -388,3 +388,21 @@ TICK 2026-09-27T18:36:21Z ADVANCED tier=2(ISS-350) wave=1 concurrent peak=1
   D-042 appended: canonical handshake field + unit-status vs issue-status + position-is-not-time
   ISS-350 reproduction 1 of 4 closed; reader half still gated on Approved-by (mc-sessionstart.ps1)
   SERIAL: checker ran after its own manifest (real dependency edge)
+TICK 2026-09-28T04:40:00Z ADVANCED tier=3(roadmap: U4 capture wave) wave=2 concurrent peak=2
+  HUMAN-INVOKED tick, so init step 2b ran: put all four standing gate decisions to Umesh at once
+  Umesh answered 4+4 questions; nothing was inferred, every answer is on a gate file with its DECISIONS id
+  D-043 Approved-by: Umesh for delivery-gate-stop.ps1 + mc-sessionstart.ps1 (3 named fixes; 4a71633/e5402d6 ratified)
+  D-044 one-time D-014 cap waiver for wave/vector-gap-durability (ISS-346 check builds FIRST, checker still required)
+  D-045 U6 consent: new file scripts/watch/install-tasks.ps1 + Scheduled Tasks, dry-run default, -Remove, no creds
+  D-046 U4 spec+plan APPROVED; heartbeat = new watch_heartbeat collection, not a watch_state field
+  live-recording-proof-method ANSWERED: wait for next real webinar -> U6 -Apply stays BLOCKED, next webinar is manual
+  gates stamped ANSWERED: enforcement-hooks-unauthorized, iss-122-round-cap-breach, ledger-shard-union-hook,
+    live-recording-proof-method, plan-approved-u4 (spec+plan), u6-task-scheduler-consent (new)
+  ledger-shard-union-hook was a STALE FIELD not an open gate - the 9-open count was really 8 (shard 2)
+  ui-surfaces-test-file-exclusion: Gate status field ADDED (was absent entirely); genuinely OPEN since 2026-09-09
+  sweep: 3 shards collected (1 CLEAN, 2 two mediums, 3 one medium-high sibling in obs-windows.ts launchObsNormally)
+  shard 3 returned against an OLD range (213d2ac..3869c83) after a 9.4h run - consolidation re-verifies at HEAD
+  dispatched: consolidation checker (single writer: issues.jsonl + QUEUE.md + .last-sweep)
+  dispatched wave: u4a-watch-failure-alerts + u4c-watch-page in parallel worktrees (different files, no shared surface)
+  SERIAL: u4b-watch-heartbeat-alert waits on u4a - both touch telegram-alerts.ts (named dependency edge)
+  SERIAL: vector-gap-durability waits on the ISS-346 mechanical check - D-044 requires the mechanism first

@@ -45,7 +45,7 @@ or what it blocks.
 
 *(unanswered — append `Answered: <ISO date> — <choice> — <where>` before acting)*
 
-**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file
+**Gate status:** ANSWERED — 2026-09-27, approved by Umesh first-hand and carried by D-041 (Approved-by: Umesh, Changes-authorized: .claude/hooks/mc-sessionstart.ps1). This field was corrected on 2026-09-28: it read OPEN because the ISS-348 canonicalization stamped it at 899162e and the Answered line was appended afterwards, with nothing re-deriving the field. That is ISS-348's own disease — a static field where a computed one is needed — and it is why the open-gate count was reported as 9 when the true figure was 8
 
 Answered: 2026-09-27T17:2x+05:30 — APPROVED ("Yes, fix it") — Umesh first-hand, AskUserQuestion in
 checker/maker session 21132795, question "Our issue counter only reads one file, so it under-reports.

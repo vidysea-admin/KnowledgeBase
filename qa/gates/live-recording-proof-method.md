@@ -46,6 +46,6 @@ over a path no human has ever watched succeed is how the Ashoka failure repeats 
 **Answer format:** reply `live-proof: a` (or b / c). The maker appends
 `Answered: <ISO> — <choice> — <where>` here before running anything.
 
-**Answered:** (pending)
+**Answered:** 2026-09-28 — WAIT FOR THE NEXT REAL WEBINAR. Umesh declined to stage a throwaway Zoom meeting; the ISS-324 fix gets its live proof from the next genuine session instead. Two consequences are accepted deliberately and must not be quietly forgotten. **(1) The next webinar still needs a human to start the recording** — U6's unattended install must NOT be applied before this proof exists, per `docs/features/u4-watch-dashboard/plan.md`, so capture stays manual until then. **(2) The proof run has to be the instrumented one**: it must capture the full progress-event chain (`starting` / `driver-ready` / `navigating` / `opened`) and a non-empty recording file, because the meeting-bot test suite injects a fake node child (`obs-windows.test.ts:111`) and therefore stayed 94/94 green while live capture was broken. A green suite is not evidence for this path. If that run fails, the webinar is lost too — that is the accepted cost of not staging one. Asked and answered in chat (AskUserQuestion, this session).
 
-**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file
+**Gate status:** ANSWERED — 2026-09-28, proof deferred to the next real webinar, instrumented; U6 `-Apply` blocked until it lands

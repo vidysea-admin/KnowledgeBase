@@ -41,3 +41,5 @@ the unit is **not-applicable** for Mode D on the merits (changed set is one test
 with the instrument lock recorded separately as `LIVE-BROWSER: SKIP`. This gate exists so the next
 test-only unit does not have to re-derive that ruling by hand — it is a durability question, not a
 blocker.
+
+**Gate status:** OPEN — still unanswered, opened 2026-09-09, the oldest live gate in this directory. Field added 2026-09-28: the ISS-348 canonicalization left this file unstamped because its markers matched no known convention, and sweep shard 2 has since read it in full and confirmed `**Answered:** —` is accurate. Absent from the count is not the same as answered, which is exactly the gap ISS-348 exists to close
