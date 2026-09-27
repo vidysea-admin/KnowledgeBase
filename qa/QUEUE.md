@@ -1,4 +1,108 @@
-# QUEUE — checker Mode B sweep 2026-09-28T00:0x+05:30 (3-shard wave, consolidated)
+# QUEUE — checker Mode B sweep 2026-09-28T02:xx+05:30 (shard-3 re-run against the correct range, consolidated)
+
+> **Correction to the 2026-09-28T00:0x pass below: shard 3 had run against the WRONG, already-
+> superseded range (`213d2ac..3869c83`) and its findings were folded as stale duplicates in that
+> pass.** Shard 3 has now returned against this consolidation's own range (`8669919..3c4d0d5`) with
+> three fresh claims. All three verified independently against HEAD (`3c4d0d5`) before filing —
+> none accepted on say-so. **Terminal state: 1 new id (ISS-355, high); 2 `checker_note`s appended
+> (ISS-268, ISS-350); 1 claim's headline fact CONFIRMED but its cited live instance REJECTED
+> (not reproduced) and corrected in place, not filed as a new row.**
+>
+> **Finding 1 — `.codex/hooks/*` (high, filed ISS-355).** CONFIRMED and escalated to its own row,
+> not folded into ISS-268 (different fact pattern: that row describes an UNTRACKED, byte-identical
+> shadow awaiting a disposition decision; this is a now-COMMITTED, tracked mirror, born already
+> diverged). `git ls-tree -r 8669919 -- .codex/hooks` is empty; `git show eff401b --stat` (inside
+> this range) adds `.codex/hooks.json` + 6 `.ps1` files. Direct diffs at HEAD confirm three real
+> regressions in `.codex/hooks/mc-sessionstart.ps1` against `.claude/hooks/mc-sessionstart.ps1`:
+> the pre-D-041 single-file `$LEDGER` (reintroducing the union undercount), the pre-D-034 naive
+> `Status: ready-for-check` substring match, and a `Select-Object -First 1` on `Cycle checked`
+> instead of the max-across-cycles fix (the ISS-350-repro-3 trap). `mc-precommit.ps1` carries the
+> same regex regression. **One correction to the brief:** `features-snapshot-session-end.ps1`
+> differs only by CRLF-vs-LF (`diff --strip-trailing-cr` shows zero content difference) — not a
+> real divergence. `decisions-append-guard.ps1` and both `lab-session-*.ps1` confirmed
+> byte-identical. `grep -rn codex docs/DECISIONS.md` — zero hits, no Approver decision covers this
+> commit. Whether anything currently invokes `.codex/hooks/*` remains unresolved either way (a
+> Codex-CLI-side question, outside this repo's own files) — recorded as open, not assumed either
+> direction.
+>
+> **Finding 2 — verdict-form census (ISS-350 reproduction 4, CONFIRMED and undercounted).**
+> Independently re-derived across all 161 `qa/verdicts/*.md` at HEAD (one more file than the
+> dispatch's 160 — `ledger-shard-union-reader.md` landed after that count was taken). Confirms at
+> least 8 distinct first-line forms, including a wholly different field name (`**Result: PASS**`,
+> 10+ files, spot-read to confirm) and a bare `**PASS**`/`**FAIL**` with no field label at all in
+> at least 9 files (`T-020-ingestion-source-seam.md:82` spot-read to confirm). 29 of 161 files
+> carry `Cycle checked` more than once (worst: `delivery-gate-manifest-blindness.md`, 40
+> occurrences — re-confirmed by direct count). Filed as a `checker_note` on ISS-350, not a new row
+> (this is that row's own reproduction 4, now measured rather than named). **One correction folded
+> in:** the session-start hook's `Select-String -Pattern 'VERDICT:\s*PASS'` IS case-insensitive by
+> PowerShell default and DOES catch `Verdict: PASS` — what it structurally cannot catch is the
+> `**Result:**` and bare-`**PASS**` forms, which contain no "VERDICT" substring in any case. The
+> dispatch's framing of this sub-point was corrected, not repeated.
+>
+> **Finding 3 — Handshake-status-only manifest blind spot: headline fact TRUE, cited instance
+> REJECTED (does not reproduce).** `grep -l Handshake .claude/hooks/mc-sessionstart.ps1
+> scripts/lib/dispatch-state.mjs` returns nothing — neither reader parses the canonical field,
+> confirming ISS-350's own fix_direction (d) is still fully undone, exactly as D-042 already
+> disclosed. But the cited live instance, `qa/manifests/u2-4-phase3-precision-regate.md`, does
+> **not** reproduce: direct read shows `## Status: ready-for-check` at line 159, a legacy heading
+> form the CURRENT D-034 regex matches (re-run live, confirmed). Running
+> `.claude/hooks/mc-sessionstart.ps1` at HEAD reports `Checks pending: 0` — the two remaining
+> Handshake-ready-for-check manifests both carry a FAIL verdict at their current cycle, which is
+> the separate, already-known ISS-267 gap, not this one. A full scan of all 161 manifests found
+> **zero** currently in a canonical-field-only, no-legacy-field state — structurally expected,
+> since the ISS-350 backfill only ever derives the canonical field FROM an existing legacy
+> statement (D-042: purely additive). The theoretical risk (a future manifest authored with only
+> the canonical field) is real but not live today, and is already the exact concern fix_direction
+> (d) names. Corrected in place via a `checker_note` on ISS-350, not filed as a new row, and not
+> presented as a live reproduced bug — a finding that does not reproduce at HEAD is not a finding.
+>
+> **Also corrected, not a ledger matter:** this range is NOT prose-only — `git diff --stat
+> 8669919..3c4d0d5` is 226 files, `+4560/-168`, independently re-confirmed, with real application
+> code among it (`packages/meeting-bot/src/calendar/{schedule-state,schedule-tick,task-scheduler}.ts`
+> + tests, `capture/{obs-guard,obs-windows}.ts` + test, `promote-entities.test.ts`,
+> `scripts/eval-recall.mjs` rewritten + `scripts/lib/eval-recall.test.mjs`,
+> `qa/probes/golden-set-sibling-semantic.mjs`, plus all of `.codex/hooks/*`).
+>
+> **Verified clean by shard 3 this pass, not re-filed:** `lint-loc` at exactly its 4 known
+> pre-existing violations (no new ones); `lint-dirsize` clean, `scripts/` at its 32/32 cap;
+> `qa/debug/` naming consistent; token ledger appended (`opus_sub_share` 0.0); code-graph correctly
+> SKIPped (no `graph.json`, a sweep never builds one).
+>
+> **HEAD moved during this addendum**, per the coordinator: `fa32181` (Umesh answers D-043..D-046)
+> and `36909f1` (checker PASS `ledger-shard-union-reader` cycle 0 — closes ISS-129, files
+> ISS-353/354) both landed on top of this consolidation's own `96048e4`. Neither touches this
+> file's owned surfaces. `qa/manifests/ledger-shard-union-reader.md` is being closed out by that
+> other session — not touched here, per instruction.
+>
+> **Open-issue counts, union of `qa/issues.jsonl` + `qa/issues.*.jsonl`, re-derived after this
+> addendum:** 400 rows total, **156 open — 2 critical / 31 high / 77 medium / 46 low** (ISS-355 new
+> high; ISS-129 closed out by the concurrent session, -1 high; ISS-353 medium / ISS-354 low filed
+> by that same session).
+
+## Ranked top 3 (this addendum, D-013 tier order)
+
+**Tier 1** empty (0 TODO rows). **Tier 2** governs picks 1–2 — both open criticals stay
+not-pullable, unchanged (ISS-104 round-capped file-don't-fix; ISS-282 deliberately paused).
+**Tier 3** stays at #3, per D-013's "not optional, not last."
+
+1. **ISS-346 (high)** — the D-014 round-cap mechanical check, authorized D-043 item 2, still
+   explicitly sequenced FIRST (D-044's waiver depends on it landing before that exception repeats).
+2. **ISS-355 (high, new this addendum)** — `.codex/hooks/*` committed with no Approver decision,
+   already reintroducing three separately-fixed defect classes (union undercount, pre-D-034 regex,
+   first-match-not-max cycle read). Umesh's own framing of this tick's most significant finding;
+   the disposition question (sanction-with-a-parity-rule vs remove/gitignore) may need a
+   HUMAN_GATE, but the maker should raise it rather than let it sit — it is the second time this
+   exact surface has gone unanswered (ISS-268 first asked in 2026-09-22).
+3. **U4.1 (tier 3, roadmap — TASKS.md:112 / goal.json, unblocked, no deps)** — Recording/file
+   upload wired to a real transcribe worker. Unchanged from the prior pick.
+
+**Also still queued:** `delivery-gate-stamp-adoption` fix cycle 2 (D-043 item 1) and the
+`mc-sessionstart.ps1` Handshake-status reader (D-043 item 3) — both authorized, both behind #1–#2
+above in this addendum's ordering, not dropped.
+
+---
+
+## Prior consolidation (2026-09-28T00:0x+05:30, 3-shard wave — superseded by the addendum above)
 
 > Bound to `D:/KnowledgeBase`, range `8669919..3c4d0d5` for shards 1-2; shard 3 ran against an
 > **older, already-superseded range** (`213d2ac..3869c83`) because it was dispatched in a prior
