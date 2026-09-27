@@ -94,9 +94,56 @@ test("toSchtasksDateTime formats /st HH:mm and /sd MM/DD/YYYY", () => {
 // deriveJobKey — the sanitizer that stands between an internal sessionKey and JOB_KEY_RE.
 // -------------------------------------------------------------------------------------------
 
-test("deriveJobKey: realistic sessionKeys sanitize to a valid job key", () => {
-  assert.equal(deriveJobKey("gmail:664f0a1b2c3d4e5f60718293"), "gmail-664f0a1b2c3d4e5f60718293");
-  assert.equal(deriveJobKey("cal:AbC123"), "cal-abc123");
+test("deriveJobKey: realistic sessionKeys sanitize to a valid, human-readable-prefixed job key " +
+  "(ISS-321: prefix + hash, not a lossy collapse alone)", () => {
+  const k1 = deriveJobKey("gmail:664f0a1b2c3d4e5f60718293");
+  assert.match(k1!, JOB_KEY_RE);
+  assert.match(k1!, /^gmail-664f0a1b2c3d4e5f60718293-[0-9a-f]{10}$/);
+  const k2 = deriveJobKey("cal:AbC123");
+  assert.match(k2!, /^cal-abc123-[0-9a-f]{10}$/);
+});
+
+test("deriveJobKey: same sessionKey always derives the same jobKey (idempotent — required for a " +
+  "later tick's re-schedule of the same session to land on its own existing job file)", () => {
+  assert.equal(deriveJobKey("gmail:c1"), deriveJobKey("gmail:c1"));
+  assert.equal(deriveJobKey("cal:e1"), deriveJobKey("cal:e1"));
+});
+
+// -------------------------------------------------------------------------------------------
+// ISS-321 — deriveJobKey must no longer collapse distinct sessionKeys onto the same jobKey.
+// The four pairs below are the checker's own recorded reproduction (ISS-321's `evidence` field —
+// this row has no `reproductions` key, so these four pairs from `evidence` are the ledger's floor
+// per D-015). All four collided under the old lossy-collapse `deriveJobKey`; none may collide now.
+// -------------------------------------------------------------------------------------------
+const ISS_321_COLLIDING_PAIRS: Array<[string, string]> = [
+  ["gmail:abc_123", "gmail:abc-123"],
+  ["cal:ABC_DEF", "cal:abc-def"],
+  ["gmail:ABC", "GMAIL:ABC"],
+  ["gmail:a.b.c", "gmail:a-b-c"],
+];
+
+test("ISS-321: sessionKeys that used to collapse onto the same jobKey now derive DIFFERENT " +
+  "jobKeys (re-run of the checker's 4 recorded evidence pairs — ISS-321: 4/4)", () => {
+  let passed = 0;
+  for (const [a, b] of ISS_321_COLLIDING_PAIRS) {
+    const ka = deriveJobKey(a);
+    const kb = deriveJobKey(b);
+    assert.ok(ka && kb, `both '${a}' and '${b}' must still derive a non-null jobKey`);
+    assert.notEqual(ka, kb, `'${a}' and '${b}' must no longer collide (ISS-321) — both gave '${ka}'`);
+    passed++;
+  }
+  assert.equal(passed, ISS_321_COLLIDING_PAIRS.length, `ISS-321: ${passed}/${ISS_321_COLLIDING_PAIRS.length}`);
+});
+
+test("ISS-321: a genuine 40-bit hash collision would still be refused downstream — this test just " +
+  "documents the pre-image the hash is over is the FULL raw sessionKey, not the collapsed prefix " +
+  "(so collapsing can no longer be the source of a collision)", () => {
+  // Two sessionKeys with an identical collapsed prefix but different raw content (the ISS-321
+  // failure shape) must differ before hashing, i.e. the hash input is `sessionKey`, not `prefix`.
+  const raw1 = "gmail:AAA";
+  const raw2 = "gmail:aaa";
+  assert.notEqual(raw1, raw2); // sanity: they really are different raw strings
+  assert.notEqual(deriveJobKey(raw1), deriveJobKey(raw2));
 });
 
 test("deriveJobKey: every result (or null) satisfies JOB_KEY_RE — never lets through anything else", () => {
@@ -113,11 +160,15 @@ test("deriveJobKey: every result (or null) satisfies JOB_KEY_RE — never lets t
   }
 });
 
-test("deriveJobKey: empty/whitespace-only/too-long input -> null (refuse, never fall back)", () => {
+test("deriveJobKey: only a truly empty sessionKey refuses (-> null); whitespace-only/all-" +
+  "punctuation/over-length input now still derives a valid hash-based key (ISS-321 — the hash no " +
+  "longer depends on there being a readable prefix left after collapsing)", () => {
   assert.equal(deriveJobKey(""), null);
-  assert.equal(deriveJobKey("   "), null);
-  assert.equal(deriveJobKey(":::"), null);
-  assert.equal(deriveJobKey("x".repeat(65)), null);
+  for (const sessionKey of ["   ", ":::", "x".repeat(65)]) {
+    const result = deriveJobKey(sessionKey);
+    assert.notEqual(result, null, `deriveJobKey('${sessionKey}') unexpectedly refused`);
+    assert.match(result!, JOB_KEY_RE);
+  }
 });
 
 test("buildTaskName: fixed prefix + jobKey, itself always matches a safe shape", () => {

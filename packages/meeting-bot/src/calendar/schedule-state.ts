@@ -88,8 +88,27 @@ export function scheduledJobFilePath(stateDir: string, jobKey: string): string {
   return path.join(scheduledJobDir(stateDir), `${jobKey}.json`);
 }
 
-/** Writes (or overwrites) the job file for `jobKey`. Creates `<stateDir>/scheduled/` if needed. */
+/**
+ * Writes (or overwrites) the job file for `jobKey`. Creates `<stateDir>/scheduled/` if needed.
+ *
+ * **ISS-321 collision guard.** `jobKey` is now derived from a hash of the full `sessionKey`
+ * (`task-scheduler.ts`'s `deriveJobKey`), so a genuine collision between two DIFFERENT sessions is
+ * cryptographically unlikely — but "unlikely" is not "impossible, so never check": before writing,
+ * this reads whatever job file already exists at this jobKey's path. If one exists and belongs to
+ * a different session (`existing.sessionId !== job.sessionId`), this throws rather than silently
+ * overwriting it — the ISS-321 defect was exactly this overwrite happening with no detection at
+ * all. Re-scheduling the SAME session (a corrective tick, a retry) is expected and always allowed:
+ * the check is keyed on sessionId equality, not "a file is already there."
+ */
 export function writeScheduledJob(stateDir: string, jobKey: string, job: ScheduledJob): void {
+  const existing = readScheduledJob(stateDir, jobKey);
+  if (existing && existing.sessionId !== job.sessionId) {
+    throw new Error(
+      `refusing to schedule '${job.sessionId}': jobKey '${jobKey}' is already scheduled for a ` +
+        `different session '${existing.sessionId}' (ISS-321 collision guard) — job file: ` +
+        `${scheduledJobFilePath(stateDir, jobKey)}`,
+    );
+  }
   mkdirSync(scheduledJobDir(stateDir), { recursive: true });
   writeFileSync(scheduledJobFilePath(stateDir, jobKey), JSON.stringify(job, null, 2) + "\n");
 }
