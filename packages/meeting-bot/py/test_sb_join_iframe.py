@@ -131,6 +131,31 @@ def test_cross_origin_iframe_is_skipped_without_throwing(sb, fixture_server):
     assert "join" not in body
 
 
+# ---- ISS-U0-4/ISS-U0-5 (checker cycle 1 FAIL): an invisible same-origin iframe's content must
+# never be clicked and never merged into body text, regardless of HOW it's hidden -------------
+
+@pytest.mark.parametrize("fixture_name", [
+    "hidden_zerosize_top.html",            # iframe itself collapsed to width:0;height:0
+    "hidden_displaynone_top.html",         # iframe itself display:none
+    "hidden_in_displaynone_div_top.html",  # iframe has no hiding style; an ANCESTOR div does
+])
+def test_hidden_iframe_subtree_is_never_clicked_or_merged(sb, fixture_server, fixture_name):
+    sb.driver.get(_url(fixture_server, fixture_name))
+    sb.wait_for_ready_state_complete()
+    hit = sb.execute_script(CLICK_JS, JOIN_TEXTS)
+    assert hit is None, (
+        f"{fixture_name}: CLICK_JS clicked {hit!r} inside an invisible iframe (ISS-U0-4)"
+    )
+    body = sb.execute_script(BODY_TEXT_JS).lower()
+    assert "webinar has ended" not in body, (
+        f"{fixture_name}: BODY_TEXT_JS leaked hidden-iframe END_PHRASE text (ISS-U0-5)"
+    )
+    assert "thank you for attending" not in body
+    assert "join (clicked)" not in body  # the click assertion above should already guarantee this
+    # the top document's own text must still be present (only the hidden subtree is skipped)
+    assert "back" in body
+
+
 # ---- regression: a page with no iframe at all behaves exactly as before ---
 
 def test_no_iframe_page_click_and_body_text_regression(sb, fixture_server):

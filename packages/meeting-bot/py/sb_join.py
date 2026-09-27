@@ -55,7 +55,34 @@ MAX_RECONNECTS = 5  # give up reloading after this many in one run; keep holding
 # skipped rather than raising out of execute_script. Zoho/Meet pages that have no iframe at all
 # take the exact same code path: `doc.querySelectorAll('iframe')` returns an empty list, `walk`
 # recurses zero times, and behaviour is unchanged from before this fix.
+#
+# ISS-U0-4/ISS-U0-5 (checker cycle 1, fixed here): the frame recursion above had no visibility
+# gate on the <iframe> ELEMENT itself in its parent document — a frame collapsed to zero size or
+# hidden via display:none/visibility:hidden (on itself OR any ancestor) still had its content
+# visited, clicked (ISS-U0-4) and merged into BODY_TEXT_JS (ISS-U0-5), because CLICK_JS's own
+# getBoundingClientRect check only ever looked at the clicked ELEMENT relative to ITS OWN
+# document — a browser lays out an iframe's inner content at natural size regardless of the
+# iframe's own collapsed CSS size, so that check can never see a collapsed/hidden container.
+# isFrameVisible() below is checked before walkFrames recurses into a frame's contentDocument,
+# so an invisible frame's whole subtree is skipped: never visited, never clicked, never merged
+# into body text. getClientRects().length === 0 catches display:none on the iframe itself or ANY
+# ancestor (a display:none ancestor removes the iframe from layout entirely, so it generates no
+# client rects) — that is what also covers "iframe nested inside a display:none div". The
+# explicit ancestor walk on top of that catches visibility:hidden, which still generates a box
+# (and therefore non-empty getClientRects/non-zero getBoundingClientRect) but must not be
+# painted/interacted with.
 _IFRAME_WALK_JS = """
+function isFrameVisible(frame) {
+  const r = frame.getBoundingClientRect();
+  if (r.width === 0 || r.height === 0) return false;
+  if (frame.getClientRects().length === 0) return false;  // display:none, self or any ancestor
+  let el = frame;
+  while (el) {
+    if (getComputedStyle(el).visibility === 'hidden') return false;
+    el = el.parentElement;
+  }
+  return true;
+}
 function walkFrames(doc, visit) {
   visit(doc);
   let frames;
@@ -65,6 +92,7 @@ function walkFrames(doc, visit) {
     return;
   }
   for (const frame of frames) {
+    if (!isFrameVisible(frame)) continue;  // ISS-U0-4/ISS-U0-5: skip the whole hidden subtree
     let inner;
     try {
       inner = frame.contentDocument;

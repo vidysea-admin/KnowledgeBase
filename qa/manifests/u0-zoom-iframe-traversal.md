@@ -2,13 +2,138 @@
 **Contract:** qa/contracts/meeting-bot-live-capture.md (T-024b, ADOPTED 2026-09-25) — criteria C1
 (real browser join), C2 (bounded/denylisted auto-click — exact-match semantics unchanged, only
 traversal added), C10 (no regression)
-**Fix cycle:** 1 of max 3
+**Fix cycle:** 2 of max 3
 **Dual check:** no
-**Issues addressed:** ISS-U0-1 (high, coverage-class — `qa/issues.u0.jsonl`)
+**Issues addressed:** ISS-U0-1 (high, coverage-class — `qa/issues.u0.jsonl`, cycle 1);
+ISS-U0-4, ISS-U0-5 (both high — `qa/issues.u0.jsonl` on `master`/main tree; filed by the checker
+against this lane in cycle 1, not yet present in this lane's own `qa/issues.u0.jsonl` copy at
+`cae512d` — this cycle re-runs their recorded reproductions verbatim per D-015)
 **Executor:** claude-opus-subagent (dispatched as a time-critical /maker build unit, ~08:05 IST,
 target 10:55 IST live webinar)
 **Commits:** `ea48a4c` (the fix + tests + fixtures) then `fb45fbd` (self-caught correction — see
-below)
+below); cycle 2 commit below.
+
+## Fix cycle 2 (responds to cycle-1 FAIL — `qa/verdicts/u0-zoom-iframe-traversal.md`)
+
+**What the checker found (cycle 1, VERDICT: FAIL, 2/3 criteria met):** the frame-recursion fix
+from cycle 1 had no visibility gate on the `<iframe>` ELEMENT itself in its parent document.
+`CLICK_JS`'s own `getBoundingClientRect` guard (`sb_join.py:94-95` at `cae512d`) reads the
+clicked element's rect relative to ITS OWN document — a browser lays out an iframe's inner
+content at natural size regardless of the iframe's own collapsed CSS size, so a same-origin
+iframe collapsed to `width:0;height:0` (or hidden via `display:none`) still had its button
+clicked (ISS-U0-4) and its text merged into the `END_PHRASES` check that
+`record-commands.ts:118,168` uses to stop a live recording early (ISS-U0-5). The checker's own
+adversarial fixtures (not part of this unit's cycle-1 test suite) reproduced both against the
+real, unmodified code.
+
+**What changed this cycle** — `packages/meeting-bot/py/sb_join.py:58-99` (`_IFRAME_WALK_JS`):
+added `isFrameVisible(frame)`, called by `walkFrames` immediately before it would recurse into a
+frame's `contentDocument` (line ~92: `if (!isFrameVisible(frame)) continue;`). When a frame is
+not visible, its WHOLE subtree is skipped — never visited, never clicked (fixes ISS-U0-4), never
+merged into `BODY_TEXT_JS`'s output (fixes ISS-U0-5) — because both `CLICK_JS` and `BODY_TEXT_JS`
+share the one `walkFrames` traversal. `isFrameVisible` checks, on the `<iframe>` element itself:
+1. `getBoundingClientRect()` width/height > 0 (catches the zero-size case);
+2. `getClientRects().length === 0` (catches `display:none` on the iframe itself OR any
+   ancestor — a `display:none` ancestor removes the iframe from layout entirely, so it generates
+   no client rects at all; this is what also covers "iframe nested inside a `display:none` div"
+   without a separate ancestor walk for that case);
+3. an explicit walk up `parentElement` checking `getComputedStyle(el).visibility === 'hidden'`
+   at every ancestor (needed because `visibility:hidden` still generates a box — non-empty
+   `getClientRects()`/non-zero `getBoundingClientRect()` — but must not be treated as visible).
+
+Top-document behaviour is byte-identical: `visit(doc)` for the top document is unconditional
+(never gated by `isFrameVisible`, which only ever receives an `<iframe>` element), and
+`CLICK_JS`'s own per-element `wanted.includes(t)` / 40-char / disabled / rect checks are
+untouched — Zoho/Meet (no-iframe) pages take the same `querySelectorAll('iframe')` → `[]` path as
+before, confirmed by `test_no_iframe_page_click_and_body_text_regression` staying green.
+`BODY_TEXT_JS` for the top document still reads via `doc.body.innerText` inside the shared
+`visit` callback (unchanged) — the fix only changes whether `walkFrames` recurses INTO a given
+frame at all, not how any document's own text/elements are read once visited, so the "use
+`innerText` consistently, gated on frame visibility" property holds structurally rather than as
+a separate per-frame check.
+
+**Tests added** — `packages/meeting-bot/py/test_sb_join_iframe.py`,
+`test_hidden_iframe_subtree_is_never_clicked_or_merged`, parametrized over three new fixtures
+(`packages/meeting-bot/py/fixtures/`): `hidden_zerosize_top.html` (iframe itself
+`width:0;height:0`), `hidden_displaynone_top.html` (iframe itself `display:none`),
+`hidden_in_displaynone_div_top.html` (iframe has no hiding style of its own; an ANCESTOR `<div>`
+is `display:none`). All three load `hidden_leaf.html` (new), which contains a Join button
+(matches `JOIN_TEXTS`) AND an `END_PHRASES` substring ("webinar has ended... thank you for
+attending"). Each case asserts `CLICK_JS` returns `None` (not just non-matching — the click must
+never fire) AND the END_PHRASE is absent from `BODY_TEXT_JS`'s merged output, AND the top
+document's own text ("back") is still present (only the hidden subtree is skipped, not the
+whole traversal).
+
+**Measured against the ledger's own recorded reproductions (D-015)** — re-ran, not authored
+fresh:
+- **ISS-U0-4** (fix_direction: "Re-test with a 0-size AND a display:none iframe, both containing
+  a matching button, asserting CLICK_JS returns null for both") — both named cases now covered
+  (`hidden_zerosize_top.html`, `hidden_displaynone_top.html`) plus one extra case this unit added
+  (ancestor-div `display:none`): **3/3 refused** (`click_hit` is `None` for all three; the
+  checker's own zero-size adversarial fixture had returned `"join"` against the cycle-1 code).
+- **ISS-U0-5** (checker's own evidence tested display:none AND zero-size, both leaking
+  `"webinar has ended"` into `BODY_TEXT_JS` against the cycle-1 code) — both named cases plus the
+  same extra ancestor-div case: **3/3 refused** (END_PHRASE absent from merged body text for all
+  three).
+- No recorded reproduction from either issue's row was left untested.
+
+## Evidence — cycle 2
+
+```
+$ python -m pytest packages/meeting-bot/py -q
+..............................                                           [100%]
+30 passed in 6.35s          # 27 pre-existing (cycle 1) + 3 new hidden-iframe cases
+$ python -m pytest packages/meeting-bot/py -q   # repeatability, second consecutive run
+..............................                                           [100%]
+30 passed in 5.42s
+$ git status --porcelain -- packages/meeting-bot/py/fixtures/cross_origin_outer.html
+   (no output — cycle 1's port-template fix still holds)
+```
+
+### RED-before / GREEN-after (D-020 discipline: timeout-wrapped, trap-restored on EXIT/INT/TERM/ERR, cmp-verified)
+
+```
+$ cp sb_join.py sb_join.py.fixed.bak                       # byte backup of the fixed file
+$ cp <git show cae512d:...sb_join.py> sb_join.py            # swap in cycle-1 (FAIL) code
+$ trap 'cp sb_join.py.fixed.bak sb_join.py; cmp sb_join.py.fixed.bak sb_join.py' EXIT INT TERM ERR
+$ timeout 60 python -m pytest packages/meeting-bot/py/test_sb_join_iframe.py -k hidden_iframe -q
+FAILED ...[hidden_zerosize_top.html]
+FAILED ...[hidden_displaynone_top.html]
+FAILED ...[hidden_in_displaynone_div_top.html]
+3 failed, 5 deselected in 6.08s        <- RED, confirmed against cycle-1 (checker-FAILed) code
+TRAP-RESTORE OK: byte-identical
+$ cmp sb_join.py.fixed.bak sb_join.py -> identical, confirmed
+$ python -m pytest packages/meeting-bot/py -q
+..............................                                           [100%]
+30 passed in 5.41s                      <- GREEN again on the fixed lane copy
+```
+
+```
+$ git diff --stat
+ packages/meeting-bot/py/sb_join.py             | 28 ++++++++++++++++++++++++
+ packages/meeting-bot/py/test_sb_join_iframe.py | 25 +++++++++++++++++++++
+ 2 files changed, 53 insertions(+)
+$ git status --porcelain
+ M packages/meeting-bot/py/sb_join.py
+ M packages/meeting-bot/py/test_sb_join_iframe.py
+?? packages/meeting-bot/py/fixtures/hidden_displaynone_top.html
+?? packages/meeting-bot/py/fixtures/hidden_in_displaynone_div_top.html
+?? packages/meeting-bot/py/fixtures/hidden_leaf.html
+?? packages/meeting-bot/py/fixtures/hidden_zerosize_top.html
+```
+No file outside `packages/meeting-bot/py/` touched; no real Zoom URL opened; `data/bot-profile/`
+untouched; `raw/webinars/2026-09-27-ashoka-join-url.txt` never read.
+
+### TS/pnpm suite — still not run in this lane (unchanged environment gap from cycle 1)
+
+Zero TypeScript files touched this cycle either (`git diff --stat` above). Same recommendation
+as cycle 1: run the full `pnpm` suite once at merge time or in the next checker pass.
+
+## Known gaps carried from cycle 1 (unchanged by this cycle)
+
+- No live-Zoom verification yet (ISS-U0-2 HUMAN_GATE, separate and unresolved).
+- `_IFRAME_WALK_JS`'s sibling/nested-frame traversal after a click hit still isn't a full early
+  exit (functionally correct, first-found-wins; noted, not fixed, same judgment call as cycle 1).
 
 ## Self-caught issue during build
 
@@ -211,5 +336,7 @@ anticipate.
   single-return semantics) but slightly less efficient than a full early exit. Not fixed here:
   correctness over micro-optimization under the time budget; noted for a future pass if profiling
   ever shows it matters (each tick's DOM is tiny — one Zoom iframe, not hundreds).
+
+**Status (cycle 1):** superseded by cycle 2 below.
 
 **Status:** ready-for-check
