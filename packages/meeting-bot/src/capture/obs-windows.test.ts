@@ -22,6 +22,7 @@ import { createObsBrowserDeps, type ObsClientLike, type ObsBrowserConfig } from 
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_SCRIPT = join(HERE, "fake-join-fixture.mjs");
+const STAGES_FIXTURE = join(HERE, "fake-join-stages-fixture.mjs"); // ISS-324
 
 // --- fake OBS client ---------------------------------------------------------------------------
 
@@ -210,6 +211,138 @@ test("obs-windows stop(): StopRecord rejecting still restores this run's mutes a
     assert.deepEqual(muteCallsFor(calls, "Mic/Aux"), [true, false],
       "stop()'s finally must restore the mute even though StopRecord itself threw");
     assert.ok(await waitUntilDead(pid), "bot Chrome (fixture) process must be terminated after stop() despite StopRecord failing");
+  } finally {
+    cleanupCfg(cfg);
+  }
+});
+
+// --- ISS-324 regression: the page-open budget ---------------------------------------------------
+// Reproduction on the ledger row: `lkb record` failed with "bot browser did not open the page
+// (timeout)" on the live Ashoka run with correct argv, 5 GB RAM free and no leftover bot Chrome.
+// The child was alive and still inside SB()'s opaque browser bring-up when the fixed 120 s budget
+// expired. These scale that shape down: the stall window is 400 ms and the bring-up 1.2 s.
+
+function stagesCfg(onOpened: (pid: number) => void, over: Partial<ObsBrowserConfig> = {}) {
+  return makeCfg({ onOpened, joinScript: STAGES_FIXTURE, openStallMs: 400, openCapMs: 20_000, ...over });
+}
+
+function withFixtureMode<T>(mode: string, extra: Record<string, string>, fn: () => Promise<T>): Promise<T> {
+  const saved = { ...process.env };
+  process.env.LKB_FIXTURE_MODE = mode;
+  for (const [k, v] of Object.entries(extra)) process.env[k] = v;
+  return fn().finally(() => {
+    delete process.env.LKB_FIXTURE_MODE;
+    for (const k of Object.keys(extra)) {
+      if (saved[k] === undefined) delete process.env[k];
+      else process.env[k] = saved[k];
+    }
+  });
+}
+
+test("obs-windows launch(): ISS-324 — a bring-up that keeps reporting progress past the stall window still opens", async () => {
+  let pid = -1;
+  const cfg = stagesCfg((p) => (pid = p));
+  // stopRecordFails so stop() throws before its 60s output-size poll (the existing convention in
+  // this file) — this test is about launch(), and the poll would add a minute for nothing.
+  const { obs } = makeFakeObs({ specialInputs: { m: "Mic/Aux" }, stopRecordFails: true });
+  try {
+    await withFixtureMode("progress-then-open", { LKB_FIXTURE_TICK_MS: "100", LKB_FIXTURE_TICKS: "12" }, async () => {
+      const { deps } = createObsBrowserDeps(cfg, {
+        obs, connectObs: async () => undefined, confirmBotWindow: async () => true,
+      });
+      // 1.2 s of bring-up against a 400 ms stall window: the pre-fix fixed budget would have
+      // killed this child and blamed the page. Progress resets the budget, so it must succeed.
+      const { sessionHandle } = await deps.launch("https://example.com/meet", { tenantId: "t1" });
+      assert.ok(pid > 0, "fixture must reach 'opened' despite outlasting the stall window");
+      assert.ok(deps.stop, "createObsBrowserDeps must always provide stop");
+      await assert.rejects(() => deps.stop!(sessionHandle), /StopRecord rejected/);
+      assert.ok(await waitUntilDead(pid), "the bot child must still be terminated on the way out");
+    });
+  } finally {
+    cleanupCfg(cfg);
+  }
+});
+
+test("obs-windows launch(): ISS-324 — a genuinely wedged bring-up fails naming the last stage reached and what the child said", async () => {
+  const cfg = stagesCfg(() => {});
+  const { obs } = makeFakeObs({ specialInputs: { m: "Mic/Aux" } });
+  try {
+    await withFixtureMode("silent", {}, async () => {
+      const { deps } = createObsBrowserDeps(cfg, {
+        obs, connectObs: async () => undefined, confirmBotWindow: async () => true,
+      });
+      const err = await deps.launch("https://example.com/meet", { tenantId: "t1" })
+        .then(() => null, (e: Error) => e);
+      assert.ok(err, "a child that emits 'starting' and then wedges must fail the launch");
+      // The pre-fix message was bare "(timeout)" — it named the page, which was never reached.
+      assert.match(err!.message, /no progress for 0s|no progress for \d+s/, "must say progress stalled, not that a page failed to load");
+      assert.match(err!.message, /last stage: starting/, "must name how far the bring-up actually got");
+      assert.match(err!.message, /last output:.*starting/, "must report the child's own output, which child.kill() used to destroy");
+    });
+  } finally {
+    cleanupCfg(cfg);
+  }
+});
+
+// Gap named by the fresh-context senior review of c8cbbf4: the four tests above all set
+// openCapMs: 20_000, far past any test's runtime, so the absolute-cap branch was never executed --
+// and it is precisely the branch that stops a CHATTY but never-opening bring-up from resetting the
+// stall budget forever. A cap that only exists on inspection is a cap that can be deleted silently.
+test("obs-windows launch(): ISS-324 — a child that reports progress forever cannot outlive the absolute cap", async () => {
+  const cfg = stagesCfg(() => {}, { openStallMs: 400, openCapMs: 1_200 });
+  const { obs } = makeFakeObs({ specialInputs: { m: "Mic/Aux" } });
+  try {
+    // ticks far exceed the cap, at an interval well inside the stall window: every tick resets
+    // lastProgressAt, so ONLY the cap can end this run.
+    await withFixtureMode("progress-then-open", { LKB_FIXTURE_TICK_MS: "100", LKB_FIXTURE_TICKS: "10000" }, async () => {
+      const { deps } = createObsBrowserDeps(cfg, {
+        obs, connectObs: async () => undefined, confirmBotWindow: async () => true,
+      });
+      const started = Date.now();
+      const err = await deps.launch("https://example.com/meet", { tenantId: "t1" })
+        .then(() => null, (e: Error) => e);
+      assert.ok(err, "endless progress must still fail once the absolute cap is reached");
+      assert.match(err!.message, /cap/, `must attribute the failure to the cap, not the stall window: ${err!.message}`);
+      assert.ok(Date.now() - started < 10_000,
+        "the cap must fire near openCapMs — a stall-only implementation would never end here");
+      assert.match(err!.message, /last stage: bootstrapping/, "must name the stage it was stuck reporting");
+    });
+  } finally {
+    cleanupCfg(cfg);
+  }
+});
+
+test("obs-windows launch(): ISS-324 — the child's stderr reaches the thrown error instead of being discarded", async () => {
+  const cfg = stagesCfg(() => {});
+  const { obs } = makeFakeObs({ specialInputs: { m: "Mic/Aux" } });
+  try {
+    await withFixtureMode("stderr-then-silent", {}, async () => {
+      const { deps } = createObsBrowserDeps(cfg, {
+        obs, connectObs: async () => undefined, confirmBotWindow: async () => true,
+      });
+      const err = await deps.launch("https://example.com/meet", { tenantId: "t1" })
+        .then(() => null, (e: Error) => e);
+      assert.ok(err, "launch must fail when the bring-up never completes");
+      assert.match(err!.message, /chromedriver mirror/, "the real child stderr is the diagnostic the live run lost");
+    });
+  } finally {
+    cleanupCfg(cfg);
+  }
+});
+
+test("obs-windows launch(): ISS-324 — a child that cannot be spawned reports THAT, not a page timeout", async () => {
+  const cfg = stagesCfg(() => {}, { python: "lkb-no-such-interpreter-xyz" });
+  const { obs } = makeFakeObs({ specialInputs: { m: "Mic/Aux" } });
+  try {
+    const { deps } = createObsBrowserDeps(cfg, {
+      obs, connectObs: async () => undefined, confirmBotWindow: async () => true,
+    });
+    const err = await deps.launch("https://example.com/meet", { tenantId: "t1" })
+      .then(() => null, (e: Error) => e);
+    assert.ok(err, "an unspawnable interpreter must fail the launch");
+    assert.match(err!.message, /could not spawn/, "a spawn failure must be reported as itself");
+    assert.doesNotMatch(err!.message, /did not open the page/,
+      "spawn failure previously fell through to the page-timeout branch (no 'error' handler) and blamed the wrong subsystem");
   } finally {
     cleanupCfg(cfg);
   }

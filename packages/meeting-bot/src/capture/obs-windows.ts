@@ -51,6 +51,11 @@ export interface ObsBrowserConfig {
   /** Called for every JSON line sb_join.py prints. */
   onEvent?: (handle: string, ev: BotEvent) => void;
   log?: (msg: string) => void;
+  /** ISS-324: give up only after the child has been SILENT this long (default 90s). Not a total
+   * budget — sb_join.py ticks "bootstrapping" every 10s while SB() brings the browser up. */
+  openStallMs?: number;
+  /** ISS-324: absolute ceiling on reaching "opened", however chatty the child is (default 480s). */
+  openCapMs?: number;
 }
 
 const SCENE = "LKB Bot";
@@ -236,34 +241,85 @@ export function createObsBrowserDeps(cfg: ObsBrowserConfig, overrides: ObsBrowse
     // T-031: --reload-file mirrors --stop-file — the audio watchdog's forced-reload channel.
     const pyArgs = [cfg.joinScript, url, "--profile", cfg.profileDir, "--title", title, "--stop-file", stopFile, "--reload-file", path.join(cfg.recordDir, `.reload-${handle}`)];
     if (!cfg.autoClick) pyArgs.push("--no-click");
-    const child = spawn(cfg.python, pyArgs, { stdio: ["ignore", "pipe", "pipe"], windowsHide: false });
+    // ISS-324: PYTHONUNBUFFERED so the child's own diagnostics arrive line-by-line instead of
+    // sitting in a block-buffered pipe until exit — where child.kill() below destroyed them.
+    const child = spawn(cfg.python, pyArgs, {
+      stdio: ["ignore", "pipe", "pipe"], windowsHide: false,
+      env: { ...process.env, PYTHONUNBUFFERED: "1" },
+    });
     const exited = new Promise<number | null>((r) => child.on("exit", (code) => r(code)));
+    // ISS-324: a spawn failure emits "error" and NEVER "exit". Without this the race below fell
+    // through to the timeout branch and blamed the page for a child that never ran at all.
+    const spawnFailed = new Promise<Error>((r) => child.on("error", (e) => r(e)));
+
+    // ISS-324: keep what the child actually said, so a failure can report it instead of guessing.
+    const tail: string[] = [];
+    const remember = (l: string): void => { tail.push(l); if (tail.length > 20) tail.shift(); };
+
+    // ISS-324: any output is liveness; the last event names how far the bring-up actually got.
+    let lastStage = "spawned";
+    let lastProgressAt = Date.now();
+    const progress = (stage: string): void => { lastStage = stage; lastProgressAt = Date.now(); };
+
     let opened: (() => void) | undefined;
     const openedP = new Promise<void>((r) => (opened = r));
     createInterface({ input: child.stdout! }).on("line", (line) => {
+      remember(line);
       let ev: BotEvent;
       try {
         ev = JSON.parse(line) as BotEvent;
       } catch {
+        progress("stdout");
         log(`sb_join: ${line}`);
         return;
       }
+      progress(ev.event); // starting → bootstrapping… → driver-ready → navigating → opened
       if (ev.event === "opened") opened?.();
       if (ev.event !== "heartbeat") log(`${ev.event} ${JSON.stringify({ ...ev, event: undefined, t: undefined })}`);
       cfg.onEvent?.(handle, ev);
     });
     createInterface({ input: child.stderr! }).on("line", (l) => {
-      if (l.trim()) log(`sb_join stderr: ${l}`);
+      if (!l.trim()) return;
+      remember(`stderr: ${l}`);
+      progress("stderr");
+      log(`sb_join stderr: ${l}`);
     });
+
+    // ISS-324 root cause: the old fixed 120 s budget covered the ENTIRE opaque SB() browser
+    // bring-up (chromedriver fetch/patch + large signed-in profile load), which emits nothing —
+    // so a slow cold start was reported as "did not open the page", naming a page never reached.
+    // The budget now resets on every progress event and fires only when progress itself stalls.
+    const stallMs = cfg.openStallMs ?? 90_000;
+    const capMs = cfg.openCapMs ?? 480_000;
+    const startedAt = Date.now();
+    let settled = false;
+    const stalled = (async () => {
+      const poll = Math.max(25, Math.min(1000, Math.floor(stallMs / 4)));
+      for (;;) {
+        await sleep(poll);
+        if (settled) return "opened" as const; // race already decided; stop polling
+        if (Date.now() - lastProgressAt >= stallMs) return "stalled" as const;
+        if (Date.now() - startedAt >= capMs) return "cap" as const;
+      }
+    })();
 
     const outcome = await Promise.race([
       openedP.then(() => "opened" as const),
       exited.then(() => "exited" as const),
-      sleep(120_000).then(() => "timeout" as const),
+      spawnFailed.then((e) => e),
+      stalled,
     ]);
+    settled = true;
     if (outcome !== "opened") {
       child.kill();
-      throw new Error(`bot browser did not open the page (${outcome})`);
+      const said = tail.length ? ` last output: ${tail.slice(-5).join(" | ")}` : " child produced NO output";
+      if (outcome instanceof Error) {
+        throw new Error(`bot browser failed to start: could not spawn '${cfg.python}' (${outcome.message}).${said}`);
+      }
+      const why = outcome === "exited" ? "child exited"
+        : outcome === "cap" ? `no page within the ${Math.round(capMs / 1000)}s cap`
+          : `no progress for ${Math.round(stallMs / 1000)}s`;
+      throw new Error(`bot browser did not open the page (${why}; last stage: ${lastStage}).${said}`);
     }
 
     const mutedByUs: string[] = [];

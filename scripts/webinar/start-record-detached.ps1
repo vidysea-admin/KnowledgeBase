@@ -1,6 +1,6 @@
 <#
-  scripts/webinar/start-record-detached.ps1 — T-047. Launches `pnpm --filter @lkb/meeting-bot
-  cli record ...` fully detached from the calling console/window, so closing that console can
+  scripts/webinar/start-record-detached.ps1 — T-047. Launches the meeting-bot CLI (`node --import
+  tsx packages/meeting-bot/src/cli.ts record ...`, never via a pnpm/.cmd shim — ISS-323) fully detached from the calling console/window, so closing that console can
   never kill the recording again — the 2026-09-24 16:30:56 failure (console closed → Ctrl+C exit
   0xC000013A → OBS + bot Chrome kept going with nothing to finalize them) this script closes.
   Output goes to a timestamped log file under raw/webinars/, never to a visible window, via
@@ -31,7 +31,12 @@ param(
   # ISS-317 fix (cycle 2): the ONLY value a Task Scheduler-launched run passes. Validated below
   # against the same [a-z0-9-]{1,64} shape task-scheduler.ts's JOB_KEY_RE enforces on the maker
   # side — belt-and-suspenders, since this script trusts nothing about how it was invoked.
-  [string]$Job
+  [string]$Job,
+  # ISS-323 test seam: the entry script node runs. Defaults to the real CLI; the regression test
+  # points it at a fixture that dumps its argv, so argv fidelity is checked without a recording.
+  [string]$CliEntry,
+  # ISS-323: how long to watch the child before declaring the launch good. 0 skips the wait.
+  [int]$LivenessSeconds = 5
 )
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
@@ -66,14 +71,77 @@ $stamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
 $log = Join-Path $logDir "record-$stamp.log"
 $errLog = Join-Path $logDir "record-$stamp.err.log"
 
-$cliArgs = @("--filter", "@lkb/meeting-bot", "cli", "record", $Url, "--until", $Until)
+# ISS-323: never launch through pnpm. On this machine `Start-Process -FilePath "pnpm"` resolved the
+# pnpm *sh* shim ("%1 is not a valid Win32 application"), produced an empty pid, and still exited 0;
+# and any .cmd shim re-parses argv through cmd.exe, where an unquoted `&` in a Zoom join URL splits
+# the command ("uuid is not recognized"). node.exe is a real PE and takes argv verbatim.
+$node = (Get-Command node -ErrorAction Stop).Source
+if ($CliEntry) { $entry = $CliEntry } else { $entry = Join-Path $repoRoot "packages\meeting-bot\src\cli.ts" }
+
+$cliArgs = @("--import", "tsx", $entry, "record", $Url, "--until", $Until)
 if ($Title) { $cliArgs += @("--title", $Title) }
 if ($SessionId) { $cliArgs += @("--session-id", $SessionId) }
 if ($EndNotBefore) { $cliArgs += @("--end-not-before", $EndNotBefore) }
 if ($ExtraArgs) { $cliArgs += ($ExtraArgs -split ' ' | Where-Object { $_ -ne "" }) }
 
-$proc = Start-Process -FilePath "pnpm" -ArgumentList $cliArgs -WorkingDirectory $repoRoot `
+# Quote every argument so neither PowerShell's argument joining nor any downstream re-parse can
+# split a URL on `&` or a title on spaces. Windows PowerShell 5.1's `Start-Process -ArgumentList`
+# joins the array into ONE raw command line with spaces and does no escaping of its own, so the
+# whole burden is here and it must follow CommandLineToArgvW's rules exactly: a backslash run is
+# literal unless it precedes a quote (or the closing quote we add), in which case it must be
+# doubled. Wrapping in quotes and escaping only the quote character is NOT enough -- an argument
+# ending in a backslash would emit BACKSLASH-QUOTE, whose backslash escapes our own closing quote
+# and merges every following argument into it (reviewer-reproduced on this machine: a title ending
+# in a backslash swallowed `--until 12:30` entirely). Same silent-argv-corruption class as ISS-323.
+function Quote-Win32Argv([string]$s) {
+  $out = New-Object System.Text.StringBuilder
+  [void]$out.Append('"')
+  $i = 0
+  while ($i -lt $s.Length) {
+    $slashes = 0
+    while ($i -lt $s.Length -and $s[$i] -eq [char]92) { $slashes++; $i++ }
+    if ($i -ge $s.Length) {
+      # trailing run: doubled so it stays literal and does not escape the closing quote
+      [void]$out.Append([string][char]92 * ($slashes * 2))
+      break
+    }
+    if ($s[$i] -eq [char]34) {
+      [void]$out.Append([string][char]92 * ($slashes * 2 + 1))
+      [void]$out.Append('"')
+    } else {
+      [void]$out.Append([string][char]92 * $slashes)
+      [void]$out.Append($s[$i])
+    }
+    $i++
+  }
+  [void]$out.Append('"')
+  return $out.ToString()
+}
+
+$quoted = $cliArgs | ForEach-Object { Quote-Win32Argv $_ }
+
+$proc = Start-Process -FilePath $node -ArgumentList $quoted -WorkingDirectory $repoRoot `
   -WindowStyle Hidden -RedirectStandardOutput $log -RedirectStandardError $errLog -PassThru
+
+# ISS-323: fail LOUDLY. The old script printed "started detached record: pid " with an empty pid and
+# exited 0 when the launch had not happened at all, so nothing upstream ever retried.
+if ($null -eq $proc -or -not $proc.Id) {
+  Write-Error "launch FAILED: Start-Process returned no process for '$node' - nothing is recording. See $errLog"
+  exit 1
+}
+if ($LivenessSeconds -gt 0) {
+  $null = $proc.WaitForExit($LivenessSeconds * 1000)
+  if ($proc.HasExited) {
+    Write-Error ("launch FAILED: recorder (pid {0}) exited within {1}s with code {2} - nothing is recording." -f $proc.Id, $LivenessSeconds, $proc.ExitCode)
+    foreach ($f in @($errLog, $log)) {
+      if ((Test-Path $f) -and (Get-Item $f).Length -gt 0) {
+        Write-Output "--- tail $f ---"
+        Get-Content -Path $f -Tail 20
+      }
+    }
+    exit 1
+  }
+}
 
 Write-Output "started detached record: pid $($proc.Id)"
 Write-Output "stdout log: $log"

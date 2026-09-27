@@ -17,6 +17,7 @@ import argparse
 import json
 import os
 import sys
+import threading
 import time
 
 from seleniumbase import SB
@@ -180,8 +181,26 @@ return parts.join(' ');
 """
 
 
+_EMIT_LOCK = threading.Lock()
+
+
 def emit(event, **kw):
-    print(json.dumps({"event": event, "t": time.time(), **kw}), flush=True)
+    # ISS-324: the bootstrap-progress thread emits concurrently with the main thread, so the
+    # write is serialised — an interleaved line would be unparseable JSON on the node side.
+    with _EMIT_LOCK:
+        print(json.dumps({"event": event, "t": time.time(), **kw}), flush=True)
+
+
+def _bootstrap_progress(done, stage):
+    """ISS-324: SB(uc=True, headed=True, user_data_dir=...) emits NOTHING while it fetches/patches
+    chromedriver and loads a large signed-in profile. On the 2026-09-27 Ashoka run that opaque phase
+    outlasted the node side's fixed 120 s budget, which then reported "did not open the page
+    (timeout)" -- naming the page, when the page had not been reached yet. This thread ticks every
+    10 s so the controller can tell "still bringing the browser up" from "wedged"."""
+    waited = 0.0
+    while not done.wait(10.0):
+        waited += 10.0
+        emit("bootstrapping", stage=stage, seconds=int(waited))
 
 
 def click_gate(clicks, now, started, extra_click_until, last_click, no_click):
@@ -336,7 +355,14 @@ def main():
         "--deny-permission-prompts",  # mic/camera/notifications: every prompt auto-denied
         "--start-maximized",
     ])
+    # ISS-324: tick while SB() brings the browser up. Daemon thread, so a failure inside SB()
+    # needs no unwinding here -- __main__ emits "fatal" and the interpreter exits under it.
+    boot_done = threading.Event()
+    threading.Thread(target=_bootstrap_progress, args=(boot_done, "driver-bringup"), daemon=True).start()
     with SB(uc=True, headed=True, user_data_dir=a.profile, chromium_arg=args) as sb:
+        boot_done.set()
+        emit("driver-ready")
+        emit("navigating", url=a.url)
         sb.uc_open_with_reconnect(a.url, 4)
         emit("opened", url=sb.get_current_url())
         started = time.time()
