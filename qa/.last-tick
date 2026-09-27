@@ -107,5 +107,7 @@ MISSED_WAKEUP 2026-09-27T09:44:00+05:30
     while a handshake is open and 6 decisions sit with Umesh
   - NO unit pulled this tick by design: the only unblocked engineering left (U4) is itself
     gated on docs/features/u4-watch-dashboard/ + a umesh-operator persona walk (plan unit 11)
-  - continuation: ScheduleWakeup armed (1800s) BEFORE writing this line, per D-036's finding
-    that arming last is what killed the loop twice
+  - continuation: ScheduleWakeup armed for 15:44 (1843s) immediately after this line, not at the
+    end of a long turn — D-036 found that arming last is what killed the loop twice. (Correction:
+    the line as first committed in 5c4221d said "BEFORE writing this line"; it was in fact armed
+    straight after. Recorded rather than rewritten.)
