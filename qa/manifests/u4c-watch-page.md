@@ -16,7 +16,7 @@ this unit's own criticality, and is never round-capped).
 **Executor:** claude-opus-subagent (maker build subagent, this worktree)
 **Date:** 2026-09-28
 
-**Status: ready-for-check (cycle 0)**
+**Status:** checked-PASS (cycle 0)
 
 ---
 
@@ -236,4 +236,4 @@ edited. Flagging this plainly rather than claiming a green `lint:structure` that
   snapshot staleness, tracker-audit's 5 ambiguous refs) — none belong to this unit; fixing them
   here would be exactly the kind of unrelated-change scope creep the brief warns against.
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS — closed out 2026-09-28 against verdict cycle 0 (VERDICT: PASS, commit 18d00c3). ISS-358 (high) and ISS-359 remain OPEN; per D-042 unit-status and issue-status are separate axes, and ISS-358 is a spec-level premise spanning all three U4 units, not a defect in this one.
