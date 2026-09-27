@@ -111,3 +111,23 @@ MISSED_WAKEUP 2026-09-27T09:44:00+05:30
     end of a long turn — D-036 found that arming last is what killed the loop twice. (Correction:
     the line as first committed in 5c4221d said "BEFORE writing this line"; it was in fact armed
     straight after. Recorded rather than rewritten.)
+2026-09-27T17:0x | maker | tier 3 (roadmap) — ADVANCED · wave=0 builds, 4 agents dispatched
+  - human-invoked tick (Umesh typed /maker continue). Bound D:\KnowledgeBase · adapter none → DEFAULT
+    coding · no qa/.paused · plan gate 3/3 Answered
+  - reconcile: fixed ISS-325 — restored the prose example commit 6558508 overwrote in
+    mc-hooks-bolded-status.md (the close-out edited the file's one bolded line, which was the
+    EXAMPLE of a form the hooks could not see, not the status). ISS-326 verified already resolved
+  - sweep DUE on both triggers (HEAD 3869c83 off recorded 213d2ac; 2h+) → 3 read-only shards
+    dispatched in parallel, then ONE consolidation checker as single writer (ids from ISS-337)
+  - tier 2 top-3 now clear of buildables: ISS-323/324 fixed+verified+merged, ISS-322 gated
+  - tier 3 pulled: U4 (plan unit 11). Its plan row was STALE — /sessions, /sessions/:id and the
+    calendar approve/reject flow already exist; the real gap is GET|POST /watched-sources +
+    /watched-sources/run having NO web consumer at all. Drafted docs/features/u4-watch-dashboard/
+    {intent,spec,plan}.md and mini-grilled Umesh: (b) push-alert-first, visible-only, 2 user types
+  - wrote qa/gates/live-recording-proof-method.md — shard 2 caught that this gate was named in
+    D-036/D-039 and asked in chat three times with NO gate file. Own omission, recorded not hidden
+  - filed ISS-335 (medium, /ask registered twice in App.tsx, line 35 unreachable) and ISS-336 (low,
+    SourcesPage is the only page with no test)
+  - SERIAL: no build unit ran — U4a/U4b/U4c are all gated on the spec+plan approval lines, which is
+    the PLAN gate working as intended, not a ceiling
+  - continuation: ScheduleWakeup armed for 17:36 right after this line
