@@ -283,3 +283,35 @@ the two with the widest unblocking effect are `iss-322-multifile-shape: a` + `ne
   adding a collision guard would be a net loss, so every caller must be checked for reliance on that null.
 - third build (`vector-gap-durability`, ISS-122) still running.
 - SERIAL: none. Each checker went out in the turn its build returned; wave=3 builds, concurrent peak=3.
+
+## 2026-09-27 ~19:1x IST — maker tick — state: HUMAN_GATE on one unit, others in flight
+- third build `vector-gap-durability` (ISS-122, 49f49aa/5d25837) returned having found that **my own
+  dispatch breached D-014's round cap.** Verified myself rather than taking its word:
+  `grep -l "VERDICT: PASS" qa/verdicts/*vector-gap*` returns **two** files (vector-gap-record.md,
+  vector-gap-tenant-id.md), and vector-gap-tenant-id.md — the verdict that FILED ISS-122 — says at
+  line 157 it ruled ISS-122 **outside the security class**, at line 154 that the fix belongs in "the
+  next unit touching this file — not a unit of its own, and explicitly not a third round on this",
+  and at line 187 "ISS-122 is filed and must **not** be promoted into a round-3 unit on its own."
+  My tier-4 selection was exactly that shape. D-014 requires counting prior PASSes before pulling a
+  non-security unit. **I did not count.**
+- **No checker dispatched for that unit, deliberately** — dispatching one would be *conducting* round 3,
+  which is the thing in question. This is the one case where the no-dangling rule yields, and it is
+  stated out loud rather than left quiet: `qa/gates/iss-122-round-cap-breach.md` (a / b / c, b
+  recommended — hold the branch, let the cap stand, ISS-122 verified inside the next unit that touches
+  the file for another reason).
+- filed **ISS-346 (high)**: the cap has no mechanical check. Nothing in backlog selection counts prior
+  PASSes per seam, so this breach is available on every future tick. It was caught only because a build
+  subagent opened a neighbouring manifest for a formatting template, after the fix was already written.
+  The cap worked — but not through me. The fix is mechanical: seam PASS counts are computable from
+  `qa/verdicts/` before a unit is pulled.
+- filed **ISS-347 (medium)**: **three** independent subagents today reported the sandbox refusing
+  D-020's mandated inline `trap ... EXIT INT TERM ERR`, each falling back to `mutate.mjs` and each
+  disclosing it. No one of them could see it had happened three times — that recurrence is the finding.
+  A single disclosed limitation is a judgement call; three in one day from agents that never spoke is an
+  environmental constraint the governing decision does not account for. D-020's letter and this
+  sandbox are incompatible and one of them has to move.
+- credit where due: the builder found the breach itself, finished the verified work rather than
+  discarding it, put the conflict in **bold as the first section of its manifest**, and refused to merge
+  or self-certify. That is the behaviour the pair exists to produce.
+- in flight: checkers for `topicrefs-arg-guard` and `jobkey-collision-detection`.
+- SERIAL: `vector-gap-durability` has no checker by DECISION, not by ceiling — see the gate.
