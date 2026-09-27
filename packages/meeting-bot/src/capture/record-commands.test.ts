@@ -16,7 +16,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { finalizeRecordingWith, isSilentCapture, runFinalize, shouldAutoClick } from "./record-commands.js";
+import { finalizeRecordingWith, isSilentCapture, runFinalize, shouldAutoClick, todayAt } from "./record-commands.js";
 import type { ObsClientLike } from "./obs-windows.js";
 
 // Same derivation record-commands.ts uses for its own REPO_ROOT (this file lives in the same
@@ -41,6 +41,43 @@ test("shouldAutoClick: zoom and zoho get autoClick, everything else does not", (
   assert.equal(shouldAutoClick("meet"), false);
   assert.equal(shouldAutoClick("teams"), false);
   assert.equal(shouldAutoClick("unknown"), false);
+});
+
+// --- todayAt: ISS-319 fix (u5-auto-record-scheduler, fix cycle 2) ----------------------------
+// Exported (was private) so this pure function can be unit-tested without spinning up a real
+// runRecord/OBS/browser session. `runRecord`'s own callers still pass a bare "HH:MM" (unchanged
+// behavior); schedule-tick.ts's job files now pass a full ISO datetime instead, specifically so
+// a session crossing midnight doesn't resolve to a stop time ~24h in the past.
+
+test("todayAt: a bare HH:MM still resolves to today at that local time (unchanged baseline)", () => {
+  const before = new Date();
+  const d = todayAt("21:00");
+  assert.equal(d.getHours(), 21);
+  assert.equal(d.getMinutes(), 0);
+  assert.equal(d.getFullYear(), before.getFullYear());
+  assert.equal(d.getMonth(), before.getMonth());
+  assert.equal(d.getDate(), before.getDate());
+});
+
+test("todayAt: a full ISO datetime is parsed directly, not reinterpreted as today (ISS-319)", () => {
+  const iso = "2026-09-29T00:45:00.000Z";
+  const d = todayAt(iso);
+  assert.equal(d.getTime(), new Date(iso).getTime());
+});
+
+test("todayAt: ISS-319's own reproduction — a session crossing midnight must not resolve -Until " +
+  "to a time before the session's own start", () => {
+  const start = todayAt("23:30"); // legacy bare-HH:mm start, still today
+  // The OLD behavior for a midnight-crossing end (bare "00:45") also resolved to TODAY, landing
+  // ~23h before `start`. The fix: schedule-tick.ts now passes the full ISO end datetime instead
+  // of a bare HH:mm, so the same real end instant parses to the correct absolute time.
+  const realEndIso = new Date(start.getTime() + 75 * 60 * 1000).toISOString(); // start + 1h15m
+  const end = todayAt(realEndIso);
+  assert.ok(end.getTime() > start.getTime(), "end must be after start, even across midnight");
+});
+
+test("todayAt: an unparseable non-HH:MM, non-ISO string still throws a clear error", () => {
+  assert.throws(() => todayAt("not-a-time"), /bad time/);
 });
 
 // --- finalizeRecordingWith: silence gate + source.json registration ---------------------------
