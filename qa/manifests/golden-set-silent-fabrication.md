@@ -218,4 +218,28 @@ before committing; avoided by placing the test at `scripts/lib/eval-recall.test.
 "Where the new test files live" above). No regression shipped; recording the near-miss so the
 reasoning is visible rather than silent.
 
-## Status: ready-for-check
+## Status: checked-PASS (cycle 0)
+
+Verdict: `qa/verdicts/golden-set-silent-fabrication.md` (**Cycle checked: 0**, commit `8c33117`) —
+**PASS**, `ISSUES-WRITTEN: none`. ISS-271 and ISS-272 flipped `open -> fixed`.
+
+Per this repo's verdict rule, `none` is a complete and creditable check: the checker found nothing on a
+correct implementation, which is its job, not a lapse.
+
+What the checker re-derived rather than trusted: it wrote its **own** mutations (not the two in the
+table above), reverting `computeFilterBias` to the bare `return null` and `computeMarginRow` to the `-2`
+sentinel under full D-020 discipline, and both went red on exactly the claimed rows and nothing else —
+which is what establishes that the tests assert on the real computed field rather than a value the test
+itself supplies. It also re-verified the 89/90 `test:lint` claim **on the base commit** `a99140f` in a
+throwaway detached worktree, confirming the `docs/SNAPSHOT.md` staleness is pre-existing; verified the
+`scripts/` 32/32 dirsize claim by counting; and read both files in full to confirm the `isMain` guards
+disabled nothing (every removed line reappears inside the extracted pure function or the guarded block).
+
+### Correction — one wording nit the checker caught
+
+This manifest describes ISS-271/ISS-272 as carrying `reproductions: null` and an empty `fix_direction`.
+Parsed directly, those keys are **absent from both rows**, not present-with-a-null-value. The substance
+is unchanged — there were no recorded reproductions to replay, so authoring a corpus was correct and is
+not a D-015 substitution — but "absent" and "null" are different claims about a ledger row, and a
+manifest that paraphrases the ledger instead of parsing it is how a wrong id or a wrong field slips
+through later. Recorded rather than silently edited.
