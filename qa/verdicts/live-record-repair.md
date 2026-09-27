@@ -189,3 +189,186 @@ cycle 0's quoting was fully correct. **Cycle 1 (`f01b47a`, manifest now at `Fix 
 `ready-for-check`) has NOT been checked by me** — it needs its own Mode A dispatch. I did not
 self-assign it: it is a different, newer submission than the one I was bound to, and Mode A
 checkers do not race ahead of their dispatch.
+
+---
+
+## CYCLE 1 VERDICT
+
+**Date:** 2026-09-27 · **Cycle checked:** 1 · **Checker:** fresh Claude subagent
+(claude-sonnet-subagent), Mode A, bound to `D:\KnowledgeBase-lanes\live-record-repair` (branch
+`wave/live-record-repair`, commit `f01b47a` — confirmed HEAD's only changes since are `qa/verdicts/`
+and `qa/issues.jsonl`, no source drift).
+
+## VERDICT: PASS
+
+## SCOREBOARD
+
+- ISS-LIVE-RECORD-REPAIR-002 (`Quote-Win32Argv` real Win32 backslash-run doubling): **evidenced** —
+  independently re-falsified in a throwaway copy; adversarially probed with 7 hostile inputs beyond
+  the manifest's own test.
+- ISS-LIVE-RECORD-REPAIR-003 (`openCapMs` cap-branch test): **evidenced** — independently
+  re-falsified in a throwaway copy.
+- D-015 (fix measured against its issue's own corpus): **confirmed** — the new launcher test is a
+  4th test appended after the original 3 (`runLauncher`'s `title` parameter defaults to the
+  original `TITLE`, so ISS-323(c)/(a,b)/happy-path are byte-for-byte unchanged); the new cap test is
+  a 5th test appended after the original four ISS-324 tests. Both are additions, never substitutions.
+- Diff scope (4c): clean — `git diff c8cbbf4 f01b47a` touches only `obs-windows.test.ts` (+28,
+  test-only), `start-record-detached.ps1` (+36, the quoter), `start-record-detached.test.mjs` (+36,
+  new test + a default-parameter signature change), plus the manifest and this lane's issues file.
+  No function, export, test, or route deleted or renamed; no file outside the manifest's declared
+  "What changed" touched.
+- HUMAN_GATE `qa/gates/obs-windows-loc-split.md`: confirmed present, still unanswered (no
+  `Answered:` line), correctly not blocking this unit (it blocks merge-to-master with a green
+  `lint:structure`, not the fix itself).
+- Shared-data disclosure: confirmed by my own grep across every changed file for
+  `mongo|Mongo|MONGO` — zero matches.
+
+## Verify commands re-run myself (all from `D:\KnowledgeBase-lanes\live-record-repair`)
+
+1. `node --test scripts/webinar/start-record-detached.test.mjs`
+   → First run: **3 pass, 1 fail** (ISS-323(a,b), the liveness-gate test). Re-ran isolated (no
+   concurrent load) **8 times total across two batches: 8/8 clean, 4/4 pass each**. The one failure
+   only ever occurred while this suite ran concurrently with the full 251-test meeting-bot suite in
+   another process — see EXPLANATION. In isolation the manifest's claimed "4 pass, 0 fail" holds
+   every time I ran it.
+2. `cd packages/meeting-bot && node --test --import tsx "src/**/*.test.ts"`
+   → First run (concurrent with #1): **250 pass, 1 fail** (a different, pre-existing ISS-324 timing
+   test, not part of this cycle's changes). Re-run in isolation: **251 pass, 0 fail** (30.4s),
+   matches the manifest exactly. Also ran `src/capture/obs-windows.test.ts` alone 5 times in
+   isolation: **8/8 pass every time.**
+3. `cd packages/meeting-bot && npx tsc --noEmit -p tsconfig.json`
+   → exit 0, no output. Matches.
+4. `python -m pytest packages/meeting-bot/py -q`
+   → **35 passed** (30.1s). Matches (unchanged this cycle, as declared).
+5. `node scripts/lint-loc.mjs`
+   → **FAILS as declared, 4 violations**: `speakers-llm.ts:313`, `sb_join.py:437`,
+   `obs-windows.ts:352`, `run-watch.mjs:447` (budget 300 each) — identical to cycle 0's numbers,
+   unchanged this cycle. Matches the gated state in `qa/gates/obs-windows-loc-split.md` exactly. No
+   action needed from the checker.
+
+No pasted output was taken on faith; every number above is from my own runs, and the one
+discrepancy from the manifest (the concurrent-load flake) is disclosed rather than silently
+resolved by re-running until green.
+
+## Adversarial probe of Quote-Win32Argv (the one thing cycle 0 got wrong)
+
+Ran 7 hostile inputs through the REAL launcher (`start-record-detached.ps1` unmodified, in the
+bound tree — reading/executing it is not an edit), each with `-CliEntry` pointed at
+`argv-dump-fixture.mjs` and a distinct `LKB_ARGV_DUMP`, batched as 7 parallel child processes (one
+Node script spawning all 7 concurrently) rather than serially, given the ~10-12s-per-invocation cost
+from the pre-existing pipe-inheritance defect (ISS-LIVE-RECORD-REPAIR-001). All 7 completed in one
+batch (~15s wall time).
+
+| Input | Round-trip | `--until 23:59` intact | URL intact |
+|---|---|---|---|
+| even trailing backslash run (`a\\`, 2) | **exact** | yes | yes |
+| odd trailing backslash run (`a\\\`, 3) | **exact** | yes | yes |
+| backslash immediately before embedded quote (`a\"b`) | **exact** | yes | yes |
+| lone `"` | **exact** | yes | yes |
+| empty string (`""`) | **not applicable** — see note | yes | yes |
+| argument that is only backslashes (5×`\`) | **exact** | yes | yes |
+| URL containing `&` plus a trailing backslash | **exact** | yes | yes |
+
+**Empty-string note, not a quoter defect:** an empty `-Title` never reaches `Quote-Win32Argv` at
+all — `start-record-detached.ps1`'s own `if ($Title) { $cliArgs += @("--title", $Title) }` treats
+`""` as falsy (pre-existing PowerShell truthiness pattern, identical for `$SessionId` and
+`$EndNotBefore`, not introduced or touched by this cycle), so `--title` is simply omitted. The argv
+dump confirms this: `["record", <url>, "--until", "23:59"]`, no `--title` entry at all. Judged as
+correct behavior (no title supplied = no title flag), not a round-trip failure.
+
+**Result: 6/6 non-degenerate hostile inputs round-tripped byte-identical.** No input I tried broke
+`Quote-Win32Argv`.
+
+## Capability coverage — independent falsification (throwaway copies, never the bound tree)
+
+Built two throwaway copies outside the bound tree (`git status --short` in the bound tree confirmed
+clean throughout and after). Both confirmed GREEN in the copy itself before any edit — the green
+line came from the copy's own run in both cases, never reused from step 3's bound-tree run.
+
+**Row 1 — `scripts/webinar/` copy** (core Node modules only, no `node_modules` needed for this
+suite): junctioned nothing; copied `*.ps1`/`*.mjs` verbatim. Confirmed GREEN: **4/4 pass.**
+Falsifying edit: reverted `$quoted = $cliArgs | ForEach-Object { Quote-Win32Argv $_ }` to the naive
+`'"' + ($_ -replace '"', '\"') + '"'` scheme (single-hunk, the exact line the manifest names).
+Result: **3/4 pass, 1 fail** — and the failure is exactly the new trailing-backslash test:
+```
+AssertionError: the trailing backslash and the embedded quotes must survive as ONE argument
++ actual:   'Ashoka "Educator" Dialogues C:\\share" '
+- expected: 'Ashoka "Educator" Dialogues C:\\share\\'
+```
+The other 3 tests (URL/`&`, liveness gate, happy path) stayed green — the naive scheme still
+handles those cases; only the trailing-backslash case (what cycle 1 exists to fix) reddens. Isolates
+precisely.
+
+**Row 2 — full-tree copy** (`packages/meeting-bot` needs its pnpm-workspace dependencies;
+robocopied the whole tree excluding `node_modules`/`.git`/`dist`, then junctioned `node_modules` at
+the repo root and every workspace package that has its own). Confirmed GREEN: `obs-windows.test.ts`
+**8/8 pass** (23.1s). Falsifying edit: changed the cap comparison inside the `stalled` polling loop
+from `if (Date.now() - startedAt >= capMs) return "cap" as const;` to
+`if (false && Date.now() - startedAt >= capMs) return "cap" as const;` (single-hunk, the exact
+branch the manifest names). Result: the cap test alone reddened. Running it under an external
+15s `timeout` (the fixture emits progress every 100ms toward `LKB_FIXTURE_TICKS: 10000`, i.e. ~1000s
+of real time if left to run to a natural stall, so I bounded the wall-clock rather than waiting it
+out — disclosed, not silently substituted) produced:
+```
+AssertionError: must attribute the failure to the cap, not the stall window: bot browser did not
+open the page (child exited; last stage: bootstrapping). ...
+expected: /cap/
+```
+The assertion that fired is exactly the one the test is named for (`assert.match(err!.message,
+/cap/, ...)`), and it fails for the right reason: with the cap branch inert, nothing in the code can
+ever attribute a failure to "cap" — the external kill surfaced as "child exited" instead, which is
+precisely what the disabled cap predicts (no code path can produce the word "cap" any more). This is
+not a parse/import wrong-reason failure; the suite loaded and ran normally, and only this one
+targeted assertion broke.
+
+CAPABILITY-COVERAGE: 2/2 rows independently reproduced by the checker, both reddening exactly the
+targeted assertion from a checker-obtained green baseline in a throwaway copy, bound tree
+untouched throughout (confirmed via `git status --short`).
+
+## Ledger
+
+Updated `D:\KnowledgeBase-lanes\live-record-repair\qa\issues.live-record-repair.jsonl`:
+- **ISS-LIVE-RECORD-REPAIR-002**: `fixed` → **`verified`** (`verified_date: 2026-09-27`) — its
+  regression_check independently confirmed to fail with the fix reverted, per the ledger's
+  `fixed → verified` bar.
+- **ISS-LIVE-RECORD-REPAIR-003**: `fixed` → **`verified`** (`verified_date: 2026-09-27`) — same
+  bar, same confirmation.
+- **ISS-LIVE-RECORD-REPAIR-001** (pre-existing pipe-inheritance defect): left `open`, unchanged —
+  out of scope for this cycle, not claimed as fixed by the manifest.
+
+Main-lane `qa/issues.jsonl` (ISS-323, ISS-324): left exactly as cycle 0's checker set them
+(`fixed`, explicitly not `verified` pending a live webinar run) — this cycle adds no live proof, so
+that annotation still holds and I am not touching it.
+
+CAPABILITY-COVERAGE: 2/2 rows independently reproduced by the checker
+LIVE-BROWSER: not-applicable (no UI surface touched — CLI launcher + headless capture-budget logic,
+same class of change as cycle 0)
+ISSUES-WRITTEN: none (two existing lane-ledger rows moved fixed → verified; no new issue filed)
+EXECUTOR: claude-opus-5 (maker, in-session) (checker: claude-sonnet-subagent)
+
+## EXPLANATION
+
+Cycle 1 does exactly what it claims: `Quote-Win32Argv` implements the real Win32
+`CommandLineToArgvW`-compatible escaping algorithm (backslash-run doubling before a quote or the
+closing quote), verified correct not just on the manifest's one new test but on 7 adversarial inputs
+run through the real launcher, including the two combinations most likely to break a hand-rolled
+quoter (odd-length backslash runs, and backslashes immediately adjacent to an embedded quote). The
+`openCapMs` fix is test-only (no source change — the cap logic itself was already correct in cycle
+0, per my own cycle-0 verdict; only the untested branch is new), and I independently confirmed the
+new test actually pins that branch by neutering it and watching the exact `/cap/` assertion break.
+D-015 is satisfied on both regression checks: the original ISS-323 corpus (3 tests) and the original
+four ISS-324 tests are unweakened and still present, with cycle 1's tests appended after them.
+
+One disclosed observation, not filed (matches this repo's "ISSUES-WRITTEN: none is a complete and
+creditable check" rule — this is a note, not a finding I'd defend at >80% confidence as attributable
+to cycle 1's code): two timing-sensitive tests (`ISS-323(a,b)`'s liveness-gate wait and a
+pre-existing, unrelated `obs-windows.test.ts` ISS-324 test) intermittently failed only when run
+concurrently with other heavy test suites on this machine (CPU contention), and passed reliably
+(8/8 and 5/5 across isolated re-runs) alone. This is a property of tight timing budgets under load,
+not a functional regression, not new to this cycle, and not part of either fix this cycle claims —
+noted for whoever eventually looks at CI flakiness on this machine, not a blocker here.
+
+Per the dispatch's explicit instruction, I am not claiming a live webinar run happened, and I am not
+treating the disclosed live-proof gap (ISS-324's live attribution) as a reason to withhold PASS —
+cycle 1 is judged on its two stated fixes, both of which are real, tested beyond the manifest's own
+suite, and correctly scoped.
