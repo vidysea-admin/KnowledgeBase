@@ -34,10 +34,26 @@ function flag(rest: string[], name: string): string | undefined {
   return i >= 0 ? rest[i + 1] : undefined;
 }
 
-/** "HH:MM" today (local time) → Date. */
-function todayAt(hhmm: string): Date {
-  const m = /^(\d{1,2}):(\d{2})$/.exec(hhmm);
-  if (!m) throw new Error(`bad time '${hhmm}', expected HH:MM`);
+/**
+ * "HH:MM" (today, local time) OR a full ISO datetime string → Date.
+ *
+ * ISS-319 fix (fix cycle 2, u5-auto-record-scheduler): a bare `HH:MM` always resolves to
+ * *today*, which is correct for a human typing `--until 21:00` at the terminal, but wrong for an
+ * auto-scheduled session that crosses midnight (e.g. 23:30-00:45) — the launcher runs on the
+ * START day, so `todayAt("00:45")` used to land ~23h in the PAST relative to when the recording
+ * begins. A caller that already has the real end instant (schedule-tick.ts's job JSON) now
+ * passes a full ISO datetime instead, which this function parses directly — no day-of-week
+ * guessing needed. Exported (previously private) so it can be unit-tested without spinning up a
+ * real `runRecord`/OBS/browser session.
+ */
+export function todayAt(hhmmOrIso: string): Date {
+  if (/^\d{4}-\d{2}-\d{2}T/.test(hhmmOrIso)) {
+    const iso = new Date(hhmmOrIso);
+    if (!Number.isNaN(iso.getTime())) return iso;
+    throw new Error(`bad ISO datetime '${hhmmOrIso}'`);
+  }
+  const m = /^(\d{1,2}):(\d{2})$/.exec(hhmmOrIso);
+  if (!m) throw new Error(`bad time '${hhmmOrIso}', expected HH:MM or an ISO datetime`);
   const d = new Date();
   d.setHours(Number(m[1]), Number(m[2]), 0, 0);
   return d;

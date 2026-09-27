@@ -57,8 +57,17 @@ export function isTrustedSender(email: string | undefined, domain: string | unde
   return false;
 }
 
-const DEFAULT_TRUSTED_SENDER_EMAILS = ["karunn@vidysea.com"];
-const DEFAULT_TRUSTED_SENDER_DOMAINS = ["theoutreachcollective.in", "ashoka.edu.in", "zoho.com", "zoom.us"];
+// ISS-318 (fix cycle 2): zoho.com/zoom.us were removed from the defaults. They are the
+// platform VENDORS' own public, multi-tenant email domains (anyone can register a free
+// @zoho.com/@zoom.us address) — categorically different from the two entries that remain, which
+// are actual vetted partner organizations. Umesh's approval (qa/feedback-inbox.md
+// 2026-09-26T23:54:34+05:30 / 23:56:41+05:30) named "trusted senders", not "any sender on our
+// vendors' own domains". umeshsugara@vidysea.com is added to the trusted EMAIL list (not a
+// vidysea.com domain entry) because that is the real Gmail account the candidate pipeline reads
+// (gws-gmail.ts, OAuth'd as umeshsugara@vidysea.com per gmail-meeting-candidates-approval.md) —
+// a self-forwarded invite lands with that address as the From header's sender.
+const DEFAULT_TRUSTED_SENDER_EMAILS = ["karunn@vidysea.com", "umeshsugara@vidysea.com"];
+const DEFAULT_TRUSTED_SENDER_DOMAINS = ["theoutreachcollective.in", "ashoka.edu.in"];
 
 function parseCsvEnv(value: string | undefined): string[] | undefined {
   if (!value) return undefined;
@@ -68,9 +77,10 @@ function parseCsvEnv(value: string | undefined): string[] | undefined {
 
 /**
  * Reads the trusted-sender allowlist from env (`AUTO_RECORD_TRUSTED_EMAILS` /
- * `AUTO_RECORD_TRUSTED_DOMAINS`, comma-separated), falling back to the defaults named in the U5
- * unit brief: karunn@vidysea.com, theoutreachcollective.in, ashoka.edu.in, zoho.com, zoom.us.
- * [ASSUMPTION] no existing settings/env key for this list was found in the repo (checked
+ * `AUTO_RECORD_TRUSTED_DOMAINS`, comma-separated), falling back to the fix-cycle-2 defaults
+ * (ISS-318): karunn@vidysea.com, umeshsugara@vidysea.com, theoutreachcollective.in,
+ * ashoka.edu.in — vetted partners/known accounts only, never a platform vendor's own public
+ * domain. [ASSUMPTION] no existing settings/env key for this list was found in the repo (checked
  * qa/contracts/web-settings-keys.md, .env, config/) — these two new env keys are this unit's own
  * addition, documented here rather than silently invented; see the manifest's Known gaps.
  */

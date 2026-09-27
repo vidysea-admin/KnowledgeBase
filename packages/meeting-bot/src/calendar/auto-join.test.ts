@@ -101,10 +101,30 @@ test("isTrustedSender: neither email nor domain given -> false", () => {
   assert.equal(isTrustedSender(undefined, undefined, TRUSTED), false);
 });
 
-test("loadTrustedSenderConfig: falls back to the U5-brief defaults with no env set", () => {
+test("loadTrustedSenderConfig: falls back to the fix-cycle-2 defaults with no env set (ISS-318)", () => {
   const cfg = loadTrustedSenderConfig({});
-  assert.deepEqual(cfg.emails, ["karunn@vidysea.com"]);
-  assert.deepEqual(cfg.domains, ["theoutreachcollective.in", "ashoka.edu.in", "zoho.com", "zoom.us"]);
+  assert.deepEqual(cfg.emails, ["karunn@vidysea.com", "umeshsugara@vidysea.com"]);
+  assert.deepEqual(cfg.domains, ["theoutreachcollective.in", "ashoka.edu.in"]);
+});
+
+// ISS-318 (fix cycle 2): the checker's own reproduction — zoho.com/zoom.us must no longer be
+// default-trusted, since they are the platform VENDORS' own public, multi-tenant email domains,
+// not vetted partner organizations (Umesh's approval named "trusted senders", not those).
+test("loadTrustedSenderConfig: defaults no longer trust the platform vendor domains zoho.com/zoom.us (ISS-318)", () => {
+  const cfg = loadTrustedSenderConfig({});
+  assert.ok(!cfg.domains.includes("zoho.com"), "zoho.com must not be a default-trusted domain");
+  assert.ok(!cfg.domains.includes("zoom.us"), "zoom.us must not be a default-trusted domain");
+});
+
+test("isTrustedSender: with the real DEFAULT config, a stranger on zoho.com/zoom.us is untrusted (ISS-318)", () => {
+  const defaults = loadTrustedSenderConfig({});
+  assert.equal(isTrustedSender("random.stranger@zoho.com", undefined, defaults), false);
+  assert.equal(isTrustedSender("marketing@zoom.us", undefined, defaults), false);
+  // The two genuine partner domains + the two named accounts still are.
+  assert.equal(isTrustedSender("someone@theoutreachcollective.in", undefined, defaults), true);
+  assert.equal(isTrustedSender("someone@ashoka.edu.in", undefined, defaults), true);
+  assert.equal(isTrustedSender("karunn@vidysea.com", undefined, defaults), true);
+  assert.equal(isTrustedSender("umeshsugara@vidysea.com", undefined, defaults), true);
 });
 
 test("loadTrustedSenderConfig: env overrides, comma-separated + lower-cased", () => {

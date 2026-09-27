@@ -17,6 +17,14 @@
  * non-goal is "no live wiring into a scheduled job… blocked on missing [Google OAuth]
  * credentials," which still holds. `loadCalendarEvents` is the seam a real `CalendarClient`
  * plugs into once those credentials exist; nothing here needs to change to wire it up then.
+ *
+ * Fix cycle 2 (checker FAIL, 2026-09-27): the real-schedule loop below no longer builds the
+ * Windows Scheduled Task's `/tr` from title/url/sessionId (ISS-317 — command injection). It
+ * derives a validated `jobKey` from the item's `sessionKey`, persists the sensitive fields to a
+ * per-job JSON file (`schedule-state.ts`'s `writeScheduledJob`), and passes only `jobKey` +
+ * the fixed launcher path to `task-scheduler.ts`'s `scheduleOnce`. It also now writes the item's
+ * FULL ISO `endTime` into that job file rather than a bare local `HH:mm` (ISS-319 — a session
+ * crossing midnight used to get a stop time ~24h in the past).
  */
 import { existsSync } from "node:fs";
 import path from "node:path";
@@ -27,8 +35,8 @@ import {
   selectAutoRecordItems, loadTrustedSenderConfig, redactJoinLink,
   type AutoRecordCandidateInput, type AutoRecordItem, type SkippedItem,
 } from "./auto-join.js";
-import { readScheduledKeys, recordScheduled } from "./schedule-state.js";
-import { createWindowsTaskScheduler, toLocalHHMM, type TaskScheduler } from "./task-scheduler.js";
+import { readScheduledKeys, recordScheduled, writeScheduledJob } from "./schedule-state.js";
+import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, "..", "..", "..", "..");
@@ -130,9 +138,9 @@ export function buildRealScheduleTickDeps(): ScheduleTickDeps {
   };
 }
 
-function taskNameFor(sessionKey: string): string {
-  return `lkb-autorecord-${sessionKey.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
-}
+// taskNameFor was removed in fix cycle 2 (ISS-317): the Scheduled Task name is now derived
+// inside task-scheduler.ts's scheduleOnce, from the already-validated jobKey (buildTaskName),
+// never built here from an unvalidated sessionKey.
 
 function describeSkip(s: SkippedItem): string {
   const detail = s.detail ? ` (${s.detail})` : "";
@@ -170,20 +178,33 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
   }
 
   for (const item of result.toSchedule) {
+    // ISS-317 fix: no title/url/sessionId ever reaches the Task Scheduler command line. The
+    // sensitive fields are persisted to a per-job JSON file instead, keyed by a validated
+    // `jobKey` derived from the sessionKey; the launcher reads that file via `-Job <jobKey>`.
+    const jobKey = deriveJobKey(item.sessionKey);
+    if (!jobKey) {
+      // sessionKey ids come from our own Mongo _id / calendar event id, so this should be
+      // unreachable in practice — but a caller MUST refuse rather than fall back to something
+      // unvalidated (ISS-317's own fix direction), so this is a hard skip, not a crash.
+      deps.log(`  refused to schedule ${item.sessionKey}: sessionKey does not derive a safe job key — skipped`);
+      continue;
+    }
+    writeScheduledJob(deps.stateDir, jobKey, {
+      url: item.meetingUrl,
+      // ISS-319 fix: the FULL ISO end datetime, not a bare local HH:mm — so a session that
+      // crosses midnight doesn't resolve to a stop time ~24h in the past (record-commands.ts's
+      // `todayAt` now accepts either form).
+      until: item.endTime,
+      title: item.title,
+      sessionId: item.sessionKey,
+    });
     await deps.scheduler.scheduleOnce({
-      taskName: taskNameFor(item.sessionKey),
+      jobKey,
+      launcherPath: RECORD_LAUNCHER,
       runAtIso: item.startTime,
-      command: "powershell.exe",
-      args: [
-        "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", RECORD_LAUNCHER,
-        "-Url", item.meetingUrl,
-        "-Until", toLocalHHMM(item.endTime),
-        "-Title", item.title,
-        "-SessionId", item.sessionKey,
-      ],
     });
     recordScheduled(deps.stateDir, { sessionKey: item.sessionKey, title: item.title, scheduledAt: now });
-    deps.log(`  scheduled: ${item.sessionKey} via one-off Windows task`);
+    deps.log(`  scheduled: ${item.sessionKey} via one-off Windows task (job ${jobKey})`);
   }
 
   return result;

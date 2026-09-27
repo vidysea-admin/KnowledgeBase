@@ -57,3 +57,52 @@ export function recordScheduled(stateDir: string, entry: ScheduledEntry): void {
   state[entry.sessionKey] = entry;
   writeFileSync(scheduleStateFilePath(stateDir), JSON.stringify(state, null, 2) + "\n");
 }
+
+// ---------------------------------------------------------------------------------------------
+// ISS-317 fix (cycle 2): per-job JSON files under `<stateDir>/scheduled/<jobKey>.json`. The
+// sensitive fields (url with its join token, full end datetime, title, sessionId) used to be
+// interpolated straight into the Scheduled Task's `/tr` command line — now they are persisted
+// here instead, and `start-record-detached.ps1 -Job <jobKey>` reads this file at launch time.
+// Keyed by `jobKey` (task-scheduler.ts's `deriveJobKey`), never the raw `sessionKey` — sessionKey
+// can contain a `:` (`gmail:<id>`), which is not a safe/legal Windows filename character.
+// ---------------------------------------------------------------------------------------------
+
+export interface ScheduledJob {
+  /** The real join URL (with its join token) — never persisted to the Task Scheduler command
+   * line, only here (this file lives under the gitignored `raw/webinars/` tree). */
+  url: string;
+  /** Full ISO end datetime (ISS-319 fix) — NOT a bare local `HH:mm`, so a session crossing
+   * midnight still resolves to a stop time after its own start, not ~24h in the past. */
+  until: string;
+  title: string;
+  /** The original sessionKey (`gmail:<id>` / `cal:<id>`), kept for logging/debugging — never
+   * used as a filesystem path component itself (that's `jobKey`'s job). */
+  sessionId: string;
+}
+
+function scheduledJobDir(stateDir: string): string {
+  return path.join(stateDir, "scheduled");
+}
+
+export function scheduledJobFilePath(stateDir: string, jobKey: string): string {
+  return path.join(scheduledJobDir(stateDir), `${jobKey}.json`);
+}
+
+/** Writes (or overwrites) the job file for `jobKey`. Creates `<stateDir>/scheduled/` if needed. */
+export function writeScheduledJob(stateDir: string, jobKey: string, job: ScheduledJob): void {
+  mkdirSync(scheduledJobDir(stateDir), { recursive: true });
+  writeFileSync(scheduledJobFilePath(stateDir, jobKey), JSON.stringify(job, null, 2) + "\n");
+}
+
+/** Never throws — a missing or corrupt job file returns `null` (mirrors `readScheduleState`'s
+ * conservative-on-read-failure convention). */
+export function readScheduledJob(stateDir: string, jobKey: string): ScheduledJob | null {
+  const p = scheduledJobFilePath(stateDir, jobKey);
+  if (!existsSync(p)) return null;
+  try {
+    const parsed = JSON.parse(readFileSync(p, "utf8"));
+    return parsed && typeof parsed === "object" ? (parsed as ScheduledJob) : null;
+  } catch {
+    return null;
+  }
+}

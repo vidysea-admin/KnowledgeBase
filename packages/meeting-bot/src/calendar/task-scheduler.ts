@@ -13,6 +13,22 @@
  * `execFileFn` defaults to a real `child_process.execFile` call to `schtasks.exe`, but tests
  * inject a fake and never invoke the real binary.
  *
+ * **ISS-317 (fix cycle 2) — command-injection fix.** The first draft built `/tr` by
+ * string-joining a caller-supplied `command`/`args` array with naive `\"`-escaping; `args` came
+ * straight from the (partly email-sourced) candidate's `title`/`url`/`sessionId`. Task Scheduler
+ * re-parses `/tr` with real Windows command-line rules when the task fires, so a crafted title
+ * could break out of the intended quoting and inject extra `powershell.exe` arguments —
+ * confirmed by the checker with a standalone `CommandLineToArgvW`-rules simulation. Fix: no
+ * caller-supplied free text (title/url/sessionId) is ever placed in `/tr` again. `scheduleOnce`
+ * now takes only a `jobKey` (validated against `JOB_KEY_RE`, refused otherwise) and a
+ * `launcherPath` (a repo-controlled absolute path, never sender/candidate data) and always
+ * builds the exact same fixed shape: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File
+ * "<launcherPath>" -Job "<jobKey>"`. The sensitive fields (url, full end datetime, title,
+ * sessionId) are persisted out-of-band to a per-job JSON file (`schedule-state.ts`'s
+ * `writeScheduledJob`) that the launcher reads via its new `-Job` parameter
+ * (`start-record-detached.ps1`) — never passed as a Task Scheduler argument, so the join-link
+ * token no longer appears in `/tr` either (the checker's aggravating-detail finding).
+ *
  * **Build-session constraint (explicit, from the unit brief): no real Windows Scheduled Task is
  * created while building/testing this unit.** Every test below injects a fake `execFileFn`; the
  * real path is read-reviewed, never exercised against the live `schtasks.exe` in this session —
@@ -20,18 +36,44 @@
  */
 import { execFile } from "node:child_process";
 
+/** The ONLY caller-supplied text ever allowed into `/tr` (as the `-Job` argument). Deliberately
+ * narrow — lowercase ascii letters, digits, hyphen, 1-64 chars — so nothing matching it can ever
+ * contain a quote, backslash, `&`, `|`, `;`, `$(...)`, a backtick, `%VAR%`, or a newline. */
+export const JOB_KEY_RE = /^[a-z0-9-]{1,64}$/;
+
+/**
+ * Derives a safe job key from an internal `sessionKey` (`"gmail:<id>"`, `"cal:<id>"` —
+ * `auto-join.ts`'s `normalizeCandidate`/`normalizeCalendarEvent`, built from our own Mongo `_id`
+ * / calendar event id, never from `title`/`url` free text). Lower-cases, collapses any run of
+ * characters outside `[a-z0-9]` to a single `-`, trims leading/trailing `-`. Returns `null`
+ * (never throws) when the result is empty or still fails `JOB_KEY_RE` — callers MUST refuse to
+ * schedule on `null` rather than fall back to the raw `sessionKey` or any other unvalidated text.
+ * This is a defensive floor, not the primary trust boundary (sessionKey ids are not attacker-
+ * authored free text like title/url), but `scheduleOnce` re-validates independently below so a
+ * caller cannot smuggle unsafe characters through even if this function were bypassed.
+ */
+export function deriveJobKey(sessionKey: string): string | null {
+  const candidate = sessionKey.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return JOB_KEY_RE.test(candidate) ? candidate : null;
+}
+
+/** The Windows Scheduled Task name for a given (already-validated) job key — fixed prefix +
+ * jobKey, so the whole name is safe by construction once `jobKey` itself validates. */
+export function buildTaskName(jobKey: string): string {
+  return `lkb-autorecord-${jobKey}`;
+}
+
 export interface ScheduleOnceOptions {
-  /** Unique Scheduled Task name — the caller is responsible for making this stable per
-   * `sessionKey` so a re-run of `schtasks /create` with the same name is idempotent (`/f`
-   * overwrites rather than erroring on "already exists"). */
-  taskName: string;
+  /** The per-session job identity passed to the launcher via `-Job`. MUST match `JOB_KEY_RE` —
+   * `scheduleOnce` rejects (never calls `schtasks`) otherwise. This is the ONLY variable content
+   * that ends up inside `/tr`; everything else in the built command line is a fixed string. */
+  jobKey: string;
+  /** Absolute path to the fixed launcher script (`scripts/webinar/start-record-detached.ps1`).
+   * Repo-controlled — must never be built from candidate/title/url data. */
+  launcherPath: string;
   /** When the task should fire, as an ISO datetime in the LOCAL timezone the task should run in
    * (schtasks takes local wall-clock time, not UTC). */
   runAtIso: string;
-  /** The command to run at that time — always `powershell.exe` for this unit's one caller
-   * (`schedule-tick.ts`), kept generic here so this module stays reusable. */
-  command: string;
-  args: string[];
 }
 
 export interface TaskScheduler {
@@ -66,17 +108,30 @@ type ExecFileFn = (
 
 /**
  * Builds the real scheduler. `execFileFn` defaults to Node's real `child_process.execFile`
- * (never a shell string — args are passed as an array, so a title/URL containing `"`/`&`/`|`
- * can't break out of the command line) but is injectable for tests.
+ * (never a shell string — args are passed as an array to `schtasks` itself) but is injectable
+ * for tests.
+ *
+ * ISS-317 fix: `/tr` is now always the exact fixed shape below — `opts.jobKey` (validated
+ * against `JOB_KEY_RE`, refused otherwise) and `opts.launcherPath` (repo-controlled, never
+ * sender/candidate data) are the only two values that ever appear inside it. No title, url,
+ * sessionId, or any other caller-supplied free text is placed in `/tr`.
  */
 export function createWindowsTaskScheduler(execFileFn: ExecFileFn = execFile as unknown as ExecFileFn): TaskScheduler {
   return {
     scheduleOnce(opts: ScheduleOnceOptions): Promise<void> {
+      if (!JOB_KEY_RE.test(opts.jobKey)) {
+        return Promise.reject(
+          new Error(`refusing to schedule: jobKey '${opts.jobKey}' fails ${JOB_KEY_RE} (ISS-317)`),
+        );
+      }
+      const taskName = buildTaskName(opts.jobKey);
       const { st, sd } = toSchtasksDateTime(opts.runAtIso);
-      const taskRun = [opts.command, ...opts.args].map((a) => `"${a.replace(/"/g, '\\"')}"`).join(" ");
+      // Fixed shape, no interpolation of untrusted content: opts.jobKey already validated above
+      // can contain only [a-z0-9-], so it needs no escaping; opts.launcherPath is repo-controlled.
+      const taskRun = `"powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "${opts.launcherPath}" -Job "${opts.jobKey}"`;
       const args = [
         "/create", "/f",
-        "/tn", opts.taskName,
+        "/tn", taskName,
         "/sc", "once",
         "/st", st,
         "/sd", sd,
@@ -85,7 +140,7 @@ export function createWindowsTaskScheduler(execFileFn: ExecFileFn = execFile as 
       return new Promise((resolve, reject) => {
         execFileFn("schtasks", args, (error, _stdout, stderr) => {
           if (error) {
-            reject(new Error(`schtasks /create failed for task '${opts.taskName}': ${stderr || error.message}`));
+            reject(new Error(`schtasks /create failed for task '${taskName}': ${stderr || error.message}`));
             return;
           }
           resolve();

@@ -11,9 +11,9 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 import type { AutoRecordCandidateInput } from "./auto-join.js";
-import { readScheduledKeys } from "./schedule-state.js";
+import { readScheduledKeys, readScheduledJob } from "./schedule-state.js";
 import { createHttpCandidateLoader, runScheduleTickOnce, type ScheduleTickDeps } from "./schedule-tick.js";
-import type { TaskScheduler, ScheduleOnceOptions } from "./task-scheduler.js";
+import { JOB_KEY_RE, type TaskScheduler, type ScheduleOnceOptions } from "./task-scheduler.js";
 
 function withTempDir(fn: (dir: string) => void | Promise<void>) {
   const dir = mkdtempSync(path.join(tmpdir(), "lkb-schedule-tick-"));
@@ -84,12 +84,84 @@ test("real (non-dry-run) run: schedules once via the injected scheduler and reco
 
     assert.equal(result.toSchedule.length, 1);
     assert.equal(calls.length, 1);
-    assert.equal(calls[0]!.taskName, "lkb-autorecord-gmail_c1");
-    assert.match(calls[0]!.args.join(" "), /start-record-detached\.ps1/);
-    assert.ok(calls[0]!.args.includes("-Until"));
-    const untilIdx = calls[0]!.args.indexOf("-Until");
-    assert.match(calls[0]!.args[untilIdx + 1]!, /^\d{2}:\d{2}$/, "-Until must be local HH:mm, not raw ISO");
+    // ISS-317 fix (cycle 2): scheduleOnce now takes only jobKey/launcherPath/runAtIso — no
+    // title/url/sessionId ever reaches it. jobKey is derived from the sessionKey and validated.
+    assert.match(calls[0]!.jobKey, JOB_KEY_RE);
+    assert.equal(calls[0]!.jobKey, "gmail-c1");
+    assert.match(calls[0]!.launcherPath, /start-record-detached\.ps1$/);
     assert.deepEqual([...readScheduledKeys(dir)], ["gmail:c1"]);
+  });
+});
+
+test("real (non-dry-run) run: persists url/until/title/sessionId to a per-job JSON file, keyed by jobKey (ISS-317)", async () => {
+  await withTempDir(async (dir) => {
+    const deps = baseDeps(dir);
+    await runScheduleTickOnce(deps, false);
+    const job = readScheduledJob(dir, "gmail-c1");
+    assert.ok(job, "expected a job file to have been written for jobKey 'gmail-c1'");
+    assert.equal(job!.url, CANDIDATE.meetingUrl);
+    assert.equal(job!.title, CANDIDATE.title);
+    assert.equal(job!.sessionId, "gmail:c1");
+    // ISS-319 fix: the FULL ISO end datetime is persisted, not a truncated local HH:mm.
+    assert.equal(job!.until, CANDIDATE.endTime);
+  });
+});
+
+test("ISS-317: no title/url/sessionId text ever reaches the scheduler — hostile title/url are " +
+  "contained to the job file, never the /tr-bound call", async () => {
+  await withTempDir(async (dir) => {
+    const hostileCandidate: AutoRecordCandidateInput = {
+      ...CANDIDATE,
+      id: "c-hostile",
+      title: 'Evil"; & powershell -Command "Remove-Item C:\\ -Recurse -Force"; `whoami` %COMSPEC% $(id)\ntrailing',
+      meetingUrl: "https://zoho.com/meeting/abc?tk=SECRET123\"; -Command evil&pwn|x;y$(z)`w",
+    };
+    const { scheduler, calls } = fakeScheduler();
+    const deps = baseDeps(dir, { scheduler, loadCandidates: async () => [hostileCandidate] });
+    const result = await runScheduleTickOnce(deps, false);
+
+    assert.equal(result.toSchedule.length, 1);
+    assert.equal(calls.length, 1);
+    // Everything the scheduler actually receives is clean: a validated jobKey + the fixed
+    // launcher path + a plain ISO timestamp. None of it can carry the hostile text through.
+    const call = calls[0]!;
+    assert.match(call.jobKey, JOB_KEY_RE);
+    assert.doesNotMatch(call.jobKey, /["&|;$`%\n]/);
+    assert.doesNotMatch(call.launcherPath, /["&|;$`%\n]/);
+    // The hostile text DID get persisted (safely, as JSON field values on disk) — that's the
+    // intended "still remember the real title/url" half of the fix, just never as a Task
+    // Scheduler argument.
+    const job = readScheduledJob(dir, call.jobKey);
+    assert.equal(job!.title, hostileCandidate.title);
+    assert.equal(job!.url, hostileCandidate.meetingUrl);
+  });
+});
+
+test("ISS-319: a session crossing midnight keeps its full end datetime, which is AFTER its own start", async () => {
+  await withTempDir(async (dir) => {
+    const midnightCandidate: AutoRecordCandidateInput = {
+      ...CANDIDATE,
+      id: "c-midnight",
+      startTime: "2026-09-28T18:00:00Z", // 23:30 IST
+      endTime: "2026-09-28T19:15:00Z", // 00:45 IST the next day
+    };
+    const deps = baseDeps(dir, {
+      loadCandidates: async () => [midnightCandidate],
+      now: () => "2026-09-28T17:56:00Z",
+    });
+    const result = await runScheduleTickOnce(deps, false);
+    assert.equal(result.toSchedule.length, 1);
+
+    const job = readScheduledJob(dir, "gmail-c-midnight");
+    assert.ok(job);
+    // The regression this guards against: a bare local HH:mm ("00:45") resolved against the
+    // START day landed ~23h in the past. The full ISO end datetime is unambiguous regardless of
+    // which local day it prints as.
+    assert.equal(job!.until, midnightCandidate.endTime);
+    assert.ok(
+      new Date(job!.until).getTime() > new Date(midnightCandidate.startTime as string).getTime(),
+      "the persisted end datetime must be AFTER the session's own start, even across midnight",
+    );
   });
 });
 
