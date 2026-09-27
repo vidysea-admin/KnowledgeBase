@@ -190,3 +190,150 @@ assumed. This is recorded honestly as `LIVE-BROWSER: SKIP`, not fabricated, and 
 substituted with a read of the maker's own (also-absent) browser evidence. Re-dispatching Mode D
 alone, once the shared profile is free, is expected to close this out with no source change
 required.
+
+## MODE D RE-DISPATCH (cycle 0)
+
+**Checker:** independent subagent, Mode D ONLY (Mode A/4b/4c/contract-adjudication above are
+UNCHANGED and NOT re-run — this dispatch judges only the live-browser gap left open above), bound
+to `D:/KnowledgeBase-lanes/iss-274-web-fallback-wire` (branch `wave/iss-274-web-fallback-wire`).
+**Date:** 2026-09-28. **Cycle checked:** 0 (re-dispatch of the same cycle; the maker changed
+nothing between the two checks).
+
+```
+VERDICT: PASS
+SCOREBOARD: 5/5 criteria met (post-amendment), 4/4 invariants hold — UNCHANGED from the prior
+  Mode A verdict above. This section adds only the Mode D result.
+FAILURES (if any): none
+CAPABILITY-COVERAGE: unchanged from above (4/5 rows independently reproduced; row 4 independently
+  reconfirmed by the checker's own compliant single-file mutation)
+LIVE-BROWSER: qa/evidence/browser-iss-274-wire-web-fallback-2026-09-28-checker/report.json
+ISSUES-WRITTEN: none (ISS-274WIRE-3 updated in place, not newly filed — see below)
+EXECUTOR: claude-sonnet-subagent (checker: claude-sonnet-subagent)
+EXPLANATION: The shared MCP Playwright profile (mcp-chrome-dde8b72) was still unavailable, so this
+  check drove its OWN isolated Playwright instance (headless Chromium, fresh userDataDir, launched
+  via a cached `playwright` package resolved through NODE_PATH — never touching the locked shared
+  profile) against a real vite dev server serving the real, unmodified AskPage.tsx. Both open
+  questions the prior verdict left unresolved are now settled with live evidence: (1) `/ask`
+  resolves to AskPage, not the dead second `DashboardPage` route — ISS-274WIRE-3 downgraded from an
+  open reachability question to a harmless cleanup item; (2) the honest-degradation message renders
+  correctly and accurately in a real browser. 0 console errors across all 3 page visits. PASS.
+```
+
+### Why the real production server could not be started, and what ran instead
+
+`apps/api/src/index.ts`'s `main()` calls `await connect(process.env.MONGODB_URL ?? "mongodb://localhost:27017", ...)`
+**before** it starts listening. This worktree has **no `.env` file at all** (confirmed:
+`ls -la .env*` finds only `.env.example`; not merely an unset key, no file) and no local Mongo is
+running, so the real production entrypoint cannot start regardless of anything in this unit's diff.
+This is a harder blocker than the prior checker's disclosed remote-Mongo timeout — there is no Mongo
+target configured here at all.
+
+To still verify the REAL shipped code live, in a real browser, this check wrote a small
+checker-owned evidence harness (never touching source, tests, or the manifest):
+
+- `qa/evidence/browser-iss-274-wire-web-fallback-2026-09-28-checker/harness-server.mts` — imports
+  `createServer` (`apps/api/src/server.ts`, **unmodified**) and `createTavilySearchFn`
+  (`apps/api/src/ask-web-fallback.ts`, **unmodified**) directly, and wires them into a `ServerDeps`
+  object. The web-fallback seam this unit exists to ship is **100% real, unmodified production
+  code** running with no `TAVILY_API_KEY` in the process env — the returned function genuinely
+  throws `TavilyUnavailableError`, exactly as it would in real production today. `askV2`
+  (`packages/ask/src/ask-v2.ts`, **unmodified**, reached transitively through the real,
+  **unmodified** `createAskRouter`) runs for real too, including its real try/catch honesty
+  wiring. Only the parts requiring live Mongo/embeddings/LLM-provider API keys — which this
+  worktree has none of, and which this unit never touched — are faked: `treeSearchFn` (always
+  returns `[]`, deterministically producing a real "no candidates" / `insufficient_coverage: true`
+  result from the REAL `evaluate()` logic, not a hand-typed fixture), `scoreFn` (unreachable given
+  empty candidates), `complete` (canned responses matching `packages/ask/src/testUtils.ts`'s own
+  existing fake shape), and the `ApiKeyStore`/`TreeStore` (in-memory stand-ins for `store.ts`'s
+  Mongo-backed versions, which this unit also never touched). This is the same fakes-only-around-
+  the-unrelated-Mongo/LLM-layer technique `ask-v2.test.ts` already uses — run here through a live
+  HTTP + real-browser round trip instead of `node:test`, which is exactly the independent
+  verification Mode D exists to add over trusting a test file.
+- Served on `http://127.0.0.1:3399` (free port, confirmed via `netstat` before use; torn down
+  after this check — verified `netstat` no longer shows a listener).
+- `apps/web` was served for real via `npx vite --port 5180 --strictPort` (real, unmodified
+  `AskPage.tsx`, real React Router, real CSS) with `VITE_API_BASE_URL=http://127.0.0.1:3399` in the
+  process env (Vite passes an already-set process-env `VITE_`-prefixed var through to
+  `import.meta.env` unchanged) — confirmed empirically: the browser's actual `/ask` POST landed on
+  `127.0.0.1:3399`, not `5173`/`3300`. Torn down after this check (verified via `netstat`).
+- The browser itself: `playwright`'s `chromium`, resolved via `NODE_PATH` pointing at an
+  already-cached `_npx` install (`C:\Users\Lenovo\AppData\Local\npm-cache\_npx\...\node_modules`,
+  no download performed, no `package.json`/lockfile touched in this worktree), launched
+  **headless** with a **fresh, isolated `userDataDir`**
+  (`C:/Users/Lenovo/AppData/Local/Temp/claude/checker-iss274wire-profile`, outside the bound
+  worktree) — never the shared `mcp-chrome-dde8b72` profile, so no lock contention was possible.
+  Context closed and the process exited cleanly at the end of the run (`tasklist` before/after
+  showed no leaked `chrome.exe` from this run).
+
+### 1. `/ask` route resolution — CONFIRMED, ISS-274WIRE-3 downgraded
+
+Navigated directly to `http://127.0.0.1:5180/ask` after pasting a key into `LoginGate` (client-side
+gate only; the real auth boundary is server-side per request, unaffected by this). Rendered:
+`<h1>Ask</h1>`, the `#ask-query` input present, the sidebar's "Ask" nav item highlighted active —
+this is **AskPage**, not `DashboardPage`. 0 console errors on this page load.
+Screenshot: `qa/evidence/browser-iss-274-wire-web-fallback-2026-09-28-checker/01-askpage-empty.png`.
+
+This settles the question the prior verdict left open under §8 ("Separately noted, out of this
+unit's scope"): React Router resolves the App.tsx duplicate to the **first** declared `/ask` route
+(`AskPage`, line 27), never reaching the dead second declaration (`DashboardPage`, line 35). The
+unit's entire UI surface **is** reachable and **was** testable through the real route, exactly as
+the prior verdict hoped but could not confirm. `ISS-274WIRE-3` is updated in place (not a new id):
+downgraded from an open reachability question to a low-severity cleanup item — the dead
+`<Route path="/ask" element={<DashboardPage />} />` line in `apps/web/src/App.tsx` should still be
+deleted (it can never render and is a latent trap for a future route reorder), but it blocks
+nothing today and is pre-existing, outside this unit's own diff (`git diff 2bda2f4...HEAD --
+apps/web/src/App.tsx` is empty, reconfirmed).
+
+### 2. The honest-degradation message — CONFIRMED accurate, live
+
+Submitted the off-corpus query "What is the current weather forecast for Reykjavik tomorrow?"
+through the real `#ask-query` input and the real submit button, waited on the real network response.
+
+**Real API response** (from the harness's genuinely-real `ask-v2.ts`/`ask-web-fallback.ts` code
+path, captured via `page.waitForResponse`):
+```json
+{ "verdict": "incorrect", "insufficient_coverage": true, "web_used": false,
+  "auditLog": [ ..., { "jobKind": "ask.web_fallback_unavailable",
+    "step": "web_fallback_unavailable: web fallback unavailable: TAVILY_API_KEY not configured" }, ... ] }
+```
+
+**Rendered on the real page** (screenshot:
+`qa/evidence/browser-iss-274-wire-web-fallback-2026-09-28-checker/02-askpage-answered.png`):
+> The router judged internal coverage insufficient for this question; the web fallback was reached
+> but is currently unavailable.
+
+This is the NEW, accurate message this unit added — distinct from, and not the stale, now-false
+"; no web fallback is configured." text. The message is TRUE for the actual state: a fallback IS
+configured (`production.ts` wires it unconditionally), it reached `TavilyUnavailableError`
+honestly, and the page says exactly that rather than lying that nothing is configured. 0 console
+errors on this interaction. The page also correctly shows "Internal sources (0)" / "Web sources
+(0)" — no fabricated sources on a genuinely-empty result.
+
+### 3. Console errors — clean
+
+0 console errors across all 3 page visits (`/` pre-login, `/ask` on load, `/ask` after submit) —
+recorded per-page in `report.json`'s `pagesVisited`.
+
+### 4. State change on submit — CONFIRMED
+
+Before submit: empty form, no answer card. After submit: Answer card appears with the model's
+text, the accurate empty-note message, verdict line (`verdict: incorrect — no candidates`), and
+zeroed Internal/Web source lists — a real, observed state transition, not a page that renders and
+does nothing (the defect class this mode exists to catch).
+
+### Ledger
+
+`qa/issues.274wire.jsonl`: `ISS-274WIRE-3` updated in place (status stays `open`, downgraded
+severity-in-practice per its own pre-written fix_direction: "If AskPage wins, downgrade this to a
+lint/cleanup-only duplicate-route removal") — title, evidence, fix_direction, reproductions and
+notes all updated to record this Mode D re-dispatch's live confirmation. No new issue id minted;
+nothing else filed. `ISS-274WIRE-1` and `ISS-274WIRE-2` are unaffected by this dispatch (Mode
+A/4b findings, out of Mode D's scope).
+
+### Verdict
+
+Mode A was already clean (5/5 criteria, 4/4 invariants, capability coverage independently
+reproduced). The sole open item was the mandatory Mode D live-browser check for a UI-touching
+unit, which is now complete, independent, and finds no defect: the UI surface is reachable, the
+honest-degradation message is accurate, and no unexpected console errors or dead interactions were
+observed. **VERDICT: PASS.**
