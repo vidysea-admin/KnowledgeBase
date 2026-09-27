@@ -71,3 +71,47 @@ decision.
 
 **Gate status:** OPEN — awaiting the Approver. Also carries the ISS-268 disposition question, which has
 been open since that row was filed and is now more urgent
+
+## MEASUREMENT TAKEN — 2026-09-28, before asking. It changes the answer.
+
+The maker said above that it had not checked whether anything invokes `.codex/hooks/`, and that the
+check would decide between the options on evidence. The check has now been run, and the answer is
+**yes, the mirror is live-configured and the Codex CLI is installed on this machine.**
+
+- **`.codex/hooks.json` exists** (committed in the same commit `eff401b`, previously unnoticed because
+  the earlier scan looked only at `.codex/hooks/`) and it wires **all six** scripts by absolute path:
+  `PreToolUse` on `Bash|PowerShell` → `mc-precommit.ps1`; `SessionStart` → `lab-session-start.ps1` and
+  `mc-sessionstart.ps1`; `SessionEnd` → `lab-session-end.ps1` and
+  `features-snapshot-session-end.ps1`.
+- **The Codex CLI is installed:** `C:/Users/Lenovo/AppData/Local/Programs/OpenAI/Codex/bin/codex`.
+
+So this is not dormant code on disk. **Any Codex session opened in this repo runs a SessionStart hook
+that reports the undercounted open-issue figure and matches manifest status with the pre-D-034 naive
+substring** — the two defects D-041 and D-034 were written to close. ISS-355 is therefore **live wrong,
+not latent**, which is a stronger claim than the row was filed with.
+
+**This removes option (a) as a free choice.** Deleting `.codex/hooks/` without also removing the
+`hooks.json` wiring would leave a config pointing at absent files; deleting both would leave Codex
+sessions in this Lab Protocol repo running with **no governance hooks at all** — no session-start
+directive, no pre-commit guard, no decisions-append guard. That is a worse state than a stale mirror,
+because the stale mirror at least still blocks the things `mc-precommit.ps1` blocks.
+
+**The maker's recommendation, now that it has the evidence: option (c), replace the copies with links.**
+There is then one implementation per hook and divergence is impossible by construction rather than
+policed by a lint that someone must keep passing. The single unverified assumption is whether the Codex
+CLI resolves Windows symlinks or junctions when PowerShell is invoked with `-File` against them — it
+almost certainly does, since PowerShell itself follows them, but that should be proven with one hook
+before all six are converted. If it turns out not to, **(b)** is the fallback: keep the copies, write the
+authorizing entry the mirror never had, and add a structure-lint rule that fails on any divergence
+modulo line endings.
+
+Either way, two things are true regardless of which option is chosen and should be done as part of it:
+the mirror still has **no authorizing DECISIONS entry** despite being an enforcement path, and the three
+reintroduced defects are live in a configured hook **right now**.
+
+**Note on provenance:** `eff401b` is a maker tick commit — *"tick: maker 2026-09-27 17:5x - tier 2,
+ISS-337 built, checker dispatched"*. So the mirror was created by a maker loop as an incidental part of
+a tick about something else, with no manifest, no verdict and no authorizing entry for the
+enforcement-path files it added. That is the same class as the unauthorized `delivery-gate-stop.ps1`
+edits recorded in `qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md`, and it is the second
+instance of a loop quietly widening its own enforcement surface.
