@@ -11,7 +11,11 @@ three ISS rows themselves — see "Issues addressed")
 
 ## STATUS — read this first
 
-**Status: BLOCKED (not ready-for-check).** All three fixes are implemented, root-caused, and unit-
+**Status:** ready-for-check
+
+**Status update 2026-09-27T07:30+05:30 (maker):** moved to ready-for-check on the code claim only. Umesh chose first-hand (AskUserQuestion "Wait for merge (Recommended)") to run the live index step from D:\KnowledgeBase AFTER this branch merges, because the lane run hit the ISS-308 two-module-instance artefact (see "Live repair run - 2026-09-27" below). Checker: judge the three fixes on the unit evidence; ISS-304/305/306 stay OPEN in the ledger until the post-merge `--reingest` shows chunks > 0 against the issues' own reproductions (D-015). The history below is kept as written.
+
+Previous status (historical): BLOCKED (not ready-for-check). All three fixes are implemented, root-caused, and unit-
 tested in this worktree (branch `wave/u2-fix1-ingest-guards`, base `ca07376`) — see "What changed"
 and "Capability coverage" below, all green. **Step 4's LIVE REPAIR (delete the bad
 `2026-09-25-infocu` rows, re-ingest Drive id `1mJI5wuOvDuNu7A_sBj191Pe6-Olm18ri` under the
