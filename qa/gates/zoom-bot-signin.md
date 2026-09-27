@@ -21,3 +21,4 @@ Follow-up for maker (not blocking today): `cli login` should launch plain Chrome
 so Google SSO works; plus session-expiry detection (feedback-inbox).
 
 2026-09-27T09:08:02.7726331+05:30 — maker: ISS-U0-1 iframe traversal (+U0-4/5/6/7) merged b2830c8, checker PASS cycle 3, 35/35 py tests on master. Launch step is HUMAN: reading raw/webinars/2026-09-27-ashoka-join-url.txt was refused by the auto-mode classifier (Credential Materialization) and is not re-routed. Umesh runs the launch command from his own PowerShell at ~10:50 (see maker session reply). Live verification = his run's raw/webinars/record-<stamp>.log.
+Confirmed: 2026-09-27T10:23:00.4651181+05:30 - Umesh first-hand in maker session knowledgebase-ed, verbatim 'krr tho liyaa thaa remember' (sign-in already done). Not independently verified (reading the bot profile's Zoom session would be credential material); the ~10:50 live launch log is the verification.
