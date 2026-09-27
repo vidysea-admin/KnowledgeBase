@@ -172,3 +172,137 @@ test("ISS-255: handover markers do not block genuine direct self-naming in the s
   );
   assert.equal(resolved.length, 1, "self-naming overrides the handover refusal");
 });
+
+/**
+ * ISS-104 cycle 4 — D-015, ENFORCED BY THE SUITE rather than by good intentions.
+ *
+ * D-015 exists because cycle 3 measured 12/12 against a 12-case corpus it authored that same
+ * cycle while the ledger's own 20 gave 15/20. The rule was then written down, and the corpus
+ * above was transcribed by hand — which leaves the identical failure one careless edit away: drop
+ * a row, soften a string, and the suite goes green against a smaller exam with nobody the wiser.
+ *
+ * So the corpus is checked against the ledger itself. This test reads ISS-104's own `evidence`
+ * field out of `qa/issues.jsonl` (per D-019, the union of the canonical file and any lane shards),
+ * re-parses its recorded reproductions, and asserts the array above is byte-identical in content
+ * and order. A future cycle can no longer quietly shrink its denominator: it fails here first.
+ *
+ * ISS-104 is the ledger id; it was filed as ISS-093 on `lane/a-speakers` and the row's
+ * `id_collision` field records the renumber, which is why the constant above keeps the old name
+ * and every manifest in this seam cites both.
+ */
+test("D-015: the corpus above is byte-faithful to ISS-104's own recorded reproductions", async () => {
+  const { readFileSync, readdirSync } = await import("node:fs");
+  const { join, dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+
+  // walk up from this test file to the repo root (the directory that owns `qa/`)
+  let root = dirname(fileURLToPath(import.meta.url));
+  for (let hop = 0; hop < 12 && !existsIn(root, "qa"); hop++) root = dirname(root);
+  function existsIn(dir: string, child: string): boolean {
+    try { return readdirSync(dir).includes(child); } catch { return false; }
+  }
+  assert.ok(existsIn(root, "qa"), "repo root with qa/ must be findable from the test file");
+
+  const qa = join(root, "qa");
+  const shards = readdirSync(qa).filter((f) => f === "issues.jsonl" || /^issues\..+\.jsonl$/.test(f));
+  assert.ok(shards.length > 0, "at least the canonical ledger must exist");
+
+  let row: { evidence: string } | undefined;
+  for (const shard of shards) {
+    for (const line of readFileSync(join(qa, shard), "utf8").split("\n")) {
+      if (!line.trim()) continue;
+      const parsed = JSON.parse(line) as { id?: string; evidence?: string };
+      if (parsed.id === "ISS-104" && typeof parsed.evidence === "string") row = { evidence: parsed.evidence };
+    }
+  }
+  assert.ok(row, "ISS-104 must be present in the ledger union (D-019)");
+
+  // Recorded shape, verbatim from the evidence field: "TEXT"/"NAME"->person:id
+  const recorded = [...row.evidence.matchAll(/"([^"]+)"\/"([^"]+)"->person:/g)].map(
+    (m) => [m[1]!, m[2]!] as [string, string],
+  );
+  assert.equal(recorded.length, 20, "ISS-104 records exactly 20 reproductions");
+  assert.deepEqual(
+    ISS_093_CORPUS,
+    recorded,
+    "the in-file corpus must equal the ledger's own cases, in order — substituting a corpus is the D-015 defect",
+  );
+});
+
+/**
+ * ISS-104 cycle 4 — the CLOSED-CLASS ENUMERATION, one standing case per class.
+ *
+ * The chargeable half of ISS-104 was `not`, a negation particle; the six rounds before this one
+ * each added the single word they were shown. Adding `not` alone would have been the seventh.
+ * Measured instead: of 406 words enumerated from the closed classes of English, 277 were absent
+ * from `NEVER_A_PERSON` and ALL 277 shipped a fabricated person — every one through this exact
+ * `"I am <Word> sure about that."` shape, the one ISS-104 recorded for `Not`.
+ *
+ * What is pinned here is the CLASS, not the words: one representative per class, so a future
+ * refactor that drops a class reddens a named test instead of quietly reopening a whole grammar
+ * category. The full 406 are the audit in the manifest; these are the sentinels.
+ */
+const CLOSED_CLASS_SENTINELS: [string, string[]][] = [
+  ["pronoun (reflexive/possessive)", ["Myself", "Theirs", "Itself"]],
+  ["pronoun (indefinite)", ["Anything", "Another", "Nothing"]],
+  ["interrogative / relative", ["Whom", "Whatever", "Which"]],
+  ["conjunction / conjunctive adverb", ["Because", "However", "Although"]],
+  ["preposition", ["Between", "Despite", "Towards", "Via"]],
+  ["auxiliary / modal", ["Should", "Might", "Been"]],
+  ["adverbial particle", ["Away", "Together", "Aside"]],
+  ["negator", ["Nowhere", "Nope"]],
+  ["degree / focusing adverb", ["Hardly", "Entirely", "Rather"]],
+  ["deictic / temporal adverb", ["Tonight", "Already", "Always"]],
+  ["numeral / ordinal", ["Seven", "Twelve", "Third"]],
+  ["greeting / farewell", ["Namaste", "Goodbye", "Cheers"]],
+  ["acknowledgement", ["Indeed", "Certainly", "Noted"]],
+  ["interjection / filler", ["Hmm", "Oops", "Wow"]],
+  ["evaluative response", ["Perfect", "Brilliant", "Awesome"]],
+  ["calendar term", ["Weekend", "Hour", "Year"]],
+];
+
+for (const [className, words] of CLOSED_CLASS_SENTINELS) {
+  for (const word of words) {
+    test(`ISS-104 closed class — ${className}: refuses ${JSON.stringify(word)}`, async () => {
+      const text = `I am ${word} sure about that.`;
+      const { resolved } = await extractSpeakers([turn("t1", "spk:0", text)], replies([
+        { speakerRef: "spk:0", displayName: word, turnIds: ["t1"] },
+      ]));
+      assert.deepEqual(resolved, [], `${word} is a ${className}, not a person`);
+    });
+  }
+}
+
+/**
+ * ISS-104 cycle 4 — the NAME-COLLISION COST, pinned in both directions so it stays visible.
+ *
+ * `will`, `can`, `dare`, `need`, `day` and `true` are closed-class words that are also attested
+ * personal names, so a BARE single-token "Will" is now refused. That cost is deliberate — C12
+ * makes these guards the only barrier against a fabricated identity, so refusal is the safe
+ * direction of error, and `may`/`march`/`june`/`august` have carried the same cost as month names
+ * since cycle 3. It is pinned rather than merely documented because a silent recall loss is
+ * exactly what ISS-098 was.
+ *
+ * The bound on the cost is `isDiscourseOnly`'s ALL-tokens rule: multi-token names are untouched.
+ * If a later cycle changes that to ANY-token, the second test here goes red immediately.
+ */
+test("ISS-104 collision cost: a bare closed-class name is refused (accepted, documented)", async () => {
+  const { resolved } = await extractSpeakers([turn("t1", "spk:0", "My name is Will and I lead admissions.")], replies([
+    { speakerRef: "spk:0", displayName: "Will", turnIds: ["t1"] },
+  ]));
+  assert.deepEqual(resolved, [], "bare 'Will' is refused — the accepted cost of the modal class");
+});
+
+for (const [text, name] of [
+  ["My name is Will Smith and I lead admissions.", "Will Smith"],
+  ["Good morning Doris Day, please go ahead.", "Doris Day"],
+  ["This is Can Ozturk from the Istanbul office.", "Can Ozturk"],
+] as [string, string][]) {
+  test(`ISS-104 collision bound: multi-token ${JSON.stringify(name)} still resolves`, async () => {
+    const { resolved } = await extractSpeakers([turn("t1", "spk:0", text)], replies([
+      { speakerRef: "spk:0", displayName: name, turnIds: ["t1"] },
+    ]));
+    assert.equal(resolved.length, 1, "isDiscourseOnly requires EVERY token — a real surname rescues the name");
+    assert.equal(resolved[0]?.displayName, name);
+  });
+}
