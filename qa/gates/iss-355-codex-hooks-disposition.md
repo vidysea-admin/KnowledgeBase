@@ -115,3 +115,36 @@ a tick about something else, with no manifest, no verdict and no authorizing ent
 enforcement-path files it added. That is the same class as the unauthorized `delivery-gate-stop.ps1`
 edits recorded in `qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md`, and it is the second
 instance of a loop quietly widening its own enforcement surface.
+
+## PROVENANCE CORRECTION — 2026-09-28, same day, correcting the paragraph above
+
+The "Note on provenance" above says the mirror was *created* by a maker tick. That is wrong, and the
+correction matters because it changes both who did what and what the fix should be.
+
+All six scripts and `hooks.json` carry an mtime of **2026-09-24 23:08** — every one identical, which is
+the signature of a one-shot setup step, almost certainly whatever configured the Codex CLI for this repo
+on that date. They were **committed** three days later by `eff401b` on 2026-09-27, a maker tick about
+ISS-337.
+
+So the accurate account is: the files were authored on 24 Sep by a Codex setup, sat **untracked** for
+three days — which is exactly the state ISS-268 describes, an untracked shadow awaiting a disposition
+decision — and then a maker tick **committed them without authorization**, converting an open question
+into a sanctioned-looking part of the repo. The loop did not write the stale logic; it made it official.
+
+Two consequences:
+
+1. **"Born already stale" needs restating.** The copies were taken on 24 Sep from the `.claude` originals
+   as they were **at that moment**. D-041 (the ledger union) and the D-034 status-regex hardening landed
+   **after** that date, so the mirror did not reintroduce fixes that already existed — it froze a
+   snapshot which has since been overtaken. The end state is identical and just as wrong in a live hook,
+   but the mechanism is drift-by-copy, not a regression authored on top of a fix. That distinction is why
+   option (c), linking, is the right structural answer: a copy taken at any instant is stale from the next
+   commit onward, so the problem is the copying, not the copier's care.
+2. **The authorization failure is narrower and more specific.** It is not "a loop invented an enforcement
+   surface". It is that a maker tick `git add`-ed enforcement-path files that had no authorizing entry,
+   inside a commit about an unrelated unit. That is a pathspec-discipline failure — the same class the
+   repo already guards against by requiring narrow pathspecs — and it argues for a mechanical check that
+   refuses to commit any file under a hooks directory without a matching DECISIONS entry, which would have
+   caught this and would also have caught the `delivery-gate-stop.ps1` commits.
+
+The recommendation above (option (c), links; (b) as fallback) is unchanged by this correction.
