@@ -94,3 +94,81 @@ export function slugSessionId(date, title) {
     .slice(0, 60);
   return `${date}-${slug || randomUUID().slice(0, 8)}`;
 }
+
+// ---- ISS-306: date + title derivation for a Drive recording -------------------------------
+//
+// `ingestOneDriveFile` used to take the session date from `file.createdTime` (when the
+// organizer's file landed in Drive) and the title from a filesystem-safe `stem` that had ALSO
+// been mangled by an off-by-one in its own extension-stripping (see ingest-chain.mjs's `stem`
+// fix, same unit). Both were wrong on this unit's own first live file: "24th Sep : InFocus",
+// uploaded to Drive a day later, became session `2026-09-25-infocu` instead of
+// `2026-09-24-in-focus`. The fix below prefers the file's OWN stated date (TOC's Drive naming
+// convention is "<day><suffix> <Mon>: <title>" — every hand-named recording in this Drive folder
+// follows it) and, when that date matches a TOC calendar row, uses the CALENDAR's own agenda
+// text as the title — which is exactly how the existing hand-authored `data/toc-migrated/`
+// directories are named (e.g. calendar agenda "UniAccess : Japan" -> `uniaccess-japan`), so a
+// watcher-derived id lands on the same slug a human curating U1 would have picked.
+
+const MONTH_ABBR = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+
+/** Extracts `{day, monthIndex}` from a Drive title that starts with TOC's own naming convention
+ * ("24th Sep : InFocus", "2nd Sep: India Test Series..."). Returns `null` for a title with no
+ * such prefix (e.g. a Drive-generated "video1968958572.mp4") — the caller falls back to
+ * `createdTime`. */
+export function parseDayMonthFromTitle(rawName) {
+  const m = /^\s*(\d{1,2})(?:st|nd|rd|th)?\s+([a-z]{3,9})\b/i.exec(rawName || "");
+  if (!m) return null;
+  const day = Number(m[1]);
+  const monthIndex = MONTH_ABBR.indexOf(m[2].slice(0, 3).toLowerCase());
+  if (monthIndex === -1 || day < 1 || day > 31) return null;
+  return { day, monthIndex };
+}
+
+/** TOC's membership/program year: April(index 3)..December is `firstYear`, January..March is
+ * `firstYear + 1` — the same rule `packages/ingest/src/sources/toc-calendar.ts`'s own
+ * `yearForMonth` encodes. Re-stated here (3 lines) rather than imported: that module is a
+ * `packages/ingest` source adapter and this one is a `scripts/watch` lib — crossing that
+ * boundary for a rule this small would add a dependency edge for no real reuse benefit. */
+export function yearForProgramMonth(monthIndex, firstYear) {
+  return monthIndex >= 3 ? firstYear : firstYear + 1;
+}
+
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
+/** Strips a leading "<day><suffix> <Mon>[.]<sep>" prefix, same shape `parseDayMonthFromTitle`
+ * recognizes — used only as the title fallback when no TOC calendar row matches the derived
+ * date. */
+function stripDatePrefix(rawName) {
+  return (rawName || "").replace(/^\s*\d{1,2}(?:st|nd|rd|th)?\s*[a-z]{3,9}\.?\s*[-:–—]?\s*/i, "").trim();
+}
+
+/**
+ * @param {{
+ *   rawName: string, createdTime?: string,
+ *   calendarEvents?: {date: string, agenda: string}[], programYearFirstYear?: number,
+ * }} opts
+ * @returns {{date: string, title: string}}
+ */
+export function deriveSessionDateAndTitle({ rawName, createdTime, calendarEvents = [], programYearFirstYear }) {
+  const parsed = parseDayMonthFromTitle(rawName);
+  let date;
+  if (parsed) {
+    const firstYear = programYearFirstYear ?? new Date(createdTime || Date.now()).getUTCFullYear();
+    const year = yearForProgramMonth(parsed.monthIndex, firstYear);
+    date = `${year}-${pad2(parsed.monthIndex + 1)}-${pad2(parsed.day)}`;
+  } else {
+    // No day/month pattern in the title at all — createdTime is the best signal left, and it is
+    // usually the UPLOAD, one day after the real session on this unit's own first live file.
+    const created = new Date(createdTime || Date.now());
+    created.setUTCDate(created.getUTCDate() - 1);
+    date = created.toISOString().slice(0, 10);
+  }
+
+  const calendarMatch = calendarEvents.find((e) => e.date === date);
+  if (calendarMatch) return { date, title: calendarMatch.agenda.trim() };
+
+  const stripped = stripDatePrefix(rawName);
+  return { date, title: stripped || (rawName || "").trim() || date };
+}
