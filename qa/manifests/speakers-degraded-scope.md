@@ -103,3 +103,5 @@ Not UI-touching — no surface changed. Changed paths:
 - `qa/manifests/speakers-degraded-scope.md` (this file)
 
 ## Status: checked-PASS — qa/verdicts/speakers-degraded-scope.md (Cycle checked: 0, 8d8ac20); merged to master
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -90,3 +90,5 @@ Pure code change, reversible by `git revert`. No production data touched (read-o
 unchanged behavior on the happy path — confirmed live).
 
 **Status: checked-PASS**
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

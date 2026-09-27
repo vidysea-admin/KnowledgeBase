@@ -226,3 +226,5 @@ tests flake — the ISS-323(a,b) liveness wait and a pre-existing ISS-324 timing
 **Gated, non-blocking:** `node scripts/lint-loc.mjs` still fails with exactly the 4 declared C1
 violations (`speakers-llm.ts:313`, `sb_join.py:437`, `obs-windows.ts:352`, `run-watch.mjs:447`) —
 the state `qa/gates/obs-windows-loc-split.md` is waiting on Umesh to resolve.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

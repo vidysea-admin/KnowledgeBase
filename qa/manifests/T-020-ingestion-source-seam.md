@@ -178,3 +178,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration (105 lines, budget 200)
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-020-ingestion-source-seam.md (Cycle checked: 1, commit 3d2bb6f) — 7/7 criteria met; C1 amended (Turn reuse ruled correct).
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

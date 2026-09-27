@@ -88,3 +88,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration (109 lines, budget 200)
 - `apps/api/src/score.test.ts` (new file, 4 tests)
 - `apps/api/src/production.ts` (wired `createLlmScorer` as the default scorer)
 - `qa/contracts/real-llm-scorer.md` (new contract, maker-drafted)
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

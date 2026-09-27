@@ -93,3 +93,5 @@ Pure additive route + one contract-relevant score change. Reversible by `git rev
 production data touched (read-only route).
 
 **Status: checked-PASS**
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

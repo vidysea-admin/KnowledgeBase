@@ -124,3 +124,5 @@ check time. The script is saved in this session's scratchpad
 4. **Confirmed ISS-056's fix untouched** and both cross-path independence tests (degraded summarize
    doesn't affect claims; degraded claims doesn't affect summarize) are real and passing.
 5. Full suite 339/339, typecheck 10/10 clean, fresh run.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

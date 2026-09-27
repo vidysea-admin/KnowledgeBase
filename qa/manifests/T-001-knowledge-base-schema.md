@@ -45,3 +45,5 @@ Exit code: 0
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-001-knowledge-base-schema.md (commit 2ce65d1) — 8/8 criteria met.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

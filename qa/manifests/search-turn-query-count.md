@@ -59,3 +59,5 @@ replayed an output-preserving per-hit `turns.findOne` mutation, observed the foc
 three forbidden lookups, restored `search-store.ts` byte-identically, and re-confirmed focused 1/1,
 full API 173/173, API typecheck, structure lint, and diff-check. ISS-085 moved `open -> fixed` and
 remains unverified. Closed 2026-09-09.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

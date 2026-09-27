@@ -128,3 +128,5 @@ Fixed in the next unit, `derived-input-trust` (which derives the input set from 
 reader), rather than in a fix cycle here — so this manifest is superseded, not stalled. Its own
 contributions (behaviour-pinned gates, trust for `.goal/catalogue.json`, the staged-file and CRLF
 fixes) shipped and were re-verified as holding through cycle 2 of the successor unit.
+
+**Handshake status:** superseded — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

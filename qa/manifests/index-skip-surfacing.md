@@ -117,3 +117,5 @@ one, because the honest fix (add the row) cannot clear it. Regex widened, two te
 **`lint:structure` is still red, and only the other lane can clear it.** After my fixes, the sole
 remaining g1 findings are `U2.4`'s unknown status `"partial"` and its `pending`/`partial` divergence
 — `lane/a-speakers`' row, mid-cycle. ISS-117 stands.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

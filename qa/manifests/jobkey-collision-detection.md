@@ -260,3 +260,5 @@ Once U6's poller exists, `deps.log`'s destination needs a real consumer. Until t
 the CLI sees the collision refusal directly; after U6 it would be a refusal logged where nothing reads
 it — which is exactly the "looked like it worked" class that ISS-271/272 closed earlier today. Noted
 here and in the verdict so U6 inherits it rather than rediscovering it.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

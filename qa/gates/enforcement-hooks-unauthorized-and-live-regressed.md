@@ -164,3 +164,10 @@ the file is covered.
 Answering this gate should therefore cover **all three**, not the first alone.
 
 **Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file
+
+Answered: 2026-09-27T17:2x+05:30 — PROCESS CHOSEN, approval still pending — Umesh first-hand,
+AskUserQuestion in session 21132795: "Audit them, then I approve what stays". Sequence: run
+/aios-config-auditor over .claude/hooks/*, present each hook's behaviour + what changed against the
+last approved state, then Umesh approves the final set in ONE decision, which becomes the
+Approved-by entry. NOTE: this is not yet an approval of the current hooks — nothing is committed as
+authorized on the strength of this line. Covers ISS-189/190/200/201/219/220.

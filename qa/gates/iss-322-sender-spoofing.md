@@ -11,3 +11,10 @@
 Answered: 2026-09-27T10:32:00+05:30 - (a) require Gmail Authentication-Results (dkim/spf pass aligned with From domain) before a candidate counts as trusted - Umesh in chat to checker session knowledgebase-7a, verbatim "email verification lgaa do". Scribed by /checker; build is the maker's (not blocking today's webinar; do not build/merge into the shared launcher path before the live run ends).
 
 **Gate status:** ANSWERED — recorded inline: 2026-09-27T10:32:00+05:30 - (a) require Gmail Authentication-Results (dkim/spf pass aligned with From domain) 
+
+Answered: 2026-09-27T17:2x+05:30 — option (b) "Yes required, but keep running meanwhile" — Umesh
+first-hand, AskUserQuestion in session 21132795. Ruling: sender authentication (SPF/DKIM/DMARC on
+the scanned inbox) IS a hard invariant of the auto-record feature and must be written into
+qa/contracts/u5-auto-record-scheduler.md as an [I*]; auto-join is NOT switched off while it is
+built. Umesh explicitly accepted the interim window of risk on his own inbox. Resolves the
+invariant-set question ISS-328 was holding the contract on.

@@ -157,3 +157,5 @@ Appended verbatim to `qa/feedback-inbox.md`.
    survives the entire suite and typecheck, and live it took two scratch tenants 1→0. Not chargeable
    to this unit (HEAD had the identical hole), and this unit is what makes it cheap to close — the
    fake db need only record filters as well as op names.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

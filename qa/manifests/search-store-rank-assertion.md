@@ -149,3 +149,5 @@ this session of the mutation-concurrency hazard already logged as a PATTERN in `
 instances were a sweep *reading* a mutated file; this one is a mutation *surviving* its own restore
 verification, which is a stronger failure and argues the mutation protocol needs a post-restore
 re-verification at close-out, not only at restore time.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

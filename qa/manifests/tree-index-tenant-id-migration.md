@@ -226,3 +226,5 @@ the checker's most thorough independent re-verification of the whole session.
    had never fired in any prior unit's test run.
 6. **`down()` as a no-op ruled correct**, given `tenantId` is now required to find a root at all.
 7. Full suite 344/344, typecheck 10/10, schema/gen-types/lint:structure all clean, fresh runs.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

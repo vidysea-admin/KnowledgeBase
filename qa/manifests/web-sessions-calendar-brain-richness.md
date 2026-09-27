@@ -113,3 +113,5 @@ Review Meeting", "startTime":"2026-09-07T17:00:00+05:30", "meetingUrl":
    fabricated data anywhere in the Sessions/Calendar/Brain rewrites.
 5. Real browser: `/sessions`, `/calendar`, `/brain` all render correctly; the Brain panel is
    visible before any click.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

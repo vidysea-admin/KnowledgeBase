@@ -378,3 +378,5 @@ sweep duty on its own side. Filed as ISS-164; that is the next unit on this seam
 **The red gate was honest disclosure**, confirmed by link: the finding was correct, the contract was
 committed by a checker ten minutes earlier, and the gate really was exit 0 at `3380e84`. As owner of
 `qa/contracts/` the checker cleared it itself, so master is green again.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

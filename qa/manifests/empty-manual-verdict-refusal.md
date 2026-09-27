@@ -74,3 +74,5 @@ dupes, migrations OK, SNAPSHOT fresh, 0 dependency-cruiser violations).
 Pure code change, one-line guard, reversible by `git revert`. No production data touched.
 
 **Status: checked-PASS**
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

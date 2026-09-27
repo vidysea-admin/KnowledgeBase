@@ -134,3 +134,5 @@ initial contract creation is always human-approved and the maker is not the huma
 measured at 26k lines of governance prose against 10k of source, a self-authorised contract is
 exactly what the D-013 override exists to stop. It recommended a four-criterion version to Umesh in
 the verdict instead. I think it was right to refuse.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

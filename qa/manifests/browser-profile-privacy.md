@@ -72,3 +72,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration (111 lines, budget 200)
 A real Playwright `BrowserLauncher` implementation consumes `resolveProfileDir`'s output as its
 persistent-context path. A future live-monitor UI/worker collects `privateWindows` from a "mark
 private now" control and calls `excludePrivateSegments` before turns reach the ingest pipeline.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

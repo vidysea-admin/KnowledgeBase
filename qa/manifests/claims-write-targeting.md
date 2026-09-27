@@ -112,3 +112,5 @@ survivor. That is a real trap in every mutation result in this project, includin
   `qa/gates/vector-retrieval-contract.md` rather than left in a manifest again.
 - **9 of the 81 claims lack `topicRefs` entirely** rather than carrying `[]`. Predates this unit,
   but a future backfill's idempotency check must not assume the field exists.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

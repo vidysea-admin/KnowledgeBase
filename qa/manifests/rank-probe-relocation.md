@@ -109,3 +109,5 @@ queries now print `UNVERIFIED`, not silence.
 `genuinely_not_user_facing` in `qa/ui-surfaces.json`.
 
 ## Status: checked-PASS
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -154,3 +154,5 @@ The one behavioural edge: a query whose tokens are all stripped now returns `[]`
 instead of scanning everything and returning `[]` anyway — same output, less work.
 
 **Status: checked-PASS** — PASS from `qa/verdicts/search-prefilter.md` (Cycle checked: 1, matching Fix cycle 1), committed `8d0734c`. Closed out on the 2026-09-08 reconcile tick.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

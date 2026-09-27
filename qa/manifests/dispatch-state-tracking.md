@@ -116,3 +116,5 @@ If that checker dies, this is the first unit in the repo whose death is visible 
 `genuinely_not_user_facing`, and neither file is imported by `apps/` or `packages/`.
 
 ## Status: checked-PASS
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

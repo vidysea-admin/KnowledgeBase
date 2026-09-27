@@ -209,3 +209,5 @@ Status line, and the close-out then demonstrated it by editing the one bolded li
 was never a status at all — destroying the record of which forms used to be invisible, inside the
 document whose only job was to record them. The real status line was closed out correctly later; it
 was only the evidence that stayed corrupted, which is why the sweep could still see it at 13:47.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -265,3 +265,5 @@ bar it wrote before this build landed (`qa/evidence/ui-epic-2026-09-24/checker-p
    but `.tsx` is not covered by `lint-loc` at all (`structure.config.json` `loc.extensions` is
    `.ts/.py/.mjs`). The split here was deliberate rather than lint-forced; flagging that the budget
    would not have caught a monolith.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

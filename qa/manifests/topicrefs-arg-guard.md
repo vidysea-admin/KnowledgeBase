@@ -299,3 +299,5 @@ worked examples concern a Mongo filter selecting which *document* a write hits, 
 a predicate selecting which *values* the write's body carries. Same shape, but the citation is a
 reading of C4 rather than a literal instance of it — worth stating, since a citation that does not hold
 up is worse than none (ISS-341).
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

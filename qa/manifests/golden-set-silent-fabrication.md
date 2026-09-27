@@ -243,3 +243,5 @@ is unchanged — there were no recorded reproductions to replay, so authoring a 
 not a D-015 substitution — but "absent" and "null" are different claims about a ledger row, and a
 manifest that paraphrases the ledger instead of parsing it is how a wrong id or a wrong field slips
 through later. Recorded rather than silently edited.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

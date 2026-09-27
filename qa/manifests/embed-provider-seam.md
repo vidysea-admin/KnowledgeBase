@@ -136,3 +136,5 @@ the contract predated the seam and U1.2–U1.5 would otherwise be judged against
 foundation. It **deliberately did not** add a `dims > 0` criterion, on the grounds that *writing a
 new criterion to fail the unit in front of you distorts the gate as surely as softening one would*.
 That is the right call and worth recording as precedent — the gap lives in ISS-096 instead.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

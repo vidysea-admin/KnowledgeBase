@@ -87,3 +87,5 @@ criterion. Two things for the checker to weigh, and I am deliberately not decidi
    Approver.
 
 ## Status: checked-PASS
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -211,3 +211,5 @@ lost: (1) the `qa/evidence/` dirty-file exclusion is a regex rather than a path 
 ledger, still strictly better than a constant; (3) **292/300 LOC means the next change to
 `live-verify.mjs` must extract, not append**; (4) unrelated to this unit, `qa/issues.jsonl`
 line 17 is malformed JSON — already tracked as ISS-020, left byte-intact per append-only.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

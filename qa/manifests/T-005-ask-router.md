@@ -50,3 +50,5 @@ exit: 0
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-005-ask-router.md (Cycle checked: 2, commit 129f8f1) — 7/7 criteria met; ISS-001..003 verified.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

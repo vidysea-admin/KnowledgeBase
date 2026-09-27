@@ -126,3 +126,5 @@ thing stopping the throw.
 consequence), so the never-capped clause does not apply and **ISS-122 must not become a round-3
 unit**. It is verified inside the next unit that touches `vector-gap.ts` for an independent reason.
 Recorded here so the next tick cannot quietly re-open the seam.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

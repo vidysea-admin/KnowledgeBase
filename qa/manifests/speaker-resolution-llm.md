@@ -164,3 +164,5 @@ something writes it down.
 
 **U2.4 deliberately left open.** This unit persists nothing and does not flip B3/B10 by its own
 statement, so closing the goal task on this PASS would overclaim.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

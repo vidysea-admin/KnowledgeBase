@@ -297,3 +297,5 @@ verdict is the checker's, running its own script — `qa/evidence/ui-epic-2026-0
     I kept the 404 (with an explanatory `message`) and made the UI render it as an honest empty
     state. Turning it into a 200-with-empty-nodes would have broken the [I1] probe set verbatim.
     Flagging it explicitly rather than narrowing either one quietly.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

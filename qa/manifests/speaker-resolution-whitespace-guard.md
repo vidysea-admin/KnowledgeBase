@@ -115,3 +115,5 @@ Its forward note, recorded here so the next unit does not rediscover it: the pro
 emit a `displayName` containing a **literal newline or tab** — verbatim per C2 as written, but it
 would put raw whitespace into a `person:` slug and into every rendered speaker name. That needs
 pinning in that unit's contract up front, not after.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

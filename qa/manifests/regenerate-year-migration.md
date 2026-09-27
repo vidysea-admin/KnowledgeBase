@@ -74,3 +74,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration (109 lines, budget 200)
 - `packages/index/src/tree/build.ts` (new optional 5th param, backward-compatible default)
 - `packages/index/src/tree/regenerate.test.ts` (4 new T-004c tests, 0 existing tests modified)
 - `qa/contracts/regenerate-year-migration.md` (new contract, maker-drafted)
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

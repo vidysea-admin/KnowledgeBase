@@ -140,3 +140,5 @@ cap that D-014 itself measures as having closed the search seam two rounds befor
 found. Writing a decision and not applying it is worse than not deciding, because the decision log
 then reads as though it were done. Both passages are now corrected in place (the cap is
 class-based; the `checker/SKILL.md:127` misreading is retracted inline).
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

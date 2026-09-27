@@ -141,3 +141,5 @@ probe over all 1452 rows and discharged **C8(a), which the preceding sweep had m
   lives in `schema-v2.md`. **The dead binding is cleaned up immediately** rather than deferred to
   "the next unit touching this file" — the checker's own standing point is that such a deferral,
   with no such unit scheduled, is how a defect becomes permanent.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

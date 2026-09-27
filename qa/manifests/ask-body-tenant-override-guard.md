@@ -56,3 +56,5 @@ body-preference mutation changed the observed arm bindings from `["tenant-a","te
 `["tenant-b","tenant-b"]` and reddened the named focused test. After byte-identical restoration,
 the focused test passed 1/1, the full API suite passed 173/173, API typecheck exited 0, and the full
 structure gate passed. ISS-188 moved open -> fixed (not verified).
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

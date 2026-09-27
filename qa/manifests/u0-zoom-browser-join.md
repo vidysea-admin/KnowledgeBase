@@ -204,3 +204,5 @@ own live-verified fix once a signed-in session is reachable to test against.
   task's own "verify against the REAL page, not memory" instruction.
 
 ## Status: checked-PASS — qa/verdicts/u0-zoom-browser-join.md (Cycle checked: 0, e6f0b72); merged to master; meeting-bot 142/142 + pytest 22/22 on merged tree; open debt ISS-U0-1 (iframe traversal, needs signed-in session), ISS-U0-2 (HUMAN_GATE zoom-bot-signin), ISS-U0-3 (duplicate screenshot)
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

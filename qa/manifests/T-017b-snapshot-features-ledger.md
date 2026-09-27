@@ -287,3 +287,5 @@ D:\KnowledgeBase.)
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-017b-snapshot-features-ledger.md (Cycle checked: 2, commit 45b1b88) — 9/9 criteria met; ISS-013 verified.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

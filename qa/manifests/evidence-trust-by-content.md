@@ -123,3 +123,5 @@ all tests green) and ISS-041 (`.goal/catalogue.json`, the +42.1-point lever, had
 all). Both were fixed in the next unit, `score-input-trust-complete`, rather than in a fix cycle
 here — so this manifest is superseded, not stalled. Its own contribution (content-vs-HEAD trust
 replacing the path-only check) shipped and was re-verified as holding in every later cycle.
+
+**Handshake status:** superseded — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

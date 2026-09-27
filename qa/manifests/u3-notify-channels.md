@@ -213,3 +213,5 @@ Not UI-touching — no browser-rendered surface changed. This unit touches only
 (package exports), and `.env.example` (documentation).
 
 ## Status: checked-PASS — qa/verdicts/u3-notify-channels.md (Cycle checked: 0, a21bc16); merged to master; meeting-bot 177/177 on merged tree (typecheck re-run OOMed on merged tree under memory pressure — checker ran pnpm -r typecheck clean in-lane); debt ISS-U3-001/002 low
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -209,3 +209,5 @@ checker, not carried forward on trust.
 6. Full suite 349/349, typecheck 10/10, `lint:structure` clean — all fresh runs.
 7. **Ledger fully reconciled**: ISS-069 fixed; ISS-065 and ISS-068 promoted `fixed → verified`
    (re-derived by the checker's own reproduction, not just re-stamped).
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

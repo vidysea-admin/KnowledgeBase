@@ -150,3 +150,5 @@ Test-only change; zero production code touched; read-only against the database. 
 `git revert`.
 
 **Status: checked-PASS** — PASS from `qa/verdicts/search-store-tenant-assertion.md` (Cycle checked: 1, matching Fix cycle 1), committed `ca18b79`. All three documented candidates plus one of the checker's own (coordinated turn/session/score rotation) were tried in the sixth-bypass hunt; two landed and were filed rather than fixed here — ISS-083 (score value unasserted) and ISS-084 ((turnId,sessionId) pairing unchecked against what the scorer actually ranked), both medium, neither a security or ranking-order defect. Item 5's claim that assertAllCallsConfined was copied verbatim from indexing.test.ts was corrected above — it is independently sized, not copied. Closed out 2026-09-08.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

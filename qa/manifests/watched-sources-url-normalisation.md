@@ -104,3 +104,5 @@ hand inside the very lane that fixed it.
 DNS-rebinding argument stands — a store-time denylist would *look* like a control while leaving the
 rebinding path open. ISS-C-UNRUN-WRITERS-002 stays open/high, owned by the unbuilt fetcher, and is
 contract invariant `[I3]`.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -65,3 +65,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration (111 lines, budget 200)
 Once Google Calendar OAuth credentials exist: a real `CalendarClient` implementation (small,
 isolated, same shape as T-019's provider adapters), a scheduler tying `listUpcomingEvents` →
 `selectEventsToAutoJoin` → `capture()` together, and a per-meeting opt-in UI.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

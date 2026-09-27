@@ -454,3 +454,5 @@ and is a small regex change for the next unit that touches this block.
 **[C1]** — `mc-sessionstart.ps1` and `mc-precommit.ps1` remain blind, gated on
 `qa/gates/mc-hooks-manifest-blindness.md`. The commit guard cannot see a pending handshake until the
 Approver rules.
+
+**Handshake status:** STALLED — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

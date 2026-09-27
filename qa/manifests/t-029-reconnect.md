@@ -442,3 +442,5 @@ extracted it into named, independently-tested functions.
 
 Fix cycle: 0
 Status: checked-PASS — qa/verdicts/t-029-reconnect.md (Cycle checked: 0, 9eb5307); merged to master; meeting-bot 94/94 + pytest 17/17 on merged tree; debt ISS-T-029-1 (low, live proof script uncommitted)
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

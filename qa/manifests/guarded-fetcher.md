@@ -210,3 +210,5 @@ the transport unit, with the checker's honest asymmetry recorded: unlike a pinne
 **This is a PASS on the primitive, not the feature.** `request` is still an empty seam and **A13
 does not move.** Three issues now stand between this and any transport accepted without pinning,
 cancellation or a real cap.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

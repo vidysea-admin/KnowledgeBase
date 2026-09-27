@@ -51,3 +51,5 @@ temperature 0, seed 42, real TOC session `2026-04-21-visa-blueprint-part2-italy-
   harness, the measurement, and the verdict, not corpus-wide precision.
 - Determinism across runs is NOT achieved by temperature+seed alone; ISS-255 records the
   2-of-3 agreement requirement for the eventual gate.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

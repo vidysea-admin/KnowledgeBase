@@ -187,3 +187,5 @@ checker's own instrumentation, occurrence-count asserted 1→0 before each run.
 6. **`raw` should go, but is not a defect today — ISS-065.** `updateOne`'s tenantId is pinned by
    the confinement test; the exposed escape hatch still shouldn't remain now that a live caller
    uses it.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

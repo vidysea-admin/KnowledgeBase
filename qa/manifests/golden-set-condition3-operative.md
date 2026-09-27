@@ -161,3 +161,5 @@ not going to describe it as such. Whether that clears the gate's bar is the chec
 `qa/ui-surfaces.json`, and `data/**` matches no pattern in it.
 
 ## Status: checked-PASS
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

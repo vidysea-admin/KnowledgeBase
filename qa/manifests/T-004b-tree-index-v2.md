@@ -218,3 +218,5 @@ All well under budget; no `structure.config.json` changes were needed or made.
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-004b-tree-index-v2.md (Cycle checked: 1, commit 15e4ecf) — 5/5 criteria met; NZ cross-session claim independently confirmed; follow-up T-004c logged.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

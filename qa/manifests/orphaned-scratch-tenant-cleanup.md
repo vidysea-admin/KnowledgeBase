@@ -83,3 +83,5 @@ unchanged), and explicit user confirmation obtained before running (production M
 a hard-boundary action per project rules, not something run without asking).
 
 **Status: checked-PASS**
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -78,3 +78,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration (113 lines, budget 200)
    (`apps/web/package.json` unchanged in dependencies), confirm `DashboardPage` never fabricates
    a stat number (all four come from real API calls).
 5. Real browser: `/` shows real stat cards; `/brain` and `/calendar` still work with the new nav.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

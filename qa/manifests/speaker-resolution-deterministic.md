@@ -165,3 +165,5 @@ the module's most important rule. Not filed as an issue (no criterion is unmet; 
 committed is correct), and deliberately **not** patched into this unit: editing an artifact after
 its PASS is the live-edit race that already cost a re-check earlier today. It lands as its own
 follow-up unit, `speaker-resolution-whitespace-guard`.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -111,3 +111,5 @@ checker-PASSed `ingest-store.ts` write pattern.
 5. If `whatsapp_msg`'s Mongo is reachable, independently re-run the real-data verification
    yourself (import `whatsapp-store.ts`, call `listTrackableGroups`/`fetchWhatsAppMessages`) —
    strongest possible check, real data, no mocks.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

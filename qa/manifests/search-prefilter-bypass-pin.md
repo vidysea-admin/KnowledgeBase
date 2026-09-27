@@ -115,3 +115,5 @@ One comment and one test file; zero production behaviour change; read-only again
 Reversible by `git revert`.
 
 **Status: checked-PASS** — PASS from `qa/verdicts/search-prefilter-bypass-pin.md` (Cycle checked: 1, matching Fix cycle 1), committed `b1fd6b9`. Closed out on the 2026-09-08 reconcile tick.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -106,3 +106,5 @@ is unauthenticated by design, disclosed explicitly in both the code comment and 
 not something that crept in silently. Reversible by `git revert`.
 
 **Status: checked-PASS**
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

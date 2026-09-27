@@ -70,3 +70,5 @@ browser authenticated against the isolated work database, loaded 23 sessions, op
 console errors. The checker also reproduced the missing-`MONGO_WORK_DB` exit-2 guard with zero
 listeners and independently traced the evaluator-local no-op writer. U3.1 correctly remains
 `in_progress`: the final real question plus citation-link proof is still gated.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -272,3 +272,5 @@ amend.
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-024-meeting-bot-capture.md (Cycle checked: 1, commit e2a8136) — 7/7 criteria met; Vexa platform mapping + wire-shape approach both confirmed.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

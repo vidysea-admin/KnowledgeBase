@@ -301,3 +301,5 @@ edited, per its own contract.)
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-018-schema-v2.md (Cycle checked: 1) — 7/7 criteria met.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

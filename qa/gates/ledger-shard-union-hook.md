@@ -46,3 +46,12 @@ or what it blocks.
 *(unanswered — append `Answered: <ISO date> — <choice> — <where>` before acting)*
 
 **Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file
+
+Answered: 2026-09-27T17:2x+05:30 — APPROVED ("Yes, fix it") — Umesh first-hand, AskUserQuestion in
+checker/maker session 21132795, question "Our issue counter only reads one file, so it under-reports.
+Right now it says 125 open issues; the real number across all files is 146. Fix is roughly one line.
+Approve?" Authorizes replacing the hardcoded $LEDGER = 'qa/issues.jsonl' at
+.claude/hooks/mc-sessionstart.ps1:5 with a union glob over qa/issues.jsonl + qa/issues.*.jsonl, and
+the same union in every other ledger-reading surface (checker sweep, tracker audit) per D-019.
+Enforcement path -> authorizing entry D-041 carries **Approved-by:** Umesh. Unblocks plan unit 19
+and ISS-129/130. Gate open 19 days.

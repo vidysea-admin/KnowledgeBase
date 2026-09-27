@@ -35,3 +35,5 @@ nothing, which is the correct conservative outcome while the floor keeps `spk:2 
   precision + zero wrong links on the hand-labelled corpus, per the answered gate's phase 3.
 - Latency: 3x window runs (~389s for one session with qwen3:8b on CPU). Recorded for the gate
   design; no optimisation claimed.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

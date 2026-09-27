@@ -222,3 +222,5 @@ authoritative-by-replacement, so it would discard a richer future document.
 
 **U2.4 stays `pending`.** B3/B10 cannot flip without a live write, and B10 still needs its human
 downgrade to PARTIAL.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

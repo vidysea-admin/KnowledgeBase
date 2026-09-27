@@ -147,3 +147,5 @@ No criterion left unmet.
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-012-compete-screen.md (Cycle checked: 1, commit 71b5fd2) — 6/6 criteria met; credibility:'internal' confirmed hardcoded, no path to misrepresentation.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

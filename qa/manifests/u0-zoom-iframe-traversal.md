@@ -529,3 +529,5 @@ non-blocking gap as cycles 1 and 2.
 **Status (cycle 2):** superseded by cycle 3 above.
 
 **Status:** checked-PASS (cycle 3, checker verdict `qa/verdicts/u0-zoom-iframe-traversal.md` "Cycle 3")
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -74,3 +74,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration (110 lines, budget 200)
 ## Follow-up (not this unit, disclosed in contract Non-goals)
 A future worker unit wires `isPurgeEligible`/`deriveEvidenceClipWindows` to a real Mongo read +
 actual file delete + `media.retention` field update. Not built here.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

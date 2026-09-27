@@ -144,3 +144,5 @@ handshake forbids.
 The honest version of that bullet: *`ensureObsReady` observes the launch failure, logs it, and throws
 a message naming the spawn error and `OBS_EXE`.* The race it also claimed to close was already closed
 by `connectWithBackoff` returning early — which **is** covered, by the second row of the table.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

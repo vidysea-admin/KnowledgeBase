@@ -245,3 +245,5 @@ prose required the checker to do the diffing I should have made unnecessary.
 **C6 (tenancy) and C7 (the real hybrid recall number) are still the FIRST deferral** — verified, not
 accepted. Cycle 1's condition binds part 2: **a second deferral of either is accretion and should be
 failed as such.**
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

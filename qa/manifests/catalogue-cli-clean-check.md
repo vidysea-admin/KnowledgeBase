@@ -95,3 +95,5 @@ Pure test-code change, reversible by `git revert`. No production behavior touche
 the test suite's own cleanliness enforcement, not the CLI it tests.
 
 **Status: checked-PASS**
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

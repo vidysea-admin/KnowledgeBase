@@ -102,3 +102,5 @@ mocks, as shown above.
 4. Read the changed files listed above — confirm each of the 5 findings is genuinely fixed as
    described (not just claimed).
 5. If `whatsapp_msg`'s Mongo is reachable, independently re-verify the idempotency claim.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

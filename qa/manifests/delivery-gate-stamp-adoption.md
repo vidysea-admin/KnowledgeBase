@@ -120,3 +120,5 @@ state has no authorizing entry, on the reasoning that a known defect in a live g
 governance gap already filed and gated. If you judge that a unit may not touch an unauthorized
 enforcement path at all until the Approver rules — even to fix it — say so and FAIL this, because
 that is a rule I would rather have explicit than keep deciding case by case.
+
+**Handshake status:** ready-for-check — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

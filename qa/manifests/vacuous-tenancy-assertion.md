@@ -129,3 +129,5 @@ construction** and which never calls the store the defects it cites were *in*; a
 ingest-store,whatsapp-store}.ts` and does not reach it, and no page's data flows through a test.
 
 ## Status: checked-PASS
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -73,3 +73,5 @@ from "active" to "revoked" and removed its Revoke button — a real, working end
 5. Real browser: navigate to `/settings`, create a key, confirm the raw value only appears once,
    revoke it, confirm the badge updates.
 6. Confirm `TASKS.md`'s T-010 line says `done`.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -227,3 +227,5 @@ attached: this is not end-to-end `/ask` latency and U1.5 must not inherit it as 
   than at cycle 1: U1.5 inherits 0.935 as the input to a ≥0.85 exit criterion while the directory it
   depends on has no criteria of its own. Raised as a HUMAN_GATE — contract creation belongs to the
   checker and the human, never the maker.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

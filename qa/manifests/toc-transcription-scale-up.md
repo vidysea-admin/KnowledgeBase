@@ -141,3 +141,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration (111 lines, budget 200)
 3. Re-run `scripts/seed-toc.mjs`'s turns insertion (or a small targeted update) to sync the
    newly-real turns into the live `lkb` Mongo database — a deliberate separate step, not
    automated here.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

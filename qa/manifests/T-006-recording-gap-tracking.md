@@ -162,3 +162,5 @@ Every file stayed within the 300 LOC budget (`capture.ts` 132, `gap-tracking.ts`
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-006-recording-gap-tracking.md (Cycle checked: 1, commit 819262a) — 7/7 criteria met; ADR content independently verified against source HTML.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

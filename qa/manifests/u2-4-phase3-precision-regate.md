@@ -157,3 +157,5 @@ discriminator for bar 4.
 `config/**`, `schema/**` all untouched; no UI surface exists in this unit).
 
 ## Status: ready-for-check
+
+**Handshake status:** ready-for-check — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

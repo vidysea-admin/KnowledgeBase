@@ -100,3 +100,5 @@ commit `985dd52`. 4/4 verify steps met · contract criterion 3a holds.
    code path in `indexSession` touches `tenantId` via a dotted path today — an honestly-flagged
    scope boundary, not something owed inside this unit.
 5. Full suite 335/335, typecheck clean across all 10 projects.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

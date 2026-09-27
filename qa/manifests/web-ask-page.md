@@ -206,3 +206,5 @@ Checker instructions: independently read `qa/contracts/web-ask-page.md`, inspect
 description. Mode D is not applicable to this resubmission because the changed path is test-only;
 no runtime UI surface changed in this cycle. A PASS fixes ISS-246 but **must not close U3.1**:
 the real provider-backed answer-and-citation browser exit criterion remains outstanding.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree
