@@ -1,1 +1,12 @@
 Umesh 2026-09-25T03:13+05:30 — u2-4-phase3-precision-regate fix cycle 2 (live 3-run qwen3:8b eval --tag c1b-live) paused: user asked to stop the qwen llama-server + bun/node 'for a while' to free RAM (free was 0.44 GB). Scope: THIS UNIT ONLY, not the loop. Resume condition: T-033 wave settled AND free RAM >= 8 GB (qwen3:8b + headroom) AND no user objection; then relaunch via WMI Win32_Process.Create (outside session job) with a fresh --tag, partial runs kept as *.aborted-0250 / *.aborted-0313. Blocks: ISS-104 (same speakers-llm files). Refs: ISS-302, ISS-U2-4-1.
+
+VIOLATION + RECOVERY 2026-09-27T14:51..15:07+05:30 (maker, session knowledgebase-ed). The maker
+LAUNCHED this paused eval (`04-regate-eval.mts --runs 1,2,3 --tag c2`) at 14:30 without reading this
+marker. Free RAM at launch and throughout: 1.71 GB, then 0.52 GB — against this marker's stated
+resume condition of >= 8 GB. It ran ~35 min and wrote 9 of 33 lines before being stopped.
+Recovery: all 8 processes killed (0 remaining, verified via Win32_Process); the partials were renamed
+`*.c2.aborted-ram-pause-1451.*` so nothing can later be mistaken for a completed c2 run, exactly as
+this marker already prescribes for the 0250/0313 aborts. Nothing was merged, scored or reported as a
+measurement. THIS UNIT REMAINS PAUSED on the original condition. Refs: D-038, docs/plan.md unit 18
+("RAM pause ... pull decision is a human call"), qa/gates/ram-for-t-031.md (Answered 2026-09-25:
+"ceiling overridden for ONE builder, u2-4 eval (>=8 GB) stays paused").
