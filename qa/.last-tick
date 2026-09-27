@@ -380,3 +380,11 @@ TICK 2026-09-27T17:25:53Z ADVANCED tier=0(handshake reconciliation) wave=0 concu
   filed: ISS-350 (high, handshake unreadable by any scan)
   PASS item 5 of stamp-adoption already satisfied by a prior cycle (gate names all 3 commits) - no edit made
   SERIAL: no wave dispatched - the only tier-0 unit is gated on Approved-by, tier-3 U4/U6 gated on plan approval + outward-facing install
+TICK 2026-09-27T18:36:21Z ADVANCED tier=2(ISS-350) wave=1 concurrent peak=1
+  unit handshake-canonical-field: cycle 0 FAIL (ISS-351) -> cycle 1 PASS (verdict 50d7f7c, 6/6 claims, ISSUES-WRITTEN none) -> closed out
+  160/160 manifests carry **Handshake status:**; 0 ambiguous, 0 underivable, 1 hand adjudication
+  additive verified: 159 files +320 -2 (both trailing-newline artifacts)
+  checker ruled the ISS-351 adjudication in the maker favour and flipped that row to wontfix with evidence
+  D-042 appended: canonical handshake field + unit-status vs issue-status + position-is-not-time
+  ISS-350 reproduction 1 of 4 closed; reader half still gated on Approved-by (mc-sessionstart.ps1)
+  SERIAL: checker ran after its own manifest (real dependency edge)

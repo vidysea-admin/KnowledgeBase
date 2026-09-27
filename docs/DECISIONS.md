@@ -503,3 +503,107 @@ sweep, open); `D:/ai_os/audits/2026-09-09-delivery-gate-browser-predicate.md` H1
 **Result:** The unit is committed on wave/topicrefs-arg-guard (333c7f1) as a test-only change: a new treeRootExclusiveTopics() fixture (the shared treeRoot() was deliberately left alone, since 18 existing assertions pin its one-topic shape) plus one test asserting the claims write's topicRefs contains only the s1-exclusive topic. Reported evidence: 19/19 on the file, 196/196 apps/api, pnpm -r typecheck exit 0, depcruise clean, lint-loc unchanged at the same 4 violations. Its cycle-0 checker was dispatched in the same turn the build returned, briefed explicitly that the unit did something materially different from its brief, that the burden of proof is therefore HIGHER not lower, and that its first job is to rule on whether the builder's reframing of the row is correct at all - because if the row really does describe an undefended argument, this unit fixed the wrong thing and that is a FAIL. The checker was also asked to rule on a D-020 deviation the builder disclosed: the sandbox refused a chained shell trap construct, so arm/mutate/test/restore/verify ran as separate explicit calls, which does not satisfy D-020's requirement that restore fire on timeout and interrupt and error rather than only the success path. Whether mutate.mjs's arm/restore ledger plus assert-clean is equivalent protection is a genuine open question and is the checker's to answer, not the maker's. No claim is made here that the unit is correct - only that it is honestly framed.
 
 **Links:** ISS-C-TOPICREFS-ARG-001 - qa/manifests/topicrefs-arg-guard.md - qa/contracts/entity-promotion.md (C4, I2) - ISS-333 (the anti-pattern the brief cited while committing it) - D-015 (measure against the row's own recorded cases) - D-019 (ledger is the union of shards) - D-020 (mutation-run safety, the disclosed deviation) - apps/api/src/indexing/promote-entities.test.ts
+
+## D-041 | 2026-09-27 | type: decision | status: ACTIVE
+
+**What:** Eight Approver rulings taken in one sitting (Umesh first-hand, two AskUserQuestion rounds
+in session 21132795), settling the direction and several of the nine open gates.
+
+1. PRIORITY: recording capture comes first. Reason given: recordings are the raw material for
+   everything and are being lost now - the Ashoka Educator Dialogues webinar of 2026-09-27 was not
+   captured. (Noted at ruling time: the concurrent maker loop had already moved ISS-323 and ISS-324
+   to status fixed, so this ruling confirms the ordering rather than opening new work.)
+2. WEB FALLBACK: build it, do not amend the north star. ISS-274 is resolved as wire-it, not
+   sign-the-honest-limit. The Phase-1 exit clause stands as written and off-corpus questions must
+   reach a web search path. The QUEUE GRILL row for it is discharged.
+3. LEDGER UNION: approved. Every ledger-reading surface reads the union of qa/issues.jsonl and
+   qa/issues.*.jsonl. Closes the gate that had been open 19 days.
+4. SPEAKER SEAM: keep working until it is clean. This DELIBERATELY OVERRIDES the D-014 class-based
+   round cap for the speaker-resolution seam in this repo: that seam carries 6+ PASSed verdicts and
+   is a non-security (fabrication/correctness) class, so D-014 had closed it as file-don't-fix.
+   ISS-104 is pullable again on the Approver's instruction. The cap stands for every other
+   non-security seam.
+5. STUCK UNITS: retry with fresh attempts. The 4 STALLED and 2 BLOCKED units get their fix-cycle
+   counters reset rather than being closed as not-pursued.
+6. ZOOM SIGN-IN: re-confirmed done. The bot profile is signed in as umeshsugara@vidysea.com, done by
+   Umesh in plain Chrome on data/bot-profile and verified 08:30 through the bot's own driver path.
+   Consequence: plan.md unit 1 is NOT gated, and ISS-324's timeout was a code defect, not a
+   credential wall.
+7. ENFORCEMENT HOOKS: audit first, then one approval. /aios-config-auditor runs over .claude/hooks/*,
+   the diff against the last approved state is presented, and Umesh approves the surviving set in a
+   single later decision. This entry does NOT authorize the current hook contents.
+8. AUTO-RECORD SENDER AUTH: required, but auto-join keeps running. Sender authentication becomes a
+   hard [I*] in the U5 contract; the interim risk window on Umesh's own inbox is accepted knowingly.
+
+**Why:** The roadmap tier of the backlog priority (D-013 tier 3) was structurally unreachable while
+nine gates sat unanswered, three of them 18-19 days old, because each blocked a plan unit that no
+autonomous tick may build. Asking them in two batched rounds converted several gates into buildable
+work in one sitting instead of one gate per idle heartbeat. Rulings 4 and 6 also correct the record:
+the round cap was suppressing a seam the Approver wants finished, and plan.md's row for unit 1 still
+claims an OPEN gate that has carried an Answered line since 08:15 and a verification since 08:30.
+
+**Result:** Gates ledger-shard-union-hook, iss-322-sender-spoofing and
+enforcement-hooks-unauthorized-and-live-regressed carry Answered lines as of this entry;
+zoom-bot-signin re-confirmed. Buildable now with no human gate: ledger union (plan unit 19), web
+fallback, ISS-104 speaker precision, the U5 contract. Still open and NOT settled here:
+d015-generalisation-scope, handshake-liveness-contract-start, ui-surfaces-test-file-exclusion,
+write-guard-contract-contradiction. Two contracts still owed (ISS-328 U5 auto-record, ISS-329
+notify-channels); ISS-328's invariant question is answered by ruling 8.
+
+**Changes-authorized:** .claude/hooks/mc-sessionstart.ps1 (line 5 $LEDGER hardcode -> union glob over
+qa/issues.jsonl + qa/issues.*.jsonl, per ruling 3) - and no other enforcement path. The hook audit in
+ruling 7 authorizes no edit yet.
+
+**Approved-by:** Umesh
+
+**Links:** ISS-323, ISS-324, ISS-274, ISS-129, ISS-130, ISS-104, ISS-282, ISS-322, ISS-328, ISS-329,
+ISS-189, ISS-190, ISS-200, ISS-201, ISS-219, ISS-220; qa/gates/ledger-shard-union-hook.md,
+qa/gates/iss-322-sender-spoofing.md,
+qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md, qa/gates/zoom-bot-signin.md;
+docs/plan.md units 1, 12, 18, 19; D-013, D-014, D-019
+
+## D-042 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** The maker-checker handshake state in this repo is recorded in one canonical, machine-readable
+field per manifest, `**Handshake status:**`, with the vocabulary
+`checked-PASS | ready-for-check | STALLED | BLOCKED | superseded | paused`. It is additive: the three
+pre-existing status forms (an inline `**Status:**` field in 30 files, a `## Status:` heading in 92, a
+third inline form in 37) are left exactly as written, because commit messages and verdicts cite them
+and repointing live references is the harm D-019 refused to accept when it rejected renumbering lane
+ids. The field's value is derived from ALL anchored status statements in the file and is written only
+when they agree; where they disagree, a hand adjudication is recorded inline with its evidence, and
+where nothing settles it, no field is written at all. Two further rules follow from this unit:
+(1) unit-handshake-state and issue-status are separate axes -- a unit may be `checked-PASS` while the
+issues it addressed stay open, and conflating the two is an error; (2) file position is not edit time
+in this repo, because a top status block is updated in place while narrative accumulates below it, so
+any claim about a manifest's current state must be settled with `git log`, not by reading downward.
+
+**Why:** Measured across all 159 manifests, `Status` was written three incompatible ways, so no single
+command could compute the handshake state. This was not cosmetic: the session-start hook printed
+`Checks pending: 0` while `delivery-gate-stamp-adoption` sat at `ready-for-check` over a cycle-1 FAIL
+and owed fix cycle 2. The handshake IS the maker-checker contract in this project (the pair communicates
+through files, never memory), so a contract whose state no reader can compute is one a session can
+silently skip -- which is what happened. This is ISS-176/ISS-183's bold-blindness generalised from one
+hook predicate to the whole substrate, and the twin of ISS-348 on the gate directory.
+
+Rule (2) is recorded because it caused a real false finding. The cycle-0 checker read `BLOCKED` below
+`checked-PASS` in `u2-fix1-ingest-guards.md` and filed ISS-351 (high) asserting a false PASS on an
+unfinished production-Mongo repair. `git log -S` shows the `checked-PASS` field was introduced by
+14f5771, later than 9f6b784 which wrote the BLOCKED evidence; the cycle-1 checker went further and
+showed e5ca83b explicitly rewrites the top field and relabels the old paragraph "Previous status
+(historical)". Position-as-time is a mistake a competent fresh reader made on the first attempt, so it
+belongs in writing.
+
+**Result:** 160 of 160 manifests carry the field; 0 ambiguous, 0 underivable; one recorded hand
+adjudication. Verified additive: 159 files, +320, -2, the two deletions being byte-identical
+trailing-newline artifacts. Cycle 0 FAILed and was fixed; cycle 1 PASSed with 6/6 manifest claims
+independently confirmed and `ISSUES-WRITTEN: none`. ISS-351 was flipped to `wontfix` by the checker
+that owns the ledger, with its evidence trail, neither deleted nor renumbered. ISS-350's reproduction
+1 of 4 is closed; 3 remain deliberately open and named -- the reader half (the session-start hook, the
+sweep, the tracker audit still miscount) is NOT done and touches `mc-sessionstart.ps1`, an enforcement
+path requiring `**Approved-by:** Umesh`, and the verdict side (`VERDICT:` vs `Verdict:`, verdict files
+ordered newest-cycle-first) is untouched. This decision makes the manifest side computable; it does
+not make anything read it.
+
+**Links:** ISS-350, ISS-351, ISS-348, ISS-176, ISS-183, D-019, D-015, ISS-304, ISS-305, ISS-306,
+qa/manifests/handshake-canonical-field.md, qa/verdicts/handshake-canonical-field.md, 1fe83d7, 50d7f7c

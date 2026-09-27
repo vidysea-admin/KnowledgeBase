@@ -173,16 +173,24 @@ Run from the repo root. Nothing below is a self-report — each command is re-ru
    `grep -c '^\*\*Handshake status:\*\*' qa/manifests/*.md | grep -v ':1$'` → expect **no output**.
 2. **The directory is countable in one command:**
    `grep -h '^\*\*Handshake status:\*\*' qa/manifests/*.md | sed 's/^\*\*Handshake status:\*\* //; s/ —.*//' | sort | uniq -c`
-   → expect `152 checked-PASS`, `3 superseded`, `3 ready-for-check`, `2 STALLED` (160 total; the
-   third `ready-for-check` is this manifest itself).
+   → **at cycle 1, before close-out:** `152 checked-PASS`, `3 superseded`, `3 ready-for-check`,
+   `2 STALLED` (160 total; the third `ready-for-check` was this manifest itself).
+   → **after this unit's close-out:** `153 checked-PASS`, `3 superseded`, `2 ready-for-check`,
+   `2 STALLED`. Both figures are recorded because the act of closing out changes the number a
+   re-runner sees, and an assertion that only held for one hour is worse than no assertion.
 3. **The unresolved units are findable by the field alone:**
    `grep -l '^\*\*Handshake status:\*\* \(ready-for-check\|STALLED\)' qa/manifests/*.md`
-   → expect exactly five: `delivery-gate-manifest-blindness`, `delivery-gate-stamp-adoption`,
+   → **at cycle 1** exactly five: `delivery-gate-manifest-blindness`, `delivery-gate-stamp-adoption`,
    `u2-4-phase3-precision-regate`, `write-guard-enforcement-gaps`, and `handshake-canonical-field`
-   (this unit's own manifest, which is itself awaiting check — it appears because the field is
-   honest about its own state rather than exempting itself).
+   (this unit's own manifest, appearing because the field is honest about its own state rather than
+   exempting itself). → **after close-out** the same four minus this one.
 4. **The change is additive — no governance text was altered:**
-   `git diff --numstat qa/manifests/ | awk '{a+=$1; d+=$2} END {print a, d}'` → expect `320 2`. The
+   `git diff --numstat 76c3363..1fe83d7 -- qa/manifests/ | grep -v handshake-canonical-field | awk '{a+=$1; d+=$2} END {print NR, a, d}'`
+   → expect `159 320 2`. **The exclusion is necessary and was initially missing here:** the raw
+   numstat over that range gives `577 2`, because this unit's own new manifest (257 lines) is part of
+   the range. 577 − 257 = 320. The cycle-0 figure of `320 2` was measured while that file was still
+   untracked, so `git diff` silently omitted it — a correct number reached by an unreproducible
+   command. The cycle-1 checker caught this and traced it rather than accepting either figure. The
    two deletions are `iss-262-lint-loc-split.md` and `u2-4-phase3-precision-regate.md`, both of which
    lacked a trailing newline, so git renders their unchanged final line as delete+re-add. **Verify
    this rather than taking it on trust:** `git diff -- <file>` shows the `-` and `+` status lines are
@@ -252,6 +260,22 @@ the second one nearly became a two-unit false alarm against the governance recor
 - No test suite covers `qa/` prose, so there is no green-suite claim to make here. The verification
   commands above are the whole evidence.
 
-## Status: ready-for-check (cycle 1)
+## Status: checked-PASS (cycle 1)
 
-**Handshake status:** ready-for-check — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree
+Verdict `qa/verdicts/handshake-canonical-field.md`, **Cycle checked: 1, VERDICT: PASS**, SCOREBOARD
+6/6 manifest claims independently confirmed, `ISSUES-WRITTEN: none`. Checker commit `50d7f7c`.
+
+**The adjudication was ruled in this unit's favour, on stronger evidence than the unit itself gave.**
+The checker ran the history independently and found that `e5ca83b` does not merely predate the
+`BLOCKED` text — it *explicitly rewrites* the top status field from `BLOCKED` to `ready-for-check`,
+relabels the old paragraph "Previous status (historical)", and writes the "history below is kept as
+written" line inline. It also surfaced evidence neither side had cited: **ISS-304/305/306 are now
+`status: fixed`** in the ledger with live evidence (chunks=27, EXIT 0, post-merge run), so the
+unfinished live repair that ISS-351 was worried about has since completed. Cycle 0's error is named
+precisely: it treated file *position* as a proxy for edit *time*, which is false in a project that
+updates a top status block in place while narrative accumulates below it.
+
+`ISS-351` was flipped `open → wontfix` by the checker, which owns the ledger, with the full evidence
+trail in a `checker_note`. The row was neither deleted nor renumbered, per D-019's permanence norm.
+
+**Handshake status:** checked-PASS — closed out 2026-09-27 against verdict cycle 1 (VERDICT: PASS)
