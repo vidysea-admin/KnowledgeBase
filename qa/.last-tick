@@ -156,3 +156,18 @@ MISSED_WAKEUP 2026-09-27T09:44:00+05:30
   gate, a named dependency, not a ceiling); U6 waits behind U4 by Umesh's "finish the capture wave"
   sequencing; ISS-322 waits on iss-322-multifile-shape. wave=1 · concurrent peak=1 (checker).
 - continuation: ScheduleWakeup armed immediately after this line is written (not before).
+
+## 2026-09-27 ~18:0x IST — maker tick — state: ADVANCED (close-out)
+- obs-launch-error: verdict PASS cycle 0 (qa/verdicts/obs-launch-error.md, 9a0174f) → manifest
+  flipped **checked-PASS** → lane wave/obs-launch-error **merged** to master (--no-ff).
+- re-verified ON MASTER after the merge, not just in the lane: `npx tsc --noEmit` exit 0 ·
+  `node --test --import tsx "src/**/*.test.ts"` → **254 pass / 0 fail** (23.5s).
+- the checker earned its keep: it deleted the `setImmediate` yield in ensureObsReady on its own
+  initiative and all 9 tests stayed green. The line is inert AND the manifest bullet claimed it
+  closed a race that connectWithBackoff's early return already closes. Filed **ISS-344 (low)** and
+  corrected the manifest sentence in place with the honest version — NOT edited in code, because
+  changing code after a PASS without a new cycle is the shortcut the handshake exists to prevent.
+  The lesson is the claim, not the line: an unsupported sentence in an evidence manifest is worse
+  than a dead line of code, because the next reader trusts it.
+- checker also filed ISS-343 (medium): ISS-340 still names the stale 352 LOC figure, not 359.
+- ledger: 342 rows, all valid JSON. ISS-337 open → fixed.
