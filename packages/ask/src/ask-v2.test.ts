@@ -131,6 +131,45 @@ test("insufficient coverage with no sync webFallbackFn: tavilySearchFn fills the
   assert.ok(write.writes.some((w) => (w as { kind?: string }).kind === "ask.web_fallback"));
 });
 
+test("ISS-274: insufficient coverage + tavilySearchFn that THROWS (e.g. no Tavily key configured) still reaches the fallback path and degrades honestly", async () => {
+  // D-041 ruling 2: off-corpus questions must REACH a web search path, not merely have one
+  // present. This proves the path is actually invoked and its failure is caught, logged, and
+  // never silently turned into a false "resolved" nor left to crash askV2.
+  const complete = fakeComplete(
+    { json: { node_ids: ["tenant:t1/session:b"] } }, // selectNodes -- scored below lower -> incorrect, good_docs empty
+    { text: "Final answer" }, // answer -- no refine call since there are no docs (web fetch failed, internal empty)
+  );
+  const write = fakeWrite();
+  let tavilyCalled = false;
+  const tavilySearchFn = async (_query: string): Promise<never> => {
+    tavilyCalled = true;
+    throw new Error("web fallback unavailable: TAVILY_API_KEY not configured");
+  };
+
+  const result = await askV2("what color are apples?", TREE, {
+    complete,
+    scoreFn: fakeScoreFn({ "tenant:t1/session:b": 0.05 }),
+    treeSearchFn: fakeTreeSearch,
+    tavilySearchFn,
+    write,
+    tenantId: "t1",
+  });
+
+  assert.equal(tavilyCalled, true, "the fallback path must actually be invoked, not skipped");
+  assert.equal(result.insufficient_coverage, true, "a failed fallback must not be reported as resolved coverage");
+  assert.equal(result.web_used, false, "no real web result was obtained");
+  assert.deepEqual(result.sources.web, [], "no fabricated web source on failure");
+
+  const entry = result.auditLog.find((e) => e.jobKind === "ask.web_fallback_unavailable");
+  assert.ok(entry, "the unavailable fallback must be visible in the audit log, not silently swallowed");
+  assert.match(entry!.step, /TAVILY_API_KEY not configured/, "the real reason must be in the audit trail");
+  assert.ok(!result.auditLog.some((e) => e.jobKind === "ask.web_fallback"), "must not also log a successful fallback");
+  assert.ok(
+    write.writes.some((w) => (w as { kind?: string; status?: string }).kind === "ask.web_fallback_unavailable" && (w as { status?: string }).status === "failed"),
+    "the ledger write must record this as a failed job, not a done one",
+  );
+});
+
 test("insufficient coverage with no tavilySearchFn provided: behavior is unchanged (byte-identical)", async () => {
   const complete = fakeComplete(
     { json: { node_ids: ["tenant:t1/session:a"] } }, // selectNodes

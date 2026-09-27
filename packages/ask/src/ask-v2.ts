@@ -166,15 +166,31 @@ export async function askV2(query: string, tree: TreeIndexNode, deps: AskV2Deps)
   // selectNodes/treeSearch resolved (with `summary`), so refine below needs no second lookup.
   let askResult = await ask(query, tree, () => candidates, scoreFn, webFallbackFn, upper, lower);
 
-  // ISS-010: real async web-search fallback, layered on top of router.ts (never inside it — see
-  // AskV2Deps.tavilySearchFn doc). Only reachable when the sync webFallbackFn path didn't already
-  // cover it (insufficient_coverage is true exactly when verdict != correct AND no webFallbackFn
-  // fired), so this and the sync path never both run for the same query.
+  // ISS-010 / ISS-274: real async web-search fallback, layered on top of router.ts (never inside
+  // it — see AskV2Deps.tavilySearchFn doc). Only reachable when the sync webFallbackFn path
+  // didn't already cover it (insufficient_coverage is true exactly when verdict != correct AND no
+  // webFallbackFn fired), so this and the sync path never both run for the same query.
+  //
+  // ISS-274 / D-041 ruling 2: the seam must be REACHED on every off-corpus question, not merely
+  // present. tavilySearchFn can now throw (no TAVILY_API_KEY configured -> TavilyUnavailableError,
+  // or a real Tavily HTTP/network failure) instead of always resolving. Either case degrades
+  // HONESTLY and OBSERVABLY: caught here, logged via a distinct `ask.web_fallback_unavailable`
+  // audit entry (status "failed", the real error message attached), and insufficient_coverage is
+  // left exactly as ask() computed it — never flipped to a false "resolved" and never left to
+  // crash the whole /ask request.
   if (askResult.insufficient_coverage && tavilySearchFn) {
-    const webResults = await tavilySearchFn(query);
-    await recordJob({ tenantId, kind: "ask.web_fallback", status: "done" }, write);
-    auditLog.push({ jobKind: "ask.web_fallback", step: "web_fallback" });
-    askResult = { ...askResult, web_used: true, insufficient_coverage: false, sources: { ...askResult.sources, web: webResults } };
+    try {
+      const webResults = await tavilySearchFn(query);
+      await recordJob({ tenantId, kind: "ask.web_fallback", status: "done" }, write);
+      auditLog.push({ jobKind: "ask.web_fallback", step: "web_fallback" });
+      askResult = { ...askResult, web_used: true, insufficient_coverage: false, sources: { ...askResult.sources, web: webResults } };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      await recordJob({ tenantId, kind: "ask.web_fallback_unavailable", status: "failed", error: message }, write);
+      auditLog.push({ jobKind: "ask.web_fallback_unavailable", step: `web_fallback_unavailable: ${message}` });
+      // insufficient_coverage / web_used are deliberately left unchanged: the fallback was
+      // reached and failed, which is not the same claim as "there was nothing to fall back to".
+    }
   }
 
   for (const s of askResult.scored) {

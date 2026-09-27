@@ -145,6 +145,30 @@ describe("AskPage", () => {
     expect(screen.getByText(/no web fallback is configured/i)).toBeInTheDocument();
   });
 
+  test("ISS-274: distinguishes 'fallback unavailable' (reached, honestly failed) from 'no fallback configured' (never wired)", async () => {
+    // Before this unit, web_used:false always meant "no tavilySearchFn was configured" -- now the
+    // seam is always wired (apps/api/src/production.ts), so web_used:false can also mean "the
+    // fallback was reached and failed honestly" (e.g. no TAVILY_API_KEY). ask-v2.ts records that
+    // as an `ask.web_fallback_unavailable` audit entry; the page must say something DIFFERENT and
+    // ACCURATE in that case, not repeat the now-false "no web fallback is configured" claim.
+    vi.spyOn(askApi, "ask").mockResolvedValue(
+      response({
+        verdict: "incorrect",
+        insufficient_coverage: true,
+        web_used: false,
+        auditLog: [{ step: "answer" }, { step: "web_fallback_unavailable: web fallback unavailable: TAVILY_API_KEY not configured" }],
+      }),
+    );
+    renderPage();
+    await submit("something off-corpus");
+
+    await waitFor(() =>
+      expect(screen.getByText(/judged internal coverage insufficient/i)).toBeInTheDocument(),
+    );
+    expect(screen.getByText(/web fallback was reached but is currently unavailable/i)).toBeInTheDocument();
+    expect(screen.queryByText(/no web fallback is configured/i)).toBeNull();
+  });
+
   test("renders the API error message rather than a generic failure", async () => {
     vi.spyOn(askApi, "ask").mockRejectedValue(new ApiError(404, "no tree index built for this tenant yet"));
     renderPage();

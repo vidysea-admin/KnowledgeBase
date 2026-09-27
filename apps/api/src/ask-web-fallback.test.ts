@@ -2,18 +2,44 @@
  * apps/api/src/ask-web-fallback.test.ts — real behavior of `createTavilySearchFn`, `fetch`
  * mocked (no real network call in tests — the honest limitation disclosed in the manifest is
  * that the REAL Tavily HTTP path is unverified pending a real TAVILY_API_KEY, not this logic).
+ *
+ * ISS-274: `createTavilySearchFn` no longer returns `undefined` when the key is unset — it always
+ * returns a function, so the seam is reachable. Without a key that function REJECTS with
+ * `TavilyUnavailableError` instead of performing a network call or resolving with fake success.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { createTavilySearchFn } from "./ask-web-fallback.js";
+import { createTavilySearchFn, TavilyUnavailableError } from "./ask-web-fallback.js";
 
-test("createTavilySearchFn returns undefined when TAVILY_API_KEY is unset", () => {
+test("createTavilySearchFn always returns a function, even with no TAVILY_API_KEY (ISS-274)", () => {
   const prev = process.env.TAVILY_API_KEY;
   delete process.env.TAVILY_API_KEY;
   try {
-    assert.equal(createTavilySearchFn(), undefined);
+    const fn = createTavilySearchFn();
+    assert.equal(typeof fn, "function", "the seam must be reachable even with no key configured");
   } finally {
+    if (prev !== undefined) process.env.TAVILY_API_KEY = prev;
+  }
+});
+
+test("createTavilySearchFn's function rejects with TavilyUnavailableError when no key is set, WITHOUT a network call (ISS-274)", async () => {
+  const prev = process.env.TAVILY_API_KEY;
+  delete process.env.TAVILY_API_KEY;
+  const originalFetch = globalThis.fetch;
+  let fetchCalled = false;
+  globalThis.fetch = (async () => {
+    fetchCalled = true;
+    throw new Error("must not be called");
+  }) as typeof fetch;
+
+  try {
+    const fn = createTavilySearchFn();
+    await assert.rejects(() => fn("what color are apples?"), TavilyUnavailableError);
+    await assert.rejects(() => fn("what color are apples?"), /web fallback unavailable: TAVILY_API_KEY not configured/);
+    assert.equal(fetchCalled, false, "the honest-unavailable path must not touch the network");
+  } finally {
+    globalThis.fetch = originalFetch;
     if (prev !== undefined) process.env.TAVILY_API_KEY = prev;
   }
 });
