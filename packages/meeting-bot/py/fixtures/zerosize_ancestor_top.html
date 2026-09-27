@@ -1,0 +1,16 @@
+<!doctype html>
+<!-- ISS-U0-6 fixture (checker cycle 2, high): iframe has its OWN explicit nonzero width/height,
+     nested inside an ancestor <div> that clips its own box to zero size via overflow:hidden.
+     overflow:hidden only clips rendering -- it does not remove the child from layout or zero the
+     child's own rect -- so the cycle-1/cycle-2 getClientRects()-based check stayed blind to this
+     ancestor-level clipping, unlike an ancestor display:none (which removes the whole subtree
+     from layout, so it DOES zero the child's client rects). -->
+<html>
+<head><title>zerosize-ancestor-top</title></head>
+<body>
+  <a href="#">Back</a>
+  <div style="width:0;height:0;overflow:hidden;">
+    <iframe id="wc" src="hidden_leaf.html" style="width:400px;height:300px;border:0;"></iframe>
+  </div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<!doctype html>
+<!-- Cycle-3 happy-path fixture: Zoom's real web-client shape often renders its join iframe as a
+     full-viewport overlay (position:fixed;inset:0;width:100%;height:100%) rather than a fixed
+     640x480 box. Must still be traversed, clicked and read -- the geometric visible-area rewrite
+     must not treat "fills the whole viewport" as somehow less visible than a small fixed box. -->
+<html>
+<head><title>happy-fullviewport-top</title></head>
+<body>
+  <a href="#">Back</a>
+  <iframe id="wc" src="inner.html" style="position:fixed;inset:0;width:100%;height:100%;border:0;"></iframe>
+</body>
+</html>

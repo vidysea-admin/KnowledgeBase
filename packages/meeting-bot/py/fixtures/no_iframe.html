@@ -1,0 +1,10 @@
+<!doctype html>
+<!-- Regression fixture: a Zoho/Meet-style page with the join UI directly in the top document,
+     no iframe at all. Both CLICK_JS and BODY_TEXT_JS must behave exactly as before this fix. -->
+<html>
+<head><title>no-iframe</title></head>
+<body>
+  <p>The webinar has ended. Thank you for attending.</p>
+  <button onclick="this.textContent = this.textContent + ' (clicked)';">Join</button>
+</body>
+</html>

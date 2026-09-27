@@ -1,0 +1,13 @@
+<!doctype html>
+<!-- ISS-U0-4/ISS-U0-5 fixture leaf: a Join button (matches JOIN_TEXTS "join") and an
+     END_PHRASES substring ("webinar has ended" / "thank you for attending"), reused by three
+     wrapper pages that each hide the CONTAINING <iframe> a different way. If the frame-visibility
+     gate works, none of CLICK_JS/BODY_TEXT_JS ever see this content regardless of which wrapper
+     loads it. -->
+<html>
+<head><title>hidden-leaf</title></head>
+<body>
+  <p>The webinar has ended. Thank you for attending.</p>
+  <button onclick="this.textContent = this.textContent + ' (clicked)';">Join</button>
+</body>
+</html>

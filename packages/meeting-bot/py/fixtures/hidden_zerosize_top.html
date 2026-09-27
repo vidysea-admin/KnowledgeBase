@@ -1,0 +1,12 @@
+<!doctype html>
+<!-- ISS-U0-4 fixture: same-origin iframe collapsed to zero size. Before the fix, CLICK_JS's own
+     visibility check reads the button's rect relative to ITS OWN document (the iframe lays out
+     its content at natural size regardless of the container's collapsed CSS size), so the button
+     appeared clickable even though the iframe renders nowhere on the page. -->
+<html>
+<head><title>hidden-zerosize-top</title></head>
+<body>
+  <a href="#">Back</a>
+  <iframe id="wc" src="hidden_leaf.html" style="width:0;height:0;border:0;overflow:hidden;"></iframe>
+</body>
+</html>

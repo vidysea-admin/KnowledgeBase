@@ -1,0 +1,14 @@
+<!doctype html>
+<!-- ISS-U0-4/ISS-U0-5 fixture: the <iframe> element itself carries no hiding style at all (it
+     has an explicit non-zero size and no display/visibility override) — only an ANCESTOR <div>
+     is display:none. Proves the visibility gate walks ancestors, not just the iframe's own
+     inline style/rect. -->
+<html>
+<head><title>hidden-in-displaynone-div-top</title></head>
+<body>
+  <a href="#">Back</a>
+  <div style="display:none;">
+    <iframe id="wc" src="hidden_leaf.html" style="width:640px;height:480px;border:0;"></iframe>
+  </div>
+</body>
+</html>

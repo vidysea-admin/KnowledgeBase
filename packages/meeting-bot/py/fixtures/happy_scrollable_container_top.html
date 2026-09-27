@@ -1,0 +1,15 @@
+<!doctype html>
+<!-- Cycle-3 happy-path fixture: a genuinely visible, on-screen iframe nested inside an
+     overflow:auto container -- overflow:auto/scroll containers are common real layout (a
+     scrollable panel) and must NOT be treated as clipping the iframe just because their computed
+     overflow isn't 'visible', as long as the iframe's own rect still fits inside the container's
+     own (nonzero, on-screen) box. -->
+<html>
+<head><title>happy-scrollable-container-top</title></head>
+<body>
+  <a href="#">Back</a>
+  <div style="width:700px;height:520px;overflow:auto;">
+    <iframe id="wc" src="inner.html" style="width:640px;height:480px;border:0;"></iframe>
+  </div>
+</body>
+</html>

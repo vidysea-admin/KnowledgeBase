@@ -1,0 +1,11 @@
+<!doctype html>
+<!-- ISS-U0-1 fixture: top document has only a non-matching "Back" link. Zoom's real join UI
+     (name field, Join button, "Join Audio by Computer", waiting-for-host text) lives entirely
+     inside a same-origin <iframe>, exactly as the live probe found on app.zoom.us/wc/<id>/join. -->
+<html>
+<head><title>top</title></head>
+<body>
+  <a href="#">Back</a>
+  <iframe id="wc" src="inner.html" style="width:640px;height:480px;border:0;"></iframe>
+</body>
+</html>

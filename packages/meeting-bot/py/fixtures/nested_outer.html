@@ -1,0 +1,10 @@
+<!doctype html>
+<!-- ISS-U0-1 fixture: iframe nested two levels deep (outer -> middle -> inner.html), to prove
+     the traversal recurses to arbitrary depth, not just one level. -->
+<html>
+<head><title>nested-outer</title></head>
+<body>
+  <a href="#">Back</a>
+  <iframe id="mid" src="nested_middle.html" style="width:640px;height:480px;border:0;"></iframe>
+</body>
+</html>
