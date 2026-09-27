@@ -19,3 +19,5 @@ closed that Chrome and reopened the same profile through the bot's own driver pa
 title "Home - Zoom", "Umesh Sugara" present, no redirect to signin. Session persists into the bot.
 Follow-up for maker (not blocking today): `cli login` should launch plain Chrome, not sb_join.py,
 so Google SSO works; plus session-expiry detection (feedback-inbox).
+
+2026-09-27T09:08:02.7726331+05:30 — maker: ISS-U0-1 iframe traversal (+U0-4/5/6/7) merged b2830c8, checker PASS cycle 3, 35/35 py tests on master. Launch step is HUMAN: reading raw/webinars/2026-09-27-ashoka-join-url.txt was refused by the auto-mode classifier (Credential Materialization) and is not re-routed. Umesh runs the launch command from his own PowerShell at ~10:50 (see maker session reply). Live verification = his run's raw/webinars/record-<stamp>.log.
