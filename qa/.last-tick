@@ -252,3 +252,34 @@ the two with the widest unblocking effect are `iss-322-multifile-shape: a` + `ne
   open critical+high, 22 need an `Approved-by` signature, 4 sit behind the speaker pause/cap, 5 behind
   named gates, 1 is itself a HUMAN_GATE.
 - SERIAL: none. wave=3, dispatched as one wave; each unit's checker goes out the turn its build returns.
+
+## 2026-09-27 ~19:0x IST — maker tick — state: ADVANCED (2 of 3 builds back, both checkers out)
+- `topicrefs-arg-guard` (333c7f1) returned having done something **materially different from its brief**,
+  and it was right to. My brief said "the sessionId argument is undefended — add a guard, choose the
+  boundary". That came from the row's TITLE. The row's own evidence says the opposite about what to
+  change: the filing checker had mutated the argument to a hard-coded "s2" and apps/api stayed
+  **142/142 green**, and the row states "Cause is the FIXTURE, not the assertions" and "the shipped
+  argument is correct". The builder read the row, reported the discrepancy, added **no guard anywhere**,
+  and changed only a test file. **D-040 appended** — dispatch briefs come from `evidence` and
+  `fix_direction`, never the title. The irony worth keeping: the brief cited ISS-333 to warn against
+  fixing a defect at one consumer when it lives upstream, and was committing that error one level up.
+- its checker was dispatched told explicitly that the unit diverged from its brief, that the burden of
+  proof is therefore **higher not lower**, and that its first job is to rule on whether the reframing is
+  right at all — because if the row really does describe an undefended argument, this unit fixed the
+  wrong thing and that is a FAIL. Also asked to rule on a **disclosed D-020 deviation**: the sandbox
+  refused a chained `trap` construct, so arm/mutate/test/restore ran as separate calls, which does not
+  satisfy "restore fires on timeout AND interrupt AND error". Whether `mutate.mjs`'s ledger plus
+  `assert-clean` is equivalent is a real open question and it is the checker's to answer, not mine.
+- `jobkey-collision-detection` (5f8e1eb, a7f44be) returned: deriveJobKey now appends a SHA-256 suffix
+  instead of relying on the lossy collapse, writeScheduledJob refuses a different-sessionId overwrite,
+  schedule-tick catches and continues. 47/47, ISS-321 4/4 against the row's own four collision pairs,
+  4 self-written mutations all RED, ledger clean.
+- its checker was dispatched with the two things the builder **volunteered** as the primary targets,
+  precisely because volunteering them is not the same as them being safe: (1) the jobKey format changes
+  for every sessionKey, orphaning any existing Scheduled Task, declared acceptable on the empirical
+  claim that no real task has ever been created — if that claim is wrong this strands live recordings on
+  the machine of a user whose webinar already failed once; (2) `deriveJobKey` now returns a valid key for
+  `'   '`, `':::'` and over-long input where it used to return `null` — losing a rejection path while
+  adding a collision guard would be a net loss, so every caller must be checked for reliance on that null.
+- third build (`vector-gap-durability`, ISS-122) still running.
+- SERIAL: none. Each checker went out in the turn its build returned; wave=3 builds, concurrent peak=3.
