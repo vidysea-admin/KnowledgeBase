@@ -88,10 +88,14 @@ Both are called out in `WatchPage.tsx`'s header comment too.
    that source, via `poll-now-summary`'s `failed[]`) but this is a real product gap, not a display
    choice — closing it needs the run to persist failure state on the source (an `apps/api` +
    schema change, outside this unit's authorization).
-2. **[R5] No API exposes "why an auto-record was selected."** `selectAutoRecordItems`
-   (`packages/meeting-bot/src/calendar/auto-join.ts`) and `schedule-state.json`
+2. **[R5] No API exposes "why an auto-record was selected."** The real decision is
+   `selectAutoRecordItems` (`packages/meeting-bot/src/calendar/auto-join.ts`), composed by
+   `packages/meeting-bot/src/calendar/schedule-tick.ts` (the `cli schedule-tick` command) — not
+   `scripts/watch/run-watch.mjs`, which is U2's Drive/Gmail digest watcher and does no selection or
+   trust filtering at all. The chosen items' dedup state lands in `schedule-state.json`
    (`packages/meeting-bot/src/calendar/schedule-state.ts`, whose own header calls it "a local JSON
-   file... single-poller-instance data") are CLI-only; no route serves either. "Next up" therefore
+   file... single-poller-instance data"). All of this is CLI-only; no `apps/api` route serves
+   `selectAutoRecordItems`'s output or `schedule-state.json`. "Next up" therefore
    lists real `GET /meeting-candidates` rows with status `approved`/`auto_approved` (a genuinely
    real "this will be auto-recorded" signal CalendarPage already relies on) with their **real
    status** as the plain-language reason — not the richer selection reason spec.md's prose
