@@ -41,3 +41,25 @@ the live proof run — the fix works as it stands in the lane.
 **Answer format:** reply `obs-windows-loc-split: a` (or b / c) → the maker appends
 `Answered: <ISO> - <choice> - <where>` here. In this Lab repo the choice also needs a DECISIONS entry
 via `scripts/append_decision.ps1` before the split lands.
+
+---
+
+## Update 2026-09-27 — the gate got more acute while it waited (unit `obs-launch-error`, ISS-337)
+
+The ISS-337 fix touches the same file and took it **352 -> 359 non-blank lines** (budget 300). The
++7 lines are the retained `ChildProcess`, the `child.on("error")` listener and its comment — the
+minimum the fix needs. It is stated in `qa/manifests/obs-launch-error.md` under a "Declared
+regression, not hidden" heading rather than left to be discovered.
+
+Two facts that change how this gate should be read:
+
+- **ISS-340 (high) exists now**, filed in the 2026-09-27 sweep, precisely because D-039 merged past
+  this open gate and disclosed the resulting violation in prose instead of in the ledger. So the
+  cost of leaving this unanswered is no longer hypothetical — it has already produced one issue.
+- **Option (c) is now measurably worse than when it was written.** Its caveat was that landing over
+  budget "normalises" a red gate. That has now happened twice in one day on this one file.
+
+The recommendation is unchanged — **(a)**, split the file — and the ask is unchanged. What changed is
+that the file is 59 lines over instead of 52, and a second unit has had to declare the same debt.
+
+**Answer format (unchanged):** reply `obs-windows-loc-split: a` (or b / c).

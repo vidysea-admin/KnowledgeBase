@@ -131,3 +131,28 @@ MISSED_WAKEUP 2026-09-27T09:44:00+05:30
   - SERIAL: no build unit ran — U4a/U4b/U4c are all gated on the spec+plan approval lines, which is
     the PLAN gate working as intended, not a ceiling
   - continuation: ScheduleWakeup armed for 17:36 right after this line
+
+## 2026-09-27 ~17:5x IST — maker tick — state: ADVANCED
+- bound to D:\KnowledgeBase · adapter: DEFAULT (coding, no qa/adapter.json)
+- unit built: obs-launch-error (ISS-337, high) — backlog **tier 2** (open critical/high).
+  Tier 1 empty (0 QUEUE TODO rows). Both open criticals not pullable: ISS-282 paused by Umesh
+  (qa/.paused.u2-4-phase3-precision-regate, needs >=8 GB free RAM + his go-ahead), ISS-104
+  round-capped at >=6 non-security PASSes on the speaker seam (D-014 class rule). ISS-337 is the
+  top freely-buildable high with no gate in front of it.
+- lane: worktree D:/KnowledgeBase-lanes/obs-launch-error, branch wave/obs-launch-error, commit 45ccf9f
+- evidence: obs-guard 9/9 · meeting-bot 254/254 · tsc --noEmit exit 0 · lint-loc still 4 violations,
+  no new file. Both falsifying mutations isolate to their named assertions under D-020 discipline
+  (byte backup, trap on EXIT INT TERM ERR, timeout 150, cmp — RESTORED-VERIFIED, nothing committed).
+- the finding worth keeping: under mutation 1 (deleting `child.on("error")`) the FAKE-PROBE test
+  ISS-337(a) still passed — a test that supplies the onError callback itself cannot see the listener
+  being removed. Only the test driving the real `spawn` went red. That is why launchObsNormally is
+  exported as a seam, and it is the thing to re-check if anyone later "simplifies" the export away.
+- checker DISPATCHED this same turn (no-dangling rule), cycle 0, briefed to falsify independently
+  rather than accept the manifest's mutation table, and to verify ISS-337's ledger row itself per D-015.
+- declared, not hidden: this unit takes obs-windows.ts 352 -> 359 non-blank lines vs the C1 budget
+  of 300. Appended to qa/gates/obs-windows-loc-split.md; ISS-340 (high) already tracks D-039 having
+  merged past that gate with a prose-only disclosure. Not repeating that pattern.
+- SERIAL: only one unit in this wave. U4a/U4b/U4c wait on the u4-spec/u4-plan approval lines (PLAN
+  gate, a named dependency, not a ceiling); U6 waits behind U4 by Umesh's "finish the capture wave"
+  sequencing; ISS-322 waits on iss-322-multifile-shape. wave=1 · concurrent peak=1 (checker).
+- continuation: ScheduleWakeup armed immediately after this line is written (not before).
