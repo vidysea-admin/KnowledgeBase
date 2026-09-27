@@ -374,4 +374,10 @@ No real Windows Scheduled Task created this session either (still a build-sessio
 Calendar events still always `[]`. Master-moved-during-build note from cycle 1 still applies —
 not re-verified against the current tip in this session (targeted-tests scope).
 
-**Status:** checked-PASS (cycle 2, verdict b96d22e; merge HELD until after the 2026-09-27 12:50 live webinar run, launcher file shared)
+**Status:** checked-PASS (cycle 2, verdict b96d22e) — **merged** in `213d2ac`
+
+Status-line correction, 2026-09-27 15:5x: this line read "merge HELD until after the 2026-09-27
+12:50 live webinar run" long after `213d2ac` had merged the lane, and the maker's own status audit
+repeated the stale "merge HELD" to Umesh as a live blocker. The hold's reason (don't disturb the
+shared launcher file before a real run) expired when that run happened — it is the run that failed
+to record and produced ISS-323/324, whose fix is now merged too (`3368454`).
