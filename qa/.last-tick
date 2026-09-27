@@ -345,3 +345,31 @@ the two with the widest unblocking effect are `iss-322-multifile-shape: a` + `ne
   collision refusal becomes the same "looked like it worked" class ISS-271/272 closed today.
 - open at tier 2/4 that is freely buildable: **0**. Three units merged this tick; the fourth
   (`vector-gap-durability`) is held at `qa/gates/iss-122-round-cap-breach.md` by the round cap.
+
+## 2026-09-27 ~19:4x IST — maker tick — state: HUMAN_GATE (idle-tick audit, nothing buildable)
+- heartbeat fired, nothing due, no gate answered on disk. Used the idle tick to audit `qa/gates/`
+  rather than manufacture a unit — and found the maker's own reporting was wrong.
+- **`qa/gates/` recorded state four incompatible ways** with no canonical field: `**Answered:**
+  (pending)` (4 files) · a `## Answered` heading with italic "(unanswered)" (2) · an inline dated
+  `**Answered:** <date> — <choice>` (22) · **no marker at all** (2 — and both were files the maker
+  itself wrote and was actively asking about). A grep for the first convention reports **4** open
+  gates; the real number is **9**.
+- worse: `write-guard-contract-contradiction.md` carries `**Answered:** <pending>` at line 32 and a
+  real dated authorisation at line 35, so a naive pending-scan reports an ANSWERED gate as blocked.
+- **the correction I owe Umesh:** gate counts have been reported to him from memory every tick, not
+  from any scan. The plan file lists `external-eval-data-egress`, `github-export-internal-qa`,
+  `iss-245-multifile-plan`, `write-guard-contract-contradiction` and `meeting-bot-live-capture-adoption`
+  as long-dormant **unanswered** gates. All five carry dated answers (2026-09-21 / 2026-09-25). That
+  was wrong and it was wrong in the direction that makes the maker look more blocked than it is.
+- fixed additively: a canonical `**Gate status:** OPEN|PARTIAL|ANSWERED|CLOSED` line now exists in all
+  32 gate files. Classifier precedence: explicit closure > dated answer > pending marker. **No existing
+  Answered line was edited, moved or removed.** The one file whose markers did not settle its state
+  (`ui-surfaces-test-file-exclusion.md`) was left untouched rather than guessed at.
+- the directory is now countable in one command: **22 ANSWERED · 8 OPEN · 1 PARTIAL · 1 CLOSED**.
+- filed **ISS-348 (medium)**. Its remaining work is deliberately NOT done here: the stale pending line
+  is a governance record and wants Umesh's eye, not a silent fix; and having the session-start hook
+  print the computed OPEN count touches an enforcement path, so it needs an `Approved-by` entry.
+- **the 9 that actually await Umesh**, computed not recalled: iss-122-round-cap-breach ·
+  iss-322-multifile-shape · obs-windows-loc-split · live-recording-proof-method ·
+  enforcement-hooks-unauthorized-and-live-regressed · d015-generalisation-scope ·
+  ledger-shard-union-hook · handshake-liveness-contract-start · plan-approved-u4-watch-dashboard (PARTIAL).

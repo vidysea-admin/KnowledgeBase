@@ -47,3 +47,5 @@ over a path no human has ever watched succeed is how the Ashoka failure repeats 
 `Answered: <ISO> — <choice> — <where>` here before running anything.
 
 **Answered:** (pending)
+
+**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file

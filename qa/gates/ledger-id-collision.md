@@ -105,3 +105,5 @@ re-flagging, maker re-asking). Filed as **ISS-131**. Two follow-ons are NOT clos
 are tracked separately: **ISS-129** (no reader actually globs the shards, so D-019's union is
 declared but not implemented) and **ISS-130** (only 1 of 3 lanes has adopted a shard, so the
 collision this gate describes is still possible in `a-speakers` and `b-golden-set`).
+
+**Gate status:** ANSWERED — recorded inline: 2026-09-08 — **per-lane ledgers with namespaced ids** (the "no collisions by

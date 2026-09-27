@@ -59,3 +59,5 @@ safe under privacy, and that is the dependency the original answer left implicit
 **Residual risk, stated rather than closed:** the 40 addresses were publicly reachable between
 2026-09-21 and 2026-09-27. Making the repo private stops further access but cannot un-cache what
 third parties may already have fetched or indexed. No remediation is claimed here.
+
+**Gate status:** ANSWERED — recorded inline: 2026-09-21 — **A (approve repo + content scope)**. Umesh approved pushing the

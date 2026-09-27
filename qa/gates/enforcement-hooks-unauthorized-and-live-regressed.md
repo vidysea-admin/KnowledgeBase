@@ -162,3 +162,5 @@ the file is covered.
 | *(this cycle)* | ISS-205 clauses 2 and 3 — the erased-value sentinel, the `Fix cycle` sibling, and the unreadable-cycle default |
 
 Answering this gate should therefore cover **all three**, not the first alone.
+
+**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file

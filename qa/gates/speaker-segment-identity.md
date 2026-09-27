@@ -60,3 +60,5 @@ just a display name. That persona end-state is the target data-model shape for t
 speaker write unit; it does NOT change the phase order here — the deterministic block floor
 (phase 1) and no-write precision eval (phase 3) still come first, and `schema/` changes stay
 behind the separate approved write unit (phase 4).
+
+**Gate status:** ANSWERED — recorded inline: 2026-09-21 — **A (segment-aware plan)**. Umesh approved the four-phase plan, with an

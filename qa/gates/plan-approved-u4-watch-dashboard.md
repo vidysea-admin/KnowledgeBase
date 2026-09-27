@@ -39,3 +39,5 @@ Consequences the maker is taking from those three answers, so the spec can be ch
   read-only apart from the pre-existing `POST /watched-sources/run`.
 **Answered: spec —** (pending)
 **Answered: plan —** (pending)
+
+**Gate status:** PARTIAL — intent answered 2026-09-27; the spec and plan lines are still pending

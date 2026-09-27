@@ -38,3 +38,5 @@ No browser page, API route, Mongo collection, production data, or external servi
 ## Checker reconciliation (Mode B sweep 2026-09-21)
 
 The question above was answered on disk on 2026-09-21 (A) and the answered work is landed (commit e22dea5, manifest qa/manifests/iss-245-opener-accountability.md, verdict qa/verdicts/iss-245-opener-accountability.md, checker PASS). The earlier **Answered:** 2026-09-21 - **A (approve the two-file plan)** line above already resolves this gate; this note adds the on-disk pointer so no later sweep re-asks it. (Checker note 2026-09-21T23:4x+05:30; no decision content changed.)
+
+**Gate status:** ANSWERED — recorded inline: 2026-09-21 — **A (approve the two-file plan)**. Umesh approved the exact in-place plan above (scripts/demo-liv

@@ -124,3 +124,5 @@ reserves new files for you regardless of how well-precedented they are.
 explicitly rather than inferred from the shape approval.
 
 **Answered:** (pending)
+
+**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file

@@ -33,3 +33,5 @@ this unit (its sibling stall `delivery-gate-manifest-blindness` is already cover
 ---
 
 **Answered:** 2026-09-25 — **Fix authorised** — Umesh (AskUserQuestion, 2026-09-25) on the config audit's Critical C1: the guard fails OPEN on its own deny via `$ErrorActionPreference=Stop` + an outer `catch { exit 0 }`, reachable through a Windows extended-length path prefix to docs/DECISIONS.md and settings.json. Authorised: make the deny path fail-CLOSED, strip the extended-length prefix before the existence probe, add a fixture asserting a THROWN EXCEPTION never yields an allow, and correct ISS-180's recorded root cause (it blames Test-Path; the real mechanism is the fail-open catch). Requires a DECISIONS entry carrying Approved-by: Umesh.
+
+**Gate status:** ANSWERED — recorded inline: 2026-09-25 — **Fix authorised** — Umesh (AskUserQuestion, 2026-09-25) on the config audit's Critical C1: the g

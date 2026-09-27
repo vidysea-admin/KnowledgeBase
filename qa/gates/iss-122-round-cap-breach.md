@@ -74,3 +74,5 @@ unit is pulled.
 entry is written before the merge.
 
 **Answered:** (pending)
+
+**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file

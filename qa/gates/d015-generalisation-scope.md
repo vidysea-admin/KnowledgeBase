@@ -79,3 +79,5 @@ On approval the maker drafts the entry and you run
 ## Answered
 
 _(unanswered — append `Answered: <ISO date> — <choice> — <where>` before acting)_
+
+**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file

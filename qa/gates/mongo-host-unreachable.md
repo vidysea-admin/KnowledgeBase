@@ -151,3 +151,5 @@ WhatsApp Mongo endpoint (`whatsapp_msg`, same host family) reachable but returni
 database on 2026-09-24 — no linked WhatsApp account, so there is nothing to read yet. That is a
 different blocker (account linking, not host/network reachability) and keeps T-007 criterion 14
 open under its existing terms. Do not read the `lkb` answer above as closing WhatsApp too.
+
+**Gate status:** ANSWERED — recorded inline: 2026-09-08 — SELF-RESOLVED (see the close-out note above). Left no longer pending.

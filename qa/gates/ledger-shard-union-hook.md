@@ -44,3 +44,5 @@ or what it blocks.
 ## Answered
 
 *(unanswered — append `Answered: <ISO date> — <choice> — <where>` before acting)*
+
+**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file

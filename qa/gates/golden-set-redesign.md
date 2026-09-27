@@ -300,3 +300,5 @@ Findings the re-pointer of U1.4/U1.5 gates must read:
   (86/92), question-blind control 0.217 cited beside it, 6 non-zero misses, pin rate 10.9%
   (threshold: well below 63%), near-verbatim 0/0. Condition 2's band holds (not 1.000 — no
   Option B escalation). Manifest: `qa/manifests/golden-set-semantic-leg.md`.
+
+**Gate status:** ANSWERED — Answered 2026-09-08 - Option C (regenerate from raw transcripts) - recorded inline

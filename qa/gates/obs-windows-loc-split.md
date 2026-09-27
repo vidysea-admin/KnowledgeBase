@@ -63,3 +63,5 @@ The recommendation is unchanged — **(a)**, split the file — and the ask is u
 that the file is 59 lines over instead of 52, and a second unit has had to declare the same debt.
 
 **Answer format (unchanged):** reply `obs-windows-loc-split: a` (or b / c).
+
+**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file

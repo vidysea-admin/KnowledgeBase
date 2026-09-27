@@ -83,3 +83,5 @@ paths). One line is enough.
 ## Answered:
 
 _(unanswered)_
+
+**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file
