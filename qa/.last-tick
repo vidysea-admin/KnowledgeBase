@@ -227,3 +227,28 @@ the two with the widest unblocking effect are `iss-322-multifile-shape: a` + `ne
 - SERIAL: none — the checker followed its own build, a real dependency edge, and it was dispatched in
   the turn the build returned. wave=1 · concurrent peak=1. The one-unit-deep ceiling recorded above
   still holds: with ISS-271/272 now closed, the ungated buildable inventory at critical/high is **0**.
+
+## 2026-09-27 ~18:4x IST — maker tick — state: ADVANCED (wave of 3 dispatched)
+- tier 3 (roadmap) is **gated, not skipped**: U4a/U4b/U4c wait on the u4-spec/u4-plan approval lines;
+  U6 needs a new file (`scripts/watch/install-tasks.ps1`) which the anti-drift rule reserves for
+  Umesh, and it also installs Windows Scheduled Tasks on his machine — an outward-facing action.
+- so tier **4** (open medium), **three units in ONE wave**, files pairwise disjoint, no schema, no
+  shared runtime: `jobkey-collision-detection` (ISS-321, packages/meeting-bot/src/calendar/) ·
+  `vector-gap-durability` (ISS-122, ingest/index pipeline) · `topicrefs-arg-guard`
+  (ISS-C-TOPICREFS-ARG-001, tree-index-v2 — a **lane-shard** id, read via the D-019 union, not
+  renumbered).
+- deliberately NOT pulled, each with its reason rather than silently skipped:
+  - **ISS-335** (/ask registered twice in App.tsx) — medium + UI. This repo's severity gate says a
+    medium is verified inside the next unit that touches the same file, and that unit is U4c, which
+    builds the watch page in App.tsx. Pulling it now would buy a full persona walk across two user
+    types for a dead route.
+  - **ISS-LIVE-RECORD-REPAIR-001** — its own fix_direction ends "Needs a design call before
+    building": any fix must not trade away the ISS-323 liveness gate, which REQUIRES waiting on the
+    child, and the two-stage launch that detaches cleanly cannot report the real pid back. Gated.
+  - **ISS-T-033-2** (obs-windows.ts 120s timer never cleared) — lands in the file that is 359/300
+    with an unanswered LOC gate. Making that gate redder for a medium is the pattern ISS-340 exists
+    to punish.
+- ungated critical/high inventory is **0** after ISS-271/272 closed. That is the honest state: of 33
+  open critical+high, 22 need an `Approved-by` signature, 4 sit behind the speaker pause/cap, 5 behind
+  named gates, 1 is itself a HUMAN_GATE.
+- SERIAL: none. wave=3, dispatched as one wave; each unit's checker goes out the turn its build returns.
