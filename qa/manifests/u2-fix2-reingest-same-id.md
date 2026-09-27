@@ -156,4 +156,4 @@ fixed `--reingest` run confirms `2026-09-24-in-focus` (the correct, non-forked i
 
 Fix cycle 1 of 3. No prior cycles — this is ISS-314's first fix attempt.
 
-**Status:** ready-for-check
+**Status:** checked-PASS (verdict qa/verdicts/u2-fix2-reingest-same-id.md, cycle 1, 1bfd83f; follow-up ISS-316 medium)
