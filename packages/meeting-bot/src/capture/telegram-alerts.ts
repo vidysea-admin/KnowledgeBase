@@ -80,6 +80,19 @@ export interface TelegramNotifier {
    * start, naming the meeting and the reason it was surfaced/selected. `startTime` is optional so
    * a caller with only a date (no exact time) can still alert. */
   notifyUpcomingRecording(meetingTitle: string, reason: string, startTime?: string): void;
+  /** R2 (u4b-watch-heartbeat-alert, D-046, spec.md R2): fires when a watched source's liveness
+   * heartbeat has gone stale — the load-bearing "polling stopped happening at all" alert, as
+   * opposed to `notifyPollFailed`'s "a poll ran and failed". `lastHeartbeatAt` is `null` for a
+   * source that has never completed a single run (distinct from one that used to be healthy and
+   * went quiet — the message text says which). `intervalMs` is echoed in the message so the reader
+   * never has to know the configured threshold from memory. The `(tenantId, sourceType)` state-
+   * based "one alert, then silence until it recovers" throttle is the CALLER's job (same division
+   * of responsibility as `notifyPollFailed` — see that method's doc comment): this method itself
+   * always sends, subject only to the generic per-key time throttle every method here already has.
+   * NOT YET CALLED by any production code path this cycle — see u4b-watch-heartbeat-alert's
+   * manifest for why the write/read side (a new `watch_heartbeat` collection, D-046) and the
+   * detector's independent invocation are HUMAN_GATE material, not built here. */
+  notifyWatchSilent(tenantId: string, sourceType: string, lastHeartbeatAt: string | null, intervalMs: number): void;
   /** Pure event-shape dispatcher for sb_join.py's JSON stream (the existing onEvent point in
    * record-commands.ts). Maps "reconnect-reload" -> disconnected and a completed, RECOVERED gap
    * -> recovered; every other event (heartbeat, clicked, tab-switch, an unrecovered end-of-run
@@ -165,6 +178,13 @@ export function createTelegramNotifier(deps: TelegramNotifierDeps = {}): Telegra
       fireAndForget(
         `upcoming:${meetingTitle}:${startTime ?? ""}`,
         `📅 Upcoming recording${when}: ${meetingTitle} — ${reason}`,
+      );
+    },
+    notifyWatchSilent(tenantId, sourceType, lastHeartbeatAt, intervalMs) {
+      const last = lastHeartbeatAt ? `last completed run: ${lastHeartbeatAt}` : "no run has ever completed";
+      fireAndForget(
+        `watchSilent:${tenantId}:${sourceType}`,
+        `🔕 Watch gone quiet: ${sourceType} (tenant ${tenantId}) — ${last}, expected within ${formatDuration(intervalMs / 1000)}. This means polling itself has stopped, not that a poll failed — check the watcher process/task, not the credential.`,
       );
     },
     onBotEvent(ev) {

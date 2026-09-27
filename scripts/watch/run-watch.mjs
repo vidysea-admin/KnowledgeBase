@@ -105,6 +105,62 @@ export function isImminentDate(dateStr, now) {
   return diffDays >= 0 && diffDays <= 1;
 }
 
+// --- U4b (u4b-watch-heartbeat-alert, D-046) pure heartbeat-liveness helpers — no I/O. R2
+// (spec.md): "if no watch run has completed within a configured interval, alert." Nothing here is
+// wired to a call site or to Mongo yet — see this unit's manifest, "Why R2 stops at pure functions
+// this cycle", for why the write/read side (a new `watch_heartbeat` collection, D-046 point 4) and
+// the detector's independent invocation are HUMAN_GATE material rather than built here. These are
+// the tested brain that wiring will call once that collection is authorized.
+
+/** R2: the interval a source's heartbeat must not go stale past, in ms. Configured via
+ * WATCH_HEARTBEAT_INTERVAL_MS (same env-var-with-fallback idiom schedule-tick.ts uses for
+ * LKB_API_URL) — never hardcoded. [ASSUMPTION]: no interval number is specified anywhere in
+ * spec.md/plan.md/D-046 ("a configured interval", no value given), so the 2-hour fallback below is
+ * a placeholder pending an explicit answer from Umesh, not a researched default — flagged, not
+ * silently chosen as if it were settled. */
+export function watchHeartbeatIntervalMs(env = process.env) {
+  const parsed = env.WATCH_HEARTBEAT_INTERVAL_MS ? Number(env.WATCH_HEARTBEAT_INTERVAL_MS) : NaN;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 2 * 60 * 60 * 1000;
+}
+
+/** R2: true when a source's watch is silently dead. `lastHeartbeatAt` is `null`/`undefined`/
+ * unparsable for a source that has NEVER completed a run — treated as maximally stale with no
+ * grace period (a source that has never proven it is alive gets no benefit of the doubt, the same
+ * safer-default `readDriveWatchState`'s failed-read path above already uses). Otherwise stale iff
+ * the heartbeat is STRICTLY older than `intervalMs` — a heartbeat exactly `intervalMs` old is still
+ * fresh, matching spec.md R2's "no run for LONGER than the configured interval" (not >=). */
+export function isHeartbeatStale(lastHeartbeatAt, now, intervalMs) {
+  if (!lastHeartbeatAt) return true;
+  const last = Date.parse(lastHeartbeatAt);
+  if (Number.isNaN(last)) return true;
+  return now.getTime() - last > intervalMs;
+}
+
+/** R2: evaluates every (tenantId, sourceType) heartbeat row against `isHeartbeatStale` in one
+ * pass, returning only the stale ones — so "multiple sources, only one stale" alerts on exactly
+ * that one, not all of them. `rows` is whatever eventually reads `watch_heartbeat`; pure otherwise. */
+export function findStaleHeartbeats(rows, now, intervalMs) {
+  return rows.filter((r) => isHeartbeatStale(r.lastHeartbeatAt, now, intervalMs));
+}
+
+/** R2: the composite id one heartbeat row would use — `(tenantId, sourceType)`, ONE row per source
+ * TYPE run-watch.mjs polls (drive/gmail/calendar), not per individual item like watch_state's
+ * `(tenantId, sourceType, sourceId)` (an item id has no meaning for "did this whole phase run"). */
+export function watchHeartbeatId(tenantId, sourceType) {
+  return `${tenantId}:${sourceType}`;
+}
+
+/** R2: the exact heartbeat document a completed phase would upsert into `watch_heartbeat`, once
+ * that collection exists. "Completed" here means the phase's own try/catch in `main()` ran to its
+ * end — whether it succeeded or caught and logged an error into `errors[]` — because either way the
+ * PROCESS is still alive and made it back to this point. Only a crash/hang BEFORE reaching here
+ * (uncaught exception, infinite loop, killed process) would skip this write, which is exactly what
+ * R2 must detect. See this unit's manifest for the three exact call sites (end of steps 1/2/3) this
+ * would be dropped into, and why they are not wired in this cycle. */
+export function buildHeartbeatDoc(tenantId, sourceType, completedAt) {
+  return { _id: watchHeartbeatId(tenantId, sourceType), tenantId, sourceType, lastHeartbeatAt: completedAt };
+}
+
 // --- real gws runner (same shape as apps/api/src/gws-gmail.ts's runGws/parseGwsJson — cannot
 // import it: ARCHITECTURE §5 is apps -> packages, never a script depending the OTHER way is fine,
 // but gdrive.ts (packages/ingest) importing apps/api would not be; this file is a script, not a
