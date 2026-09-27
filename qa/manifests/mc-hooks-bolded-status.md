@@ -19,7 +19,7 @@ defect in `mc-sessionstart.ps1`).
 `mc-sessionstart.ps1` (the SessionStart AUTO-CONTINUE directive) and `mc-precommit.ps1` (the commit
 guard) both matched manifest Status lines with the bare literal `Status: ready-for-check`. Every
 line the pre-fix hooks could see one of `## Status: ready-for-check` (heading form); everything else
-— `**Status:** checked-PASS (verdict qa/verdicts/mc-hooks-bolded-status.md, cycle 1, d8c45ed; /aios-config-auditor CLEAN)` (bold), `- **Status:** ready-for-check` (bulleted+bold), and
+— `**Status:** ready-for-check` (bold), `- **Status:** ready-for-check` (bulleted+bold), and
 `Status: ready-for-check` sitting mid-sentence in prose containing the phrase "ready-for-check" —
 either went invisible (bold/list forms: a truly-pending unit is reported as clear) or produced a
 false positive (unanchored prose match: an already-closed unit is reported as still pending).
@@ -196,3 +196,16 @@ that state.
   than silently substituted, per D-015.
 
 **Status:** checked-PASS (Cycle checked: 1, verdict `qa/verdicts/mc-hooks-bolded-status.md`, VERDICT: PASS, ISSUES-WRITTEN: none; wave/mc-hooks-bolded-status already merged into master) — closed out by /maker 2026-09-27
+
+## ISS-325 correction — 2026-09-27 15:5x (restores this manifest's own evidence)
+
+The close-out commit `6558508` searched this file for a Status line and edited the **prose example**
+in the failure description above instead of the real `**Status:**` line at the end, rewriting the
+example to `checked-PASS (… d8c45ed; /aios-config-auditor CLEAN)`. The original text is restored
+verbatim from `58cfaf0`.
+
+The irony is the finding: this unit exists because the pre-fix hooks could not see a **bolded**
+Status line, and the close-out then demonstrated it by editing the one bolded line in the file that
+was never a status at all — destroying the record of which forms used to be invisible, inside the
+document whose only job was to record them. The real status line was closed out correctly later; it
+was only the evidence that stayed corrupted, which is why the sweep could still see it at 13:47.
