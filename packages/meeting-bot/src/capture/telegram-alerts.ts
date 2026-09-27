@@ -67,6 +67,19 @@ export interface TelegramNotifier {
    * it on its own. */
   notifySilence(durationSec: number): void;
   notifyFinished(summary: FinishedSummary): void;
+  /** R1 (u4a-watch-failure-alerts, D-046, spec.md R1): fires when a watch run records
+   * `status: "failed"` for one watched source. Names the source (`sourceType`/`sourceId`), the
+   * time, and `failureReason` VERBATIM — no rewording, no truncation — so a reader can match it
+   * 1:1 against the `watch_state` row it reports on. The `(tenantId, sourceType, sourceId)`
+   * throttle spec.md asks for ("one alert, then silence until it changes state") is the CALLER's
+   * job — scripts/watch/run-watch.mjs reads the prior `watch_state` row before writing "failed"
+   * and only calls this on a genuine transition into failure. This method itself always sends
+   * (subject only to the generic per-key time throttle every other method here already has). */
+  notifyPollFailed(tenantId: string, sourceType: string, sourceId: string, failedAt: string, failureReason: string): void;
+  /** R3 (u4a-watch-failure-alerts, D-046, spec.md R3): fires before a recording is expected to
+   * start, naming the meeting and the reason it was surfaced/selected. `startTime` is optional so
+   * a caller with only a date (no exact time) can still alert. */
+  notifyUpcomingRecording(meetingTitle: string, reason: string, startTime?: string): void;
   /** Pure event-shape dispatcher for sb_join.py's JSON stream (the existing onEvent point in
    * record-commands.ts). Maps "reconnect-reload" -> disconnected and a completed, RECOVERED gap
    * -> recovered; every other event (heartbeat, clicked, tab-switch, an unrecovered end-of-run
@@ -140,6 +153,19 @@ export function createTelegramNotifier(deps: TelegramNotifierDeps = {}): Telegra
       if (summary.transcriptPath) lines.push(`transcript: ${summary.transcriptPath}`);
       if (summary.turnCount !== undefined) lines.push(`turns: ${summary.turnCount}`);
       fireAndForget(`finished:${summary.sessionId}`, lines.join("\n"));
+    },
+    notifyPollFailed(tenantId, sourceType, sourceId, failedAt, failureReason) {
+      fireAndForget(
+        `pollFailed:${tenantId}:${sourceType}:${sourceId}`,
+        `🛑 Watch poll failed: ${sourceType}:${sourceId} (tenant ${tenantId}) at ${failedAt} — ${failureReason}`,
+      );
+    },
+    notifyUpcomingRecording(meetingTitle, reason, startTime) {
+      const when = startTime ? ` at ${startTime}` : "";
+      fireAndForget(
+        `upcoming:${meetingTitle}:${startTime ?? ""}`,
+        `📅 Upcoming recording${when}: ${meetingTitle} — ${reason}`,
+      );
     },
     onBotEvent(ev) {
       // Routed through the public methods above (single source of truth for the message text

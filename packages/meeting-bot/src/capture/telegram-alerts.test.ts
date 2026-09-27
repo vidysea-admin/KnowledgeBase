@@ -124,6 +124,72 @@ test("notifyFinished omits transcript/turns lines when there was no transcript",
   assert.doesNotMatch(calls[0]!.text, /turns:/);
 });
 
+test("notifyPollFailed sends the source, time, and failureReason VERBATIM (R1)", async () => {
+  const { calls, send } = fakeTransport();
+  const notifier = createTelegramNotifier(notifierDeps({ send }));
+  notifier.notifyPollFailed("toc", "drive", "file-123", "2026-09-28T10:00:00.000Z", "401 Unauthorized: token expired");
+  await flush();
+  assert.equal(calls.length, 1);
+  assert.match(calls[0]!.text, /drive:file-123/);
+  assert.match(calls[0]!.text, /2026-09-28T10:00:00\.000Z/);
+  // verbatim: the exact reason string appears unmodified, not reworded/summarized.
+  assert.ok(calls[0]!.text.includes("401 Unauthorized: token expired"));
+});
+
+test("notifyPollFailed: two calls for the SAME (tenantId, sourceType, sourceId) within the throttle window collapse to one", async () => {
+  let clock = 0;
+  const { calls, send } = fakeTransport();
+  const notifier = createTelegramNotifier(notifierDeps({ send, now: () => clock, throttleMs: 60_000 }));
+  notifier.notifyPollFailed("toc", "drive", "file-123", "t1", "boom");
+  clock = 5_000;
+  notifier.notifyPollFailed("toc", "drive", "file-123", "t2", "boom again");
+  await flush();
+  assert.equal(calls.length, 1); // generic per-key backstop throttle — see notify-channels.ts's header
+});
+
+test("notifyPollFailed: a DIFFERENT (tenantId, sourceType, sourceId) triple is never throttled by another triple's key", async () => {
+  const { calls, send } = fakeTransport();
+  const notifier = createTelegramNotifier(notifierDeps({ send }));
+  notifier.notifyPollFailed("toc", "drive", "file-A", "t1", "boom A");
+  notifier.notifyPollFailed("toc", "drive", "file-B", "t1", "boom B");
+  await flush();
+  assert.equal(calls.length, 2);
+});
+
+test("notifyUpcomingRecording sends the meeting title and the selection reason (R3)", async () => {
+  const { calls, send } = fakeTransport();
+  const notifier = createTelegramNotifier(notifierDeps({ send }));
+  notifier.notifyUpcomingRecording("Ashoka Educator Dialogues", "on the TOC events calendar", "2026-09-29");
+  await flush();
+  assert.equal(calls.length, 1);
+  assert.match(calls[0]!.text, /Ashoka Educator Dialogues/);
+  assert.match(calls[0]!.text, /on the TOC events calendar/);
+  assert.match(calls[0]!.text, /2026-09-29/);
+});
+
+test("notifyUpcomingRecording works without a startTime (date-only callers)", async () => {
+  const { calls, send } = fakeTransport();
+  const notifier = createTelegramNotifier(notifierDeps({ send }));
+  notifier.notifyUpcomingRecording("Weekly Sync", "Gmail scan found a join link");
+  await flush();
+  assert.equal(calls.length, 1);
+  assert.match(calls[0]!.text, /Weekly Sync/);
+  assert.match(calls[0]!.text, /Gmail scan found a join link/);
+});
+
+test("a healthy tick that never calls notifyPollFailed/notifyUpcomingRecording sends nothing", async () => {
+  // A real "healthy run" assertion belongs at the run-watch.mjs call-site level (no failed polls,
+  // no imminent upcoming items -> neither method is ever invoked) — not exercised by an automated
+  // test in this unit; see this unit's manifest, "What this unit does NOT do". This test only
+  // documents the notifier-level half of that guarantee: constructing it and calling neither
+  // method sends nothing, i.e. these two alerts are opt-in per call, never emitted by construction
+  // or by any OTHER notify* method as a side effect.
+  const { calls, send } = fakeTransport();
+  createTelegramNotifier(notifierDeps({ send }));
+  await flush();
+  assert.equal(calls.length, 0);
+});
+
 test("onBotEvent: reconnect-reload triggers a disconnected alert with the event's reason", async () => {
   const { calls, send } = fakeTransport();
   const notifier = createTelegramNotifier(notifierDeps({ send }));

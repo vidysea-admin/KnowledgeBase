@@ -29,7 +29,7 @@
  * function this claim rests on; this script is a thin composition around it).
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join, dirname, resolve } from "node:path";
+import { basename, join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFile } from "node:child_process";
 import "dotenv/config";
@@ -76,6 +76,34 @@ const MONTHS = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
 ];
+
+// --- U4a (u4a-watch-failure-alerts, D-046) pure decision helpers — no I/O, exported so they are
+// independently unit-testable the moment a scripts/watch/run-watch.test.mjs exists (this cycle
+// did not add one — see this unit's manifest, "What this unit does NOT do"). ---
+
+/** R1 (spec.md): alert only on a genuine transition INTO "failed" — never on a repeat failure of
+ * a source that was already failed, which is spec.md's "one alert, then silence until it changes
+ * state" throttle, keyed by (tenantId, sourceType, sourceId) via `watch_state`'s own composite
+ * `_id`. `priorStatus` is the STATUS FIELD of the `watch_state` row read before this run's write
+ * (`undefined` when no row exists yet, e.g. the source's first-ever poll). */
+export function shouldAlertPollFailed(priorStatus) {
+  return priorStatus !== "failed";
+}
+
+/** R3 (spec.md): a coarse "is this meeting close enough to alert about now" filter — today or
+ * tomorrow (UTC calendar date), evaluated against `now`. Deliberately narrow (not the full
+ * 14-day upcoming window `findings.upcoming` itself covers) because nothing in this file persists
+ * which upcoming items were already alerted on across separate `run-watch.mjs` process runs, so a
+ * wide window would re-alert on the same meeting every tick until its date passed. See this
+ * unit's manifest for why that residual repeat-alert risk (within a 2-day window, across ticks)
+ * is disclosed rather than fully closed in this cycle. */
+export function isImminentDate(dateStr, now) {
+  const target = Date.parse(`${dateStr}T00:00:00Z`);
+  if (Number.isNaN(target)) return false;
+  const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const diffDays = Math.round((target - todayUtc) / 86_400_000);
+  return diffDays >= 0 && diffDays <= 1;
+}
 
 // --- real gws runner (same shape as apps/api/src/gws-gmail.ts's runGws/parseGwsJson — cannot
 // import it: ARCHITECTURE §5 is apps -> packages, never a script depending the OTHER way is fine,
@@ -129,6 +157,11 @@ async function main() {
   const gdrive = { listDriveSubfolders, listDriveFiles, downloadDriveFile, findMonthFolder, diffNewDriveFiles };
   const { parseTocCalendar, upcomingTocEvents } = await import("../../packages/ingest/src/sources/toc-calendar.ts");
   const { buildDigest } = await import("./lib/digest.mjs");
+  // U4a (D-046): same construction as record-commands.ts's default — reads
+  // TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID, degrades to `enabled: false` (never throws) when unset,
+  // so a watch tick with no Telegram configured behaves exactly as before this unit.
+  const { createTelegramNotifier } = await import("../../packages/meeting-bot/src/capture/telegram-alerts.ts");
+  const telegram = createTelegramNotifier();
 
   // u2-fix1: parsed once, up front, and hoisted (was scoped inside step 3's own try block) so
   // `--ingest`/`--reingest` can hand the SAME calendar rows to `deriveSessionDateAndTitle`
@@ -188,13 +221,23 @@ async function main() {
     const candidates = await scanGmailForMeetingCandidates(60);
     for (const c of candidates) {
       if (c.kind === "upcoming" && c.startTime) {
+        const date = c.startTime.slice(0, 10);
         findings.upcoming.push({
-          date: c.startTime.slice(0, 10),
+          date,
           agenda: c.subject,
           source: "gmail",
           joinLink: Boolean(c.meetingUrl) && !c.registrationOnly,
           registrationOnly: Boolean(c.registrationOnly),
         });
+        // R3 (spec.md, D-046): naming the meeting and why it was surfaced. See isImminentDate's
+        // doc comment for why this is narrowed to today/tomorrow rather than the full 14-day
+        // upcoming window.
+        if (isImminentDate(date, now)) {
+          const reason = c.registrationOnly
+            ? "Gmail scan found this meeting mail (registration-only)"
+            : "Gmail scan found this meeting mail with a join link";
+          telegram.notifyUpcomingRecording(c.subject, reason, c.startTime);
+        }
       } else if (c.kind === "past-recording") {
         findings.pastRecordingPending.push({ subject: c.subject, senderEmail: c.senderEmail, recordingUrl: c.recordingUrl });
       }
@@ -213,7 +256,15 @@ async function main() {
       }
       const upcoming = upcomingTocEvents(calendarEvents, now, 14);
       for (const e of upcoming) {
-        findings.upcoming.push({ date: e.date, agenda: e.agenda, source: "toc-calendar", membersZoom: (e.mode || "").toLowerCase() === "virtual" && (e.location || "").toLowerCase() === "zoom" });
+        const membersZoom = (e.mode || "").toLowerCase() === "virtual" && (e.location || "").toLowerCase() === "zoom";
+        findings.upcoming.push({ date: e.date, agenda: e.agenda, source: "toc-calendar", membersZoom });
+        // R3 (spec.md, D-046) — see the Gmail branch above for why this is imminent-only.
+        if (isImminentDate(e.date, now)) {
+          const reason = membersZoom
+            ? "on the TOC events calendar (members-only Zoom)"
+            : "on the TOC events calendar";
+          telegram.notifyUpcomingRecording(e.agenda, reason, e.date);
+        }
       }
     } else {
       errors.push(`calendar CSV not found at ${CALENDAR_CSV}`);
@@ -243,8 +294,16 @@ async function main() {
             await markDriveState(file.id, "ingested", { sessionId });
           } catch (err) {
             const reason = err instanceof Error ? err.message : String(err);
+            // R1 (spec.md, D-046): read the PRIOR watch_state row before overwriting it, so the
+            // alert fires only on a genuine transition into "failed" — shouldAlertPollFailed is
+            // the (tenantId, sourceType, sourceId)-scoped "one alert, then silence until it
+            // changes state" throttle spec.md asks for, not the notifier's own time-based one.
+            const priorStatus = (await readDriveWatchState(file.id))?.status;
             findings.driveFailed.push({ id: file.id, name: file.name, reason });
             await markDriveState(file.id, "failed", { failureReason: reason });
+            if (shouldAlertPollFailed(priorStatus)) {
+              telegram.notifyPollFailed(TENANT, "drive", file.id, new Date().toISOString(), reason);
+            }
           }
         }
       } finally {
@@ -287,6 +346,20 @@ async function loadSeenDriveIds() {
   const { listSeenIds } = await import("../../packages/db/src/collections/watch-state.js");
   await connect(process.env.MONGODB_URL, MONGODB_DB);
   return listSeenIds(TENANT, "drive");
+}
+
+/** R1 (spec.md, D-046): the prior `watch_state` row for one Drive source, read BEFORE this run
+ * overwrites it — `shouldAlertPollFailed` needs `priorStatus` from the state as it stood before
+ * the current failure, never the just-written one. Returns `null` on a first-ever poll (no row
+ * yet) or if the read itself fails — a failed READ must never crash the ingest loop it guards; it
+ * degrades to "alert" (the safer default: an extra alert beats a silently swallowed one). */
+async function readDriveWatchState(sourceId) {
+  try {
+    const { findWatchState } = await import("../../packages/db/src/collections/watch-state.js");
+    return await findWatchState(TENANT, "drive", sourceId);
+  } catch {
+    return null;
+  }
 }
 
 async function markDriveState(sourceId, status, extra) {
@@ -468,16 +541,22 @@ async function recordReport(findings, digestPath, errors) {
   });
 }
 
-main()
-  .then(async () => {
-    try {
-      const { close } = await import("../../packages/db/src/client.js");
-      await close();
-    } catch {
-      /* never connected (e.g. --dry-run) — nothing to close */
-    }
-  })
-  .catch((err) => {
-    console.error("FAIL:", err instanceof Error ? err.stack : err);
-    process.exit(1);
-  });
+// U4a: guarded (same idiom as scripts/lint-loc.mjs) so this module can be `import()`ed — e.g. for
+// its exported pure helpers, `shouldAlertPollFailed`/`isImminentDate` — without running `main()`'s
+// real Drive/Gmail/Mongo I/O. Behavior when run directly (`node run-watch.mjs ...`, the only way
+// this script is invoked today — checked, nothing imports it as a module) is unchanged.
+if (process.argv[1] && import.meta.url.endsWith(basename(process.argv[1]))) {
+  main()
+    .then(async () => {
+      try {
+        const { close } = await import("../../packages/db/src/client.js");
+        await close();
+      } catch {
+        /* never connected (e.g. --dry-run) — nothing to close */
+      }
+    })
+    .catch((err) => {
+      console.error("FAIL:", err instanceof Error ? err.stack : err);
+      process.exit(1);
+    });
+}
