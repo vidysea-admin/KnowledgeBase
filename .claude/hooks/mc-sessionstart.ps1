@@ -2,10 +2,15 @@
 # Installed under D-006 (docs/DECISIONS.md). SessionStart stdout is injected into the agent's
 # context -- a directive here is read as an instruction, not just a status line.
 if ($env:CLAUDE_PROJECT_DIR) { Set-Location $env:CLAUDE_PROJECT_DIR }
-$LEDGER = 'qa/issues.jsonl'
+# D-019: qa/issues.<lane>.jsonl shards are SHARDS of one ledger, not private copies -- every reader
+# must count the UNION. Authorized by D-041 (Approved-by: Umesh); before this the hardcoded single
+# path under-reported by 21 open rows (132 vs 153 measured 2026-09-28). Fixes the reader half of
+# ISS-129 / ISS-350.
+$LEDGERS = @(Get-ChildItem -Path 'qa' -Filter 'issues*.jsonl' -File -ErrorAction SilentlyContinue | Sort-Object Name)
+$LEDGER = 'qa/issues*.jsonl (' + $LEDGERS.Count + ' file union)'
 $ROOT = (Get-Location).Path
 $n = -1
-if (Test-Path $LEDGER) { $n = @(Get-Content $LEDGER | Where-Object { $_ -match '"status":\s*"(open|Open)"' }).Count }
+if ($LEDGERS.Count -gt 0) { $n = @($LEDGERS | ForEach-Object { Get-Content $_.FullName } | Where-Object { $_ -match '"status":\s*"(open|Open)"' }).Count }
 # Pending handshake (cycle-aware): ready-for-check with no verdict, or a verdict for an older
 # cycle, or a PASS verdict whose manifest was never flipped to checked-PASS.
 $pending = @(); $unclosed = @()
