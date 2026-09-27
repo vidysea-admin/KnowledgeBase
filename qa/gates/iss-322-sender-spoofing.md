@@ -7,3 +7,5 @@
 (c) Keep U5 in dry-run / per-meeting approval until (a) lands.
 **Blocks:** U6 unattended poller going live. Does NOT block today's manual Ashoka recording or the U5 merge (U5 itself only schedules when schedule-tick runs without --dry-run).
 **Answer format:** reply a/b/c -> maker appends `Answered: <ISO> - <choice> - <where>`.
+
+Answered: 2026-09-27T10:32:00+05:30 - (a) require Gmail Authentication-Results (dkim/spf pass aligned with From domain) before a candidate counts as trusted - Umesh in chat to checker session knowledgebase-7a, verbatim "email verification lgaa do". Scribed by /checker; build is the maker's (not blocking today's webinar; do not build/merge into the shared launcher path before the live run ends).
