@@ -232,4 +232,31 @@ same call as the parent unit's own manifest ("Persona walk: skip"). No browser s
   test in this unit and its predecessors injects a fake `execFileFn` — unchanged constraint from
   `qa/manifests/u5-auto-record-scheduler.md`).
 
-## Status: ready-for-check
+## Status: checked-PASS (cycle 0)
+
+Verdict: `qa/verdicts/jobkey-collision-detection.md` (**Cycle checked: 0**, commit `12f6bb3`) —
+**PASS**, `ISSUES-WRITTEN: none`. ISS-321 flipped `open -> fixed`.
+
+The checker re-derived rather than accepted the two things this manifest volunteered:
+
+- **The orphan claim was verified on the real host, not reasoned about.** It ran `schtasks /query`
+  filtered on `lkb-autorecord` (zero results), confirmed no `raw/webinars/scheduled/` directory exists,
+  confirmed no log ever mentions `schedule-tick`, and confirmed `cli.ts` wires the subcommand but
+  nothing in `scripts/` invokes it yet. It also independently confirmed `schedule-state.json`'s dedup
+  index is keyed by raw `sessionKey` (`schedule-state.ts:57`) and so is unaffected by the format change.
+  **Nothing is stranded today** — the claim held, but it held on evidence rather than on assertion.
+- **The lost `null` rejection was ruled harmless on a caller census**, not on plausibility:
+  `deriveJobKey` has exactly one production caller (`schedule-tick.ts:184`) and it branches only on
+  truthiness, never on *why* the value was null — so nothing today distinguishes junk input from empty.
+
+It also wrote **its own** two mutations instead of replaying the four above, and extended beyond a
+re-run by reverting all six changed files to the pre-fix commit, re-running `tsc --noEmit`, and diffing:
+**byte-identical 17 pre-existing `@lkb/*` errors**, which is what turns "pre-existing" from a claim into
+a measurement.
+
+### Carried forward, not closed by this unit
+
+Once U6's poller exists, `deps.log`'s destination needs a real consumer. Until then an operator running
+the CLI sees the collision refusal directly; after U6 it would be a refusal logged where nothing reads
+it — which is exactly the "looked like it worked" class that ISS-271/272 closed earlier today. Noted
+here and in the verdict so U6 inherits it rather than rediscovering it.
