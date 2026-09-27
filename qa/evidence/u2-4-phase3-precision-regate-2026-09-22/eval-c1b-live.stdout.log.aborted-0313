@@ -1,0 +1,4 @@
+[run 1] 2026-04-21-visa-blueprint-part2-italy-france-nz: 344160ms, calls=111, resolved=1, unresolved=2, degraded=no
+   ACCEPTED spk:0 -> "Rashi" ev=2026-04-21-visa-blueprint-part2-italy-france-nz-t141,2026-04-21-visa-blueprint-part2-italy-france-nz-t145 blocks=[{"startTurnIndex":141,"endTurnIndex":143}]
+   FLOOR spk:2 -> "Ruby" ev=2026-04-21-visa-blueprint-part2-italy-france-nz-t206
+[run 1] 2026-05-20-telling-your-brand-story-better: 59177ms, calls=39, resolved=0, unresolved=4, degraded=no

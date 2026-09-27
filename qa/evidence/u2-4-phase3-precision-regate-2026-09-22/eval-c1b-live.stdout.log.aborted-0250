@@ -1,0 +1,10 @@
+[run 1] 2026-04-21-visa-blueprint-part2-italy-france-nz: 382447ms, calls=111, resolved=1, unresolved=2, degraded=no
+   ACCEPTED spk:0 -> "Rashi" ev=2026-04-21-visa-blueprint-part2-italy-france-nz-t141,2026-04-21-visa-blueprint-part2-italy-france-nz-t145 blocks=[{"startTurnIndex":141,"endTurnIndex":143}]
+   FLOOR spk:2 -> "Ruby" ev=2026-04-21-visa-blueprint-part2-italy-france-nz-t206
+[run 1] 2026-05-20-telling-your-brand-story-better: 59664ms, calls=39, resolved=0, unresolved=4, degraded=no
+[run 1] 2026-05-23-uniaccess-atlas-skilltech: 25183ms, calls=9, resolved=0, unresolved=2, degraded=no
+[run 1] 2026-05-28-in-focus-1: 55226ms, calls=18, resolved=0, unresolved=1, degraded=no
+[run 1] 2026-07-15-creative-futures: 345021ms, calls=144, resolved=1, unresolved=1, degraded=no
+   ACCEPTED spk:1 -> "Sumit" ev=2026-07-15-creative-futures-t260 blocks=[{"startTurnIndex":260,"endTurnIndex":260}]
+[run 1] 2026-07-22-uniaccess-cept-university: 5242ms, calls=3, resolved=0, unresolved=1, degraded=no
+[run 1] 2026-07-28-metrics-and-mingling: 30957ms, calls=9, resolved=0, unresolved=2, degraded=no
