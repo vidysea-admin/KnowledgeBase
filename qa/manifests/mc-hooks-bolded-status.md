@@ -19,7 +19,7 @@ defect in `mc-sessionstart.ps1`).
 `mc-sessionstart.ps1` (the SessionStart AUTO-CONTINUE directive) and `mc-precommit.ps1` (the commit
 guard) both matched manifest Status lines with the bare literal `Status: ready-for-check`. Every
 line the pre-fix hooks could see one of `## Status: ready-for-check` (heading form); everything else
-— `**Status:** ready-for-check` (bold), `- **Status:** ready-for-check` (bulleted+bold), and
+— `**Status:** checked-PASS (verdict qa/verdicts/mc-hooks-bolded-status.md, cycle 1, d8c45ed; /aios-config-auditor CLEAN)` (bold), `- **Status:** ready-for-check` (bulleted+bold), and
 `Status: ready-for-check` sitting mid-sentence in prose containing the phrase "ready-for-check" —
 either went invisible (bold/list forms: a truly-pending unit is reported as clear) or produced a
 false positive (unanchored prose match: an already-closed unit is reported as still pending).
