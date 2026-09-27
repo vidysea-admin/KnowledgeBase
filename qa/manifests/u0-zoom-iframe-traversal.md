@@ -7,6 +7,19 @@ traversal added), C10 (no regression)
 **Issues addressed:** ISS-U0-1 (high, coverage-class — `qa/issues.u0.jsonl`)
 **Executor:** claude-opus-subagent (dispatched as a time-critical /maker build unit, ~08:05 IST,
 target 10:55 IST live webinar)
+**Commits:** `ea48a4c` (the fix + tests + fixtures) then `fb45fbd` (self-caught correction — see
+below)
+
+## Self-caught issue during build
+
+The first commit (`ea48a4c`)'s `fixture_server` rewrote `fixtures/cross_origin_outer.html` IN
+PLACE, baking that run's actual randomly-assigned port into the committed file. Running the full
+suite a second time (different random port) would have silently pointed the cross-origin test at
+a stale port. Caught before calling this unit done by re-running the suite twice in a row and
+diffing the fixture file against what commit `ea48a4c` had staged. Fixed in `fb45fbd`: the
+template keeps the literal `__PORT__` placeholder forever; the fixture now renders a throwaway
+sibling file per test session and deletes it on teardown. Verified: two consecutive runs, two
+different ports, template untouched both times (see "How to verify" below).
 
 ## What changed
 
@@ -75,6 +88,20 @@ Expected: 27 passed (22 pre-existing + 5 new iframe tests), ~6s.
 $ python -m pytest packages/meeting-bot/py -q
 ...........................                                              [100%]
 27 passed in 6.57s
+```
+
+Repeatability check (run twice back-to-back, after `fb45fbd`'s fix, each picking its own random
+port; confirms the port-rendering fix and rules out any leftover stray file from a prior run):
+
+```
+$ python -m pytest packages/meeting-bot/py/test_sb_join_iframe.py packages/meeting-bot/py/test_sb_join.py -q
+...........................                                              [100%]
+27 passed in 7.14s
+$ python -m pytest packages/meeting-bot/py/test_sb_join_iframe.py packages/meeting-bot/py/test_sb_join.py -q
+...........................                                              [100%]
+27 passed in 5.54s
+$ git status --porcelain -- packages/meeting-bot/py/fixtures/cross_origin_outer.html
+   (no output — template untouched by either run)
 ```
 
 ### RED-before / GREEN-after (D-020 discipline)
