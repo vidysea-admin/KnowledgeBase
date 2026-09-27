@@ -23,6 +23,19 @@ Approving the intent also means accepting that narrowed scope.
 
 Then, after the maker writes them from those answers, one line each for spec and plan.
 
-**Answered: intent —** (pending)
+**Answered: intent —** 2026-09-27 — `1=umesh-operator + a Vidysea colleague` · `2=(b) push alert
+first, page second` · `3=visible only` — Umesh in chat (AskUserQuestion, this session). Recorded
+before `spec.md` was written, per the PLAN gate.
+
+Consequences the maker is taking from those three answers, so the spec can be checked against them:
+- **(b) reframes the unit.** The alert is the feature; the page is where you land afterwards. The
+  U3 notify channel already exists (`packages/meeting-bot/src/capture/telegram-alerts.ts` →
+  `Notifier`), so the alerting half is wiring, not new transport. The screen shrinks accordingly.
+- **Two user types** → `audience: internal-tool`, `personas: [umesh-operator, vidysea-staff]`, and
+  **two persona walks**. The second one is the load-bearing change: a colleague who did not build
+  this system must be able to read a failed poll and know what to do, so every state on the screen
+  needs a plain-language line, not a status code.
+- **Visible only** → no writes to scheduler state, `criticality: medium` holds, and the unit stays
+  read-only apart from the pre-existing `POST /watched-sources/run`.
 **Answered: spec —** (pending)
 **Answered: plan —** (pending)
