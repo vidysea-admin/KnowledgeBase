@@ -35,25 +35,55 @@
  * recorded as a known gap in the manifest, not silently skipped.
  */
 import { execFile } from "node:child_process";
+import { createHash } from "node:crypto";
 
 /** The ONLY caller-supplied text ever allowed into `/tr` (as the `-Job` argument). Deliberately
  * narrow — lowercase ascii letters, digits, hyphen, 1-64 chars — so nothing matching it can ever
  * contain a quote, backslash, `&`, `|`, `;`, `$(...)`, a backtick, `%VAR%`, or a newline. */
 export const JOB_KEY_RE = /^[a-z0-9-]{1,64}$/;
 
+/** Hex characters of the SHA-256 digest kept in the jobKey (ISS-321). 10 hex chars = 40 bits —
+ * this system schedules a handful of concurrent webinars, not billions, so a 40-bit space makes an
+ * accidental collision astronomically unlikely without bloating the key. */
+const JOB_KEY_HASH_HEX_LEN = 10;
+
 /**
  * Derives a safe job key from an internal `sessionKey` (`"gmail:<id>"`, `"cal:<id>"` —
  * `auto-join.ts`'s `normalizeCandidate`/`normalizeCalendarEvent`, built from our own Mongo `_id`
- * / calendar event id, never from `title`/`url` free text). Lower-cases, collapses any run of
- * characters outside `[a-z0-9]` to a single `-`, trims leading/trailing `-`. Returns `null`
- * (never throws) when the result is empty or still fails `JOB_KEY_RE` — callers MUST refuse to
- * schedule on `null` rather than fall back to the raw `sessionKey` or any other unvalidated text.
- * This is a defensive floor, not the primary trust boundary (sessionKey ids are not attacker-
- * authored free text like title/url), but `scheduleOnce` re-validates independently below so a
- * caller cannot smuggle unsafe characters through even if this function were bypassed.
+ * / calendar event id, never from `title`/`url` free text).
+ *
+ * **ISS-321 fix (fix cycle 0).** The original version lower-cased and collapsed any run of
+ * characters outside `[a-z0-9]` to a single `-`. That collapse is LOSSY: `"gmail:abc_123"`,
+ * `"gmail:abc-123"` and `"GMAIL:ABC-123"` all collapsed to the identical `"gmail-abc-123"`, and
+ * both `writeScheduledJob` and `scheduleOnce`'s `schtasks /create /f` then overwrote whatever was
+ * already scheduled under that key with no detection (ISS-321's own reproduction — 4 such pairs).
+ * The jobKey is now `<readable-prefix>-<hash>`: the same lower-cased, punctuation-collapsed prefix
+ * as before (kept for humans skimming `schtasks /query` output or the `scheduled/` directory) plus
+ * a fixed-length hex slice of a SHA-256 digest of the FULL, UN-collapsed `sessionKey`. Collapsing
+ * can no longer erase the distinction between two different sessionKeys, because the hash is taken
+ * before any collapsing happens. Same input always derives the same jobKey (required — a session
+ * re-scheduled by a later tick must land on its own existing job file, not a fresh one).
+ *
+ * Still returns `null` (never throws) for a truly empty `sessionKey`, and — as a structural
+ * guarantee, not an expected runtime path — for the unreachable case of the assembled candidate
+ * failing `JOB_KEY_RE` (e.g. a hash implementation change producing non-hex output). Callers MUST
+ * refuse to schedule on `null` rather than fall back to the raw `sessionKey` or any other
+ * unvalidated text. This is a defensive floor, not the primary trust boundary (sessionKey ids are
+ * not attacker-authored free text like title/url), but `scheduleOnce` re-validates independently
+ * below so a caller cannot smuggle unsafe characters through even if this function were bypassed.
+ *
+ * **Migration note (see manifest):** this changes the jobKey format for every sessionKey, so any
+ * already-scheduled Windows Task or `scheduled/<jobKey>.json` file written under the OLD lossy
+ * jobKey is orphaned by this change — it is not renamed or migrated. See the manifest's
+ * "Migration" section for what happens to those and why that is acceptable here.
  */
 export function deriveJobKey(sessionKey: string): string | null {
-  const candidate = sessionKey.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  if (sessionKey.length === 0) return null;
+  const hash = createHash("sha256").update(sessionKey, "utf8").digest("hex").slice(0, JOB_KEY_HASH_HEX_LEN);
+  const readablePrefix = sessionKey.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  const maxPrefixLen = 64 - 1 - hash.length; // reserve "-" + hash inside JOB_KEY_RE's 64-char cap
+  const prefix = readablePrefix.slice(0, maxPrefixLen);
+  const candidate = prefix ? `${prefix}-${hash}` : hash;
   return JOB_KEY_RE.test(candidate) ? candidate : null;
 }
 

@@ -189,15 +189,25 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
       deps.log(`  refused to schedule ${item.sessionKey}: sessionKey does not derive a safe job key — skipped`);
       continue;
     }
-    writeScheduledJob(deps.stateDir, jobKey, {
-      url: item.meetingUrl,
-      // ISS-319 fix: the FULL ISO end datetime, not a bare local HH:mm — so a session that
-      // crosses midnight doesn't resolve to a stop time ~24h in the past (record-commands.ts's
-      // `todayAt` now accepts either form).
-      until: item.endTime,
-      title: item.title,
-      sessionId: item.sessionKey,
-    });
+    try {
+      writeScheduledJob(deps.stateDir, jobKey, {
+        url: item.meetingUrl,
+        // ISS-319 fix: the FULL ISO end datetime, not a bare local HH:mm — so a session that
+        // crosses midnight doesn't resolve to a stop time ~24h in the past (record-commands.ts's
+        // `todayAt` now accepts either form).
+        until: item.endTime,
+        title: item.title,
+        sessionId: item.sessionKey,
+      });
+    } catch (err) {
+      // ISS-321: writeScheduledJob refuses (throws) when jobKey already belongs to a different
+      // session — never silently overwrite another session's scheduled recording. Skip only this
+      // item, loudly, rather than let one collision crash the whole tick's remaining items (same
+      // "never crash a poller tick" contract as the other refusal path above and the HTTP loader).
+      deps.log(`  refused to schedule ${item.sessionKey} (job ${jobKey}): ` +
+        `${err instanceof Error ? err.message : String(err)}`);
+      continue;
+    }
     await deps.scheduler.scheduleOnce({
       jobKey,
       launcherPath: RECORD_LAUNCHER,
