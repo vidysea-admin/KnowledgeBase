@@ -10,7 +10,9 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { complete as routeComplete, embed as routeEmbed, parseRoutingYaml, GeminiProvider, ClaudeCodeProvider, OllamaProvider, type Provider } from "@lkb/ai";
 import { treeSearch } from "@lkb/index";
+import { listHeartbeats } from "@lkb/db";
 import type { ServerDeps } from "./server.js";
+import type { WatchSilenceDeps } from "./routes/health.js";
 import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, createMongoTreeStore, createMongoBrainReadDeps,
   createMongoWatchedSourceDeps, createMongoCitationsDeps, createMongoHealthDeps, createMongoGraphReadDeps, createGwsCalendarReadDeps, createMeetingCandidatesDeps, createMongoKeysDeps } from "./store.js";
 import { createMongoIngestDeps } from "./ingest-store.js";
@@ -23,6 +25,43 @@ import { indexSession, type BoundIndexer } from "./indexing/session.js";
 import { createAskArmsFor } from "./ask-arms.js";
 
 const ROUTING_CONFIG_PATH = fileURLToPath(new URL("../../../config/ai-routing.yaml", import.meta.url));
+
+/** U4b/R2 (D-048): the real, Mongo-backed watcher-silence detector `/health` runs on every probe.
+ * Lives here rather than in `store.ts` for a measured reason — `store.ts` is at 299 non-blank lines
+ * against a 300 budget (`structure.config.json` loc.max), so any wiring added there fails
+ * `lint-loc`; this file is the other "real deps" home and already does env-driven wiring (see
+ * `corsOrigins` below).
+ *
+ * Tenancy: `tenantIds` comes from `WATCH_HEARTBEAT_TENANTS` (default "toc", the tenant
+ * run-watch.mjs writes as) — CONFIG, never the request, because `/health` is unauthenticated and has
+ * no caller to derive a tenant from. Each read goes through `@lkb/db`'s `listHeartbeats`, i.e.
+ * `scopedCollection()`, so it is `withTenant`-merged per tenant and never a cross-tenant scan.
+ *
+ * `notifyWatchSilent` is a console sink, NOT the Telegram notifier, and that is a DISCLOSED GAP:
+ * `.dependency-cruiser.cjs`'s `apps-only-ask-ingest-index-ai-db-core` rule forbids
+ * `apps/* -> packages/meeting-bot`, so nothing under apps/ can reach `createTelegramNotifier` (only
+ * scripts/ can, which is how run-watch.mjs does it). The detector is fully injectable, so wiring the
+ * real notifier is a one-line change once that boundary is resolved — see the manifest's HUMAN_GATE.
+ * Until then a silent watcher surfaces in the API's own ops log and in `/health`'s `watchSilent`
+ * count: a real signal, just not a phone notification. */
+export function createMongoWatchSilenceDeps(): WatchSilenceDeps {
+  const tenantIds = (process.env.WATCH_HEARTBEAT_TENANTS ?? "toc").split(",").map((t) => t.trim()).filter(Boolean);
+  const parsed = process.env.WATCH_HEARTBEAT_INTERVAL_MS ? Number(process.env.WATCH_HEARTBEAT_INTERVAL_MS) : NaN;
+  return {
+    tenantIds,
+    // Same env var, same rule and the same 1-hour D-048 default as
+    // scripts/watch/lib/heartbeat.mjs's `watchHeartbeatIntervalMs` — writer and detector must read
+    // one number, or a watcher looks alive to one side and dead to the other.
+    intervalMs: Number.isFinite(parsed) && parsed > 0 ? parsed : 60 * 60 * 1000,
+    listHeartbeats: (tenantId) => listHeartbeats(tenantId),
+    notifyWatchSilent: (tenantId, sourceType, lastHeartbeatAt, intervalMs) => {
+      const last = lastHeartbeatAt ? `last completed run: ${lastHeartbeatAt}` : "no run has ever completed";
+      console.error(
+        `WATCH SILENT: ${sourceType} (tenant ${tenantId}) — ${last}, expected within ${intervalMs}ms. Polling itself has stopped; check the watcher process/task, not the credential.`,
+      );
+    },
+  };
+}
 /** `write` for the router's own per-attempt ledger entries — a tenant isn't known until a
  * request resolves one, so router-level attempts (as opposed to askV2's own writes, which do
  * carry the real per-request tenantId) are logged under this fixed system id. */
@@ -109,7 +148,8 @@ export function buildProductionDeps(): ServerDeps {
     brain: createMongoBrainReadDeps(),
     watchedSources: createMongoWatchedSourceDeps(),
     citations: createMongoCitationsDeps(),
-    health: createMongoHealthDeps(),
+    // U4b/R2: the same Mongo health deps as before, plus the injected watcher-silence detector.
+    health: { ...createMongoHealthDeps(), watchSilence: createMongoWatchSilenceDeps() },
     search: createMongoSearchDeps(),
     graph: createMongoGraphReadDeps(),
     calendar: createGwsCalendarReadDeps(),

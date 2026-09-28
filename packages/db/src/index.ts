@@ -19,3 +19,7 @@ export * from "./collections/graph-edges.js";
 // (watch_reports) for scripts/watch/run-watch.mjs.
 export * from "./collections/watch-state.js";
 export * from "./collections/watch-reports.js";
+// U4b/R2 (D-048): watcher liveness. Written by scripts/watch/run-watch.mjs at the end of each
+// polling phase; read by apps/api/src/routes/health.ts's staleness detector, in a DIFFERENT
+// process from the writer (a detector inside the writer dies with it).
+export * from "./collections/watch-heartbeat.js";
