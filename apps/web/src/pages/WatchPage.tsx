@@ -23,11 +23,23 @@
  *    Gmail meeting candidates (`GET /meeting-candidates`) with status `approved`/`auto_approved`
  *    — genuinely real "this will be auto-recorded" signals — and states their REAL status as the
  *    reason, rather than fabricating the richer selection reason nothing exposes.
+ *
+ * U4d (D-047/D-048/ISS-361/ISS-358) adds a THIRD section, "Watcher liveness": R1's alert
+ * (`notifyPollFailed`) fires off `watch_state`, and R2's (once wired) off `watch_heartbeat` — both
+ * genuinely disjoint from `watched_sources` above, with zero code overlap (the U4c checker verified
+ * this by reading shipped code). Before this section existed, following the alert's deep link here
+ * landed on a page with zero visibility into the failure that triggered it — worse than no page,
+ * because it invited the reader to conclude nothing was wrong. `GET /watch-state`
+ * (apps/api/src/routes/watched-sources.ts) is the new read; a stale flag on each heartbeat is
+ * computed server-side by the exact same predicate R2's `/health` detector alerts on
+ * (`heartbeatStatuses` in routes/health.ts), so this page can never show a watcher as healthy that
+ * the alert already fired on as silent.
  */
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext.js";
 import { listWatchedSources, runWatchedSources, type WatchedSource, type WatchedSourcesRunSummary } from "../api/watched-sources.js";
 import { listMeetingCandidates } from "../api/meeting-candidates.js";
+import { getWatchState, type WatchStateResponse } from "../api/watch-state.js";
 import { ApiError } from "../api/client.js";
 import type { MeetingCandidate } from "../api/types.js";
 
@@ -71,6 +83,8 @@ export function WatchPage(): React.ReactElement {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [candidates, setCandidates] = useState<MeetingCandidate[] | null>(null);
   const [candidatesError, setCandidatesError] = useState<string | null>(null);
+  const [watchState, setWatchState] = useState<WatchStateResponse | null>(null);
+  const [watchStateError, setWatchStateError] = useState<string | null>(null);
   const [polling, setPolling] = useState(false);
   const [pollError, setPollError] = useState<string | null>(null);
   const [lastRun, setLastRun] = useState<WatchedSourcesRunSummary | null>(null);
@@ -91,6 +105,16 @@ export function WatchPage(): React.ReactElement {
     return () => { cancelled = true; };
   }, [apiKey]);
 
+  // U4d: a third, independent lane — a failure here must not blank the watched-sources lane
+  // above it, same rule as the candidates lane's own degraded-fetch handling just above.
+  useEffect(() => {
+    let cancelled = false;
+    getWatchState(apiKey)
+      .then((data) => { if (!cancelled) setWatchState(data); })
+      .catch((err: unknown) => { if (!cancelled) setWatchStateError(err instanceof ApiError ? err.message : "failed to reach the watch-state API"); });
+    return () => { cancelled = true; };
+  }, [apiKey]);
+
   function handlePollNow(): void {
     setPolling(true);
     setPollError(null);
@@ -103,6 +127,9 @@ export function WatchPage(): React.ReactElement {
   const now = Date.now();
   const failedJustNow = new Map((lastRun?.failed ?? []).map((f) => [f.id, f.reason]));
   const nextUp = (candidates ?? []).filter((c) => c.status === "approved" || c.status === "auto_approved");
+  // U4d: only the most recent 20 failures surface here — the API already caps watch_state at 200
+  // rows per tenant (packages/db/src/collections/watch-state.ts), this trims further for the UI.
+  const recentFailures = (watchState?.state ?? []).filter((s) => s.status === "failed").slice(0, 20);
 
   return (
     <>
@@ -167,6 +194,64 @@ export function WatchPage(): React.ReactElement {
             </div>
           );
         })}
+      </div>
+
+      <div className="card">
+        <div className="section-title">Watcher liveness (Drive &middot; Gmail &middot; Calendar)</div>
+        <p className="row-meta" style={{ marginTop: "-0.2rem" }}>
+          The watchers R1&rsquo;s alert fires on &mdash; a different collection from the watched
+          sources above (they can fail independently of each other). If an alert brought you here,
+          this is what it was about.
+        </p>
+
+        {watchStateError && (
+          <div className="error-note" data-testid="watch-state-unreachable">
+            Can&rsquo;t reach the watcher-liveness API right now ({watchStateError}). This is NOT
+            the same as &ldquo;all healthy&rdquo; &mdash; watcher state is simply unknown until this
+            loads. The watched sources above are unaffected.
+          </div>
+        )}
+
+        {!watchStateError && watchState === null && <div className="empty-note" data-testid="watch-state-loading">Loading&hellip;</div>}
+
+        {!watchStateError && watchState !== null && watchState.heartbeats.map((hb) => {
+          const badgeClass = hb.stale ? "badge-bad" : "badge-good";
+          return (
+            <div className="row-card" key={hb.sourceType} data-testid="watch-heartbeat-row" data-status={hb.stale ? "stale" : "healthy"}>
+              <div className="row-title">
+                {hb.sourceType} <span className={`badge ${badgeClass}`}>{hb.stale ? "silent" : "alive"}</span>
+              </div>
+              <div className="row-meta">
+                {hb.lastHeartbeatAt
+                  ? `Last completed run ${new Date(hb.lastHeartbeatAt).toLocaleString()} (${relativeAge(now - new Date(hb.lastHeartbeatAt).getTime())})`
+                  : "Has never completed a single polling run"}
+              </div>
+              <div className="row-meta" data-testid="watch-heartbeat-plain-language">
+                {hb.stale
+                  ? "This watcher has stopped polling entirely — it may be dead, not just slow. Check the run-watch.mjs process or its scheduled task, not a single source's credential."
+                  : "Completed a run within its expected interval. No action needed."}
+              </div>
+            </div>
+          );
+        })}
+
+        {!watchStateError && watchState !== null && recentFailures.length === 0 && (
+          <div className="empty-note" data-testid="watch-state-no-failures">
+            No recent poll failures recorded for Drive, Gmail, or Calendar items.
+          </div>
+        )}
+
+        {!watchStateError && watchState !== null && recentFailures.map((row) => (
+          <div className="row-card" key={`${row.sourceType}:${row.sourceId}`} data-testid="watch-state-failure-row">
+            <div className="row-title">
+              {row.sourceType}: {row.sourceId} <span className="badge badge-bad">failed</span>
+            </div>
+            <div className="row-meta">{new Date(row.failedAt ?? row.seenAt).toLocaleString()}</div>
+            {row.failureReason && (
+              <div className="row-meta error-note" data-testid="watch-state-failure-reason">{row.failureReason}</div>
+            )}
+          </div>
+        ))}
       </div>
 
       <div className="section-title">Next up (read-only)</div>

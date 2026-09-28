@@ -14,10 +14,17 @@
  * on a timer. An unvalidated `url` here is a stored server-side request target — so the scheme is
  * checked against http(s) rather than trusted, the same reasoning that made the Ask page refuse a
  * `javascript:` citation.
+ *
+ * U4d (D-047) ALSO mounts `GET /watch-state` here — a second, genuinely different concern
+ * (`watch_state`/`watch_heartbeat`, the U2/U4b Drive-Gmail-Calendar watcher collections R1's alert
+ * fires off, disjoint from this file's `watched_sources` URL bookmarks, ISS-358) living in the same
+ * file only because `apps/api/src` and `apps/api/src/routes/` are both at/over their `lint-dirsize`
+ * budgets; see that route's own comment for the reasoning and the precedent (`routes/health.ts`).
  */
 import { Router, type Request, type Response } from "express";
-import type { WatchedSources } from "@lkb/core";
+import type { WatchedSources, WatchHeartbeat, WatchState } from "@lkb/core";
 import { requireScope } from "../auth.js";
+import { heartbeatStatuses, type HeartbeatStatus } from "./health.js";
 
 export interface WatchedRunSummary {
   checked: number;
@@ -37,6 +44,27 @@ export interface WatchedSourceDeps {
    * someone asked for a URL to be watched, a run proves anything was ever watched.
    */
   run(tenantId: string): Promise<WatchedRunSummary>;
+
+  // --- U4d (D-047/D-048/ISS-361/ISS-358): GET /watch-state below --------------------------
+  // Three fields, all optional, added to THIS interface rather than as a new file/router: ISS-358
+  // found R1's alert (`notifyPollFailed`) fires off `watch_state` and R4's page (`WatchPage.tsx`)
+  // reads only `watched_sources` — genuinely disjoint collections. D-047 authorizes closing that
+  // gap by extending the page, not by re-scoping it or unifying the collections. A fourth apps/api
+  // route file was the obvious shape, but `apps/api/src` is already over its dirsize budget
+  // (`node scripts/lint-dirsize.mjs`: "apps/api/src: 32 files (budget 31)", pre-existing) and
+  // `routes/` sits exactly AT its own 30-file budget — a new file in either directory turns
+  // `lint:structure` newly red. `watched-sources.ts` is already the file `WatchPage.tsx` calls for
+  // its other data, so the new read lives here, same precedent D-048 itself used for `health.ts`
+  // ("edited rather than added to"). Optional so the A13-only fixtures/tests (`fakeWatchedSourceDeps`
+  // in fixtures.ts, itself at 299/300 lines with no room to grow) need no changes at all; the route
+  // 501s when they are absent rather than silently rendering an empty page.
+  listWatchState?(tenantId: string): Promise<WatchState[]>;
+  listHeartbeats?(tenantId: string): Promise<WatchHeartbeat[]>;
+  /** The SAME number `apps/api/src/production.ts`'s `watchHeartbeatIntervalMs()` computes for
+   * `routes/health.ts`'s detector — required whenever the two functions above are wired, never
+   * re-derived or re-defaulted here, or a watcher could show healthy on this page and silent on
+   * `/health` at the same instant. */
+  heartbeatIntervalMs?: number;
 }
 
 const TIERS = new Set(["official", "community", "blog"]);
@@ -107,6 +135,30 @@ export function createWatchedSourcesRouter(deps: WatchedSourceDeps): Router {
   router.get("/watched-sources", requireScope("sources"), async (req: Request, res: Response) => {
     const sources = await deps.listActive(req.auth!.tenantId);
     res.status(200).json({ sources });
+  });
+
+  // U4d (D-047/D-048/ISS-361): the ONLY caller of `watch_state`/`watch_heartbeat` from the web
+  // tier. Same "sources" scope as the rest of this router (both are read surfaces of the /watch
+  // page, R8) rather than a new scope needing its own key-provisioning story. Deliberately its OWN
+  // route, never folded into `/health` (that route is unauthenticated and count-only by design,
+  // see health.ts's own comment) — this one is authenticated and tenant-scoped, exactly like every
+  // other route in this file.
+  router.get("/watch-state", requireScope("sources"), async (req: Request, res: Response) => {
+    if (!deps.listWatchState || !deps.listHeartbeats || deps.heartbeatIntervalMs === undefined) {
+      // Not a 200 with empty arrays: an empty-but-200 body here would be exactly the "looks
+      // healthy, isn't" failure R4/R7 exist to prevent, this time for the wiring itself rather
+      // than for a watcher. Production always wires all three together (production.ts); only an
+      // A13-only test/fixture that never overrides them lands here.
+      res.status(501).json({ error: "not_implemented", message: "watch-state read is not wired for this deployment" });
+      return;
+    }
+    const tenantId = req.auth!.tenantId;
+    const [state, heartbeatRows] = await Promise.all([
+      deps.listWatchState(tenantId),
+      deps.listHeartbeats(tenantId),
+    ]);
+    const heartbeats: HeartbeatStatus[] = heartbeatStatuses(tenantId, heartbeatRows, new Date(), deps.heartbeatIntervalMs);
+    res.status(200).json({ state, heartbeats });
   });
 
   return router;

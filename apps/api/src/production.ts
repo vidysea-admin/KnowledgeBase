@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { complete as routeComplete, embed as routeEmbed, parseRoutingYaml, GeminiProvider, ClaudeCodeProvider, OllamaProvider, type Provider } from "@lkb/ai";
 import { treeSearch } from "@lkb/index";
-import { listHeartbeats } from "@lkb/db";
+import { listHeartbeats, listWatchState } from "@lkb/db";
 import type { ServerDeps } from "./server.js";
 import type { WatchSilenceDeps } from "./routes/health.js";
 import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, createMongoTreeStore, createMongoBrainReadDeps,
@@ -44,15 +44,23 @@ const ROUTING_CONFIG_PATH = fileURLToPath(new URL("../../../config/ai-routing.ya
  * real notifier is a one-line change once that boundary is resolved — see the manifest's HUMAN_GATE.
  * Until then a silent watcher surfaces in the API's own ops log and in `/health`'s `watchSilent`
  * count: a real signal, just not a phone notification. */
+/** U4d (D-047/D-048): the ONE place `WATCH_HEARTBEAT_INTERVAL_MS` is parsed with its 1-hour
+ * fallback — extracted out of `createMongoWatchSilenceDeps` (which used to inline this) so
+ * `createMongoWatchStateReadDeps` below reads the exact same number instead of re-declaring the
+ * fallback a third time (the first two are this file's former inline copy and
+ * scripts/watch/lib/heartbeat.mjs's `watchHeartbeatIntervalMs`, pinned equal by
+ * `health.test.ts`'s drift test). Writer, detector and now the page must all agree on one number,
+ * or a watcher can look alive to one reader and dead to another. */
+function watchHeartbeatIntervalMs(): number {
+  const parsed = process.env.WATCH_HEARTBEAT_INTERVAL_MS ? Number(process.env.WATCH_HEARTBEAT_INTERVAL_MS) : NaN;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 60 * 60 * 1000;
+}
+
 export function createMongoWatchSilenceDeps(): WatchSilenceDeps {
   const tenantIds = (process.env.WATCH_HEARTBEAT_TENANTS ?? "toc").split(",").map((t) => t.trim()).filter(Boolean);
-  const parsed = process.env.WATCH_HEARTBEAT_INTERVAL_MS ? Number(process.env.WATCH_HEARTBEAT_INTERVAL_MS) : NaN;
   return {
     tenantIds,
-    // Same env var, same rule and the same 1-hour D-048 default as
-    // scripts/watch/lib/heartbeat.mjs's `watchHeartbeatIntervalMs` — writer and detector must read
-    // one number, or a watcher looks alive to one side and dead to the other.
-    intervalMs: Number.isFinite(parsed) && parsed > 0 ? parsed : 60 * 60 * 1000,
+    intervalMs: watchHeartbeatIntervalMs(),
     listHeartbeats: (tenantId) => listHeartbeats(tenantId),
     notifyWatchSilent: (tenantId, sourceType, lastHeartbeatAt, intervalMs) => {
       const last = lastHeartbeatAt ? `last completed run: ${lastHeartbeatAt}` : "no run has ever completed";
@@ -60,6 +68,23 @@ export function createMongoWatchSilenceDeps(): WatchSilenceDeps {
         `WATCH SILENT: ${sourceType} (tenant ${tenantId}) — ${last}, expected within ${intervalMs}ms. Polling itself has stopped; check the watcher process/task, not the credential.`,
       );
     },
+  };
+}
+
+/** U4d (D-047/ISS-361/ISS-358): read-only `watch_state`/`watch_heartbeat` deps merged into
+ * `ServerDeps.watchedSources` below, alongside the A13 create/listActive/run trio
+ * (`routes/watched-sources.ts`). Both accessors are the SAME tenant-scoped `@lkb/db` functions R1's
+ * alert (`markWatchState`) and R2's detector (`listHeartbeats` above) already read/write, and
+ * `heartbeatIntervalMs` is the SAME number the detector uses — so the `/watch` page can never show
+ * a watcher as healthy that `/health` would already have alerted on as silent. Lives here rather
+ * than in `store.ts` for the same measured reason `createMongoWatchSilenceDeps` does: `store.ts` is
+ * at 299/300 non-blank lines with no room, and this file already does this exact kind of env-driven
+ * composition-root wiring. */
+function createMongoWatchStateReadDeps() {
+  return {
+    listWatchState: (tenantId: string) => listWatchState(tenantId),
+    listHeartbeats: (tenantId: string) => listHeartbeats(tenantId),
+    heartbeatIntervalMs: watchHeartbeatIntervalMs(),
   };
 }
 /** `write` for the router's own per-attempt ledger entries — a tenant isn't known until a
@@ -146,10 +171,12 @@ export function buildProductionDeps(): ServerDeps {
     keyStore: createMongoApiKeyStore(),
     evalRuns: createMongoEvalRunStore(),
     brain: createMongoBrainReadDeps(),
-    watchedSources: createMongoWatchedSourceDeps(),
     citations: createMongoCitationsDeps(),
     // U4b/R2: the same Mongo health deps as before, plus the injected watcher-silence detector.
     health: { ...createMongoHealthDeps(), watchSilence: createMongoWatchSilenceDeps() },
+    // U4d: the same A13 watched-sources deps as before, plus the watch_state/watch_heartbeat read
+    // surface GET /watch-state serves (routes/watched-sources.ts).
+    watchedSources: { ...createMongoWatchedSourceDeps(), ...createMongoWatchStateReadDeps() },
     search: createMongoSearchDeps(),
     graph: createMongoGraphReadDeps(),
     calendar: createGwsCalendarReadDeps(),

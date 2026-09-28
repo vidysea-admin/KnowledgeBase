@@ -8,17 +8,41 @@
  * watched_sources (empty)`.
  *
  * So the gap was never the logic. It was that no user action could reach it.
+ *
+ * U4d (D-047/D-048/ISS-361/ISS-358) adds `GET /watch-state`'s tests below (search "U4d"). They live
+ * in THIS file, not a new one, for the same dirsize reason ISS-C-UNRUN-WRITERS-017's tests do
+ * (see the comment further down) — `apps/api/src` and `apps/api/src/routes/` are both at/over their
+ * `lint-dirsize` budget, so the fix for ISS-358 must not be the cause of a new violation.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+
+import type { WatchHeartbeat, WatchState } from "@lkb/core";
 
 import { isGuardedFetcher } from "@lkb/ingest";
 
 import { startTestServer } from "../testUtils.js";
 import { createWatchedRunDeps } from "../store.js";
 import { buildTestDeps, fakeKeyStore, fakeWatchedSourceDeps } from "../fixtures.js";
+import type { WatchedSourceDeps } from "./watched-sources.js";
 
 const key = (scopes: string[]) => fakeKeyStore({ "ws-key": { tenantId: "tenant-1", scopes } });
+
+/** U4d: a fake read surface for `GET /watch-state`, partitioned BY TENANT like
+ * `fakeWatchedSourceDeps`'s own `byTenant` map above (ISS-C-UNRUN-WRITERS-018's lesson: a fake that
+ * ignores tenantId cannot fail an isolation test). Defined here rather than in fixtures.ts, which
+ * is itself at 299/300 non-blank lines with no room to grow. */
+function fakeWatchStateReadDeps(
+  stateByTenant: Record<string, WatchState[]> = {},
+  heartbeatsByTenant: Record<string, WatchHeartbeat[]> = {},
+  heartbeatIntervalMs = 60 * 60 * 1000,
+): Pick<WatchedSourceDeps, "listWatchState" | "listHeartbeats" | "heartbeatIntervalMs"> {
+  return {
+    listWatchState: async (tenantId) => stateByTenant[tenantId] ?? [],
+    listHeartbeats: async (tenantId) => heartbeatsByTenant[tenantId] ?? [],
+    heartbeatIntervalMs,
+  };
+}
 
 test("POST /watched-sources registers a source and returns it", async () => {
   const server = await startTestServer(buildTestDeps({ keyStore: key(["sources"]) }));
@@ -250,4 +274,105 @@ test("the deps supply a real sha256 hasher and an ISO clock", () => {
     "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
   );
   assert.match(deps.now(), /^\d{4}-\d{2}-\d{2}T/);
+});
+
+// --- U4d (D-047/D-048/ISS-361): GET /watch-state ------------------------------------------
+
+test("U4d: GET /watch-state 501s when the deployment has not wired the read deps (the A13-only default)", async () => {
+  const server = await startTestServer(buildTestDeps({ keyStore: key(["sources"]) }));
+  try {
+    // buildTestDeps' default watchedSources is plain fakeWatchedSourceDeps() — no listWatchState/
+    // listHeartbeats/heartbeatIntervalMs — matching what an A13-only fixture looks like today.
+    const res = await fetch(`${server.baseUrl}/watch-state`, { headers: { authorization: "Bearer ws-key" } });
+    assert.equal(res.status, 501, "an unwired deployment must say so, never a silent empty 200");
+    const body = (await res.json()) as { error: string };
+    assert.equal(body.error, "not_implemented");
+  } finally {
+    await server.close();
+  }
+});
+
+test("U4d: GET /watch-state 403s without the sources scope", async () => {
+  const server = await startTestServer(buildTestDeps({
+    keyStore: key(["ask"]),
+    watchedSources: { ...fakeWatchedSourceDeps(), ...fakeWatchStateReadDeps() },
+  }));
+  try {
+    const res = await fetch(`${server.baseUrl}/watch-state`, { headers: { authorization: "Bearer ws-key" } });
+    assert.equal(res.status, 403);
+  } finally {
+    await server.close();
+  }
+});
+
+test("U4d: GET /watch-state returns watch_state rows and heartbeat staleness computed server-side, per R2's own rule", async () => {
+  const HOUR = 60 * 60 * 1000;
+  const NOW = Date.now();
+  const state: WatchState[] = [
+    { _id: "tenant-1:drive:f1", tenantId: "tenant-1", sourceType: "drive", sourceId: "f1", status: "failed", seenAt: new Date(NOW - 60_000).toISOString(), failedAt: new Date(NOW - 60_000).toISOString(), failureReason: "401: token expired" },
+  ];
+  const heartbeats: WatchHeartbeat[] = [
+    { _id: "tenant-1:drive", tenantId: "tenant-1", sourceType: "drive", lastHeartbeatAt: new Date(NOW - 5 * 60_000).toISOString() },
+    { _id: "tenant-1:gmail", tenantId: "tenant-1", sourceType: "gmail", lastHeartbeatAt: new Date(NOW - 3 * HOUR).toISOString() },
+    // calendar: no row at all -- must be synthesised as maximally stale, not silently dropped.
+  ];
+  const server = await startTestServer(buildTestDeps({
+    keyStore: key(["sources"]),
+    watchedSources: { ...fakeWatchedSourceDeps(), ...fakeWatchStateReadDeps({ "tenant-1": state }, { "tenant-1": heartbeats }, HOUR) },
+  }));
+  try {
+    const res = await fetch(`${server.baseUrl}/watch-state`, { headers: { authorization: "Bearer ws-key" } });
+    assert.equal(res.status, 200);
+    const body = (await res.json()) as { state: WatchState[]; heartbeats: { sourceType: string; lastHeartbeatAt: string | null; stale: boolean }[] };
+    assert.equal(body.state.length, 1);
+    assert.equal(body.state[0]?.failureReason, "401: token expired");
+
+    const byType = new Map(body.heartbeats.map((h) => [h.sourceType, h]));
+    assert.equal(byType.get("drive")?.stale, false, "5 minutes old, well within the 1h interval");
+    assert.equal(byType.get("gmail")?.stale, true, "3 hours old, past the 1h interval");
+    assert.equal(byType.get("calendar")?.stale, true, "no row at all -- absence is maximally stale, not healthy (D-048)");
+    assert.equal(byType.get("calendar")?.lastHeartbeatAt, null);
+  } finally {
+    await server.close();
+  }
+});
+
+test("U4d/R8: one tenant's watch-state read never returns another tenant's rows -- live two-key walk", async () => {
+  const HOUR = 60 * 60 * 1000;
+  const NOW = Date.now();
+  const stateByTenant: Record<string, WatchState[]> = {
+    "tenant-a": [{ _id: "tenant-a:drive:only-a", tenantId: "tenant-a", sourceType: "drive", sourceId: "only-a", status: "failed", seenAt: new Date(NOW).toISOString(), failureReason: "tenant-a's own failure" }],
+    // tenant-b: deliberately empty.
+  };
+  const heartbeatsByTenant: Record<string, WatchHeartbeat[]> = {
+    "tenant-a": [{ _id: "tenant-a:drive", tenantId: "tenant-a", sourceType: "drive", lastHeartbeatAt: new Date(NOW).toISOString() }],
+    // tenant-b: no heartbeat rows either -- every source type must come back maximally stale.
+  };
+  const server = await startTestServer(buildTestDeps({
+    watchedSources: { ...fakeWatchedSourceDeps(), ...fakeWatchStateReadDeps(stateByTenant, heartbeatsByTenant, HOUR) },
+    keyStore: fakeKeyStore({
+      "a-key": { tenantId: "tenant-a", scopes: ["sources"] },
+      "b-key": { tenantId: "tenant-b", scopes: ["sources"] },
+    }),
+  }));
+  try {
+    const aRes = await fetch(`${server.baseUrl}/watch-state`, { headers: { authorization: "Bearer a-key" } });
+    const aBody = (await aRes.json()) as { state: WatchState[] };
+    assert.equal(aBody.state.length, 1);
+    assert.equal(aBody.state[0]?.failureReason, "tenant-a's own failure");
+
+    const bRes = await fetch(`${server.baseUrl}/watch-state`, { headers: { authorization: "Bearer b-key" } });
+    const bBody = (await bRes.json()) as { state: WatchState[]; heartbeats: { sourceType: string; stale: boolean }[] };
+    // NOT assert.deepEqual(bBody.state, [], ...): node:assert/strict's deepEqual is deepStrictEqual,
+    // typed `<T>(actual: unknown, expected: T): asserts actual is T`. With expected inferred as
+    // `never[]` from the `[]` literal, that assertion signature narrows bBody.state itself to
+    // `never[]` for the rest of this block, breaking the `.some((s) => s.failureReason ...)` call
+    // below with TS2339 ("does not exist on type 'never'"). Asserting on `.length` instead narrows
+    // only that number property, leaving bBody.state's array element type untouched.
+    assert.equal(bBody.state.length, 0, "tenant-b must not see tenant-a's watch_state row");
+    assert.equal(bBody.state.some((s) => s.failureReason === "tenant-a's own failure"), false, "tenant-a's failure text must never appear in tenant-b's response");
+    assert.equal(bBody.heartbeats.every((h) => h.stale === true), true, "tenant-b has no heartbeat rows of its own, so every source type is maximally stale, never borrowed from tenant-a");
+  } finally {
+    await server.close();
+  }
 });
