@@ -1,6 +1,6 @@
 # Manifest — `u4b-r2-alert-interface`
 
-**Status:** ready-for-check
+**Status:** checked-PASS (cycle 0)
 **Fix cycle:** 0 of max 3
 **Authorized by:** D-053
 **Round cap:** first unit on the alert-interface seam — no prior PASSes exist on it, so the class-
@@ -315,3 +315,22 @@ pnpm -r test
 npm run lint:structure
 npm run test:lint
 ```
+
+**Handshake status:** checked-PASS
+- Cycle 0 verdict `qa/verdicts/u4b-r2-alert-interface.md` (**PASS**, cycle checked 0). Merged to
+  master; maker re-verified on the merged tree: `python schema/validate.py` **27/27 including
+  `watch_heartbeat`** (this unit's only previously-red item, now green), both prohibitions still
+  byte-for-byte intact, `npm run test:lint` 111/112 with the single failure being the pre-existing
+  stale `docs/SNAPSHOT.md`, and `lint-codex-hooks` green 6/6 (no ISS-366 regression).
+- **R2 reaches 1/1 on alert delivery.** End-to-end liveness detection is still incomplete: nothing
+  schedules the `/health` probe (U6) and the heartbeat write leg has never written a row. Both are
+  recorded in D-053 and not charged here.
+- Scope: wired at `apps/api/src/production.ts` per **D-054**, which corrected D-053's naming of
+  `routes/health.ts` (no sink exists in that file). The builder disclosed the substitution rather
+  than widening its own scope; the checker verified `health.ts` and `.dependency-cruiser.cjs` are
+  untouched and falsified the depcruise proof with three escalating mutations.
+- **Carried forward: ISS-U4BR2-001 (high, non-blocking).** `createTelegramAlertSink` has **zero
+  throttle**, while meeting-bot's `notifyWatchSilent` inherits a 60s per-key backstop via
+  `notify-channels.ts`. Proved live: two `detectSilentWatchers()` calls on one stale row produced
+  **6 alerts** with no collapsing. Latent only because nothing schedules `/health` today -- **U6 is
+  exactly the unit that changes that, so this must close before or alongside U6.**
