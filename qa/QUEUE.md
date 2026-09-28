@@ -36,6 +36,17 @@ not merge, rebase or delete anything.
 repair for the Approver (it changes what committed citations mean). A reader that fails loudly on a
 duplicate id decides nothing and can ship first. Do not resolve the collision inside this unit.
 
+**Update 2026-09-28 (D-055 ruling 2, executed by `/checker`):** the repair landed on disk. Both
+rows' `canonical_id` was promoted to a real `id` (`ISS-360-OBSFLAKE` line 358 open,
+`ISS-360-HEARTBEAT` line 359 fixed) and the bare `ISS-360` no longer exists as an id anywhere in
+the ledger union. Every already-committed bare-`ISS-360` citation this repair found was ANNOTATED,
+never rewritten — see `qa/issues.360-citations.md` for the full disambiguation table (39 sites; 1
+marked genuinely `AMBIGUOUS`). **Commit deferred**: another loop holds an unresolved merge conflict
+in this checkout (`apps/api/src/production.ts`, `UU`) at the time of this repair, so
+`qa/issues.jsonl` and `qa/issues.360-citations.md` are on disk, uncommitted, pending that merge
+clearing. This TODO row (`ledger-duplicate-id-guard`) still stands — the mechanical duplicate-id
+guard is separate work and unaffected by the repair landing.
+
 ---
 ## TODO — speaker-name-rules.test.ts is 8 lines from its gate budget
 
