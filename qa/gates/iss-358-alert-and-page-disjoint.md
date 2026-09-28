@@ -73,7 +73,9 @@ inside this wave.
 
 `iss-358: <a|b|c>`
 
-**Answered:** (pending)
-
-**Gate status:** OPEN — awaiting the Approver. Nothing is blocked by it; U4b continues. The maker
+**Answered:** `iss-358: a` -- Umesh, AskUserQuestion, 2026-09-28. Extend scope in a **U4d** that gives the
+`/watch` page visibility into `watch_state`; do NOT re-scope R4. Authorized by **D-047**. Per ISS-361, U4d
+must also surface `watch_heartbeat`, which D-048 makes a third collection, rather than leaving a second
+round-trip.
+**Gate status:** ANSWERED 2026-09-28 (D-047). U4d is queued as the next U4 unit
 recommends (a) and states that the unreconciled premise is its own, from the spec it wrote

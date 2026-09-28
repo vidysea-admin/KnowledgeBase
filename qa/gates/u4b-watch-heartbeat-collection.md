@@ -74,7 +74,10 @@ test. Two new files, both conventional.
 
 `u4b: 1=<yes|no> 2=<health-route|other:...> 3=<interval, e.g. 30m|1h|2h> 4=<yes|no>`
 
-**Answered:** (pending)
-
-**Gate status:** OPEN — awaiting the Approver. U4b's checker runs regardless; the shipped parts stand or
+**Answered:** `u4b: 1=yes 2=health-route 3=1h 4=yes` -- Umesh, AskUserQuestion, 2026-09-28. All four
+`watch_heartbeat` collection files authorized; detector extends `apps/api/src/routes/health.ts` in place;
+interval **1 hour**, replacing U4b's `[ASSUMPTION]` 2h; and the five pure functions move to
+`scripts/watch/lib/heartbeat.mjs` with their first committed test. Authorized by **D-048**, which widens
+D-046's new-file cap for these six files only.
+**Gate status:** ANSWERED 2026-09-28 (D-048). R2 stays unmet until the authorized unit is built and PASSed
 fall on their own merits and R2 stays unmet until this is answered

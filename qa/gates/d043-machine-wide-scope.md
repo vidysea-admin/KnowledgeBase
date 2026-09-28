@@ -68,8 +68,14 @@ standing.
 
 `d043-scope: 1=<a|b|c> 2=<ratification-holds|rescope-needed>`
 
-**Answered:** (pending)
-
-**Gate status:** OPEN — awaiting the Approver. Item 3 proceeds regardless; items 1 and 2 are held. The
+**Answered:** `d043-scope: 1=a 2=ratification-holds` -- Umesh, AskUserQuestion, 2026-09-28. The
+machine-wide `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1` change is authorized, with the decision
+recorded in the shared `D:/ai_os/decisions/log.md` as well as this repo's log so the other projects have a
+trace; and the retro-ratification of `4a71633` / `e5402d6` stands now that it is correctly scoped, so the
+ANSWERED stamp on `enforcement-hooks-unauthorized-and-live-regressed.md` needs no correction. Authorized by
+**D-049**. The scope-blindness in the rule itself -- enforcement paths named by filename pattern rather
+than resolved location -- is filed for its own fix regardless.
+**Gate status:** ANSWERED 2026-09-28 (D-049). Unblocks delivery-gate-stamp-adoption fix cycle 2 and the
+ISS-346 cap check, which D-044 requires before wave/vector-gap-durability gets a manifest
 maker opened this gate against its own earlier question rather than proceeding on an authorization it had
 obtained by mis-describing the file

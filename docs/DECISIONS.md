@@ -826,3 +826,267 @@ held 94/94 green through the period when live capture was broken.
 qa/gates/plan-approved-u4-watch-dashboard.md, qa/gates/live-recording-proof-method.md,
 qa/gates/u6-task-scheduler-consent.md, docs/features/u4-watch-dashboard/spec.md,
 docs/features/u4-watch-dashboard/plan.md
+
+## D-047 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** ISS-358 is resolved by **extending scope, not by re-scoping R4**. A new unit **U4d** gives the
+`/watch` page visibility into the `watch_state` collection: a read-only, tenant-scoped API route serving
+`watch_state` to the web tier (none exists today), plus `WatchPage.tsx` rendering those rows alongside the
+`watched_sources` rows it already shows. The page becomes one surface over both the Drive/Gmail/Calendar
+watchers that actually fail and the URL bookmarks. R4's spec text is amended to say "both source families"
+rather than being narrowed. Options (b) re-scope R4 and (c) unify the two collections were both rejected.
+
+**Why:** U4c's checker established by reading merged code that R1's alert (`notifyPollFailed`, U4a) fires off
+`watch_state` while R4's page (`WatchPage.tsx`, U4c) reads only `watched_sources` and `meeting-candidates` --
+genuinely disjoint collections with zero code overlap. The consequence is that the wave's own motivating
+incident, a Drive/Gmail/Calendar watcher that stops, alerts correctly and then deep-links the reader to a
+page with no visibility into the failure class that triggered the alert. That is worse than having no page,
+because it invites the reader to conclude nothing is wrong. This is not a defect in U4c's build: D-046
+approved R4-R8 against `watched_sources` by name and R6 cites its route explicitly, so U4c built what was
+approved and disclosed the gap rather than working around it. The defect is one level up, in the spec the
+maker itself wrote, which was drafted against one collection while the alerting was built against another
+and nobody reconciled them. Option (b) was rejected because the cheap version is not actually cheap: it
+would also require removing the alert's deep link, since an alert must not point at a page that cannot show
+its subject, which makes the alert less useful to save one unit. Option (c) was rejected as correct but out
+of scope -- a schema and migration job touching U2's live watcher does not belong inside this wave.
+
+**Result:** U4d is authorized and queued as the next U4 unit. Umesh answered `iss-358: a` via AskUserQuestion
+on 2026-09-28. Two facts recorded for whoever builds it: `watched_sources` persists no failure state at all
+(`packages/ingest/src/watched/run.ts`'s catch branch never calls `recordFetch`, and the schema has no failure
+field) and has no scheduler, so today the only caller of `runWatchedSources` anywhere in the repo is the
+page's own "Poll now" button. A page whose sole data source is a button the reader presses is the state
+option (b) would have frozen. Per ISS-361, filed by U4b's checker, `watch_heartbeat` will be a **third**
+collection once D-048 lands, and U4d must surface it too rather than leaving a second round-trip.
+
+**Links:** ISS-358 (high), ISS-361 (low, the third-collection analysis), `qa/gates/iss-358-alert-and-page-disjoint.md`,
+`docs/features/u4-watch-dashboard/spec.md` R1/R4/R6, D-046, `qa/verdicts/u4c-watch-page.md`, close-out c2f339b
+
+**Changes-authorized:** `docs/features/u4-watch-dashboard/spec.md` (R4 wording, and the plan's unit list to
+add U4d); `docs/features/u4-watch-dashboard/plan.md`. No enforcement path is touched by this entry.
+
+## D-048 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** The `watch_heartbeat` collection promised by D-046 is authorized **with the four files this repo
+requires for every collection**, which D-046 chose the collection without authorizing. Six new files in all:
+
+1. `schema/watch-heartbeat.schema.json` -- row shape `{_id: "<tenantId>:<sourceType>", tenantId, sourceType, lastHeartbeatAt}`
+2. its generated type under `packages/core/src/generated/`
+3. `packages/db/src/collections/watch-heartbeat.ts` -- a `scopedCollection()`-backed tenant-scoped accessor
+4. a `migrations/*.cjs` entry creating the collection, following `migrations/20260925090000-source-watcher.cjs`
+5. `scripts/watch/lib/heartbeat.mjs` -- the five pure functions U4b built, moved out of `run-watch.mjs`
+6. `scripts/watch/lib/heartbeat.test.mjs` -- their first committed test
+
+The staleness **detector extends `apps/api/src/routes/health.ts` in place** -- an existing separately-running
+server, edited rather than added to. The heartbeat **interval is 1 hour**, replacing U4b's `[ASSUMPTION]` 2h
+placeholder. The two-part key `tenantId:sourceType` is confirmed, deliberately unlike `watch_state`'s
+three-part key.
+
+**Why:** D-046 settled the heartbeat's shape as a new collection -- correctly, since R2's failure mode is the
+*absence* of `watch_state` rows and a field on the rows that stop being written cannot detect it -- and in the
+same entry capped new files at exactly three, all U4c's, stating "No other new file is authorized." Those two
+provisions conflict: `ARCHITECTURE.md:66-100` requires a schema file, a generated type, a tenant-scoped
+accessor and a migration entry for every collection, and U4b's checker verified independently that **every**
+existing collection on disk has all four with no exception, and that `packages/db/src/lib/tenantScope.ts`
+offers no raw escape hatch (removed per ISS-065). So the decision that chose a collection forbade the files a
+collection needs. U4b's builder stopped at that boundary and raised a gate rather than routing around it, and
+its checker ruled the blocker **real, not a rationalization**, having read ARCHITECTURE.md, the cited
+migration and D-046 itself rather than taking the manifest's word. The three workarounds were correctly
+rejected: a local JSON file reverses D-046's own Mongo choice; reusing `watch_reports` reintroduces exactly
+the prunability coupling D-046 rejected `watch_state` for; and hand-rolling raw untyped `db.collection()`
+calls would ship R8's tenancy guarantee without the scoped-accessor machinery every other collection has --
+the ISS-078 hazard class, and the one class this repo never round-caps.
+
+Files 5 and 6 are authorized for a second reason that is worth stating on its own. **Two units in a row have
+now been unable to commit a test for new logic because a test file is itself a new file** -- ISS-357 on U4a,
+and ISS-360 on U4b's five pure heartbeat functions, which shipped verified only by an uncommitted throwaway
+script. A new-file cap intended to stop scope creep was instead blocking tests, which inverts its purpose.
+`scripts/watch/lib/` already holds a `lib/*.mjs` + `lib/*.test.mjs` pair pattern, so this follows convention
+rather than inventing one, and it relieves `run-watch.mjs`, one of the repo's four standing `lint-loc`
+violators, which grew 522 -> 572 during U4b.
+
+**Result:** Umesh answered `u4b: 1=yes 2=health-route 3=1h 4=yes` via AskUserQuestion on 2026-09-28. R2
+remains **unmet** until this is built -- U4b PASSed cycle 0 (verdict af6037a) on the parts that do not touch
+the collection, and its verdict states R2 at 0/1 so no reader mistakes the PASS for the requirement. The
+detector must run in a different process from the writer or it dies with it, which is why `health.ts` was
+chosen over `run-watch.mjs`; U6's Task Scheduler work is gated separately and is not a prerequisite. Per
+ISS-361, `watch_heartbeat` becomes a third collection the `/watch` page does not surface, and D-047's U4d must
+cover it in the same pass.
+
+**Links:** ISS-360 (medium, uncommitted test), ISS-361 (low), ISS-357, ISS-065, ISS-078,
+`qa/gates/u4b-watch-heartbeat-collection.md`, `qa/manifests/u4b-watch-heartbeat-alert.md`,
+`qa/verdicts/u4b-watch-heartbeat-alert.md`, D-046, D-047, `ARCHITECTURE.md:66-100`,
+`migrations/20260925090000-source-watcher.cjs`, spec R2/R7/R8
+
+**Changes-authorized:** the six new files listed above, plus in-place edits to
+`apps/api/src/routes/health.ts`, `scripts/watch/run-watch.mjs` (removing the five moved functions) and
+`packages/db/src/collections/index.ts` if it carries a registry. This widens D-046's new-file cap for these
+files only; the cap otherwise stands. No enforcement path is touched by this entry.
+
+## D-049 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** The machine-wide Stop hook `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1` is authorized for the two
+fixes D-043 described as items 1 and 2 -- the `Fix cycle` predicate bug, the ISS-205 stripper clause, and the
+ISS-346 mechanical round-cap check -- **and this decision is to be recorded in the shared AIOS log
+`D:/ai_os/decisions/log.md` as well as here**, so the other projects on this machine have a trace of why their
+Stop hook changed. D-043's scope error is corrected, not quietly absorbed: D-043 remains ACTIVE and correct
+for item 3 (`.claude/hooks/mc-sessionstart.ps1`, genuinely repo-local, built and PASSed as
+`ledger-shard-union-reader`), and its retro-ratification of commits `4a71633` and `e5402d6` is **re-authorized
+here at the correct scope** rather than resting on an entry that lacked the authority.
+
+**Why:** When the maker asked Umesh to authorize D-043, it presented all three items as touching "enforcement
+paths that **this repo** requires you to authorize by name." That is false for `delivery-gate-stop.ps1`, which
+does not exist in this repo at all: it lives at `D:/ai_os/.claude/hooks/` and is registered in the
+**user-level** `C:/Users/Lenovo/.claude/settings.json:124`, so it fires as a Stop hook in every project on
+this machine -- `d:/erp`, `d:/vc`, `d:/autoTesting`, `d:/vidysea/*` and every scratch directory. A decision of
+`D:/KnowledgeBase` cannot authorize that, because the blast radius reaches projects that never saw the
+decision, whose maker loops depend on the hook's current behaviour, and whose own Lab Protocol records would
+contain no trace of why it changed. The maker disclosed this against its own earlier question and opened
+`qa/gates/d043-machine-wide-scope.md` rather than proceeding on an authorization it had obtained by
+mis-describing the file.
+
+Machine-wide was chosen over keeping it repo-local because **the defects are genuinely generic and are live
+elsewhere right now.** Every maker-checker project has manifests with fix cycles, so the `Fix cycle` predicate
+bug misfires in all of them, including `d:/erp` where a loop is currently running. A repo-local copy would fix
+one project and leave the same bug in every other, while adding a second implementation of the same predicate
+-- which is precisely the drift-by-copy failure recorded in D-050 and ISS-355 on the same day. Fixing the one
+shared implementation is both smaller and the only option that does not create a divergence to police.
+
+**Why the rule did not catch this, which matters more than the instance:** the project CLAUDE.md names
+enforcement paths by filename **pattern** (`.claude/hooks/*`), not by resolved location.
+`delivery-gate-stop.ps1` matches that pattern in prose while living outside the repo, so the rule read as
+satisfied by an `Approved-by` line that had no authority over the file. The rule has no notion of scope: it
+cannot distinguish a hook this repo owns from a hook this repo merely runs. That is a defect in the rule, not
+only in this instance, and it is filed for its own fix regardless of this entry.
+
+**Result:** Umesh answered `d043-scope: 1=a 2=ratification-holds` via AskUserQuestion on 2026-09-28,
+authorizing the machine-wide change with a shared-log record and confirming the retro-ratification stands now
+that it is correctly scoped. This unblocks `delivery-gate-stamp-adoption` fix cycle 2 and the ISS-346 cap
+check, which D-044 requires to land **before** `wave/vector-gap-durability` gets a manifest. The stamp on
+`qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md` therefore stands rather than needing
+correction. Still to confirm during the build: whether the ISS-346 cap check has to live in the shared maker
+skill (`D:/ai_os/.claude/skills/maker/`, also machine-wide), which the maker has not yet verified -- if so it
+falls under this same authorization, and the shared-log entry must say so.
+
+**Links:** D-043 (corrected in scope, not superseded), D-044, ISS-205, ISS-346,
+`qa/gates/d043-machine-wide-scope.md`, `qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md`,
+commits `4a71633` and `e5402d6`, `C:/Users/Lenovo/.claude/settings.json:124`, D-050
+
+**Changes-authorized:** `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1` (machine-wide), plus a matching entry
+in `D:/ai_os/decisions/log.md`, and `D:/ai_os/.claude/skills/maker/SKILL.md` if the ISS-346 check must live
+there.
+
+**Approved-by:** Umesh
+
+## D-050 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** Four Approver rulings taken in one batched AskUserQuestion round (Umesh first-hand,
+session 21132795), all four answered as recommended.
+
+1. SPEAKER SEAM MECHANISM: move the NEVER_A_PERSON word list out of
+   packages/index/src/pipeline/speaker-name-rules.ts into its own data module. This is the explicit
+   "create a new file" authorization the user-global edit-in-place discipline requires, and it is
+   scoped to this extraction only. Zero behavior change is the acceptance condition.
+2. ISS-307 (false STALL banner): fix it now. This entry is the authorizing record for the
+   enforcement-path edit to .claude/hooks/mc-sessionstart.ps1 lines 47-49 -- read the NEWEST line of
+   the append-only oldest-first qa/.last-tick instead of the oldest, and match a real status field
+   instead of substring-matching STALLED/EXHAUSTED anywhere in that tick's prose.
+3. D-020 MUTATION SAFETY: amend it. The byte backup must be scoped PER-MUTATION rather than
+   per-run, and every mutation run must end with a post-run check that each touched file still
+   matches HEAD.
+4. ENFORCEMENT HOOK AUDIT (D-041 ruling 7): run it on the next tick. /aios-config-auditor over
+   .claude/hooks/* read-only, present the graded findings plus the diff against the last approved
+   state, then one Umesh approval. This entry still authorizes NO hook edit beyond ruling 2 above.
+
+**Why:** The speaker seam that D-041 ruling 4 ordered worked "until it is clean" had become
+unworkable rather than merely hard: speaker-name-rules.ts sits at exactly 300 non-blank lines, which
+is the loc.max ceiling with zero headroom, so not one further denylist word fits; and ISS-104's
+remaining residue (India, Mumbai, Google) is gazetteer-bound with person-valid twins of identical
+syntax, so no word list or syntactic gate can close it. Every way forward collided with a standing
+rule rather than with a technical limit -- the new-file discipline, a project-wide lint budget, or
+ruling 4 itself -- which is precisely the class of thing that must not be decided autonomously.
+Ruling 3 exists because a worktree silently lost a completed unit this session: a mutation-restore
+trap fired on normal shell exit (a trap on EXIT fires on success too) and overwrote finished work
+with a pre-fix backup, 28 files reverted across packages/index. D-020 as written permits exactly
+that shape, which makes it a rule defect and not just an incident.
+
+**Result:** Buildable now with no further gate: the NEVER_A_PERSON data-module extraction, and the
+ISS-307 hook fix. Gate qa/gates/speaker-seam-loc-ceiling.md carries the matching Answered line.
+ISS-104 stays open and critical -- the extraction unblocks the ceiling and closes nothing on its
+own. The hook audit is queued for the next tick and remains unauthorized to edit. Still open and
+NOT settled here: d015-generalisation-scope, handshake-liveness-contract-start,
+ui-surfaces-test-file-exclusion, write-guard-contract-contradiction, and ISS-355 (.codex/hooks
+committed with no Approver decision).
+
+**Changes-authorized:** .claude/hooks/mc-sessionstart.ps1 (lines 47-49 only: newest-line read plus a
+real status-field match, per ruling 2) -- and no other enforcement path.
+packages/index/src/pipeline/speaker-name-rules.ts plus one new sibling data module (ruling 1).
+This project CLAUDE.md's D-020 section (ruling 3).
+
+**Approved-by:** Umesh
+
+**Links:** ISS-104, ISS-104CC-1, ISS-104CC-2, ISS-307, ISS-355, ISS-360; D-013, D-014, D-019, D-020,
+D-041; qa/gates/speaker-seam-loc-ceiling.md, qa/debug/delivery-gate-manifest-blindness-cycle3.md,
+qa/debug/write-guard-enforcement-gaps-cycle3.md
+
+## D-050 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** `.codex/hooks/` -- the six-file mirror of this repo's `.claude/hooks/*.ps1` -- is **retained and
+authorized, with the copies replaced by links**. Each `.codex/hooks/<name>.ps1` becomes a Windows symlink or
+junction to its `.claude/hooks/` original, so there is exactly one implementation per hook and divergence is
+impossible by construction rather than policed by a lint someone must keep passing. `.codex/hooks.json` keeps
+its current wiring. **This entry also supplies the authorization the mirror never had**, closing the
+Update-Authorization violation in ISS-355 and the long-open disposition question in ISS-268. Deleting the
+mirror was rejected; a parity lint is the fallback only if links do not resolve.
+
+**One verification is required before all six are converted:** whether the Codex CLI resolves a Windows
+symlink or junction when PowerShell is invoked with `-File` against it. Convert **one** hook, prove it runs,
+then convert the rest. If it does not resolve, fall back to keeping the copies plus a structure-lint rule that
+fails on any divergence from the `.claude` original modulo line endings -- that fallback is authorized by this
+entry too, so a failed probe does not need a new decision.
+
+**Why:** Sweep shard 3 and the consolidation checker established at HEAD that `.codex/hooks/` carries **three
+defects that are live wrong in a configured hook right now**, not latent: it reads only `qa/issues.jsonl`
+instead of the union over `qa/issues.jsonl` + `qa/issues.*.jsonl` (the measured 132-vs-153 undercount D-041 was
+written to close), it uses the pre-D-034 naive `'Status: ready-for-check'` substring match, and it takes the
+**first** `Cycle checked` match rather than the maximum, which in a newest-first verdict file hands the reader
+the oldest verdict (the ISS-350 reproduction-3 trap). The maker then took the measurement it had said would
+decide the question: `.codex/hooks.json` exists and wires all six scripts by absolute path (`PreToolUse` on
+`Bash|PowerShell`, two `SessionStart` hooks, two `SessionEnd` hooks), and the Codex CLI is installed at
+`C:/Users/Lenovo/AppData/Local/Programs/OpenAI/Codex/bin/codex`. So any Codex session opened in this repo runs
+a SessionStart hook reporting a wrong open-issue count and matching manifest status with the superseded
+substring.
+
+**That measurement removed deletion as a free choice.** Removing the scripts without the wiring leaves a
+config pointing at absent files; removing both leaves Codex sessions in a Lab Protocol repo with **no
+governance hooks at all** -- no session-start directive, no pre-commit guard, no decisions-append guard. A
+stale mirror is bad; an unguarded session in this repo is worse, because the stale mirror at least still blocks
+what `mc-precommit.ps1` blocks.
+
+Links were chosen over a parity lint because of what the corrected provenance shows about the mechanism. All
+six files and `hooks.json` carry an identical mtime of 2026-09-24 23:08 -- the signature of a one-shot Codex
+setup, not of a loop authoring stale logic on top of a fix. They sat **untracked** for three days, which is
+exactly the state ISS-268 describes, and were then committed without authorization by `eff401b`, a maker tick
+about ISS-337, inside a commit about an unrelated unit. So the mirror did not reintroduce fixes that already
+existed; it froze a snapshot which has since been overtaken. **The problem is the copying, not the copier's
+care** -- a copy taken at any instant is stale from the next commit onward -- and that is an argument for
+removing the second copy rather than for adding a rule that detects when it drifts.
+
+**Result:** Umesh answered `iss-355: c` via AskUserQuestion on 2026-09-28. Two facts are settled by this entry
+regardless of how the link probe goes: the mirror now has the authorizing entry it lacked, and the three
+reintroduced defects stop being live the moment the links land, because the links point at the fixed
+originals. Recorded for its own fix, because it is the more general lesson: the authorization failure here was
+a **pathspec-discipline failure** -- a tick `git add`-ed enforcement-path files that had no authorizing entry,
+inside a commit about something else. A mechanical check refusing to commit any file under a hooks directory
+without a matching DECISIONS entry would have caught this **and** the `delivery-gate-stop.ps1` commits
+re-authorized in D-049 on the same day. That check is proposed, not authorized here.
+
+**Links:** ISS-355 (high), ISS-268, ISS-350, ISS-337, D-041, D-034, D-049, commit `eff401b`,
+`qa/gates/iss-355-codex-hooks-disposition.md`
+
+**Changes-authorized:** `.codex/hooks/decisions-append-guard.ps1`, `.codex/hooks/features-snapshot-session-end.ps1`,
+`.codex/hooks/lab-session-end.ps1`, `.codex/hooks/lab-session-start.ps1`, `.codex/hooks/mc-precommit.ps1`,
+`.codex/hooks/mc-sessionstart.ps1` (each replaced by a link to its `.claude/hooks/` original), and
+`scripts/lint-*.mjs` plus `structure.config.json` only if the parity-lint fallback is taken. `.codex/hooks.json`
+is unchanged. The `.claude/hooks/` originals are NOT modified by this entry.
+
+**Approved-by:** Umesh

@@ -67,9 +67,14 @@ evidence instead of preference. Say the word and it will be taken first.
 `iss-355: <a|b|c>` — optionally preceded by `measure-first` to have the invocation check run before the
 decision.
 
-**Answered:** (pending)
-
-**Gate status:** OPEN — awaiting the Approver. Also carries the ISS-268 disposition question, which has
+**Answered:** `iss-355: c` -- Umesh, AskUserQuestion, 2026-09-28. Replace the six copies with links to
+their `.claude/hooks/` originals, so there is one implementation and divergence is impossible by
+construction. Authorized by **D-050**, which also supplies the authorization the mirror never had (closing
+the ISS-355 Update-Authorization violation and the ISS-268 disposition question) and pre-authorizes the
+parity-lint fallback if the link probe fails. Convert ONE hook and prove Codex resolves a Windows link
+through `powershell -File` before converting the other five.
+**Gate status:** ANSWERED 2026-09-28 (D-050). ISS-355 stays open until the links land -- the three defects
+are live in a configured hook until then
 been open since that row was filed and is now more urgent
 
 ## MEASUREMENT TAKEN — 2026-09-28, before asking. It changes the answer.

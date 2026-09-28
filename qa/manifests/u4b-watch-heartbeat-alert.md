@@ -7,7 +7,7 @@ quiet — the load-bearing one") only; approved as written by D-046 (2026-09-28)
 "fake-clock test: no run for > interval ⇒ exactly one alert; a resumed run clears it",
 criticality **high**. `qa/gates/plan-approved-u4-watch-dashboard.md` — Answered, all three lines.
 **Fix cycle:** 0 of max 3
-**Status:** ready-for-check (cycle 0)
+**Status:** checked-PASS (cycle 0)
 **Persona walk:** skip — plan.md's own U4b row says "skip (no screen)"; this unit adds no UI.
 **Backlog tier:** dispatched as `after: U4a` per D-046's Result (U4a merged/PASSed, then this unit).
 **Issues addressed:** none (new-feature unit, not a ledger fix).
@@ -435,4 +435,27 @@ $ git status --short
 ```
 No file outside these three was modified. No file was created or deleted.
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS -- closed out 2026-09-28 against verdict cycle 0 (VERDICT: PASS, commit
+af6037a, merge e74e7dd). The checker ruled the four-file authorization blocker **real, not a
+rationalisation**, verifying it independently against `ARCHITECTURE.md:66-100`,
+`packages/db/src/lib/tenantScope.ts` (no raw escape hatch, removed per ISS-065), every existing collection
+on disk, and `migrations/20260925090000-source-watcher.cjs`. It wrote its own verification script rather
+than reusing the maker's, added adversarial cases the manifest had not tested (negative interval,
+interval=0, malformed date -- all resolve safely to stale), and ran the meeting-bot suite **twice** rather
+than claiming determinism from one green run.
+
+**R2 is UNMET, 0/1 -- this PASS is not the requirement being satisfied.** Nothing writes or reads
+`watch_heartbeat`. The HUMAN_GATE was answered the same day: **D-048** authorizes the four collection files,
+the `health.ts` detector, a 1h interval and the `scripts/watch/lib/heartbeat.mjs` extraction, so the
+follow-up unit can finish R2. Per D-042 unit-status and issue-status are separate axes.
+
+**Issues filed, both open, neither a defect in what shipped:**
+- **ISS-360 (medium)** -- the five pure functions have no committed test, only an uncommitted script. This is
+  the second unit in a row blocked from testing new logic because a test file is itself a new file (ISS-357
+  was the first). D-048 item 4 fixes the cause, not just the instance.
+- **ISS-361 (low)** -- once wired, `watch_heartbeat` is a **third** collection the shipped `/watch` page does
+  not surface, alongside the `watch_state` / `watched_sources` split in ISS-358. D-047's U4d must cover both.
+
+The checker allocated ids 360/361 rather than 358/359 on purpose: master had already allocated 358/359 to
+u4c's checker after this worktree's branch point, so reusing them would have collided on merge. That is
+D-019's per-lane discipline applied correctly without being asked.
