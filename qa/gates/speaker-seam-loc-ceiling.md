@@ -45,7 +45,12 @@ requires your explicit say-so before any new file.
 
 ## Status
 
-**Answered:** _(pending)_
+**Answered:** 2026-09-28, Umesh, first-hand via AskUserQuestion — **option 1, move the word list to
+its own data file.** Recorded as **D-050-SPEAKER** ruling 1 (see D-051 for why a bare `D-050` is
+ambiguous: two entries carry that number). That answer is the explicit "create a new file"
+permission the edit-in-place discipline requires, scoped to this extraction only. Unit
+`speaker-rules-data-module-extraction` dispatched the same turn. ISS-104 stays open and critical —
+the extraction lifts the ceiling and closes nothing on its own.
 
 **Not gated on this:** other backlog tiers remain unblocked and the loop continues on them. This
 gate blocks the speaker seam only.

@@ -223,7 +223,7 @@ mutation that was found applied to production source, and the reason the pre-com
 HEAD. Prefer it over hand-rolled `sed`/`python` mutation; if you hand-roll, the two rules above are
 the minimum.
 
-### Amendment (2026-09-28, authorized by D-050 ruling 3) — the trap must be PER-MUTATION
+### Amendment (2026-09-28, authorized by D-050-SPEAKER ruling 3 (see D-051: two entries share the number D-050)) — the trap must be PER-MUTATION
 
 The two rules above are necessary and **not sufficient**, measured against a live loss in this repo.
 

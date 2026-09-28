@@ -48,7 +48,7 @@ if (Test-Path 'qa/.regrill-due') {
   $first = Get-Content 'qa/.regrill-due' -TotalCount 1
   if ($first -match '^(\d{4}-\d{2}-\d{2})') { if ([datetime]$Matches[1] -le (Get-Date)) { Write-Output ("RE-GRILL DUE: " + $first + " -- HUMAN_GATE: run /grill on that topic before continuing.") } }
 }
-# ISS-307 fix, authorized by D-050 ruling 2 (Approved-by: Umesh). Two defects, both measured
+# ISS-307 fix, authorized by D-050-SPEAKER ruling 2 (Approved-by: Umesh; see D-051 - two entries share the number D-050). Two defects, both measured
 # 2026-09-28 against this repo's own qa/.last-tick (470 lines):
 #   (1) -TotalCount 1 read the OLDEST line of an append-only oldest-first file, so the banner
 #       reported a tick from 2026-09-24 while the newest was 2026-09-28. Now reads the LAST line.
