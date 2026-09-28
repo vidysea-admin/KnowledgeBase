@@ -37,6 +37,15 @@ function Check($name, $cond, $detail) {
   else { Write-Output "  FAIL  $name -- $detail"; $script:fails++ }
 }
 
+# The resolution chain ends at D:/ai_os because that is where the hook is WIRED (user-level), but a
+# stray or stale repo-local copy would silently win and the suite would certify the wrong file while
+# still printing a green RESULT. Pin the identity of what is being tested, not its path -- that also
+# holds for a -HookPath candidate.
+Check "the resolved hook actually contains the ROUNDCAP predicate (not a shadow/stale file)" `
+      [bool](Select-String -Path $hook -Pattern 'predicate ROUNDCAP' -Quiet) `
+      "no ROUNDCAP predicate in $hook -- every assertion below would be meaningless"
+if ($fails -gt 0) { Write-Output "RESULT: FAIL (wrong hook resolved)"; exit 1 }
+
 # ---------------------------------------------------------------------------
 # Tree builder. A "unit" is a manifest, plus a verdict of the same slug when $verdict is given.
 #   @{ slug='x'; changed=@('packages/index/widget.ts'); verdict=@('VERDICT: PASS'); extra='' }
@@ -93,11 +102,32 @@ function RunHook($tree) {
     transcript_path  = $tree.transcript
   } | ConvertTo-Json -Compress
   $evFile = Join-Path $tree.dir 'event.json'
-  Set-Content -Path $evFile -Value $ev -Encoding ascii
+  # utf8, NOT ascii: the paths in this payload come from %TEMP%, and a non-ASCII character anywhere in
+  # it would be silently replaced by '?' under -Encoding ascii, corrupting cwd/transcript_path and
+  # breaking every assertion for a reason that looks like a hook bug.
+  Set-Content -Path $evFile -Value $ev -Encoding utf8
   return (Get-Content $evFile -Raw | & powershell -NoProfile -ExecutionPolicy Bypass -File $hook 2>&1 | Out-String)
 }
 
 function Drop($tree) { Remove-Item -Recurse -Force $tree.dir -ErrorAction SilentlyContinue }
+
+# An ALLOW assertion that only checks for the ABSENCE of a round-cap block is VACUOUS when the hook
+# throws: the outer catch fails OPEN with no stdout at all, so "no block" is indistinguishable from
+# "crashed". That is not hypothetical here -- the null-unrolled HashSet does exactly this, on real data.
+# So every ALLOW is corroborated POSITIVELY on its own tree: strip the ScheduleWakeup and re-run, and
+# the MAKER predicate (which sits immediately AFTER ROUNDCAP) must then block. If ROUNDCAP crashed on
+# THIS tree's shape, MAKER never runs and there is no output, so the assertion fails as it should.
+# Per-tree, because the shapes differ: the 'Round cap:' extra field, a multi-line FAIL->PASS verdict
+# body and a FAIL verdict body are each a distinct parse path, and one shared CONTROL tree covers none
+# of them.
+function CheckAllowed($name, $tree) {
+  $o = RunHook $tree
+  if ($o -match $CAP) { Check $name $false ("blocked when it should have been allowed; got: " + $o); return }
+  StripWakeup $tree
+  $o2 = RunHook $tree
+  Check $name ($o2 -match 'maker-checker project with pending backlog') `
+        ("no round-cap block, but the hook did not run to completion on this tree either (failed open?); second run gave: " + $o2)
+}
 
 $SEAM  = 'packages/index/widget.ts'
 $OTHER = 'packages/index/other.ts'
@@ -123,9 +153,7 @@ $t = NewTree @(
   @{ slug='prior-c'; changed=@($OTHER); tail=$SCOPE; verdict=@('VERDICT: PASS','',('`' + $SEAM + '` again, in prose only.')) },
   @{ slug='cand-1';  changed=@($SEAM) }
 )
-$o = RunHook $t
-Check "a 0-PASS seam is ALLOWED (a verdict that only MENTIONS the file does not count toward the seam)" `
-      (-not ($o -match $CAP)) ("blocked a freely-pullable seam; got: " + $o)
+CheckAllowed "a 0-PASS seam is ALLOWED (a verdict that only MENTIONS the file does not count toward the seam)" $t
 Drop $t
 
 # ---------------------------------------------------------------------------
@@ -152,9 +180,7 @@ $t = NewTree @(
   @{ slug='prior-b'; changed=@($SEAM); verdict=$PASSV },
   @{ slug='cand-3';  changed=@($SEAM); extra='Round cap: SECURITY CLASS -- cross-tenant read on this seam; D-014 never caps this class.' }
 )
-$o = RunHook $t
-Check "a SECURITY-class candidate on the same 2-PASS seam is still ALLOWED (D-014, ISS-078)" `
-      (-not ($o -match $CAP)) ("capped a security-class unit; got: " + $o)
+CheckAllowed "a SECURITY-class candidate on the same 2-PASS seam is still ALLOWED (D-014, ISS-078)" $t
 Drop $t
 
 # ---------------------------------------------------------------------------
@@ -182,9 +208,7 @@ $t = NewTree @(
   @{ slug='prior-b'; changed=@($SEAM); verdict=@('VERDICT: PASS','','... re-opened, cycle 1 ...','','VERDICT: FAIL') },
   @{ slug='cand-4b'; changed=@($SEAM) }
 )
-$o = RunHook $t
-Check "4b: PASS-then-FAIL does NOT count (a superseded PASS is not a prior round)" `
-      (-not ($o -match $CAP)) ("counted a superseded PASS as a prior round; got: " + $o)
+CheckAllowed "4b: PASS-then-FAIL does NOT count (a superseded PASS is not a prior round)" $t
 Drop $t
 
 # ---------------------------------------------------------------------------
@@ -195,9 +219,7 @@ $t = NewTree @(
   @{ slug='prior-b'; changed=@($SEAM); verdict=$FAILV },
   @{ slug='cand-5';  changed=@($SEAM) }
 )
-$o = RunHook $t
-Check "1 prior PASS is ALLOWED (threshold is >= 2; a FAILed prior round does not count)" `
-      (-not ($o -match $CAP)) ("blocked below the threshold; got: " + $o)
+CheckAllowed "1 prior PASS is ALLOWED (threshold is >= 2; a FAILed prior round does not count)" $t
 Drop $t
 
 # ---------------------------------------------------------------------------
@@ -209,9 +231,7 @@ $t = NewTree @(
   @{ slug='prior-b'; changed=@($SEAM); verdict=$PASSV },
   @{ slug='cand-6';  changed=@($SEAM); extra='Round cap: waived by D-044 (Approved-by: Umesh) -- this branch, this issue, this seam, once.' }
 )
-$o = RunHook $t
-Check "a written 'Round cap:' waiver stands the block down (cannot wedge a session)" `
-      (-not ($o -match $CAP)) ("ignored a written waiver; got: " + $o)
+CheckAllowed "a written 'Round cap:' waiver stands the block down (cannot wedge a session)" $t
 Drop $t
 
 # ---------------------------------------------------------------------------
@@ -223,9 +243,7 @@ $t = NewTree @(
   @{ slug='prior-b'; changed=@($SEAM); verdict=$PASSV },
   @{ slug='cand-7';  changed=@($SEAM); verdict=$PASSV }
 )
-$o = RunHook $t
-Check "an already-checked unit on a capped seam is NOT a candidate (no block on settled history)" `
-      (-not ($o -match $CAP)) ("blocked on a unit that already has a verdict; got: " + $o)
+CheckAllowed "an already-checked unit on a capped seam is NOT a candidate (no block on settled history)" $t
 Drop $t
 
 # ---------------------------------------------------------------------------
@@ -286,5 +304,5 @@ Check "CONTROL: the MAKER predicate still fires downstream when ROUNDCAP is sile
 Drop $t
 
 if ($fails -gt 0) { Write-Output "RESULT: FAIL ($fails assertion(s))"; exit 1 }
-Write-Output 'RESULT: PASS (11/11 assertions)'
+Write-Output 'RESULT: PASS (12/12 assertions)'
 exit 0

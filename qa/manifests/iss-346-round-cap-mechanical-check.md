@@ -76,7 +76,7 @@ delivered as a reviewable patch at
 
 H1+H2 together are what make the check fire on ISS-346's own recorded case. See **Actual outputs**.
 
-### 2. `qa/tests/mc-hooks-round-cap.ps1` — **NEW FILE**, the standing regression test (196 lines)
+### 2. `qa/tests/mc-hooks-round-cap.ps1` — **NEW FILE**, the standing regression test, 12 assertions
 
 The landed predicate shipped with **no test**. This is it. It runs the **real hook** against throwaway
 temp trees under `$env:TEMP`, one fresh `session_id` per assertion so the once-per-session marker never
@@ -84,7 +84,21 @@ leaks, and never reads or writes this repo's `qa/`. It follows `qa/tests/mc-hook
 `qa/tests/mc-hooks-ledger-union.ps1`: a `Check` helper, a tree builder, exit 0/1, a named detail on
 failure.
 
-Two deliberate departures from those two, both forced and both recorded in the file's own header:
+**Every ALLOW assertion is corroborated positively, not by absence alone.** This is the substantive
+change the review forced (see "Review fold-in"). The hook's outer `catch` fails **open** with no stdout,
+so `-not ($o -match 'round cap')` passes identically for "correctly allowed" and "crashed" — and that is
+not hypothetical, because H1 crashes on real data. So `CheckAllowed` runs each ALLOW tree twice: once as
+built (must not block), then with the `ScheduleWakeup` stripped (the MAKER predicate, which sits
+immediately *after* ROUNDCAP, must then block). If ROUNDCAP threw on that tree's shape, MAKER never runs
+and there is no output, so the assertion fails as it should. Per-tree rather than via one shared CONTROL,
+because the `Round cap:` field, a multi-line FAIL→PASS verdict body and a FAIL verdict body are each a
+distinct parse path.
+
+Three deliberate departures from those two, all forced and all recorded in the file's own header:
+
+- **The suite refuses to run against the wrong file.** Assertion 1 pins the *identity* of the resolved
+  hook (it must contain the ROUNDCAP predicate) and exits before anything else if it does not, so a stray
+  repo-local copy cannot silently absorb the suite and still print a green RESULT.
 
 - **The event goes in on STDIN, not as `-InputJson`.** Passing the JSON as an argument through
   `powershell -File` loses the quoting and the hook dies in `ConvertFrom-Json`
@@ -116,10 +130,10 @@ sha256 `28c1ae4463875bf17be245d85cb5baeb92e0a764ad0ee844a652929d11047337`.
 ## How to verify
 
 ```
-# 1. The standing test against the LANDED hook (expect 8/11 -- three RED, the three defects above)
+# 1. The standing test against the LANDED hook (expect 9/12 -- three RED, the three defects above)
 powershell -NoProfile -ExecutionPolicy Bypass -File qa/tests/mc-hooks-round-cap.ps1
 
-# 2. The same test against the 3-hunk candidate (expect 11/11)
+# 2. The same test against the 3-hunk candidate (expect 12/12)
 #    (build the candidate first: copy the live hook, apply the diff)
 powershell -NoProfile -ExecutionPolicy Bypass -File qa/tests/mc-hooks-round-cap.ps1 -HookPath <candidate>
 
@@ -199,28 +213,30 @@ candidate seam: ['apps/api/src/indexing/vector-gap.test.ts']
 selection consulted either of the two facts above") is the one this unit closes: a step now does, and
 the measured block above is that step consulting both facts. None left open.
 
-**The standing test against the LANDED hook — 8/11:**
+**The standing test against the LANDED hook — 9/12:**
 
 ```
-hook: D:\ai_os\.claude\hooks\delivery-gate-stop.ps1
+hook: D:/ai_os/.claude/hooks/delivery-gate-stop.ps1
+  PASS  the resolved hook actually contains the ROUNDCAP predicate (not a shadow/stale file)
   PASS  a 0-PASS seam is ALLOWED (a verdict that only MENTIONS the file does not count toward the seam)
   PASS  a >= 2-PASS seam is REFUSED, naming the unit and the count
   PASS  a SECURITY-class candidate on the same 2-PASS seam is still ALLOWED (D-014, ISS-078)
   PASS  4a: FAIL-then-PASS COUNTS (the iss-104 shape -- operative verdict is the last line)
-  FAIL  4b: PASS-then-FAIL does NOT count (a superseded PASS is not a prior round)
+  FAIL  4b: PASS-then-FAIL does NOT count (a superseded PASS is not a prior round) -- blocked when it should have been allowed
   PASS  1 prior PASS is ALLOWED (threshold is >= 2; a FAILed prior round does not count)
   PASS  a written 'Round cap:' waiver stands the block down (cannot wedge a session)
   PASS  an already-checked unit on a capped seam is NOT a candidate (no block on settled history)
-  FAIL  a prior seam cited WITH a line range (path.ts:56-103) still counts (ISS-346's own case)
-  FAIL  a PASSed prior unit with no extractable seam does not fail the hook open (null-unroll guard)
+  FAIL  a prior seam cited WITH a line range (path.ts:56-103) still counts (ISS-346's own case) -- line-range citations were skipped
+  FAIL  a PASSed prior unit with no extractable seam does not fail the hook open (null-unroll guard) -- the hook threw and failed open
   PASS  CONTROL: the MAKER predicate still fires downstream when ROUNDCAP is silent
 RESULT: FAIL (3 assertion(s))
 ```
 
-**The same test against the 3-hunk candidate — 11/11:**
+**The same test against the 3-hunk candidate — 12/12:**
 
 ```
 hook: ...\scratchpad\cand.ps1
+  PASS  the resolved hook actually contains the ROUNDCAP predicate (not a shadow/stale file)
   PASS  a 0-PASS seam is ALLOWED (a verdict that only MENTIONS the file does not count toward the seam)
   PASS  a >= 2-PASS seam is REFUSED, naming the unit and the count
   PASS  a SECURITY-class candidate on the same 2-PASS seam is still ALLOWED (D-014, ISS-078)
@@ -232,7 +248,7 @@ hook: ...\scratchpad\cand.ps1
   PASS  a prior seam cited WITH a line range (path.ts:56-103) still counts (ISS-346's own case)
   PASS  a PASSed prior unit with no extractable seam does not fail the hook open (null-unroll guard)
   PASS  CONTROL: the MAKER predicate still fires downstream when ROUNDCAP is silent
-RESULT: PASS (11/11 assertions)
+RESULT: PASS (12/12 assertions)
 ```
 
 **The live hook was not modified.** sha256 before any work and after every mutation run:
@@ -259,9 +275,10 @@ once.
 
 ## Capability coverage
 
-Baseline for every row: **GREEN-BEFORE 11/11, obtained from `scratchpad/cand.ps1` — the very file each
+Baseline for every row: **GREEN-BEFORE 12/12, obtained from `scratchpad/cand.ps1` — the very file each
 mutation is applied to** (printed at the head of the matrix run). Every falsifying edit is a
-**single hunk in a single file**, `delivery-gate-stop.ps1`, named in "What changed".
+**single hunk in a single file**, `delivery-gate-stop.ps1`, named in "What changed". The matrix was
+re-run in full after the review hardening; all seven still isolate.
 
 | Capability | Check that covers it | Falsifying edit (single hunk, `delivery-gate-stop.ps1`) | Observed |
 |---|---|---|---|
@@ -272,7 +289,35 @@ mutation is applied to** (printed at the head of the matrix run). Every falsifyi
 | Only a unit **awaiting its first check** is a candidate — settled history never blocks | assertion 8 | C5: `if (Test-Path (Join-Path $qaDirC ("verdicts\{0}.md" …))) { continue }` → `if ($false) { continue }` | GREEN-before: `PASS an already-checked unit … is NOT a candidate` / RED-after: `FAIL … -- blocked on a unit that already has a verdict` |
 | A seam cited **with a line range** (`path.ts:56-103`) still counts — the dominant citation style here, and ISS-346's own case | assertion 9 | C6: drop `(?::[\d,\-]+)?` from the seam regex | GREEN-before: `PASS a prior seam cited WITH a line range … still counts` / RED-after: `FAIL … -- line-range citations were skipped, so the count under-reported` |
 | A PASSed prior unit with **no extractable seam** does not fail the hook open | assertion 10 | C7: `return ,$set` → `return $set` in `Get-ManifestSeam` | GREEN-before: `PASS a PASSed prior unit with no extractable seam does not fail the hook open` / RED-after: `FAIL … -- the hook threw and failed open` (output empty; trace: `EXIT exception: You cannot call a method on a null-valued expression`) |
-| **CONTROL (isolation)** — ROUNDCAP sits before the MAKER predicate; when it is silent the rest of the hook is unchanged | assertion 11 (no `ScheduleWakeup` in the transcript → the MAKER block must still fire) | *(stays green under C1–C7)* | GREEN under **all seven** mutations: `PASS CONTROL: the MAKER predicate still fires downstream when ROUNDCAP is silent`. This is what makes C1–C7 falsifications rather than parse breaks — and it is how an earlier C1 candidate (`Seam = (Get-ManifestSeam $vt)`) was **rejected**: it threw, reddened the CONTROL too, and isolated nothing. |
+| The suite cannot be pointed at the wrong file and still go green | assertion 1 (the resolved hook must contain the ROUNDCAP predicate; the suite exits immediately if not) | *not mutated — it is the guard on every other row* | Verified by construction: the `hook:` line plus a hard assertion. Run A prints `hook: D:/ai_os/...` then `PASS the resolved hook actually contains the ROUNDCAP predicate`. |
+| **CONTROL (isolation)** — ROUNDCAP sits before the MAKER predicate; when it is silent the rest of the hook is unchanged | assertion 12 (no `ScheduleWakeup` in the transcript → the MAKER block must still fire) | *(stays green under C1–C7)* | GREEN under **all seven** mutations: `PASS CONTROL: the MAKER predicate still fires downstream when ROUNDCAP is silent`. This is what makes C1–C7 falsifications rather than parse breaks — and it is how an earlier C1 candidate (`Seam = (Get-ManifestSeam $vt)`) was **rejected**: it threw, reddened the CONTROL too, and isolated nothing. |
+
+---
+
+## Review fold-in (lifecycle "review")
+
+The `senior-software-engineer` agent reviewed `qa/tests/mc-hooks-round-cap.ps1` in fresh context.
+**Verdict: Warning**, three findings, **all three applied** and the whole suite plus the full mutation
+matrix re-run afterwards:
+
+1. **[medium] Six pure-absence assertions were vacuous.** `-not ($o -match $CAP)` passes identically on a
+   correct ALLOW and on a crash, because the outer `catch` fails open with no stdout — and one shared
+   CONTROL tree does not cover the distinct parse paths those six use. **Fixed** by `CheckAllowed`, which
+   corroborates every ALLOW positively on its own tree (strip the wakeup, require the MAKER block).
+   This is the finding that mattered: it was the same "measuring against something that cannot fail"
+   error D-015 exists to stop, one level down in the test itself.
+2. **[low] `event.json` written `-Encoding ascii`** would silently corrupt `cwd`/`transcript_path` if
+   `%TEMP%` ever held a non-ASCII character. **Fixed** → `utf8`.
+3. **[low] Hook resolution printed but never asserted** — a stray repo-local copy would absorb the suite
+   and still print green. **Fixed** by assertion 1, which pins the resolved hook's identity (it must
+   contain the ROUNDCAP predicate) and exits before anything else if it does not.
+
+The reviewer **could not execute** the test (its Bash tool refused to invoke `powershell` in that
+session) and said so plainly rather than asserting the figures; its findings are from static tracing, and
+its trace independently predicted which three assertions would be RED against the live hook. That
+prediction matched the measured run. Its two Open Questions: the 5-vs-0 / 8-vs-3 seam figures (confirmed
+here by direct measurement over the real corpus — see the Round cap line at the top of this manifest) and
+reproducibility of the run figures (measured twice here, before and after the hardening).
 
 ---
 
