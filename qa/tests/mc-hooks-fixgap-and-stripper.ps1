@@ -1,11 +1,26 @@
-# Standing regression test -- delivery-gate-stop.ps1, unit `delivery-gate-machine-wide-fix`.
-# Authorized by D-049 (Approved-by: Umesh). Covers two fixes:
+# Standing regression test -- delivery-gate-stop.ps1, units `delivery-gate-machine-wide-fix` and
+# `delivery-gate-stamp-adoption` (fix cycle 2). Authorized by D-049 (Approved-by: Umesh) for the
+# hook; the FIX 4 section below is `delivery-gate-stamp-adoption` cycle 2's own contribution, added
+# in place rather than as a new file, since it tests the identical `Cycle checked` predicate FIX 2
+# already exercises. Covers:
 #   FIX 1  ISS-266/ISS-267 class: a NON-PASS verdict at the manifest's current Fix cycle (a fix gap)
 #          counted as neither `pend` nor `unclosed`, so the gate went SILENT on a fix-gapped
 #          handshake. It is now counted as `fixgap` and feeds the backlog.
 #   FIX 2  ISS-205 clause 3: Strip-Code stripped only closed ``` fences and paired inline spans, so
 #          an INDENTED code block, a ~~~ fence and an UNCLOSED ``` fence could each MANUFACTURE a
 #          cycle stamp that appears nowhere in the file -- ISS-205's stated property.
+#   FIX 4  ISS-230 (delivery-gate-stamp-adoption cycle 2): the `(?:^|\()` leading-paren alternative
+#          in the Cycle-checked reader matched a stamp label after ANY '(' anywhere in the file, not
+#          only the one real corpus form ("**Status: PASS** (Cycle checked: N)"). A stray
+#          parenthetical in PROSE ("(Cycle checked: 9)") or a LIST ROW ("- see (Cycle checked: 4)
+#          elsewhere") inflated the max-cycle reader past the manifest's real Fix cycle, turning a
+#          genuinely PENDING cycle-3 unit (whose only real stamp is a stale cycle-1 PASS) into a
+#          reported `unclosed` ("PASS not closed out") -- i.e. it told the maker to merge a unit
+#          that has never actually been checked at its current cycle. NOT applied to the live hook
+#          this cycle (see qa/manifests/delivery-gate-stamp-adoption.md and
+#          qa/gates/ai-os-enforcement-hooks-uncommitted.md); shipped as
+#          qa/evidence/delivery-gate-stamp-adoption/delivery-gate-stop.paren-scope-fix.diff,
+#          verified to apply at --fuzz=0 against the live file's current sha.
 #
 # The hook is MACHINE-WIDE (D:/ai_os/.claude/hooks/, registered in the USER-level settings.json), so
 # this test is deliberately built so it can never touch it:
@@ -255,6 +270,39 @@ Check 'CONTROL a prior FAIL on the seam does not inflate the PASS count' `
       ($c.stdout -match '2 prior PASS' -or -not $c.capBlocked) "a FAIL was counted as a PASS; stdout: $($c.stdout)"
 
 # --------------------------------------------------------------------------------------------------
+# FIX 4 -- ISS-230 (delivery-gate-stamp-adoption cycle 2): the leading-paren alternative in the
+# Cycle-checked reader must be PINNED to the one real corpus form ("**Status: PASS** (Cycle checked:
+# N)"), not left open to match after ANY '(' in the file. Manifest at Fix cycle 3 (cycle-3 unit that
+# has never been checked at cycle 3); verdict's only genuine stamp is a stale cycle-1 PASS. A
+# distractor elsewhere in the body must not be adopted as the max cycle -- doing so flips the correct
+# `pend` (needs a fresh check) into a false `unclosed` ("PASS not closed out"), which tells the maker
+# to merge a unit that was never checked at its current cycle. This is the DANGEROUS direction: it
+# does not silence the block outright (the session still stops), but it recommends the WRONG action.
+# --------------------------------------------------------------------------------------------------
+Write-Output 'FIX 4 -- ISS-230 the leading-paren alternative must not adopt a distractor elsewhere in the body'
+$mfC3 = $mfReady3
+$vd230Prose = "# Verdict - fx-unit`n`nCycle checked: 1`n**VERDICT: PASS**`n`nThe predecessor unit (Cycle checked: 9) is unrelated.`n"
+$vd230List  = "# Verdict - fx-unit`n`nCycle checked: 1`n**VERDICT: PASS**`n`n- see (Cycle checked: 4) elsewhere`n"
+$vd230Ctl   = "# Verdict - fx-unit`n`nCycle checked: 1`n**VERDICT: PASS**`n"
+
+$r = Invoke-Gate $mfC3 $vd230Prose
+Check 'ISS-230 a PROSE parenthetical elsewhere is not adopted as the max cycle' `
+      ($r.pend -eq 1 -and $r.unclosed -eq 0) "expected pend=1 unclosed=0 (a stale cycle-1 PASS must read as pending, not closed out); log: $($r.logline)"
+$r = Invoke-Gate $mfC3 $vd230List
+Check 'ISS-230 a LIST-ROW parenthetical elsewhere is not adopted as the max cycle' `
+      ($r.pend -eq 1 -and $r.unclosed -eq 0) "expected pend=1 unclosed=0; log: $($r.logline)"
+$r = Invoke-Gate $mfC3 $vd230Ctl
+Check 'ISS-230 CONTROL no distractor, genuine stale cycle-1 PASS still reads pending' `
+      ($r.pend -eq 1 -and $r.unclosed -eq 0) "log: $($r.logline)"
+
+Write-Output 'FIX 4 control -- the ONE real corpus paren form remains load-bearing'
+$mfReady2 = "# Manifest - fx-unit`n`n**Status:** ready-for-check`n**Fix cycle:** 2 of max 3`n"
+$vdParenReal = "# Verdict - fx-unit`n`n**Status: PASS** (Cycle checked: 2)`n**VERDICT: PASS**`n"
+$r = Invoke-Gate $mfReady2 $vdParenReal
+Check 'ISS-230 CONTROL the real "Status: PASS (Cycle checked: N)" form is still read' `
+      ($r.pend -eq 0 -and $r.unclosed -eq 1) "this is the one real corpus occurrence of the paren form -- must not break; log: $($r.logline)"
+
+# --------------------------------------------------------------------------------------------------
 # FALSIFYING EDITS -- applied to a COPY of the hook, never to the live machine-wide file.
 # Each mutation must turn a specific assertion RED while the control rows stay GREEN.
 # --------------------------------------------------------------------------------------------------
@@ -299,6 +347,17 @@ $t = [regex]::Replace($t, '(?ms)^[ \t]*```.*\z', '~')
        repl = ''
        probe = { Invoke-GateTree $t3s -HookPath $args[0] }
        redWhen = { param($r) $r.capBlocked } }
+    # M7 DIFF (ISS-230). Against the LIVE (unpatched) hook this anchor is not present yet -- the fix
+    # is not applied there this cycle (see qa/gates/ai-os-enforcement-hooks-uncommitted.md). The
+    # harness below reports that as "anchor text not found -- vacuous", which is the correct,
+    # expected reading for a diff that is shipped but not yet landed, exactly as
+    # qa/tests/mc-hooks-round-cap.ps1 does for its own un-landed hunk. Against the patched candidate
+    # (DG_HOOK=cand.ps1) the anchor is present and the mutation must turn FIX 4's own assertions red.
+    @{ name = 'M7 DIFF (ISS-230): revert the pinned paren alternative back to the bare (?:^|\() form'
+       find = "'(?m)(?:^[\s\-*#>|]*|Status:?[^\S\r\n]*(?:PASS|FAIL)[^\S\r\n]*\()Cycle checked:?[^\S\r\n]*(\d+)'"
+       repl = "'(?m)(?:^|\()[\s\-*#>|]*Cycle checked:?[^\S\r\n]*(\d+)'"
+       probe = { Invoke-Gate $mfC3 $vd230Prose -HookPath $args[0] }
+       redWhen = { param($r) $r.unclosed -eq 1 -or $r.pend -eq 0 } }
   )
 
   $i = 0
