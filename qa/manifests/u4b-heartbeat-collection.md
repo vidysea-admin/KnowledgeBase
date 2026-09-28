@@ -476,5 +476,19 @@ unit's shape does to U4d's job:
 
 ---
 
-**Status:** ready-for-check
+**Status:** checked-PASS (cycle 0)
 **Fix cycle:** 0
+
+**Handshake status:** checked-PASS
+- Cycle 0 verdict `qa/verdicts/u4b-heartbeat-collection.md` (**PASS**, cycle checked 0, 9/9 D-048
+  provisions, 10/10 capability rows, 4/5 `qa/loop.md` gates). Merged to master at `2801ec6`
+  (one trivial `package.json` union conflict on `test:lint`, resolved keeping both test files and
+  verified by running the suite).
+- Carried forward, NOT resolved here: **R2 stays 0.5/1** until the alert-interface unit lands
+  (now authorized by **D-053**, option (a)); nothing schedules the `/health` probe (U6); the
+  heartbeat write leg has still never written a row (no test connects to Mongo).
+- Issues filed by the checker: ISS-U4BHB-001 (security class, never round-capped), -002, -003,
+  -004 in lane shard `qa/issues.u4bhb.jsonl` per D-019. Checker closed ISS-360 (line 359).
+- The merge surfaced an unrelated high defect, filed **ISS-366** and fixed at `398dfff`: every
+  `.codex` hard link was severed, so the mirror had silently regressed the ISS-307 and D-042
+  hook fixes. Not charged to this unit.

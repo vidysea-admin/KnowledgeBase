@@ -55,4 +55,7 @@ no design choice inside this — the shapes are fully determined by the schema D
 **Options if the answer is no:** the validator stays red on this one collection until someone authorizes
 the pair; nothing else in the unit changes, and no runtime behaviour depends on a fixture.
 
-**Answered:** _(pending)_
+**Answered:** `u4b-fixtures: yes` -- Umesh, AskUserQuestion, 2026-09-28. Both
+`schema/fixtures/watch_heartbeat/valid.json` and `invalid.json` authorized. Authorized by **D-053**.
+**Gate status:** ANSWERED 2026-09-28 (D-053). `python schema/validate.py` was this unit's only red
+verification; the fixtures are the fix and are now buildable.
