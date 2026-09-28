@@ -1,3 +1,14 @@
+## TODO — a duplicate-id guard over the ledger union
+
+| unit | tier | why | files | schema | surface | consumes | runtime |
+|---|---|---|---|---|---|---|---|
+| `ledger-duplicate-id-guard` | 2 (high) | `qa/issues.jsonl` carries **two different issues both id `ISS-360`**, statuses `open` and `fixed` (lines 358-359, predates the iss-104 merge). Every reader silently takes one. D-015's measure-against-the-issue's-own-reproductions rule is only as strong as an id resolving to one row. The guard is separable from the repair and blocks the class recurring. | `scripts/` (the tracker-audit / ledger reader), not the ledger itself | no | ledger read contract | `qa/issues.jsonl` + `qa/issues.*.jsonl` union | none |
+
+**The repair is gated, the guard is not.** `qa/gates/iss-360-duplicate-id-collision.md` holds the
+repair for the Approver (it changes what committed citations mean). A reader that fails loudly on a
+duplicate id decides nothing and can ship first. Do not resolve the collision inside this unit.
+
+---
 ## TODO — speaker-name-rules.test.ts is 8 lines from its gate budget
 
 | unit | tier | why | files | schema | surface | consumes | runtime |
