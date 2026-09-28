@@ -97,3 +97,26 @@ export const NEVER_A_PERSON = new Set([
  * reach, since telling a country from a person is a gazetteer problem, not a pattern problem.
  */
 export const DEMONSTRATIVE_CUES = ["this is", "that is", "that's"];
+
+/**
+ * Prepositions that cannot govern a PERSON, so a candidate standing in their complement is being
+ * used as a place or an organisation (ISS-104 cycle 5, D-052 ruling 2, Approved-by: Umesh).
+ *
+ * This is the enumerated data half of the place-vs-person signal, and it is deliberately NOT a
+ * gazetteer: no city, country or company appears here or anywhere in this module, because the
+ * lookup-list option was rejected on the record — it refuses real people named India or Paris and
+ * never finishes. What is enumerated instead is a CLOSED grammatical class, the same property that
+ * makes `NEVER_A_PERSON` completable: English has a fixed set of prepositions, and for each one the
+ * question "can a person stand in its complement?" has a fixed answer. "in Mumbai" is a place;
+ * "in Rahul" is not English. `from`, `to`, `with` and `about` are absent on purpose — each takes a
+ * person perfectly well ("a note from Rahul"), and `from` in particular is the affiliation cue the
+ * rules module must keep admitting.
+ *
+ * `at` is included and is the loosest member: "at Google" is an organisation, while "look at Rahul"
+ * is a person. The cost is bounded because a governed occurrence only demotes the WEAK affiliation
+ * cues (see `readsAsAPlaceOrOrg` in speaker-name-rules.ts), and a possessive occurrence
+ * ("at Priya's desk") is excluded there.
+ */
+export const LOCATIVE_GOVERNORS = [
+  "in", "into", "inside", "outside", "across", "throughout", "within", "around", "at",
+];
