@@ -1327,3 +1327,78 @@ is the correct target. D-053 is otherwise unaffected and stays ACTIVE, both proh
 
 **Links:** D-053, D-048, `qa/manifests/u4b-r2-alert-interface.md`,
 `qa/gates/u4b-r2-alert-sink-depcruise.md`, ISS-A0CDAEE-002
+
+## D-055 | 2026-09-28 | type: decision | status: ACTIVE
+
+**Type:** decision
+**Status:** ACTIVE
+**Approved-by:** Umesh
+**Changes-authorized:** qa/issues.jsonl and qa/issues.*.jsonl (ISS-360 id promotion, by /checker only â€” the maker is not the ledger's writer); qa/QUEUE.md; packages/index/src/pipeline/ speaker-name modules (a follow-up narrowing unit, ruling 1)
+**Links:** ISS-104, ISS-104CC-3, ISS-360, ISS-282, D-014, D-015, D-019, D-052, qa/gates/iss-360-duplicate-id-collision.md, qa/gates/unmerged-worktree-inventory.md
+
+**What:** Three decisions taken by the Approver in one batch, answering `AskUserQuestion` prompts
+raised by the `iss-104-place-vs-person-signal` close-out and the post-merge worktree hygiene pass:
+(1) the place-vs-person signal stays in master with its ~32% recall cost accepted PROVISIONALLY and
+a narrowing unit to follow; (2) the duplicate `ISS-360` is resolved by promoting each row's existing
+`canonical_id` to a real distinct id and retiring the bare id, with already-committed citations
+ANNOTATED rather than rewritten, executed by `/checker` as the ledger's only writer; (3) the 5
+unmerged worktree branches holding 23 commits are audited READ-ONLY, committing to no merge,
+rebase, delete or unpause.
+
+**Why:** Each was a decision the maker structurally could not take. The recall cost is a
+product-quality tradeoff, not a correctness question, and the checker's claim that D-052 already
+authorized it was false â€” D-052 authorized a contextual SIGNAL, not a 32% cost. The ISS-360 repair
+changes what already-committed manifest, verdict and commit citations mean, and D-019's permanence
+argument forbids the cheap renumbering. Merging unreviewed commits is an irreversible trunk change
+and deleting them destroys work, so both directions needed the Approver. Batched to one prompt per
+Umesh's standing instruction to be given everything at once in plain language.
+
+**Result:** No revert and no merge. ISS-104 stays `open`/`critical` (disclosed partial fix, 19/20);
+ISS-104CC-3 stays `open` until the narrowing unit lands. The ISS-360 promotion and the citation
+sweep are dispatched to `/checker`. Five read-only branch audits are dispatched, including
+`wave/u2-4-phase3-fix` â€” reading a paused branch is not resuming it. The per-branch merge/retire
+decision returns to the Approver once those audits land. The duplicate-id reader guard remains
+queued at tier 2 high and ships independently.
+
+Three decisions taken by the Approver in one batch, on questions raised by the
+`iss-104-place-vs-person-signal` close-out and the post-merge hygiene pass.
+
+**Ruling 1 â€” the place-vs-person signal stays in master; its recall cost is accepted *for now*, not
+as final.** The unit self-reported a 15% false-positive cost against a corpus it authored and did
+not share; the checker re-measured **~32%** (6/19) against its own corpus built from the
+construction the manifest itself names, because `readsAsAPlaceOrOrg` is candidate-independent and
+the refusal is therefore deterministic for any name in that construction. **Umesh chose "accept for
+now, tighten next."** Reasoning: the refusal direction is the safe one under [C12] â€” a refused real
+speaker is recoverable, a fabricated identity is not â€” and the approach was already authorized by
+D-052 ruling 2. **Explicitly NOT ratified:** the claim that D-052 ruling 2 "already authorized the
+tradeoff." It authorized a contextual signal, not a 32% recall cost; the cost is authorized here,
+by this entry, and only provisionally. A follow-up unit narrows the signal so that a strong cue,
+direct address, or multi-token name rescues the real person. ISS-104CC-3 stays `open` until it does.
+**No revert.** ISS-104 itself stays `open` at `critical` â€” 19/20 of its recorded reproductions â€” as
+a disclosed partial fix.
+
+**Ruling 2 â€” the duplicate `ISS-360` is resolved by giving each row a real, distinct id.** The two
+rows' existing `canonical_id` values are promoted to real ids â€” `ISS-360-OBSFLAKE` (open, the
+obs-windows load flake) and `ISS-360-HEARTBEAT` (fixed, u4b heartbeat coverage) â€” and the bare
+`ISS-360` is retired. Rejected: renumbering the newer row (D-019's permanence argument cuts against
+it) and leaving the collision in place behind a loud reader. **Bare `ISS-360` citations already
+committed in manifests, verdicts and commit messages are swept for and ANNOTATED, never silently
+rewritten** â€” that is the whole of D-019's point, and the promotion is worthless if it repoints
+references instead of disambiguating them. **Executed by `/checker`, which is the single writer of
+the ledger; the maker does not touch `qa/issues.jsonl`.** The separable duplicate-id reader guard
+remains queued at tier 2 high and ships independently of this repair.
+
+**Ruling 3 â€” the 5 unmerged worktree branches are audited read-only before anything is merged or
+deleted.** 23 commits across `wave/u2-4-phase3-fix` (13), `worktree-agent-a3d4ea73632cda74e` (4),
+`worktree-agent-a779f0b3b445697af` (2), `wave/vector-gap-durability` (2) and `lane/a-speakers` (2)
+are invisible to every gate, count and sweep, because all of them read master. One read-only agent
+per branch reports what it contains, whether it was ever checked, and whether master already holds
+equivalent work. **The audit commits to nothing** â€” no merge, no rebase, no branch delete, no
+unpause. `wave/u2-4-phase3-fix` IS included: a `/maker pause` records "stop working on it", not
+"discard 13 commits", and reading a paused branch is not resuming it. The merge/retire decision per
+branch returns to the Approver once the audits land.
+
+**Why all three were batched to one prompt:** Umesh's standing instruction is to be given
+everything needed at once in plain language. Three independent decisions had accumulated and none
+depended on the still-running `iss-346-round-cap-mechanical-check` build, so holding them for a
+fourth would have left real decisions idle behind an unrelated unit.
