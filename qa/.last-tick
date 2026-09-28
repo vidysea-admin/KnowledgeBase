@@ -468,3 +468,63 @@ PARALLELISM: wave=1 concurrent peak=1 (the u4b checker). SERIAL: everything else
 gate, not on a dependency edge -- four of the five available units are gate-blocked.
 2026-09-28T04:07:46+05:30 · ADVANCED · post-merge gate for iss-274-wire-web-fallback RESOLVED as PASS: `pnpm -r test` red (`packages/meeting-bot test: Failed`, 267/1) was a LOAD FLAKE, not the merge -- same package suite alone 268/0 exit 0, single test standalone 594ms pass, and `git diff addbed1..HEAD -- packages/meeting-bot packages/core packages/ingest pnpm-lock.yaml` is EMPTY so the whole dep closure is byte-identical across the merge · my own earlier "exit code 0" claim was meaningless (piped pnpm into tail, read tail exit) -- corrected · filed ISS-360 medium (load-flaky obs-windows ISS-324 bring-up assertion makes `pnpm -r test` an unreliable post-merge gate repo-wide) · iss-274 lane worktree deregistered + branch wave/iss-274-web-fallback-wire deleted (orphan dir D:/KnowledgeBase-lanes/iss-274-web-fallback-wire left on disk, rm denied by permission -- cosmetic, git state correct) · D-041 ruling 5 applied to the set that EXISTS, not the set named: ruling says 4 STALLED + 2 BLOCKED, disk has 2 STALLED (delivery-gate-manifest-blindness, write-guard-enforcement-gaps); 4 of the 6 carried-forward slugs read checked-PASS and u2-fix1-ingest-guards checked-PASS too (its BLOCKED text is historical prose -- third stale-citation class catch this session, caught by re-deriving) · both counters 3->0, Status reset-awaiting-rebuild NOT ready-for-check (0 false pending handshakes), each recording that its own cycle-3 diagnosis says a cycle 4 is the WRONG recovery (fold-in ISS-205 / C1 contract amendment the maker cannot make) · tier 2 (open critical/high) · dispatched: checker iss-104-closed-class-function-words cycle 1 (Mode A, worktree lane, D-015 fidelity focus) · SERIAL: ISS-346 round-cap-check waits on enforcement-path contention (D-043) · SERIAL: ISS-282 waits on qa/.paused.u2-4-phase3-precision-regate · wave=1 · concurrent peak=1 · ISS-307 false STALL banner still printing, still needs its own Approved-by entry
 2026-09-28T04:24:42+05:30 · ADVANCED · iss-104-closed-class-function-words checked-PASS cycle 1 (verdict 95a43fe read from the BOTTOM: FAIL line 12 cycle 0 byte-intact, operative PASS line 174) · closed out 083dcd9 · merged to master --no-ff (7 files, +3085) · post-merge gate run PER-PACKAGE not `pnpm -r` because of ISS-360, and read from its OUTPUT not its exit code: packages/index typecheck exit 0, test 285 pass / 0 fail, audit script re-derives on MASTER (409 words = SET A 299 + SET B 110, LIVE BYPASSES 0/409), mutate assert-clean CLEAN · scope stated honestly: the PASS closes C13/ISS-104CC-1 (audit now independently re-derivable) ONLY -- ISS-104 stays open+critical, this unit changed ZERO behavior (diff over speaker-name-rules.ts and its test is empty), so ruling 4s seam is NOT clean, only its measurement is trustworthy · ISS-104CC-2 left open (trap-on-EXIT worktree reversion; D-020 as written permits that shape -- the real finding) · HUMAN_GATE opened qa/gates/speaker-seam-loc-ceiling.md: speaker-name-rules.ts at exactly 300 non-blank lines = loc.max with ZERO headroom, one more word does not fit, and ISS-104s residue (India/Mumbai/Google) is gazetteer-bound with person-valid twins of identical syntax so no word list or syntactic gate can close it -- all 4 ways forward collide with a standing rule (new-file discipline / loc budget / ruling 4 itself), so the mechanism is Umeshs call · tier 2 (open critical/high) · wave=1 · concurrent peak=1 · seam gated, loop NOT idled: next tick pulls a different unblocked tier · ISS-307 false STALL banner still printing
+
+=== TICK 2026-09-28 (maker, continued) — STATE: ADVANCED ===
+Tier: 3 (roadmap) + tier 2 (open high issues), all four blocking gates answered by Umesh this tick.
+
+UMESH ANSWERED FOUR GATES IN ONE ROUND -> D-047, D-048, D-049, D-050-CODEX:
+- iss-358: a          -> U4d extends the page to watch_state; do NOT re-scope R4.        (D-047)
+- u4b: 1=yes 2=health-route 3=1h 4=yes -> watch_heartbeat collection authorized, four
+  ARCHITECTURE.md-required files + the lib/heartbeat.mjs extraction with its first test. (D-048)
+- d043-scope: 1=a 2=ratification-holds -> machine-wide delivery-gate-stop.ps1 authorized,
+  recorded in the shared AIOS log too; the retro-ratification stands at correct scope.   (D-049)
+- iss-355: c          -> .codex/hooks copies replaced by links; parity lint pre-authorized
+  as the fallback; the mirror finally has the authorizing entry it never had.       (D-050-CODEX)
+
+CLOSED OUT: u4b-watch-heartbeat-alert -> checked-PASS cycle 0 (verdict af6037a, merge e74e7dd).
+R2 stays UNMET at 0/1 and the verdict says so -- the PASS is on the parts that do not touch the
+collection. Its checker ruled the four-file blocker REAL, verified against ARCHITECTURE.md:66-100,
+tenantScope.ts, every collection on disk and the cited source-watcher migration. It wrote its own
+verification script rather than reusing the maker's, added adversarial cases the manifest lacked
+(negative interval, interval=0, malformed date) and ran the suite TWICE rather than claiming
+determinism from one green run.
+
+DISPATCHED THIS WAVE — 3 parallel build units, no shared files:
+- u4b-heartbeat-collection     (D-048) schema + generated type + scoped accessor + migration +
+                               lib/heartbeat.mjs + its test; detector extends health.ts in place.
+- codex-hooks-links            (D-050-CODEX) probe ONE link first, then convert five.
+- delivery-gate-machine-wide-fix (D-049) no worktree -- target is outside the repo.
+SERIAL: u4d-watch-state-visibility waits on u4b-heartbeat-collection -- ISS-361 requires the page
+to surface watch_heartbeat in the same pass, and that accessor does not exist yet. Named dependency
+edge, not a ceiling.
+
+THE FINDING OF THIS TICK — docs/DECISIONS.md HAS TWO ENTRIES NUMBERED D-050 (ISS-362, high):
+Two sessions in the same checkout each read max=D-049, each computed D-050, each appended
+successfully. append_decision.ps1's V3 computes max+1 from a value it read earlier, holds no lock
+across read and write, and never re-validates uniqueness afterwards; V1 validates the submitted
+ENTRY FILE, never the log it lands in.
+
+This falsifies a claim the repo makes about itself. D-019 closes with "append_decision.ps1 refused a
+non-sequential id both times. That refusal is the whole difference between the two logs: DECISIONS is
+guarded, qa/issues.jsonl accepts whatever it is handed." Those refusals were SEQUENTIAL collisions,
+which V3 does catch. A SIMULTANEOUS collision is the opposite case and V3 cannot see it. D-051
+publishes the D-050-SPEAKER / D-050-CODEX disambiguation rather than renumbering, for D-019's own
+reason: rewriting a cited id makes an append-only log mutable to fix what a new entry can describe.
+
+ALSO: the ISS-307 stall-banner fix was found UNCOMMITTED and live in .claude/hooks/mc-sessionstart.ps1.
+It IS authorized -- by D-050-SPEAKER ruling 2, which names that file and those lines and carries
+Approved-by -- so it was committed after checking the diff against that scope, not reverted. That is
+why "STALL UNDIAGNOSED: ADVANCED" has been printing at every session start.
+
+NOT ADJUDICATED, deliberately: qa/gates/speaker-seam-loc-ceiling.md still reads "Answered: (pending)"
+although D-050-SPEAKER states it carries the matching Answered line, and this session cannot verify
+another session's first-hand Approver attribution. Ratifying another session's Approver claim is
+exactly the laundering the Approved-by rule exists to prevent. Flagged for that session.
+
+ISS-362 (high) the allocator race. ISS-363 (medium) enforcement paths named by filename PATTERN
+rather than resolved location -- the rule defect that let a machine-wide hook be authorized by a
+repo-local decision. Both filed to qa/issues.jsonl.
+
+PARALLELISM: wave=3 concurrent peak=4 (3 builders + the other session's handshake-field-reader).
+SERIAL: u4d (named dependency above). Nothing else is gate-blocked any more -- all four standing
+gates closed this tick.
