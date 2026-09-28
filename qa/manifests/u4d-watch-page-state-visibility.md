@@ -264,8 +264,13 @@ refuse scoring a dirty tree, which this worktree currently is, mid-unit, by desi
 yet). The `docs/SNAPSHOT.md` failure is the same disclosed baseline staleness as `snapshot --check`
 above. None of these 5 exercise `watch-state.ts`, `health.ts`, `watched-sources.ts`,
 `production.ts`, or `WatchPage.tsx` — they are the repo's own meta-tooling tests, unrelated to this
-unit's code paths. Expected to clear once this unit is committed; the checker should re-run
-`npm run test:lint` post-commit to confirm.
+unit's code paths.
+
+**Confirmed post-commit** (commit `6a28088e8e6b0a2904f3be11c2a67400ea37f8c9`): re-ran
+`node --test scripts/catalogue-cli.test.mjs scripts/snapshot.test.mjs` against the now-clean tree —
+all 4 catalogue-cli "clean tree" failures cleared (16/17 pass in that pair); the sole remaining
+failure is `docs/SNAPSHOT.md is stale`, the same disclosed baseline staleness as `snapshot --check`
+above, unrelated to this unit (this unit did not touch `docs/SNAPSHOT.md` or its generator).
 
 ### `python schema/validate.py` — schema/ untouched by this unit; one pre-existing gap unrelated to
 this unit surfaced by the run
