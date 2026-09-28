@@ -1,6 +1,6 @@
 # Manifest — u4d-watch-page-state-visibility
 
-**Status:** ready-for-check
+**Status:** checked-PASS (cycle 0)
 **Fix cycle:** 0 of max 3
 **Authorized by:** D-047 (ISS-358: extend `/watch` to read `watch_state` — option a, not R4 re-scope
 or collection unification); D-048/ISS-361 (also surface `watch_heartbeat`, a third, two-part-keyed
@@ -336,3 +336,25 @@ section reading `GET /watch-state`, which surfaces exactly the row R1's alert wo
 plus the per-source-type heartbeat liveness R2's alert (once wired) would fire on, computed by the
 identical staleness predicate. A reader following the alert's deep link now sees the failure that
 sent them there.
+
+**Handshake status:** checked-PASS
+- Cycle 0 verdict `qa/verdicts/u4d-watch-page-state-visibility.md` (**PASS**, cycle checked 0,
+  `ISSUES-WRITTEN: none` after deliberate attack on tenancy). Merged to master **second**, after
+  `u4b-r2-alert-interface`, per the order the maker fixed once it found the two units overlap.
+- **The `apps/api/src/production.ts` conflict the checker predicted did occur**, and was resolved
+  as its verdict specified: U4d's `watchHeartbeatIntervalMs()` extraction **plus** R2's
+  `createTelegramAlertSink()`. Both guarantees survive -- one interval source, and a real Telegram
+  transport. The maker's first resolution attempt broke the typecheck (a hoisted inline comment and
+  an orphaned line from the superseded doc paragraph); caught by `tsc`, fixed, re-verified.
+- Re-verified by the maker on the merged tree: `pnpm -r typecheck` all 10 projects Done ·
+  `apps/api` **217/217** · `apps/web` **154/154** across 17 files · `packages/core` **14/14** ·
+  `python schema/validate.py` **27/27** (the `watch_heartbeat` fixture red cleared once R2 landed,
+  exactly as the checker predicted) · depcruise **0 violations, 380 modules**.
+- The checker ran a **real-browser Playwright walk** the manifest had disclosed as missing, rather
+  than accepting its own judgement that jsdom coverage sufficed. It rendered the verbatim
+  `failureReason` and, unplanned, confirmed live that a failure in one lane does not blank the lane
+  above it.
+- Tenancy cleared by construction, not by test alone: the tenant id's only entry point is
+  `req.auth!.tenantId` from `ApiKeyStore.verify()`, with no client-assertable tenant id anywhere in
+  the new route or web client, and the test double genuinely branches on `tenantId` -- unlike the
+  ISS-359-flagged `fakeMeetingCandidatesDeps`.
