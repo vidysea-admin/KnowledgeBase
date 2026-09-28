@@ -1090,3 +1090,68 @@ re-authorized in D-049 on the same day. That check is proposed, not authorized h
 is unchanged. The `.claude/hooks/` originals are NOT modified by this entry.
 
 **Approved-by:** Umesh
+
+## D-051 | 2026-09-28 | type: fix | status: ACTIVE
+
+**What:** **`docs/DECISIONS.md` now contains two different entries both numbered `D-050`**, appended
+concurrently by two sessions working in the same checkout on 2026-09-28. Neither is withdrawn and neither is
+renumbered. From this entry onward they are cited as:
+
+- **D-050-SPEAKER** -- the earlier of the two by file position (line 980): four batched Approver rulings
+  (speaker-seam data-module extraction, the ISS-307 stall-banner fix, a D-020 per-mutation backup amendment,
+  and a read-only enforcement-hook audit), attributed to session 21132795.
+- **D-050-CODEX** -- the later by file position (line 1031): retain `.codex/hooks/` with the six copies
+  replaced by links, and supply the authorization that mirror never had.
+
+Every existing citation of a bare "D-050" is **ambiguous and must be re-read against this mapping**. Known
+instances: the comment block now committed in `.claude/hooks/mc-sessionstart.ps1` cites "D-050 ruling 2",
+which means **D-050-SPEAKER**; the `Answered:` stamps in `qa/gates/iss-355-codex-hooks-disposition.md` cite
+D-050 meaning **D-050-CODEX**.
+
+**Why:** The id collision is the interesting part, not the inconvenience. This repo's own project CLAUDE.md
+holds `docs/DECISIONS.md` up as the guarded counter-example to the issue ledger -- D-019 closes with
+*"`append_decision.ps1` refused a non-sequential id both times. That refusal is the whole difference between
+the two logs: DECISIONS is guarded, `qa/issues.jsonl` accepts whatever it is handed."* **That claim is now
+falsified.** The guard's V3 check computes `max + 1` by reading the log, then appends -- a
+time-of-check-to-time-of-use race. Two sessions that both read `max = D-049` both compute `D-050` and both
+append successfully, because nothing holds a lock across the read and the write and nothing re-validates
+uniqueness after the append. V1 ("exactly one `## D-` header, at line 1") validates the *entry file* being
+submitted, not the log it lands in, so a duplicate in the log is invisible to every validation the script
+runs.
+
+D-019 predicted this shape of failure for the ledger and explicitly exempted DECISIONS from it on the strength
+of two observed refusals. Those refusals were real, but they were **sequential** collisions -- a session
+submitting a stale id that was already taken, which V3 catches. A **simultaneous** collision is the opposite
+case and V3 cannot see it. The lesson is narrow and worth keeping: an id allocator that validates against a
+value it read earlier is not an allocator, and two observations of it working are not evidence that it holds
+under concurrency.
+
+Renumbering was rejected for the same reason D-019 rejected it for lane issue ids: it would rewrite an id that
+other entries, gates, manifests and commit messages already cite, and it would make an append-only log
+mutable to fix a problem that a new entry can describe. A stable ambiguous id with a published mapping is
+strictly better than a silently repointed one, because a reader who follows a citation to the wrong entry with
+no warning is worse off than one who is told to disambiguate.
+
+**Result:** The mapping above is the canonical disambiguation. Both entries stay ACTIVE and in force. The
+`.claude/hooks/mc-sessionstart.ps1` ISS-307 fix found uncommitted in the working tree **is** authorized -- by
+D-050-SPEAKER ruling 2, which names that file and those lines exactly and carries `Approved-by: Umesh` -- so
+it is committed rather than reverted, and its diff was checked against that scope before committing.
+
+**Two loose ends recorded rather than resolved, because they belong to the other session:**
+`qa/gates/speaker-seam-loc-ceiling.md` still reads `**Answered:** _(pending)_` although D-050-SPEAKER states
+that gate carries the matching Answered line; and this session cannot independently verify the first-hand
+Approver attribution of another session's batched round. Both are flagged for that session to close out, not
+adjudicated here -- a session must not ratify another session's Approver claim, which is exactly the
+authorization laundering the `Approved-by` rule exists to prevent.
+
+**Links:** D-019 (the falsified claim), D-050-SPEAKER, D-050-CODEX, D-049, ISS-307, ISS-355,
+`scripts/append_decision.ps1` (V1 and V3), `qa/gates/speaker-seam-loc-ceiling.md`,
+`.claude/hooks/mc-sessionstart.ps1`, commit 116e2fe (which committed both entries together)
+
+**Verdict:** The duplicate stands, disambiguated by name, and the allocator's race is filed for a real fix --
+an append that re-reads and re-validates uniqueness under a lock file, and a `lint`-level check that fails on
+any duplicate `## D-` id in the log. This entry authorizes neither; it records that the guard does not do what
+the repo's own documentation says it does.
+
+**Changes-authorized:** none. This entry is a record and a naming convention. The ISS-307 hook fix it clears
+for commit is authorized by D-050-SPEAKER, not by this entry.

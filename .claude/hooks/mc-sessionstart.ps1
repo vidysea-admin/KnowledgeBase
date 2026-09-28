@@ -48,10 +48,24 @@ if (Test-Path 'qa/.regrill-due') {
   $first = Get-Content 'qa/.regrill-due' -TotalCount 1
   if ($first -match '^(\d{4}-\d{2}-\d{2})') { if ([datetime]$Matches[1] -le (Get-Date)) { Write-Output ("RE-GRILL DUE: " + $first + " -- HUMAN_GATE: run /grill on that topic before continuing.") } }
 }
+# ISS-307 fix, authorized by D-050 ruling 2 (Approved-by: Umesh). Two defects, both measured
+# 2026-09-28 against this repo's own qa/.last-tick (470 lines):
+#   (1) -TotalCount 1 read the OLDEST line of an append-only oldest-first file, so the banner
+#       reported a tick from 2026-09-24 while the newest was 2026-09-28. Now reads the LAST line.
+#   (2) -match 'STALLED|EXHAUSTED' substring-matched that word anywhere in the tick's PROSE. The
+#       oldest line carries 'STALLED' at character offset 316 of 361 while its actual status is
+#       ADVANCED -- which is why 'STALL UNDIAGNOSED: ADVANCED' printed at every session start.
+#       The status is positionally the 3rd whitespace token (<iso> <sep> <STATUS>), so test THAT
+#       token exactly rather than scanning the whole line.
+# Deliberately NOT splitting on the middot separator: PowerShell 5.1 mis-decodes this UTF-8
+# file's middot, so a separator-based split is encoding-fragile. The positional token is not.
 if (Test-Path 'qa/.last-tick') {
-  $lt = Get-Content 'qa/.last-tick' -TotalCount 1
-  if ($lt -match 'STALLED|EXHAUSTED') {
-    $unit = ($lt -split '\s+')[2]
+  $ltAll = @(Get-Content 'qa/.last-tick')
+  $lt = ''
+  if ($ltAll.Count -gt 0) { $lt = $ltAll[$ltAll.Count - 1] }
+  $status = ($lt -split '\s+')[2]
+  if ($status -match '^(STALLED|EXHAUSTED)$') {
+    $unit = $status
     if (-not (Test-Path "qa/debug") -or -not (Get-ChildItem "qa/debug" -Filter "$unit-cycle*.md" -ErrorAction SilentlyContinue)) { Write-Output ("STALL UNDIAGNOSED: " + $unit + " -- run /agent-debugger on it before any new unit.") }
   }
 }
