@@ -74,6 +74,39 @@ getting worse but fixes nothing on its own, and cannot be enforced mechanically 
 and it means the machine-wide Stop hook is permanently unreviewed. It would also require withdrawing the
 PASS on `delivery-gate-machine-wide-fix` rather than carrying it with a caveat.
 
+## Added 2026-09-28 — three verified fixes are now parked behind this gate
+
+Whoever answers this gate is also deciding when these land. All three are verified against the live
+file at sha `5d6e0994` / 823 lines, and **none is applied**:
+
+| Fix | Source | State |
+|---|---|---|
+| comma-separated line ranges (`:12,40-44`) in the round-cap seam | `qa/evidence/iss-346-round-cap-mechanical-check/delivery-gate-stop.roundcap-fixes.diff` | applies clean at `--fuzz=0`; PASSed cycle 1 (verdict `2776aac`) |
+| paren-scope pin for `Cycle checked` (ISS-230) | `qa/evidence/delivery-gate-stamp-adoption/delivery-gate-stop.paren-scope-fix.diff` | applies clean at `--fuzz=0`; PASSed cycle 2 (verdict `3d3c71d`) |
+| **line-start anchoring for BOTH `Cycle checked` alternatives (ISS-STAMPADOPT-001)** | not yet written — fix direction only | see below |
+
+**ISS-STAMPADOPT-001 is why the third row matters.** The stamp-adoption checker constructed a verdict
+whose *prose merely quotes* the real corpus form — `"...wrote Status: FAIL (Cycle checked: 9) here
+before it was corrected"` — and the gate misreads it as `pend=0 unclosed=1` **on the live hook and on
+the patched candidate alike**. The ISS-230 pin narrows the match surface without anchoring it to
+line-start, so quoting the shape still defeats the real field.
+
+This is the **fourth** recurrence of one defect family: ISS-307 (a substring match found `STALLED`
+inside a tick's prose), `iss-346`'s H3 hunk (an unrestricted regex returned the stray prose token
+`RULE`), ISS-230, and now this. Every instance is the same root shape — **an unanchored pattern
+scanning a whole file for a bare label** — and every instance made an enforcement gate fail **silently**,
+in the permissive direction.
+
+Under D-014's class-based cap this seam is at 2 non-security PASSes and is closed to further units, so
+per `.claude/CLAUDE.md` the finding is filed rather than turned into round 3. That rule's own escape
+hatch says a seam that still looks unsafe past the cap raises a HUMAN_GATE instead — which is this
+gate. So: **anchor both alternatives to line-start when the hunks land, and re-verify
+`transcription-empty-result-guard.md` still reads correctly under the stricter anchor** (it is the sole
+real occurrence across all 175 verdict files, so it is the whole reason the alternative exists).
+
+None of this changes the options below. It raises the cost of (c) and (d): every additional day the
+gate stays open is a day two verified fixes sit unapplied while the hook they fix keeps firing.
+
 ## Answer format
 
 `aios-hooks: <a|b|c|d>`

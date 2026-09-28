@@ -6,7 +6,7 @@
 **Fix cycle:** 2 of max 3
 **Dual check:** no
 **Issues addressed:** **ISS-205** (high), **ISS-227**, **ISS-228**, **ISS-229**, **ISS-230** (this cycle).
-**Status:** ready-for-check (cycle 2)
+**Status:** checked-PASS (cycle 2)
 **Round cap:** N/A — this is fix cycle 2 of the SAME unit responding to its own cycle-1 FAIL, not a
 new unit on the seam; D-014's class-based cap governs a NEW unit pulled against an already-PASSed
 seam, not a fix cycle owed to an open FAIL.
@@ -408,4 +408,35 @@ open gate (5 revisions that day from other lanes) — no further revision landed
    section itself (by-issue-id counts, real-corpus re-derivation) — judge those on whether THIS
    cycle's evidence satisfies D-015, not on cycle 1's table, which is superseded.
 
-**Handshake status:** ready-for-check — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree
+**Handshake status:** checked-PASS
+- Cycle 1 **FAIL** -> cycle 2 **PASS**, verdict `qa/verdicts/delivery-gate-stamp-adoption.md`
+  (cycle-2 on top, cycle-1 FAIL preserved verbatim below an `# ARCHIVE` marker). Merged to master.
+- Checker ruled **both** of the builder's open questions and said it would have ruled the same way
+  regardless of outcome: **pinning beats deletion**, because deleting would make an already-PASSed
+  verdict file unreadable by the gate, and verdict files are audit record rather than something to
+  reformat around a regex limitation. **Diff-only delivery is acceptable** for a unit that owes a
+  cycle, since the gate is genuinely OPEN and identical packaging PASSed for `iss-346` the same day
+  against the same file.
+- ISS-227/228 confirmed already closed **by reading the live hook's source**, not the manifest's
+  paraphrase. The real-corpus control (`transcription-empty-result-guard.md`) was verified to be
+  genuinely the sole live occurrence across all 175 verdicts, and still reads correctly patched.
+- **ISS-230 stays `open`, not `fixed`.** The diff is verified to apply at `--fuzz=0` against live sha
+  `5d6e0994` (823 lines, steady across four independent readings) but is **not landed**. Landing it
+  is gated on `qa/gates/ai-os-enforcement-hooks-uncommitted.md`.
+- **A third attack shape was found by the checker** and filed as `ISS-STAMPADOPT-001` (medium):
+  prose merely quoting the real corpus form is still adopted -- **identically on the live hook and
+  the patched candidate** -- because the pin narrows the surface without anchoring to line-start.
+  Correctly not charged to this cycle; the unit had disclosed it had not searched exhaustively.
+
+**Round cap (D-014, class-based) -- ISS-STAMPADOPT-001 does NOT open a round 3.**
+Prior PASSed verdicts naming the `delivery-gate-stop.ps1` predicate seam: **2** --
+`iss-346-round-cap-mechanical-check` (cycle 1, verdict `2776aac`) and this unit (cycle 2, verdict
+`3d3c71d`). The finding is a gate-predicate correctness defect, **not** security class (tenancy,
+auth, cross-tenant read, data write, credential handling), so the non-security cap of 2 PASSes per
+seam binds. Per `.claude/CLAUDE.md`, it is filed `file-don't-fix` and does not become a unit.
+It is **not** dismissed: it is the fourth recurrence of this defect family (ISS-307's substring
+match on prose, `iss-346`'s H3 regex returning the stray token `RULE`, ISS-230, and now this), and
+the rule's own escape hatch applies -- a seam that looks unsafe past the cap raises a HUMAN_GATE
+rather than a round N+1. That gate already exists and is OPEN, so the finding is recorded there
+instead, with its fix direction (anchor **both** alternatives to line-start, then re-verify the
+control still reads) so whoever lands the hunks lands this too.
