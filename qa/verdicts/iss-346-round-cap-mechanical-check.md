@@ -343,3 +343,95 @@ I own: the shared-log entry D-049 requires DOES exist (`D:/ai_os/decisions/log.m
 merely stale, contrary to the manifest; and ISS-365's ledger row understates its priors by one, so
 four is right.
 ```
+
+---
+
+# ADDENDUM (same cycle, `Cycle checked: 0`) — ruling on the ordering semantic against the unit merged on master
+
+Added after the dispatcher reported that a **different** `iss-346-round-cap-mechanical-check` was
+merged and closed out on `master` (`67cc32b` → `97756f5`) while this check was running. I read that
+unit's manifest and verdict from `master` and re-ran the decisive test myself. **Nothing in my
+verdict above changes.** One coordinator premise does not survive checking, and I correct it rather
+than build on it.
+
+## The decisive test: the merged verdict file misreads ITSELF under the rule it proposed
+
+`master:qa/verdicts/iss-346-round-cap-mechanical-check.md` is a **newest-first** file: `**VERDICT:
+PASS**` near the top, `# ARCHIVE — cycle 0 verdict (FAIL), preserved verbatim below` at line 299. I
+fed that exact file to the live hook's own `Get-VerdictTokens` / `Test-VerdictPass`:
+
+```
+tokens in order: PASS@77 , FAIL@4524 , PASS@4806 , FAIL@6163 , FAIL@6187 , FAIL@6556 , FAIL@6580 ,
+                 FAIL@10265 , FAIL@10337 , FAIL@10445 , FAIL@10567 , FAIL@10684 , FAIL@16941
+LIVE cumulative rule (Test-VerdictPass) -> True      <- correct; this unit PASSed
+LAST-line rule would read                -> FAIL     <- wrong
+FIRST-line rule would read               -> PASS
+```
+
+**A PASSed unit's own verdict reads as FAIL under the last-line rule that unit originally proposed.**
+That is the sharpest available test of the rule, and the rule fails it on its author's own artifact.
+It is not a curiosity: a cap count over this corpus would drop that unit's PASS from its seam's
+total — the **silent, under-counting** direction, which is the whole of ISS-346 and ISS-365.
+
+## Correction to the coordinator's premise — the under-counting rule did NOT ship
+
+The message states the merged unit "shipped the exact counting semantic your brief asks you to rule
+on" into the machine-wide hook. **Measured, it did not, and I will not file a finding on a premise I
+could not confirm.**
+
+```
+live hook sha256: 5d6e09943119b4f26b13c93dd32d8e28bd11099447b13c4d32ded074a51ec162
+live hook implements cumulative any-PASS (foreach token, return $true on PASS)? True
+live hook contains a $vLast / last-line gate?                                    False
+```
+
+The live hook's sha is the same `5d6e0994…5162` this unit produced and my run of its test
+re-verified — and the merged unit's own verdict records that same sha at both the start and the end
+of its check. So **the rule running in every project on this machine is the cumulative one**, from
+this unit, and the last-line rule (its "H3") was measured and deliberately **not applied**. The
+merged unit's cycle-0 verdict FAILed precisely on H3, and its cycle-1 verdict says applying it
+"would be reintroducing, not fixing, a real regression on the newest-first-archive" shape, marking
+its `C4` row "legitimately superseded". **The two units reached the same conclusion by opposite
+routes.** No under-counting cap is live; there is nothing to file against the hook.
+
+## Ruling, stated plainly
+
+**The cumulative rule is right and the last-line rule is wrong for this corpus. I rule with my
+builder, against my own dispatch brief, now with a second independent corroboration.** The evidence
+is cumulative across four measurements: two incompatible conventions confirmed by line number
+(`iss-104` 12/174 downward; `vector-cosine-retriever` 13/326 newest-first), **21** verdicts
+disagreeing first-vs-last, **0** false blocks over 1,021 manifests in the loud direction, and now a
+PASSed verdict that the last-line rule misreads as FAIL. The other checker, working from the
+opposite starting position and on a different branch, reached the same place. **Had the merged
+unit's H3 been applied it would have shipped an under-counting cap into a machine-wide hook** — and
+both checkers independently stopped it. That is the mechanism working.
+
+## Residual finding this raises, and it is a real one
+
+The merged unit's **manifest** still carries, as a covered capability row, *"The operative verdict is
+the **LAST** `VERDICT:` line, so a superseded PASS is not a round"*, with a GREEN-before/RED-after
+falsification (`C4`) behind it — and that manifest is now `checked-PASS` on `master`. Only the
+**verdict** supersedes it, in prose. A future unit reading the PASSed manifest's capability table for
+precedent would find a rejected, regression-causing rule presented as a proven capability. Filed as
+**ISS-A035913-010**, medium: the trap is in the record, not in the code.
+
+## Duplicate or complementary — complementary, and I am not softening either way
+
+- **No filename collision.** `master` carries `qa/tests/mc-hooks-round-cap.ps1`; this unit adds
+  `qa/tests/mc-hooks-roundcap-verdict-reading.ps1`, which is **not on master**. Nor is either probe.
+  My lane shard `qa/issues.a035913.jsonl` does not collide with `master:qa/issues.iss346.jsonl`.
+- **The overlap is one defect, and both lanes found it independently:** `return $set` →
+  `return ,$set` (`Get-ManifestSeam`'s fail-open unroll). Two lanes converging on the same fail-open
+  defect from different directions is corroboration, not duplication.
+- **The complement is real.** The merged unit's fixes were *measured but not applied* — it did not
+  write the hook; this unit **wrote the live hook** and carries the standing regression test and the
+  two probes. Between them: their analysis, this unit's instrument.
+- **I confirmed neither closed the ledger.** On `master`, `ISS-346` and `ISS-365` are both still
+  `high` / `open`. My verdict already holds them open, so that is unchanged.
+
+**The FAIL above stands on its own evidence and is untouched by any of this.** It is not about
+ordering semantics, which I have now ruled in this unit's favour twice over; it is [C7] — the
+canonical `**Handshake status:**` defect, fixed here in `ROUNDCAP`, left live and **silent** in the
+`MAKER` predicate of the same file and unaudited in the manifest — plus the undisclosed prose-seam
+bypass. Neither is addressed by the unit on `master`, and both remain the narrow content of fix
+cycle 1.
