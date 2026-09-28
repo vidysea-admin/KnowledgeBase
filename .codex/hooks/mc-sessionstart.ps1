@@ -2,22 +2,32 @@
 # Installed under D-006 (docs/DECISIONS.md). SessionStart stdout is injected into the agent's
 # context -- a directive here is read as an instruction, not just a status line.
 if ($env:CLAUDE_PROJECT_DIR) { Set-Location $env:CLAUDE_PROJECT_DIR }
-$LEDGER = 'qa/issues.jsonl'
+# D-019: qa/issues.<lane>.jsonl shards are SHARDS of one ledger, not private copies -- every reader
+# must count the UNION. Authorized by D-041 (Approved-by: Umesh); before this the hardcoded single
+# path under-reported by 21 open rows (132 vs 153 measured 2026-09-28). Fixes the reader half of
+# ISS-129 / ISS-350.
+$LEDGERS = @(Get-ChildItem -Path 'qa' -Filter 'issues*.jsonl' -File -ErrorAction SilentlyContinue | Sort-Object Name)
+$LEDGER = 'qa/issues*.jsonl (' + $LEDGERS.Count + ' file union)'
 $ROOT = (Get-Location).Path
 $n = -1
-if (Test-Path $LEDGER) { $n = @(Get-Content $LEDGER | Where-Object { $_ -match '"status":\s*"(open|Open)"' }).Count }
+if ($LEDGERS.Count -gt 0) { $n = @($LEDGERS | ForEach-Object { Get-Content $_.FullName } | Where-Object { $_ -match '"status":\s*"(open|Open)"' }).Count }
 # Pending handshake (cycle-aware): ready-for-check with no verdict, or a verdict for an older
 # cycle, or a PASS verdict whose manifest was never flipped to checked-PASS.
 $pending = @(); $unclosed = @()
 if (Test-Path 'qa/manifests') {
   foreach ($m in Get-ChildItem 'qa/manifests' -Filter *.md -ErrorAction SilentlyContinue) {
     $v = "qa/verdicts/" + $m.Name
-    if (-not (Select-String -Path $m.FullName -Pattern 'Status: ready-for-check' -Quiet)) { continue }
+    if (-not (Select-String -Path $m.FullName -Pattern '^\s*(?:[-*]\s+)?(?:#{1,6}\s+)?[*_]{0,3}Status:[*_]{0,3}\s+ready-for-check' -Quiet)) { continue }
     if (-not (Test-Path $v)) { $pending += $m.BaseName; continue }
     $mc = 0; $a = Select-String -Path $m.FullName -Pattern 'Fix cycle[:*\s]+(\d+)' | Select-Object -First 1
     if ($a) { $mc = [int]$a.Matches[0].Groups[1].Value }
-    $vc = -1; $b = Select-String -Path $v -Pattern '(Cycle checked|Fix cycle judged)[:*\s]+(\d+)' | Select-Object -First 1
-    if ($b) { $vc = [int]$b.Matches[0].Groups[2].Value }
+    $vc = -1
+    foreach ($bm in (Select-String -Path $v -Pattern '(Cycle checked|Fix cycle judged)[:*\s]+(\d+)')) {
+      foreach ($mm in $bm.Matches) {
+        $cv = [int]$mm.Groups[2].Value
+        if ($cv -gt $vc) { $vc = $cv }
+      }
+    }
     if ($vc -lt $mc) { $pending += $m.BaseName; continue }
     if (Select-String -Path $v -Pattern 'VERDICT:\s*PASS' -Quiet) { $unclosed += $m.BaseName }
   }
@@ -38,10 +48,24 @@ if (Test-Path 'qa/.regrill-due') {
   $first = Get-Content 'qa/.regrill-due' -TotalCount 1
   if ($first -match '^(\d{4}-\d{2}-\d{2})') { if ([datetime]$Matches[1] -le (Get-Date)) { Write-Output ("RE-GRILL DUE: " + $first + " -- HUMAN_GATE: run /grill on that topic before continuing.") } }
 }
+# ISS-307 fix, authorized by D-050 ruling 2 (Approved-by: Umesh). Two defects, both measured
+# 2026-09-28 against this repo's own qa/.last-tick (470 lines):
+#   (1) -TotalCount 1 read the OLDEST line of an append-only oldest-first file, so the banner
+#       reported a tick from 2026-09-24 while the newest was 2026-09-28. Now reads the LAST line.
+#   (2) -match 'STALLED|EXHAUSTED' substring-matched that word anywhere in the tick's PROSE. The
+#       oldest line carries 'STALLED' at character offset 316 of 361 while its actual status is
+#       ADVANCED -- which is why 'STALL UNDIAGNOSED: ADVANCED' printed at every session start.
+#       The status is positionally the 3rd whitespace token (<iso> <sep> <STATUS>), so test THAT
+#       token exactly rather than scanning the whole line.
+# Deliberately NOT splitting on the middot separator: PowerShell 5.1 mis-decodes this UTF-8
+# file's middot, so a separator-based split is encoding-fragile. The positional token is not.
 if (Test-Path 'qa/.last-tick') {
-  $lt = Get-Content 'qa/.last-tick' -TotalCount 1
-  if ($lt -match 'STALLED|EXHAUSTED') {
-    $unit = ($lt -split '\s+')[2]
+  $ltAll = @(Get-Content 'qa/.last-tick')
+  $lt = ''
+  if ($ltAll.Count -gt 0) { $lt = $ltAll[$ltAll.Count - 1] }
+  $status = ($lt -split '\s+')[2]
+  if ($status -match '^(STALLED|EXHAUSTED)$') {
+    $unit = $status
     if (-not (Test-Path "qa/debug") -or -not (Get-ChildItem "qa/debug" -Filter "$unit-cycle*.md" -ErrorAction SilentlyContinue)) { Write-Output ("STALL UNDIAGNOSED: " + $unit + " -- run /agent-debugger on it before any new unit.") }
   }
 }

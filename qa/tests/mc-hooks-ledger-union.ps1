@@ -4,10 +4,19 @@
 #
 # Runs the REAL hook against a throwaway project tree -- never touches this repo's ledger.
 # Usage: powershell -NoProfile -ExecutionPolicy Bypass -File qa/tests/mc-hooks-ledger-union.ps1
+#    or: ... -File qa/tests/mc-hooks-ledger-union.ps1 -HookPath .codex/hooks/mc-sessionstart.ps1
+#        (codex-hooks-links, 2026-09-28: proves the .codex mirror behaves identically, not just
+#        textually -- pass a path relative to the repo root, or absolute)
 # Exit 0 = all assertions pass; exit 1 = a failure (message says which).
 
+param(
+  [string]$HookPath = '.claude/hooks/mc-sessionstart.ps1'
+)
+
 $ErrorActionPreference = 'Stop'
-$hook = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) '.claude/hooks/mc-sessionstart.ps1'
+$REPO_ROOT = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$hook = $HookPath
+if (-not [System.IO.Path]::IsPathRooted($hook)) { $hook = Join-Path $REPO_ROOT $HookPath }
 if (-not (Test-Path $hook)) { Write-Output "FAIL: hook not found at $hook"; exit 1 }
 
 $fails = 0

@@ -29,5 +29,18 @@
     "dir": "migrations",
     "pattern": "^migrate-.*\\.(mjs|js|ts|py)$",
     "extraIgnoreDirs": [".git", "sources"]
+  },
+  "codexHooks": {
+    "$comment": "D-050-CODEX parity-lint fallback (ISS-355/ISS-268): links (hard link + junction) do not survive git clone/worktree, so this is the durable check. Compares each named file byte-for-byte MODULO LINE ENDINGS only -- CRLF-vs-LF alone (e.g. features-snapshot-session-end.ps1) is not a defect.",
+    "mirrorDir": ".codex/hooks",
+    "sourceDir": ".claude/hooks",
+    "files": [
+      "decisions-append-guard.ps1",
+      "features-snapshot-session-end.ps1",
+      "lab-session-end.ps1",
+      "lab-session-start.ps1",
+      "mc-precommit.ps1",
+      "mc-sessionstart.ps1"
+    ]
   }
 }
