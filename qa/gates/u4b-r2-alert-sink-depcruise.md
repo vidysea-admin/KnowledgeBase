@@ -61,7 +61,12 @@ unit touching `schema/`. This is the unit's only red verification. Recorded sepa
 
 `u4b-r2: <a|b|c>` and `u4b-fixtures: <yes|no>`
 
-**Answered:** (pending)
+**Answered:** `u4b-r2: a` and `u4b-fixtures: yes` -- Umesh, AskUserQuestion, 2026-09-28. A thin alert
+interface in a package `apps/*` may already import, implemented by meeting-bot's Telegram notifier; the
+detector stays in `health.ts` and `.dependency-cruiser.cjs` is NOT loosened. Both
+`schema/fixtures/watch_heartbeat/{valid,invalid}.json` authorized. Authorized by **D-053**.
 
-**Gate status:** OPEN — awaiting the Approver. The unit's checker runs regardless; the shipped detection
-stands or falls on its own merits and R2 stays at 0.5/1 until this is answered
+**Gate status:** ANSWERED 2026-09-28 (D-053). The alert-interface unit is unblocked. Two limits stay
+open and are NOT charged to it: nothing schedules the `/health` probe (U6, separately gated on live
+proof), and the heartbeat write leg has never written a row (no test connects to Mongo). R2 reaches 1/1
+on alert delivery only

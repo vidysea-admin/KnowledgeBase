@@ -1,6 +1,6 @@
 # Manifest — delivery-gate-machine-wide-fix
 
-**Status:** ready-for-check
+**Status:** checked-PASS (cycle 0)
 **Fix cycle:** 0 of max 3
 **Authorized by:** `docs/DECISIONS.md` **D-049** (2026-09-28, `Approved-by: Umesh`). Required to land
 before `wave/vector-gap-durability` gets a manifest (**D-044**). **D-043 is NOT the authority here** —
@@ -411,3 +411,12 @@ D-020 as amended by D-050 ruling 3 · D-015 · D-019 · ISS-205 · ISS-227 · IS
 ISS-267 · ISS-346 · ISS-347 · ISS-078 · ISS-083 · ISS-122 ·
 `qa/gates/d043-machine-wide-scope.md` · `qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md` ·
 `qa/gates/iss-122-round-cap-breach.md` · `C:/Users/Lenovo/.claude/settings.json:124`
+
+**Handshake status:** checked-PASS
+- Cycle 0 dispatched, verdict `qa/verdicts/delivery-gate-machine-wide-fix.md` (**PASS**, cycle checked 0,
+  SCOREBOARD 9/9 criteria + 3/3 invariants, ISSUES-WRITTEN: none), preserved at commit `9ebe9b4`.
+- Close-out by the maker 2026-09-28. Stated limitation carried forward, not resolved by this close-out:
+  the verdict certifies a byte-state of `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1` that **no commit
+  in any repo pins** (sha256 `28c1ae44…7337`). The checker recommends **ISS-190 rise high -> critical**
+  and leaves ISS-205 / ISS-346 at `open` until that artifact is committed. Both are the sweep's
+  consolidation writer to apply, per D-019 concurrency history.

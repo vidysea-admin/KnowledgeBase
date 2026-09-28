@@ -1155,3 +1155,125 @@ the repo's own documentation says it does.
 
 **Changes-authorized:** none. This entry is a record and a naming convention. The ISS-307 hook fix it clears
 for commit is authorized by D-050-SPEAKER, not by this entry.
+
+## D-052 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** Umesh, as this repo's named Approver, answered a batched four-question round put to him on
+2026-09-28 (first-hand, via AskUserQuestion, after the previous session died with the questions
+pending). All four answers are recorded here verbatim in effect, with the two that grant new
+authority stated as such.
+
+**Ruling 1 â€” the `mc-sessionstart.ps1` round-cap decision: "Land ISS-346 first, then decide."**
+ISS-346 (the mechanical round-cap check, authorized by D-043 item 2, target
+`.claude/hooks/delivery-gate-stop.ps1`) is to be built BEFORE the cap question on
+`mc-sessionstart.ps1` is settled, so the decision is made against a working instrument rather than
+an argument. `qa/gates/mc-sessionstart-handshake-reader-round-cap.md` stays OPEN pending that.
+**No cap waiver is granted by this entry.**
+
+**Ruling 2 â€” ISS-104 closes with a place-vs-person signal. NEW AUTHORITY.** The remaining speaker
+bypasses (India, Mumbai, Google) are place/organisation names that are each also a real person's
+name, so no word list can separate them â€” only the surrounding sentence can. Umesh chose "add a
+place-vs-person signal" over accepting the residue, over a place-name lookup list, and over parking
+it. This authorizes contextual logic plus its own tests on the speaker seam, and supersedes the
+reading that D-041 ruling 4 had been satisfied by the data-module extraction: the extraction was the
+prerequisite (it freed 78 lines of headroom), never the fix. A place-name lookup list was
+specifically NOT chosen, because it wrongly rejects real people named India or Paris and the list
+never ends.
+
+**Ruling 3 â€” `lab-session-end.ps1` gets its approval record backfilled. NEW AUTHORITY, and this is
+the `Approved-by` the rule requires.** The hook audit
+(`qa/evidence/config-audit-hooks-all-2026-09-28.md`) found it live but authorized by nothing: its
+only citation, D-000, carries no `Approved-by` at all. Its content is byte-identical to the shared
+AIOS template, which mitigates the risk but is not the citation this repo's rule demands. Umesh
+chose to backfill the record over unwiring the hook and over recording a standing exception. So:
+`.claude/hooks/lab-session-end.ps1` as it stands at this entry's date is APPROVED, retroactive to
+its installation. Nothing about its behaviour changes; the paper trail now matches reality.
+
+**Ruling 4 â€” the Codex hook copy: let the other loop finish it.** Overtaken by events, and recorded
+as such rather than silently dropped: the other loop landed `codex-hooks-links` (merge `a5dd849`,
+verdict `ce67554`, closed out `7cbfebe`) while this session was down. The decision was the right one
+and is now moot in outcome. No action remains.
+
+**Why:** Three of these had been sitting as unanswered gates across multiple ticks, and one
+(ruling 2) was a mechanism question the maker had no standing to answer for itself. Ruling 2 in
+particular is the kind of call the loop cannot make: the four options differ in what the product
+does when a transcript is ambiguous, not in how the code is written.
+
+Ruling 3 is the narrower of the two defensible fixes. Unwiring a working end-of-session hook to
+resolve a paperwork defect would have removed real function to satisfy a record-keeping rule; a
+standing "accepted, no entry" exception would have left the repo's own authorization rule with an
+undocumented hole, which makes every later audit harder to read. Backfilling is the option that
+leaves both the behaviour and the rule intact.
+
+**A finding recorded here because it bears directly on ruling 1, and against this loop's own
+interest:** while the gate for D-043 item 3 was open on exactly this ground, the other loop built
+and landed that same fix â€” `handshake-field-reader` (maker `1f263e0`, PASS `2b5acc8`, merge
+`b1c32fc`, close-out `f3978c1`), whose `## What changed` names `.claude/hooks/mc-sessionstart.ps1`.
+Measured before it landed, that seam already carried 3 PASSed units against a non-security cap of 2;
+it is now 4. **Neither its manifest nor its verdict mentions D-014 or the round cap anywhere.** The
+code is authorized by D-043 and it PASSed a real check, so this is not a reason to revert it, and it
+is not being filed as misconduct â€” it is the second recorded instance of the identical failure
+(`91ee4ae`, "my ISS-122 dispatch breached D-014's round cap", is the first and is ISS-346's
+originating incident). Two independent loops have now breached the same prose rule while reading it.
+That is the strongest available argument that ISS-346 is a real defect in the mechanism rather than
+in anyone's attention, and it is why ruling 1's sequencing is being followed rather than treated as
+overtaken.
+
+**Result:** ISS-346 is dispatched this tick as the build unit (tier 2; its own seam,
+`delivery-gate-stop.ps1`, has 0 PASSed units that touched it, so it is freely pullable). A
+place-vs-person signal unit for ISS-104 becomes buildable and is queued behind it, needing no
+further gate. `.claude/hooks/lab-session-end.ps1` is authorized retroactively and that audit finding
+closes. `qa/gates/mc-sessionstart-handshake-reader-round-cap.md` stays OPEN, now recording that the
+fix it gated has already shipped. The cap-breach observation above is filed to the ledger as a
+finding in its own right.
+
+**Approved-by:** Umesh
+
+**Changes-authorized:** `.claude/hooks/lab-session-end.ps1` (retroactive authorization of the
+existing file as-is, no code change); `packages/index/src/pipeline/` speaker-name modules (a
+place-vs-person contextual signal plus its tests, per ruling 2)
+
+**Links:** D-041, D-043, D-044, D-049, D-050-CODEX, D-051, D-014, D-013, ISS-104, ISS-346, ISS-350,
+qa/gates/mc-sessionstart-handshake-reader-round-cap.md,
+qa/gates/speaker-seam-loc-ceiling.md, qa/evidence/config-audit-hooks-all-2026-09-28.md
+
+## D-053 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** Resolves both questions on `qa/gates/u4b-r2-alert-sink-depcruise.md`, answered by Umesh via
+AskUserQuestion on 2026-09-28.
+
+1. **`u4b-r2: a`** - R2's alert sink becomes **a thin alert interface in a package `apps/*` is already
+   permitted to import**, which `packages/meeting-bot`'s Telegram notifier implements. Authorized new
+   files for that unit: the interface module in `packages/core/src/` (one file) and its test (one file).
+   The detector stays in `apps/api/src/routes/health.ts` exactly as D-048 requires; the injectable sink
+   the u4b-heartbeat builder already shipped is the seam it plugs into, so the wiring is an in-place
+   one-line change. `.dependency-cruiser.cjs` is **not** modified - option (b) was rejected.
+2. **`u4b-fixtures: yes`** - authorizes the seventh and eighth files of the U4b heartbeat work:
+   `schema/fixtures/watch_heartbeat/valid.json` and `schema/fixtures/watch_heartbeat/invalid.json`.
+   Content is determined by the `watch_heartbeat` schema already approved in D-048.
+
+**Why:** Option (a) respects the boundary rather than bending it. The forbidden edge
+`apps/* -> packages/meeting-bot` exists to keep the web tier independent of the capture stack, and
+option (b) would have bought a one-line fix by removing that independence permanently - on an
+enforcement path, which additionally demands its own `Approved-by`. Option (c) was rejected because it
+reopens what D-048 settled: putting the detector back beside the writer restores exactly the failure
+mode R2 exists to catch (a watcher that dies takes its own staleness detector with it).
+
+The fixtures are authorized because `python schema/validate.py` is the unit's **only red verification**
+and `qa/loop.md:25` requires that validator green for any unit touching `schema/`. The u4b-heartbeat
+builder stopped rather than create unauthorized files under D-048's cap; that restraint was correct and
+this entry supplies what it was waiting for.
+
+**Result:** The R2 alert-interface unit is unblocked and buildable. Two limits are recorded rather than
+resolved, and neither is charged to that unit: **nothing schedules the `/health` probe** (U6's Task
+Scheduler work, separately gated on live proof), and **the heartbeat write leg has never written a row**
+because no test connects to Mongo. R2 therefore reaches 1/1 on *alert delivery* only; end-to-end
+liveness detection stays incomplete until U6 lands. The gate is stamped ANSWERED.
+
+**Changes-authorized:** `packages/core/src/` (new alert-interface module + its test),
+`schema/fixtures/watch_heartbeat/valid.json`, `schema/fixtures/watch_heartbeat/invalid.json`,
+in-place wiring in `apps/api/src/routes/health.ts`. **Explicitly NOT authorized:**
+`.dependency-cruiser.cjs`, and any move of the detector out of `health.ts`.
+
+**Links:** D-048 (heartbeat collection + detector placement), D-046 (R4-R8 scope), ISS-361,
+`qa/gates/u4b-r2-alert-sink-depcruise.md`, `qa/manifests/u4b-heartbeat-collection.md`
