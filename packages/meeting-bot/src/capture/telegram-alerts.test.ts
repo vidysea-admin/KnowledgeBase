@@ -177,13 +177,57 @@ test("notifyUpcomingRecording works without a startTime (date-only callers)", as
   assert.match(calls[0]!.text, /Gmail scan found a join link/);
 });
 
-test("a healthy tick that never calls notifyPollFailed/notifyUpcomingRecording sends nothing", async () => {
+test("notifyWatchSilent: a source that never completed a run says so, not a stale timestamp", async () => {
+  const { calls, send } = fakeTransport();
+  const notifier = createTelegramNotifier(notifierDeps({ send }));
+  notifier.notifyWatchSilent("toc", "drive", null, 2 * 60 * 60 * 1000);
+  await flush();
+  assert.equal(calls.length, 1);
+  assert.match(calls[0]!.text, /no run has ever completed/);
+  assert.match(calls[0]!.text, /drive/);
+  assert.match(calls[0]!.text, /toc/);
+});
+
+test("notifyWatchSilent: a source that went quiet reports its last heartbeat and the configured interval", async () => {
+  const { calls, send } = fakeTransport();
+  const notifier = createTelegramNotifier(notifierDeps({ send }));
+  notifier.notifyWatchSilent("toc", "gmail", "2026-09-27T08:00:00.000Z", 2 * 60 * 60 * 1000);
+  await flush();
+  assert.equal(calls.length, 1);
+  assert.match(calls[0]!.text, /2026-09-27T08:00:00\.000Z/);
+  assert.match(calls[0]!.text, /120m/); // formatDuration(intervalMs/1000) — no hour unit, matches every other notify* method's duration formatting
+  // this is the "polling stopped" alert, not the "a poll failed" one — the message must say so,
+  // per spec.md R7 (plain language) and the brief's own "check the watcher, not the credential".
+  assert.match(calls[0]!.text, /polling itself has stopped/);
+});
+
+test("notifyWatchSilent: throttle key is per (tenantId, sourceType) — different sourceType never collides", async () => {
+  const { calls, send } = fakeTransport();
+  const notifier = createTelegramNotifier(notifierDeps({ send }));
+  notifier.notifyWatchSilent("toc", "drive", null, 1000);
+  notifier.notifyWatchSilent("toc", "gmail", null, 1000);
+  await flush();
+  assert.equal(calls.length, 2);
+});
+
+test("notifyWatchSilent: two calls for the SAME (tenantId, sourceType) within the throttle window collapse to one", async () => {
+  let clock = 0;
+  const { calls, send } = fakeTransport();
+  const notifier = createTelegramNotifier(notifierDeps({ send, now: () => clock, throttleMs: 60_000 }));
+  notifier.notifyWatchSilent("toc", "drive", null, 1000);
+  clock = 5_000;
+  notifier.notifyWatchSilent("toc", "drive", "2026-09-27T08:00:00.000Z", 1000);
+  await flush();
+  assert.equal(calls.length, 1); // generic per-key backstop throttle — see notify-channels.ts's header
+});
+
+test("a healthy tick that never calls notifyPollFailed/notifyUpcomingRecording/notifyWatchSilent sends nothing", async () => {
   // A real "healthy run" assertion belongs at the run-watch.mjs call-site level (no failed polls,
-  // no imminent upcoming items -> neither method is ever invoked) — not exercised by an automated
-  // test in this unit; see this unit's manifest, "What this unit does NOT do". This test only
-  // documents the notifier-level half of that guarantee: constructing it and calling neither
-  // method sends nothing, i.e. these two alerts are opt-in per call, never emitted by construction
-  // or by any OTHER notify* method as a side effect.
+  // no imminent upcoming items, no stale heartbeat -> none of these methods is ever invoked) — not
+  // exercised by an automated test in this unit; see this unit's manifest, "What this unit does NOT
+  // do". This test only documents the notifier-level half of that guarantee: constructing it and
+  // calling none of the three methods sends nothing, i.e. these alerts are opt-in per call, never
+  // emitted by construction or by any OTHER notify* method as a side effect.
   const { calls, send } = fakeTransport();
   createTelegramNotifier(notifierDeps({ send }));
   await flush();
