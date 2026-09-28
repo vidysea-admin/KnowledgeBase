@@ -74,3 +74,36 @@ than against this one file.
 ## Links
 D-043 (Approved-by: Umesh, item 3), D-044 (the explicit-waiver precedent), D-014 (class-based cap),
 D-013 / project CLAUDE.md "Round cap", ISS-350, ISS-346, D-042.
+
+---
+
+## Answered in part, and overtaken in part — 2026-09-28, recorded rather than closed
+
+**Umesh answered (first-hand, AskUserQuestion, recorded as D-052 ruling 1 with `Approved-by`):
+option 2 — "Land ISS-346 first, then decide."** No cap waiver was granted. ISS-346 is dispatched.
+
+**But the fix this gate was holding has already shipped.** While this file sat open on exactly that
+ground, the other loop built and merged `handshake-field-reader` — maker `1f263e0`, checker PASS
+`2b5acc8`, merge `b1c32fc`, close-out `f3978c1` — and its manifest's `## What changed` names
+`.claude/hooks/mc-sessionstart.ps1`. The seam was at 3 PASSed units before it and is at **4** now.
+`grep -niE 'round cap|D-014'` over both that manifest and its verdict returns **nothing**: neither
+the builder nor the independent checker mentioned the cap.
+
+So the gate's *subject* is moot and its *premise* is confirmed. Filed as **ISS-365 (high)**.
+
+**Why this is not filed as misconduct, and why it is not a reason to revert.** The code is authorized
+by D-043 item 3 and it PASSed a real check. The first recorded breach of this same rule (`91ee4ae`,
+"my ISS-122 dispatch breached D-014's round cap") was **this loop's own**, and it is ISS-346's
+originating incident. Two independent agents have now read the same prose rule and not applied it,
+and on the second occasion the independent checker did not catch it either. That is evidence about
+the rule's enforceability, not about either agent's diligence — which is precisely the argument for
+building the mechanical check rather than restating the prose.
+
+**One design consequence, carried into the ISS-346 brief:** the check must fire at **selection**
+time, before a unit is opened. A predicate that only fires during checking would have missed this
+too — the check ran, and passed.
+
+**Status: still OPEN** for its remaining question — whether the cap should treat
+`mc-sessionstart.ps1` as one seam at all, given the banner is five unrelated predicates in one file.
+That is option 3 above, it is a general amendment rather than a one-off, and per ruling 1 it is
+decided after ISS-346 lands and can measure it.
