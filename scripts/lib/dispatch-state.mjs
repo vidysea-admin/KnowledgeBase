@@ -44,10 +44,87 @@ export function manifestCycle(text) {
   return m ? Number(m[1]) : 0;
 }
 
-/** True when the manifest is asking for a check. Anchored to line start so a close-out section
- *  that merely QUOTES the phrase in prose is not counted. */
+/** The D-042 vocabulary for the canonical `**Handshake status:**` field, in its exact casing. */
+export const HANDSHAKE_VOCAB = ["checked-PASS", "ready-for-check", "STALLED", "BLOCKED", "superseded", "paused"];
+
+/**
+ * The canonical `**Handshake status:**` value for a manifest, or null when the field is absent.
+ * Anchored at column 0 -- per D-042 the field is always a top-level bold line, never indented,
+ * quoted or wrapped in prose -- so a narrative sentence that merely discusses the field does not
+ * count as carrying it.
+ */
+export function canonicalHandshakeStatus(text) {
+  const re = new RegExp("^\\*\\*Handshake status:\\*\\*\\s*(" + HANDSHAKE_VOCAB.join("|") + ")\\b", "m");
+  const m = re.exec(text);
+  return m ? m[1] : null;
+}
+
+/** True when the manifest carries a legacy `Status:` field (any value, any of the three pre-D-042
+ *  forms) saying `ready-for-check`. Used both as the fallback when no canonical field exists, and
+ *  as one side of the disagreement check below. Anchored to line start so a close-out section that
+ *  merely QUOTES the phrase in prose is not counted.
+ *
+ *  The leading character class deliberately excludes a backtick, unlike `manifestCycle`'s (out of
+ *  scope here, a separate reader). Found live against this corpus while building the D-042/D-043
+ *  disagreement check: `delivery-gate-manifest-blindness.md:35` and `mc-hooks-bolded-status.md`
+ *  both open a line with an inline-code span quoting the exact phrase this bug class produces --
+ *  `` `## Status: ready-for-check`, which is the one form the old regex could see `` -- and a
+ *  backtick in the class let `^` match at that span's opening tick, misreading documentation PROSE
+ *  about the bug as a real field declaration. `verdictCycle`/`stripQuoted` already exclude code
+ *  spans by removing them outright before matching; this function has no such pre-pass, so the
+ *  narrower fix is to drop the one character that let a code span masquerade as line start. */
+function legacyReadyForCheck(text) {
+  return /^[\s\-*#>|]*(?:#+\s*)?Status:\s*ready-for-check/m.test(text.replace(/\*\*/g, ""));
+}
+
+/** True when a legacy `Status:` field exists AT ALL (any value), as opposed to simply saying
+ *  ready-for-check. Needed so "there is no legacy field yet" is never mistaken for "the legacy
+ *  field disagrees" in `handshakeDisagreement` -- a manifest authored fresh with only the
+ *  canonical field is the exact latent case D-042/ISS-350 disclosed, not a disagreement.
+ *
+ *  Same backtick exclusion as `legacyReadyForCheck` above, for the same reason -- this function
+ *  shares its false-positive class exactly (a code-quoted `Status:` example read as a real field). */
+function legacyStatusPresent(text) {
+  return /^[\s\-*#>|]*(?:#+\s*)?Status:\s*\S/m.test(text.replace(/\*\*/g, ""));
+}
+
+/**
+ * True when the manifest is asking for a check. D-042/D-043: the canonical `**Handshake status:**`
+ * field, where present, is the DERIVED, authoritative signal for a manifest's state and wins over
+ * the legacy `Status:` forms this function used to read alone -- that blindness was ISS-350
+ * reproduction 2. When no canonical field exists yet, the legacy reading still applies, so an
+ * older manifest is not silently reclassified as not-pending the day this ships.
+ *
+ * A mismatch between the two is not resolved silently here in the sense of being hidden: this
+ * function has to return ONE boolean, so it commits to the canonical answer, but a caller that
+ * wants to know whether the two disagreed calls `handshakeDisagreement` below -- see `stateOf`,
+ * which attaches it to its result rather than dropping it.
+ */
 export function isReadyForCheck(text) {
-  return /^[\s\-*#>|`]*(?:#+\s*)?Status:\s*ready-for-check/m.test(text.replace(/\*\*/g, ""));
+  const canonical = canonicalHandshakeStatus(text);
+  if (canonical !== null) return canonical === "ready-for-check";
+  return legacyReadyForCheck(text);
+}
+
+/**
+ * Null when there is nothing to disagree about: no canonical field, or the canonical field and the
+ * legacy `Status:` reading of "ready-for-check" agree. Otherwise a short string naming both sides.
+ *
+ * D-042 makes the canonical field authoritative; it does not make a mismatch between the two
+ * harmless. In this corpus a mismatch almost always means one field was updated by an edit that
+ * missed the other -- exactly the drift D-042's own fix_direction (d) warned could happen once the
+ * field existed for people to edit around. `isReadyForCheck` resolves the mismatch (it has to, for
+ * its callers to get a usable boolean); this function is how a caller that wants the disagreement
+ * itself, rather than the silence of a single resolved boolean, gets to see it.
+ */
+export function handshakeDisagreement(text) {
+  const canonical = canonicalHandshakeStatus(text);
+  if (canonical === null) return null;
+  if (!legacyStatusPresent(text)) return null;
+  const canonicalReady = canonical === "ready-for-check";
+  const legacyReady = legacyReadyForCheck(text);
+  if (canonicalReady === legacyReady) return null;
+  return `canonical Handshake status="${canonical}" (ready-for-check=${canonicalReady}) disagrees with the legacy Status: reading (ready-for-check=${legacyReady})`;
 }
 
 /**
@@ -174,7 +251,14 @@ export function stateOf(root, slug, { now = Date.now(), staleMs = STALE_MS } = {
   const mPath = join(root, "qa", "manifests", `${slug}.md`);
   if (!existsSync(mPath)) return { slug, state: "not-pending", reason: "no manifest" };
   const mText = readFileSync(mPath, "utf8");
-  if (!isReadyForCheck(mText)) return { slug, state: "not-pending", reason: "manifest not ready-for-check" };
+  // Attached to whichever result is returned below, on every path -- a disagreement is information
+  // about the manifest, not about which branch of this function it happened to fall into. D-042
+  // makes the canonical field authoritative for the STATE (isReadyForCheck already resolves it);
+  // this is what keeps the mismatch itself from being silently dropped once resolved.
+  const disagreement = handshakeDisagreement(mText);
+  const tag = (result) => (disagreement ? { ...result, disagreement } : result);
+
+  if (!isReadyForCheck(mText)) return tag({ slug, state: "not-pending", reason: "manifest not ready-for-check" });
 
   const cycle = manifestCycle(mText);
   const vPath = join(root, "qa", "verdicts", `${slug}.md`);
@@ -182,25 +266,25 @@ export function stateOf(root, slug, { now = Date.now(), staleMs = STALE_MS } = {
 
   // A landed verdict is the authority, whatever the marker says. This is what makes the module
   // correct against a checker that never deletes its marker.
-  if (vc >= cycle) return { slug, state: "complete", cycle, verdictCycle: vc };
+  if (vc >= cycle) return tag({ slug, state: "complete", cycle, verdictCycle: vc });
 
   const marker = readMarker(root, slug);
   if (!marker || Number(marker.cycle) !== cycle) {
-    return { slug, state: "not-dispatched", cycle, staleMarker: marker ? Number(marker.cycle) : null };
+    return tag({ slug, state: "not-dispatched", cycle, staleMarker: marker ? Number(marker.cycle) : null });
   }
 
   const age = now - Date.parse(marker.dispatched_at);
   // NaN (an unparseable timestamp) must not read as young: `NaN > staleMs` is false, which would
   // silently report a dead check as in-flight. Treat it as dead so it gets re-dispatched.
   const died = !(age <= staleMs);
-  return {
+  return tag({
     slug,
     state: died ? "checker-died" : "in-flight",
     cycle,
     ageMs: Number.isFinite(age) ? age : null,
     dispatched_at: marker.dispatched_at,
     session_id: marker.session_id,
-  };
+  });
 }
 
 /** Every manifest's state, worst-first, so a reconcile reads the actionable rows at the top. */

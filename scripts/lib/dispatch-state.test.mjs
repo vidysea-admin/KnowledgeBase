@@ -13,7 +13,10 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync } from "node:
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { record, clear, stateOf, sweep, manifestCycle, isReadyForCheck, verdictCycle, STALE_MS } from "./dispatch-state.mjs";
+import {
+  record, clear, stateOf, sweep, manifestCycle, isReadyForCheck, verdictCycle, STALE_MS,
+  canonicalHandshakeStatus, handshakeDisagreement, HANDSHAKE_VOCAB,
+} from "./dispatch-state.mjs";
 
 const T0 = Date.parse("2026-09-09T12:00:00.000Z");
 
@@ -234,4 +237,137 @@ test("ISS-197: a NON-ENOENT readdir fault THROWS — it is not swallowed into a 
       return true;
     });
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// ---------------------------------------------------------------------------
+// ISS-350 reproduction 2 / D-042 / D-043: isReadyForCheck (and stateOf through it) must key on the
+// canonical `**Handshake status:**` field, not only the legacy `Status:` forms this module used to
+// read alone. D-042 disclosed that today's corpus never carries the canonical field WITHOUT a
+// legacy statement backing it (the backfill only ever derives the canonical field FROM one), so
+// the "canonical only" cases below are CONSTRUCTED fixtures, not live reproductions -- named as
+// such rather than claimed as reproduced bugs.
+// ---------------------------------------------------------------------------
+
+test("canonicalHandshakeStatus reads every D-042 vocabulary value, and null when the field is absent", () => {
+  for (const v of HANDSHAKE_VOCAB) {
+    assert.equal(canonicalHandshakeStatus(`**Handshake status:** ${v}`), v, `unread vocabulary value: ${v}`);
+  }
+  assert.equal(canonicalHandshakeStatus("## Status: ready-for-check\nno canonical field here\n"), null);
+  // A narrative line merely discussing the field must not count as carrying it (column-0 anchor).
+  assert.equal(canonicalHandshakeStatus("  the field reads **Handshake status:** checked-PASS in prose\n"), null);
+});
+
+test("isReadyForCheck: canonical-only ready-for-check is ready — the blind spot ISS-350/D-042 named, constructed here", () => {
+  assert.ok(isReadyForCheck("**Handshake status:** ready-for-check\n"),
+    "a manifest with ONLY the canonical field must still be seen as ready-for-check");
+});
+
+test("isReadyForCheck: canonical-only checked-PASS is NOT ready, with no legacy field to fall back to", () => {
+  assert.ok(!isReadyForCheck("**Handshake status:** checked-PASS\n"));
+});
+
+test("isReadyForCheck: canonical field WINS over a disagreeing legacy field, in both directions", () => {
+  assert.ok(!isReadyForCheck("## Status: ready-for-check\n\n**Handshake status:** checked-PASS\n"),
+    "legacy says ready, canonical says checked-PASS -> canonical wins -> not ready");
+  assert.ok(isReadyForCheck("## Status: checked-PASS\n\n**Handshake status:** ready-for-check\n"),
+    "legacy says checked-PASS, canonical says ready -> canonical wins -> ready");
+});
+
+test("isReadyForCheck: falls back to the legacy Status: forms when no canonical field exists (pre-D-042 shape)", () => {
+  for (const form of ["## Status: ready-for-check", "**Status:** ready-for-check (cycle 2)", "Status: ready-for-check"]) {
+    assert.ok(isReadyForCheck(form), `unmatched legacy fallback form: ${form}`);
+  }
+});
+
+test("handshakeDisagreement: null when there is no canonical field at all", () => {
+  assert.equal(handshakeDisagreement("## Status: ready-for-check\n"), null);
+  assert.equal(handshakeDisagreement("no status field of any kind\n"), null);
+});
+
+test("handshakeDisagreement: null for a canonical-only manifest — absence of a legacy field is NOT a disagreement", () => {
+  // This is the precedence decision this unit had to make explicit: a manifest authored with only
+  // the canonical field (the exact latent case D-042 disclosed) must not be reported as disagreeing
+  // with a legacy statement that was simply never written.
+  for (const v of HANDSHAKE_VOCAB) {
+    assert.equal(handshakeDisagreement(`**Handshake status:** ${v}`), null, `false disagreement for canonical-only "${v}"`);
+  }
+});
+
+test("handshakeDisagreement: null when canonical and legacy agree", () => {
+  assert.equal(handshakeDisagreement("## Status: ready-for-check\n\n**Handshake status:** ready-for-check\n"), null);
+  assert.equal(handshakeDisagreement("## Status: checked-PASS\n\n**Handshake status:** checked-PASS\n"), null);
+});
+
+test("handshakeDisagreement: names both sides when canonical and legacy disagree, in both directions", () => {
+  const a = handshakeDisagreement("## Status: ready-for-check\n\n**Handshake status:** checked-PASS\n");
+  assert.match(a, /checked-PASS/);
+  assert.match(a, /ready-for-check=true/i);
+  const b = handshakeDisagreement("## Status: checked-PASS\n\n**Handshake status:** ready-for-check\n");
+  assert.match(b, /ready-for-check/);
+  assert.match(b, /ready-for-check=false/i);
+});
+
+test("stateOf attaches `disagreement` when the two fields conflict, and omits it otherwise", () => {
+  const root = repo();
+  try {
+    // Disagreeing: legacy says ready, canonical says checked-PASS -> canonical wins (not-pending),
+    // but the mismatch itself must still surface on the result, not be dropped just because
+    // isReadyForCheck already resolved it.
+    manifest(root, "conflicted", "## Status: ready-for-check\n\n**Handshake status:** checked-PASS\n");
+    const s1 = stateOf(root, "conflicted", { now: T0 });
+    assert.equal(s1.state, "not-pending");
+    assert.ok(s1.disagreement, "expected a disagreement field on the not-pending result");
+    assert.match(s1.disagreement, /checked-PASS/);
+
+    // Agreeing: no disagreement field at all (not even `disagreement: null`).
+    manifest(root, "agreeing", "## Status: ready-for-check\n\n**Handshake status:** ready-for-check\n");
+    const s2 = stateOf(root, "agreeing", { now: T0 });
+    assert.equal(s2.state, "not-dispatched");
+    assert.ok(!("disagreement" in s2), "an agreeing manifest must not carry a disagreement key at all");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("a manifest whose ONLY status statement is the canonical field is still handled correctly end to end", () => {
+  // The exact case D-042 disclosed as latent (no manifest today carries the field without a legacy
+  // statement behind it) but which fix_direction (d) requires this module to get right going
+  // forward. Constructed here, not lifted from a live file.
+  const root = repo();
+  try {
+    manifest(root, "canon-only", "**Handshake status:** ready-for-check\n**Fix cycle:** 1 of max 3\n");
+    const s = stateOf(root, "canon-only", { now: T0 });
+    assert.equal(s.state, "not-dispatched", "canonical-only ready-for-check must reach the dispatch decision, not be swallowed as not-pending");
+    assert.ok(!("disagreement" in s), "no legacy field exists, so there is nothing to disagree with");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("handshakeDisagreement: an inline-code-quoted `Status:` example in PROSE is not a real legacy field", () => {
+  // Found live against this repo's own corpus while building this module: qa/manifests/
+  // delivery-gate-manifest-blindness.md:35 and mc-hooks-bolded-status.md both open a line with a
+  // backtick-quoted example of the exact bug class this repo keeps hitting -- documentation
+  // discussing "`## Status: ready-for-check`, which is the one form the old regex could see" -- and
+  // the original leading character class `[\s\-*#>|`]*` included a backtick, so `^` matched at the
+  // code span's opening tick and read the PROSE as a real field declaration. Both files' real
+  // canonical and legacy fields agree (STALLED / checked-PASS respectively); the false "disagree"
+  // came entirely from this sentence, not from either file's actual Status line.
+  const prose =
+    "Some notes on the bug.\n\n" +
+    "`## Status: ready-for-check`, which is the one form the old regex could see. **The suite was\n" +
+    "green** after that fix.\n\n" +
+    "**Handshake status:** STALLED\n";
+  assert.equal(handshakeDisagreement(prose), null,
+    "a code-quoted Status example in prose must not be read as a disagreeing legacy field");
+
+  // Same shape, but the quoted example says something that WOULD disagree if it were a real field --
+  // still must not be picked up, because it is still inside a code span, not a field declaration.
+  const proseDisagreeing =
+    "`Status: ready-for-check` sitting mid-sentence in prose containing the phrase \"ready-for-check\" --\n" +
+    "is one of the forms the old regex could not see either.\n\n" +
+    "**Handshake status:** checked-PASS\n";
+  assert.equal(handshakeDisagreement(proseDisagreeing), null,
+    "a code-quoted Status example must not be read as a legacy field even when its wording would disagree if real");
+
+  // Control: the same phrase as a REAL, non-code-quoted legacy field must still be caught.
+  const real = "## Status: ready-for-check\n\n**Handshake status:** checked-PASS\n";
+  assert.match(handshakeDisagreement(real) ?? "", /checked-PASS/,
+    "removing the backtick from the character class must not blind the function to a genuine legacy field");
 });
