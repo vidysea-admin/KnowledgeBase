@@ -26,7 +26,7 @@
 
 | # | unit | tier | why now | cap check |
 |---|---|---|---|---|
-| 1 | `iss-371-loc-testpatterns-mjs` | 2 (high) | **released** — it was `SERIAL` on the iss-346 check because it re-runs `lint-loc`; that check has now returned. One `loc.testPatterns` entry drops `lint-loc` 5→4 and changes ISS-367's masking picture | 0 prior PASSes on `structure.config.json` — clear |
+| 1 | `iss-367-lint-structure-no-shortcircuit` (folds in ISS-371) | 2 (high) | **released** — it was `SERIAL` on the iss-346 check because it re-runs `lint-loc`; that check has returned. **CORRECTION to this tick's first draft: ISS-371 is severity `medium`, not high.** Under this repo's severity gate a medium gets a ledger entry and is "verified inside the next unit that touches the same file" — not its own ceremony. That unit is ISS-367, whose own `fix_direction` says to do the `testPatterns` entry FIRST because it drops `lint-loc` 5→4 and changes the masking picture. So they are one unit, not two | 0 prior PASSes on `package.json` / `structure.config.json` / `scripts/lint-*.mjs` — clear |
 | 2 | `iss-368-heartbeat-read-failure-is-not-health` | 2 (high) | a `listHeartbeats` throw is reported as zero silent watchers — byte-identical to "all fresh", contradicting D-048; its standing test pins the wrong answer and passes on the broken implementation | `apps/api/src/routes/health.ts` 1 prior PASS — under the cap |
 | 3 | `ledger-duplicate-id-guard` | 2 (high) | `SERIAL` this wave — see below | 0 prior PASSes — clear |
 | 4 | `iss-104cc-3-narrow-place-signal` | 2 (high) | D-055 ruling 1; hard prerequisite `speaker-rules-test-file-split` (test file at 392/400) not yet done | measurement pre-specified against BOTH ledger corpora by id |
