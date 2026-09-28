@@ -1,0 +1,11 @@
+--- pristine.ps1	2026-09-28 17:57:04.552882000 +0530
++++ cand.ps1	2026-09-28 17:57:04.589911300 +0530
+@@ -69,7 +69,7 @@
+   # 2026-09-28: `mc-hooks-bolded-status`, one of the three prior PASSes ISS-365 counted BY HAND on the
+   # mc-sessionstart seam, cites `.claude/hooks/mc-sessionstart.ps1:15` and `...ps1:19-25` and so
+   # contributed ZERO to the count. Obeying the repo's citation rule made a unit invisible to the cap.
+-  foreach ($m in [regex]::Matches($scope, ('`([\w.\-]+(?:/[\w.\-]+)+\.(?:' + $ext + '))(?::\d+(?:-\d+)?)?`'))) {
++  foreach ($m in [regex]::Matches($scope, ('`([\w.\-]+(?:/[\w.\-]+)+\.(?:' + $ext + '))(?::[\d,\-]+)?`'))) {
+     [void]$set.Add($m.Groups[1].Value.ToLowerInvariant())
+   }
+   # `return $set` UNROLLS: PowerShell enumerates a returned collection, so an EMPTY HashSet came back
