@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 import { complete as routeComplete, embed as routeEmbed, parseRoutingYaml, GeminiProvider, ClaudeCodeProvider, OllamaProvider, type Provider } from "@lkb/ai";
 import { treeSearch } from "@lkb/index";
 import { listHeartbeats } from "@lkb/db";
+import { createTelegramAlertSink } from "@lkb/core";
 import type { ServerDeps } from "./server.js";
 import type { WatchSilenceDeps } from "./routes/health.js";
 import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, createMongoTreeStore, createMongoBrainReadDeps,
@@ -37,16 +38,23 @@ const ROUTING_CONFIG_PATH = fileURLToPath(new URL("../../../config/ai-routing.ya
  * no caller to derive a tenant from. Each read goes through `@lkb/db`'s `listHeartbeats`, i.e.
  * `scopedCollection()`, so it is `withTenant`-merged per tenant and never a cross-tenant scan.
  *
- * `notifyWatchSilent` is a console sink, NOT the Telegram notifier, and that is a DISCLOSED GAP:
- * `.dependency-cruiser.cjs`'s `apps-only-ask-ingest-index-ai-db-core` rule forbids
- * `apps/* -> packages/meeting-bot`, so nothing under apps/ can reach `createTelegramNotifier` (only
- * scripts/ can, which is how run-watch.mjs does it). The detector is fully injectable, so wiring the
- * real notifier is a one-line change once that boundary is resolved — see the manifest's HUMAN_GATE.
- * Until then a silent watcher surfaces in the API's own ops log and in `/health`'s `watchSilent`
- * count: a real signal, just not a phone notification. */
+ * `notifyWatchSilent` is now `@lkb/core`'s `createTelegramAlertSink` (packages/core/src/alerts/
+ * alert-sink.ts), U4b/R2's D-053 resolution of the boundary noted below: `.dependency-
+ * cruiser.cjs`'s `apps-only-ask-ingest-index-ai-db-core` rule forbids `apps/* ->
+ * packages/meeting-bot`, so this file cannot import `createTelegramNotifier` directly (only
+ * scripts/ can, which is how run-watch.mjs does it). `createTelegramAlertSink` is a SEPARATE,
+ * independent Telegram sender living in the already-permitted `packages/core`, satisfying the
+ * same `AlertSink`/`notifyWatchSilent` shape `packages/meeting-bot`'s `TelegramNotifier` already
+ * does by signature — see alert-sink.ts's own doc comment for why this is two implementations,
+ * not a shared one, and why that is disclosed rather than hidden. */
 export function createMongoWatchSilenceDeps(): WatchSilenceDeps {
   const tenantIds = (process.env.WATCH_HEARTBEAT_TENANTS ?? "toc").split(",").map((t) => t.trim()).filter(Boolean);
   const parsed = process.env.WATCH_HEARTBEAT_INTERVAL_MS ? Number(process.env.WATCH_HEARTBEAT_INTERVAL_MS) : NaN;
+  // U4b/R2 (D-053): a real alert transport, not a console sink. Construction reads env only
+  // (token/chatId), matching createMongoWatchSilenceDeps's own lazy-binding style and
+  // production.test.ts's "constructs without throwing or requiring a live network connection"
+  // guarantee — the actual HTTPS call happens only if/when notifyWatchSilent is invoked.
+  const alertSink = createTelegramAlertSink();
   return {
     tenantIds,
     // Same env var, same rule and the same 1-hour D-048 default as
@@ -54,12 +62,8 @@ export function createMongoWatchSilenceDeps(): WatchSilenceDeps {
     // one number, or a watcher looks alive to one side and dead to the other.
     intervalMs: Number.isFinite(parsed) && parsed > 0 ? parsed : 60 * 60 * 1000,
     listHeartbeats: (tenantId) => listHeartbeats(tenantId),
-    notifyWatchSilent: (tenantId, sourceType, lastHeartbeatAt, intervalMs) => {
-      const last = lastHeartbeatAt ? `last completed run: ${lastHeartbeatAt}` : "no run has ever completed";
-      console.error(
-        `WATCH SILENT: ${sourceType} (tenant ${tenantId}) — ${last}, expected within ${intervalMs}ms. Polling itself has stopped; check the watcher process/task, not the credential.`,
-      );
-    },
+    notifyWatchSilent: (tenantId, sourceType, lastHeartbeatAt, intervalMs) =>
+      alertSink.notifyWatchSilent(tenantId, sourceType, lastHeartbeatAt, intervalMs),
   };
 }
 /** `write` for the router's own per-attempt ledger entries — a tenant isn't known until a

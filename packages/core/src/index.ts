@@ -29,3 +29,7 @@ export * from "./generated/watch_state.js";
 export * from "./generated/watched_sources.js";
 
 export * from "./domain/purge-policy.js";
+
+// U4b/R2 (D-053): the thin alert interface apps/* imports so a real alert can be delivered
+// without apps/* importing packages/meeting-bot (.dependency-cruiser.cjs forbids that edge).
+export * from "./alerts/alert-sink.js";
