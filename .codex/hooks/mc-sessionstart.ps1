@@ -13,11 +13,36 @@ $n = -1
 if ($LEDGERS.Count -gt 0) { $n = @($LEDGERS | ForEach-Object { Get-Content $_.FullName } | Where-Object { $_ -match '"status":\s*"(open|Open)"' }).Count }
 # Pending handshake (cycle-aware): ready-for-check with no verdict, or a verdict for an older
 # cycle, or a PASS verdict whose manifest was never flipped to checked-PASS.
-$pending = @(); $unclosed = @()
+# D-042/D-043 (Approved-by: Umesh): the canonical `**Handshake status:**` field -- vocabulary
+# checked-PASS | ready-for-check | STALLED | BLOCKED | superseded | paused -- is the DERIVED,
+# authoritative signal for a manifest's state, and wins when present. The legacy `Status:` forms
+# (bold-field / heading / bare) are read only when no canonical field exists, so a manifest that
+# predates the ISS-350 backfill is still classified correctly. A disagreement between the two is
+# never silently resolved in either direction -- collected below and surfaced in the banner,
+# because a mismatch usually means one field was updated by an edit that missed the other, which is
+# exactly the drift D-042's own fix_direction (d) warned could happen once the field exists. Fixes
+# ISS-350 reproduction 2 (this hook was structurally blind to the canonical field).
+$HANDSHAKE_VOCAB = 'checked-PASS|ready-for-check|STALLED|BLOCKED|superseded|paused'
+$pending = @(); $unclosed = @(); $disagreements = @()
 if (Test-Path 'qa/manifests') {
   foreach ($m in Get-ChildItem 'qa/manifests' -Filter *.md -ErrorAction SilentlyContinue) {
     $v = "qa/verdicts/" + $m.Name
-    if (-not (Select-String -Path $m.FullName -Pattern '^\s*(?:[-*]\s+)?(?:#{1,6}\s+)?[*_]{0,3}Status:[*_]{0,3}\s+ready-for-check' -Quiet)) { continue }
+    # Two separate legacy questions: whether a legacy Status statement exists AT ALL (any value --
+    # needed so "no legacy field yet" is never mistaken for "legacy field disagrees"), and whether
+    # it specifically says ready-for-check.
+    $legacyPresent = [bool](Select-String -Path $m.FullName -Pattern '^\s*(?:[-*]\s+)?(?:#{1,6}\s+)?[*_]{0,3}Status:[*_]{0,3}\s+\S' -Quiet)
+    $legacyReady = [bool](Select-String -Path $m.FullName -Pattern '^\s*(?:[-*]\s+)?(?:#{1,6}\s+)?[*_]{0,3}Status:[*_]{0,3}\s+ready-for-check' -Quiet)
+    $canon = Select-String -Path $m.FullName -Pattern ('^\*\*Handshake status:\*\*\s*(' + $HANDSHAKE_VOCAB + ')\b') | Select-Object -First 1
+    if ($canon) {
+      $canonValue = $canon.Matches[0].Groups[1].Value
+      $isReady = ($canonValue -ieq 'ready-for-check')
+      if ($legacyPresent -and ($isReady -ne $legacyReady)) {
+        $disagreements += ($m.BaseName + ' (canonical=' + $canonValue + ', legacy Status ready-for-check=' + $legacyReady + ')')
+      }
+    } else {
+      $isReady = $legacyReady
+    }
+    if (-not $isReady) { continue }
     if (-not (Test-Path $v)) { $pending += $m.BaseName; continue }
     $mc = 0; $a = Select-String -Path $m.FullName -Pattern 'Fix cycle[:*\s]+(\d+)' | Select-Object -First 1
     if ($a) { $mc = [int]$a.Matches[0].Groups[1].Value }
@@ -29,7 +54,12 @@ if (Test-Path 'qa/manifests') {
       }
     }
     if ($vc -lt $mc) { $pending += $m.BaseName; continue }
-    if (Select-String -Path $v -Pattern 'VERDICT:\s*PASS' -Quiet) { $unclosed += $m.BaseName }
+    # Widened per the 2026-09-28 checker consolidation sweep: the existing 'VERDICT:\s*PASS' anchor
+    # is already case-insensitive by PowerShell default (catches 'Verdict: PASS' too -- confirmed,
+    # not re-litigated), but it cannot see the ~12 files using `**Result: PASS**` or the files that
+    # write a bare `**PASS**` with no field label at all. Both are added as alternates, not as a
+    # replacement, so the existing match keeps matching exactly what it always matched.
+    if (Select-String -Path $v -Pattern 'VERDICT:\s*PASS|Result:\s*PASS|\*\*PASS\*\*' -Quiet) { $unclosed += $m.BaseName }
   }
 }
 $queue = 0
@@ -43,12 +73,15 @@ $asleep = $backlog -and (($tickAge -lt 0) -or ($tickAge -gt 120))
 $openTxt = 'UNKNOWN (no ledger)'; if ($n -ge 0) { $openTxt = "$n" }
 $pendTxt = ''; if ($pending.Count) { $pendTxt = ' [' + ($pending -join ', ') + ']' }
 Write-Output ("MAKER-CHECKER ACTIVE: substantive dev work routes through /maker (say 'normal' to opt out). Open issues: $openTxt | Checks pending: $($pending.Count)$pendTxt | PASS not closed out: $($unclosed.Count) | Queue TODO: $queue | Last tick: $tickTxt | Last sweep: $sweepTxt | Ledger: $LEDGER")
+if ($disagreements.Count) {
+  Write-Output ("HANDSHAKE DISAGREEMENT: " + ($disagreements -join '; ') + " -- canonical **Handshake status:** field wins per D-042; the legacy Status line was not updated to match. Investigate before trusting Checks pending / PASS not closed out for these slugs.")
+}
 # Discovery/repair directives (enforcement-wiring.md, Layer 2 extension)
 if (Test-Path 'qa/.regrill-due') {
   $first = Get-Content 'qa/.regrill-due' -TotalCount 1
   if ($first -match '^(\d{4}-\d{2}-\d{2})') { if ([datetime]$Matches[1] -le (Get-Date)) { Write-Output ("RE-GRILL DUE: " + $first + " -- HUMAN_GATE: run /grill on that topic before continuing.") } }
 }
-# ISS-307 fix, authorized by D-050 ruling 2 (Approved-by: Umesh). Two defects, both measured
+# ISS-307 fix, authorized by D-050-SPEAKER ruling 2 (Approved-by: Umesh; see D-051 - two entries share the number D-050). Two defects, both measured
 # 2026-09-28 against this repo's own qa/.last-tick (470 lines):
 #   (1) -TotalCount 1 read the OLDEST line of an append-only oldest-first file, so the banner
 #       reported a tick from 2026-09-24 while the newest was 2026-09-28. Now reads the LAST line.
