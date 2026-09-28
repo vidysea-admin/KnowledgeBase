@@ -1277,3 +1277,53 @@ in-place wiring in `apps/api/src/routes/health.ts`. **Explicitly NOT authorized:
 
 **Links:** D-048 (heartbeat collection + detector placement), D-046 (R4-R8 scope), ISS-361,
 `qa/gates/u4b-r2-alert-sink-depcruise.md`, `qa/manifests/u4b-heartbeat-collection.md`
+
+## D-054 | 2026-09-28 | type: fix | status: ACTIVE
+
+**What:** Corrects a factual error in **D-053**'s `Changes-authorized` field and records the deviation
+the `u4b-r2-alert-interface` builder disclosed rather than hid.
+
+D-053 authorized "in-place wiring in `apps/api/src/routes/health.ts`". **That file contains no concrete
+alert sink to wire.** It holds only the injectable interface and the pure detector logic. The concrete
+sink -- the disclosed `console.error` stub -- lives in **`apps/api/src/production.ts:57`**, inside
+`createMongoWatchSilenceDeps()`. The builder read `health.ts` first, grepped to locate the real sink,
+wired `production.ts` instead, left `health.ts` untouched, and stated the substitution explicitly in its
+manifest section 1 instead of quietly widening its own scope.
+
+**So the authorized wiring target for the D-053 option (a) work is `apps/api/src/production.ts`**, not
+`routes/health.ts`. Everything else in D-053 stands unchanged, including both prohibitions: the detector
+does **not** move out of `health.ts` (option (c) stays rejected, and `health.ts` is in fact untouched),
+and `.dependency-cruiser.cjs` is **not** modified (option (b) stays rejected).
+
+**Why:** The error is the maker's, in the same class as the D-049 prose error (ISS-A0CDAEE-002) and worth
+naming as a pattern: **an authorization written from a plan rather than from the file lands on the wrong
+file.** D-053 named `health.ts` because D-048 named it as the *detector's* home, and the entry carried
+that over to the *sink* without anyone reading `production.ts`. A builder holding a literal reading of
+`Changes-authorized` would have had to either stop on a one-line wiring change or edit a file its
+authorization did not name. It chose a third option -- do the correct thing and disclose it -- which is
+the behaviour this project wants, but it should not need to rely on the maker noticing. This entry makes
+the record match the code.
+
+The builder's design disclosure is accepted and recorded rather than re-litigated: `packages/core` may
+import no workspace package (`core-imports-nothing`) and `apps/*` may not import `packages/meeting-bot`,
+so duck typing solves type compatibility but **not construction** -- apps/api cannot obtain a real
+`TelegramNotifier` instance by import. `createTelegramAlertSink()` is therefore a **second, independent**
+Telegram sender with the same env vars, request shape, timeout, redaction and wording. The wording match
+is guaranteed only by a hardcoded-string test, because a dynamic cross-import test would itself trip
+`core-imports-nothing`. That is a real duplication with a real, disclosed weakness; it is accepted as the
+cost of not bending the boundary, which is exactly the trade D-053 chose.
+
+**Result:** `qa/manifests/u4b-r2-alert-interface.md` is at `ready-for-check` cycle 0 and its checker is
+dispatched. The deviation is authorized retroactively and is not a finding against the unit. The
+duplicate-wording weakness is the checker's to judge on severity; it is disclosed, not hidden.
+
+**Changes-authorized:** `apps/api/src/production.ts` (in-place wiring), in correction of D-053.
+**Explicitly still NOT authorized:** `.dependency-cruiser.cjs`, and any move of the detector out of
+`apps/api/src/routes/health.ts`.
+
+**Supersedes:** D-053 -- only its `Changes-authorized` naming of `apps/api/src/routes/health.ts` as the
+wiring target, on the ground that no concrete alert sink exists in that file; `apps/api/src/production.ts`
+is the correct target. D-053 is otherwise unaffected and stays ACTIVE, both prohibitions included.
+
+**Links:** D-053, D-048, `qa/manifests/u4b-r2-alert-interface.md`,
+`qa/gates/u4b-r2-alert-sink-depcruise.md`, ISS-A0CDAEE-002
