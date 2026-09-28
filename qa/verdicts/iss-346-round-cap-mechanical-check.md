@@ -435,3 +435,220 @@ canonical `**Handshake status:**` defect, fixed here in `ROUNDCAP`, left live an
 `MAKER` predicate of the same file and unaudited in the manifest — plus the undisclosed prose-seam
 bypass. Neither is addressed by the unit on `master`, and both remain the narrow content of fix
 cycle 1.
+
+---
+
+# CYCLE 1 VERDICT (appended below cycle 0 and its addendum — nothing above this line is touched)
+
+**Cycle checked:** 1
+**Date:** 2026-09-28
+**Verdict-file convention used:** this file already appends **downward** (the cycle-0 ADDENDUM was
+added below the original cycle-0 body, not above it, and nothing above was edited). This cycle-1
+section follows that same convention — appended at the bottom, cycle 0 and its addendum left
+byte-intact above. Reader note: this repo also has verdict files that use the opposite,
+newest-first-with-`# ARCHIVE` convention (see the cycle-0 addendum's own discussion of
+`vector-cosine-retriever.md`); this particular file is not one of those.
+**Checker binding:** `D:/KnowledgeBase/.claude/worktrees/agent-a035913864247fa58`, branch
+`worktree-agent-a035913864247fa58`, HEAD `610ed0e`, clean at check time (confirmed:
+`git status --porcelain` empty, `git rev-parse HEAD` = `610ed0e61ea8370672dba077d74eef4ff403deb8`).
+**Executor (manifest):** not stated in this manifest · checker: claude-sonnet-subagent, fresh context,
+no `ANTHROPIC_BASE_URL` override, no external executor named. `self != executor` holds.
+
+```
+VERDICT: FAIL
+SCOREBOARD: 7/9 criteria met, 2/3 invariants hold
+```
+
+## What I re-ran / re-derived myself this cycle (independent of the manifest and of cycle 0)
+
+1. **Scope of `610ed0e`.** `git show --format= --name-only 610ed0e` → `qa/manifests/iss-346-round-cap-mechanical-check.md`
+   only. `git diff HEAD~1 HEAD --stat` → that one file, `137 insertions(+), 12 deletions(-)`. No code touched.
+2. **Live hook identity.** `Get-FileHash D:/ai_os/.claude/hooks/delivery-gate-stop.ps1 -Algorithm SHA256`
+   → `5D6E09943119B4F26B13C93DD32D8E28BD11099447B13C4D32DED074A51EC162`, matching the manifest's "After"
+   value and the dispatcher's own prefix `5d6e09943119b4f2` exactly.
+3. **`node scripts/lib/mutate.mjs assert-clean`** → `MUTATIONS CLEAN: none outstanding`. `git status
+   --porcelain` empty. No mutation ran this cycle, no mutant on disk.
+4. **C7 audit table, verified by reading the live hook, every citation exact:**
+   - `:378` `$vtPlain = Strip-Code ($vt -replace '\*\*', '')` — matches.
+   - `:388` `elseif ($vtPlain -match '(?m)^[\s\-*#>|]*VERDICT:?\s*PASS') { $unclosed++ } else { $fixgap++ }` — matches.
+   - `Get-ManifestSeam` call sites: `:262`, `:278` — both confirmed inside the `ROUNDCAP` block, which the
+     hook's own comments and structure place at `:212`–`:308`; `MAKER` begins at `:310` (comment: `# predicate
+     MAKER`) and runs to `:459`/460 (`SERIAL-MC` begins at `:461`). Structural claim ("MAKER never calls
+     Get-ManifestSeam") **confirmed** — the two call sites are strictly before `MAKER` starts.
+   - `:375` `if ($mtPlain -match '(?m)^[\s\-*#>|]*Status:\s*ready-for-check')` — legacy-only, confirmed.
+     `:256` `if ($p -notmatch '(?im)^[\s\-*#>|]*(?:Handshake[^\S\r\n]+)?Status:\s*ready-for-check')` —
+     `ROUNDCAP`'s fixed form, confirmed. Every `file:line` in the manifest's C7 table checks out exactly.
+5. **The reproduction (claim 2), re-run independently** in my own throwaway trees, my own script, never
+   reading the manifest's or the builder's test file first:
+   ```
+   LEGACY  Status: field       -> blocked=True   trace=(BLOCK-MAKER path; MAKER-pend trace only logged on non-block completion)
+   CANON   Handshake status:   -> blocked=False  trace=MAKER pend=0 unclosed=0 queue=0 fixgap=0 scheduled=False
+   HOOK SHA BEFORE=5D6E0994...5162   HOOK SHA AFTER=5D6E0994...5162   UNCHANGED=True
+   ```
+   Confirmed exactly: a manifest at only the canonical `**Handshake status:**` field is invisible to `MAKER`.
+6. **The prose-seam count (claim 3), re-derived a THIRD time**, dot-sourcing `Get-ManifestSeam` verbatim
+   from the live hook myself, over this worktree's real `qa/manifests/*.md`:
+   ```
+   total manifests = 171
+   zero-seam       = 18
+   non-zero-seam   = 153
+   ```
+   Same 18, and the same 18 slugs, as both the checker's cycle-0 figure and the builder's cycle-1
+   re-derivation. Three independent extractions now agree exactly.
+7. **The self-referential claim (claim 4), settled with the real extractor** (not a grep for backticked
+   paths anywhere in the file, which is the wrong instrument and is what produced the dispatcher's stray
+   "48"): `iss-346-round-cap-mechanical-check` **is** in the zero-seam list produced by the real
+   `Get-ManifestSeam` over its own `## What changed` section. **The self-referential claim is TRUE**, not
+   an overstatement — this manifest's own seam citations are prose tables, not a single backticked
+   `path/with/slash.ext`, exactly as claimed.
+8. **The cycle-0 correction (claim 5).** Confirmed: the original cycle-0 sentence ("has NOT been written by
+   this unit") is still present, verbatim, under `*(original cycle-0 text, uncorrected, kept for the audit
+   trail):*`, clearly marked, directly below the cycle-1 correction that points at it. Not silently rewritten.
+9. **Capability coverage (claim 6).** Confirmed via `git show HEAD~1:qa/manifests/...md`: the cycle-0 T6 row
+   ended "...not mutation-covered" with **no issue id**. The cycle-1 version adds `ISS-A035913-007` to that
+   exact row and adds four new rows (C7-1, C7-2/3, C7-4, I2). Judgment: this is legitimate enumerated debt,
+   not laundering — T6's redundancy claim was independently verified by the checker at cycle 0 (the
+   separator class absorbs the property), and the four new C7/I2 rows are disclosure rows for criteria the
+   manifest does NOT claim are met; they carry their true state ("affected, not fixed" / "not applicable" /
+   "disclosed as shipped scope limit") rather than dressing up an unmet criterion as covered.
+
+## The central question: can C7 and I2 be satisfied by disclosure alone?
+
+**C7 — partially yes in principle, but this disclosure does not clear it.** C7's own text carries an
+explicit escape hatch: *"the audit result is stated — 'checked, not affected' is an acceptable answer;
+silence is not."* That makes C7 a criterion about the audit being **performed and stated**, not about the
+underlying defect being fixed everywhere — so disclosure is the right instrument in principle, and cycle
+1's stated audit of `MAKER` (rows 1 and 4) is honest, verified, and exactly what C7 asks for **as far as it
+goes**.
+
+**It does not go far enough, and this is a finding I made myself, not one handed to me by the brief.** C7
+requires the audit across *"every predicate **and every sibling hook that shares the pattern**"*, and the
+contract's own "Artifacts under contract" section names `mc-sessionstart.ps1` and `mc-precommit.ps1` as
+in-scope specifically *"because they share the predicate."* The manifest's C7 section states: *"`ROUNDCAP`
+and `MAKER` are the only two predicates in `delivery-gate-stop.ps1` ... So `MAKER` is the only sibling this
+audit needs to cover"* — which answers only the "every predicate [within one file]" branch and never
+mentions either contract-named sibling **hook** at all. I checked both myself:
+
+- `mc-sessionstart.ps1:62` reads a verdict's PASS via `Select-String -Pattern 'VERDICT:\s*PASS|Result:\s*PASS|\*\*PASS\*\*'`
+  directly against the raw file — no `Strip-Code` step — so it is genuinely unaffected by defect 1, and
+  `mc-sessionstart.ps1:35` already reads the canonical `**Handshake status:**` field (D-042/D-043), so it is
+  unaffected by defect 4 too. This is a legitimate **"checked, not affected"** the manifest could have
+  stated in one line and did not.
+- `mc-precommit.ps1:43` — `Select-String -Pattern '^\s*(?:[-*]\s+)?(?:#{1,6}\s+)?[*_]{0,3}Status:[*_]{0,3}\s+ready-for-check'`
+  — requires the literal substring `Status:` at the anchored position. I tested this exact pattern against
+  both field forms in a real PowerShell run:
+  ```
+  legacy match: True
+  canonical-only match: False
+  ```
+  **A manifest written to the current canonical standard is silently excluded from `mc-precommit.ps1`'s
+  pre-commit pending-unit count** — the identical defect-4 class, live, in a **third contract-named
+  artifact**, never mentioned anywhere in this unit's C7 section. Filed as `ISS-A035913-011` (high) in my
+  lane shard `qa/issues.a035913.jsonl`.
+
+So C7 is not merely "disclosure vs. fix" here — the disclosure itself is scoped narrower than the contract
+requires, and when I extended it to the scope the contract actually names, I found a real, live,
+undisclosed instance of the defect class in a hook this unit never looked at. **C7 remains not met**, for a
+different and more specific reason than cycle 0's "silence about `MAKER`."
+
+**I2 — no, disclosure cannot satisfy it, and this is a structural finding, not a builder failure.** I2's
+text is explicit that *"neither [blindness nor noise] is acceptable **as a shipped state**"* — it judges the
+artifact's actual behavior, not whether that behavior has been written down. Three blind spots now ship
+live in the contract's in-scope artifacts regardless of how well they are disclosed: the `MAKER`
+canonical-field blindness (C7-4), the `ROUNDCAP` prose-seam bypass (I2 itself, 18/171 manifests), and the
+newly-found `mc-precommit.ps1` canonical-field blindness. Fixing any of them is a code change to
+`.claude/hooks/*`, which this project's own enforcement-path rule gates behind an `Approved-by` entry — and
+`qa/gates/maker-predicate-canonical-field-and-prose-seam.md` (confirmed present in the main checkout,
+`D:/KnowledgeBase/qa/gates/`, though not yet merged into this worktree's own branch — the file is reachable
+at commit `c4387ef`, which postdates this worktree's branch point `b44a3a2`) is **OPEN — needs the
+Approver**, no `Answered:` line. **This unit cannot lawfully close I2 by any action available to it.** That
+is the legitimate outcome the dispatch brief anticipated: not a failure of technique, but a wall that only
+the Approver can remove.
+
+**C1** follows the same logic as I2 for the same underlying reason (`MAKER` blind to the canonical field is
+literally "not every reader sees every form") and stays not met for the same structural cause.
+
+## Criteria and invariants, this cycle
+
+| | Verdict | Change from cycle 0 | Evidence |
+|---|---|---|---|
+| C1 | **not met** | unchanged | `MAKER` (and now `mc-precommit.ps1`) blind to canonical field; gated to Approver |
+| C2–C6, C8, C9, I1, I3 | met | unchanged | re-confirmed structurally this cycle (scope diff, hook sha, mutate.mjs clean); not re-litigated, cycle 1 touched none of this machinery |
+| C7 | **not met** | reason narrowed but not cleared | audit of `MAKER` is now honest and stated (real progress); audit omits both contract-named sibling hooks entirely, and one of them (`mc-precommit.ps1`) has its own live, undisclosed instance of defect 4 |
+| I2 | **not met** | unchanged | three blind spots now ship live (`MAKER`, prose-seam, `mc-precommit.ps1`); I2 judges shipped state, not disclosure quality, and none of the three can be fixed without the Approver |
+
+## FAILURES
+
+```
+FAILURES:
+- [C7] sev: high · the manifest's Cross-predicate audit states "MAKER is the only sibling this audit
+  needs to cover," answering only the every-predicate-within-one-file branch of C7 and never mentioning
+  mc-sessionstart.ps1 or mc-precommit.ps1, both named as in-scope by the contract's own "Artifacts under
+  contract" section "because they share the predicate." I checked both: mc-sessionstart.ps1 is genuinely
+  unaffected by defects 1 and 4 (Select-String reads raw text with no Strip-Code step; already reads the
+  canonical Handshake-status field) — a "checked, not affected" the manifest could have stated and did
+  not. mc-precommit.ps1:43's pending-unit regex does NOT match a canonical-only "**Handshake status:**"
+  manifest (verified: legacy match True, canonical-only match False) — the identical defect-4 class, live,
+  in a third contract-named artifact, entirely unaudited · fix direction: extend the C7 section to name
+  both hooks and their real status; the mc-precommit.ps1 fix itself needs its own Approved-by entry, but
+  unlike delivery-gate-stop.ps1 it is repo-local and not blocked by ISS-190 · issue: ISS-A035913-011
+- [C1] sev: high · consequence of the above and of cycle 0's finding, not blamed on this unit: not every
+  reader sees every handshake form; MAKER and mc-precommit.ps1 both still miss the canonical field ·
+  fix direction: same code fix as C7's remedy, same authorization gate · issue: ISS-A035913-001 (existing)
+- [I2] sev: high · three blind spots ship live regardless of disclosure quality: MAKER canonical-field
+  blindness, the ROUNDCAP prose-seam bypass (18/171 manifests, re-confirmed a third time), and the newly
+  found mc-precommit.ps1 canonical-field blindness. I2 judges the artifact's shipped behavior, and no
+  code path to fix any of the three is authorized for this unit to take · fix direction: none available
+  to this unit; requires the Approver's ruling on qa/gates/maker-predicate-canonical-field-and-prose-seam.md
+  (or a narrower follow-up gate covering mc-precommit.ps1 specifically, which is NOT blocked by ISS-190) ·
+  issue: ISS-A035913-003 (existing, prose-seam) + ISS-A035913-011 (new, mc-precommit.ps1)
+```
+
+## CAPABILITY-COVERAGE
+
+`CAPABILITY-COVERAGE: 6/8 rows reproduced by my own execution this cycle is not re-run — cycle 1 touched
+no code and the capability table's falsifiable rows (M1–M6) are unchanged from cycle 0, whose reproduction
+I already re-confirmed structurally (scope diff shows zero code change, hook sha unchanged, mutate.mjs
+clean). The four NEW disclosure rows this cycle (T6's issue id, C7-1, C7-2/3, C7-4, I2) are not
+independently falsifiable capabilities of this unit's own artifact — they are audit/disclosure claims,
+judged above on their own evidence, not against a green/red mutation.`
+
+`LIVE-BROWSER: not-applicable (changed path this cycle is qa/manifests/iss-346-round-cap-mechanical-check.md
+only — a markdown manifest, no route/page/component; qa/ui-surfaces.json matches nothing here)`
+
+## Ledger obligations this cycle
+
+- `ISS-346` and `ISS-365` stay `open` — no status moves to `fixed` on a FAIL, unchanged from cycle 0.
+- New finding `ISS-A035913-011` (high) appended to `qa/issues.a035913.jsonl` (lane shard, append-only,
+  never edited in place per D-019).
+- `ISS-A035913-001` through `-010` (cycle-0's rows) are unchanged by this cycle; I did not re-litigate the
+  counting-semantics ruling, the ISS-190 severity promotion, or the ISS-365 count correction — all settled
+  per the dispatch brief and re-confirmed only where the brief asked (claims 1–7 above).
+
+## EXPLANATION
+
+```
+EXPLANATION: Cycle 1 made real, verified progress on C7's letter — it states an honest, reproduced audit
+of the MAKER predicate (defects 1 and 4), corrects its own cycle-0 misstatement visibly rather than
+silently, and its self-referential claim about being in the zero-seam blind class is true (confirmed by a
+third independent extraction, exactly 18/171, exact same slugs). But C7 requires auditing "every predicate
+and every sibling hook that shares the pattern," and the contract names mc-sessionstart.ps1 and
+mc-precommit.ps1 as in-scope specifically because they share this predicate -- neither is mentioned in the
+manifest's C7 section. Checking both myself found mc-sessionstart.ps1 genuinely unaffected (a disclosure
+the manifest could have made for free) and mc-precommit.ps1 carrying its OWN live, undisclosed instance of
+the exact defect-4 class this unit fixed in ROUNDCAP -- filed as ISS-A035913-011. So C7 stays not met, for
+a narrower and more specific reason than cycle 0's outright silence. I2 and C1 stay not met for a
+structural reason the builder cannot fix: both judge the artifact's actual shipped behavior, not whether
+that behavior is documented, and every code path to close them (.claude/hooks/* is an enforcement path)
+needs an Approved-by entry that does not yet exist -- qa/gates/maker-predicate-canonical-field-and-prose-
+seam.md is OPEN with no Answered: line. This is the outcome the dispatch brief anticipated: the unit did
+everything lawfully available to it and cannot PASS until the Approver rules. A further fix cycle on this
+unit's own authorization cannot close C1 or I2 either -- only a code fix can, and that fix is not this
+unit's to make. Scope for this cycle confirmed narrow: 610ed0e touches only the manifest (137
+insertions/12 deletions), the live hook sha is unchanged (5D6E0994...5162, matches the dispatcher's
+verified prefix), and mutate.mjs assert-clean reports none outstanding.
+```
+
+**LIVE-BROWSER:** not-applicable (manifest-only change, no UI surface)
+**ISSUES-WRITTEN:** ISS-A035913-011
+**EXECUTOR:** not stated in manifest (checker: claude-sonnet-subagent)
