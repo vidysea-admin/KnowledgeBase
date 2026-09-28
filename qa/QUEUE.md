@@ -1,3 +1,109 @@
+# QUEUE — checker Mode B sweep 2026-09-28T23:5x+05:30 (consolidated, single agent)
+
+> **Terminal state: `FINDINGS: 5 new` (2 high, 3 medium) + `3 checker_note`s appended.** Range
+> `2a0d5f7..9219d96`, **72 commits**. The sweep ran consolidated rather than 3-sharded because it
+> was ~15 h overdue and the previous 3-shard attempt died with its session having written nothing.
+> **The tree moved mid-sweep** (64 commits at start, HEAD `b44a3a2`; the other loop added 8 more);
+> every check was re-derived and completed at `9219d96`, and the range above is the one actually
+> used — stated explicitly because a previous shard silently ran a superseded range and every one of
+> its findings had to be re-verified by hand.
+>
+> **Filed: ISS-367 (high), ISS-368 (high), ISS-369, ISS-370, ISS-371 (medium).**
+> **Appended: ISS-358, ISS-267, ISS-248.**
+>
+> **ISS-367 — `pnpm lint:structure` is an `&&` chain, and four of its ten stages have never been
+> observed.** This is the finding of the sweep. The chain short-circuits on `lint-loc`, which has
+> been red for a long time, so `lint-dirsize`, `lint-root`, `snapshot --check` and `tracker-audit`
+> have been dark. Run separately, **five** stages are red: `lint-loc` (5), `lint-dirsize` (1 —
+> `apps/api/src` 32 files against a budget of 31), `lint-root` (1 — 17 loose root files against 15),
+> `snapshot --check` (**`docs/SNAPSHOT.md` stale, 95 lines differ from a fresh regeneration**), and
+> `tracker-audit --gate G1,G4` (6 findings). The dirsize breach is *in range and attributable*:
+> `apps/api/src` went 31→32 via the sole added file `apps/api/src/ask-web-fallback.ts` in `d23d464`
+> (ISS-274) — a unit whose manifest is literally headed *"pre-existing failure, NOT a regression from
+> this unit"*, pasting only `lint-loc`'s output, and whose **verdict re-ran the command and
+> concurred**. Both conclusions rest on output that never reached stage 2. That is not a lapse by
+> either party: the command genuinely cannot show them stage 2.
+>
+> Filed as the **shared root cause** of a class, not another instance of it. ISS-058, ISS-100,
+> ISS-136 and ISS-222 are each a closed instance of "a manifest claimed `lint:structure` green or
+> mis-attributed its red"; all four are `fixed`/`verified`, and **none names this mechanism** — which
+> is exactly why the class kept recurring. It also bears directly on this project's own Definition of
+> done items 1 and 2.
+>
+> **`docs/SNAPSHOT.md` deserves its own line.** The user-level memory records it as the read-first
+> digest whose staleness is supposed to be gated by `pnpm lint:structure`. It was last regenerated at
+> `7616beb`, *before* this range. The gate that was meant to catch that is the one behind the
+> short-circuit.
+>
+> **ISS-371 is the cheap prerequisite and is ranked first for that reason.** `loc.testPatterns`
+> covers `.test.ts` and `^test_*.py` but **not** `.test.mjs`, while `.mjs` *is* in `loc.extensions` —
+> so all 12 `.mjs` test files are judged against the 300-line **source** budget instead of `testMax`
+> 400. `scripts/lib/dispatch-state.test.mjs` sits at 332 counted lines: over 300, comfortably under
+> 400. One pattern entry drops `lint-loc` from 5 violations to 4 **without touching a single source
+> file**, which materially changes ISS-367's masking picture. Fix it first, then re-measure.
+>
+> **ISS-368 — a read failure is being reported as health.** `detectSilentWatchers`
+> (`apps/api/src/routes/health.ts:102-106`) catches a `listHeartbeats` throw and `continue`s, so a
+> tenant whose heartbeat collection is unreadable contributes **zero** silent watchers — an output
+> byte-identical to "all watchers fresh". This contradicts D-048 as restated in that unit's own
+> header comment (*a missing row is treated as maximally stale, not as healthy*). The unit's standing
+> test **pins the wrong answer**: it asserts `detectSilentWatchers(deps) === 0` for a tenant that
+> under D-048 owes 3 stale alerts, so it passes on both the correct and the broken implementation.
+> This is the "a check asserting a state the bug also produces" trap, caught in the wild.
+>
+> **Two corrections recorded against this session's own earlier reporting, not buried:**
+> 1. I told the user `lint-loc` stood at **3** violations "down from 4". **It was 4.**
+>    `packages/index/src/pipeline/speakers-llm.ts:313` is a real violation my post-merge gate output
+>    dropped — I read a truncated tail and lost both the `FAIL — N violation(s)` header and the first
+>    file line. Re-derived directly: `node scripts/lint-loc.mjs` at HEAD prints **5**. The one thing
+>    that was right is that `speaker-name-rules.ts` did leave the list.
+> 2. The dispatch brief handed the sweep that same wrong baseline of 3. The sweep caught it and said
+>    so. Recorded here because a brief that ships a wrong baseline can launder it into a finding.
+>
+> **Not ranked, and why — `ISS-267` is the highest-value governance item on the board and is still
+> going to a HUMAN_GATE.** Its only fix site is `.claude/hooks/mc-sessionstart.ps1`, a non-security
+> seam now at **4** PASSed touching units against D-014's cap of 2, and D-052 ruling 1 sequences
+> ISS-346 ahead of any cap decision on that file. Per D-013's round cap that is a gate, not a unit —
+> `qa/gates/mc-sessionstart-handshake-reader-round-cap.md`. ISS-370's hook half is held for the same
+> reason; its `dispatch-state.mjs` half may be separable.
+>
+> **Verified clean and worth stating, since a sweep that only reports problems misleads:** zero
+> bypasses (every code-bearing commit in range traces to a manifest *and* a verdict); zero untracked
+> verdicts, manifests or ledger shards; all 12 hooks across `.claude/hooks/` and `.codex/hooks/`
+> wired, with no orphan, no dead entry and no double-wiring; **every** enforcement-path change in
+> range carries an authorizing entry with `Approved-by`, read from commit **bodies** not subjects
+> (`1f263e0`→D-043, `ca86e53`+`0cf1b17`→D-050-SPEAKER, `f8fc81e`+`398dfff`→D-050-CODEX,
+> `bdc755b`→comment-only under D-051); no checker touched code, a manifest or a contract outside
+> checker-owned paths; both `STALLED` units have their `qa/debug/` diagnosis on disk; and the ledger
+> reader and the disk agree at **17 shards**.
+>
+> **Tier-3 reachability, measured rather than asserted:** of the units PASSed in range, roughly half
+> (u4a, u4b, u4c, u4b-heartbeat, iss-274) are roadmap-derived and half are the loop's own machinery.
+> `.goal/goal.json`: **51 done, 2 in progress, 31 pending**. That is no longer the structurally
+> unreachable tier 3 of 2026-09-08, so no goal-coverage row was filed.
+>
+> **Honest gaps, named rather than implied:** `pnpm -r test` and `depcruise` were **not run** (the
+> suite is long and `packages/meeting-bot` carries the ISS-360 load flake, so no honest single-run
+> claim was available; `depcruise` is stage 10 and unreachable behind ISS-367 anyway) — **no
+> test-count or dependency-boundary claim is made anywhere in this sweep**. Contract staleness was
+> **sampled, not swept** (only the one contract amended in range was verified). Whether
+> `lint:structure`'s later stages were also red at `2a0d5f7` was not measured; only the
+> `apps/api/src` 31→32 breach is attributed in range.
+
+## Top 3 next units — strict D-013 tier order
+
+| # | unit | tier | why now | cap check |
+|---|---|---|---|---|
+| 1 | `iss-371-loc-testpatterns-mjs` then `iss-367-lint-structure-no-shortcircuit` | 2 (high) | ISS-371 is one config entry and drops `lint-loc` 5→4, changing ISS-367's picture; ISS-367 then un-masks four gate stages that back this project's own Definition of done | 0 prior PASSes on `package.json` / `scripts/lint-*.mjs` / `structure.config.json` — clear |
+| 2 | `iss-368-heartbeat-read-failure-is-not-health` | 2 (high) | the seam the last three units were built to deliver, and the defect makes R2's own guarantee unfalsifiable; its standing test currently passes on the broken implementation | `apps/api/src/routes/health.ts` has 1 prior PASS — under the cap of 2 |
+| 3 | `ISS-282` / U2.4 phase-3 precision re-gate | 2 (critical) → 3 | a critical row over a manifest at `ready-for-check` with two cycle-0 FAILs; U2.4 is the single roadmap item before the Phase-1 exit clause, so closing it turns a tier-2 critical into tier-3 progress | paused at `qa/.paused.u2-4-phase3-precision-regate` — resolve the pause first |
+
+**In flight at this stamp (not queue rows):** `iss-346-round-cap-mechanical-check` and
+`iss-104-place-vs-person-signal`, both dispatched this tick to worktrees, both authorized
+(D-043 item 2 / D-052 rulings 1–2).
+
+---
+
 # QUEUE — checker Mode B sweep 2026-09-28T02:xx+05:30 (shard-3 re-run against the correct range, consolidated)
 
 > **Correction to the 2026-09-28T00:0x pass below: shard 3 had run against the WRONG, already-
