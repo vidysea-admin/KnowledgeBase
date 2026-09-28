@@ -22,5 +22,6 @@
   "meeting_candidates": [{ "keys": { "tenantId": 1 } }, { "keys": { "tenantId": 1, "messageId": 1 }, "unique": true }, { "keys": { "tenantId": 1, "status": 1 } }],
   "trusted_senders": [{ "keys": { "tenantId": 1 } }, { "keys": { "tenantId": 1, "senderDomain": 1 }, "unique": true }],
   "watch_state": [{ "keys": { "tenantId": 1 } }, { "keys": { "tenantId": 1, "sourceType": 1, "sourceId": 1 }, "unique": true }],
-  "watch_reports": [{ "keys": { "tenantId": 1 } }, { "keys": { "tenantId": 1, "runAt": 1 } }]
+  "watch_reports": [{ "keys": { "tenantId": 1 } }, { "keys": { "tenantId": 1, "runAt": 1 } }],
+  "watch_heartbeat": [{ "keys": { "tenantId": 1 } }, { "keys": { "tenantId": 1, "sourceType": 1 }, "unique": true }]
 }
