@@ -324,6 +324,14 @@ Nothing else is claimed. In particular this unit does **not** claim ISS-255, ISS
 
 ---
 
-## Status: ready-for-check
+## Status: checked-PASS
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
+
+**Close-out:** `/checker` returned **PASS** at `Cycle checked: 0`, matching this manifest's
+`Fix cycle: 0`. Verdict: `qa/verdicts/iss-104-place-vs-person-signal.md`, committed `923aea2`.
+Capability coverage 3/3 rows reproduced with 3/3 controls clean, in the checker's own throwaway
+copies. **ISS-104 remains `open` at `critical`** — this unit is a disclosed partial fix (19/20 of
+its recorded reproductions), not a close. ISS-SPKDATA-001 flipped `open -> fixed` by the checker.
+New finding **ISS-104CC-3** (medium): the false-positive cost is nearer **32%** than the 15% this
+manifest reported, because the refusal is candidate-independent; filed, not fixed here.
