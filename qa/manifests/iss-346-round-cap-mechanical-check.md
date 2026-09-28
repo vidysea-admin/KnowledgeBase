@@ -601,6 +601,27 @@ comma-list assertion red — see **Actual outputs**).
 
 ---
 
-## Status: ready-for-check
+## **Status:** checked-PASS (cycle 1)
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
+- Cycle 0 **FAIL** (H3's regex unsound on real newest-first-archive verdicts) -> cycle 1 **PASS**,
+  verdict `qa/verdicts/iss-346-round-cap-mechanical-check.md` (cycle-0 FAIL preserved verbatim
+  below an `# ARCHIVE` marker; verdict files here read newest-cycle-first). Merged to master.
+- The checker **ruled on the assertion-4b rewrite instead of accepting it**: legitimate, because the
+  OLD 4b encoded H3's rejected model, the more permissive reading that lets a seam with a
+  later-superseded PASS dodge the cap -- the exact failure direction this unit exists to close. The
+  hook's own comment documents 21 verdicts disagreeing first-vs-last (17 FAIL->PASS, 4 PASS->FAIL)
+  and names over-counting as the safe direction, since a false block clears with one `Round cap:` line.
+- **Both falsifications hold, reproduced by the checker's own mutations:** reverting H1 reddens the
+  null-unroll guard, and inverting D-014's security-class exemption to count-based reddens 2
+  assertions. That second one is the ISS-078 protection -- the reason the cap is class-based at all.
+- The disclosed capability-coverage gap was **closed, not carried**: the checker found 3 of the 5
+  un-re-run anchors still present verbatim in the 823-line hook and re-mutated all three itself;
+  C4 is legitimately superseded and now covered by assertions 11/12, C6 by the diff-apply test.
+- **Still owed by the Approver, not by this unit:** the one remaining hunk (comma-separated line
+  ranges, `:12,40-44`) is verified re-applicable at `--fuzz=0` against the live hook's current sha
+  `5d6e0994` but is deliberately **NOT applied**. Landing it in `D:/ai_os` is gated behind
+  `qa/gates/ai-os-enforcement-hooks-uncommitted.md`.
+- Unblocks **D-052 ruling 1**, which held the `mc-sessionstart.ps1` round-cap question until this
+  unit landed so the decision is made against a working instrument rather than an argument.
+- `ISS-ISS346-001` closed `open -> fixed` by the checker with evidence. No new issues this cycle.
