@@ -1,3 +1,15 @@
+## TODO — speaker-name-rules.test.ts is 8 lines from its gate budget
+
+| unit | tier | why | files | schema | surface | consumes | runtime |
+|---|---|---|---|---|---|---|---|
+| `speaker-rules-test-file-split` | 5 (contract gap / gate budget) | `packages/index/src/pipeline/speaker-name-rules.test.ts` sits at **392 of testMax 400** after iss-104-place-vs-person-signal. The NEXT corpus added on this seam breaks the `lint-loc` gate, and this seam takes a corpus nearly every unit (D-015 requires each fix to carry its issue's recorded reproductions, which only grows the file). Split by concern before that happens, not after a red gate forces it. | `packages/index/src/pipeline/speaker-name-rules.test.ts` (+ the new sibling test files) | no | none — test-only | `speaker-name-rules.ts`, `speaker-name-data.ts` | none |
+
+Surfaced by the iss-104 build, not by a checker — recorded here rather than in the ledger because
+the maker is not the ledger's writer. **Depends on ISS-371** (`loc.testPatterns` omits `.test.mjs`)
+only in spirit, not mechanically: this file is `.test.ts` and is already correctly judged against
+`testMax` 400, so ISS-371 does not move this number.
+
+---
 # QUEUE — checker Mode B sweep 2026-09-28T23:5x+05:30 (consolidated, single agent)
 
 > **Terminal state: `FINDINGS: 5 new` (2 high, 3 medium) + `3 checker_note`s appended.** Range
