@@ -262,4 +262,53 @@ red-after command output, and reverted with a byte-level (`cmp`) restoration che
 | 2 | The ceiling is genuinely lifted (`speaker-name-rules.ts` has real headroom, not merely "currently under 300 by coincidence") | Inserted a 79-line filler-comment block (one contiguous hunk) into `speaker-name-rules.ts` right after the new import line, pushing it from 222 to 301 non-blank lines | `node scripts/lint-loc.mjs` → `speaker-name-rules.ts` absent from the violation list (4 violations, all pre-existing) | Same command → `speaker-name-rules.ts:301 (budget 300)` appears as a 5th violation | Reverted via backup copy; `cmp` confirmed byte-identical to pre-mutation file; re-ran → back to the same 4 pre-existing violations |
 | — | **CONTROL** — an unrelated, stable behavior that must NOT be affected by either mutation above (proves the mutations are localized, not a global break) | *(no edit — run during each mutation above)* | `pnpm test` in `packages/index` → 285/285 (baseline, captured separately above) | Re-ran **during mutation 1** → still 285/285. Re-ran **during mutation 2** → still 285/285 | N/A — this row is the control; it is expected to stay green throughout, and did |
 
-## Status: ready-for-check
+## Status: checked-PASS
+
+**Handshake status:** checked-PASS (Cycle checked: 0, verdict
+`qa/verdicts/speaker-rules-data-module-extraction.md` committed 42b11fc, VERDICT: PASS,
+CAPABILITY-COVERAGE 3/3 rows reproduced by the checker in its own throwaway copy,
+LIVE-BROWSER not-applicable, ISSUES-WRITTEN: ISS-SPKDATA-001 medium) - closed out 2026-09-28.
+
+**What this unit did:** lifted the `loc.max` ceiling that had blocked ISS-104. `speaker-name-rules.ts`
+300/300 -> 222/300 non-blank lines (78 headroom); new `speaker-name-data.ts` at 97/300 (203
+headroom). Two data blocks moved out, one import line in, every logic function and every other
+constant byte-for-byte untouched.
+
+**What it did NOT do: ISS-104 stays open and critical.** This unit changed no behavior whatsoever -
+that is its acceptance condition, not a shortfall. The audit still reports 0/409 live bypasses on the
+enumerated closed-class words, and ISS-104's actual residue is untouched and not word-list-shaped:
+India, Mumbai and Google are gazetteer-bound, each with a person-valid twin of identical syntax.
+Nothing here may be cited as progress on the fabrication defect. What changed is that the next word
+now fits.
+
+### Correction recorded rather than quietly fixed - ISS-SPKDATA-001 (medium)
+
+**This manifest's own mechanical word-count proof states the wrong numbers.** It reports
+`NEVER_A_PERSON` at **426 raw / 425 unique**. The true figures are **422 raw / 421 unique**.
+
+Cause: the counter extracted string literals from the `Set` literal body **without stripping `//` and
+`/* */` comments first**, so four quoted strings sitting inside this block's doc-comment prose were
+counted as denylist entries - among them an issue's `fix_direction` phrase and a full sentence.
+
+Two independent confirmations, one of which had made the same mistake first: the orchestrator caught
+the figure before relaying it (its own first count reproduced the identical error until it stripped
+comments), and the checker then wrote its own comment-aware extractor and got 422/421 on both the
+merge-base file and the new data file, with full multiplicity match including the duplicate
+`everyone` twice on each side.
+
+**The byte-identical-data conclusion still HOLDS** - both sides of that diff were produced by the same
+flawed counter, and the checker re-derived the equality independently. The defect is the reported
+figure, which would mislead a future reader. Filed medium per the D-013 severity gate: a one-line
+ledger entry, not a blocker, and deliberately not in the verdict's FAILURES list.
+
+**Corroborating arithmetic, independently reconciled by both the checker and the orchestrator:**
+`closed-class-audit-words.json` declares `totals: {words: 409, setA: 299, setB: 110}`, its
+`excludedCollectiveAddress.words` holds exactly 12 entries, the set difference between the real
+denylist and the enumerated words is exactly those 12 and nothing else, and 421 - 12 = 409.
+
+### Scope judgement the checker upheld
+
+`DEMONSTRATIVE_CUES` was moved alongside `NEVER_A_PERSON`. Judged in scope: D-050-SPEAKER ruling 1's
+`Changes-authorized` is file-level ("`speaker-name-rules.ts` plus one new sibling data module"), not
+restricted to a named constant; both constants have exactly one use site each and no external
+importer anywhere in the repo; and the move was disclosed in this manifest rather than buried.
