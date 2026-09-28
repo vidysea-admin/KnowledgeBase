@@ -20,31 +20,40 @@ out of scope by D-043 item 3's own text (verdict-side, a separate concern).
 `.claude/hooks/mc-sessionstart.ps1` is an enforcement path under the project CLAUDE.md, so
 `Changes-authorized` alone is insufficient. **D-043 carries `Approved-by: Umesh`** and its
 `Changes-authorized` line names this exact file and change: `.claude/hooks/mc-sessionstart.ps1 (parse
-**Handshake status:** for the pending/closed-out counts)`. D-043 item 3's body text: *"The session-start
-hook reading the canonical handshake field (ISS-350 reproduction 2, and the reader half D-042
-explicitly left undone): `mc-sessionstart.ps1` must compute `Checks pending` and `PASS not closed out`
-from `**Handshake status:**` rather than from a single bolded-`Status` grep."*
+**Handshake status:** checked-PASS -- closed out 2026-09-28 against verdict cycle 0 (VERDICT: PASS, commit
+2b5acc8, merge b1c32fc). SCOREBOARD 6/6 claims independently re-derived, 3/3 authorization checks hold.
 
-`scripts/lib/dispatch-state.mjs` and `scripts/lib/dispatch-state.test.mjs` are **not** enforcement
-paths (not under `.claude/hooks/*`, `.claude/settings.json`, `CLAUDE.md`, `.claude/rules/*`, or
-`scripts/append_decision.ps1`), so no authorizing entry is needed for them.
+**The merge hazard was the crux and the checker settled it properly.** This worktree branched at 8cf88fc,
+and master had since changed the same file (`ca86e53` / `0cf1b17`, the ISS-307 stall-check fix authorized by
+D-050-SPEAKER ruling 2). The builder declined to re-fast-forward mid-unit with uncommitted edits in a shared
+file and flagged it for the merge step -- the right call. The checker then trial-merged with
+`git merge-tree --write-tree` (clean, exit 0), extracted the merged tree to a throwaway copy, and re-ran
+everything against BOTH fixes applied: 22/22 handshake, 4/4 master's stall-detect suite, 4/4 ledger-union,
+plus a live hook run with no false `STALL UNDIAGNOSED` banner and no spurious disagreement. A verdict that
+passed this unit in isolation and clobbered an authorized fix on merge would have been worse than a FAIL.
 
-**Deliberately NOT touched, though named in the same brief:**
-- **`delivery-gate-stop.ps1`** — does not exist in this repo. It lives at
-  `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1`, registered machine-wide in the user-level
-  `C:\Users\Lenovo\.claude\settings.json`, so it fires in every project on this machine. D-043 is a
-  decision of this repo and cannot authorize a change there. `qa/gates/d043-machine-wide-scope.md`
-  (opened 2026-09-28, commit `7867c99`) says exactly this and blocks D-043 items 1-2 on it while
-  explicitly clearing item 3 — this unit — as "genuinely repo-local ... being built now as
-  `handshake-field-reader`". That gate file is **not present in this worktree's tree** (my HEAD
-  predates the commit that added it on `master`); I read it read-only via
-  `git show 7867c99:qa/gates/d043-machine-wide-scope.md` rather than pull it in, since merging further
-  master history mid-unit would fold other lanes' commits into a diff scoped to two files. Not edited,
-  not inspected as a live file, exactly as instructed.
-- **`verdictCycle()`** in `dispatch-state.mjs` — untouched. Its newest-first-max approach was read as
-  the model for `isReadyForCheck()`'s own multi-statement handling, but D-043 item 3 / ISS-350
-  reproductions 3-4 (the verdict-side `VERDICT:` vs `Verdict:` split, and newest-cycle-first verdict
-  ordering) are a separate, out-of-scope concern.
+**Checked beyond the claims:** all three legacy `Status` forms; disagreement surfacing in both directions
+(a real conflict must fire, a canonical-only manifest must not); an independent live scan of all 162
+manifests confirming the backtick fix gives 0 disagreements; and the widened PASS-closeout pattern checked
+by hand against all 161 real verdict files -- **17 new matches, every one a genuine PASS in a format the old
+regex missed, zero false positives.**
+
+**ISS-350: reproduction 2 of 4**, and the accounting is honest -- the checker found it matches the ledger's
+own `checker_note` almost verbatim. The code fix is delivered but verified against a **constructed fixture,
+not a live reproduction**, because zero of 162 manifests are in the canonical-only blind state today.
+Reproductions 3-4 (the verdict-side `VERDICT:`/`Verdict:` split, newest-first ordering) are deliberately
+left open as outside D-043 item 3's scope, and are named rather than omitted, per D-015.
+
+**Issues filed, neither blocking, both in the lane shard `qa/issues.a0cdaee.jsonl` per D-019:**
+- **ISS-A0CDAEE-001 (medium)** -- `manifestCycle()` shares the identical backtick false-positive class this
+  unit fixed in two sibling functions. 0/162 misreads today, but only because the quoted mention happens to
+  sit after the real field in all 10 manifests that have one: an ordering coincidence, not a design.
+  Confirmed by fixture (reads 9 instead of the real 1 when the quote comes first). Correctly out of scope.
+- **ISS-A0CDAEE-002 (low)** -- a record-accuracy correction against **this session's own D-049**, which
+  claims item 3 was "built and PASSed as `ledger-shard-union-reader`". That is false: that unit's
+  checker-corrected manifest shows it touched only the D-019 ledger-union lines and never the handshake
+  field. **`handshake-field-reader` is the actual first delivery of D-043 item 3.** The error is mine, in
+  D-049's prose; the authorization itself is unaffected, and D-043 item 3 remains valid on its own terms.
 
 ## Worktree ancestry (recorded per a mid-task coordinator instruction)
 
@@ -298,5 +307,5 @@ Reproductions 3-4 deliberately left open, out of D-043 item 3's scope.**
   ISS-307 fix, other lanes' merges) — flagged above for the merge step, not resolved here.
 - Does not claim a PASS. Only `/checker` can PASS this unit.
 
-## Status: ready-for-check (cycle 0)
+## **Status:** checked-PASS (cycle 0)
 **Handshake status:** ready-for-check
