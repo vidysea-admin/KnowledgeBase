@@ -341,4 +341,55 @@ above, not self-marked fixed here.
 
 ## Fix cycle: 0
 
-**Status:** ready-for-check
+**Status:** checked-PASS (cycle 0)
+
+**Handshake status:** checked-PASS -- closed out 2026-09-28 against verdict cycle 0 (VERDICT: PASS, commit
+ce67554, merge a5dd849). SCOREBOARD 8/8 claims evidenced, capability-coverage 9/9 rows reproduced,
+ISSUES-WRITTEN: none.
+
+**This unit shipped the fallback, not the primary approach Umesh chose, and that is recorded plainly.**
+He answered `iss-355: c` (links). D-050-CODEX pre-authorized a parity-lint fallback "if links proved
+unworkable", and its literal trigger was *"if it does not resolve"* under `-File` -- which links **do**.
+So the narrow trigger was not hit. What the builder found, and the checker reproduced independently, is that
+the resolve test was never the requirement that mattered:
+
+- a **hard link** is severed by `git checkout` and by any write-replace edit (the checker reproduced this
+  with different tooling than the builder used -- a Node `fs.writeFileSync` -- rather than re-running its
+  transcript);
+- a **directory junction** cannot be stored by git at all: its contents commit as plain `100644` blobs, and
+  the checker's decisive test was an **actual fresh `git clone`** of a junction-backed commit, which
+  materializes an ordinary unlinked file where edits no longer propagate.
+
+Since `git worktree add` is this repo's routine concurrency primitive under D-019, "impossible to drift by
+construction" was never achievable -- the worktree this unit was built in came into existence with six
+unlinked copies. The checker ruled the extension from "does not resolve" to "fails at the point that
+actually matters" a **defensible, disclosed** reading of the decision's own purpose rather than a
+re-litigation, and found no superior undiscussed alternative: a gitattributes filter or post-checkout hook
+needs the same per-clone `git config` re-establishment, so it is the same failure class, not an escape.
+
+**The junction was dismantled, not merely unused** -- invisible to `git status`, and a junction-unaware
+recursive delete anywhere in this repo's tooling could follow it into `.claude/hooks/` and damage the real
+enforcement hooks. Removing it was a safety call, not tidiness.
+
+**On whether a parity lint answers ISS-355 or reinstates the condition it was meant to end, the checker's
+answer is "both, honestly disclosed" -- and that is the correct answer.** D-050-CODEX's own reasoning,
+*"the problem is the copying, not the copier's care"*, is an argument for **deletion**, which that same
+entry had already rejected on the ground that an unguarded Codex session in a Lab Protocol repo is worse
+than a stale mirror. With deletion off the table and links proven non-durable, the lint is what remains. It
+is **not** impossible-by-construction and the manifest says so itself. What it does is convert ISS-355's
+actual complaint -- silent, unauthorized, undetected divergence -- into a check enforced on every push and
+PR; the checker confirmed `.github/workflows/ci.yml` really runs `pnpm lint:structure`, so this is CI-gated
+rather than an optional local step. Residual gap, disclosed not hidden: an unpushed local branch can still
+drift briefly.
+
+**Defects closed.** Both previously-regressed mirrors (`mc-sessionstart.ps1`, `mc-precommit.ps1`) are
+byte-identical to their originals on a **raw** diff, not merely `--strip-trailing-cr` -- stronger than the
+manifest claimed. The checker also introduced its own one-line divergence in a throwaway copy and watched
+the lint go red naming that file, then confirmed a line-ending-only flip stays green: the CRLF qualifier
+matters because `features-snapshot-session-end.ps1` previously differed by line endings alone and was never
+part of the defect.
+
+**Ledger disposition (checker-owned):** ISS-355 and ISS-268 moved `open -> verified`, each with
+`regression_check: node scripts/lib/lint-codex-hooks.mjs`, meeting the confirm-once/fix-reverted bar in the
+same pass rather than stopping at `fixed`. ISS-268's long-open disposition question is answered: sanctioned,
+with the lint. The mirror also now carries the authorizing entry it never had, which was half of ISS-355.
