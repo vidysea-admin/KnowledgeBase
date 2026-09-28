@@ -1,7 +1,7 @@
 # Manifest — iss-346-round-cap-mechanical-check
 
 **Status:** ready-for-check
-**Fix cycle:** 0 of max 3
+**Fix cycle:** 1 of max 3
 **Issues addressed:** ISS-346, ISS-365
 **Round cap:** not applicable — 0 prior PASSed units touched the `delivery-gate-stop.ps1` seam.
 Measured, not asserted: 7 verdicts *mention* that filename and **0** PASSed units' manifests name it in
@@ -10,6 +10,112 @@ own check re-derives that number, which is the smallest possible dogfood.
 **Persona walk:** skip — the only changed runtime file is a Stop hook (`.claude/hooks/`), plus a test and
 two probes under `qa/`. `ui-surfaces.json`'s pattern matches none of them, no route, component or page is
 touched, and the artifact has no rendered surface for a persona to walk.
+
+## Cycle 1 — what changed and why
+
+Cycle 0's verdict (`qa/verdicts/iss-346-round-cap-mechanical-check.md`, `VERDICT: FAIL`, 7/9 criteria,
+2/3 invariants) FAILed this unit on **[C7]**: one of the four defects fixed in `ROUNDCAP` — D-042's
+canonical `**Handshake status:**` field (defect 4) — is live and **silent** in the sibling `MAKER`
+predicate of the same file, and this manifest audited a different, lesser defect across that boundary
+while saying nothing about the more dangerous one. **[C1]** is scored as a consequence, not blamed on
+this unit. **[I2]** raised a second undisclosed blind class: a candidate escapes the round cap entirely
+by naming its seam in prose instead of a backticked path.
+
+The checker's own guidance is that this cycle is narrow: "C7 asks for the audit to be *stated*", not for
+the `MAKER` code fix or the seam-grammar fix, both of which sit outside what D-049 authorizes (D-049
+names the ISS-346 `ROUNDCAP` check specifically; extending it to a second predicate or to the seam
+extractor would be the same "authorization is a waiver" move already refused for D-043 — see
+`qa/gates/mc-sessionstart-handshake-reader-round-cap.md`). Cycle 1 therefore does exactly three things,
+none of them a code change to the machine-wide hook:
+
+1. adds the **Cross-predicate audit (C7)** section below, auditing each of the four defects against the
+   `MAKER` predicate by name, `file:line`, and my own reproduction — not asserting "not affected" anywhere
+   I did not actually check;
+2. adds the **Disclosed blind class — prose-seam bypass (I2)** section below, with my own independent
+   re-derivation of the corpus count (checker measured 18/171; I re-derived it from scratch before reading
+   this sentence — see that section);
+3. updates the **Capability coverage** table so the T6 `UNVERIFIED` row carries its assigned id
+   `ISS-A035913-007`, and adds rows for the two audits above.
+
+One correction carried from the verdict rather than repeated: this manifest's cycle-0 text below (under
+"What this unit does not fix") said the D-049 shared-log obligation "has NOT been written by this unit."
+**That is inaccurate and the checker caught it.** The entry exists at `D:/ai_os/decisions/log.md`, dated
+2026-09-28, item 3 ("Machine-wide Stop hook `delivery-gate-stop.ps1`: three fixes …"), citing D-049 and
+this predicate. It is **stale** — it records `after 28c1ae44…7337`, which is this unit's *pre*-state, and
+`grep -c 5d6e0994 D:/ai_os/decisions/log.md` = 0 — so the shared log has no trace of this unit's five
+counting fixes or the resulting byte state. The obligation is stale, not absent. Filed as
+**ISS-A035913-005** (the checker's id; I did not re-file it). The cycle-0 sentence below is left in place
+for the historical record of what this manifest originally claimed, with this correction pointing at it.
+
+## Cross-predicate audit (C7)
+
+The contract's C7 criterion requires every defect this unit fixed in `ROUNDCAP` to be checked against
+every other predicate in the same file, with the result **stated** — "checked, not affected" is
+acceptable; silence is not. `ROUNDCAP` and `MAKER` are the only two predicates in
+`D:/ai_os/.claude/hooks/delivery-gate-stop.ps1` that read `qa/manifests/*.md` at all (confirmed by
+`Select-String -Pattern 'qa/manifests|qa\\manifests'` over the file: the two predicate blocks at
+`ROUNDCAP` (approx. lines 212–308) and `MAKER` (lines 310–459), and nothing else). So `MAKER` is the only
+sibling this audit needs to cover.
+
+| # | Defect fixed in `ROUNDCAP` | `MAKER` predicate: affected? | `file:line` | Evidence |
+|---|---|---|---|---|
+| 1 | Result line read through `Strip-Code`, destroying a fenced `VERDICT: PASS` | **Affected, and NOT fixed** — live and silent-in-effect-on-the-message | `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1:378` (`$vtPlain = Strip-Code ($vt -replace '\*\*', '')`) feeding the match at `:388` (`elseif ($vtPlain -match '(?m)^[\s\-*#>|]*VERDICT:?\s*PASS') { $unclosed++ } else { $fixgap++ }`) — the exact pre-fix `ROUNDCAP` reading. **Direction confirmed same as the checker's finding, filed as ISS-A035913-002 (medium, not high):** `$backlog = ($pend + $unclosed + $queue + $fixgap) -gt 0` still blocks either way, so the gate stays loud; what breaks is which counter takes it — a fenced PASS lands in `$fixgap` (reported "owes a fix cycle") instead of `$unclosed` (correct: "PASS not closed out"). Not re-measured by me beyond confirming the code path; the checker's own reproduction (`fixgap=1` where `unclosed=1` is correct, on 76 of 170 verdicts) stands. |
+| 2 | `Get-ManifestSeam`'s `return $set` unroll (empty/one-element HashSet degraded to `$null`/substring match) | **Not applicable — `MAKER` never calls `Get-ManifestSeam`.** Verified by `Select-String -Pattern 'Get-ManifestSeam' D:/ai_os/.claude/hooks/delivery-gate-stop.ps1`: both call sites (`:262`, `:278`) are inside the `ROUNDCAP` block (`:212`–`:308`), strictly before `MAKER` begins at `:310`. `MAKER` has no seam concept at all — it counts `pend`/`unclosed`/`queue`/`fixgap` per manifest, never a cross-manifest file overlap. | n/a — structurally unreachable, not merely untested | `grep -n Get-ManifestSeam` output pasted above; no reproduction needed because there is no code path to exercise |
+| 3 | `` `file:line` `` citation form rejected as a seam | **Not applicable, same reason as #2** — the citation-suffix regex lives inside `Get-ManifestSeam`, which `MAKER` never calls | n/a | same grep as row 2 |
+| 4 | Candidate scan read only the legacy `Status:` field, missing D-042's canonical `**Handshake status:**` | **Affected, and NOT fixed — live and SILENT** (this is [C7]'s finding) | `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1:375` — `if ($mtPlain -match '(?m)^[\s\-*#>|]*Status:\s*ready-for-check')`, legacy-only, no `(?:Handshake[^\S\r\n]+)?` alternation (contrast `ROUNDCAP`'s fixed form at `:256`) | **Reproduced myself, real hook binary, two throwaway trees, byte-identical hook before/after:**<br>`A: legacy Status: field  → blocked = True` (`BLOCK-MAKER`, "1 check(s) pending")<br>`B: canonical **Handshake status:** field only → blocked = False`, trace `MAKER pend=0 unclosed=0 queue=0 fixgap=0 scheduled=False`<br>A manifest written to the current canonical standard makes the pending-handshake gate go completely quiet under `MAKER` — the ISS-266/ISS-267 class the hook was changed to fix, still live through this door. Filed as **ISS-A035913-001** (high, the checker's id — I did not re-file it). |
+
+**What this audit does and does not authorize.** Stating rows 1 and 4 here is the disclosure C7 asks for.
+Neither row's *fix* is in scope: `.claude/hooks/*` is a user-level enforcement path, D-049's
+`Changes-authorized` names the `ROUNDCAP` predicate specifically, and it does not extend to `MAKER` or to
+the seam grammar. `qa/gates/maker-predicate-canonical-field-and-prose-seam.md` is the standing `HUMAN_GATE`
+for both fixes, raised by the previous tick, still `OPEN`, needing the Approver. This cycle changes nothing
+about that gate — it only makes sure the manifest itself states the audit instead of leaving it to the
+gate file alone.
+
+## Disclosed blind class — prose-seam bypass (I2)
+
+**The mechanism, by `file:line`.** `Get-ManifestSeam` (`D:/ai_os/.claude/hooks/delivery-gate-stop.ps1:72`)
+extracts a seam only from **backticked** paths matching `` `path/with/a/slash.ext` `` (optionally
+`` :line `` or `` :line-line ``) inside the manifest's `## What changed` section. A file named in prose, or
+cited without backticks, or without a `/`, contributes nothing to the set. The `ROUNDCAP` predicate then
+skips any candidate whose own seam is empty **before ever comparing it to a prior PASS's seam**:
+`D:/ai_os/.claude/hooks/delivery-gate-stop.ps1:281` — `if ($c.Seam.Count -eq 0) { continue }        # no
+extractable seam -> no claim, stay silent`. So a unit that touches the exact same file as two already-
+PASSed units, but names it in prose in its own `## What changed`, is never even compared — not "compared
+and found not capped", literally never evaluated. The comment states the silence is deliberate (to avoid
+inventing a seam claim from thin air), which makes this a **scope limit that was never disclosed** rather
+than a bug — and an un-disclosed scope limit on a safety cap is the same failure shape ISS-346 exists to
+remove.
+
+**My own re-derivation, independent of the checker's 18/171.** I extracted `Get-ManifestSeam` verbatim
+from the live hook (the same method `qa/probes/roundcap-wouldblock-census.ps1` uses) and ran it over every
+one of this worktree's 171 real manifests, counting how many produce a zero-size seam from their own
+`## What changed` section:
+
+```
+total manifests = 171
+zero-seam       = 18
+non-zero-seam   = 153
+```
+
+**18 of 171 (10.5%) — I confirm the checker's count exactly, from a fresh extraction I wrote myself
+without reading its script first.** The 18: `brain-knowledge-graph`, `calendar-grid-ui`,
+`delivery-gate-machine-wide-fix`, `delivery-gate-manifest-blindness`, `delivery-gate-stamp-adoption`,
+`guarded-fetcher`, `handshake-canonical-field`, `ISS-004-tree-index-fixtures`,
+`iss-346-round-cap-mechanical-check` (this unit's own manifest — its own `## What changed` cites the hook
+path in prose tables, not as a single backticked `path/with/slash.ext`, so it is itself in the blind
+class it now discloses), `lint-score-split`, `score-input-trust-complete`, `session-loading-verification`,
+`T-002-toc-migration`, `T-018-schema-v2`, `tracker-honesty`, `u2-4-phase3-precision-regate`,
+`u4c-watch-page`, `write-guard-enforcement-gaps`.
+
+**Consequence, one line:** any of these 18 units — and any future one shaped like them — can share a seam
+with two already-PASSed units and never be capped, silently, regardless of the D-014 round-cap rule; the
+`ROUNDCAP` predicate's own trace (`ROUNDCAP candidates=N capped=0`) reads as "checked, nothing capped",
+which is exactly the false confidence ISS-346 was opened to remove. Filed as **ISS-A035913-003** (high,
+the checker's id). The fix (backticked-path grammar is too narrow; the extractor should also recognise a
+prose-cited path, or a candidate with zero extractable seam should be flagged rather than silently passed)
+is outside this unit's authorization — see `qa/gates/maker-predicate-canonical-field-and-prose-seam.md`
+option 1/2.
 
 ## Authorization
 
@@ -333,7 +439,11 @@ file's sha256 is re-checked after the run. GREEN-before is from the same tree th
 | 6 | a candidate carrying only D-042's canonical `**Handshake status:**` is seen | T9 | **M6** `'(?im)^…(?:Handshake[^\S\r\n]+)?Status:\s*ready-for-check'` → the legacy-only `'(?m)^…Status:…'` | GREEN before: `T9 … PASS` / RED after: `M6 → RED after`, **CONTROL T2 stays green** |
 | 7 | **CONTROL** — a declared **SECURITY-CLASS** candidate is never capped, at any round count (ISS-078: a cross-tenant read disclosure first found at **round 5** after four consecutive PASSes) | T3 | intentionally none: an edit that reddens this row ships a data leak | GREEN and stays green under M1–M6 |
 | 8 | **CONTROL** — a verdict that only **mentions** the seam file does not count toward it | T5 | intentionally none: it is the wrong implementation this unit had to avoid, and the corpus number (7 mentions / 0 touches) is the standing evidence | GREEN; re-derived from the live corpus in Actual outputs 3 |
-| — | bold-prefixed fields parse (`**Status:**`, `**VERDICT:**`) | T6 | **none is admissible — disclosed, not faked.** The property is implemented **redundantly**: dropping the emphasis strip (`$t = $text -replace '\*\*',''` → `$t = $text`) left T6 **green**, because clause 1's separator class `[^\w\r\n]{0,4}` absorbs the remaining `:** ` on its own. Either mechanism alone suffices, so no one-hunk edit isolates it. Measured in the run recorded above (`M4 … mutation falsified nothing`), then withdrawn. | asserted by T6 and used as M2's control; **not** mutation-covered |
+| — | bold-prefixed fields parse (`**Status:**`, `**VERDICT:**`) — **UNVERIFIED, `ISS-A035913-007`** | T6 | **none is admissible — disclosed, not faked.** The property is implemented **redundantly**: dropping the emphasis strip (`$t = $text -replace '\*\*',''` → `$t = $text`) left T6 **green**, because clause 1's separator class `[^\w\r\n]{0,4}` absorbs the remaining `:** ` on its own. Either mechanism alone suffices, so no one-hunk edit isolates it. Measured in the run recorded above (`M4 … mutation falsified nothing`), then withdrawn. | asserted by T6 and used as M2's control; **not** mutation-covered. Cycle-0 disclosed this row honestly but with no issue id — the checker accepted the redundancy claim (verified it, not just taken it) and assigned `ISS-A035913-007` to turn the disclosure into enumerated debt rather than an unenumerated gap. This cycle carries that id into the row; no new measurement. |
+| C7-1 | `MAKER` predicate audited for defect 1 (`Strip-Code`-stripped verdict reading) — **affected, not fixed, `ISS-A035913-002` (medium)** | manual code audit, this cycle (`file:line` above) | none applicable — disclosure, not a falsifiable capability of this unit's own artifact | `MAKER` (`:378`,`:388`) still reads the pre-fix pattern; `$backlog` still sums `fixgap`, so the gate stays loud — only the message (`fixgap` vs `unclosed`) is wrong. Not independently re-measured this cycle beyond confirming the code path; see Cross-predicate audit table above for the citation. |
+| C7-2/3 | `MAKER` predicate audited for defects 2 and 3 (`Get-ManifestSeam` unroll / `file:line` seam form) — **not applicable, structurally unreachable** | `Select-String -Pattern Get-ManifestSeam` over the live hook, this cycle | n/a | Both call sites (`:262`, `:278`) sit inside `ROUNDCAP` (`:212`–`:308`), strictly before `MAKER` begins at `:310`. `MAKER` has no seam concept — verified by reading the full `MAKER` block, not merely grepping for the absence. |
+| C7-4 | `MAKER` predicate audited for defect 4 (canonical `**Handshake status:**` field) — **affected, NOT fixed, live and SILENT, `ISS-A035913-001` (high)** | live hook run, this cycle, two throwaway trees | the *diagnostic* edit is swapping which field the candidate manifest carries (legacy `Status:` vs canonical `**Handshake status:**`), not a hunk in the hook — this is the audit's own falsification, over the artifact's *behavior*, not a fix to isolate | `A: legacy Status: field → blocked = True` (`BLOCK-MAKER`, 1 pending) / `B: canonical **Handshake status:** field only → blocked = False`, trace `MAKER pend=0 unclosed=0 queue=0 fixgap=0 scheduled=False`. Live hook sha256 identical before and after both runs (`5D6E0994…5162`). This is [C7]'s core finding, now stated rather than silent. |
+| I2 | Prose-only seam bypass — a candidate whose `## What changed` cites its seam in prose (no backticked `path/with/slash.ext`) is never compared to any prior PASS, however many it shares — **disclosed as shipped scope limit, `ISS-A035913-003` (high)** | `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1:281` (`if ($c.Seam.Count -eq 0) { continue }`) | n/a — disclosure of an existing code path, not a new capability of this unit to falsify | Re-derived independently, this cycle: `zero-seam = 18` of `171` real manifests (matches the checker's 18/171 exactly, from a fresh extraction). Listed by slug above, including this unit's own manifest. |
 
 ## What this unit does not fix, and what it could not execute
 
@@ -345,10 +455,21 @@ file's sha256 is re-checked after the run. GREEN-before is from the same tree th
   on the same volatile working tree, and I agree with that recommendation. **I am deliberately not editing
   that ledger row** (D-019: concurrent lanes have collided on `qa/issues.jsonl`, and an in-place severity
   edit is not an append) — it belongs to the sweep's single consolidation writer.
-- **D-049's required shared-log entry in `D:/ai_os/decisions/log.md` has NOT been written by this unit.**
-  D-049 makes it part of the authorization so the other projects on this machine have a trace of why their
-  Stop hook changed. It is outside this worktree and outside what I can commit. **This is an open obligation
-  of the authorization, and the unit should not be closed out as if it were met.**
+- **[Cycle 1 correction — this bullet was wrong in cycle 0 and the checker caught it; left below for the
+  record, corrected here rather than silently rewritten.]** Cycle 0 said the D-049 shared-log entry in
+  `D:/ai_os/decisions/log.md` "has NOT been written by this unit." **It exists** —
+  `D:/ai_os/decisions/log.md`, 2026-09-28 heading, item 3 ("Machine-wide Stop hook `delivery-gate-stop.ps1`:
+  three fixes …"), citing D-049 and naming this predicate. What is true, and still an open obligation: it is
+  **stale**, recording `after 28c1ae44…7337` — this unit's *pre*-state — and `grep -c 5d6e0994
+  D:/ai_os/decisions/log.md` = 0, so the shared log carries no trace of this unit's five counting fixes or
+  the resulting `5d6e0994…5162` byte state. It is outside this worktree and outside what I can commit.
+  **The obligation is stale, not absent, and the unit should not be closed out as if it were met.** Filed
+  as **ISS-A035913-005** (the checker's id).
+- *(original cycle-0 text, uncorrected, kept for the audit trail):* "D-049's required shared-log entry in
+  `D:/ai_os/decisions/log.md` has NOT been written by this unit. D-049 makes it part of the authorization
+  so the other projects on this machine have a trace of why their Stop hook changed. It is outside this
+  worktree and outside what I can commit. This is an open obligation of the authorization, and the unit
+  should not be closed out as if it were met."
 - **I could not run the parse check on the live hook.** The auto-mode classifier denied every attempt to
   `Get-FileHash` / `Get-Content` / copy / `ParseFile` that path from a shell (`[Self-Modification]`,
   `[Modify Shared Resources]`), which is correct behaviour for a machine-wide enforcement file. So verify
@@ -361,12 +482,16 @@ file's sha256 is re-checked after the run. GREEN-before is from the same tree th
   `task-notification` / `local-command-*` discrimination are untouched and unexercised, as the previous
   unit's manifest also disclosed. `ROUNDCAP`'s once-per-session marker is asserted only within single runs,
   never across a real multi-turn session. The 15 s Stop budget was not measured with a real transcript in play.
-- **The sibling `MAKER` predicate has the same verdict-reading blindness and I did not fix it.**
-  `delivery-gate-stop.ps1`'s `elseif ($vtPlain -match '(?m)^[\s\-*#>|]*VERDICT:?\s*PASS') { $unclosed++ }
-  else { $fixgap++ }` reads a `Strip-Code`-stripped verdict, so on the 76 fenced verdicts a **PASS is
-  miscounted as a fix gap**. That is a defect in the fix-1 the previous unit shipped, it is out of this
-  unit's scope, and D-049 authorizes the file for the cap check — not for a second predicate. **Filed here
-  for the checker to raise as its own row**; I did not touch it, and no criterion of mine requires it.
+- **The sibling `MAKER` predicate has the same verdict-reading blindness and I did not fix it** (defect 1;
+  see the "Cross-predicate audit (C7)" section above, row 1, `ISS-A035913-002`, medium — the gate still
+  blocks, only the message is wrong). `delivery-gate-stop.ps1`'s `elseif ($vtPlain -match
+  '(?m)^[\s\-*#>|]*VERDICT:?\s*PASS') { $unclosed++ } else { $fixgap++ }` reads a `Strip-Code`-stripped
+  verdict, so on the 76 fenced verdicts a **PASS is miscounted as a fix gap**. That is a defect in the fix-1
+  the previous unit shipped, it is out of this unit's scope, and D-049 authorizes the file for the cap
+  check — not for a second predicate. **Cycle 0 filed this for the checker to raise as its own row and
+  disclosed nothing about defect 4 across the same boundary — that omission is [C7]'s FAIL and is now
+  corrected above** (`ISS-A035913-001`, high: defect 4 is live and *silent*, not merely mislabeled, in
+  `MAKER`). I did not touch either code path, and no criterion of mine requires it.
 - **The predicate accepts any non-empty `Round cap:` value**, including this manifest's own `not applicable`.
   It forces a decision onto the record; it does not validate it. Pre-existing, and the previous verdict
   recorded the same note. The mitigation is that a checker reads the line — as one must read mine.
