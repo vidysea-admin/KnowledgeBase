@@ -1,3 +1,47 @@
+# QUEUE — maker tick 2026-09-28 (iss-346 cycle-1 FAIL, HELD; slug collision gated)
+
+> **iss-346-round-cap-mechanical-check is HELD, not stalled.** Cycle-1 verdict `8ac0582`: FAIL,
+> 7/9 criteria, 2/3 invariants. The checker ruled that C1 and I2 **cannot be satisfied by disclosure
+> at all** — both judge shipped behaviour, and every lawful fix is a `.claude/hooks/*` edit gated
+> behind `qa/gates/maker-predicate-canonical-field-and-prose-seam.md` (still OPEN). **No further fix
+> cycle from the builder alone can close them**, so cycle 2 was NOT opened; that would burn a cycle
+> on work the unit is not permitted to do.
+>
+> **New, and the reason this tick matters: a THIRD contract-named artifact has the same live defect.**
+> `ISS-A035913-011` (high, open) — `.claude/hooks/mc-precommit.ps1:43`'s pending-unit regex does not
+> match a manifest carrying only D-042's canonical `**Handshake status:**` field (verified live:
+> legacy `True`, canonical-only `False`). The cycle-1 audit had narrowed [C7]'s "every sibling hook
+> that shares the pattern" to "every sibling predicate in one file"; the checker extended it to the
+> two hooks the contract names, found `mc-sessionstart.ps1` genuinely clean, and found this. The gate
+> above is now about three artifacts, not two.
+>
+> **Second gate opened this tick — `qa/gates/iss-346-slug-collision-two-units.md`.** Merging the
+> worktree returned `CONFLICT (add/add)` on **both** the manifest and the verdict: master already
+> carries a *different* unit at the same two paths, PASSed and closed out at `97756f5`. Two loops
+> claimed one ledger row. I aborted the merge and overwrote nothing — resolving it either way deletes
+> a checked verdict. Only the lane ledger shard was landed (no conflict, same git blob
+> `45061ef0…`, so verbatim as the checker wrote it).
+>
+> **Tick state:** `wave=2 · concurrent peak=2 · ` see SERIAL lines below.
+
+| # | unit | tier | why now | cap check |
+|---|---|---|---|---|
+| 1 | `iss-371-loc-testpatterns-mjs` | 2 (high) | **released** — it was `SERIAL` on the iss-346 check because it re-runs `lint-loc`; that check has now returned. One `loc.testPatterns` entry drops `lint-loc` 5→4 and changes ISS-367's masking picture | 0 prior PASSes on `structure.config.json` — clear |
+| 2 | `iss-368-heartbeat-read-failure-is-not-health` | 2 (high) | a `listHeartbeats` throw is reported as zero silent watchers — byte-identical to "all fresh", contradicting D-048; its standing test pins the wrong answer and passes on the broken implementation | `apps/api/src/routes/health.ts` 1 prior PASS — under the cap |
+| 3 | `ledger-duplicate-id-guard` | 2 (high) | `SERIAL` this wave — see below | 0 prior PASSes — clear |
+| 4 | `iss-104cc-3-narrow-place-signal` | 2 (high) | D-055 ruling 1; hard prerequisite `speaker-rules-test-file-split` (test file at 392/400) not yet done | measurement pre-specified against BOTH ledger corpora by id |
+
+**SERIAL: `ledger-duplicate-id-guard` waits on a named edge** — D-055 ruling 2 assigns the `ISS-360`
+id promotion to **`/checker`**, and it rewrites the same `qa/issues*.jsonl` surface this guard would
+validate. Building the guard against a ledger that is about to change under it measures the wrong
+corpus. It goes in the next wave, after the promotion lands.
+
+**SERIAL: `iss-346-round-cap-mechanical-check` waits on two OPEN human gates** — named above. Not a
+stall: diagnosis is on disk in both gate files, and the checker's own verdict states no builder-only
+fix exists.
+
+---
+
 ## TODO — narrow the place-vs-person signal (D-055 ruling 1)
 
 | unit | tier | why | files | schema | surface | consumes | runtime |
