@@ -184,8 +184,23 @@ CheckAllowed "a SECURITY-class candidate on the same 2-PASS seam is still ALLOWE
 Drop $t
 
 # ---------------------------------------------------------------------------
-# 4. THE OPERATIVE VERDICT IS THE LAST 'VERDICT:' LINE IN THE FILE.
-# 4a. FAIL first, operative PASS last -- the real shape of
+# 4. CUMULATIVE COUNTING, NOT "LAST LINE WINS". Corrected in fix cycle 1 (ISS-ISS346-001) -- this
+#    block used to be titled "the operative verdict is the LAST VERDICT: line", which is NOT what the
+#    live hook does and was never what it should do. Read live delivery-gate-stop.ps1's own comment
+#    directly above $script:VERDICT_VOCAB (as of sha fc328d0688d0..., 816 lines): "For a ROUND cap the
+#    question is not 'what is this verdict's final word' but 'has this seam been PASSed before', which
+#    is cumulative: a seam that PASSED at cycle 0 had a PASS round on it whatever a later cycle said.
+#    So ANY operative-form PASS counts as one prior PASS." Get-VerdictTokens collects EVERY vocabulary
+#    match in the file and Test-VerdictPass returns true if ANY of them is PASS -- order-independent,
+#    a pure OR across the whole file, not a position rule at all.
+#    ISS-346's own dispatched fix (H3, rejected in fix cycle 1 -- see ISS-ISS346-001) proposed the
+#    opposite model ("read the LAST VERDICT:-shaped line") and this assertion 4b originally encoded
+#    that same rejected model ("a superseded PASS is not a prior round"). It was WRONG: it asserted
+#    behaviour that contradicts the live hook's own extensively-reasoned, already-landed design, and a
+#    direct re-run against the current live hook confirms the live hook does NOT implement it (see
+#    cycle-1 manifest, "Assertion 4b was testing the wrong model"). Fixed here to assert what the hook
+#    actually and deliberately does, which is also the safer ("loud") direction per D-014/ISS-078.
+# 4a. FAIL first, operative PASS later in the file -- the real shape of
 #     qa/verdicts/iss-104-closed-class-function-words.md (FAIL at line 12, PASS at line 174).
 #     Both priors count, so the seam is capped.
 # ---------------------------------------------------------------------------
@@ -195,20 +210,27 @@ $t = NewTree @(
   @{ slug='cand-4a'; changed=@($SEAM) }
 )
 $o = RunHook $t
-Check "4a: FAIL-then-PASS COUNTS (the iss-104 shape -- operative verdict is the last line)" `
+Check "4a: FAIL-then-PASS COUNTS (a later operative PASS in the same file)" `
       (($o -match $CAP) -and ($o -match '2 prior PASS')) `
       ("missed an operative PASS below a FAIL; got: " + $o)
 Drop $t
 
-# 4b. The inverse, and the half a first-match reader gets wrong in the REFUSING direction: both priors
-#     open with PASS and END with FAIL -- a re-checked unit whose PASS was superseded. The operative
-#     verdict of each is FAIL, so the seam is at 0 PASSes and the unit is pullable.
+# 4b. CORRECTED (fix cycle 1): both priors open with PASS and later carry an appended FAIL -- a
+#     re-opened unit whose earlier PASS round was superseded by a later cycle. Per the live hook's own
+#     cumulative rule, the seam STILL had a PASS round at cycle 0, so this counts toward the cap exactly
+#     like 4a. (The old version of this assertion asserted the opposite -- "does NOT count" -- via
+#     CheckAllowed, which is the rejected H3 model; that assertion FAILED against the live hook both
+#     before and after fix cycle 1's other changes, because the live hook was correct and the assertion
+#     was not. See the cycle-1 manifest for the re-run evidence.)
 $t = NewTree @(
   @{ slug='prior-a'; changed=@($SEAM); verdict=@('VERDICT: PASS','','... re-opened, cycle 1 ...','','VERDICT: FAIL') },
   @{ slug='prior-b'; changed=@($SEAM); verdict=@('VERDICT: PASS','','... re-opened, cycle 1 ...','','VERDICT: FAIL') },
   @{ slug='cand-4b'; changed=@($SEAM) }
 )
-CheckAllowed "4b: PASS-then-FAIL does NOT count (a superseded PASS is not a prior round)" $t
+$o = RunHook $t
+Check "4b: PASS-then-FAIL STILL counts (cumulative -- a seam that passed once had a round on it, whatever a later cycle said)" `
+      (($o -match $CAP) -and ($o -match '2 prior PASS')) `
+      ("a superseded PASS was not counted, contradicting the live hook's documented cumulative rule; got: " + $o)
 Drop $t
 
 # ---------------------------------------------------------------------------
@@ -287,6 +309,63 @@ Check "a PASSed prior unit with no extractable seam does not fail the hook open 
 Drop $t
 
 # ---------------------------------------------------------------------------
+# 11. NEWEST-FIRST-ARCHIVE VERDICTS WITH VOCABULARY-POLLUTING PROSE STILL COUNT THEIR REAL PASS.
+#    Added in fix cycle 1 (ISS-ISS346-001, checker cycle 0) -- the class of defect the rejected H3 hunk
+#    would have shipped and that assertion 4b alone did not catch. Modeled on the REAL shape of
+#    qa/verdicts/vector-cosine-retriever.md: a PASS near the TOP (its line 13), an earlier cycle's FAIL
+#    preserved further down under a literal '# ARCHIVE' marker (its line 326), a 'VERDICT: INFORMATIVE'
+#    line that is not a VERDICT_VOCAB member and must be ignored (its lines 195/377), and -- separately,
+#    the actual defect the checker found by running H3's own proposed regex against this exact real
+#    file -- an ordinary prose line elsewhere that happens to start with the word 'verdict' but is not a
+#    result field at all (its real line 552: "  verdict rule rather than in the backlog."). H3's proposed
+#    rule ("read the LAST 'VERDICT:'-shaped line, no vocabulary restriction") reads that prose line last
+#    and returns the token RULE -- not a member of VERDICT_VOCAB and not PASS -- so a hook built on H3
+#    would silently drop this seam's real PASS and let a capped seam through. The live hook's
+#    Get-VerdictTokens ignores RULE (not in $VERDICT_VOCAB) and Test-VerdictPass finds the real PASS
+#    regardless of where it sits in the file, because the question is cumulative ("was this seam EVER
+#    PASSed"), not positional.
+# ---------------------------------------------------------------------------
+$ARCHIVE_POLLUTED_VERDICT = @(
+  '## VERDICT: PASS',
+  '',
+  '**SCOREBOARD:** newest-first-archive fixture, modeled on qa/verdicts/vector-cosine-retriever.md',
+  '',
+  'VERDICT: INFORMATIVE -- 0.935 vs a 0.217 question-blind control, not a VERDICT_VOCAB member.',
+  '',
+  '# ARCHIVE -- cycle 1 verdict (FAIL), preserved verbatim',
+  '',
+  '## VERDICT: FAIL',
+  '',
+  'VERDICT: INFORMATIVE -- 0.935 vs a 0.217 question-blind control, repeated in the archived cycle.',
+  '',
+  '  verdict rule rather than a re-opened cycle -- ordinary prose citing the round-cap policy, not a result field.'
+)
+$t = NewTree @(
+  @{ slug='prior-a'; changed=@($SEAM); verdict=$ARCHIVE_POLLUTED_VERDICT },
+  @{ slug='prior-b'; changed=@($SEAM); verdict=$ARCHIVE_POLLUTED_VERDICT },
+  @{ slug='cand-11'; changed=@($SEAM) }
+)
+$o = RunHook $t
+Check "a newest-first-archive verdict with vocabulary-polluting prose still counts its real PASS (models vector-cosine-retriever.md; the rejected H3 rule misreads this -- see assertion 12)" `
+      (($o -match $CAP) -and ($o -match '2 prior PASS')) `
+      ("the archived FAIL / prose noise defeated the real PASS count; got: " + $o)
+Drop $t
+
+# 12. STATIC FALSIFICATION, run directly rather than asserted from prose: the REJECTED H3 rule ("read
+#    the last VERDICT:-shaped line, no vocabulary restriction") really does misread assertion 11's own
+#    fixture text. This is H3's exact proposed regex from the diff the checker rejected
+#    (delivery-gate-stop.roundcap-fixes.diff, hunk 2), applied with "take the last match" semantics.
+#    If this assertion ever finds H3's regex returning PASS here, the falsification above is void and
+#    fixture 11 would be proving nothing -- see the cycle-1 manifest.
+# ---------------------------------------------------------------------------
+$h3Text = ($ARCHIVE_POLLUTED_VERDICT -join "`n")
+$h3Last = ''
+foreach ($m in [regex]::Matches($h3Text, '(?im)^[\s\-*#>|]*VERDICT:?[ \t]*([A-Za-z-]+)')) { $h3Last = $m.Groups[1].Value.ToUpperInvariant() }
+Check "the rejected H3 rule misreads assertion 11's fixture as '$h3Last', not PASS (regex-unsound on this real-corpus shape)" `
+      ($h3Last -ne 'PASS') `
+      ("expected H3's naive last-match regex to return a non-PASS token on this fixture; it returned '$h3Last', which would make H3 accidentally correct here and void the falsification")
+
+# ---------------------------------------------------------------------------
 # 10. CONTROL -- isolation. ROUNDCAP sits BEFORE the MAKER predicate; when ROUNDCAP is silent the rest
 #    of the hook must behave exactly as before. Same 0-PASS tree as (1), with the ScheduleWakeup
 #    removed: the MAKER block must still fire. A mutation that reddens 1-7 while leaving this green has
@@ -304,5 +383,5 @@ Check "CONTROL: the MAKER predicate still fires downstream when ROUNDCAP is sile
 Drop $t
 
 if ($fails -gt 0) { Write-Output "RESULT: FAIL ($fails assertion(s))"; exit 1 }
-Write-Output 'RESULT: PASS (12/12 assertions)'
+Write-Output 'RESULT: PASS (14/14 assertions)'
 exit 0
