@@ -1,0 +1,48 @@
+--- /c/Users/Lenovo/AppData/Local/Temp/claude/d--KnowledgeBase/21132795-be68-45be-b8b9-2c0bac822a56/scratchpad/pristine.ps1	2026-09-28 08:31:19.879607700 +0530
++++ /c/Users/Lenovo/AppData/Local/Temp/claude/d--KnowledgeBase/21132795-be68-45be-b8b9-2c0bac822a56/scratchpad/cand.ps1	2026-09-28 08:54:14.825652800 +0530
+@@ -63,10 +63,26 @@
+   $sec = [regex]::Match($text, '(?ms)^#{2,4}\s*What changed.*?(?=^#{2,4}\s|\z)')
+   $scope = if ($sec.Success) { $sec.Value } else { $text }
+   $ext = 'ts|tsx|js|jsx|mjs|cjs|py|ps1|psm1|go|rs|java|cs|rb|php|sql|sh'
+-  foreach ($m in [regex]::Matches($scope, ('`([\w.\-]+(?:/[\w.\-]+)+\.(?:' + $ext + '))`'))) {
++  # The optional ':<lines>' suffix is load-bearing. This repo's manifests overwhelmingly cite a path
++  # WITH its line range inside the backticks -- `apps/api/src/indexing/vector-gap.ts:56-103` -- and a
++  # regex that requires the backtick to close right after the extension skips every one of them.
++  # Measured on ISS-346's OWN originating case, qa/manifests/vector-gap-durability.md: 5 of its 6 cited
++  # files carry a line range, so the extracted seam was {vector-gap.test.ts} alone, the real seam file
++  # vector-gap.ts was invisible, the count came back 1 instead of 2, and the predicate did not fire on
++  # the very unit ISS-346 was filed about. Under-counting is the SILENT direction -- it lets a capped
++  # seam through, which is the whole defect.
++  foreach ($m in [regex]::Matches($scope, ('`([\w.\-]+(?:/[\w.\-]+)+\.(?:' + $ext + '))(?::[\d,\-]+)?`'))) {
+     [void]$set.Add($m.Groups[1].Value.ToLowerInvariant())
+   }
+-  return $set
++  # ',' is load-bearing. `return $set` puts the HashSet on the pipeline, and PowerShell UNROLLS a
++  # collection on output: an EMPTY seam returns $null, a 1-element seam returns a bare [string]. The
++  # caller then does $ps.Seam.Contains($f), which throws on $null -- and this hook's outer catch fails
++  # OPEN, so one PASSed unit whose manifest names no backticked path silently disables ROUNDCAP *and
++  # every predicate after it* (MAKER, REVIEW, CONFIG, BROWSER, BRAIN, SOURCES, learning) for the whole
++  # session. Measured on this repo's real corpus: 167 manifests + 167 verdicts plus the
++  # vector-gap-durability candidate -> "EXIT exception: You cannot call a method on a null-valued
++  # expression", i.e. ISS-346's own reproduction 3 did not fire. ',' wraps the object so it survives.
++  return ,$set
+ }
+ 
+ 
+@@ -190,7 +206,15 @@
+       foreach ($v in (Get-ChildItem (Join-Path $qaDirC "verdicts") -Filter *.md -File -ErrorAction SilentlyContinue)) {
+         $vt = Get-Content $v.FullName -Raw -ErrorAction SilentlyContinue
+         if ($null -eq $vt) { continue }
+-        if ((Strip-Code ($vt -replace '\*\*', '')) -notmatch '(?m)^[\s\-*#>|]*VERDICT:?\s*PASS') { continue }
++        # The OPERATIVE verdict is the LAST 'VERDICT:' line in the file, not any of them. A verdict may
++        # hold several (dual/concurrent checks, and successive cycles appended):
++        # qa/verdicts/iss-104-closed-class-function-words.md holds FAIL at line 12 and the operative
++        # PASS at line 174. A plain -match counts a PASS that a later FAIL superseded, so a re-opened
++        # unit keeps inflating its seam's round count forever -- in the REFUSING direction, which
++        # silently cancels legitimate work. Measured by qa/tests/mc-hooks-round-cap.ps1 assertion 4b.
++        $vLast = ''
++        foreach ($vv in [regex]::Matches((Strip-Code ($vt -replace '\*\*', '')), '(?im)^[\s\-*#>|]*VERDICT:?[ \t]*([A-Za-z-]+)')) { $vLast = $vv.Groups[1].Value }
++        if ($vLast.ToUpperInvariant() -ne 'PASS') { continue }
+         $vm = Join-Path $qaDirC ("manifests\{0}.md" -f $v.BaseName)
+         if (-not (Test-Path $vm)) { continue }
+         $passSeams += [pscustomobject]@{ Slug = $v.BaseName; Seam = (Get-ManifestSeam (Get-Content $vm -Raw -ErrorAction SilentlyContinue)) }
