@@ -222,3 +222,23 @@ mutation that was found applied to production source, and the reason the pre-com
 `scripts/lib/mutate.mjs` already provides an arm/restore ledger that `assert-clean` checks against
 HEAD. Prefer it over hand-rolled `sed`/`python` mutation; if you hand-roll, the two rules above are
 the minimum.
+
+### Amendment (2026-09-28, authorized by D-050 ruling 3) — the trap must be PER-MUTATION
+
+The two rules above are necessary and **not sufficient**, measured against a live loss in this repo.
+
+- **The byte backup is scoped PER MUTATION, never per run.** A backup captured once before a run of
+  several mutations restores the *pre-run* state over every later mutation's legitimate work.
+- **A `trap ... EXIT` fires on NORMAL exit too.** So a trap holding a run-scoped backup restores
+  pre-fix content at ordinary shell teardown — on success, silently.
+- **Every mutation run ends with a HEAD-fidelity check on each touched file**, not just a `cmp`
+  against the backup: `git hash-object <file>` must equal `git rev-parse HEAD:<file>` (or the
+  intended post-fix blob). `cmp` against a stale backup confirms the *wrong* state.
+
+**Why.** A finished, checked unit's work was destroyed this way on 2026-09-28: a hand-rolled
+`trap ... EXIT INT TERM ERR` whose backup predated the fix fired at normal shell exit and reverted
+**28 files across `packages/index`**, with `git diff --stat HEAD` showing exactly the unit's whole
+change deleted while HEAD still held it. Both unit files hashed to the base blob. It was recoverable
+only because HEAD was intact. The rules as previously written permit that shape exactly — the backup
+was taken, the trap did fire, `cmp` would have reported a clean restore — which makes it a defect in
+the rule, not merely an incident. Filed as ISS-104CC-2.
