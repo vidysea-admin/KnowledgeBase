@@ -1,3 +1,20 @@
+## TODO — narrow the place-vs-person signal (D-055 ruling 1)
+
+| unit | tier | why | files | schema | surface | consumes | runtime |
+|---|---|---|---|---|---|---|---|
+| `iss-104cc-3-narrow-place-signal` | 2 (high) | D-055 ruling 1 accepted the ~32% false-positive cost **provisionally, not as final**, and requires a narrowing unit. `readsAsAPlaceOrOrg` is candidate-independent, so the refusal is deterministic for ANY name in a locative-self-mention construction. Make a strong naming cue, direct address, or a multi-token name RESCUE the real person, without reopening the fabrications ISS-104 closed. | `packages/index/src/pipeline/speaker-name-rules.ts` (`readsAsAPlaceOrOrg`, `citesNameAsAnIntroduction`), `speaker-name-rules.test.ts` | no | speaker resolution | `speaker-name-data.ts` (`LOCATIVE_GOVERNORS`) | none |
+
+**Measurement is pre-specified, so the unit cannot grade its own homework** (D-013's "Measuring a fix
+against the ledger", D-015): it reports BOTH corpora by id — **ISS-104's 20 recorded reproductions**
+(must not regress below the current 19/20 refused) and **ISS-104CC-3's recorded false-positive
+cases** (must improve on ~32%). A self-authored corpus may be added, never substituted. The 15%-vs-32%
+discrepancy is precisely what an author-chosen corpus produced last time.
+
+**Gate constraint, already measured:** `speaker-name-rules.test.ts` is at **392 of testMax 400**. This
+unit adds cases to that file, so `speaker-rules-test-file-split` is a hard prerequisite, not a
+nice-to-have. Do the split first or the gate reds.
+
+---
 ## TODO — report unmerged-worktree commits in the sweep
 
 | unit | tier | why | files | schema | surface | consumes | runtime |

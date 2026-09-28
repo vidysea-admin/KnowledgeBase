@@ -77,12 +77,50 @@ export interface HealthDeps {
  * implementations agree" case dynamically imports the real `heartbeat.mjs` and asserts both give the
  * same answer over a shared case table, so the copies cannot diverge silently. Recorded as a
  * follow-up in the manifest, not hidden.
+ *
+ * Exported (U4d, D-047) so `routes/watched-sources.ts`'s `/watch-state` route computes staleness
+ * with the EXACT same predicate this detector alerts on, via `heartbeatStatuses` below — the page
+ * must never show a source as healthy that this detector would already have alerted on as silent.
  */
-function isStale(lastHeartbeatAt: string | null | undefined, now: Date, intervalMs: number): boolean {
+export function isStale(lastHeartbeatAt: string | null | undefined, now: Date, intervalMs: number): boolean {
   if (!lastHeartbeatAt) return true;
   const last = Date.parse(lastHeartbeatAt);
   if (Number.isNaN(last)) return true;
   return now.getTime() - last > intervalMs;
+}
+
+/** The three source types `scripts/watch/run-watch.mjs` polls. Shared (U4d) so `detectSilentWatchers`'s
+ * default and `heartbeatStatuses`' default are the same array, not two hand-typed copies. */
+export const EXPECTED_WATCH_SOURCE_TYPES = ["drive", "gmail", "calendar"] as const;
+
+/** One tenant's per-source-type liveness, exactly as both a reader and an alerter need it. */
+export interface HeartbeatStatus {
+  tenantId: string;
+  sourceType: string;
+  lastHeartbeatAt: string | null;
+  stale: boolean;
+}
+
+/**
+ * Every EXPECTED (tenantId, sourceType) heartbeat for one tenant, each with `stale` computed by
+ * `isStale` — a missing row is synthesised as `lastHeartbeatAt: null` (maximally stale, D-048),
+ * never silently dropped. Extracted out of `detectSilentWatchers` (U4d, D-047/ISS-361) so R2's
+ * alert and the `/watch-state` page read the identical computation — the exact disjoint-surface
+ * gap ISS-358 raised, closed here by construction rather than by convention.
+ */
+export function heartbeatStatuses(
+  tenantId: string,
+  rows: HeartbeatRow[],
+  now: Date,
+  intervalMs: number,
+  expected: readonly string[] = EXPECTED_WATCH_SOURCE_TYPES,
+): HeartbeatStatus[] {
+  const byType = new Map(rows.map((r) => [r.sourceType, r]));
+  return expected.map((sourceType) => {
+    const row = byType.get(sourceType) ?? { tenantId, sourceType, lastHeartbeatAt: null };
+    const lastHeartbeatAt = row.lastHeartbeatAt ?? null;
+    return { tenantId, sourceType, lastHeartbeatAt, stale: isStale(lastHeartbeatAt, now, intervalMs) };
+  });
 }
 
 /**
@@ -95,7 +133,7 @@ function isStale(lastHeartbeatAt: string | null | undefined, now: Date, interval
  */
 export async function detectSilentWatchers(deps: WatchSilenceDeps): Promise<number> {
   const now = deps.now ? deps.now() : new Date();
-  const expected = deps.expectedSourceTypes ?? ["drive", "gmail", "calendar"];
+  const expected = deps.expectedSourceTypes ?? EXPECTED_WATCH_SOURCE_TYPES;
   let silent = 0;
   for (const tenantId of deps.tenantIds) {
     let rows: HeartbeatRow[];
@@ -104,14 +142,10 @@ export async function detectSilentWatchers(deps: WatchSilenceDeps): Promise<numb
     } catch {
       continue; // an unreadable heartbeat collection is a db problem, already reported by `db`.
     }
-    const byType = new Map(rows.map((r) => [r.sourceType, r]));
-    const candidates = expected.map(
-      (sourceType) => byType.get(sourceType) ?? { tenantId, sourceType, lastHeartbeatAt: null },
-    );
-    for (const row of candidates.filter((r) => isStale(r.lastHeartbeatAt, now, deps.intervalMs))) {
+    for (const status of heartbeatStatuses(tenantId, rows, now, deps.intervalMs, expected).filter((s) => s.stale)) {
       silent += 1;
       try {
-        deps.notifyWatchSilent(tenantId, row.sourceType, row.lastHeartbeatAt ?? null, deps.intervalMs);
+        deps.notifyWatchSilent(tenantId, status.sourceType, status.lastHeartbeatAt, deps.intervalMs);
       } catch {
         /* a failing alert transport must never break the probe — telegram-alerts.ts is already
            fire-and-forget, this guards a hand-rolled sink that is not. */

@@ -41,10 +41,17 @@ a watcher that dies writes nothing, alerts nothing, and looks identical to a qui
 **[R3] Alert before a recording starts**, naming the meeting and why it was selected.
 
 **[R4] The landing screen** at `/watch`, reachable from the nav and from a deep link in every alert.
-Per watched source: last poll time as **both** an absolute timestamp and a relative age, outcome,
-and the failure reason when failed. A source past its expected interval renders as *visibly wrong*
-(its own state, not a timestamp the reader must compute) — restating R2 in the UI, because "stale"
-that requires arithmetic is the same silence as before.
+Covers **both source families**, not just `watched_sources` — amended 2026-09-28 by D-047, after
+ISS-358 found R1's alert fires off `watch_state`/`watch_heartbeat` while the page as built (U4c)
+read only `watched_sources`/`meeting-candidates`, genuinely disjoint collections with zero code
+overlap: the alert's deep link landed on a page with no visibility into the failure that triggered
+it. Per watched source: last poll time as **both** an absolute timestamp and a relative age,
+outcome, and the failure reason when failed. Per Drive/Gmail/Calendar watcher (`watch_state`/
+`watch_heartbeat`, U4d): the same failed-poll detail plus per-source-type heartbeat liveness, using
+the exact staleness predicate R2's alert uses, so the page can never show a watcher as healthy that
+the alert already fired on as silent. A source or watcher past its expected interval renders as
+*visibly wrong* (its own state, not a timestamp the reader must compute) — restating R2 in the UI,
+because "stale" that requires arithmetic is the same silence as before.
 
 **[R5] Next up, read-only.** Upcoming auto-records with the reason each was selected. No cancel, no
 force — answer (3) was visible-only, so there are no writes to scheduler state in this unit.

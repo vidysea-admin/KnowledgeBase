@@ -14,9 +14,11 @@ import { AuthProvider } from "../auth/AuthContext.js";
 import { WatchPage } from "./WatchPage.js";
 import * as watchedApi from "../api/watched-sources.js";
 import * as candidatesApi from "../api/meeting-candidates.js";
+import * as watchStateApi from "../api/watch-state.js";
 import { ApiError } from "../api/client.js";
 import type { WatchedSource, WatchedSourcesRunSummary } from "../api/watched-sources.js";
 import type { MeetingCandidate } from "../api/types.js";
+import type { WatchStateResponse } from "../api/watch-state.js";
 
 const NOW = new Date("2026-09-28T12:00:00.000Z");
 
@@ -60,10 +62,16 @@ const CANDIDATES: MeetingCandidate[] = [
 
 const EMPTY_RUN: WatchedSourcesRunSummary = { checked: 0, changed: 0, skipped: 0, failed: [], remaining: 0 };
 
+const EMPTY_WATCH_STATE: WatchStateResponse = { state: [], heartbeats: [] };
+
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(NOW);
   vi.spyOn(candidatesApi, "listMeetingCandidates").mockResolvedValue({ candidates: CANDIDATES });
+  // U4d: default every test to the empty, non-erroring shape so the pre-existing R4-R8 suites
+  // above (none of which know about this lane) don't each have to mock it -- a real network call
+  // to a fixed default here would be the wrong failure mode for tests unrelated to this lane.
+  vi.spyOn(watchStateApi, "getWatchState").mockResolvedValue(EMPTY_WATCH_STATE);
 });
 
 afterEach(() => {
@@ -217,6 +225,71 @@ describe("[negative] zero watched sources is distinguishable from all healthy", 
     expect(await screen.findByTestId("watch-none-configured")).toBeInTheDocument();
     expect(screen.queryByTestId("watch-row")).toBeNull();
     expect(screen.queryByText(/all healthy/i)).toBeNull();
+  });
+});
+
+describe("[U4d, D-047/ISS-358] watcher liveness — the collection R1's alert actually fires on", () => {
+  test("a fresh heartbeat renders alive, a stale one renders silent, and a never-run one renders as never having run", async () => {
+    vi.spyOn(watchedApi, "listWatchedSources").mockResolvedValue({ sources: [] });
+    vi.spyOn(watchStateApi, "getWatchState").mockResolvedValue({
+      state: [],
+      heartbeats: [
+        { sourceType: "drive", lastHeartbeatAt: isoMinutesAgo(10), stale: false },
+        { sourceType: "gmail", lastHeartbeatAt: isoMinutesAgo(180), stale: true },
+        { sourceType: "calendar", lastHeartbeatAt: null, stale: true },
+      ],
+    });
+    renderPage();
+    const rows = await screen.findAllByTestId("watch-heartbeat-row");
+    expect(rows).toHaveLength(3);
+
+    const drive = rows.find((r) => r.textContent?.includes("drive"))!;
+    expect(drive).toHaveAttribute("data-status", "healthy");
+    expect(drive.querySelector(".badge-good")).toHaveTextContent("alive");
+
+    const gmail = rows.find((r) => r.textContent?.includes("gmail"))!;
+    expect(gmail).toHaveAttribute("data-status", "stale");
+    expect(gmail.querySelector(".badge-bad")).toHaveTextContent("silent");
+    expect(gmail.querySelector('[data-testid="watch-heartbeat-plain-language"]')).toHaveTextContent(/stopped polling/i);
+
+    const calendar = rows.find((r) => r.textContent?.includes("calendar"))!;
+    expect(calendar).toHaveAttribute("data-status", "stale");
+    expect(calendar).toHaveTextContent("Has never completed a single polling run");
+  });
+
+  test("a recent watch_state poll failure shows its real failureReason, distinct from the watched-sources lane above", async () => {
+    vi.spyOn(watchedApi, "listWatchedSources").mockResolvedValue({ sources: [] });
+    vi.spyOn(watchStateApi, "getWatchState").mockResolvedValue({
+      state: [{ sourceType: "drive", sourceId: "gdrive-file-1", status: "failed", seenAt: isoMinutesAgo(5), failedAt: isoMinutesAgo(5), failureReason: "401: token expired" }],
+      heartbeats: [{ sourceType: "drive", lastHeartbeatAt: isoMinutesAgo(1), stale: false }],
+    });
+    renderPage();
+    const row = await screen.findByTestId("watch-state-failure-row");
+    expect(row).toHaveTextContent("gdrive-file-1");
+    expect(row.querySelector('[data-testid="watch-state-failure-reason"]')).toHaveTextContent("401: token expired");
+    expect(screen.queryByTestId("watch-state-no-failures")).toBeNull();
+  });
+
+  test("no recent failures renders its own message, not a blank section", async () => {
+    vi.spyOn(watchedApi, "listWatchedSources").mockResolvedValue({ sources: [] });
+    renderPage();
+    expect(await screen.findByTestId("watch-state-no-failures")).toBeInTheDocument();
+  });
+
+  test("[negative] the watch-state API being unreachable does not blank the watched-sources lane above it", async () => {
+    vi.spyOn(watchedApi, "listWatchedSources").mockResolvedValue({ sources: [HEALTHY] });
+    vi.spyOn(watchStateApi, "getWatchState").mockRejectedValue(new ApiError(0, "failed to connect"));
+    renderPage();
+    await screen.findByTestId("watch-row");
+    expect(await screen.findByTestId("watch-state-unreachable")).toHaveTextContent(/NOT the same as/i);
+    expect(screen.queryByTestId("watch-heartbeat-row")).toBeNull();
+  });
+
+  test("[negative] a deployment with the read not wired (501) renders the server's own message, not a crash", async () => {
+    vi.spyOn(watchedApi, "listWatchedSources").mockResolvedValue({ sources: [] });
+    vi.spyOn(watchStateApi, "getWatchState").mockRejectedValue(new ApiError(501, "watch-state read is not wired for this deployment"));
+    renderPage();
+    expect(await screen.findByTestId("watch-state-unreachable")).toHaveTextContent("watch-state read is not wired for this deployment");
   });
 });
 
