@@ -64,5 +64,16 @@ qa/evidence/*/cdp-profile/
 
 # meeting-bot: logged-in bot browser profile (cookies!) + webinar recordings
 data/bot-profile/
+data/browser/
+.venv/
+.cache/
+.playwright-cli/
 raw/webinars/
 **/downloaded_files/
+
+# Local release diagnostics and handoff state; retain on disk, exclude from commits.
+.pytest_cache/
+HANDOFF.md
+data/qa-checker-*20260930*/
+data/toc-migrated/synthetic-*-20260930/
+qa/evidence/senior-capture-review-temp/

@@ -17,6 +17,7 @@ export interface CalendarEvent {
   /** Absent when the event has no video-call link (nothing to auto-join). */
   meetingUrl?: string;
   organizer?: string;
+  cancelled?: boolean;
 }
 
 export interface CalendarClient {

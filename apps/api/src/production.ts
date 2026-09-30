@@ -24,6 +24,7 @@ import { createLlmScorer } from "./score.js";
 import { createTavilySearchFn } from "./ask-web-fallback.js";
 import { indexSession, type BoundIndexer } from "./indexing/session.js";
 import { createAskArmsFor } from "./ask-arms.js";
+import { withSessionArtifacts } from "./routes/brain.js";
 
 const ROUTING_CONFIG_PATH = fileURLToPath(new URL("../../../config/ai-routing.yaml", import.meta.url));
 
@@ -148,10 +149,11 @@ export function buildRouting(): {
  * --index` must index a bot-captured session through EXACTLY the binding the server's ingest
  * routes use, not a second copy of it that could drift.
  */
-export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRouting()): BoundIndexer {
+export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRouting(), options: { strictWebinar?: boolean } = {}): BoundIndexer {
   const { chains, providers, jobWrite } = routing;
   return (tenantId, sessionId) =>
     indexSession(tenantId, sessionId, {
+      strictWebinar: options.strictWebinar,
       complete: (job) => routeComplete(job.kind, job, { chains, providers, write: jobWrite, tenantId }),
       // Wired only when a chain is configured for it (U1.3). Passing an embedder unconditionally
       // would make every index run fail on an install with no embedding provider, where today it
@@ -174,7 +176,7 @@ export function buildProductionDeps(): ServerDeps {
   return {
     keyStore: createMongoApiKeyStore(),
     evalRuns: createMongoEvalRunStore(),
-    brain: createMongoBrainReadDeps(),
+    brain: withSessionArtifacts(createMongoBrainReadDeps(), fileURLToPath(new URL("../../../", import.meta.url))),
     citations: createMongoCitationsDeps(),
     // U4b/R2: the same Mongo health deps as before, plus the injected watcher-silence detector.
     health: { ...createMongoHealthDeps(), watchSilence: createMongoWatchSilenceDeps() },

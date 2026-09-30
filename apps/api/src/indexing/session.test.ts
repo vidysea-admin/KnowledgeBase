@@ -335,3 +335,19 @@ test("every chunk write is tenant-scoped — the same guard the claims path need
   const insert = calls.find((c) => c.coll === "chunks" && c.op === "insertMany");
   for (const doc of insert!.docs ?? []) assert.equal(doc.tenantId, "t");
 });
+
+test("ISS-WEBINARRELEASE-002 strict provider/parser/embedding degradation preserves prior knowledge", async () => {
+  for (const failure of ["summary-rejected", "summary-invalid", "claims-rejected", "claims-invalid", "embedding-rejected", "embedding-missing", "uncited-legacy-output"]) {
+    const {db,calls}=fakeDb({existingSessionPage:{_id:"prior",tenantId:"t",sessionId:"s1",summary:"Prior valid page"}});
+    const base=completeWith({summarizeFails:failure==="summary-rejected",claimsFails:failure==="claims-rejected"});
+    const complete=async(job: Parameters<typeof base>[0])=>{
+      if((failure==="summary-invalid"&&job.kind==="summarize")||(failure==="claims-invalid"&&job.kind==="claims")){
+        return {text:"not-json",usage:{inputTokens:0,outputTokens:0},provider:"fixture",model:"fixture",costUsd:0};
+      }return base(job);
+    };
+    const embed=failure==="embedding-missing"?undefined:failure==="embedding-rejected"?async()=>{throw new Error("fixture outage");}:embedOk;
+    await assert.rejects(indexSession("t","s1",{db,complete:complete as never,embed,strictWebinar:true}),/strict webinar index incomplete/,failure);
+    assert.ok(!calls.some((call)=>["session_pages","claims","chunks","tree_index"].includes(call.coll)&&["deleteMany","insertOne","insertMany","replaceOne"].includes(call.op)),failure);
+    assert.ok(!calls.some((call)=>JSON.stringify(call.update ?? {}).includes('"status.index":"done"')),failure);
+  }
+});

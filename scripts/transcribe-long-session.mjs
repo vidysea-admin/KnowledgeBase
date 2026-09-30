@@ -29,7 +29,7 @@ import { execFileSync } from "node:child_process";
 import "dotenv/config";
 import { register } from "tsx/esm/api";
 import { Agent, setGlobalDispatcher } from "undici";
-import { findAudioFile } from "./lib/find-audio-file.mjs";
+import { findAudioFile, transcriptTenant } from "./lib/find-audio-file.mjs";
 import { realUploadTransport } from "./lib/real-upload-transport.mjs";
 
 // 30 min: a single-call transcription of a ~60-min recording can exceed 10 min before headers (2026-09-24).
@@ -84,6 +84,7 @@ const MIN_RECURSE_SECONDS = 20;
 const MAX_RECURSE_DEPTH = 3;
 
 async function main() {
+  const tenantId = transcriptTenant(DATA_DIR, sessionId);
   const { uploadFile, pollFileState, transcribeUploadedAudio } = await import("../packages/ai/src/stt/gemini-file-upload.ts");
   const { computeChunkBoundaries, mergeChunkedTurns, findTimeGaps } = await import("../packages/ai/src/stt/chunk-audio.ts");
 
@@ -209,7 +210,7 @@ async function main() {
 
   const realTurns = mergedTurns.map((t, i) => ({
     _id: `${sessionId}-t${String(i + 1).padStart(3, "0")}`,
-    tenantId: "toc",
+    tenantId,
     sessionId,
     speakerRef: t.speakerRef,
     tStart: t.tStart,

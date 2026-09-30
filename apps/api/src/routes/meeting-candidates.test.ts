@@ -6,16 +6,17 @@ import assert from "node:assert/strict";
 
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeMeetingCandidatesDeps } from "../fixtures.js";
+import { createMeetingCandidatesDeps } from "../store.js";
 
 test("POST /gmail/scan with the gmail scope returns a real scan summary", async () => {
   const server = await startTestServer(
     buildTestDeps({
       keyStore: fakeKeyStore({ "gmail-key": { tenantId: "tenant-1", scopes: ["gmail"] } }),
-      meetingCandidates: fakeMeetingCandidatesDeps({ scanGmail: async () => ({ created: 2, autoApproved: 1 }) }),
+      meetingCandidates: fakeMeetingCandidatesDeps({ getWorkDatabase: () => "fixture-work", scanGmail: async () => ({ created: 2, autoApproved: 1 }) }),
     }),
   );
   try {
-    const res = await fetch(`${server.baseUrl}/gmail/scan`, { method: "POST", headers: { authorization: "Bearer gmail-key" } });
+    const res = await fetch(`${server.baseUrl}/gmail/scan`, { method: "POST", headers: { authorization: "Bearer gmail-key", "X-LKB-Work-DB": "fixture-work" } });
     assert.equal(res.status, 200);
     const body = (await res.json()) as { created: number; autoApproved: number };
     assert.equal(body.created, 2);
@@ -23,6 +24,62 @@ test("POST /gmail/scan with the gmail scope returns a real scan summary", async 
   } finally {
     await server.close();
   }
+});
+
+test("production Gmail factory binds source owner and actual work DB before provider writes", async () => {
+  const before = process.env.MONGO_WORK_DB; process.env.MONGO_WORK_DB = "fixture-work";
+  let reads = 0, dbReads = 0;
+  const scan = async () => {reads++; return [];};
+  const databaseName = () => {dbReads++; return "fixture-work";};
+  try {
+    for (const owner of ["", "foreign", "invalid owner"]) {
+      const deps = createMeetingCandidatesDeps(owner, scan, databaseName);
+      assert.equal(deps.getWorkDatabase!("tenant-1"), undefined);
+      await assert.rejects(deps.scanGmail("tenant-1"), /owner/);
+    }
+    assert.equal(reads, 0); assert.equal(dbReads, 0);
+    const deps = createMeetingCandidatesDeps("tenant-1", scan, databaseName);
+    assert.equal(deps.getWorkDatabase!("tenant-2"), undefined); assert.equal(dbReads, 0);
+    assert.equal(deps.getWorkDatabase!("tenant-1"), "fixture-work");
+    for (const database of ["lkb", "global_university_db", "foreign-work"]) assert.equal(createMeetingCandidatesDeps("tenant-1", scan, () => database).getWorkDatabase!("tenant-1"), undefined);
+    const server = await startTestServer(buildTestDeps({meetingCandidates: {...deps, listCandidates: async () => []}, keyStore: fakeKeyStore({
+      "owner-key": {tenantId: "tenant-1", scopes: ["gmail"]}, "foreign-key": {tenantId: "tenant-2", scopes: ["gmail"]},
+    })}));
+    try {
+      const foreign = await fetch(`${server.baseUrl}/meeting-candidates`, {headers: {authorization: "Bearer foreign-key"}});
+      assert.equal(foreign.headers.get("x-lkb-work-db"), null);
+      assert.equal((await fetch(`${server.baseUrl}/gmail/scan`, {method: "POST", headers: {authorization: "Bearer foreign-key", "X-LKB-Work-DB": "fixture-work"}})).status, 503);
+      assert.equal(reads, 0);
+      assert.equal((await fetch(`${server.baseUrl}/gmail/scan`, {method: "POST", headers: {authorization: "Bearer owner-key", "X-LKB-Work-DB": "fixture-work"}})).status, 200);
+      assert.equal(reads, 1);
+    } finally { await server.close(); }
+  } finally { if (before === undefined) delete process.env.MONGO_WORK_DB; else process.env.MONGO_WORK_DB = before; }
+});
+
+test("Gmail scan refuses unbound/production/foreign work DB before provider writes and sanitizes failures", async () => {
+  let work: string | undefined = "fixture-work", calls = 0, fail = false;
+  const server = await startTestServer(buildTestDeps({
+    keyStore: fakeKeyStore({"gmail-key": {tenantId: "tenant-1", scopes: ["gmail"]}}),
+    meetingCandidates: fakeMeetingCandidatesDeps({ getWorkDatabase: () => work, scanGmail: async () => {
+      calls++; if (fail) throw new Error("secret token raw provider details"); return {created: 0, autoApproved: 0};
+    }}),
+  }));
+  try {
+    for (const value of [undefined, "lkb", "global_university_db", "fixture-work"]) {
+      work = value;
+      for (const binding of [undefined, "foreign-work"]) {
+        const headers: Record<string, string> = {authorization: "Bearer gmail-key"};
+        if (binding) headers["X-LKB-Work-DB"] = binding;
+        assert.equal((await fetch(`${server.baseUrl}/gmail/scan`, {method: "POST", headers})).status, 503);
+      }
+    }
+    assert.equal(calls, 0);
+    work = "fixture-work"; fail = true;
+    const response = await fetch(`${server.baseUrl}/gmail/scan`, {method: "POST", headers: {authorization: "Bearer gmail-key", "X-LKB-Work-DB": work}});
+    assert.equal(response.status, 503); assert.ok(!(await response.text()).includes("secret")); assert.equal(calls, 1);
+    const read = await fetch(`${server.baseUrl}/meeting-candidates`, {headers: {authorization: "Bearer gmail-key"}});
+    assert.equal(read.headers.get("x-lkb-work-db"), work);
+  } finally { await server.close(); }
 });
 
 test("GET /meeting-candidates without the gmail scope returns 403", async () => {

@@ -1402,3 +1402,27 @@ branch returns to the Approver once the audits land.
 everything needed at once in plain language. Three independent decisions had accumulated and none
 depended on the still-running `iss-346-round-cap-mechanical-check` build, so holding them for a
 fourth would have left real decisions idle behind an unrelated unit.
+
+## D-056 | 2026-09-30 | type: decision | status: ACTIVE
+
+**Approved-by:** Umesh
+**What:** Implement the user-approved Useful Webinar -> Knowledge Base release: every classified webinar invite, audio/video capture, diarized transcript, screen-derived cited notes, indexing/search/Ask and operational visibility. Windows first; Ubuntu requires equivalent live verification.
+**Why:** The user selected only work-relevant features from the meeting transcript, explicitly required audio and video plus screen data, and then requested implementation of the complete plan. Existing real capture depends on Windows OBS; a portable tab-capture backend and media-quality safeguards are required before deployment claims.
+**Changes-authorized:** Existing meeting-bot join/capture/calendar functions, supporting browser extension/backend files and tests, scripts/webinar processing stages, setup requirements, existing API/web session surfaces and tests, schemas/generated types/migrations when required by evidence interfaces. No enforcement hooks, production promotion, or paused speaker-branch unpause authorized by this entry.
+**Result:** Implementation authorized; independent checker validation and real webinar proof required. Existing next-real-webinar proof and production-write boundaries remain binding. Every classified webinar supersedes the earlier trusted-sender-only scheduling choice for this release; explicit rejection and registration barriers remain respected.
+**Links:** docs/plan.md, docs/meeting-bot-roadmap.md, T-034, T-035, T-036, T-037, T-038, T-040, T-041, T-043, T-044, U4.1; user approved plan in current chat.
+
+## D-057 | 2026-09-30 | type: decision | status: ACTIVE
+
+**What:** Authorize additive canonical webinar evidence schemas and strict readiness repairs under the approved Useful Webinar release.
+**Why:** Independent AI/data review found ungrounded summary items and false ready outcomes after extraction or embedding degradation. The independently approved existing-file plan preserves legacy ingestion while making webinar output evidence-bound and failure-visible.
+**Result:** Implementation authorized; completion requires fresh independent verification. Real webinar, unattended activation, production promotion and Ubuntu proof remain separate gates.
+**Changes-authorized:** schema/session_pages.schema.json optional citedItems and qa with quoted item-level evidence and source status; schema/claims.schema.json optional evidence quote and origin; schema/turns.schema.json optional typed screenEvidence frame identity, confined file, hash and timestamp. Generate derived core types only with scripts/gen-types.mjs. Implement existing summarize/claims/indexing, webinar processing/sync/runner and existing UI seams per qa/manifests/webinar-release-repair-plan.md Grounded webinar knowledge section. No frozen contracts or ARCHITECTURE edit authorized.
+**Links:** T-049; D-056; ISS-WEBINARRELEASE-001; ISS-WEBINARRELEASE-002; qa/manifests/webinar-release-repair-plan.md
+
+## D-058 | 2026-09-30 | type: session | status: ACTIVE
+**What:** T-051 bounded Windows webinar implementation checkpoint: managed audio/video capture, owned interrupted recovery, protected playback/screen evidence, operation/discovery health, isolated fresh Gmail scan, and portable process identity.
+**Why:** The user selected useful webinar capture-to-knowledge only. Preserve genuine local evidence while refusing incomplete knowledge and keeping production promotion and live activation separate.
+**Result:** Actual Windows production CLI synthetic capture 81.001 seconds with reload; interrupted controller recovered 30.492 seconds of playable AV, exact owned cleanup and explicit unrecovered coverage gap. Independent headed playback verified native seek after eviction; headed operations UI verified outage/recovery/stale/unverified states. Node media/provenance suites 31/31; independent controller/backend/receiver 28/28, Python 28/28; API/web/bot TypeScript checks green. Final discovery suites and precise commands recorded in qa/verdicts/webinar-portable-release.md. python contracts/verify_contracts.py exits 0 by vacuity: no frozen contracts, not release proof. Global LOC fails five files, including modified sb_join.py. Full release NOT VERIFIED: canonical citedItems/Q&A/evidence schema edit was rejected by automatic approval review pending specific trusted Umesh approval; real webinar/provider/Ask, sustained capture, actual feed/Telegram, continuous discovery/cancellation/rescheduling, watch recovery and actual Ubuntu host remain open. No production writes/promotion, GitHub push, deployment, live-proof marker or unattended enablement.
+**Links:** T-051; D-056; D-057; qa/manifests/webinar-portable-release.md; qa/verdicts/webinar-portable-release.md; docs/webinar-release.md. D-057's immutable Links field names T-049 accidentally; its cited webinar implementation belongs to T-051, not the separate Langfuse task.
+**Changes-authorized:** T-051 status/evidence and release runbook/manifest/handoff updates only. No ARCHITECTURE, frozen contracts or enforcement-path changes.

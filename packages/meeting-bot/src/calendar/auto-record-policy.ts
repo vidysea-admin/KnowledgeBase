@@ -12,6 +12,9 @@
  * exactly matches `emails`, OR its domain exactly matches an entry in `domains`. Matching is
  * case-insensitive; callers are expected to have already lower-cased both lists (
  * `loadTrustedSenderConfig` does this). */
+import { createHash } from "node:crypto";
+import { detectPlatform } from "../platform.js";
+
 export interface TrustedSenderConfig {
   emails: string[];
   domains: string[];
@@ -89,4 +92,29 @@ export function loadTrustedSenderConfig(env: NodeJS.ProcessEnv = process.env): T
     emails: parseCsvEnv(env.AUTO_RECORD_TRUSTED_EMAILS) ?? DEFAULT_TRUSTED_SENDER_EMAILS,
     domains: parseCsvEnv(env.AUTO_RECORD_TRUSTED_DOMAINS) ?? DEFAULT_TRUSTED_SENDER_DOMAINS,
   };
+}
+
+/** Automatic recording is limited to positively identified webinars, never generic meetings. */
+export function classifyWebinarInvite(title: string): "webinar" | "meeting" | "uncertain" {
+  if (/\b(stand[ -]?up|one[ -]?on[ -]?one|1[: -]1|team meeting|interview|personal|catch[ -]?up)\b/i.test(title)) return "meeting";
+  return /\b(webinar|seminar|educator dialogues|in[ -]focus|online workshop|virtual conference)\b/i.test(title)
+    ? "webinar" : "uncertain";
+}
+
+/** Token rotations do not change a meeting's identity; date/time distinguishes recurring events. */
+export function webinarIdentity(url: string, startTime: string): string | undefined {
+  try {
+    const u = new URL(url);
+    if (u.protocol !== "https:" || detectPlatform(url) === "unknown") return undefined;
+    for (const key of [...u.searchParams.keys()]) {
+      if (/^(tk|token|access_token|pwd|password|utm_.+)$/i.test(key)) u.searchParams.delete(key);
+    }
+    u.hash = "";
+    u.searchParams.sort();
+    return `${u.toString()}|${new Date(startTime).toISOString()}`;
+  } catch { return undefined; }
+}
+
+export function webinarSessionKey(identity: string): string {
+  return `webinar-${createHash("sha256").update(identity).digest("hex").slice(0, 24)}`;
 }

@@ -1,4 +1,4 @@
-﻿# TASKS â€” Living Knowledge Base
+# TASKS â€” Living Knowledge Base
 
 > Stable IDs + status field mandatory. DECISIONS entries cross-reference these IDs in **Links**.
 > Full feature catalogue (60+ items, Aâ€“F) and the system design live in the approved plan:
@@ -138,4 +138,4 @@ Meeting-Bot pages (apps/web) are open follow-up work, not yet started.
 | T-049 | open | Langfuse self-hosted tracing on every Gemini call (transcribe, extract, ask): latency, tokens, cost, retries, failures | Vidysea standard rule 5 (brain `patterns/agentic-architecture-standard.md`): self-hosted only, TELEMETRY_ENABLED=false, no enterprise key; approved by Umesh 2026-09-24 |
 | T-050 | open | Pipeline as a thin LangGraph 1.x workflow (capture → transcribe → extract → index) with checkpoint/resume + a job queue; /ask router as a graph | standard: graph = wiring only, logic stays in functions/skills; multi-agent (Deep Agents) only for the counsellor (T-013); approved by Umesh 2026-09-24 |
 | T-048 | open | Make gemini-3.8-flash single-call the default for recordings ≤ ~90 min; keep chunking as fallback | D-028: one call fixed speaker attribution + no gaps; first re-run one TOC session to compare |
-
+| T-051 | in_progress | Useful Webinar -> Knowledge Base Windows operational release; separately verified Ubuntu portability | D-056/D-057/D-058; selected scope only. Actual Windows production CLI synthetic AV81.001s/reload and interrupted AV30.492s/recovered status, exact cleanup and visible coverage gap independently verified. Native playback seek/eviction, operations/discovery health UI, guarded fresh Gmail work-DB scan, provider error/pagination and Linux identity code checked locally. Full grounded notes/Q&A gated by rejected canonical-schema edit pending explicit approval; real-webinar/provider/Ask, sustained AV, connected feeds/Telegram, cancellation/rescheduling during active capture, service/host restart and Ubuntu host proof remain pending. Global LOC fails five files including modified sb_join.py. See qa/manifests/webinar-portable-release.md and docs/webinar-release.md. No production promotion, GitHub push, deployment or unattended activation. |

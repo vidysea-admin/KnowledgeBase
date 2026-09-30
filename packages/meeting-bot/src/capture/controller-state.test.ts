@@ -122,10 +122,14 @@ test("isPidAlive is false for a pid that cannot correspond to a live process", (
 
 // --- ISS-T-047-CONTROLLER-002: identity beyond bare pid (pid-reuse defense) -----------------
 
-test("getProcessStartTime returns a parseable timestamp for this process's own (real, live) pid", () => {
+test("getProcessStartTime returns platform identity for this process's own (real, live) pid", () => {
   const t = getProcessStartTime(process.pid);
-  assert.equal(typeof t, "string");
-  assert.ok(!Number.isNaN(new Date(t as string).getTime()), `expected a parseable timestamp, got ${t}`);
+  if (process.platform === "win32") {
+    assert.equal(typeof t, "string");
+    assert.ok(!Number.isNaN(new Date(t as string).getTime()), `expected a parseable timestamp, got ${t}`);
+  } else if (process.platform === "linux") {
+    assert.match(t ?? "", /^linux:[a-f0-9-]{36}:[1-9]\d*$/);
+  } else assert.equal(t, undefined);
 });
 
 test("getProcessStartTime returns undefined (never throws) for a pid that cannot correspond to a live process", () => {
@@ -183,4 +187,71 @@ test("isControllerAlive — pid alive, identity matches (injected probes) → al
     processStartTime: () => "2026-09-24T10:00:00.000000+05:30",
   });
   assert.equal(alive, true);
+});
+
+test("Linux process identity validates bounded proc fields without invoking Windows", () => {
+  const boot = "6bce4b13-280c-4b41-b3ea-452a4f0c6299";
+  const stat = (ticks = "123456", name = "node (worker)", pid = 4242) => `${pid} (${name}) S ${Array(18).fill("0").join(" ")} ${ticks} 0 0\n`;
+  const files = new Map<string, string | undefined>([["/proc/4242/stat", stat()], ["/proc/sys/kernel/random/boot_id", boot + "\n"]]);
+  let windowsCalls = 0;
+  const probes = {
+    platform: "linux" as const,
+    readProc: (file: string, maxBytes: number) => {
+      assert.equal(maxBytes, file.endsWith("/stat") ? 8192 : 128);
+      return files.get(file);
+    },
+    windowsStartTime: () => { windowsCalls++; throw new Error("must not call Windows"); },
+  };
+  const identity = `linux:${boot}:123456`;
+  assert.equal(getProcessStartTime(4242, probes), identity);
+  for (const name of ["node ) odd (name", "a ((b))", "name with spaces"]) {
+    files.set("/proc/4242/stat", stat("123456", name));
+    assert.equal(getProcessStartTime(4242, probes), identity);
+  }
+  const badStats = [undefined, "", "4242 node S 0", stat("123456", "node", 4243), stat().replace(") S", ") ?"),
+    stat().split(" ").slice(0, 10).join(" "), ...["0", "-1", "1.5", "01", "18446744073709551616", "123x"].map(value => stat(value)),
+    stat().replace(" S 0", " S NaN"), "x".repeat(8193), "�".repeat(4097)];
+  for (const value of badStats) {
+    files.set("/proc/4242/stat", value);
+    assert.equal(getProcessStartTime(4242, probes), undefined, `stat ${String(value).slice(0, 60)}`);
+  }
+  files.set("/proc/4242/stat", stat());
+  for (const value of [undefined, "", "bad-uuid", boot + " junk", "x".repeat(129)]) {
+    files.set("/proc/sys/kernel/random/boot_id", value);
+    assert.equal(getProcessStartTime(4242, probes), undefined);
+  }
+  files.set("/proc/sys/kernel/random/boot_id", boot.toUpperCase());
+  assert.equal(getProcessStartTime(4242, probes), identity);
+  files.set("/proc/4242/stat", stat("18446744073709551615"));
+  assert.equal(getProcessStartTime(4242, probes), `linux:${boot}:18446744073709551615`);
+  assert.equal(getProcessStartTime(4242, {...probes, readProc: () => { throw new Error("EACCES"); }}), undefined);
+  assert.equal(getProcessStartTime(4242, {...probes, platform: "darwin"}), undefined);
+  for (const pid of [0, -1, NaN, Infinity, 1.5, 2147483648]) assert.equal(getProcessStartTime(pid, probes), undefined);
+  assert.equal(windowsCalls, 0);
+  files.set("/proc/4242/stat", stat());
+  const expected = getProcessStartTime(4242, probes);
+  const state = sample({pid: 4242, controllerStartedAt: expected});
+  const live = () => isControllerAlive(state, {pidAlive: () => true, processStartTime: pid => getProcessStartTime(pid, probes)});
+  assert.equal(live(), true);
+  assert.equal(controllerMatchesIdentity(expected, expected), true);
+  files.set("/proc/4242/stat", stat("123457"));
+  assert.equal(controllerMatchesIdentity(expected, getProcessStartTime(4242, probes)), false);
+  assert.equal(live(), false);
+  files.set("/proc/4242/stat", stat());
+  files.set("/proc/sys/kernel/random/boot_id", "7bce4b13-280c-4b41-b3ea-452a4f0c6299");
+  assert.equal(controllerMatchesIdentity(expected, getProcessStartTime(4242, probes)), false);
+  assert.equal(live(), false);
+  assert.equal(controllerMatchesIdentity(expected, undefined), true);
+});
+
+test("Windows process identity retains its timestamp and never reads proc", () => {
+  const timestamp = "2026-09-30T10:00:00.0000000+05:30";
+  let calls = 0;
+  const probes = {platform: "win32" as const, readProc: () => { throw new Error("must not read proc"); },
+    windowsStartTime: (pid: number) => { calls++; assert.equal(pid, 4242); return ` ${timestamp}\n`; }};
+  assert.equal(getProcessStartTime(4242, probes), timestamp);
+  for (const pid of [0, -1, NaN, Infinity, 1.5, 2147483648]) assert.equal(getProcessStartTime(pid, probes), undefined);
+  assert.equal(getProcessStartTime(4242, {...probes, platform: "darwin"}), undefined);
+  assert.equal(calls, 1);
+  assert.equal(getProcessStartTime(4242, {...probes, windowsStartTime: () => { throw new Error("probe unavailable"); }}), undefined);
 });

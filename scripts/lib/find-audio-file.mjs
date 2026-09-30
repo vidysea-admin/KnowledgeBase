@@ -9,6 +9,13 @@
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, extname } from "node:path";
 
+export function transcriptTenant(dataDir, sessionId) {
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(sessionId)) throw new Error("invalid sessionId");
+  const source = JSON.parse(readFileSync(join(dataDir, sessionId, "source.json"), "utf8"));
+  if (typeof source.tenantId !== "string" || !source.tenantId.trim()) throw new Error("source tenantId required before transcription");
+  return source.tenantId;
+}
+
 export function findAudioFile(dataDir, audioDir, sessionId) {
   const sourceJsonPath = join(dataDir, sessionId, "source.json");
   if (!existsSync(sourceJsonPath)) throw new Error(`no data/toc-migrated/${sessionId}/source.json found`);

@@ -27,8 +27,12 @@ export function createCalendarRouter(deps: CalendarReadDeps): Router {
   const router = Router();
 
   router.get("/calendar/upcoming", requireScope("calendar"), async (req: Request, res: Response) => {
-    const meetings = await deps.listUpcoming(req.auth!.tenantId);
-    res.status(200).json({ meetings });
+    try {
+      const meetings = await deps.listUpcoming(req.auth!.tenantId);
+      res.status(200).json({ meetings });
+    } catch {
+      res.status(503).json({ error: "discovery_unavailable", message: "Calendar discovery unavailable" });
+    }
   });
 
   return router;

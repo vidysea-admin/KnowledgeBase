@@ -22,6 +22,9 @@ export interface ChunkWriteResult {
 /** What `indexSession` observed. Returned so a caller can SEE a silent degradation (ISS-116). */
 export interface IndexSessionResult {
   sessionId: string;
+  summary?: { degraded: string | null };
+  claims?: { degraded: string | null };
+  completion?: { version: 2; strict: boolean; complete: boolean; generation: string; turnCount: number; treeWritten: boolean };
   chunks: ChunkWriteResult;
   /** U2.1 entity promotion. `null` when no tree root was produced, so there was nothing to promote
    * — distinct from a promotion that ran and failed, which reports `skipped`. */

@@ -17,19 +17,22 @@
  *
  * Disclosed limitation: this only works on a machine with the `gws` CLI + its OAuth keyring
  * configured (Umesh's own machine today) — not yet portable to a hosted multi-tenant deployment,
- * and it reads one calendar ("primary"), not a per-tenant mapping. On any failure (`gws` missing,
- * not authenticated, network error, malformed output) this returns an empty list rather than
- * throwing, so the Calendar page still renders an honest state instead of a 500.
+ * and it reads one calendar ("primary"), not a per-tenant mapping. Discovery failures propagate
+ * as a sanitized error; an unavailable calendar must never look like successful empty coverage.
  */
 import { execFile } from "node:child_process";
 import type { UpcomingMeeting } from "./routes/calendar.js";
 
 interface GwsEventListResponse {
   items?: GwsCalendarEvent[];
+  kind?: string;
+  nextPageToken?: string;
+  error?: unknown;
 }
 
 interface GwsCalendarEvent {
   id: string;
+  status?: string;
   summary?: string;
   start?: { dateTime?: string; date?: string };
   end?: { dateTime?: string; date?: string };
@@ -52,33 +55,48 @@ function meetingUrlOf(event: GwsCalendarEvent): string | undefined {
 
 function runGws(args: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
-    execFile("cmd", ["/c", "gws", ...args], { timeout: 15000, maxBuffer: 4 * 1024 * 1024 }, (err, stdout) => {
+    execFile(process.platform === "win32" ? "cmd" : "gws", process.platform === "win32" ? ["/c", "gws", ...args] : args, { timeout: 15000, maxBuffer: 4 * 1024 * 1024 }, (err, stdout) => {
       if (err) { reject(err); return; }
       resolve(stdout);
     });
   });
 }
 
-export async function listUpcomingGwsMeetings(windowDays = 14): Promise<UpcomingMeeting[]> {
+export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws): Promise<UpcomingMeeting[]> {
+  if (!Number.isFinite(windowDays) || windowDays <= 0 || windowDays > 366) throw new Error("Invalid calendar discovery window");
   const timeMin = new Date().toISOString();
   const timeMax = new Date(Date.now() + windowDays * 24 * 60 * 60 * 1000).toISOString();
-  const params = JSON.stringify({
-    calendarId: "primary", maxResults: 25, orderBy: "startTime", singleEvents: true, timeMin, timeMax,
-  });
+  const params = {
+    calendarId: "primary", maxResults: 2500, orderBy: "startTime", singleEvents: true, timeMin, timeMax,
+  };
 
   try {
-    const stdout = await runGws(["calendar", "events", "list", "--params", params, "--format", "json"]);
-    const parsed = parseGwsJson(stdout) as GwsEventListResponse;
-    const mapped: UpcomingMeeting[] = (parsed.items ?? []).map((e) => ({
+    let pageToken: string | undefined;
+    const seen = new Set<string>(), events: GwsCalendarEvent[] = [];
+    for (let page = 0; page < 20; page++) {
+      const parsed = parseGwsJson(await run(["calendar", "events", "list", "--params", JSON.stringify({...params, pageToken}), "--format", "json"])) as GwsEventListResponse;
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed) || "error" in parsed ||
+          (!Array.isArray(parsed.items) && !(parsed.items === undefined && parsed.kind === "calendar#events"))) throw new Error("Invalid calendar response");
+      events.push(...(parsed.items ?? []));
+      pageToken = parsed.nextPageToken;
+      if (pageToken === undefined) break;
+      if (typeof pageToken !== "string" || !/^[A-Za-z0-9._~+/=-]+$/.test(pageToken) || pageToken.length > 2048 || seen.has(pageToken) || page === 19) throw new Error("Calendar discovery incomplete");
+      seen.add(pageToken);
+    }
+    const mapped: UpcomingMeeting[] = events.filter(e => e?.status !== "cancelled").map((e) => {
+      if (!e || typeof e.id !== "string" || !e.id || (e.summary !== undefined && typeof e.summary !== "string")) throw new Error("Invalid calendar event");
+      const start = e.start?.dateTime ?? e.start?.date;
+      if (start !== undefined && (typeof start !== "string" || !Number.isFinite(Date.parse(start)))) throw new Error("Invalid calendar timestamp");
+      return {
       id: e.id,
       title: e.summary ?? "(untitled)",
       startTime: e.start?.dateTime ?? e.start?.date ?? "",
       endTime: e.end?.dateTime ?? e.end?.date ?? "",
       meetingUrl: meetingUrlOf(e),
       organizer: e.organizer?.email,
-    }));
+    }; });
     return mapped.filter((m) => Boolean(m.meetingUrl) && Boolean(m.startTime));
   } catch {
-    return [];
+    throw new Error("Calendar discovery unavailable");
   }
 }

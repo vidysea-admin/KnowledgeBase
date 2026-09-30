@@ -8,6 +8,11 @@
     "node": ">=24"
   },
   "scripts": {
+    "webinar:setup": "node scripts/webinar/setup.mjs",
+    "webinar:run": "node scripts/webinar/run-pipeline.mjs",
+    "webinar:record": "node --import tsx packages/meeting-bot/src/cli.ts record",
+    "webinar:process": "node scripts/webinar/process-video.mjs",
+    "webinar:sync": "node scripts/webinar/sync-session.mjs",
     "demo:live": "node scripts/demo-live.mjs",
     "demo:up": "node scripts/demo-live.mjs --up",
     "gen:types": "node scripts/gen-types.mjs",

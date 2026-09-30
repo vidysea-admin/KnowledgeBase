@@ -61,11 +61,12 @@ interface MeetingCandidateApiRow {
 
 export interface ScheduleTickDeps {
   loadCalendarEvents: () => Promise<CalendarEvent[]>;
-  loadCandidates: () => Promise<AutoRecordCandidateInput[]>;
+  loadCandidates: (refresh?: boolean) => Promise<AutoRecordCandidateInput[]>;
   now: () => string;
   stateDir: string;
   scheduler: TaskScheduler;
   log: (msg: string) => void;
+  everyWebinar?: boolean;
 }
 
 function toCandidateInput(row: MeetingCandidateApiRow): AutoRecordCandidateInput {
@@ -90,6 +91,7 @@ function toCandidateInput(row: MeetingCandidateApiRow): AutoRecordCandidateInput
  * poller loop (same failure contract as `gws-gmail.ts`/`gws-calendar.ts`). */
 export function createHttpCandidateLoader(
   apiUrl: string, apiKey: string | undefined, log: (msg: string) => void,
+  everyWebinar = false,
 ): () => Promise<AutoRecordCandidateInput[]> {
   return async () => {
     if (!apiKey) {
@@ -98,16 +100,18 @@ export function createHttpCandidateLoader(
     }
     try {
       const res = await fetch(`${apiUrl}/meeting-candidates`, {
-        headers: { authorization: `Bearer ${apiKey}` },
+        headers: { authorization: `Bearer ${apiKey}` }, redirect: "error",
+        signal: AbortSignal.timeout(30_000),
       });
       if (!res.ok) {
         log(`schedule-tick: GET /meeting-candidates -> ${res.status} — skipping this tick (0 candidates)`);
         return [];
       }
       const body = (await res.json()) as { candidates?: MeetingCandidateApiRow[] } | MeetingCandidateApiRow[];
-      const rows = Array.isArray(body) ? body : body.candidates ?? [];
+      const rows = Array.isArray(body) ? body : body?.candidates;
+      if (!Array.isArray(rows)) throw new Error("Invalid Gmail candidate response");
       return rows
-        .filter((r) => r.status === "approved" || r.status === "auto_approved")
+        .filter((r) => everyWebinar || r.status === "approved" || r.status === "auto_approved")
         .map(toCandidateInput);
     } catch (err) {
       log(`schedule-tick: /meeting-candidates fetch failed (${err instanceof Error ? err.message : String(err)}) ` +
@@ -123,14 +127,59 @@ export async function loadNoCalendarEvents(): Promise<CalendarEvent[]> {
   return [];
 }
 
+export interface WebinarFeedHealth {
+  status: "healthy" | "failed";
+  checkedAt: string;
+  lastSuccessAt?: string;
+  notification?: { acknowledged?: string; fingerprint?: string; status?: string; retryable?: boolean; updatedAt?: string };
+}
+/** Load both connected feeds without converting a failed source into a healthy empty schedule. */
+export async function loadWebinarSourcesWithHealth(
+  deps: Pick<ScheduleTickDeps, "loadCalendarEvents" | "loadCandidates">,
+  checkedAt: string,
+  previous?: Partial<Record<"calendar" | "gmail", WebinarFeedHealth>>,
+  refresh = false,
+) {
+  if (previous !== undefined && (!previous || typeof previous !== "object" || Array.isArray(previous) ||
+    Object.keys(previous).some((key) => !["calendar", "gmail"].includes(key)))) throw new Error("Invalid discovery health state");
+  for (const row of Object.values(previous ?? {})) {
+    if (!row || !["healthy", "failed"].includes(row.status) || typeof row.checkedAt !== "string" || !Number.isFinite(Date.parse(row.checkedAt)) ||
+      (row.lastSuccessAt !== undefined && (typeof row.lastSuccessAt !== "string" || !Number.isFinite(Date.parse(row.lastSuccessAt))))) throw new Error("Invalid discovery health state");
+  }
+  const results = await Promise.allSettled([Promise.resolve().then(() => deps.loadCalendarEvents()), Promise.resolve().then(() => deps.loadCandidates(refresh))]);
+  const health = Object.fromEntries((["calendar", "gmail"] as const).map((feed, i) => [feed, {
+    status: results[i]!.status === "fulfilled" ? "healthy" : "failed", checkedAt,
+    lastSuccessAt: results[i]!.status === "fulfilled" ? checkedAt : previous?.[feed]?.lastSuccessAt,
+    notification: previous?.[feed]?.notification,
+  }])) as Record<"calendar" | "gmail", WebinarFeedHealth>;
+  return { health, failed: results.some((result) => result.status === "rejected"),
+    calendarEvents: results[0]!.status === "fulfilled" ? results[0]!.value as CalendarEvent[] : [],
+    candidates: results[1]!.status === "fulfilled" ? results[1]!.value as AutoRecordCandidateInput[] : [] };
+}
+
+/** Reuses the authenticated Calendar route; failed discovery never looks like a healthy empty feed. */
+export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefined): () => Promise<CalendarEvent[]> {
+  return async () => {
+    if (!apiKey) throw new Error("Calendar discovery requires LKB_API_KEY");
+    const res = await fetch(`${apiUrl}/calendar/upcoming`, {
+      headers: { authorization: `Bearer ${apiKey}` }, redirect: "error", signal: AbortSignal.timeout(30_000),
+    });
+    if (!res.ok) throw new Error(`Calendar discovery failed: HTTP ${res.status}`);
+    const body = await res.json() as { meetings?: CalendarEvent[] };
+    if (!Array.isArray(body.meetings)) throw new Error("Calendar discovery returned an invalid response");
+    return body.meetings;
+  };
+}
+
 export function buildRealScheduleTickDeps(): ScheduleTickDeps {
   const envFile = path.join(REPO_ROOT, ".env");
   if (existsSync(envFile)) process.loadEnvFile(envFile);
   const apiUrl = (process.env.LKB_API_URL ?? "http://localhost:3300").replace(/\/$/, "");
   const log = (msg: string) => console.log(`[bot] ${msg}`);
   return {
-    loadCalendarEvents: loadNoCalendarEvents,
-    loadCandidates: createHttpCandidateLoader(apiUrl, process.env.LKB_API_KEY, log),
+    loadCalendarEvents: createHttpCalendarLoader(apiUrl, process.env.LKB_API_KEY),
+    loadCandidates: createHttpCandidateLoader(apiUrl, process.env.LKB_API_KEY, log, true),
+    everyWebinar: true,
     now: () => new Date().toISOString(),
     stateDir: DEFAULT_STATE_DIR,
     scheduler: createWindowsTaskScheduler(),
@@ -165,6 +214,7 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
 
   const result = selectAutoRecordItems({
     calendarEvents, candidates, now, leadMinutes: DEFAULT_LEAD_MINUTES, trustedSenders, alreadyScheduled,
+    everyWebinar: deps.everyWebinar,
   });
 
   deps.log(`schedule-tick: ${result.toSchedule.length} to schedule, ${result.skipped.length} skipped ` +

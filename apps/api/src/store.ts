@@ -1,12 +1,8 @@
 /**
  * apps/api/src/store.ts — T-009 C3. Real Mongo-backed `ApiKeyStore` and `TreeStore` (the
- * production side of the injected interfaces `auth.ts`/`routes/ask.ts` declare; tests never
- * import this file, they build fakes matching the same interfaces). No dedicated
- * `packages/db/collections/*` accessor exists for `api_keys` or `tree_index` yet (T-018 only
- * shipped `sources`/`sessions`/`turns`/`claims`, and an api-key lookup is deliberately NOT
- * tenant-scoped — the tenant is unknown until the key resolves it), so this reads via `@lkb/db`'s
- * `getDb()` directly, the same low-level accessor `packages/db/src/collections/*.ts` itself
- * wraps — no new cross-package pattern invented.
+ * production side of the injected `auth.ts`/`routes/ask.ts` interfaces). API key lookup resolves
+ * the initially unknown tenant; `api_keys` and `tree_index` use the existing `@lkb/db.getDb()`
+ * accessor while other collections use their tenant-scoped accessors.
  */
 import { randomUUID, randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -153,13 +149,12 @@ export function createMongoGraphReadDeps(): GraphReadDeps {
 }
 
 /** Real `CalendarReadDeps` (routes/calendar.ts) — thin wrapper over the `gws`-backed adapter.
- * `tenantId` is accepted for interface parity with every other read-dep but unused today: `gws`
- * reads one calendar ("primary", Umesh's own), not a per-tenant mapping — a real, disclosed
- * limitation of this being a single-operator tool today, not a hosted multi-tenant one. */
-export function createGwsCalendarReadDeps(): CalendarReadDeps {
+ * The machine's primary calendar belongs only to its explicitly configured operator tenant. */
+export function createGwsCalendarReadDeps(owner = process.env.LKB_TENANT_ID, load = listUpcomingGwsMeetings): CalendarReadDeps {
   return {
-    async listUpcoming(_tenantId) {
-      return listUpcomingGwsMeetings();
+    async listUpcoming(tenantId) {
+      if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) throw new Error("Connected Calendar owner mismatch");
+      return load();
     },
   };
 }
@@ -170,10 +165,16 @@ export function createGwsCalendarReadDeps(): CalendarReadDeps {
  * than in the route: a candidate whose sender already crossed `AUTO_APPROVE_THRESHOLD` is filed
  * straight in as `auto_approved`, never sitting in the pending review queue Umesh has to clear
  * by hand for a sender he's already trusted three times over. */
-export function createMeetingCandidatesDeps(): MeetingCandidatesDeps {
+export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, scan = scanGmailForMeetingCandidates, databaseName = () => getDb().databaseName): MeetingCandidatesDeps {
   return {
+    getWorkDatabase(tenantId) {
+      if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) return undefined;
+      const work = process.env.MONGO_WORK_DB?.trim(), actual = databaseName();
+      return work && !["lkb", "global_university_db"].includes(work) && actual === work ? actual : undefined;
+    },
     async scanGmail(tenantId) {
-      const found = await scanGmailForMeetingCandidates();
+      if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) throw new Error("Connected Gmail owner mismatch");
+      const found = await scan();
       let created = 0, autoApproved = 0;
       // U2: pass through every optional scan field the same way meetingUrl already was — present -> included.
       const OPTIONAL_CANDIDATE_FIELDS = ["meetingUrl", "kind", "startTime", "endTime", "recordingUrl", "registrationOnly"] as const;

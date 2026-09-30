@@ -1,19 +1,4 @@
-/**
- * apps/api/src/indexing.ts — the "make ingested content searchable" step. `config/
- * ai-routing.yaml` has always declared `summarize`/`claims` job kinds, but nothing ever called
- * them for a live-ingested session — T-002's TOC `session_pages`/`claims` were a one-time
- * backfill from pre-written files (`scripts/seed-toc.mjs` only loads JSON, never calls an LLM),
- * confirmed by reading that script. Every source adapter (URL, WhatsApp, and any future one)
- * already stamps a fresh session `status.index: "pending"` — this file is what turns that into
- * `"done"`: real summary + real evidence-checked claims (`@lkb/index`'s `summarizeSession`/
- * `extractClaims`) + a real, incremental `tree_index` update (`@lkb/index`'s `regenerate`, or a
- * fresh `buildTree` the first time a tenant gets one), so newly ingested content shows up in the
- * Brain graph and becomes answerable via `/ask` — not just visible on its own session-detail page.
- *
- * Re-indexing a session (ingest re-run, or a future re-index trigger) is a clean replace, never
- * an accumulate: this session's prior `session_pages`/`claims` rows are deleted before the new
- * ones are written, so re-running never duplicates.
- */
+
 import { randomUUID } from "node:crypto";
 import type { Db } from "mongodb";
 import { getDb, scopedCollection } from "@lkb/db";
@@ -26,11 +11,7 @@ import type { IndexEmbedFn, ChunkWriteResult, IndexSessionResult } from "./types
 // Re-exported so existing importers keep one import site for the indexing surface.
 export type { IndexEmbedFn, ChunkSkipReason, ChunkWriteResult, IndexSessionResult } from "./types.js";
 
-/** `schema/{session_pages,claims}.schema.json` both declare `evidence.minItems: 1`, which the
- * generated types express as a non-empty tuple. Both callers below only ever build this from an
- * array already known non-empty (real turns for a page; `extractClaims` already drops any claim
- * whose evidence list would be empty) — this just satisfies the tuple type honestly instead of
- * casting past it. */
+
 function toEvidenceTuple<T>(items: T[]): [T, ...T[]] {
   if (items.length === 0) throw new Error("toEvidenceTuple: evidence must be non-empty");
   return items as [T, ...T[]];
@@ -38,54 +19,27 @@ function toEvidenceTuple<T>(items: T[]): [T, ...T[]] {
 
 export interface IndexSessionDeps {
   complete: SummarizeCompleteFn;
-  /** OPTIONAL (U1.3). Absent — no configured embedding provider, or a caller that does not want a
-   * vector index — means chunk writing is skipped entirely and every other stage is unaffected.
-   * An install without embeddings must still be able to summarize, extract claims and build a
-   * tree; making this required would have turned a missing capability into a broken pipeline. */
+
+  strictWebinar?: boolean;
+
   embed?: IndexEmbedFn;
-  /** Injectable so this function's WRITE decisions are testable without a live Mongo. Added for
-   * ISS-056: the fix (don't delete a session's claims when extraction degraded) sat behind a
-   * module-singleton `getDb()`, so reverting it left every test green — the same untested-guard
-   * failure this project has now hit four times. Defaults to the real db; callers pass nothing. */
+
   db?: Pick<Db, "collection">;
 }
 
-/** `tree_index` is the one collection here that CANNOT go through `scopedCollection` — see
- * `treeIndexRootFilter`'s own doc comment (`@lkb/index`, ISS-063) for why, and why this file
- * imports it rather than re-deriving the `tenant:<id>` convention itself (as it briefly did).
- * The filter now also matches on the real `tenantId` field (ISS-062) — a pre-migration document
- * that predates that field simply won't match here and falls through to the fresh-build branch
- * below, which is always safe (worst case: a full rebuild instead of an incremental one). */
+
 async function loadTreeRoot(tenantId: string, db: Pick<Db, "collection">): Promise<TreeIndexRootDocument | null> {
   return db.collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
 }
 
-/**
- * ---- chunks + embeddings (U1.3) --------------------------------------------------------------
- *
- * DEGRADE-SAFE, and that is the whole design here. ISS-056 was paid for on the claims path: a
- * provider outage returned an empty array indistinguishable from "nothing found", the
- * unconditional delete ran, and a transient failure silently destroyed real extracted data. The
- * same shape applies with more force to chunks, because a vector index is expensive to rebuild
- * and its absence is INVISIBLE — a search just quietly returns less. So the delete only ever runs
- * when a replacement is actually in hand.
- *
- * EXTRACTED from `indexSession`'s body (U1.0 backfill) rather than copied. The backfill needs
- * exactly this step and none of the LLM ones: re-running `indexSession` over the 26 already-
- * indexed sessions would re-bill `summarize`/`claims` on every one and could overwrite good
- * `session_pages`/`claims` with a degraded fallback. Duplicating the logic into a script would
- * have meant the shipped path and the backfill path could drift — and the chunk write is
- * precisely where this project has already paid for a delete/insert asymmetry once.
- *
- * @returns what actually happened, so a caller (the backfill) can report per-session counts
- *          instead of inferring success from the absence of a throw. `indexSession` ignores it.
- */
+
 export async function writeSessionChunks(
   tenantId: string,
   sessionId: string,
   turns: Turns[],
   embed: IndexEmbedFn,
   db: Pick<Db, "collection">,
+  persist = true,
 ): Promise<ChunkWriteResult> {
   const chunksColl = scopedCollection<Chunks>(db as never, "chunks");
   const plans = buildChunks(turns);
@@ -109,6 +63,7 @@ export async function writeSessionChunks(
         `indexSession: embedder returned ${embedded.vectors.length} vector(s) for ${plans.length} chunk(s)`,
       );
     }
+    if (!Number.isInteger(embedded.dims) || embedded.dims <= 0 || embedded.vectors.some((v) => v.some((n) => !Number.isFinite(n)))) throw new Error("invalid embedding dimensions/values");
     const chunkDocs: Chunks[] = plans.map((plan, i) => {
       const vector = embedded.vectors[i] ?? [];
       if (vector.length !== embedded.dims) {
@@ -129,6 +84,7 @@ export async function writeSessionChunks(
     });
     // Clean replace, never accumulate — a re-index must not double the corpus. Reached only
     // after every assertion above has passed, so the delete never runs without its replacement.
+    if (!persist) return { written: chunkDocs.length, skipped: null };
     await chunksColl(tenantId).deleteMany({ sourceRef: sessionId } as never);
     await chunksColl(tenantId).insertMany(chunkDocs);
     return { written: chunkDocs.length, skipped: null };
@@ -144,10 +100,7 @@ export async function writeSessionChunks(
   }
 }
 
-/** Real summary + real evidence-checked claims + a real tree_index update for one already-
- * ingested session. Never throws out of the caller's control on an LLM failure — `summarizeSession`/
- * `extractClaims` already degrade honestly on their own (a labeled fallback summary, an empty
- * claims list) rather than blocking the pipeline. */
+
 export async function indexSession(
   tenantId: string,
   sessionId: string,
@@ -169,6 +122,28 @@ export async function indexSession(
   ]);
   const { page: summary, degraded: summaryDegraded } = summarizeResult;
   const { claims: extractedClaims, degraded: claimsDegraded } = claimsResult;
+  const strict = deps.strictWebinar === true;
+  let preparedEmbed: Awaited<ReturnType<IndexEmbedFn>> | undefined;
+  if (strict) {
+    let reason = !turns.length ? "empty required transcript" : summaryDegraded?.reason ?? claimsDegraded?.reason;
+    if (!reason && !deps.embed) reason = "required embedding provider unavailable";
+    if (!reason && deps.embed) {
+      try {
+        preparedEmbed = await deps.embed({ kind: "embedding", texts: buildChunks(turns).map((p) => p.text), purpose: "document" });
+        const prepared = await writeSessionChunks(tenantId, sessionId, turns, async () => preparedEmbed!, db, false);
+        if (prepared.skipped || !prepared.written) reason = `required chunks incomplete: ${prepared.skipped}`;
+      } catch (error) { reason = `required embedding failed: ${error instanceof Error ? error.message : String(error)}`; }
+    }
+    // Schema-gated grounded extraction must be installed before strict completion is possible.
+    const grounded = summary as unknown as Record<string, unknown>;
+    if (!reason && (!Array.isArray(grounded.citedItems) || !Array.isArray(grounded.qa) || !Array.isArray(grounded.coveredTurnIds) ||
+      turns.some((turn) => !(grounded.coveredTurnIds as unknown[]).includes(turn._id)))) reason = "required grounded extraction/coverage unavailable";
+    if (reason) {
+      await sessionsColl(tenantId).updateOne({ _id: sessionId }, { $set: { "status.index": "failed" } });
+      throw new Error(`strict webinar index incomplete: ${reason}`);
+    }
+  }
+
 
   // schema/session_pages.schema.json requires evidence.minItems: 1 -- a session with zero turns
   // (nothing was actually ingested) has nothing real to cite, so it gets no session_page rather
@@ -234,9 +209,10 @@ export async function indexSession(
   // so the caller needs a value to inspect, not an exception to catch.
   let entities: PromotionResult | null = null;
   const chunks = deps.embed
-    ? await writeSessionChunks(tenantId, sessionId, turns, deps.embed, db)
+    ? await writeSessionChunks(tenantId, sessionId, turns, preparedEmbed ? async () => preparedEmbed! : deps.embed, db)
     : { written: 0, skipped: "no-embedder" as const };
   await recordVectorGap(tenantId, sessionId, chunks, db);
+  if (strict && (chunks.skipped || !chunks.written)) throw new Error("strict webinar index incomplete: required chunks not persisted");
   const [allSessions, allPages, existingRoot] = await Promise.all([
     sessionsColl(tenantId).find({}).toArray() as Promise<Sessions[]>,
     sessionPagesColl(tenantId).find({}).toArray() as Promise<SessionPages[]>,
@@ -245,6 +221,7 @@ export async function indexSession(
   const newRoot = existingRoot
     ? regenerate(existingRoot, [sessionId], allSessions, allPages)
     : buildTree(allSessions, allPages)[tenantId];
+  if (strict && !newRoot) throw new Error("strict webinar index incomplete: required tree unavailable");
   if (newRoot) {
     // Stamp/confirm the real tenantId regardless of which branch produced newRoot -- buildTree's
     // fresh root never carries one (it isn't a persisted document until now), and regenerate only
@@ -265,11 +242,11 @@ export async function indexSession(
 
   await sessionsColl(tenantId).updateOne({ _id: sessionId }, { $set: { "status.index": "done" } });
 
-  return { sessionId, chunks, entities };
+  return { sessionId, chunks, entities, summary: { degraded: summaryDegraded?.reason ?? null },
+    claims: { degraded: claimsDegraded?.reason ?? null },
+    completion: { version: 2, strict, complete: !summaryDegraded && !claimsDegraded && !chunks.skipped && Boolean(newRoot), generation: randomUUID(), turnCount: turns.length, treeWritten: Boolean(newRoot) } };
 }
 
 export type IndexSessionFn = typeof indexSession;
-/** The composition-root-bound shape every ingest deps builder actually takes — `complete`
- * (and its per-request `tenantId` routing) already closed over, so a caller only ever supplies
- * `(tenantId, sessionId)`. */
+
 export type BoundIndexer = (tenantId: string, sessionId: string) => Promise<IndexSessionResult>;

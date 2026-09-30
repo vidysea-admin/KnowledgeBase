@@ -39,7 +39,15 @@ export interface SessionDetail {
   page: { summary: string } | null;
   claims: Claim[];
   turns: Turn[];
+  media?: { available: boolean; bytes: number; mime: string };
+  notes?: { text: string; kind: string; tStart: number; turnId?: string; frameId?: string }[];
+  frames?: { id: string; tStart: number; text: string }[];
 }
+export interface WebinarOperation {
+  id: string; title: string; status: "queued" | "recording" | "processing" | "failed" | "ready" | "action_required";
+  attempts: number; reason?: string; updatedAt?: string; startTime?: string; endTime?: string;
+}
+export interface WebinarDiscoveryHealth { status: "healthy" | "failed"; checkedAt: string; lastSuccessAt?: string }
 
 export interface Source {
   _id: string;

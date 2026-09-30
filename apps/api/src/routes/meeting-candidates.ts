@@ -29,6 +29,7 @@ export interface MeetingCandidate {
 }
 
 export interface MeetingCandidatesDeps {
+  getWorkDatabase?(tenantId: string): string | undefined;
   scanGmail(tenantId: string): Promise<{ created: number; autoApproved: number }>;
   listCandidates(tenantId: string): Promise<MeetingCandidate[]>;
   approve(tenantId: string, id: string): Promise<boolean>;
@@ -39,11 +40,17 @@ export function createMeetingCandidatesRouter(deps: MeetingCandidatesDeps): Rout
   const router = Router();
 
   router.post("/gmail/scan", requireScope("gmail"), async (req: Request, res: Response) => {
-    const result = await deps.scanGmail(req.auth!.tenantId);
-    res.status(200).json(result);
+    try {
+      const work = deps.getWorkDatabase?.(req.auth!.tenantId);
+      if (!work || ["lkb", "global_university_db"].includes(work) || req.get("X-LKB-Work-DB") !== work) throw new Error("Work database not bound");
+      const result = await deps.scanGmail(req.auth!.tenantId);
+      res.status(200).json(result);
+    } catch { res.status(503).json({error: "discovery_unavailable", message: "Gmail scan unavailable; check the isolated work database and connection"}); }
   });
 
   router.get("/meeting-candidates", requireScope("gmail"), async (req: Request, res: Response) => {
+    const work = deps.getWorkDatabase?.(req.auth!.tenantId);
+    if (work && !["lkb", "global_university_db"].includes(work)) res.setHeader("X-LKB-Work-DB", work);
     const candidates = await deps.listCandidates(req.auth!.tenantId);
     res.status(200).json({ candidates });
   });

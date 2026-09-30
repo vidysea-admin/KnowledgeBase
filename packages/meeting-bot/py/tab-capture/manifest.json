@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "LKB webinar tab recorder",
+  "version": "1.0.0",
+  "minimum_chrome_version": "116",
+  "permissions": ["tabCapture", "offscreen", "activeTab"],
+  "host_permissions": ["http://127.0.0.1/*"],
+  "background": {"service_worker": "background.js"},
+  "action": {"default_title": "Start LKB webinar recording"},
+  "commands": {"_execute_action": {"suggested_key": {"default": "Ctrl+Shift+Y"}}}
+}

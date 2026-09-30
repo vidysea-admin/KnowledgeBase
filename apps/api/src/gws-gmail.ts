@@ -1,8 +1,8 @@
 /**
  * apps/api/src/gws-gmail.ts — T-028, extended by U2 (source-watcher). Real Gmail scan for
  * meeting-shaped mail, backed by the same already-authenticated `gws` CLI as `gws-calendar.ts`
- * (`gmail.readonly` is already among its granted scopes). Shells out via `cmd /c`, same wrapping
- * as `gws-calendar.ts`/`doc-polisher`'s `run_gws()`.
+ * (`gmail.readonly` is already among its granted scopes). Uses the native CLI on POSIX and its
+ * Windows command shim on Windows.
  *
  * Search scope: Gmail's own `q` query restricts the list to recent mail mentioning a known
  * video-conference host, or FROM a known TOC/partner sender — real server-side filtering, not a
@@ -14,8 +14,7 @@
  * substring/regex match) — never fabricated when absent; those fields stay undefined in that
  * case, same "real data or an honest gap" rule the calendar adapter follows.
  *
- * On any failure (`gws` missing, not authenticated, network error, malformed output) this
- * returns an empty list rather than throwing, matching `gws-calendar.ts`'s failure contract.
+ * Failed or incomplete discovery throws a sanitized error instead of claiming empty coverage.
  */
 import { execFile } from "node:child_process";
 
@@ -43,6 +42,9 @@ export interface GmailMeetingCandidate {
 
 interface GwsMessageListResponse {
   messages?: { id: string }[];
+  nextPageToken?: string;
+  resultSizeEstimate?: number;
+  error?: unknown;
 }
 
 interface GwsMessageHeader { name: string; value: string; }
@@ -59,15 +61,8 @@ interface GwsMessageFull extends GwsMessagePart {
 }
 
 // U2: widened from the original three video-conference hosts to also cover TOC's actual
-// providers (Zoho webinar/meeting, Google's cloudOnAir, YouTube live) and Drive recording links,
-// plus mail FROM known TOC/partner senders that may state a date/join link without ever
-// mentioning a host domain in the query-matchable text (e.g. a plain-text registration mail).
-//
-// "youtube.com"/"drive.google.com" are quoted PHRASES here, not bare OR terms — a bare
-// `youtube.com` matched almost any newsletter with a YouTube icon in its footer during this
-// unit's own live dry-run check (e.g. an unrelated "Google Cloud Weeklies" mail), which is
-// exactly the false-positive class a real digest must not be full of. The quoted forms match
-// the literal recording-link shapes this scan actually extracts (RECORDING_URL_RE below).
+// providers and TOC/partner senders. Quoted recording-link phrases avoid unrelated newsletters
+// with ordinary YouTube icons; exact meeting/recording URLs are extracted independently below.
 const MEETING_QUERY =
   'newer_than:30d (meet.google.com OR zoom.us OR teams.microsoft.com OR zoho.in OR zoho.com OR ' +
   'cloudonair.withgoogle.com OR "youtube.com/watch" OR "youtube.com/live" OR "youtu.be" OR "drive.google.com/file" OR ' +
@@ -100,7 +95,7 @@ function parseGwsJson(stdout: string): unknown {
 
 function runGws(args: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
-    execFile("cmd", ["/c", "gws", ...args], { timeout: 15000, maxBuffer: 4 * 1024 * 1024 }, (err, stdout) => {
+    execFile(process.platform === "win32" ? "cmd" : "gws", process.platform === "win32" ? ["/c", "gws", ...args] : args, { timeout: 15000, maxBuffer: 4 * 1024 * 1024 }, (err, stdout) => {
       if (err) { reject(err); return; }
       resolve(stdout);
     });
@@ -270,10 +265,13 @@ export function isRegistrationOnly(bodyText: string): boolean {
   return REGISTER_URL_RE.test(bodyText) && !DIRECT_JOIN_RE.test(bodyText);
 }
 
-async function fetchOne(messageId: string): Promise<GmailMeetingCandidate | null> {
+async function fetchOne(messageId: string, run = runGws): Promise<GmailMeetingCandidate | null> {
   const params = JSON.stringify({ userId: "me", id: messageId, format: "full" });
-  const stdout = await runGws(["gmail", "users", "messages", "get", "--params", params, "--format", "json"]);
+  const stdout = await run(["gmail", "users", "messages", "get", "--params", params, "--format", "json"]);
   const msg = parseGwsJson(stdout) as GwsMessageFull;
+  if (!msg || typeof msg !== "object" || Array.isArray(msg) || "error" in msg || msg.id !== messageId ||
+      !msg.payload || typeof msg.payload !== "object" || Array.isArray(msg.payload) ||
+      !Array.isArray(msg.payload.headers) || msg.payload.headers.some(h => !h || typeof h.name !== "string" || typeof h.value !== "string")) throw new Error("Invalid Gmail message");
   const headers = msg.payload?.headers;
   const senderEmail = extractEmail(header(headers, "From"));
   if (!senderEmail.includes("@")) return null;
@@ -301,16 +299,29 @@ async function fetchOne(messageId: string): Promise<GmailMeetingCandidate | null
   };
 }
 
-export async function scanGmailForMeetingCandidates(maxMessages = 15): Promise<GmailMeetingCandidate[]> {
+export async function scanGmailForMeetingCandidates(maxMessages = 100, run = runGws): Promise<GmailMeetingCandidate[]> {
+  if (!Number.isInteger(maxMessages) || maxMessages <= 0 || maxMessages > 500) throw new Error("Invalid Gmail page size");
   try {
-    const listParams = JSON.stringify({ userId: "me", q: MEETING_QUERY, maxResults: maxMessages });
-    const listStdout = await runGws(["gmail", "users", "messages", "list", "--params", listParams, "--format", "json"]);
-    const list = parseGwsJson(listStdout) as GwsMessageListResponse;
-    const ids = (list.messages ?? []).map((m) => m.id);
-
-    const results = await Promise.all(ids.map((id) => fetchOne(id).catch(() => null)));
+    let pageToken: string | undefined;
+    const seen = new Set<string>(), ids = new Set<string>();
+    for (let page = 0; page < 20; page++) {
+      const list = parseGwsJson(await run(["gmail", "users", "messages", "list", "--params",
+        JSON.stringify({userId: "me", q: MEETING_QUERY, maxResults: maxMessages, pageToken}), "--format", "json"])) as GwsMessageListResponse;
+      if (!list || typeof list !== "object" || Array.isArray(list) || "error" in list ||
+          (list.messages !== undefined && !Array.isArray(list.messages)) ||
+          (list.messages === undefined && Object.keys(list).some(k => !["resultSizeEstimate", "nextPageToken"].includes(k))) ||
+          (list.messages === undefined && list.resultSizeEstimate !== undefined && list.resultSizeEstimate !== 0) ||
+          (list.resultSizeEstimate !== undefined && (!Number.isInteger(list.resultSizeEstimate) || list.resultSizeEstimate < 0))) throw new Error("Invalid Gmail list");
+      for (const m of list.messages ?? []) { if (!m || typeof m.id !== "string" || !/^[A-Za-z0-9_-]{1,256}$/.test(m.id)) throw new Error("Invalid Gmail id"); ids.add(m.id); }
+      pageToken = list.nextPageToken;
+      if (pageToken === undefined) break;
+      if (typeof pageToken !== "string" || !/^[A-Za-z0-9._~+/=-]+$/.test(pageToken) || pageToken.length > 2048 || seen.has(pageToken) || page === 19) throw new Error("Gmail discovery incomplete");
+      seen.add(pageToken);
+    }
+    const results: (GmailMeetingCandidate | null)[] = [], ordered = [...ids];
+    for (let start = 0; start < ordered.length; start += 10) results.push(...await Promise.all(ordered.slice(start, start + 10).map(id => fetchOne(id, run))));
     return results.filter((c): c is GmailMeetingCandidate => c !== null);
   } catch {
-    return [];
+    throw new Error("Gmail discovery unavailable");
   }
 }

@@ -2,9 +2,7 @@
  * apps/api/src/gws-gmail.test.ts — U2 source-watcher. Tests the pure helpers gws-gmail.ts
  * exports (decodeGmailBody, extractSessionDateTime, classifyMeetingKind, isRegistrationOnly)
  * against the REAL body formats named in the task brief. No `gws` call — `scanGmailForMeetingCandidates`
- * itself still shells out directly (unchanged, matches its pre-existing failure contract: any
- * `gws` failure returns []), so it is exercised only for that fallback shape here, never for a
- * real scan.
+ * uses injected CLI responses below; no provider request or credential access runs.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -14,14 +12,37 @@ import {
   extractSessionDateTime,
   classifyMeetingKind,
   isRegistrationOnly,
+  scanGmailForMeetingCandidates,
 } from "./gws-gmail.js";
 
-// `scanGmailForMeetingCandidates` itself is NOT unit-tested here: it has never accepted an
-// injectable `gws` runner (pre-existing T-028 shape, unchanged by this unit — see the module
-// doc comment), so calling it for real would shell out to a real, possibly-unauthenticated `gws`
-// on whatever machine runs `pnpm -r test`. Its failure contract ("any gws error -> []") is
-// unchanged and untouched by this unit's edits; every new extraction/classification behavior it
-// composes is covered above as pure functions instead.
+test("Gmail pagination preserves all unique messages and refuses incomplete or malformed coverage", async () => {
+  const requests: any[] = [];
+  const run = async (args: string[]) => {
+    const params = JSON.parse(args[args.indexOf("--params") + 1]!); requests.push(params);
+    if (args.includes("list")) return JSON.stringify(params.pageToken ? {messages: [{id: "b"}, {id: "a"}]} : {messages: [{id: "a"}], nextPageToken: "next"});
+    return JSON.stringify({id: params.id, payload: {headers: [{name: "From", value: "host@example.org"}, {name: "Subject", value: "Webinar"}], body: {data: Buffer.from("Join https://meet.google.com/abc-defg-hij").toString("base64url")}}});
+  };
+  assert.deepEqual((await scanGmailForMeetingCandidates(100, run)).map(row => row.messageId), ["a", "b"]);
+  assert.equal(requests.filter(row => row.pageToken === "next").length, 1);
+  for (const empty of [{}, {resultSizeEstimate: 0}, {messages: []}]) assert.deepEqual(await scanGmailForMeetingCandidates(100, async () => JSON.stringify(empty)), []);
+  for (const invalid of [null, [], {error: {code: 401}}, {messages: {}}, {messages: [{id: 1}]}, {resultSizeEstimate: -1}, {resultSizeEstimate: 15}, {unexpected: true}, {nextPageToken: "repeat"}]) {
+    await assert.rejects(scanGmailForMeetingCandidates(100, async () => JSON.stringify(invalid)), /Gmail discovery unavailable/);
+  }
+  let pages = 0;
+  await assert.rejects(scanGmailForMeetingCandidates(100, async () => JSON.stringify({nextPageToken: String(++pages)})), /unavailable/);
+  assert.equal(pages, 20);
+  for (const token of ['&echo secret', '%PATH%', '!secret!', 'quote"', "space here", "a\nb", "a|b", "a^b", "<bad>", "$(bad)", "`bad`", "(bad)"]) {
+    for (const reply of [{nextPageToken: token}, {messages: [{id: token}]}]) {
+      let calls = 0;
+      await assert.rejects(scanGmailForMeetingCandidates(100, async () => {calls++; return JSON.stringify(reply);}), /unavailable/);
+      assert.equal(calls, 1, "untrusted token or id never reaches a second CLI invocation");
+    }
+  }
+  for (const message of [null, {error: {}}, {id: "wrong"}, {id: "a", payload: {headers: {}}}]) {
+    await assert.rejects(scanGmailForMeetingCandidates(100, async args => JSON.stringify(args.includes("list") ? {messages: [{id: "a"}]} : message)), /unavailable/);
+  }
+  await assert.rejects(scanGmailForMeetingCandidates(100, async () => {throw new Error("private credentials");}), /^Error: Gmail discovery unavailable$/);
+});
 
 function b64url(text: string): string {
   return Buffer.from(text, "utf8").toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");

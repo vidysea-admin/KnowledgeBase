@@ -7,7 +7,7 @@
  */
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
@@ -48,9 +48,40 @@ function defaultRunTranscription(sessionId: string): void {
     { cwd: REPO_ROOT, stdio: "inherit" });
 }
 
+/** Read packets as well as headers: an empty stream declaration is not a capture. */
+function defaultProbeMedia(video: string): number {
+  const probe = spawnSync("ffprobe", ["-v", "error", "-count_packets", "-show_streams",
+    "-show_format", "-of", "json", video], { encoding: "utf8", timeout: 120_000 });
+  if (probe.error || probe.status !== 0 || probe.stderr.trim()) throw new Error(`recording probe failed: ${probe.error?.message ?? probe.stderr}`);
+  const media = JSON.parse(probe.stdout);
+  const duration = Number(media.format?.duration);
+  for (const kind of ["audio", "video"]) {
+    if (!media.streams?.some((s: { codec_type?: string; nb_read_packets?: string; codec_name?: string }) =>
+      s.codec_type === kind && s.codec_name && Number(s.nb_read_packets) > 0)) {
+      throw new Error(`recording has no readable ${kind} packets`);
+    }
+  }
+  return duration;
+}
+
+function validateTranscript(turnsPath: string, duration: number): void {
+  const turns: unknown = JSON.parse(readFileSync(turnsPath, "utf8"));
+  if (!Array.isArray(turns) || turns.length === 0) throw new Error("transcript must contain turns");
+  for (const [index, turn] of turns.entries()) {
+    const { tStart, tEnd, text } = turn ?? {};
+    if (typeof tStart !== "number" || typeof tEnd !== "number" || !Number.isFinite(tStart) ||
+      !Number.isFinite(tEnd) || tStart < 0 || tEnd <= tStart || tEnd > duration ||
+      typeof text !== "string" || !text.trim()) {
+      throw new Error(`transcript turn ${index} has invalid timing/text for ${duration}s media`);
+    }
+  }
+}
+
 /** Test seam (T-033, ISS-300): every field defaults to REAL production behaviour unchanged, so
  * every in-repo caller (`finalizeRecording`, no overrides arg) is exactly today's code path. */
 export interface FinalizeRecordingOverrides {
+  tenantId?: string;
+  probeMedia?: (video: string) => number; // actual container duration in seconds
   extractAudio?: (video: string, audioOut: string) => void;
   measureVolume?: (audioPath: string) => { maxDb: number; meanDb: number };
   runTranscription?: (sessionId: string) => void;
@@ -72,25 +103,51 @@ export async function finalizeRecordingWith(
   telegram: TelegramNotifier = createTelegramNotifier(),
   durationSec?: number, // T-030: unknown (0) on the `finalize` recovery path — no live startedAt there
 ): Promise<void> {
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(sessionId)) throw new Error("invalid sessionId");
+  const tenantId = overrides.tenantId ?? "vidysea";
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(tenantId)) throw new Error("invalid capture tenant");
   const root = overrides.repoRoot ?? REPO_ROOT;
   const recordDir = overrides.repoRoot ? path.join(root, "raw", "webinars") : RECORD_DIR;
   const extractAudio = overrides.extractAudio ?? defaultExtractAudio;
   const measureVolume = overrides.measureVolume ?? defaultMeasureVolume;
   const runTranscription = overrides.runTranscription ?? defaultRunTranscription;
 
+  const dataDir = path.join(root, "data", "toc-migrated", sessionId);
+  const priorSource = path.join(dataDir, "source.json");
+  if (existsSync(priorSource) && JSON.parse(readFileSync(priorSource, "utf8")).tenantId !== tenantId) throw new Error("Existing capture belongs to a different tenant");
+  mkdirSync(dataDir, { recursive: true });
+  const validationPath = path.join(dataDir, "validation.json");
+  const fail = (stage: string, error: unknown) => writeFileSync(validationPath,
+    JSON.stringify({ stage, status: "failed", error: String(error) }, null, 2) + "\n");
+  writeFileSync(validationPath, JSON.stringify({ stage: "media", status: "processing" }, null, 2) + "\n");
+  let measuredDuration: number;
+  try {
+    measuredDuration = (overrides.probeMedia ?? defaultProbeMedia)(video);
+    if (!Number.isFinite(measuredDuration) || measuredDuration <= 0) {
+      throw new Error("recording duration must be finite and positive");
+    }
+  } catch (error) {
+    writeFileSync(path.join(dataDir, "validation.json"), JSON.stringify({ stage: "media", status: "failed",
+      error: String(error) }, null, 2) + "\n");
+    throw error;
+  }
+
   const audio = path.join(recordDir, `${sessionId}.m4a`);
-  extractAudio(video, audio);
+  try { extractAudio(video, audio); } catch (error) { fail("audio", error); throw error; }
   console.log(`[bot] audio → ${audio}`);
 
-  const { maxDb, meanDb } = measureVolume(audio);
+  let volume: { maxDb: number; meanDb: number };
+  try {
+    volume = measureVolume(audio);
+    if (!Number.isFinite(volume.maxDb) || !Number.isFinite(volume.meanDb)) throw new Error("invalid audio volume measurement");
+  } catch (error) { fail("audio", error); throw error; }
+  const { maxDb, meanDb } = volume;
   const silent = isSilentCapture(maxDb);
   console.log(`[bot] audio level: max ${maxDb} dB, mean ${meanDb} dB${silent ? "  ← SILENT" : ""}`);
 
-  const dataDir = path.join(root, "data", "toc-migrated", sessionId);
-  mkdirSync(dataDir, { recursive: true });
   const sourceDoc = {
     _id: `${sessionId}-src`,
-    tenantId: "vidysea",
+    tenantId,
     kind: "recording",
     // schema/sources.schema.json requires hash (unique index {tenantId, hash}).
     hash: createHash("sha256").update(readFileSync(audio)).digest("hex"),
@@ -113,15 +170,26 @@ export async function finalizeRecordingWith(
   console.log(`[bot] registered session ${sessionId}`);
 
   if (silent) {
-    throw new Error(`recording is silent (max ${maxDb} dB) — not transcribing; the capture did not hear the bot window`);
+    const error = new Error(`recording is silent (max ${maxDb} dB) — not transcribing; the capture did not hear the bot window`);
+    fail("audio", error);
+    throw error;
   }
   const turnsPath = path.join(dataDir, "turns.json");
   if (transcribe) {
-    runTranscription(sessionId);
+    try {
+      runTranscription(sessionId);
+      validateTranscript(turnsPath, measuredDuration);
+    } catch (error) {
+      writeFileSync(path.join(dataDir, "validation.json"), JSON.stringify({ stage: "transcript", status: "failed",
+        durationSec: measuredDuration, error: String(error) }, null, 2) + "\n");
+      throw error;
+    }
   }
+  writeFileSync(path.join(dataDir, "validation.json"), JSON.stringify({ status: "passed",
+    durationSec: measuredDuration, transcriptValidated: transcribe }, null, 2) + "\n");
   // T-030: finished + transcript-ready summary — no LLM call, turnCount is turns.json's own length.
   telegram.notifyFinished({
-    title, sessionId, durationSec: durationSec ?? 0, gapCount: gaps.length,
+    title, sessionId, durationSec: measuredDuration, gapCount: gaps.length,
     transcriptPath: transcribe ? toPosix(path.relative(root, turnsPath)) : undefined,
     turnCount: transcribe ? readTurnCount(turnsPath) : undefined,
   });

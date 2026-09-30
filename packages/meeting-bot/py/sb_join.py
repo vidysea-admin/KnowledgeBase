@@ -307,11 +307,114 @@ def kill_orphans(profile):
     """A previous bot run that was killed leaves its Chrome holding the profile lock, and the
     next launch then hangs silently. Kill only processes whose command line names this profile."""
     import subprocess
-    needle = os.path.abspath(profile).replace("'", "''")
-    ps = ("Get-CimInstance Win32_Process | Where-Object { $_.Name -eq 'chrome.exe' -and "
-          f"$_.CommandLine -like '*{needle}*' }} | ForEach-Object {{ Stop-Process -Id $_.ProcessId -Force "
-          "-ErrorAction SilentlyContinue }")
-    subprocess.run(["powershell", "-NoProfile", "-Command", ps], capture_output=True, timeout=60)
+    if sys.platform.startswith("linux"):
+        import signal
+        expected = os.path.realpath(profile)
+
+        def identity(pid):
+            try:
+                base = "/proc/" + str(pid)
+                executable = os.path.realpath(os.readlink(base + "/exe"))
+                if os.path.basename(executable) not in ("chrome", "chromium", "chromium-browser"):
+                    return None
+                with open(base + "/cmdline", "rb") as handle:
+                    argv = [part.decode("utf-8", "strict") for part in handle.read().split(b"\0") if part]
+                if any(arg == "--type" or arg.startswith("--type=") for arg in argv):
+                    return None
+                profiles = []
+                for index, arg in enumerate(argv):
+                    if arg.startswith("--user-data-dir="):
+                        profiles.append(arg.split("=", 1)[1])
+                    elif arg == "--user-data-dir" and index + 1 < len(argv):
+                        profiles.append(argv[index + 1])
+                if len(profiles) != 1 or not os.path.isabs(profiles[0]) or os.path.realpath(profiles[0]) != expected:
+                    return None
+                with open(base + "/stat", encoding="utf-8") as handle:
+                    start_time = handle.read().rsplit(")", 1)[1].split()[19]
+                return executable, expected, start_time
+            except (OSError, UnicodeError, IndexError):
+                return None
+
+        try:
+            entries = os.listdir("/proc")
+        except OSError as error:
+            raise RuntimeError("Cannot inspect Linux recorder processes") from error
+        for entry in entries:
+            if not entry.isdigit() or int(entry) <= 0:
+                continue
+            pid = int(entry)
+            before = identity(pid)
+            if before is None:
+                continue
+            if identity(pid) != before:
+                raise RuntimeError("Recorder browser process identity changed before cleanup")
+            try:
+                os.kill(pid, signal.SIGTERM)
+            except ProcessLookupError:
+                continue
+            except OSError as error:
+                raise RuntimeError("Cannot terminate owned recorder browser") from error
+            deadline = time.monotonic() + 3
+            while True:
+                try:
+                    os.kill(pid, 0)
+                except ProcessLookupError:
+                    break
+                except OSError as error:
+                    raise RuntimeError("Cannot verify recorder browser termination") from error
+                current = identity(pid)
+                if current != before:
+                    raise RuntimeError("Recorder browser identity changed during termination")
+                if time.monotonic() >= deadline:
+                    raise RuntimeError("Owned recorder browser remains alive")
+                time.sleep(0.05)
+        return  # Never delete Linux Singleton files, which may be live symlinks.
+    if os.name != "nt":
+        raise RuntimeError("Unsupported recorder process-cleanup platform")
+    import math
+    import psutil
+    expected = os.path.normcase(os.path.realpath(profile))
+
+    def windows_identity(process):
+        executable = os.path.normcase(os.path.realpath(process.exe()))
+        if os.path.basename(executable).lower() not in ("chrome.exe", "chromium.exe"):
+            return None
+        argv = process.cmdline()
+        if any(arg == "--type" or arg.startswith("--type=") for arg in argv):
+            return None
+        profiles = []
+        for index, arg in enumerate(argv):
+            if arg.startswith("--user-data-dir="):
+                profiles.append(arg.split("=", 1)[1])
+            elif arg == "--user-data-dir":
+                profiles.append(argv[index + 1] if index + 1 < len(argv) else "")
+        normalized = [os.path.normcase(os.path.realpath(p)) if p and os.path.isabs(p) else None for p in profiles]
+        if expected not in normalized:
+            return None
+        if any(value != expected for value in normalized):
+            raise RuntimeError("Ambiguous recorder browser profile identity")
+        created = process.create_time()
+        if not isinstance(process.pid, int) or isinstance(process.pid, bool) or process.pid <= 0 or not isinstance(created, (int, float)) or isinstance(created, bool) or not math.isfinite(created) or created <= 0:
+            raise RuntimeError("Missing recorder browser process identity")
+        return process.pid, executable, expected, created
+
+    try:
+        for process in psutil.process_iter():
+            try:
+                if process.name().lower() not in ("chrome.exe", "chromium.exe"):
+                    continue
+                before = windows_identity(process)
+                if before is None:
+                    continue
+                current = psutil.Process(process.pid)
+                if windows_identity(current) != before:
+                    raise RuntimeError("Recorder browser process identity changed before cleanup")
+                current.terminate()
+                current.wait(timeout=3)
+            except psutil.NoSuchProcess:
+                continue
+    except (psutil.AccessDenied, psutil.TimeoutExpired, OSError) as error:
+        raise RuntimeError("Cannot verify owned recorder browser termination") from error
     for name in ("SingletonLock", "SingletonCookie", "SingletonSocket"):
         try:
             os.remove(os.path.join(profile, name))
@@ -342,7 +445,46 @@ def main():
     ap.add_argument("--reload-file", default=None,
                      help="T-031: sentinel; if present, force an immediate reload/rejoin then delete it")
     ap.add_argument("--no-click", action="store_true", help="never auto-click (login/dry-run mode)")
+    ap.add_argument("--capture-extension", default=None, help="unpacked tab audio/video recorder extension")
+    ap.add_argument("--browser-executable", default=None, help="project-managed Chromium/Chrome for Testing binary")
+    ap.add_argument("--cleanup-only", action="store_true", help="terminate only exact owned profile browser processes, without launching")
     a = ap.parse_args()
+    if a.cleanup_only:
+        if not os.path.isabs(a.profile):
+            raise RuntimeError("Cleanup requires an absolute owned profile")
+        kill_orphans(a.profile)
+        emit("cleanup-complete")
+        return
+
+    driver_version = None
+    if a.browser_executable:
+        import pathlib
+        import re
+        import subprocess
+        import seleniumbase
+        from seleniumbase.core import browser_launcher, detect_b_ver
+        if seleniumbase.__version__ != "4.51.9":
+            raise RuntimeError("Managed capture requires pinned SeleniumBase 4.51.9; run setup")
+        driver_dir = pathlib.Path(seleniumbase.__file__).parent / "drivers"
+        if a.browser_executable == "cft":
+            platform_dir, browser_name = (("chrome-win64", "chrome.exe") if os.name == "nt"
+                                          else ("chrome-linux64", "chrome"))
+            a.browser_executable = str(driver_dir / "cft_drivers" / platform_dir / browser_name)
+        browser = pathlib.Path(a.browser_executable)
+        driver = driver_dir / ("uc_driver.exe" if os.name == "nt" else "uc_driver")
+        if not browser.is_file() or not driver.is_file():
+            raise RuntimeError("Managed Chrome and installed UC driver are required; run setup")
+        browser_version = detect_b_ver.get_browser_version_from_binary(str(browser))
+        installed = subprocess.run([str(driver), "--version"], capture_output=True,
+                                   text=True, timeout=20, check=True)
+        version = re.search(r"ChromeDriver\s+(\d+(?:\.\d+){3})", installed.stdout)
+        if not browser_version or not version:
+            raise RuntimeError("Cannot verify managed browser/driver versions")
+        driver_version = version.group(1)
+        if browser_version.split(".")[0] != driver_version.split(".")[0]:
+            raise RuntimeError("Managed Chrome and installed UC driver major versions differ")
+        browser_launcher.override_driver_dir(str(driver_dir))
+        emit("managed-driver", browser_version=browser_version, driver_version=driver_version)
 
     os.makedirs(a.profile, exist_ok=True)
     kill_orphans(a.profile)
@@ -355,16 +497,143 @@ def main():
         "--deny-permission-prompts",  # mic/camera/notifications: every prompt auto-denied
         "--start-maximized",
     ])
+    if a.capture_extension:
+        args += ",--enable-unsafe-extension-debugging"
     # ISS-324: tick while SB() brings the browser up. Daemon thread, so a failure inside SB()
     # needs no unwinding here -- __main__ emits "fatal" and the interpreter exits under it.
     boot_done = threading.Event()
     threading.Thread(target=_bootstrap_progress, args=(boot_done, "driver-bringup"), daemon=True).start()
-    with SB(uc=True, headed=True, user_data_dir=a.profile, chromium_arg=args) as sb:
+    with SB(uc=True, headed=True, user_data_dir=a.profile, chromium_arg=args,
+            extension_dir=a.capture_extension, binary_location=a.browser_executable,
+            driver_version=driver_version.split(".")[0] if driver_version else None) as sb:
         boot_done.set()
         emit("driver-ready")
         emit("navigating", url=a.url)
         sb.uc_open_with_reconnect(a.url, 4)
         emit("opened", url=sb.get_current_url())
+        if a.capture_extension:
+            import math
+            import re
+            import psutil
+            import urllib.request
+            import websocket
+            from urllib.parse import urlparse
+            if websocket.__version__ != "1.9.2":
+                raise RuntimeError("Managed capture requires pinned websocket-client 1.9.2")
+            browser_pid = getattr(sb.driver, "browser_pid", None)
+            if not isinstance(browser_pid, int) or isinstance(browser_pid, bool) or browser_pid <= 0 or not a.browser_executable:
+                raise RuntimeError("Cannot verify managed recorder browser ownership")
+            expected_exe = os.path.normcase(os.path.realpath(a.browser_executable))
+            expected_profile = os.path.normcase(os.path.realpath(a.profile))
+            identity = None
+            deadline = time.monotonic() + 15
+            def remaining():
+                budget = deadline - time.monotonic()
+                if budget <= 0:
+                    raise RuntimeError("Recorder extension invocation deadline exceeded")
+                return min(5, budget)
+            address = sb.driver.capabilities.get("goog:chromeOptions", {}).get("debuggerAddress", "")
+            if not isinstance(address, str) or not re.fullmatch(r"127\.0\.0\.1:[0-9]{1,5}", address):
+                raise RuntimeError("Recorder debugger endpoint ownership refused")
+            port = int(address.split(":")[1])
+            if not 1 <= port <= 65535:
+                raise RuntimeError("Recorder debugger port refused")
+            connection, worker_session = None, None
+            sequence = 0
+            class NoRedirect(urllib.request.HTTPRedirectHandler):
+                def redirect_request(self, *_args, **_kwargs):
+                    raise RuntimeError("Recorder debugger redirects refused")
+            try:
+                for phase in ("before-connect", "before-action"):
+                    process = psutil.Process(browser_pid)
+                    argv = process.cmdline()
+                    profiles = [arg.split("=", 1)[1] for arg in argv if arg.startswith("--user-data-dir=")]
+                    profiles += [argv[index + 1] if index + 1 < len(argv) else "" for index, arg in enumerate(argv) if arg == "--user-data-dir"]
+                    created = process.create_time()
+                    if (os.path.normcase(os.path.realpath(process.exe())) != expected_exe or
+                        any(arg == "--type" or arg.startswith("--type=") for arg in argv) or not profiles or
+                        any(not value or not os.path.isabs(value) or os.path.normcase(os.path.realpath(value)) != expected_profile for value in profiles) or
+                        not isinstance(created, (int, float)) or isinstance(created, bool) or not math.isfinite(created) or created <= 0):
+                        raise RuntimeError("Recorder browser process identity refused")
+                    current_identity = (browser_pid, expected_exe, expected_profile, created)
+                    if identity is not None and identity != current_identity:
+                        raise RuntimeError("Recorder browser process identity changed")
+                    identity = current_identity
+                    if phase == "before-action":
+                        break
+                    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+                    with opener.open("http://" + address + "/json/version", timeout=remaining()) as response:
+                        payload = response.read(1048577)
+                    if len(payload) > 1048576:
+                        raise RuntimeError("Recorder debugger response oversized")
+                    endpoint = json.loads(payload)["webSocketDebuggerUrl"]
+                    parsed = urlparse(endpoint)
+                    if (parsed.scheme != "ws" or parsed.hostname != "127.0.0.1" or parsed.port != port or
+                        parsed.username or parsed.password or parsed.query or parsed.fragment or
+                        not re.fullmatch(r"/devtools/browser/[A-Za-z0-9-]+", parsed.path)):
+                        raise RuntimeError("Recorder browser websocket ownership refused")
+                    connection = websocket.create_connection(endpoint, timeout=remaining(), suppress_origin=True,
+                                                             http_no_proxy=["127.0.0.1"], redirect_limit=0)
+                    def command(method, params=None):
+                        nonlocal sequence
+                        sequence += 1
+                        connection.settimeout(remaining())
+                        connection.send(json.dumps({"id": sequence, "method": method, "params": params or {}}))
+                        for _ in range(64):
+                            connection.settimeout(remaining())
+                            reply = connection.recv()
+                            if not isinstance(reply, str) or len(reply) > 1048576:
+                                raise RuntimeError("Recorder CDP message refused")
+                            reply = json.loads(reply)
+                            if not isinstance(reply, dict):
+                                raise RuntimeError("Recorder CDP reply shape refused")
+                            if "id" in reply:
+                                if type(reply["id"]) is not int or reply["id"] != sequence:
+                                    raise RuntimeError("Recorder CDP reply identity refused")
+                                if "error" in reply or not isinstance(reply.get("result"), dict):
+                                    raise RuntimeError("Recorder CDP " + method + " failed")
+                                return reply["result"]
+                        raise RuntimeError("Recorder CDP event limit exceeded")
+                    extensions = command("Extensions.getExtensions").get("extensions", [])
+                    expected_extension = os.path.normcase(os.path.realpath(a.capture_extension))
+                    owned = [item for item in extensions if item.get("enabled") is True and item.get("path") and os.path.normcase(os.path.realpath(item["path"])) == expected_extension]
+                    if len(owned) != 1 or not re.fullmatch(r"[a-p]{32}", owned[0].get("id", "")):
+                        raise RuntimeError("Recorder extension ownership mapping refused")
+                    extension_id = owned[0]["id"]
+                    while True:
+                        targets = command("Target.getTargets").get("targetInfos", [])
+                        workers = [item for item in targets if item.get("type") == "service_worker" and item.get("url") == "chrome-extension://" + extension_id + "/background.js"]
+                        if len(workers) == 1:
+                            break
+                        if len(workers) > 1:
+                            raise RuntimeError("Recorder extension worker ambiguous")
+                        time.sleep(min(0.1, remaining()))
+                    if not isinstance(workers[0].get("targetId"), str) or not workers[0]["targetId"]:
+                        raise RuntimeError("Recorder extension worker identity refused")
+                    worker_session = command("Target.attachToTarget", {"targetId": workers[0]["targetId"], "flatten": True}).get("sessionId")
+                    if not isinstance(worker_session, str) or not worker_session:
+                        raise RuntimeError("Recorder extension worker attachment refused")
+                    targets = command("Target.getTargets", {"filter": [{"type": "tab", "exclude": False}, {"exclude": True}]}).get("targetInfos", [])
+                    current_url = sb.get_current_url()
+                    tabs = [item for item in targets if item.get("type") == "tab" and item.get("url") == current_url]
+                    if len(tabs) != 1 or not isinstance(tabs[0].get("targetId"), str) or not tabs[0]["targetId"]:
+                        raise RuntimeError("Recorder current tab ownership mapping refused")
+                command("Target.activateTarget", {"targetId": tabs[0]["targetId"]})
+                command("Extensions.triggerAction", {"id": extension_id, "targetId": tabs[0]["targetId"]})
+                emit("capture-invoked")
+            finally:
+                if connection is not None:
+                    if worker_session is not None:
+                        try:
+                            command("Target.detachFromTarget", {"sessionId": worker_session})
+                        except Exception:
+                            pass
+                    close_budget = max(0, min(1, deadline - time.monotonic()))
+                    if close_budget:
+                        connection.settimeout(close_budget)
+                        connection.close(timeout=close_budget)
+                    else:
+                        connection.shutdown()
         started = time.time()
         clicks = 0
         last_click = 0.0

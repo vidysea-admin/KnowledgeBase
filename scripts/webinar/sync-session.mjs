@@ -34,12 +34,13 @@
  *
  * Usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run] [--emit-files] [--index]
  */
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, renameSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createHash, randomUUID } from "node:crypto";
 import "dotenv/config";
 import { register } from "tsx/esm/api";
-import { replaceSessionRows, buildSessionFiles } from "./session-rows.mjs";
+import { replaceSessionRows, buildSessionFiles, loadWebinarSession } from "./session-rows.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const sessionId = process.argv[2];
@@ -51,13 +52,7 @@ if (!sessionId) {
   process.exit(1);
 }
 const dir = join(ROOT, "data", "toc-migrated", sessionId);
-for (const f of ["source.json", "turns.json", "meta.json"]) {
-  if (!existsSync(join(dir, f))) throw new Error(`missing ${join(dir, f)}`);
-}
-const load = (f) => JSON.parse(readFileSync(join(dir, f), "utf8"));
-const source = load("source.json");
-const rawTurns = load("turns.json");
-const meta = load("meta.json");
+const { source, rawTurns, meta, screenEvidence, notes } = loadWebinarSession(dir, sessionId);
 const tenantId = meta.tenantId;
 const t0 = new Date(meta.t0).getTime();
 
@@ -130,7 +125,8 @@ const sessionDoc = {
   participants,
   platform: meta.platform,
   capturedBy: meta.capturedBy,
-  status: { transcribe: "done", diarize: "done", summarize: "done", index: "pending" },
+  status: { transcribe: "done", diarize: "done", summarize: "pending", index: "pending" },
+  ...(screenEvidence ? { screenEvidence, notes } : {}),
 };
 const sourceDoc = { ...source, tenantId: undefined };
 delete sourceDoc.tenantId;
@@ -190,7 +186,9 @@ const upsert = (coll, doc) => {
 };
 const strip = ({ tenantId: _t, ...rest }) => rest;
 
-await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", process.env.MONGODB_DB || "lkb");
+const workDb = process.env.MONGO_WORK_DB?.trim();
+if (!workDb || ["lkb", "global_university_db"].includes(workDb)) throw new Error("MONGO_WORK_DB must name an isolated work database; production writes refused");
+await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", workDb);
 const gen = `gen-${Date.now()}`;
 try {
   await upsert(sources, sourceDoc);
@@ -213,7 +211,16 @@ try {
     `graph_edges ${ew.upserted} upserted/${ew.removedStale} stale removed`);
   if (INDEX) {
     const { buildIndexer } = await import("../../apps/api/src/production.ts");
-    const res = await buildIndexer()(tenantId, sessionId);
+    const res = await buildIndexer(undefined, { strictWebinar: true })(tenantId, sessionId);
+    if (!res.completion?.strict || !res.completion.complete || res.summary?.degraded || res.claims?.degraded || res.chunks.skipped || !res.completion.treeWritten) {
+      throw new Error("required webinar indexing incomplete; no completion proof emitted");
+    }
+    const inputHash = createHash("sha256").update(readFileSync(join(dir, "knowledge-turns.json"))).digest("hex");
+    const proof = { version: 2, sessionId, tenantId, inputHash, generation: res.completion.generation,
+      status: "done", strict: true, summary: "done", claims: "done", chunks: "done", tree: "done",
+      turnCount: res.completion.turnCount, semanticSupport: "passed" };
+    const proofPath = join(dir, "index-proof.json"), temp = `${proofPath}.${randomUUID()}.tmp`;
+    writeFileSync(temp, JSON.stringify(proof) + "\n", { flag: "wx" }); renameSync(temp, proofPath);
     console.log(`indexed: chunks ${res.chunks.written}${res.chunks.skipped ? ` (skipped: ${res.chunks.skipped})` : ""}` +
       `${res.entities ? `, entities ${JSON.stringify(res.entities)}` : ""}`);
   }

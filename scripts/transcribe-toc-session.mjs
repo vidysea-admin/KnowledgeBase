@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 import "dotenv/config";
 import { register } from "tsx/esm/api";
 import { Agent, setGlobalDispatcher } from "undici";
-import { findAudioFile } from "./lib/find-audio-file.mjs";
+import { findAudioFile, transcriptTenant } from "./lib/find-audio-file.mjs";
 import { realUploadTransport } from "./lib/real-upload-transport.mjs";
 
 // Real audio transcription (generateContent processing a large uploaded file server-side) can
@@ -45,6 +45,7 @@ register();
 const MIME_BY_EXT = { ".m4a": "audio/mp4", ".mp4": "video/mp4", ".mp3": "audio/mpeg" };
 
 async function main() {
+  const tenantId = transcriptTenant(DATA_DIR, sessionId);
   const { uploadFile, pollFileState, transcribeUploadedAudio } = await import("../packages/ai/src/stt/gemini-file-upload.ts");
 
   const { path: audioPath, filename } = findAudioFile(DATA_DIR, AUDIO_DIR, sessionId);
@@ -85,7 +86,7 @@ async function main() {
   }
   const realTurns = turns.map((t, i) => ({
     _id: `${sessionId}-t${String(i + 1).padStart(3, "0")}`,
-    tenantId: "toc",
+    tenantId,
     sessionId,
     speakerRef: t.speakerRef,
     tStart: t.tStart,
