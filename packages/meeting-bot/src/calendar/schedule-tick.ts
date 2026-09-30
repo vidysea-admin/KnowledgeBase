@@ -161,7 +161,8 @@ export async function loadWebinarSourcesWithHealth(
 export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefined): () => Promise<CalendarEvent[]> {
   return async () => {
     if (!apiKey) throw new Error("Calendar discovery requires LKB_API_KEY");
-    const res = await fetch(`${apiUrl}/calendar/upcoming`, {
+    const query = new URLSearchParams({ discovery: "1" });
+    const res = await fetch(`${apiUrl}/calendar/upcoming?${query}`, {
       headers: { authorization: `Bearer ${apiKey}` }, redirect: "error", signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) throw new Error(`Calendar discovery failed: HTTP ${res.status}`);

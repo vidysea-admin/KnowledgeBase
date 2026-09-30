@@ -11,9 +11,8 @@
  * its JSON stdout with a "Using keyring backend: …" diagnostic line; `parseGwsJson` skips to the
  * first `{`/`[`, same as `run_gws()` does in Python.
  *
- * "Relevant" = has a real joinable video-conference link (`hangoutLink` or a `conferenceData`
- * video entry point). An event with nothing to click is nothing a person or a meeting-bot can
- * join, so it is filtered out rather than shown as a hollow row.
+ * Discovery retains cancelled tombstones and incomplete invites. The Calendar route separately
+ * projects joinable positive rows for its default UI response.
  *
  * Disclosed limitation: this only works on a machine with the `gws` CLI + its OAuth keyring
  * configured (Umesh's own machine today) — not yet portable to a hosted multi-tenant deployment,
@@ -39,6 +38,9 @@ interface GwsCalendarEvent {
   hangoutLink?: string;
   conferenceData?: { entryPoints?: { entryPointType: string; uri: string }[] };
   organizer?: { email?: string };
+  recurringEventId?: string;
+  originalStartTime?: { dateTime?: string; date?: string };
+  updated?: string;
 }
 
 function parseGwsJson(stdout: string): unknown {
@@ -67,7 +69,7 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws): Pr
   const timeMin = new Date().toISOString();
   const timeMax = new Date(Date.now() + windowDays * 24 * 60 * 60 * 1000).toISOString();
   const params = {
-    calendarId: "primary", maxResults: 2500, orderBy: "startTime", singleEvents: true, timeMin, timeMax,
+    calendarId: "primary", maxResults: 2500, orderBy: "startTime", singleEvents: true, showDeleted: true, timeMin, timeMax,
   };
 
   try {
@@ -83,19 +85,43 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws): Pr
       if (typeof pageToken !== "string" || !/^[A-Za-z0-9._~+/=-]+$/.test(pageToken) || pageToken.length > 2048 || seen.has(pageToken) || page === 19) throw new Error("Calendar discovery incomplete");
       seen.add(pageToken);
     }
-    const mapped: UpcomingMeeting[] = events.filter(e => e?.status !== "cancelled").map((e) => {
-      if (!e || typeof e.id !== "string" || !e.id || (e.summary !== undefined && typeof e.summary !== "string")) throw new Error("Invalid calendar event");
-      const start = e.start?.dateTime ?? e.start?.date;
-      if (start !== undefined && (typeof start !== "string" || !Number.isFinite(Date.parse(start)))) throw new Error("Invalid calendar timestamp");
+    const text = (value: unknown, max: number) => typeof value === "string" && value.length > 0 && value.length <= max && !/[\u0000-\u001f]/.test(value);
+    const date = (value: unknown) => typeof value === "string" && /^\d{4}-\d\d-\d\d$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
+    const dateTime = (value: unknown) => {
+      if (!text(value, 64)) return false;
+      const match = /^(\d{4}-\d\d-\d\d)T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(?:\.\d{1,9})?(?:Z|[+-]([01]\d|2[0-3]):([0-5]\d))$/.exec(value as string);
+      return Boolean(match && date(match[1]) && Number.isFinite(Date.parse(value as string)));
+    };
+    const time = (value: unknown) => {
+      if (value === undefined) return true;
+      if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+      const v = value as { date?: unknown; dateTime?: unknown };
+      if ((v.date === undefined) === (v.dateTime === undefined)) return false;
+      return v.dateTime !== undefined ? dateTime(v.dateTime) : date(v.date);
+    };
+    return events.map((e): UpcomingMeeting => {
+      if (!e || typeof e !== "object" || Array.isArray(e) || !text(e.id, 1024) ||
+          (e.status !== undefined && !["confirmed", "tentative", "cancelled"].includes(e.status)) ||
+          (e.summary !== undefined && (typeof e.summary !== "string" || e.summary.length > 2000)) ||
+          !time(e.start) || !time(e.end) || !time(e.originalStartTime) ||
+          (e.updated !== undefined && !dateTime(e.updated)) ||
+          ((e.recurringEventId === undefined) !== (e.originalStartTime === undefined)) ||
+          (e.recurringEventId !== undefined && !text(e.recurringEventId, 1024)) ||
+          (e.organizer !== undefined && (!e.organizer || typeof e.organizer !== "object" || Array.isArray(e.organizer) || (e.organizer.email !== undefined && !text(e.organizer.email, 320))))) throw new Error("Invalid calendar event");
+      const meetingUrl = meetingUrlOf(e);
+      if (meetingUrl !== undefined && !text(meetingUrl, 8192)) throw new Error("Invalid calendar link");
       return {
       id: e.id,
       title: e.summary ?? "(untitled)",
       startTime: e.start?.dateTime ?? e.start?.date ?? "",
       endTime: e.end?.dateTime ?? e.end?.date ?? "",
-      meetingUrl: meetingUrlOf(e),
+      meetingUrl,
       organizer: e.organizer?.email,
+      cancelled: e.status === "cancelled",
+      recurringEventId: e.recurringEventId,
+      originalStartTime: e.originalStartTime,
+      providerUpdated: e.updated,
     }; });
-    return mapped.filter((m) => Boolean(m.meetingUrl) && Boolean(m.startTime));
   } catch {
     throw new Error("Calendar discovery unavailable");
   }

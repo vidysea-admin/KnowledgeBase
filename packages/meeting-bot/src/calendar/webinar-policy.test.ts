@@ -68,11 +68,13 @@ test("calendar uses real authenticated route and reports failures instead of hea
   const original = globalThis.fetch;
   try {
     globalThis.fetch = async (url, init) => {
-      assert.equal(url, "http://local/calendar/upcoming");
+      assert.equal(url, "http://local/calendar/upcoming?discovery=1");
       assert.equal((init?.headers as any).authorization, "Bearer test");
-      return new Response(JSON.stringify({ meetings: [{ id: "event", title: "Webinar", ...times }] }));
+      assert.equal(init?.redirect, "error");
+      return new Response(JSON.stringify({ meetings: [{ id: "event", title: "Webinar", ...times, cancelled: true }] }));
     };
-    assert.equal((await createHttpCalendarLoader("http://local", "test")()).length, 1);
+    const rows = await createHttpCalendarLoader("http://local", "test")();
+    assert.equal(rows.length, 1); assert.equal(rows[0]!.cancelled, true);
     globalThis.fetch = async () => new Response("", { status: 503 });
     await assert.rejects(createHttpCalendarLoader("http://local", "test")(), /503/);
     await assert.rejects(createHttpCalendarLoader("http://local", undefined)(), /API_KEY/);

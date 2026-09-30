@@ -18,6 +18,9 @@ export interface CalendarEvent {
   meetingUrl?: string;
   organizer?: string;
   cancelled?: boolean;
+  recurringEventId?: string;
+  originalStartTime?: { date?: string; dateTime?: string };
+  providerUpdated?: string;
 }
 
 export interface CalendarClient {

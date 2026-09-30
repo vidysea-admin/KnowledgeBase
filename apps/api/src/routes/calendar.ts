@@ -17,6 +17,10 @@ export interface UpcomingMeeting {
   /** Absent when the event has no joinable video-conference link. */
   meetingUrl?: string;
   organizer?: string;
+  cancelled?: boolean;
+  recurringEventId?: string;
+  originalStartTime?: { date?: string; dateTime?: string };
+  providerUpdated?: string;
 }
 
 export interface CalendarReadDeps {
@@ -27,9 +31,13 @@ export function createCalendarRouter(deps: CalendarReadDeps): Router {
   const router = Router();
 
   router.get("/calendar/upcoming", requireScope("calendar"), async (req: Request, res: Response) => {
+    if (Object.keys(req.query).some(key => key !== "discovery") || (req.query.discovery !== undefined && req.query.discovery !== "1")) {
+      res.status(400).json({ error: "invalid_discovery_query" }); return;
+    }
     try {
       const meetings = await deps.listUpcoming(req.auth!.tenantId);
-      res.status(200).json({ meetings });
+      res.status(200).json({ meetings: req.query.discovery === "1" ? meetings : meetings.filter(m =>
+        !m.cancelled && Boolean(m.meetingUrl) && Number.isFinite(Date.parse(m.startTime))) });
     } catch {
       res.status(503).json({ error: "discovery_unavailable", message: "Calendar discovery unavailable" });
     }

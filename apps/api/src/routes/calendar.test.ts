@@ -8,6 +8,7 @@ import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeCalendarReadDeps } from "../fixtures.js";
 import { listUpcomingGwsMeetings } from "../gws-calendar.js";
 import { createGwsCalendarReadDeps } from "../store.js";
+import { selectAutoRecordItems } from "../../../../packages/meeting-bot/src/calendar/auto-join.js";
 import { createHttpCalendarLoader, loadWebinarSourcesWithHealth } from "../../../../packages/meeting-bot/src/calendar/schedule-tick.js";
 
 test("GET /calendar/upcoming with the calendar scope returns real meetings", async () => {
@@ -79,7 +80,9 @@ test("Calendar follows bounded pagination and refuses repeated/invalid tokens wi
     const params = JSON.parse(args[args.indexOf("--params") + 1]!); calls.push(params);
     return JSON.stringify(params.pageToken ? {items: [event]} : {items: [{id: "cancelled", status: "cancelled"}], nextPageToken: "next"});
   });
-  assert.equal(rows.length, 1); assert.equal(calls.length, 2); assert.equal(calls[1].pageToken, "next");
+  assert.equal(rows.length, 2); assert.equal(rows[0]!.id, "cancelled"); assert.equal(rows[0]!.cancelled, true);
+  assert.equal(rows[1]!.id, "e"); assert.equal(calls.length, 2); assert.equal(calls[1].pageToken, "next");
+  assert.equal(calls[0].showDeleted, true);
   for (const token of ["repeat", "", 1, null]) await assert.rejects(listUpcomingGwsMeetings(14, async () => JSON.stringify({items: [], nextPageToken: token})), /unavailable/);
   let pages = 0;
   await assert.rejects(listUpcomingGwsMeetings(14, async () => JSON.stringify({items: [], nextPageToken: String(++pages)})), /unavailable/);
@@ -89,6 +92,75 @@ test("Calendar follows bounded pagination and refuses repeated/invalid tokens wi
     await assert.rejects(listUpcomingGwsMeetings(14, async () => {calls++; return JSON.stringify({items: [], nextPageToken: token});}), /unavailable/);
     assert.equal(calls, 1, "untrusted page token never reaches the next CLI invocation");
   }
+});
+
+test("ISS-WEBINARRELEASE-013: cancelled Calendar occurrence suppresses its stale Gmail alias", async () => {
+  const cancelled = {id: "cancelled-webinar", status: "cancelled", summary: "AI webinar",
+    start: {dateTime: "2026-09-30T10:00:00Z"}, end: {dateTime: "2026-09-30T11:00:00Z"},
+    hangoutLink: "https://meet.google.com/abc-defg-hij"};
+  let providerFixtureCalls = 0;
+  const calendarEvents = await listUpcomingGwsMeetings(14, async () => {
+    providerFixtureCalls++; return JSON.stringify({items: [cancelled]});
+  });
+  const result = selectAutoRecordItems({calendarEvents, candidates: [{id: "old-gmail-invite",
+    title: cancelled.summary, senderEmail: "host@example.org", senderDomain: "example.org", status: "pending",
+    meetingUrl: cancelled.hangoutLink, startTime: cancelled.start.dateTime, endTime: cancelled.end.dateTime, kind: "upcoming"}],
+    now: "2026-09-30T10:00:00Z", leadMinutes: 5, trustedSenders: {emails: [], domains: []},
+    alreadyScheduled: new Set(), everyWebinar: true});
+  assert.equal(providerFixtureCalls, 1);
+  assert.equal(result.toSchedule.length, 0, "a cancelled occurrence must not record via stale Gmail");
+});
+
+test("Calendar discovery preserves id-only tombstones, recurrence metadata and incomplete positive invites", async () => {
+  const recurring = {id: "instance", status: "cancelled", recurringEventId: "series",
+    originalStartTime: {dateTime: "2026-10-01T12:00:00+05:30"}, updated: "2026-09-30T10:00:00Z"};
+  const rows = await listUpcomingGwsMeetings(14, async () => JSON.stringify({items: [
+    {id: "deleted", status: "cancelled"}, recurring,
+    {id: "registration", summary: "AI webinar", start: {dateTime: "2026-10-01T12:00:00Z"}},
+    {id: "all-day", start: {date: "2026-10-01"}, end: {date: "2026-10-02"}},
+  ]}));
+  assert.equal(rows.length, 4);
+  assert.equal(rows[0]!.cancelled, true); assert.equal(rows[0]!.startTime, "");
+  assert.equal(rows[1]!.recurringEventId, "series"); assert.deepEqual(rows[1]!.originalStartTime, recurring.originalStartTime);
+  assert.equal(rows[1]!.providerUpdated, recurring.updated);
+  assert.equal(rows[2]!.meetingUrl, undefined); assert.equal(rows[2]!.title, "AI webinar");
+  assert.equal(rows[3]!.startTime, "2026-10-01");
+  for (const invalid of [
+    {id: "", status: "cancelled"}, {id: "x", status: true}, {id: "x", status: "deleted"},
+    {id: "x", updated: "yesterday"}, {id: "x", updated: "2026-10-01"},
+    {id: "x", recurringEventId: "series"}, {id: "x", originalStartTime: {date: "2026-10-01"}},
+    {id: "x", recurringEventId: "series", originalStartTime: {date: "2026-10-01", dateTime: "2026-10-01T12:00:00Z"}},
+    {id: "x", end: {dateTime: "bad"}}, {id: "x", start: {date: "2026-02-30"}},
+    ...["2026-02-30T10:00:00Z", "2026-10-01T24:00:00Z", "2026-10-01T12:60:00Z", "2026-10-01T12:00:60Z", "2026-10-01T12:00:00+24:00"].flatMap(value => [
+      {id: "x", start: {dateTime: value}}, {id: "x", updated: value},
+      {id: "x", recurringEventId: "series", originalStartTime: {dateTime: value}},
+    ]),
+    {id: "x", organizer: {email: 1}}, {id: "x", hangoutLink: 7},
+  ]) await assert.rejects(listUpcomingGwsMeetings(14, async () => JSON.stringify({items: [invalid]})), /unavailable/);
+});
+
+test("authenticated Calendar discovery retains tombstones while default UI excludes them", async () => {
+  let reads = 0;
+  const rows = [{id: "deleted", title: "AI webinar", startTime: "", endTime: "", cancelled: true},
+    {id: "registration", title: "AI webinar", startTime: "2026-10-01T12:00:00Z", endTime: ""},
+    {id: "live", title: "AI webinar", startTime: "2026-10-01T12:00:00Z", endTime: "2026-10-01T13:00:00Z", meetingUrl: "https://meet.google.com/abc-defg-hij"}];
+  const server = await startTestServer(buildTestDeps({calendar: {listUpcoming: async () => { reads++; return rows; }},
+    keyStore: fakeKeyStore({"cal-key": {tenantId: "tenant-1", scopes: ["calendar"]}})}));
+  const headers = {authorization: "Bearer cal-key"};
+  try {
+    const normal = await fetch(`${server.baseUrl}/calendar/upcoming`, {headers});
+    const normalBody = await normal.json() as {meetings: {id: string}[]};
+    assert.deepEqual(normalBody.meetings.map(r => r.id), ["live"]);
+    const events = await createHttpCalendarLoader(server.baseUrl, "cal-key")();
+    assert.deepEqual(events.map(r => r.id), ["deleted", "registration", "live"]); assert.equal(events[0]!.cancelled, true);
+    for (const query of ["discovery=0", "discovery=true", "discovery=1&discovery=1", "discovery[x]=1"]) {
+      const before = reads;
+      assert.equal((await fetch(`${server.baseUrl}/calendar/upcoming?${query}`, {headers})).status, 400);
+      assert.equal(reads, before);
+    }
+    const before = reads;
+    assert.equal((await fetch(`${server.baseUrl}/calendar/upcoming?discovery=1`)).status, 401); assert.equal(reads, before);
+  } finally { await server.close(); }
 });
 
 test("GET /calendar/upcoming without the calendar scope returns 403", async () => {
