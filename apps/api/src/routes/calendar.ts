@@ -24,18 +24,22 @@ export interface UpcomingMeeting {
 }
 
 export interface CalendarReadDeps {
-  listUpcoming(tenantId: string): Promise<UpcomingMeeting[]>;
+  listUpcoming(tenantId: string, changedSince?: string): Promise<UpcomingMeeting[]>;
 }
 
 export function createCalendarRouter(deps: CalendarReadDeps): Router {
   const router = Router();
 
   router.get("/calendar/upcoming", requireScope("calendar"), async (req: Request, res: Response) => {
-    if (Object.keys(req.query).some(key => key !== "discovery") || (req.query.discovery !== undefined && req.query.discovery !== "1")) {
+    const changedSince = req.query.changedSince;
+    const validCheckpoint = typeof changedSince === "string" && /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(changedSince) &&
+      Number.isFinite(Date.parse(changedSince)) && new Date(changedSince).toISOString() === changedSince;
+    if (Object.keys(req.query).some(key => !["discovery", "changedSince"].includes(key)) || (req.query.discovery !== undefined && req.query.discovery !== "1") ||
+        (changedSince !== undefined && (req.query.discovery !== "1" || !validCheckpoint))) {
       res.status(400).json({ error: "invalid_discovery_query" }); return;
     }
     try {
-      const meetings = await deps.listUpcoming(req.auth!.tenantId);
+      const meetings = await deps.listUpcoming(req.auth!.tenantId, changedSince as string | undefined);
       res.status(200).json({ meetings: req.query.discovery === "1" ? meetings : meetings.filter(m =>
         !m.cancelled && Boolean(m.meetingUrl) && Number.isFinite(Date.parse(m.startTime))) });
     } catch {

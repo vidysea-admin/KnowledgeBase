@@ -6,8 +6,8 @@
  *
  * Shells out to `gws calendar events list` via `cmd /c` (the same wrapping
  * `gws_doc_polisher.py`'s `run_gws()` uses — plain `execFile("gws", …)` cannot resolve npm's
- * Windows `.cmd`/`.ps1` shims). The `--params` JSON is built entirely from values this file
- * computes (a fixed time window) — no caller input ever reaches the shell. `gws` always prefixes
+ * Windows `.cmd`/`.ps1` shims). Parameters use computed windows, strictly validated canonical
+ * change checkpoints and safe opaque page tokens. `gws` always prefixes
  * its JSON stdout with a "Using keyring backend: …" diagnostic line; `parseGwsJson` skips to the
  * first `{`/`[`, same as `run_gws()` does in Python.
  *
@@ -41,6 +41,7 @@ interface GwsCalendarEvent {
   recurringEventId?: string;
   originalStartTime?: { dateTime?: string; date?: string };
   updated?: string;
+  recurrence?: string[];
 }
 
 function parseGwsJson(stdout: string): unknown {
@@ -64,8 +65,10 @@ function runGws(args: string[]): Promise<string> {
   });
 }
 
-export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws): Promise<UpcomingMeeting[]> {
+export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, changedSince?: string): Promise<UpcomingMeeting[]> {
   if (!Number.isFinite(windowDays) || windowDays <= 0 || windowDays > 366) throw new Error("Invalid calendar discovery window");
+  if (changedSince !== undefined && (typeof changedSince !== "string" || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(changedSince) ||
+      !Number.isFinite(Date.parse(changedSince)) || new Date(changedSince).toISOString() !== changedSince)) throw new Error("Invalid calendar change checkpoint");
   const timeMin = new Date().toISOString();
   const timeMax = new Date(Date.now() + windowDays * 24 * 60 * 60 * 1000).toISOString();
   const params = {
@@ -73,17 +76,26 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws): Pr
   };
 
   try {
-    let pageToken: string | undefined;
-    const seen = new Set<string>(), events: GwsCalendarEvent[] = [];
-    for (let page = 0; page < 20; page++) {
-      const parsed = parseGwsJson(await run(["calendar", "events", "list", "--params", JSON.stringify({...params, pageToken}), "--format", "json"])) as GwsEventListResponse;
-      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed) || "error" in parsed ||
-          (!Array.isArray(parsed.items) && !(parsed.items === undefined && parsed.kind === "calendar#events"))) throw new Error("Invalid calendar response");
-      events.push(...(parsed.items ?? []));
-      pageToken = parsed.nextPageToken;
-      if (pageToken === undefined) break;
-      if (typeof pageToken !== "string" || !/^[A-Za-z0-9._~+/=-]+$/.test(pageToken) || pageToken.length > 2048 || seen.has(pageToken) || page === 19) throw new Error("Calendar discovery incomplete");
-      seen.add(pageToken);
+    const passes: Record<string, unknown>[] = [params];
+    if (changedSince !== undefined) passes.push({calendarId: "primary", maxResults: 2500, orderBy: "updated", singleEvents: false, showDeleted: true, updatedMin: changedSince});
+    const events: GwsCalendarEvent[] = [];
+    const liveDeltaMasters = new Set<GwsCalendarEvent>();
+    for (const pass of passes) {
+      let pageToken: string | undefined;
+      const seen = new Set<string>();
+      for (let page = 0; page < 20; page++) {
+        const parsed = parseGwsJson(await run(["calendar", "events", "list", "--params", JSON.stringify({...pass, pageToken}), "--format", "json"])) as GwsEventListResponse;
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed) || "error" in parsed ||
+            (!Array.isArray(parsed.items) && !(parsed.items === undefined && parsed.kind === "calendar#events"))) throw new Error("Invalid calendar response");
+        events.push(...(parsed.items ?? []));
+        if (!pass.singleEvents) for (const event of parsed.items ?? []) {
+          if (event?.status !== "cancelled" && !event?.recurringEventId && Array.isArray(event?.recurrence) && event.recurrence.length) liveDeltaMasters.add(event);
+        }
+        pageToken = parsed.nextPageToken;
+        if (pageToken === undefined) break;
+        if (typeof pageToken !== "string" || !/^[A-Za-z0-9._~+/=-]+$/.test(pageToken) || pageToken.length > 2048 || seen.has(pageToken) || page === 19) throw new Error("Calendar discovery incomplete");
+        seen.add(pageToken);
+      }
     }
     const text = (value: unknown, max: number) => typeof value === "string" && value.length > 0 && value.length <= max && !/[\u0000-\u001f]/.test(value);
     const date = (value: unknown) => typeof value === "string" && /^\d{4}-\d\d-\d\d$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
@@ -99,7 +111,7 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws): Pr
       if ((v.date === undefined) === (v.dateTime === undefined)) return false;
       return v.dateTime !== undefined ? dateTime(v.dateTime) : date(v.date);
     };
-    return events.map((e): UpcomingMeeting => {
+    const mapped = events.map((e): UpcomingMeeting => {
       if (!e || typeof e !== "object" || Array.isArray(e) || !text(e.id, 1024) ||
           (e.status !== undefined && !["confirmed", "tentative", "cancelled"].includes(e.status)) ||
           (e.summary !== undefined && (typeof e.summary !== "string" || e.summary.length > 2000)) ||
@@ -107,6 +119,7 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws): Pr
           (e.updated !== undefined && !dateTime(e.updated)) ||
           ((e.recurringEventId === undefined) !== (e.originalStartTime === undefined)) ||
           (e.recurringEventId !== undefined && !text(e.recurringEventId, 1024)) ||
+          (e.recurrence !== undefined && (!Array.isArray(e.recurrence) || e.recurrence.length === 0 || e.recurrence.length > 32 || e.recurrence.some(rule => !text(rule, 8192)))) ||
           (e.organizer !== undefined && (!e.organizer || typeof e.organizer !== "object" || Array.isArray(e.organizer) || (e.organizer.email !== undefined && !text(e.organizer.email, 320))))) throw new Error("Invalid calendar event");
       const meetingUrl = meetingUrlOf(e);
       if (meetingUrl !== undefined && !text(meetingUrl, 8192)) throw new Error("Invalid calendar link");
@@ -119,9 +132,13 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws): Pr
       organizer: e.organizer?.email,
       cancelled: e.status === "cancelled",
       recurringEventId: e.recurringEventId,
-      originalStartTime: e.originalStartTime,
+      originalStartTime: e.originalStartTime === undefined ? undefined : e.originalStartTime.date !== undefined
+        ? {date: e.originalStartTime.date} : {dateTime: e.originalStartTime.dateTime},
       providerUpdated: e.updated,
     }; });
+    // A live recurring master describes a series, not an expanded capture occurrence.
+    // Validate it above, then omit it only from delta; deleted masters still drive cancellation.
+    return mapped.filter((_row, index) => !liveDeltaMasters.has(events[index]!));
   } catch {
     throw new Error("Calendar discovery unavailable");
   }

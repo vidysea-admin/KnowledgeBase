@@ -152,9 +152,9 @@ export function createMongoGraphReadDeps(): GraphReadDeps {
  * The machine's primary calendar belongs only to its explicitly configured operator tenant. */
 export function createGwsCalendarReadDeps(owner = process.env.LKB_TENANT_ID, load = listUpcomingGwsMeetings): CalendarReadDeps {
   return {
-    async listUpcoming(tenantId) {
+    async listUpcoming(tenantId, changedSince) {
       if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) throw new Error("Connected Calendar owner mismatch");
-      return load();
+      return load(14, undefined, changedSince);
     },
   };
 }

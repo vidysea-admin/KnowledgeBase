@@ -1,8 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { selectAutoRecordItems } from "./auto-join.js";
-import { classifyWebinarInvite, webinarIdentity } from "./auto-record-policy.js";
+import { classifyWebinarInvite, webinarIdentity, webinarSessionKey } from "./auto-record-policy.js";
 import { createHttpCalendarLoader, createHttpCandidateLoader } from "./schedule-tick.js";
+import { reconcileWebinarSources, type WebinarReconciliationState } from "./calendar-client.js";
 
 const times = { startTime: "2026-09-30T10:00:00Z", endTime: "2026-09-30T11:00:00Z" };
 
@@ -89,4 +90,166 @@ test("new webinar mode loads pending Gmail rows, legacy mode still filters", asy
     assert.equal((await createHttpCandidateLoader("http://local", "test", () => {}, true)()).length, 1);
     assert.equal((await createHttpCandidateLoader("http://local", "test", () => {})()).length, 0);
   } finally { globalThis.fetch = original; }
+});
+
+const future = {startTime: "2026-10-02T10:00:00.000Z", endTime: "2026-10-02T11:00:00.000Z"};
+const checkedAt = "2026-10-01T09:00:00.000Z", revision = "2026-10-01T08:00:00.000Z";
+const calendarRow = (extra: any = {}) => ({id: "cal-a", title: "Visa webinar", meetingUrl: "https://zoom.us/w/111?tk=cal", ...future, providerUpdated: revision, ...extra});
+const mailRow = (extra: any = {}) => ({...candidate, id: "mail-a", title: "Visa webinar", meetingUrl: "https://zoom.us/w/111?tk=mail", ...future, providerUpdated: revision, ...extra});
+const reconcile = (previous?: unknown, calendarEvents: any[] = [calendarRow()], candidates: any[] = [mailRow()], extra: any = {}) =>
+  reconcileWebinarSources({tenantId: "vidysea", checkedAt, acquisition: {complete: true, historyComplete: true}, previous, calendarEvents, candidates, ...extra});
+const choose = (result: ReturnType<typeof reconcile>, now = "2026-10-02T09:59:00.000Z") => selectAutoRecordItems({
+  calendarEvents: result.calendarEvents, candidates: result.candidates, now, leadMinutes: 5, everyWebinar: true,
+  alreadyScheduled: [], trustedSenders: {emails: [], domains: []},
+});
+const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value));
+const rows = (state: WebinarReconciliationState) => Object.values(state.occurrences);
+function freeze(value: any): any {
+  if (value && typeof value === "object") { Object.values(value).forEach(freeze); Object.freeze(value); }
+  return value;
+}
+
+test("pure reconciliation retains future inventory before lead, canonical full-time keys and restart", () => {
+  const input = freeze({calendarEvents: [calendarRow()], candidates: [mailRow()]});
+  const first = reconcile(undefined, input.calendarEvents, input.candidates);
+  assert.equal(first.newStartsBlocked, false); assert.equal(first.inventory.length, 2);
+  assert.equal(choose(first, checkedAt).toSchedule.length, 0); assert.equal(choose(first).toSchedule.length, 1);
+  assert.equal(first.inventory[0]!.sessionKey, first.inventory[1]!.sessionKey);
+  const next = reconcile(freeze(clone(first.state)), input.calendarEvents, input.candidates);
+  assert.deepEqual(next.state, clone(first.state)); assert.deepEqual(next.transitions, []);
+  const distinct = reconcile(undefined, [calendarRow(), calendarRow({id: "cal-b", startTime: "2026-10-02T12:00:00.000Z", endTime: "2026-10-02T13:00:00.000Z"})], []);
+  assert.equal(distinct.newStartsBlocked, false); assert.notEqual(distinct.inventory[0]!.sessionKey, distinct.inventory[1]!.sessionKey);
+  const absent = reconcile(first.state, [], []); assert.deepEqual(absent.state.occurrences, first.state.occurrences);
+});
+test("known actual-wire and id-only cancellations preserve metadata and block stale Gmail selector", () => {
+  const first = reconcile();
+  for (const tombstone of [{id: "cal-a", cancelled: true}, {id: "cal-a", cancelled: true, title: "(untitled)", startTime: "", endTime: ""}]) {
+    const result = reconcile(freeze(clone(first.state)), [tombstone]);
+    assert.equal(result.newStartsBlocked, false); assert.equal(choose(result).toSchedule.length, 0);
+    const calendar = rows(result.state).find(row => row.source === "calendar")!;
+    assert.equal(calendar.snapshot.cancelled, true); assert.equal(calendar.snapshot.title, "Visa webinar");
+    assert.equal(calendar.snapshot.startTime, future.startTime); assert.equal(result.candidates[0]!.cancelled, true);
+    const replay = reconcile(clone(result.state), [tombstone]); assert.deepEqual(replay.state, clone(result.state));
+  }
+  const stale = reconcile(first.state, [{id: "cal-a", cancelled: true, providerUpdated: "2026-10-01T07:00:00.000Z"}]);
+  assert.equal(choose(stale).toSchedule.length, 1); assert.equal(stale.calendarEvents[0]!.cancelled, false);
+  const unknown = reconcile(first.state, [{id: "unknown", cancelled: true}]);
+  assert.equal(unknown.newStartsBlocked, true); assert.deepEqual(unknown.calendarEvents, []); assert.deepEqual(unknown.candidates, []);
+  assert.ok(unknown.inventory.some(row => row.reason === "unknown-tombstone"));
+  assert.equal(reconcile(unknown.state, [], []).newStartsBlocked, true);
+});
+test("accepted reschedule rewrites only proven Gmail lineage and retains sticky barriers", () => {
+  const moved = calendarRow({startTime: "2026-10-02T12:00:00.000Z", endTime: "2026-10-02T13:00:00.000Z", meetingUrl: "https://zoom.us/w/333?tk=new", providerUpdated: "2026-10-01T08:30:00.000Z"});
+  for (const barrier of [{}, {status: "rejected"}, {registrationOnly: true}]) {
+    const first = reconcile(undefined, [calendarRow()], [mailRow(barrier)]);
+    const result = reconcile(clone(first.state), [moved], [mailRow()]);
+    assert.equal(result.newStartsBlocked, false); assert.equal(result.candidates[0]!.startTime, moved.startTime);
+    assert.equal(result.candidates[0]!.meetingUrl, moved.meetingUrl);
+    assert.equal(choose(result, "2026-10-02T11:59:00.000Z").toSchedule.length, Object.keys(barrier).length ? 0 : 1);
+    assert.equal(rows(result.state).find(row => row.source === "calendar")!.aliases.length, 2);
+    assert.deepEqual(reconcile(clone(result.state), [moved], [mailRow()]).transitions, []);
+  }
+});
+test("disputed Calendar aliases and provider IDs never manufacture later Gmail linkage", () => {
+  const first = reconcile(undefined, [calendarRow()], []);
+  const bad = calendarRow({meetingUrl: "https://zoom.us/w/222"});
+  const disputed = reconcile(first.state, [bad], []); assert.equal(disputed.newStartsBlocked, true);
+  const result = reconcile(disputed.state, [calendarRow({meetingUrl: "https://zoom.us/w/333", providerUpdated: "2026-10-01T08:30:00.000Z"})], [mailRow({meetingUrl: bad.meetingUrl})]);
+  assert.equal(result.newStartsBlocked, false);
+  const mail = rows(result.state).find(row => row.source === "gmail")!;
+  assert.equal(mail.linkedCalendar, undefined); assert.equal(result.candidates[0]!.meetingUrl, bad.meetingUrl);
+  assert.equal(rows(result.state).find(row => row.source === "calendar")!.aliases.length, 2);
+  for (const batch of [[calendarRow(), bad], [bad, calendarRow()]]) {
+    const cold = reconcile(undefined, batch, []); assert.equal(cold.newStartsBlocked, true);
+    assert.deepEqual(rows(cold.state)[0]!.aliases, []); assert.deepEqual(rows(cold.state)[0]!.providerIds, []);
+    const accepted = reconcile(cold.state, [calendarRow({meetingUrl: "https://zoom.us/w/333", providerUpdated: "2026-10-01T08:30:00.000Z"})], [mailRow()]);
+    assert.equal(accepted.newStartsBlocked, false); assert.equal(rows(accepted.state).find(row => row.source === "gmail")!.linkedCalendar, undefined);
+    assert.equal(accepted.candidates[0]!.meetingUrl, mailRow().meetingUrl);
+  }
+  const recurring = calendarRow({recurringEventId: "series", originalStartTime: {dateTime: future.startTime}});
+  const prior = reconcile(undefined, [recurring], []);
+  const conflict = reconcile(prior.state, [{...recurring, id: "unaccepted-id", meetingUrl: bad.meetingUrl}], []);
+  assert.equal(conflict.newStartsBlocked, true);
+  assert.ok(!rows(conflict.state)[0]!.providerIds.includes("unaccepted-id"));
+});
+test("recurring siblings, immutable original date and parent cancellations remain independent", () => {
+  const a = calendarRow({recurringEventId: "series", originalStartTime: {dateTime: future.startTime}});
+  const b = calendarRow({id: "cal-b", recurringEventId: "series", originalStartTime: {date: "2026-10-03"}, startTime: "2026-10-03T10:00:00.000Z", endTime: "2026-10-03T11:00:00.000Z"});
+  const first = reconcile(undefined, [a, b], []);
+  const one = reconcile(first.state, [{id: "cal-a", recurringEventId: "series", originalStartTime: a.originalStartTime, cancelled: true}], []);
+  assert.equal(one.calendarEvents.filter(row => row.cancelled).length, 1); assert.equal(one.calendarEvents.find(row => row.id === "cal-b")!.cancelled, false);
+  const parent = reconcile(first.state, [{id: "series", cancelled: true}], []);
+  assert.equal(parent.calendarEvents.filter(row => row.cancelled).length, 2);
+  assert.deepEqual(reconcile(clone(parent.state), [{id: "series", cancelled: true}], []).state, clone(parent.state));
+  const withMaster = reconcile(undefined, [calendarRow({id: "series", meetingUrl: "https://zoom.us/w/999"}), a], []);
+  const all = reconcile(withMaster.state, [{id: "series", cancelled: true}], []);
+  assert.equal(all.calendarEvents.filter(row => row.cancelled).length, 2);
+  assert.equal(rows(first.state).find(row => row.snapshot.id === "cal-b")!.snapshot.originalStartTime!.date, "2026-10-03");
+});
+test("revision merges are permutation invariant and token rotations are equivalent", () => {
+  const before = reconcile(undefined, [calendarRow()], []), newer = calendarRow({title: "New Visa webinar", providerUpdated: "2026-10-01T08:30:00.000Z"});
+  const permutations = [[calendarRow(), newer], [newer, calendarRow()]];
+  const outcomes = permutations.map(calendar => reconcile(before.state, calendar, []));
+  assert.deepEqual(outcomes[0], outcomes[1]); assert.equal(outcomes[0]!.newStartsBlocked, false);
+  const conflict = calendarRow({title: "Different webinar"});
+  assert.deepEqual(reconcile(before.state, [calendarRow(), conflict], []), reconcile(before.state, [conflict, calendarRow()], []));
+  assert.equal(reconcile(before.state, [conflict], []).newStartsBlocked, true);
+  assert.equal(reconcile(before.state, [calendarRow({providerUpdated: undefined, title: "Different webinar"})], []).newStartsBlocked, true);
+  const tokens = [calendarRow({meetingUrl: "https://zoom.us/w/111?tk=z"}), calendarRow({meetingUrl: "https://zoom.us/w/111?tk=a"})];
+  const rotated = reconcile(before.state, tokens, []); assert.equal(rotated.newStartsBlocked, false);
+  assert.deepEqual(rotated, reconcile(before.state, [...tokens].reverse(), [])); assert.equal(rows(rotated.state)[0]!.aliases.length, 1);
+  const ambiguous = reconcile(undefined, [calendarRow(), calendarRow({id: "other-calendar-id"})], []);
+  assert.equal(ambiguous.newStartsBlocked, true); assert.equal(choose(ambiguous).toSchedule.length, 0);
+});
+test("reconciliation refuses foreign or forged state and incomplete acquisition atomically", () => {
+  const first = reconcile(), saved = clone(first.state);
+  const attack = (mutate: (state: any) => void) => {const state = clone(saved); mutate(state); const bytes = JSON.stringify(state); assert.throws(() => reconcile(freeze(state))); assert.equal(JSON.stringify(state), bytes);};
+  attack(state => {state.tenantId = "foreign";}); attack(state => {state.version = 2;});
+  attack(state => {state.checkedAt = "2026-02-30T09:00:00.000Z";});
+  attack(state => {state.checkedAt = "2026-10-01T09:00:00Z";});
+  attack(state => {const key = Object.keys(state.occurrences)[0]!; state.occurrences[key].aliases[0].key = "webinar-" + "0".repeat(24);});
+  attack(state => {const key = Object.keys(state.occurrences)[0]!; state.occurrences[key].aliases[0].identity += "|bad";});
+  attack(state => {const key = Object.keys(state.occurrences)[0]!; state.occurrences["webinar-" + "0".repeat(24)] = state.occurrences[key]; delete state.occurrences[key];});
+  attack(state => {const row = rows(state).find(row => row.source === "gmail")!; row.linkedCalendar = "webinar-" + "0".repeat(24);});
+  attack(state => {const row = rows(state).find(row => row.source === "gmail")!; row.aliases = [];});
+  attack(state => {const row = rows(state).find(row => row.source === "calendar")!; row.revision = "2026-10-01T08:45:00.000Z";});
+  const forged = clone(saved); rows(forged).find(row => row.source === "calendar")!.revision = "2026-10-01T08:45:00.000Z";
+  assert.throws(() => reconcile(freeze(forged), [{id: "cal-a", cancelled: true, providerUpdated: "2026-10-01T08:30:00.000Z"}], []));
+  assert.throws(() => reconcile(saved, [calendarRow({providerUpdated: "2026-10-01T09:01:01.000Z"})], []));
+  attack(state => {const row = rows(state).find(row => row.source === "calendar")!; row.revision = row.snapshot.providerUpdated = "2026-10-01T09:01:01.000Z";});
+  attack(state => {Object.values<any>(state.occurrences)[0].reviewKey = "webinar-" + "0".repeat(24);});
+  assert.throws(() => reconcile(freeze(saved), [], [], {acquisition: {complete: false, historyComplete: true}}));
+  assert.deepEqual(saved, first.state);
+  const unknownHistory = reconcile(undefined, [calendarRow()], [mailRow()], {acquisition: {complete: true, historyComplete: false}});
+  assert.equal(unknownHistory.state.historyComplete, false); assert.equal(unknownHistory.newStartsBlocked, true); assert.equal(choose(unknownHistory).toSchedule.length, 0);
+  for (const field of ["providerUpdated", "originalStartTime"]) assert.throws(() => reconcile(undefined, [calendarRow({[field]: field === "providerUpdated" ? "2026-02-30T08:00:00Z" : {date: "2026-02-30"}})], []));
+});
+test("reconciliation enforces bounds and invalid-time review without rolled timestamps", () => {
+  const first = reconcile(), frozen = freeze(clone(first.state)), before = JSON.stringify(frozen);
+  for (const payload of [calendarRow({id: "x".repeat(1025)}), calendarRow({title: "x".repeat(2001)}), calendarRow({meetingUrl: "x".repeat(8193)}), calendarRow({organizer: "x".repeat(321)}), calendarRow({id: "bad\n"})]) {
+    assert.throws(() => reconcile(frozen, [payload], [])); assert.equal(JSON.stringify(frozen), before);
+  }
+  assert.throws(() => reconcile(frozen, Array(20001).fill(calendarRow()), []));
+  for (const mutate of [
+    (state: any) => {Object.values<any>(state.occurrences)[0].providerIds = Array.from({length: 65}, (_, i) => `p${i}`);},
+    (state: any) => {Object.values<any>(state.occurrences)[0].aliases = Array(129).fill(Object.values<any>(state.occurrences)[0].aliases[0]);},
+    (state: any) => {state.occurrences = Object.fromEntries(Array.from({length: 20001}, (_, i) => [`p${i}`, {}]));},
+    (state: any) => {state.occurrences = {huge: {snapshot: {title: "x".repeat(8 * 1024 * 1024)}}};},
+  ]) {const state = clone(first.state); mutate(state); assert.throws(() => reconcile(freeze(state)));}
+  for (const startTime of ["2026-02-30T10:00:00Z", "2026-10-02", "2026-10-02T24:00:00Z", "2026-10-02T10:00:00+99:00"]) {
+    const result = reconcile(undefined, [calendarRow({startTime})], []);
+    assert.equal(rows(result.state)[0]!.snapshot.startTime, undefined); assert.equal(result.inventory[0]!.reason, "invalid-time");
+    assert.equal(choose(result).toSchedule.length, 0);
+  }
+  for (const meetingUrl of [undefined, "", "file:///webinar", "http://zoom.us/j/123", "https://unknown.invalid/webinar"]) {
+    const result = reconcile(undefined, [calendarRow({meetingUrl})], []), item = result.inventory[0]!;
+    assert.equal(item.reason, meetingUrl ? "unsafe-join-link" : "no-join-link");
+    assert.equal(item.reviewKey, webinarSessionKey(`source-review|${item.occurrenceKey}`));
+    assert.equal(item.sessionKey, undefined); assert.equal(choose(result).toSchedule.length, 0);
+    assert.deepEqual(reconcile(clone(result.state), [], []).inventory, result.inventory);
+  }
+  const interval = reconcile(undefined, [calendarRow({endTime: future.startTime})], []);
+  assert.equal(interval.inventory[0]!.reason, "invalid-time"); assert.equal(choose(interval).toSchedule.length, 0);
+  assert.throws(() => reconcile(undefined, [calendarRow({recurringEventId: "series"})], []));
+  assert.throws(() => reconcile(undefined, [calendarRow({recurringEventId: "series", originalStartTime: {date: "2026-10-02", dateTime: future.startTime}})], []));
 });

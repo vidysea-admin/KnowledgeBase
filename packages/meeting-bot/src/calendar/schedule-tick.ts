@@ -158,10 +158,16 @@ export async function loadWebinarSourcesWithHealth(
 }
 
 /** Reuses the authenticated Calendar route; failed discovery never looks like a healthy empty feed. */
-export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefined): () => Promise<CalendarEvent[]> {
+export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefined, checkpoint?: () => string | undefined): () => Promise<CalendarEvent[]> {
   return async () => {
     if (!apiKey) throw new Error("Calendar discovery requires LKB_API_KEY");
     const query = new URLSearchParams({ discovery: "1" });
+    const changedSince = checkpoint?.();
+    if (changedSince !== undefined) {
+      if (typeof changedSince !== "string" || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(changedSince) ||
+          !Number.isFinite(Date.parse(changedSince)) || new Date(changedSince).toISOString() !== changedSince) throw new Error("Invalid calendar change checkpoint");
+      query.set("changedSince", changedSince);
+    }
     const res = await fetch(`${apiUrl}/calendar/upcoming?${query}`, {
       headers: { authorization: `Bearer ${apiKey}` }, redirect: "error", signal: AbortSignal.timeout(30_000),
     });

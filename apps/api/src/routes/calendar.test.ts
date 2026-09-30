@@ -9,6 +9,7 @@ import { buildTestDeps, fakeKeyStore, fakeCalendarReadDeps } from "../fixtures.j
 import { listUpcomingGwsMeetings } from "../gws-calendar.js";
 import { createGwsCalendarReadDeps } from "../store.js";
 import { selectAutoRecordItems } from "../../../../packages/meeting-bot/src/calendar/auto-join.js";
+import { reconcileWebinarSources } from "../../../../packages/meeting-bot/src/calendar/calendar-client.js";
 import { createHttpCalendarLoader, loadWebinarSourcesWithHealth } from "../../../../packages/meeting-bot/src/calendar/schedule-tick.js";
 
 test("GET /calendar/upcoming with the calendar scope returns real meetings", async () => {
@@ -173,6 +174,95 @@ test("GET /calendar/upcoming without the calendar scope returns 403", async () =
   } finally {
     await server.close();
   }
+});
+
+test("Calendar delta retrieves deleted masters without time bounds and preserves conflicting revisions", async () => {
+  const since = "2026-09-01T00:00:00.000Z", calls: Record<string, unknown>[] = [];
+  const live = {id: "same", summary: "AI webinar", start: {dateTime: "2026-10-01T12:00:00Z"}, updated: "2026-09-30T10:00:00Z"};
+  const rows = await listUpcomingGwsMeetings(14, async args => {
+    const p = JSON.parse(args[args.indexOf("--params") + 1]!); calls.push(p);
+    return JSON.stringify(p.pageToken ? {items: [p.singleEvents ? live : {...live, summary: "Changed webinar"}]} :
+      {items: [p.singleEvents ? live : {id: "deleted-series", status: "cancelled"}], nextPageToken: "same-token"});
+  }, since);
+  assert.equal(calls.length, 4); assert.equal(rows.length, 4);
+  for (const p of calls) {
+    assert.equal(p.calendarId, "primary"); assert.equal(p.showDeleted, true);
+    if (p.singleEvents) { assert.equal(p.orderBy, "startTime"); assert.ok(p.timeMin); assert.ok(p.timeMax); assert.equal(p.updatedMin, undefined); }
+    else { assert.equal(p.updatedMin, since); assert.equal(p.orderBy, "updated"); assert.equal(p.timeMin, undefined); assert.equal(p.timeMax, undefined); }
+  }
+  assert.equal(rows[2]!.id, "deleted-series"); assert.equal(rows[2]!.cancelled, true);
+  assert.equal(rows.filter(r => r.id === "same").length, 3, "transport must not silently resolve equal conflicting revisions");
+  for (const failure of ["provider", "invalid", "repeat", "limit", "unsafe"]) {
+    let deltaCalls = 0;
+    await assert.rejects(listUpcomingGwsMeetings(14, async args => {
+      const p = JSON.parse(args[args.indexOf("--params") + 1]!);
+      if (p.singleEvents) return JSON.stringify({items: [live]});
+      deltaCalls++;
+      if (failure === "provider") throw new Error("secret");
+      if (failure === "invalid") return JSON.stringify({items: [{id: 4, status: "cancelled"}]});
+      return JSON.stringify({items: [], nextPageToken: failure === "repeat" ? "repeat" : failure === "unsafe" ? "&echo bad" : String(deltaCalls)});
+    }, since), /unavailable/);
+    assert.equal(deltaCalls, failure === "limit" ? 20 : failure === "repeat" ? 2 : 1);
+  }
+  for (const invalid of ["2026-02-30T10:00:00.000Z", "2026-09-01T24:00:00.000Z", "2026-09-01T00:00:00Z", "bad&echo", ""]) {
+    let calls = 0;
+    await assert.rejects(listUpcomingGwsMeetings(14, async () => {calls++; return "{}";}, invalid), /checkpoint/); assert.equal(calls, 0);
+  }
+});
+
+test("delta HTTP checkpoint is encoded once and owner/query guards run before provider", async () => {
+  const since = "2026-09-01T00:00:00.000Z", seen: (string | undefined)[] = [];
+  const calendar = createGwsCalendarReadDeps("tenant-1", async (_days, _run, changedSince) => { seen.push(changedSince); return []; });
+  const server = await startTestServer(buildTestDeps({calendar, keyStore: fakeKeyStore({
+    "cal-key": {tenantId: "tenant-1", scopes: ["calendar"]}, "foreign": {tenantId: "tenant-2", scopes: ["calendar"]},
+  })}));
+  try {
+    let callbacks = 0;
+    assert.deepEqual(await createHttpCalendarLoader(server.baseUrl, "cal-key", () => {callbacks++; return since;})(), []);
+    assert.equal(callbacks, 1); assert.deepEqual(seen, [since]);
+    const query = new URLSearchParams({discovery: "1", changedSince: since});
+    assert.equal((await fetch(`${server.baseUrl}/calendar/upcoming?${query}`, {headers: {authorization: "Bearer foreign"}})).status, 503);
+    for (const query of ["changedSince=" + encodeURIComponent(since), "discovery=1&changedSince=bad", "discovery=1&changedSince=" + encodeURIComponent(since) + "&changedSince=" + encodeURIComponent(since), "discovery=1&changedSince[x]=1"]) {
+      assert.equal((await fetch(`${server.baseUrl}/calendar/upcoming?${query}`, {headers: {authorization: "Bearer cal-key"}})).status, 400);
+    }
+    for (const invalid of ["bad", "2026-02-30T00:00:00.000Z", "2026-09-01T00:00:00Z"]) await assert.rejects(createHttpCalendarLoader(server.baseUrl, "cal-key", () => invalid)(), /checkpoint/);
+    assert.deepEqual(seen, [since], "invalid queries, callbacks and foreign owner must never reach provider");
+  } finally { await server.close(); }
+});
+
+test("delta omits validated live recurring masters but preserves instances and deleted masters", async () => {
+  const master = {id: "series", summary: "AI webinar", status: "confirmed", recurrence: ["RRULE:FREQ=WEEKLY"],
+    start: {dateTime: "2026-10-01T12:00:00Z"}, end: {dateTime: "2026-10-01T13:00:00Z"}, hangoutLink: "https://meet.google.com/abc-defg-hij"};
+  const instance = {...master, id: "instance", recurrence: undefined, recurringEventId: "series", originalStartTime: master.start};
+  const run = async (replacement: unknown) => listUpcomingGwsMeetings(14, async args => {
+    const p = JSON.parse(args[args.indexOf("--params") + 1]!);
+    return JSON.stringify({items: p.singleEvents ? [instance] : [replacement, {id: "deleted-series", status: "cancelled", recurrence: master.recurrence}]});
+  }, "2026-09-01T00:00:00.000Z");
+  const rows = await run(master);
+  assert.deepEqual(rows.map(r => r.id), ["instance", "deleted-series"]);
+  assert.equal(rows[0]!.recurringEventId, "series"); assert.equal(rows[1]!.cancelled, true);
+  for (const invalid of [null, {}, [], [1], [""], ["RRULE:FREQ=WEEKLY\n"], Array(33).fill("RRULE:FREQ=WEEKLY")]) {
+    await assert.rejects(run({...master, recurrence: invalid}), /unavailable/, "excluded masters must still be validated");
+  }
+});
+
+test("Google timezone metadata crosses actual adapter/reconciler/selector without losing cancellation", async () => {
+  const live = {id: "instance-tz", summary: "AI webinar", recurringEventId: "series-tz", updated: "2026-10-01T08:00:00Z",
+    originalStartTime: {dateTime: "2026-10-01T10:00:00Z", timeZone: "Etc/UTC"},
+    start: {dateTime: "2026-10-01T10:00:00Z", timeZone: "Etc/UTC"}, end: {dateTime: "2026-10-01T11:00:00Z"}, hangoutLink: "https://meet.google.com/abc-defg-hij"};
+  const checkedAt = "2026-10-01T09:56:00.000Z", acquisition = {complete: true, historyComplete: true};
+  const calendarEvents = await listUpcomingGwsMeetings(14, async () => JSON.stringify({items: [live]}));
+  assert.deepEqual(calendarEvents[0]!.originalStartTime, {dateTime: live.originalStartTime.dateTime});
+  const first = reconcileWebinarSources({tenantId: "fixture", checkedAt, acquisition, calendarEvents, candidates: []});
+  const select = (r: typeof first) => selectAutoRecordItems({calendarEvents: r.calendarEvents, candidates: r.candidates,
+    now: checkedAt, leadMinutes: 5, trustedSenders: {emails: [], domains: []}, alreadyScheduled: new Set(), everyWebinar: true});
+  assert.equal(select(first).toSchedule.length, 1);
+  const tombstones = await listUpcomingGwsMeetings(14, async () => JSON.stringify({items: [
+    {id: live.id, status: "cancelled", recurringEventId: live.recurringEventId, originalStartTime: live.originalStartTime},
+  ]}));
+  const cancelled = reconcileWebinarSources({tenantId: "fixture", checkedAt, acquisition, previous: first.state, calendarEvents: tombstones, candidates: []});
+  assert.equal(cancelled.transitions.filter(t => t.reason === "cancelled").length, 1);
+  assert.equal(cancelled.calendarEvents[0]!.cancelled, true); assert.equal(select(cancelled).toSchedule.length, 0);
 });
 
 test("GET /calendar/upcoming when the source returns nothing yields a real, honest empty list", async () => {
