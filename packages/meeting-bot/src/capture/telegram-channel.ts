@@ -102,7 +102,7 @@ export function createOperationNotifications(deps: {
     const collection = feed ? state.discovery : state.operations, row = collection[id];
     if (!feed && !['failed', 'action_required', 'ready'].includes(row.status)) return;
     const knownReasons = ['retry-limit', 'interrupted-no-recording-artifact', 'missed-while-processing', 'missed-coverage',
-      'cancelled', 'overlap-lost', 'needs-registration', 'needs-review', 'invalid-time', 'unsafe-join-link'];
+      'cancelled', 'rescheduled', 'controller-disconnected', 'coverage-review', 'overlap-lost', 'needs-registration', 'needs-review', 'invalid-time', 'unsafe-join-link'];
     const reason = feed || row.status === 'ready' ? '' : knownReasons.includes(row.reason) ? row.reason : 'pipeline-failed';
     const fingerprint = `${row.status}:${reason}`, notice = feed ? {feed: id, status: row.status} : {sessionId: id, status: row.status, reason};
     notifications = notifications.then(async () => {

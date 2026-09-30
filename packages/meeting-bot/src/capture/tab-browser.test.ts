@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync, symlinkSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { createTabCaptureReceiver } from "./tab-browser.js";
+import { createTabCaptureReceiver, writeOwnedTabStatus } from "./tab-browser.js";
 
 const origin = "chrome-extension://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 test("tab receiver authenticates, persists ordered media and makes acknowledged retries idempotent", async () => {
@@ -57,4 +57,31 @@ test("tab receiver rejects malformed/oversized input and keeps file unchanged", 
     assert.equal(readFileSync(output, "utf8"), "valid");
     assert.equal(events.filter((event) => event === "capture-error").length, 2);
   } finally { await receiver.close(); rmSync(dir, {recursive: true, force: true}); }
+});
+
+
+test("owned status retains deduplicated durable control gaps and refuses corrupt identity without overwrite", () => {
+  const dir=mkdtempSync(path.join(tmpdir(),"owned-status-")),output=path.join(dir,"tab-1234-aabbccdd.webm"),file=output+".status.json";
+  const identity={output,pid:1234,handle:"tab-1234-aabbccdd",sessionId:"session",tenantId:"owned",profileDir:dir,recordDir:dir,controllerStartedAt:"opaque-start"};
+  const gap={start:100,end:200,reason:"capture-control-controller-disconnected",recovered:false};
+  try {
+    writeOwnedTabStatus(file,identity,{state:"recording",controlGaps:[gap]});
+    writeOwnedTabStatus(file,identity,{state:"stopped",controlGaps:[gap]});
+    assert.deepEqual(JSON.parse(readFileSync(file,"utf8")).controlGaps,[gap]);
+    const before=readFileSync(file,"utf8");
+    for(const changes of [{pid:42},{tenantId:"foreign"},{output:output+"other"},{controllerStartedAt:"other"},
+      {controlGaps:[{...gap,recovered:true}]},{controlGaps:[{...gap,start:NaN}]},{controlGaps:[{...gap,reason:"unknown"}]},
+      {controlGaps:[{...gap,end:99}]},{controlGaps:Array(9).fill(gap)}]) {
+      assert.throws(()=>writeOwnedTabStatus(file,identity,changes));assert.equal(readFileSync(file,"utf8"),before);
+    }
+    for(const patch of [{pid:0},{pid:true},{pid:2147483648},{output:output+"other"},{handle:"foreign"},{profileDir:"relative"},{recordDir:dir+path.sep},
+      {tenantId:"foreign"},{sessionId:"foreign"},{controllerStartedAt:undefined}]) {
+      assert.throws(()=>writeOwnedTabStatus(file,{...identity,...patch},{controlGaps:[gap]}));assert.equal(readFileSync(file,"utf8"),before);
+    }
+    for(const payload of ["{","[]",JSON.stringify({...identity,state:"stopped",controlGaps:[{...gap,recovered:true}]}),"x".repeat(8193)]) {
+      writeFileSync(file,payload);assert.throws(()=>writeOwnedTabStatus(file,identity,{state:"stopped"}));assert.equal(readFileSync(file,"utf8"),payload);
+    }
+    rmSync(file);symlinkSync(path.join(dir,"absent"),file);assert.throws(()=>writeOwnedTabStatus(file,identity,{state:"stopped"}),/symlink/);
+    assert.equal(existsSync(path.join(dir,"absent")),false);assert.ok(!readdirSync(dir).some(name=>name.endsWith(".tmp")));
+  }finally{rmSync(dir,{recursive:true,force:true});}
 });

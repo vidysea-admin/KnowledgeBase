@@ -97,7 +97,7 @@ export function withSessionArtifacts(deps: BrainReadDeps, root: string): BrainRe
       if (state.tenantId !== tenantId) return { operations: [], omitted: 0 };
       if (state.version !== 1 || !state.operations || typeof state.operations !== "object" || Array.isArray(state.operations)) throw new Error("operation state unavailable");
       const statuses = ["queued", "recording", "processing", "failed", "ready", "action_required"];
-      const reasons = ["retry-limit", "interrupted-no-recording-artifact", "missed-while-processing", "missed-coverage", "cancelled", "overlap-lost", "needs-registration", "needs-review", "invalid-time", "unsafe-join-link",
+      const reasons = ["retry-limit", "interrupted-no-recording-artifact", "missed-while-processing", "missed-coverage", "cancelled", "controller-disconnected", "coverage-review", "overlap-lost", "needs-registration", "needs-review", "invalid-time", "unsafe-join-link",
         "no-join-link", "source-discontinuity", "unproven-calendar-history", "rejected", "rescheduled", "rescheduled-completed", "recurring-series", "unknown-tombstone", "ambiguous-provider", "contradictory-revision", "missing-revision", "ambiguous-identity"];
       const date = (value: unknown) => typeof value === "string" && Number.isFinite(Date.parse(value)) ? new Date(value).toISOString() : undefined;
       let discovery: WebinarOperations["discovery"];

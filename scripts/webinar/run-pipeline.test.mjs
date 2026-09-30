@@ -37,7 +37,7 @@ function completed(root, id) {
   const dir = join(root, 'data/toc-migrated', id); mkdirSync(dir, {recursive: true});
   const bytes = JSON.stringify([{_id:'turn-a',tenantId:'fixture',sessionId:id,text:'Supported source'}]);
   writeFileSync(join(dir,'knowledge-turns.json'),bytes);
-  writeFileSync(join(dir,'source.json'),JSON.stringify({tenantId:'fixture'}));
+  writeFileSync(join(dir,'source.json'),JSON.stringify({_id:`${id}-src`,tenantId:'fixture'}));
   const proof = {version:2,status:'done',strict:true,sessionId:id,tenantId:'fixture',generation:'generation-a',
     inputHash:createHash('sha256').update(bytes).digest('hex'),summary:'done',claims:'done',chunks:'done',tree:'done',semanticSupport:'passed',turnCount:1};
   writeFileSync(join(dir,'index-proof.json'),JSON.stringify(proof));

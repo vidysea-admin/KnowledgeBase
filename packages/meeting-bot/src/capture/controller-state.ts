@@ -1,6 +1,7 @@
 /** Durable controller identity and owned interrupted-capture recovery. */
 import { randomBytes } from "node:crypto";
 import type { GapWindow } from "./reconnect-gaps.js";
+import {validateCaptureControlGaps, validateCaptureStatusIdentity} from "./reconnect-gaps.js";
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, rmSync, writeFileSync, lstatSync, realpathSync, statSync, readdirSync, openSync, readSync, writeSync, fsyncSync, closeSync } from "node:fs";
 import path from "node:path";
@@ -196,11 +197,13 @@ export async function finalizeControllerRecording(
       throw new Error("Recovery capture ownership refused");
     }
     const sourcePath = path.join(root, "data", "toc-migrated", sessionId, "source.json");
+    gaps = validateCaptureControlGaps(status.controlGaps);
+    validateCaptureStatusIdentity(Object.fromEntries(["output", "pid", "handle", "sessionId", "tenantId", "profileDir", "recordDir", "controllerStartedAt"].map(key => [key, status[key]])), gaps.length > 0);
     confinedRecoveryPath(sourcePath, root, false);
     if (existsSync(sourcePath) && JSON.parse(readFileSync(sourcePath, "utf8")).tenantId !== tenantId) throw new Error("Existing capture belongs to a different tenant");
     if (status.state === "recovered") {
       if (!Array.isArray(status.gaps)) throw new Error("Recovery gaps missing");
-      gaps = status.gaps;
+      gaps = validateCaptureControlGaps([...gaps, ...validateCaptureControlGaps(status.gaps, "recovery")], "recovery");
     } else if (status.state !== "stopped") {
       recoveryLock = confinedRecoveryPath(path.join(profileDir, ".lkb-recovery.lock"), profileDir, false);
       recoveryLockIdentity = JSON.stringify({pid: process.pid, sessionId, output: raw, token: randomBytes(16).toString("hex")});
@@ -258,7 +261,7 @@ export async function finalizeControllerRecording(
       if (!Number.isFinite(probed) || probed <= 0) throw new Error("Recovery media duration invalid");
       const end = Date.parse(recovery.plannedUntil) / 1000;
       const start = Math.min(end, Date.parse(recovery.captureStartedAt) / 1000 + Math.max(0, probed - 2));
-      gaps = [{start, end, reason: "controller-interrupted-coverage-unverified", recovered: false}];
+      gaps = validateCaptureControlGaps([...gaps, {start, end, reason: "controller-interrupted-coverage-unverified", recovered: false}], "recovery");
     }
     await actions.finalize(video, gaps);
     if (recovery) {

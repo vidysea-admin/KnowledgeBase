@@ -1,11 +1,27 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { selectAutoRecordItems } from "./auto-join.js";
-import { classifyWebinarInvite, webinarIdentity, webinarSessionKey } from "./auto-record-policy.js";
+import { classifyWebinarInvite, webinarIdentity, webinarSessionKey, activeWebinarStopReason } from "./auto-record-policy.js";
 import { createHttpCalendarLoader, createHttpCandidateLoader } from "./schedule-tick.js";
 import { reconcileWebinarSources, type WebinarReconciliationState } from "./calendar-client.js";
 
 const times = { startTime: "2026-09-30T10:00:00Z", endTime: "2026-09-30T11:00:00Z" };
+
+test("accepted end boundary changes remain causal when the shortened end is already past", () => {
+  const base={id:"active-end",title:"University webinar",meetingUrl:"https://meet.google.com/abc-defg-hij",
+    startTime:"2026-10-01T09:00:00.000Z",endTime:"2026-10-01T11:00:00.000Z",providerUpdated:"2026-10-01T09:00:00.000Z"};
+  const input={tenantId:"lane",checkedAt:"2026-10-01T10:00:00.000Z",acquisition:{complete:true,historyComplete:true},candidates:[]};
+  const first=reconcileWebinarSources({...input,calendarEvents:[base]}), id=first.inventory[0]!.sessionKey!;
+  for (const endTime of ["2026-10-01T09:59:00.000Z","2026-10-01T10:30:00.000Z","2026-10-01T12:00:00.000Z"]) {
+    const result=reconcileWebinarSources({...input,previous:first.state,calendarEvents:[{...base,endTime,providerUpdated:"2026-10-01T09:58:00.000Z"}]});
+    if (endTime < input.checkedAt) assert.equal(result.inventory.length,0);
+    assert.equal(result.transitions[0]!.boundaryChanged,true); assert.equal(activeWebinarStopReason(id,base.endTime,result),"rescheduled");
+  }
+  const conflict=reconcileWebinarSources({...input,previous:first.state,calendarEvents:[{...base,endTime:"2026-10-01T09:59:00.000Z"}]});
+  assert.equal(activeWebinarStopReason(id,base.endTime,conflict),undefined);
+  const unknown=reconcileWebinarSources({...input,previous:first.state,calendarEvents:[{id:"unrelated",cancelled:true} as any]});
+  assert.equal(activeWebinarStopReason(id,base.endTime,unknown),undefined);
+});
 
 test("watch retries only typed discovery failure after 60s and preserves fatal/preview gates", async () => {
   const {runPipelineWatch} = await import(new URL('../../../../scripts/webinar/run-pipeline.mjs', import.meta.url).href);

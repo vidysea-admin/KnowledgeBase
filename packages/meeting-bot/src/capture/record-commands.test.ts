@@ -20,6 +20,8 @@ import { fileURLToPath } from "node:url";
 
 import { captureTenant, finalizeRecordingWith, isSilentCapture, runFinalize, shouldAutoClick, todayAt, validateIndexProof } from "./record-commands.js";
 import type { ObsClientLike } from "./obs-windows.js";
+import {finalizeControllerRecording} from "./controller-state.js";
+import {webinarCompletionState} from "../calendar/schedule-state.js";
 
 // Same derivation record-commands.ts uses for its own REPO_ROOT (this file lives in the same
 // directory) — used ONLY to assert absence, never to write; see the test below.
@@ -94,6 +96,26 @@ function fixtureRoot(): string {
 /** Writes fake audio bytes to whatever path finalizeRecordingWith itself computed and passed in,
  * so the seam is exercised exactly as `defaultExtractAudio` would use it, just without ffmpeg. */
 const fakeExtractAudio = (_video: string, audioOut: string): void => writeFileSync(audioOut, "fake-audio-bytes");
+
+test("recovery re-finalization preserves validated managed control-tail evidence and refuses tampering", async () => {
+  const root=fixtureRoot(), sessionId="sess-control", video=join(root,"fake-video.mkv"), source=join(root,"data/toc-migrated",sessionId,"source.json");
+  const overrides={repoRoot:root,tenantId:"lane",probeMedia:()=>60,extractAudio:fakeExtractAudio,measureVolume:()=>({maxDb:-20,meanDb:-30})};
+  const gap={start:Date.parse("2026-10-01T09:00:00.000Z")/1000,end:Date.parse("2026-10-01T10:00:00.000Z")/1000,reason:"capture-control-controller-disconnected",recovered:false};
+  const finalize=(media:string,gaps:any[])=>finalizeRecordingWith(overrides,media,sessionId,"Fixture","meet",false,gaps);
+  const recover=()=>finalizeControllerRecording(video,{repoRoot:root,recordDir:join(root,"raw/webinars"),profileDir:join(root,"profile"),sessionId,tenantId:"lane",python:"unused",joinScript:"unused"},
+    {normalize:media=>media,finalize,processArtifacts:()=>{}});
+  try {
+    await finalize(video,[gap]); assert.equal(webinarCompletionState(source,"lane",sessionId,{},new Date().toISOString()).reason,"controller-disconnected");
+    await recover();
+    const retained=JSON.parse(readFileSync(source,"utf8")); assert.equal(retained.gaps.length,1);
+    assert.equal(webinarCompletionState(source,"lane",sessionId,{},new Date().toISOString()).status,"action_required");
+    await finalize(video,[gap]); assert.equal(JSON.parse(readFileSync(source,"utf8")).gaps.length,1);
+    for (const bad of [{...retained,tenantId:"foreign"},{...retained,_id:"foreign-src"},{...retained,gaps:[{...retained.gaps[0],recovered:true}]},
+      {...retained,gaps:[{...retained.gaps[0],start:"invalid"}]},{...retained,gaps:[{...retained.gaps[0],reason:"capture-control-arbitrary"}]}]) {
+      const bytes=JSON.stringify(bad); writeFileSync(source,bytes); await assert.rejects(recover()); assert.equal(readFileSync(source,"utf8"),bytes);
+    }
+  } finally {rmSync(root,{recursive:true,force:true});}
+});
 
 test("finalizeRecordingWith: silent capture (-50.1 dB) throws, still writes source.json with audioLevel.silent:true, never transcribes", async () => {
   const root = fixtureRoot();

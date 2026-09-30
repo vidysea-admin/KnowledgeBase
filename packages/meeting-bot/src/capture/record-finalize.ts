@@ -7,7 +7,7 @@
  */
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, statSync, lstatSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
@@ -114,7 +114,25 @@ export async function finalizeRecordingWith(
 
   const dataDir = path.join(root, "data", "toc-migrated", sessionId);
   const priorSource = path.join(dataDir, "source.json");
-  if (existsSync(priorSource) && JSON.parse(readFileSync(priorSource, "utf8")).tenantId !== tenantId) throw new Error("Existing capture belongs to a different tenant");
+  if (existsSync(priorSource)) {
+    for (let current = path.resolve(priorSource); ; current = path.dirname(current)) {
+      if (lstatSync(current).isSymbolicLink()) throw new Error("Prior capture source symlink refused");
+      if (path.dirname(current) === current) break;
+    }
+    if (!statSync(priorSource).isFile() || statSync(priorSource).size > 5 * 1024 * 1024) throw new Error("Prior capture source exceeds bounds");
+    const prior = JSON.parse(readFileSync(priorSource, "utf8"));
+    if (prior.tenantId !== tenantId) throw new Error("Existing capture belongs to a different tenant");
+    if (prior._id !== `${sessionId}-src` || (prior.gaps !== undefined && !Array.isArray(prior.gaps))) throw new Error("Prior capture source identity invalid");
+    const canonical = (value: unknown) => typeof value === "string" && Number.isFinite(Date.parse(value)) && new Date(value).toISOString() === value;
+    const retained: GapWindow[] = [];
+    for (const gap of prior.gaps ?? []) {
+      if (typeof gap?.reason !== "string" || !gap.reason.startsWith("capture-control-")) continue;
+      if (!["capture-control-cancelled", "capture-control-rescheduled", "capture-control-controller-disconnected"].includes(gap.reason) ||
+        !canonical(gap.start) || !canonical(gap.end) || gap.end < gap.start || gap.recovered !== false) throw new Error("Prior capture control evidence invalid");
+      retained.push({start: Date.parse(gap.start) / 1000, end: Date.parse(gap.end) / 1000, reason: gap.reason, recovered: false});
+    }
+    gaps = [...new Map([...retained, ...gaps].map(gap => [JSON.stringify([gap.start, gap.end, gap.reason, gap.recovered]), gap])).values()];
+  }
   mkdirSync(dataDir, { recursive: true });
   const validationPath = path.join(dataDir, "validation.json");
   const fail = (stage: string, error: unknown) => writeFileSync(validationPath,
@@ -193,4 +211,13 @@ export async function finalizeRecordingWith(
     transcriptPath: transcribe ? toPosix(path.relative(root, turnsPath)) : undefined,
     turnCount: transcribe ? readTurnCount(turnsPath) : undefined,
   });
+}
+
+export function normalizeCapture(video: string): string {
+  if (!video.endsWith(".webm") || video.endsWith(".playable.webm")) return video;
+  const output = video.slice(0, -5) + ".playable.webm";
+  const normalized = spawnSync("ffmpeg", ["-y", "-nostdin", "-hide_banner", "-loglevel", "error", "-i", video,
+    "-c", "copy", output], { stdio: "inherit", timeout: 600_000 });
+  if (normalized.status !== 0) throw new Error("WebM finalization failed; original stream retained");
+  return output;
 }

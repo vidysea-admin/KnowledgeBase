@@ -182,7 +182,7 @@ test('webinar operations enforce scope and exact tenant ownership with bounded r
     assert.ok(!JSON.stringify(body).includes('secret')); assert.ok(!JSON.stringify(body).includes('C:/private'));
     assert.deepEqual(await (await get('two')).json(), { operations: [], omitted: 0 });
     for (const reason of ['no-join-link', 'source-discontinuity', 'unproven-calendar-history', 'rejected', 'rescheduled',
-      'rescheduled-completed', 'recurring-series', 'unknown-tombstone', 'ambiguous-provider', 'contradictory-revision', 'missing-revision', 'ambiguous-identity']) {
+      'rescheduled-completed', 'controller-disconnected', 'coverage-review', 'recurring-series', 'unknown-tombstone', 'ambiguous-provider', 'contradictory-revision', 'missing-revision', 'ambiguous-identity']) {
       writeFileSync(file, JSON.stringify({version:1,tenantId:'tenant-1',operations:{webinar:{...rows.webinar,status:'action_required',reason}}}));
       assert.equal(((await (await get('one')).json()) as any).operations[0].reason, reason);
       assert.deepEqual(await (await get('two')).json(), {operations:[],omitted:0});

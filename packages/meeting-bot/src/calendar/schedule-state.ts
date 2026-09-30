@@ -13,7 +13,7 @@
  * poller instance or a cross-machine view is ever needed, this should move to Mongo (a schema +
  * migration, per repo convention) — flagged here rather than silently built that way.
  */
-import { existsSync, readFileSync, writeFileSync, mkdirSync, statSync, renameSync, unlinkSync, openSync, closeSync, fsyncSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, statSync, renameSync, unlinkSync, openSync, closeSync, fsyncSync, lstatSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { reconcileWebinarSources, type CalendarEvent, type WebinarReconciliationState } from "./calendar-client.js";
@@ -76,6 +76,18 @@ function validateOperations(value: unknown, tenantId: string, checkedAt: string)
       !["queued", "recording", "processing", "failed", "ready", "action_required"].includes(row.status) ||
       (row.attempts !== undefined && (!Number.isSafeInteger(row.attempts) || row.attempts < 0)) ||
       (row.priorSessionId !== undefined && (!ID.test(row.priorSessionId) || value.operations[row.priorSessionId]?.tenantId !== tenantId))) invalid();
+    if (row.stopDisposition !== undefined) {
+      object(row.stopDisposition, ["tenantId", "sessionId", "generation", "reason", "requestedAt", "acknowledged"]);
+      const stop = row.stopDisposition;
+      if (stop.tenantId !== tenantId || stop.sessionId !== id || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(stop.generation) ||
+        !["cancelled", "rescheduled", "controller-disconnected"].includes(stop.reason) || !stamp(stop.requestedAt) || stop.requestedAt > checkedAt ||
+        (stop.acknowledged !== undefined && !["accepted", "unavailable"].includes(stop.acknowledged))) invalid();
+    }
+    if (row.monitorGap !== undefined) {
+      object(row.monitorGap, ["tenantId", "sessionId", "reason", "checkedAt"]);
+      if (row.monitorGap.tenantId !== tenantId || row.monitorGap.sessionId !== id ||
+        !["discovery-unavailable", "uncertain-source"].includes(row.monitorGap.reason) || !stamp(row.monitorGap.checkedAt) || row.monitorGap.checkedAt > checkedAt) invalid();
+    }
   }
   if (value.source === undefined) return;
   object(value.source, ["coverage", "mirror", "reconciliation"]); object(value.source.coverage, ["scope", "baselineComplete", "continuousSince", "requestStartedAt", "calendarSyncToken", "historicalDeletedReconstruction"]);
@@ -101,7 +113,7 @@ export function readWebinarOperationState(file: string, tenantId: string, checke
   validateOperations(value, tenantId, checkedAt); return value;
 }
 export function writeWebinarOperationState(file: string, value: WebinarOperationState): void {
-  validateOperations(value, value.tenantId, value.source?.coverage.requestStartedAt ?? new Date().toISOString());
+  validateOperations(value, value.tenantId, new Date().toISOString());
   const bytes = JSON.stringify(value, null, 2) + "\n"; if (Buffer.byteLength(bytes) > CAP) invalid();
   const temporary = `${file}.${randomUUID()}.tmp`;
   let descriptor: number | undefined, created = false;
@@ -113,6 +125,26 @@ export function writeWebinarOperationState(file: string, value: WebinarOperation
     if (descriptor !== undefined) closeSync(descriptor);
     if (created && existsSync(temporary)) unlinkSync(temporary);
   }
+}
+/** A successful index cannot erase a persisted stop or the managed child's incomplete tail. */
+export function webinarCompletionState(sourceFile: string, tenantId: string, sessionId: string, row: Operation, completedAt: string) {
+  let childReason: string | undefined;
+  if (existsSync(sourceFile)) {
+    for (let current = path.resolve(sourceFile); ; current = path.dirname(current)) {
+      if (lstatSync(current).isSymbolicLink()) invalid(); if (path.dirname(current) === current) break;
+    }
+    if (!statSync(sourceFile).isFile() || statSync(sourceFile).size > CAP) invalid();
+    const source = JSON.parse(readFileSync(sourceFile, "utf8"));
+    if (source.tenantId !== tenantId || source._id !== `${sessionId}-src` || (source.gaps !== undefined && !Array.isArray(source.gaps))) invalid();
+    for (const gap of source.gaps ?? []) {
+      if (typeof gap?.reason !== "string" || !gap.reason.startsWith("capture-control-")) continue;
+      if (!["capture-control-cancelled", "capture-control-rescheduled", "capture-control-controller-disconnected"].includes(gap.reason) ||
+        !stamp(gap.start) || !stamp(gap.end) || gap.end < gap.start || gap.recovered !== false) invalid();
+      childReason ??= gap.reason.slice("capture-control-".length);
+    }
+  }
+  const reason = row.stopDisposition?.reason ?? childReason ?? (row.monitorGap ? "coverage-review" : undefined);
+  return {status: reason ? "action_required" : "ready", reason, completedAt};
 }
 /** Prepare a new generation without mutating the committed source, operations or checkpoint. */
 export function prepareWebinarSourceState(previous: WebinarOperationState, value: unknown, candidates: AutoRecordCandidateInput[], requestStartedAt: string) {
@@ -152,7 +184,7 @@ export function prepareWebinarSourceState(previous: WebinarOperationState, value
     operations: projectWebinarInventory(previous.operations, reconciled, previous.tenantId, requestStartedAt, series)};
   validateOperations(state, previous.tenantId, requestStartedAt);
   if (Buffer.byteLength(JSON.stringify(state, null, 2) + "\n") > CAP) invalid();
-  return {state, calendarEvents: reconciled.calendarEvents, candidates: reconciled.candidates};
+  return {state, calendarEvents: reconciled.calendarEvents, candidates: reconciled.candidates, transitions: reconciled.transitions, inventory: reconciled.inventory};
 }
 
 export interface ScheduledEntry {

@@ -3,16 +3,43 @@
  * A controller crash leaves a recoverable WebM and status file; the extension fails closed
  * when its loopback receiver disappears. OBS remains a separate fallback adapter. */
 import { spawn, type ChildProcess } from "node:child_process";
-import { randomBytes, createHash, timingSafeEqual } from "node:crypto";
+import { randomBytes, randomUUID, createHash, timingSafeEqual } from "node:crypto";
 import { createServer, type IncomingMessage } from "node:http";
-import { closeSync, copyFileSync, existsSync, lstatSync, fsyncSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync, writeSync } from "node:fs";
+import { closeSync, copyFileSync, existsSync, lstatSync, fsyncSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync, writeSync, statSync, renameSync } from "node:fs";
 import path from "node:path";
 import type { BrowserJoinerDeps } from "../joiners/browser-joiner.js";
 import { getProcessStartTime } from "./controller-state.js";
 import type { BotEvent } from "./obs-windows.js";
+import {validateCaptureControlGaps, validateCaptureStatusIdentity, type GapWindow} from "./reconnect-gaps.js";
 
 const MAX_CHUNK = 8 * 1024 * 1024;
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** All writes retain the exact private controller identity and verified managed tail. */
+export function writeOwnedTabStatus(file: string, identity: Record<string, any>, changes: Record<string, any>) {
+  validateCaptureStatusIdentity(identity, validateCaptureControlGaps(changes.controlGaps).length > 0);
+  if (file !== `${identity.output}.status.json` || Object.keys(changes).some(key => key in identity)) throw new Error("Capture status identity override refused");
+  for (let current=path.resolve(file); ; current=path.dirname(current)) {
+    try { if (lstatSync(current).isSymbolicLink()) throw new Error("Capture status symlink refused"); }
+    catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
+    if (path.dirname(current) === current) break;
+  }
+  let prior: Record<string, any> = {};
+  if (existsSync(file)) {
+    if (!statSync(file).isFile() || statSync(file).size > 8192) throw new Error("Capture status exceeds bounds");
+    prior=JSON.parse(readFileSync(file,"utf8"));
+    if (!prior || typeof prior !== "object" || Array.isArray(prior) || Object.entries(identity).some(([key,value])=>prior[key] !== value)) throw new Error("Capture status ownership changed");
+  }
+  const controlGaps=validateCaptureControlGaps([...validateCaptureControlGaps(prior.controlGaps),...validateCaptureControlGaps(changes.controlGaps)], "combined-control");
+  validateCaptureStatusIdentity(identity, controlGaps.length > 0);
+  const bytes=JSON.stringify({...prior,...identity,...changes,controlGaps,updatedAt:new Date().toISOString()})+"\n";
+  if (Buffer.byteLength(bytes)>8192) throw new Error("Capture status exceeds bounds");
+  const temporary=`${file}.${randomUUID()}.tmp`; let fd: number | undefined, created=false;
+  try {
+    fd=openSync(temporary,"wx",0o600); created=true; writeFileSync(fd,bytes); fsyncSync(fd); closeSync(fd); fd=undefined;
+    renameSync(temporary,file);
+  } finally {if(fd !== undefined)closeSync(fd);if(created && existsSync(temporary))rmSync(temporary);}
+}
 
 export interface TabBrowserConfig {
   sessionId?: string;
@@ -112,7 +139,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
   const levels = new Set<(db: number) => void>();
   const runs = new Map<string, {child: ChildProcess; exited: Promise<number | null>; output: string;
     receiver: Awaited<ReturnType<typeof createTabCaptureReceiver>>; stopFile: string;
-    reloadFile: string; lock: string; done: boolean; failure?: string; stopped?: boolean}>();
+    reloadFile: string; lock: string; done: boolean; failure?: string; stopped?: boolean; controlGaps: GapWindow[]; identity: Record<string, any>}>();
   let active = false;
   const deps: BrowserJoinerDeps = {
     async launch(url) {
@@ -129,8 +156,9 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
       const statusPath = `${output}.status.json`;
       const controllerStartedAt = getProcessStartTime(process.pid);
       let captureStartedAt: string | undefined;
-      const status = (state: string, error?: string) => writeFileSync(statusPath,
-        JSON.stringify({state, output, pid: process.pid, handle, sessionId: cfg.sessionId, tenantId: cfg.tenantId, profileDir: path.resolve(cfg.profileDir), recordDir: path.resolve(cfg.recordDir), controllerStartedAt, captureStartedAt, updatedAt: new Date().toISOString(), error}) + "\n");
+      const identity={output,pid:process.pid,handle,sessionId:cfg.sessionId,tenantId:cfg.tenantId,profileDir:path.resolve(cfg.profileDir),recordDir:path.resolve(cfg.recordDir),controllerStartedAt};
+      const status = (state: string, error?: string) => writeOwnedTabStatus(statusPath, identity,
+        {state,captureStartedAt,error,controlGaps:runs.get(handle)?.controlGaps ?? []});
       try {
         if (existsSync(recoveryLock)) throw new Error("Profile recovery active or requires inspection");
         if (existsSync(lock)) {
@@ -183,7 +211,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
           }
         });
         child.stderr?.on("data", () => {}); // drain without exposing invite tokens or browser credentials
-        runs.set(handle, {child, exited, output, receiver, stopFile, reloadFile, lock, done: false});
+        runs.set(handle, {child, exited, output, receiver, stopFile, reloadFile, lock, done: false, controlGaps:[], identity});
         status("starting");
         const deadline = Date.now() + (cfg.startupTimeoutMs ?? 180000);
         while (!ready && !failure && !done && Date.now() < deadline) await sleep(250);
@@ -210,12 +238,18 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
       if (existsSync(run.lock) && !lstatSync(run.lock).isSymbolicLink() && readFileSync(run.lock, "utf8") === String(process.pid)) rmSync(run.lock);
       rmSync(run.stopFile, {force: true}); rmSync(run.reloadFile, {force: true});
       rmSync(path.join(cfg.recordDir, `.extension-${handle}`), {recursive: true, force: true});
-      writeFileSync(`${run.output}.status.json`, JSON.stringify({...JSON.parse(readFileSync(`${run.output}.status.json`, "utf8")), state: run.failure ? "failed" : "stopped", output: run.output, error: run.failure, bytes: run.receiver.bytes(), updatedAt: new Date().toISOString()}) + "\n");
+      writeOwnedTabStatus(`${run.output}.status.json`,run.identity,{state:run.failure ? "failed" : "stopped",error:run.failure,bytes:run.receiver.bytes(),controlGaps:run.controlGaps});
       active = false;
       if (run.failure || !run.receiver.bytes()) throw new Error(run.failure ?? "Tab capture produced no media bytes");
     },
   };
   return {
+    persistControlGap: (handle: string, gap: GapWindow) => {
+      const run=runs.get(handle); if(!run || !run.identity.tenantId || !run.identity.sessionId || !run.identity.controllerStartedAt) throw new Error("Managed capture identity unavailable");
+      run.controlGaps=validateCaptureControlGaps([...run.controlGaps,gap]);
+      try {writeOwnedTabStatus(`${run.output}.status.json`,run.identity,{controlGaps:run.controlGaps});}
+      catch(error){run.failure="Capture control evidence could not be persisted";throw error;}
+    },
     deps, outputPath: (handle: string) => runs.get(handle)?.output,
     browserExited: (handle: string) => runs.get(handle)?.exited,
     triggerReload: (handle: string) => { const run = runs.get(handle); if (run) writeFileSync(run.reloadFile, "reload"); },

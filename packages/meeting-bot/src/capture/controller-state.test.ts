@@ -5,11 +5,12 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
 import {
+  finalizeControllerRecording,
   controllerMatchesIdentity,
   getProcessStartTime,
   isControllerAlive,
@@ -20,6 +21,10 @@ import {
   writeControllerState,
   type RecordState,
 } from "./controller-state.js";
+
+import {writeOwnedTabStatus} from "./tab-browser.js";
+import {finalizeRecordingWith} from "./record-commands.js";
+import {webinarCompletionState} from "../calendar/schedule-state.js";
 
 function tmpDir(): string {
   return mkdtempSync(path.join(tmpdir(), "lkb-controller-state-"));
@@ -254,4 +259,45 @@ test("Windows process identity retains its timestamp and never reads proc", () =
   assert.equal(getProcessStartTime(4242, {...probes, platform: "darwin"}), undefined);
   assert.equal(calls, 1);
   assert.equal(getProcessStartTime(4242, {...probes, windowsStartTime: () => { throw new Error("probe unavailable"); }}), undefined);
+});
+
+test("first-source normalize/probe/extract failures retain stopped and interrupted control evidence", async () => {
+  for (const state of ["stopped", "recording"]) for (const failure of ["normalize", "probe", "extract"]) {
+    const root=tmpDir(), recordDir=path.join(root,"raw/webinars"), profileDir=path.join(root,"profile");
+    mkdirSync(recordDir,{recursive:true}); mkdirSync(profileDir);
+    const handle="tab-123456-aabbccdd", video=path.join(recordDir,handle+".webm"), sessionId="first-source-control";
+    const source=path.join(root,"data/toc-migrated",sessionId,"source.json"), statusPath=video+".status.json";
+    const started="2026-10-01T09:00:00.000Z", until="2026-10-01T09:01:00.000Z";
+    const gap={start:Date.parse(started)/1000+30,end:Date.parse(until)/1000,reason:"capture-control-controller-disconnected",recovered:false};
+    const identity={output:video,pid:99999999,handle,sessionId,tenantId:"lane",profileDir,recordDir,controllerStartedAt:started};
+    writeFileSync(video,"original-media");
+    writeOwnedTabStatus(statusPath,identity,{state,captureStartedAt:started,controlGaps:[gap]});
+    if(state==="recording") {
+      writeControllerState(recordDir,sample({pid:identity.pid,sessionId,obsOutputDir:recordDir,controllerStartedAt:started,until}));
+      writeFileSync(path.join(profileDir,".lkb-tab-capture.lock"),String(identity.pid));
+      mkdirSync(path.join(recordDir,".extension-"+handle));
+    }
+    let failing=true, processed=0;
+    const recover=()=>finalizeControllerRecording(video,{repoRoot:root,recordDir,profileDir,sessionId,tenantId:"lane",python:"unused",joinScript:"unused"},{
+      normalize:media=>{if(failing&&failure==="normalize")throw new Error("first normalize failure");return media;},
+      pidProbe:()=>"dead",cleanup:()=>{},mediaDuration:()=>20,processArtifacts:()=>{processed++;},
+      finalize:(media,gaps)=>finalizeRecordingWith({repoRoot:root,tenantId:"lane",
+        probeMedia:()=>{if(failing&&failure==="probe")throw new Error("first probe failure");return 20;},
+        extractAudio:(_input,output)=>{if(failing&&failure==="extract")throw new Error("first extract failure");writeFileSync(output,"audio");},
+        measureVolume:()=>({maxDb:-20,meanDb:-30})},media,sessionId,"Fixture","meet",false,gaps),
+    });
+    try {
+      await assert.rejects(recover(),new RegExp("first "+failure+" failure"));
+      assert.equal(existsSync(source),false); assert.equal(processed,0);
+      assert.equal(readFileSync(video,"utf8"),"original-media");
+      assert.deepEqual(JSON.parse(readFileSync(statusPath,"utf8")).controlGaps,[gap]);
+      failing=false; await recover();
+      const evidence=JSON.parse(readFileSync(source,"utf8"));
+      assert.equal(evidence.gaps.filter((item:any)=>item.reason===gap.reason).length,1);
+      const completion=webinarCompletionState(source,"lane",sessionId,{},new Date().toISOString());
+      assert.equal(completion.status,"action_required"); assert.equal(completion.reason,"controller-disconnected");
+      await recover(); assert.deepEqual(JSON.parse(readFileSync(source,"utf8")).gaps,evidence.gaps);
+      assert.equal(readFileSync(video,"utf8"),"original-media");
+    } finally {rmSync(root,{recursive:true,force:true});}
+  }
 });

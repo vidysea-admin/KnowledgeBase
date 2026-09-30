@@ -10,9 +10,9 @@ import { selectJoinStrategy } from "../strategy.js";
 import { createAudioWatchdog, createRealLevelSource } from "./audio-watchdog.js";
 import { type ControllerRecoveryActions, type ControllerRecoveryContext, cleanupOwnedBrowserProfile, finalizeControllerRecording, getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
 import { AUDIO_INPUT, createObsBrowserDeps, type ObsClientLike } from "./obs-windows.js";
-import { collectGapEvent, type GapWindow } from "./reconnect-gaps.js";
+import { collectGapEvent, installCaptureControl, type GapWindow } from "./reconnect-gaps.js";
 import { createTelegramNotifier, type TelegramNotifier } from "./telegram-alerts.js";
-import { finalizeRecordingWith } from "./record-finalize.js";
+import { finalizeRecordingWith, normalizeCapture } from "./record-finalize.js";
 import { createTabBrowserDeps } from "./tab-browser.js";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, "..", "..", "..", "..");
@@ -93,6 +93,8 @@ export async function runRecord(rest: string[]): Promise<void> {
   if (selectJoinStrategy(platform) === "vexa") {
     console.warn(`[bot] '${platform}' is Vexa-routed but no Vexa is deployed — using the local browser bot`);
   }
+  const startedAt = Date.now(), control = installCaptureControl({tenantId, sessionId, until: until.getTime(), startedAt});
+  try {
   let endedAt: number | undefined;
   const gaps: GapWindow[] = []; // T-029: filled from "gap" events on sb_join.py's stdout stream
   const telegram = createTelegramNotifier();
@@ -121,7 +123,6 @@ export async function runRecord(rest: string[]): Promise<void> {
     onEvent,
   });
   const joiner = createBrowserJoiner(bot.deps);
-  const startedAt = Date.now();
   const { sessionHandle } = await joiner.join(url, { tenantId, consentNote: title });
   telegram.notifyJoined(title, platform); // T-030
   let gone = false;
@@ -153,7 +154,8 @@ export async function runRecord(rest: string[]): Promise<void> {
       `(early stop on 'ended' only after ${endNotBefore.toLocaleTimeString()})`);
     try {
       for (;;) {
-        const now = Date.now();
+        const now = Date.now(), stop = control.request();
+        if (stop) { const gap=control.gap()!; gaps.push(gap); tab?.persistControlGap(sessionHandle,gap); console.log(`[bot] capture-control: ${stop.reason}`); break; }
         if (captureFailure) throw new Error(captureFailure);
         if (now >= until.getTime()) { console.log("[bot] --until reached"); break; }
         if (gone) { console.log("[bot] bot browser exited"); break; }
@@ -172,6 +174,7 @@ export async function runRecord(rest: string[]): Promise<void> {
       }
       await bot.disconnect().catch(() => {});
     }
+    control.dispose();
     let video = bot.outputPath(sessionHandle);
     if (!video || !existsSync(video)) {
       const newest = readdirSync(RECORD_DIR)
@@ -191,15 +194,9 @@ export async function runRecord(rest: string[]): Promise<void> {
     audioWatchdog.stop(); // idempotent — belt-and-suspenders if the inner finally was never reached
     removeControllerState(RECORD_DIR);
   }
+  } finally { control.dispose(); }
 }
-export function normalizeCapture(video: string): string {
-  if (!video.endsWith(".webm") || video.endsWith(".playable.webm")) return video;
-  const output = video.slice(0, -5) + ".playable.webm";
-  const normalized = spawnSync("ffmpeg", ["-y", "-nostdin", "-hide_banner", "-loglevel", "error", "-i", video,
-    "-c", "copy", output], { stdio: "inherit", timeout: 600_000 });
-  if (normalized.status !== 0) throw new Error("WebM finalization failed; original stream retained");
-  return output;
-}
+export { normalizeCapture } from "./record-finalize.js";
 export function processRecordingArtifacts(video: string, sessionId: string, rest: string[]): void {
   if (!rest.includes("--process-video")) return;
   if (!rest.includes("--transcribe")) throw new Error("--process-video requires --transcribe");

@@ -120,6 +120,15 @@ export function webinarSessionKey(identity: string): string {
   return `webinar-${createHash("sha256").update(identity).digest("hex").slice(0, 24)}`;
 }
 
+/** Only accepted source lineage can change an in-progress capture's planned boundary. */
+export function activeWebinarStopReason(id: string, originalEnd: string, result: Pick<WebinarReconciliationResult, "transitions" | "inventory">): "cancelled" | "rescheduled" | undefined {
+  const changed = result.transitions.find(row => row.reason === "cancelled" && row.aliases.includes(id)) ??
+    result.transitions.find(row => row.reason === "rescheduled" && row.aliases.includes(id) && (row.currentKey !== id || row.boundaryChanged === true));
+  if (changed) return changed.reason as "cancelled" | "rescheduled";
+  if (result.inventory.some(row => row.sessionKey === id && !row.reason && row.snapshot.endTime && row.snapshot.endTime !== originalEnd)) return "rescheduled";
+  return undefined;
+}
+
 /** Source inventory uses the same proven identity/alias policy as capture selection. No I/O. */
 export function projectWebinarInventory(previous: Record<string, Record<string, any>>, result: WebinarReconciliationResult,
   tenantId: string, checkedAt: string, series: (CalendarEvent & {recurrence?: string[]})[] = []) {
@@ -142,6 +151,10 @@ export function projectWebinarInventory(previous: Record<string, Record<string, 
         else if (!terminal(current) && (prior.attempts ?? 0) > 0) operations[transition.currentKey] = {...current, tenantId, updatedAt: checkedAt,
           status: (prior.attempts ?? 0) >= 3 ? "action_required" : "queued", reason: (prior.attempts ?? 0) >= 3 ? "retry-limit" : undefined,
           attempts: Math.max(current?.attempts ?? 0, prior.attempts), priorSessionId: alias};
+        const projected = operations[transition.currentKey];
+        if (projected?.priorSessionId === alias) {
+          delete projected.stopDisposition; delete projected.monitorGap;
+        }
       }
       if (alias !== transition.currentKey || transition.reason !== "rescheduled") {
         if (prior?.status === "queued") put(alias, {status: "action_required", reason: transition.reason === "unresolved" ? "source-discontinuity" : transition.reason});

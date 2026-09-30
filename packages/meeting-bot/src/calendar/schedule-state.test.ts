@@ -5,14 +5,16 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, readdirSync, existsSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, readdirSync, existsSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import {createHash} from "node:crypto";
 
 import {
   readScheduleState, readScheduledKeys, recordScheduled, scheduleStateFilePath,
   writeScheduledJob, readScheduledJob,
   prepareWebinarSourceState, readWebinarOperationState, writeWebinarOperationState, validateWebinarCalendarAcquisition,
+  webinarCompletionState,
 } from "./schedule-state.js";
 import { createHttpCalendarLoader } from "./schedule-tick.js";
 import { selectAutoRecordItems } from "./auto-join.js";
@@ -159,8 +161,18 @@ async function withNativeRunner(body: (fixture: any) => Promise<void>) {
     start: {dateTime: new Date(Date.now() + minutes * 60000).toISOString()}, end: {dateTime: new Date(Date.now() + (minutes + 60) * 60000).toISOString()},
     hangoutLink: "https://meet.google.com/abc-defg-hij", ...extra});
   const file = path.join(stateDir, "operations.json"), saved = () => JSON.parse(readFileSync(file, "utf8"));
+  const complete = (id: string, gaps: any[] = []) => {
+    const dir = path.join(root, "data/toc-migrated", id); mkdirSync(dir, {recursive:true});
+    const bytes = JSON.stringify([{_id:"fixture-turn",tenantId:"lane",sessionId:id,text:"Supported fixture"}]);
+    writeFileSync(path.join(dir,"knowledge-turns.json"), bytes);
+    writeFileSync(path.join(dir,"source.json"), JSON.stringify({_id:`${id}-src`,tenantId:"lane",gaps}));
+    const proof = {version:2,status:"done",strict:true,sessionId:id,tenantId:"lane",generation:"fixture-index",
+      inputHash:createHash("sha256").update(bytes).digest("hex"),summary:"done",claims:"done",chunks:"done",tree:"done",semanticSupport:"passed",turnCount:1};
+    writeFileSync(path.join(dir,"index-proof.json"),JSON.stringify(proof));
+    writeFileSync(path.join(dir,"pipeline-state.json"),JSON.stringify({...proof,stage:"index"}));
+  };
   try { await body({root, stateDir, provider, deps, server, launches, event, file, saved, tick: () => runPipelineTick(deps, true),
-    mail: (value: any[]) => {candidates = value;}, preview: () => runPipelineTick(deps, false)}); }
+    mail: (value: any[]) => {candidates = value;}, complete, preview: () => runPipelineTick(deps, false)}); }
   finally {await server.close(); rmSync(root, {recursive: true, force: true});}
 }
 
@@ -177,6 +189,94 @@ test("native streamed overflow cancels before JSON and never advances persisted 
     assert.deepEqual(f.saved().source, before); assert.equal(f.launches.length, 0);
     assert.equal(reads, 2); assert.equal(cancelled, 1); assert.equal(released, 1); assert.equal(parsed, 0);
   } finally {globalThis.fetch = original;}
+}));
+
+test("active native monitor commits cancellation/reschedule before control and preserves partial completion", () => withNativeRunner(async f => {
+  const generation = "11111111-1111-4111-8111-111111111111";
+  for (const reason of ["cancelled", "rescheduled", "past-end"]) {
+    if (existsSync(f.file)) rmSync(f.file);
+    const expected=reason === "past-end" ? "rescheduled" : reason;
+    const invite = f.event(`active-${reason}`, reason === "past-end" ? -30 : 1); f.provider.snapshot = [invite]; f.provider.delta = [];
+    let controls = 0, polls = 0, activeId = "", resolveChild: () => void;
+    f.deps.captureWait = async () => {
+      polls++; assert.equal(polls, 1);
+      const changed = reason === "cancelled" ? {id:invite.id,status:"cancelled",updated:new Date().toISOString()} : {...invite,
+        updated:new Date().toISOString(),...(reason === "past-end" ? {end:{dateTime:new Date(Date.now()-60000).toISOString()}} :
+          {start:{dateTime:new Date(Date.parse(invite.start.dateTime)+60000).toISOString()}})};
+      f.provider.snapshot = [changed]; f.provider.delta = [changed];
+    };
+    f.deps.launch = (args: string[], _env: any, onLine: (line: string) => void, onControl: (control: any) => void) => new Promise<void>(resolve => {
+      activeId = args[args.indexOf("--session-id")+1]!; resolveChild = resolve;
+      onControl({generation,stop: async (requested: string) => {
+        controls++; assert.equal(requested,expected);
+        const row = f.saved().operations[activeId]; assert.equal(row.status,"recording"); assert.equal(row.stopDisposition.reason,expected);
+        assert.equal(row.stopDisposition.generation,generation); assert.equal(row.stopDisposition.sessionId,activeId);
+        f.complete(activeId); onLine("[pipeline] processing"); resolveChild(); return "accepted";
+      }});
+    });
+    await f.tick(); const row = f.saved().operations[activeId];
+    assert.equal(controls,1); assert.equal(row.status,"action_required"); assert.equal(row.reason,expected); assert.equal(row.stopDisposition.acknowledged,"accepted");
+    const launches = controls; await f.tick(); assert.equal(controls,launches);
+    for (const forged of [{tenantId:"foreign"},{sessionId:"another"},{generation:"wrong"},{reason:"arbitrary"},{requestedAt:"2099-01-01T00:00:00.000Z"}]) {
+      const bad = f.saved(); Object.assign(bad.operations[activeId].stopDisposition,forged);
+      assert.throws(() => writeWebinarOperationState(f.file,bad), /Invalid/);
+    }
+  }
+}));
+
+test("active discovery failure and late processing cannot issue an unproved stop", () => withNativeRunner(async f => {
+  f.provider.snapshot = [f.event("active",1)]; let finish: () => void, line: (value:string)=>void, controls = 0, id = "", waits = 0;
+  f.deps.launch = (args:string[],_env:any,onLine:any,onControl:any) => new Promise<void>(resolve => {
+    finish=resolve; line=onLine; id=args[args.indexOf("--session-id")+1]!;
+    onControl({generation:"22222222-2222-4222-8222-222222222222",stop:async()=>{controls++;return "accepted";}});
+  });
+  f.deps.captureWait = async () => {
+    if (++waits === 1) f.provider.fail=true;
+    else {f.provider.fail=false; f.complete(id); line("[pipeline] processing"); finish();}
+  };
+  await f.tick(); assert.equal(controls,0); assert.equal(f.saved().operations[id].reason,"coverage-review");
+  assert.equal(f.saved().operations[id].monitorGap.reason,"discovery-unavailable");
+  rmSync(f.file); const originalLoader=f.deps.loadCalendarAcquisition, second=f.event("late",1); f.provider.snapshot=[second]; f.provider.delta=[];
+  f.deps.captureWait=async()=>{f.provider.snapshot=f.provider.delta=[{id:second.id,status:"cancelled",updated:new Date().toISOString()}];};
+  f.deps.loadCalendarAcquisition=async(...args:any[]) => {
+    const result=await originalLoader(...args);
+    if (existsSync(f.file) && f.saved().operations[id]?.status === "recording") {line("[pipeline] processing");f.complete(id);finish();}
+    return result;
+  };
+  await f.tick(); assert.equal(controls,0); assert.equal(f.saved().operations[id].status,"ready"); assert.equal(f.saved().operations[id].stopDisposition,undefined);
+}));
+
+test("monitor error keeps the owned child and lane alive until actual settlement", () => withNativeRunner(async f => {
+  f.provider.snapshot=[f.event("live",1)]; let finish:()=>void=()=>{throw new Error("child not launched");}, releaseWait:()=>void, id="", launches=0, ended=false;
+  const reached=new Promise<void>(resolve=>{releaseWait=resolve;});
+  f.deps.launch=(args:string[])=>new Promise<void>(resolve=>{launches++;id=args[args.indexOf("--session-id")+1]!;finish=resolve;});
+  f.deps.captureWait=async()=>{releaseWait();throw new Error("fixture wait failure");};
+  const tick=f.tick().finally(()=>{ended=true;}); await reached; await new Promise(resolve=>setTimeout(resolve,20));
+  assert.equal(ended,false); assert.equal(launches,1); assert.equal(existsSync(path.join(f.stateDir,"poller.lock")),true);
+  f.complete(id); finish(); await tick; assert.equal(launches,1); assert.equal(existsSync(path.join(f.stateDir,"poller.lock")),false);
+  assert.equal(f.saved().operations[id].status,"failed");
+}));
+
+test("child control-tail source evidence remains action-required through marker restart", () => withNativeRunner(async f => {
+  f.provider.snapshot=[f.event("disconnect",1)];
+  let id="";
+  const gap={start:new Date().toISOString(),end:new Date(Date.now()+60000).toISOString(),reason:"capture-control-controller-disconnected",recovered:false};
+  f.deps.launch=async(args:string[])=>{id=args[args.indexOf("--session-id")+1]!;f.complete(id,[gap]);};
+  await f.tick(); assert.equal(f.saved().operations[id].status,"action_required"); assert.equal(f.saved().operations[id].reason,"controller-disconnected");
+  const source=path.join(f.root,"data/toc-migrated",id,"source.json"), row=f.saved().operations[id];
+  const original=readFileSync(source,"utf8");
+  for (const bad of [{tenantId:"foreign",_id:`${id}-src`,gaps:[gap]}, {tenantId:"lane",_id:"foreign-src",gaps:[gap]},
+    {tenantId:"lane",_id:`${id}-src`,gaps:[{...gap,recovered:true}]}, {tenantId:"lane",_id:`${id}-src`,gaps:[{...gap,start:"invalid"}]},
+    {tenantId:"lane",_id:`${id}-src`,gaps:[{...gap,end:gap.start,start:gap.end}]}, {tenantId:"lane",_id:`${id}-src`,gaps:[{...gap,reason:"capture-control-arbitrary"}]}]) {
+    writeFileSync(source,JSON.stringify(bad)); assert.throws(()=>webinarCompletionState(source,"lane",id,row,f.deps.now()), /Invalid/);
+  }
+  writeFileSync(source,"x".repeat(5*1024*1024+1)); assert.throws(()=>webinarCompletionState(source,"lane",id,row,f.deps.now()), /Invalid/);
+  writeFileSync(source,original);
+  const linked=path.join(f.stateDir,"linked-source"); symlinkSync(path.dirname(source),linked,process.platform === "win32" ? "junction" : "dir");
+  assert.throws(()=>webinarCompletionState(path.join(linked,"source.json"),"lane",id,row,f.deps.now()), /Invalid/);
+  const saved=f.saved(); saved.operations[id].status="recording"; delete saved.operations[id].reason; writeWebinarOperationState(f.file,saved);
+  let relaunched=0; f.deps.launch=async()=>{relaunched++;}; await f.tick();
+  assert.equal(relaunched,0); assert.equal(f.saved().operations[id].status,"action_required"); assert.equal(f.saved().operations[id].reason,"controller-disconnected");
 }));
 
 test("persisted reschedules preserve completed, rejected and exhausted retry barriers", () => withNativeRunner(async f => {

@@ -39,7 +39,7 @@ export interface WebinarReconciliationState {
 export interface WebinarReconciliationResult {
   state: WebinarReconciliationState; calendarEvents: CalendarEvent[]; candidates: AutoRecordCandidateInput[];
   inventory: { occurrenceKey: string; reviewKey: string; sessionKey?: string; classification: string; snapshot: Snapshot; reason?: string }[];
-  transitions: { occurrenceKey: string; reason: "cancelled" | "rescheduled" | "unresolved"; aliases: string[]; currentKey?: string }[];
+  transitions: { occurrenceKey: string; reason: "cancelled" | "rescheduled" | "unresolved"; aliases: string[]; currentKey?: string; boundaryChanged?: true }[];
   newStartsBlocked: boolean;
 }
 const fail = (): never => { throw new Error("Invalid webinar reconciliation input or state"); };
@@ -251,8 +251,11 @@ export function reconcileWebinarSources(input: {
       meetingUrl: linked.snapshot.meetingUrl, cancelled: linked.snapshot.cancelled} : row.snapshot;
     const current = row.accepted ? identity(snapshot) : undefined, prior = previous.occurrences[key];
     const priorIdentity = prior && identity(prior.linkedCalendar ? previous.occurrences[prior.linkedCalendar]!.snapshot : prior.snapshot);
-    if (unresolved || snapshot.cancelled || (priorIdentity && current !== priorIdentity)) transitions.push({occurrenceKey: key,
-      reason: unresolved ? "unresolved" : snapshot.cancelled ? "cancelled" : "rescheduled", aliases: row.aliases.map(alias => alias.key), currentKey: current ? webinarSessionKey(current) : undefined});
+    const priorSnapshot = prior?.linkedCalendar ? previous.occurrences[prior.linkedCalendar]!.snapshot : prior?.snapshot;
+    const boundaryChanged = row.accepted && prior?.accepted && !unresolved && Boolean(priorSnapshot?.endTime && snapshot.endTime && priorSnapshot.endTime !== snapshot.endTime);
+    if (unresolved || snapshot.cancelled || boundaryChanged || (priorIdentity && current !== priorIdentity)) transitions.push({occurrenceKey: key,
+      reason: unresolved ? "unresolved" : snapshot.cancelled ? "cancelled" : "rescheduled", aliases: row.aliases.map(alias => alias.key),
+      currentKey: current ? webinarSessionKey(current) : undefined, ...(boundaryChanged ? {boundaryChanged: true as const} : {})});
     const classification = classifyWebinarInvite(snapshot.title ?? ""), future = !snapshot.endTime || snapshot.endTime > input.checkedAt;
     if ((classification !== "meeting" && future) || unresolved) inventory.push({occurrenceKey: key, reviewKey: webinarSessionKey(`source-review|${key}`),
       sessionKey: current ? webinarSessionKey(current) : undefined, classification, snapshot, reason: unresolved ?? linked?.reviewReason ?? row.reviewReason ?? (snapshot.cancelled ? "cancelled" : undefined)});

@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 /** Portable discovery/capture/process runner. Preview default; explicit --run and live proof gate. */
-import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, openSync, closeSync, readFileSync, writeFileSync, unlinkSync, realpathSync, statSync } from 'node:fs';
 import { dirname, join, resolve, relative, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -9,13 +8,21 @@ register();
 const {selectAutoRecordItems} = await import('../../packages/meeting-bot/src/calendar/auto-join.ts');
 const {createHttpCalendarLoader, createHttpCandidateLoader, loadWebinarSourcesWithHealth} = await import('../../packages/meeting-bot/src/calendar/schedule-tick.ts');
 const {validateIndexProof} = await import('../../packages/meeting-bot/src/capture/record-commands.ts');
-const {loadTrustedSenderConfig, redactJoinLink} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
+const {loadTrustedSenderConfig, redactJoinLink, activeWebinarStopReason} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
+const {launchControlledRecording} = await import('../../packages/meeting-bot/src/capture/reconnect-gaps.ts');
 const {createTelegramChannel, createOperationNotifications} = await import('../../packages/meeting-bot/src/capture/telegram-channel.ts');
-const {readWebinarOperationState, writeWebinarOperationState, prepareWebinarSourceState} = await import('../../packages/meeting-bot/src/calendar/schedule-state.ts');
+const {readWebinarOperationState, writeWebinarOperationState, prepareWebinarSourceState, webinarCompletionState} = await import('../../packages/meeting-bot/src/calendar/schedule-state.ts');
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const ID = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const load = (path) => JSON.parse(readFileSync(path, 'utf8'));
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
+function captureWait(ms, signal) {
+  return new Promise(resolve => {
+    const finish = () => { clearTimeout(timer); signal.removeEventListener('abort', finish); resolve(); };
+    const timer = setTimeout(finish, ms); signal.addEventListener('abort', finish, {once: true});
+    if (signal.aborted) finish();
+  });
+}
 function safeText(text) {
   // Feed errors can include opaque URLs; leave no query, fragment, userinfo or token in logs.
   return String(text).replace(/https?:\/\/[^\s"']+/gi, (url) => {
@@ -42,22 +49,6 @@ export function validateRunGate(root, env) {
     throw new Error('Live proof must reference a nonempty media file');
   }
   return work;
-}
-function launchChild(root, args, env, onLine) {
-  return new Promise((done, fail) => {
-    const child = spawn(process.execPath, ['--import', 'tsx', join(root, 'packages/meeting-bot/src/cli.ts'), ...args],
-      {cwd: root, env, shell: false, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe']});
-    let pending = '';
-    child.stdout.on('data', (bytes) => {
-      pending += bytes.toString();
-      if (pending.length > 65536) pending = pending.slice(-65536);
-      const lines = pending.split('\n'); pending = lines.pop() ?? '';
-      for (const line of lines) onLine(line);
-    });
-    child.stderr.on('data', () => {}); // drain; provider/URL details are not copied into service logs
-    child.once('error', () => fail(new Error('Recording child could not start')));
-    child.once('close', (code) => code === 0 ? done() : fail(new Error(`Recording pipeline exited ${code}`)));
-  });
 }
 export function createPipelineDeps(env = process.env) {
   const api = (env.LKB_API_URL ?? 'http://localhost:3300').replace(/\/$/, '');
@@ -95,7 +86,7 @@ export function createPipelineDeps(env = process.env) {
       if (failure) throw new Error('Gmail candidate discovery unavailable');
       return rows;
     },
-    launch: (args, childEnv, onLine) => launchChild(ROOT, args, childEnv, onLine),
+    launch: (args, childEnv, onLine, onControl) => launchControlledRecording(ROOT, args, childEnv, onLine, onControl),
     notifyOperation: async ({sessionId, status, reason, feed}) => {
       if (!channelInitialized) {
         channel = createTelegramChannel({token: env.TELEGRAM_BOT_TOKEN ?? '', chatId: env.TELEGRAM_CHAT_ID ?? '', log});
@@ -170,17 +161,47 @@ export async function runPipelineTick(deps, run = false) {
     } catch { return false; }
   };
   async function execute(id, args) {
-    await deps.launch(args, {...env, MONGO_WORK_DB: work, LKB_CAPTURE_BACKEND: 'tab'}, (line) => {
+    let recording = args[0] === 'record', settled = false, control, failure;
+    const originalEnd = state.operations[id].endTime, wake = new AbortController();
+    const child = Promise.resolve(deps.launch(args, {...env, MONGO_WORK_DB: work, LKB_CAPTURE_BACKEND: 'tab'}, (line) => {
       const artifact = /audio\/video recording started:\s*(.+)/.exec(line);
       if (artifact) {
         try { update(id, {artifact: confined(root, artifact[1].trim())}); } catch { /* untrusted line never becomes a file path */ }
       }
-      if (/audio →|\[pipeline\] processing/.test(line)) update(id, {status: 'processing'});
-    });
+      if (/audio →|\[pipeline\] processing/.test(line)) { recording = false; wake.abort(); update(id, {status: 'processing'}); }
+      if (control && line === '[bot] capture-control: controller-disconnected') update(id, {stopDisposition: {
+        tenantId, sessionId: id, generation: control.generation, reason: 'controller-disconnected', requestedAt: new Date(now()).toISOString()}});
+    }, handle => {control = handle;}));
+    const closed = child.then(() => {settled = true; wake.abort();}, error => {failure ??= error; settled = true; wake.abort();});
+    try { while (!settled && recording) {
+      await (deps.captureWait ?? captureWait)(30000, wake.signal);
+      if (settled || !recording) break;
+      try {
+        const prepared = await refresh();
+        if (settled || !recording) break;
+        const reason = activeWebinarStopReason(id, originalEnd, prepared);
+        if (reason && control && !state.operations[id].stopDisposition) {
+          update(id, {reason, stopDisposition: {tenantId, sessionId: id, generation: control.generation, reason, requestedAt: new Date(now()).toISOString()}});
+          if (!settled && recording) {
+            const acknowledged = await Promise.resolve().then(() => control.stop(reason)).catch(() => 'unavailable');
+            update(id, {stopDisposition: {...state.operations[id].stopDisposition, acknowledged}});
+          }
+        }
+        if (prepared.transitions.some(row => row.reason === 'unresolved' && row.aliases.includes(id))) monitoringGap(id, 'uncertain-source');
+        for (const [otherId, row] of Object.entries(state.operations)) if (otherId !== id && row.status === 'queued' &&
+          Date.parse(row.startTime) <= Date.parse(now()) + 5 * 60000 && Date.parse(row.startTime) < Date.parse(originalEnd) &&
+          Date.parse(row.endTime) > Date.parse(state.operations[id].startTime)) update(otherId, {status: 'action_required', reason: 'overlap-lost'});
+      } catch { monitoringGap(id, 'discovery-unavailable'); }
+    }} catch (error) {failure ??= error;} finally {wake.abort(); await closed;}
+    if (failure) throw failure;
     if (!complete(id)) throw new Error('Child exited without a completed index marker; session is not ready');
-    update(id, {status: 'ready', completedAt: now()});
+    finishOperation(id);
   }
-  try {
+  const monitoringGap = (id, reason) => update(id, {reason: state.operations[id].stopDisposition?.reason ?? 'coverage-review',
+    monitorGap: {tenantId, sessionId: id, reason, checkedAt: new Date(now()).toISOString()}});
+  const finishOperation = id => update(id, webinarCompletionState(join(root, 'data/toc-migrated', id, 'source.json'), tenantId, id, state.operations[id], now()));
+  async function refresh() {
+    await deps.validateTenant();
     const previous = state.discovery;
     const checkedAt = new Date(now()).toISOString();
     const loaded = await loadWebinarSourcesWithHealth(deps, checkedAt, previous, true, {syncToken: state.source?.coverage.calendarSyncToken});
@@ -197,11 +218,15 @@ export async function runPipelineTick(deps, run = false) {
       writeWebinarOperationState(statePath, prepared.state);
       Object.assign(state, prepared.state);
       ({calendarEvents, candidates} = prepared);
+      return prepared;
     } catch {
       state.discovery.calendar.status = 'failed'; save(); enqueueNotification('calendar', true);
       throw Object.assign(new Error('Webinar acquisition validation failed; prior source checkpoint retained'), {code: 'WEBINAR_DISCOVERY_UNAVAILABLE'});
     }
-    const selection = select(); preview = projection(selection);
+  }
+  try {
+    await refresh();
+    let selection = select(); preview = projection(selection);
     // Retry delivery independently of recording transitions; all owner gates and lane locking have completed.
     for (const id of Object.keys(state.operations)) {
       if (!ID.test(id)) throw new Error('Unsafe operation id in persisted state');
@@ -211,7 +236,7 @@ export async function runPipelineTick(deps, run = false) {
     for (const [id, row] of Object.entries(state.operations)) {
       if (!ID.test(id)) throw new Error('Unsafe operation id in persisted state');
       if (!['recording', 'processing', 'failed'].includes(row.status)) continue;
-      if (complete(id)) { update(id, {status: 'ready'}); continue; }
+      if (complete(id)) { finishOperation(id); continue; }
       if ((row.attempts ?? 0) >= 3) { update(id, {status: 'action_required', reason: 'retry-limit'}); continue; }
       let artifact = row.artifact;
       const sourcePath = join(root, 'data/toc-migrated', id, 'source.json');
@@ -222,7 +247,9 @@ export async function runPipelineTick(deps, run = false) {
       try { await execute(id, ['finalize', '--video', artifact, '--session-id', id, '--title', row.title ?? 'Webinar', '--transcribe', '--process-video', '--index']); }
       catch (error) { update(id, {status: 'failed', reason: safeText(error.message)}); }
     }
-    for (const item of selection.toSchedule) {
+    for (const initial of selection.toSchedule) {
+      const item = select().toSchedule.find(current => current.sessionKey === initial.sessionKey);
+      if (!item) continue;
       const id = item.sessionKey;
       if (!ID.test(id)) throw new Error('Unsafe canonical webinar session id');
       if (state.operations[id] && ['ready', 'action_required', 'failed'].includes(state.operations[id].status) && !reconsider(state.operations[id])) continue;
@@ -233,7 +260,7 @@ export async function runPipelineTick(deps, run = false) {
         '--session-id', id, '--title', item.title, '--transcribe', '--process-video', '--index']); }
       catch (error) { update(id, {status: 'failed', reason: safeText(error.message)}); }
     }
-    for (const skipped of selection.skipped) {
+    for (const skipped of [...selection.skipped, ...select().skipped]) {
       if (['cancelled', 'past'].includes(skipped.reason) && state.operations[skipped.sessionKey]?.status === 'queued') {
         update(skipped.sessionKey, {status: 'action_required', reason: skipped.reason === 'past' ? 'missed-coverage' : 'cancelled'});
       }
