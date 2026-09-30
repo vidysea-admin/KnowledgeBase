@@ -35,7 +35,7 @@ import {
   selectAutoRecordItems, loadTrustedSenderConfig, redactJoinLink,
   type AutoRecordCandidateInput, type AutoRecordItem, type SkippedItem,
 } from "./auto-join.js";
-import { readScheduledKeys, recordScheduled, writeScheduledJob } from "./schedule-state.js";
+import { readScheduledKeys, recordScheduled, writeScheduledJob, validateWebinarCalendarAcquisition, type WebinarCalendarAcquisition } from "./schedule-state.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -61,6 +61,7 @@ interface MeetingCandidateApiRow {
 
 export interface ScheduleTickDeps {
   loadCalendarEvents: () => Promise<CalendarEvent[]>;
+  loadCalendarAcquisition?: (syncToken?: string, requestStartedAt?: string) => Promise<WebinarCalendarAcquisition>;
   loadCandidates: (refresh?: boolean) => Promise<AutoRecordCandidateInput[]>;
   now: () => string;
   stateDir: string;
@@ -135,10 +136,11 @@ export interface WebinarFeedHealth {
 }
 /** Load both connected feeds without converting a failed source into a healthy empty schedule. */
 export async function loadWebinarSourcesWithHealth(
-  deps: Pick<ScheduleTickDeps, "loadCalendarEvents" | "loadCandidates">,
+  deps: Pick<ScheduleTickDeps, "loadCalendarEvents" | "loadCandidates" | "loadCalendarAcquisition">,
   checkedAt: string,
   previous?: Partial<Record<"calendar" | "gmail", WebinarFeedHealth>>,
   refresh = false,
+  native?: {syncToken?: string},
 ) {
   if (previous !== undefined && (!previous || typeof previous !== "object" || Array.isArray(previous) ||
     Object.keys(previous).some((key) => !["calendar", "gmail"].includes(key)))) throw new Error("Invalid discovery health state");
@@ -146,22 +148,38 @@ export async function loadWebinarSourcesWithHealth(
     if (!row || !["healthy", "failed"].includes(row.status) || typeof row.checkedAt !== "string" || !Number.isFinite(Date.parse(row.checkedAt)) ||
       (row.lastSuccessAt !== undefined && (typeof row.lastSuccessAt !== "string" || !Number.isFinite(Date.parse(row.lastSuccessAt))))) throw new Error("Invalid discovery health state");
   }
-  const results = await Promise.allSettled([Promise.resolve().then(() => deps.loadCalendarEvents()), Promise.resolve().then(() => deps.loadCandidates(refresh))]);
+  const results = await Promise.allSettled([Promise.resolve().then(async (): Promise<CalendarEvent[] | WebinarCalendarAcquisition> => {
+    if (!native) return deps.loadCalendarEvents();
+    if (!deps.loadCalendarAcquisition) throw new Error("Native Calendar acquisition required");
+    return deps.loadCalendarAcquisition(native.syncToken, checkedAt);
+  }), Promise.resolve().then(() => deps.loadCandidates(refresh))]);
+  const calendarValue = results[0]!.status === "fulfilled" ? results[0]!.value : undefined;
+  const calendarAcquisition = native && calendarValue ? calendarValue as WebinarCalendarAcquisition : undefined;
   const health = Object.fromEntries((["calendar", "gmail"] as const).map((feed, i) => [feed, {
     status: results[i]!.status === "fulfilled" ? "healthy" : "failed", checkedAt,
     lastSuccessAt: results[i]!.status === "fulfilled" ? checkedAt : previous?.[feed]?.lastSuccessAt,
     notification: previous?.[feed]?.notification,
   }])) as Record<"calendar" | "gmail", WebinarFeedHealth>;
   return { health, failed: results.some((result) => result.status === "rejected"),
-    calendarEvents: results[0]!.status === "fulfilled" ? results[0]!.value as CalendarEvent[] : [],
+    calendarAcquisition,
+    calendarEvents: calendarAcquisition ? calendarAcquisition.meetings : calendarValue as CalendarEvent[] ?? [],
     candidates: results[1]!.status === "fulfilled" ? results[1]!.value as AutoRecordCandidateInput[] : [] };
 }
 
 /** Reuses the authenticated Calendar route; failed discovery never looks like a healthy empty feed. */
-export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefined, checkpoint?: () => string | undefined): () => Promise<CalendarEvent[]> {
-  return async () => {
+export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefined, checkpoint?: () => string | undefined): () => Promise<CalendarEvent[]>;
+export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefined, checkpoint: undefined, native: {tenantId: string}): (syncToken?: string, requestStartedAt?: string) => Promise<WebinarCalendarAcquisition>;
+export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefined, checkpoint?: () => string | undefined, native?: {tenantId: string}): (syncToken?: string, requestStartedAt?: string) => Promise<CalendarEvent[] | WebinarCalendarAcquisition> {
+  return async (syncToken, requestStartedAt) => {
     if (!apiKey) throw new Error("Calendar discovery requires LKB_API_KEY");
     const query = new URLSearchParams({ discovery: "1" });
+    const startedAt = requestStartedAt ?? new Date().toISOString();
+    if (native) {
+      if (checkpoint || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(native.tenantId) ||
+          (syncToken !== undefined && (typeof syncToken !== "string" || !/^[A-Za-z0-9._~+/=-]+$/.test(syncToken) || syncToken.length > 2048)) ||
+          typeof startedAt !== "string" || !Number.isFinite(Date.parse(startedAt)) || new Date(startedAt).toISOString() !== startedAt) throw new Error("Invalid native Calendar request");
+      query.set("sync", "1"); if (syncToken !== undefined) query.set("syncToken", syncToken);
+    }
     const changedSince = checkpoint?.();
     if (changedSince !== undefined) {
       if (typeof changedSince !== "string" || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(changedSince) ||
@@ -171,7 +189,21 @@ export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefi
     const res = await fetch(`${apiUrl}/calendar/upcoming?${query}`, {
       headers: { authorization: `Bearer ${apiKey}` }, redirect: "error", signal: AbortSignal.timeout(30_000),
     });
-    if (!res.ok) throw new Error(`Calendar discovery failed: HTTP ${res.status}`);
+    if (!res.ok) { if (native) await res.body?.cancel(); throw new Error(`Calendar discovery failed: HTTP ${res.status}`); }
+    if (native) {
+      if (!res.body) throw new Error("Native Calendar response requires a stream");
+      const reader = res.body.getReader(), chunks: Uint8Array[] = []; let bytes = 0;
+      try {
+        for (;;) {
+          const {done, value} = await reader.read(); if (done) break;
+          bytes += value.byteLength; if (bytes > 5 * 1024 * 1024) throw new Error("Native Calendar response exceeds byte budget");
+          chunks.push(value);
+        }
+        const body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+        return validateWebinarCalendarAcquisition(body, native.tenantId, syncToken, startedAt);
+      } catch (error) { await reader.cancel().catch(() => {}); throw error; }
+      finally { reader.releaseLock(); }
+    }
     const body = await res.json() as { meetings?: CalendarEvent[] };
     if (!Array.isArray(body.meetings)) throw new Error("Calendar discovery returned an invalid response");
     return body.meetings;

@@ -103,6 +103,28 @@ const choose = (result: ReturnType<typeof reconcile>, now = "2026-10-02T09:59:00
   alreadyScheduled: [], trustedSenders: {emails: [], domains: []},
 });
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value));
+
+test("available-source coverage keeps independent captures eligible and filters uncertain dependants", () => {
+  const acquisition = {complete: true, historyComplete: false, scope: "available-connected-source-state" as const};
+  const fresh = reconcile(undefined, [calendarRow(), {id: "unknown-deletion", cancelled: true}], [mailRow(), mailRow({id: "orphan-mail", meetingUrl: "https://zoom.us/w/999"})], {acquisition});
+  assert.equal(fresh.state.historyComplete, false); assert.equal(fresh.newStartsBlocked, false);
+  assert.equal(choose(fresh).toSchedule.length, 1);
+  assert.ok(fresh.inventory.some(row => row.snapshot.id === "orphan-mail" && row.reason === "unproven-calendar-history"));
+  assert.equal(fresh.candidates.some(row => row.id === "orphan-mail"), false);
+  const reset = reconcile(clone(fresh.state), [], [], {acquisition: {...acquisition, discontinuousCalendarIds: ["cal-a"]}});
+  assert.equal(choose(reset).toSchedule.length, 0);
+  assert.ok(reset.inventory.some(row => row.snapshot.id === "mail-a" && row.reason === "source-discontinuity"));
+  const still = reconcile(clone(reset.state), [], [], {acquisition});
+  assert.equal(choose(still).toSchedule.length, 0);
+  const conflicting = reconcile(clone(still.state), [calendarRow({title: "Conflicting webinar"})], [], {acquisition});
+  assert.equal(choose(conflicting).toSchedule.length, 0);
+  const restored = reconcile(clone(still.state), [calendarRow()], [], {acquisition});
+  assert.equal(choose(restored).toSchedule.length, 1, "identical current provider proof restores the exact occurrence");
+  const legacy = reconcile(clone(restored.state), [], [], {acquisition: {complete: true, historyComplete: false}});
+  assert.equal(legacy.newStartsBlocked, true); assert.equal(legacy.state.coverageScope, undefined);
+  for (const ids of [["absent"], ["cal-a", "cal-a"], new Array(1), ["bad\nID"]]) assert.throws(() =>
+    reconcile(fresh.state, [], [], {acquisition: {...acquisition, discontinuousCalendarIds: ids}}), /Invalid/);
+});
 const rows = (state: WebinarReconciliationState) => Object.values(state.occurrences);
 function freeze(value: any): any {
   if (value && typeof value === "object") { Object.values(value).forEach(freeze); Object.freeze(value); }

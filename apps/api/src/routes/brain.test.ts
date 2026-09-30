@@ -181,6 +181,12 @@ test('webinar operations enforce scope and exact tenant ownership with bounded r
     assert.equal(body.operations[0].attempts, 2); assert.equal(body.operations[0].reason, 'processing-failed');
     assert.ok(!JSON.stringify(body).includes('secret')); assert.ok(!JSON.stringify(body).includes('C:/private'));
     assert.deepEqual(await (await get('two')).json(), { operations: [], omitted: 0 });
+    for (const reason of ['no-join-link', 'source-discontinuity', 'unproven-calendar-history', 'rejected', 'rescheduled',
+      'rescheduled-completed', 'recurring-series', 'unknown-tombstone', 'ambiguous-provider', 'contradictory-revision', 'missing-revision', 'ambiguous-identity']) {
+      writeFileSync(file, JSON.stringify({version:1,tenantId:'tenant-1',operations:{webinar:{...rows.webinar,status:'action_required',reason}}}));
+      assert.equal(((await (await get('one')).json()) as any).operations[0].reason, reason);
+      assert.deepEqual(await (await get('two')).json(), {operations:[],omitted:0});
+    }
     const checkedAt = '2026-09-30T12:00:00.000Z';
     const discovery = {calendar: {status:'healthy',checkedAt,lastSuccessAt:checkedAt,notification:{fingerprint:'private-secret'}},
       gmail: {status:'failed',checkedAt}};
@@ -205,10 +211,16 @@ test('authenticated API owner preflight precedes both discovery loaders and capt
   const {runPipelineTick, createPipelineDeps} = await import(new URL('../../../../scripts/webinar/run-pipeline.mjs', import.meta.url).href);
   const requests: string[] = []; let owner = 'other-tenant', status = 200, redirectDiscovery = false, workHeader: string | undefined = 'lkb_work_release';
   const server = createServer((req, res) => {
-    const path = new URL(req.url ?? '/', 'http://localhost').pathname; requests.push(path);
+    const url = new URL(req.url ?? '/', 'http://localhost'), path = url.pathname; requests.push(path);
     if (path === '/webinar-operations') { res.statusCode = status; if (owner) res.setHeader('X-LKB-Tenant', owner); res.end('{}'); }
     else if (redirectDiscovery) { res.statusCode = 302; res.setHeader('Location', '/foreign-discovery'); res.end(); }
-    else { res.setHeader('content-type', 'application/json'); if (workHeader) res.setHeader('X-LKB-Work-DB', workHeader); res.end(JSON.stringify(path === '/calendar/upcoming' ? { meetings: [] } : path === '/gmail/scan' ? {created: 0, autoApproved: 0} : { candidates: [] })); }
+    else {
+      const requestedSyncToken = url.searchParams.get('syncToken') ?? undefined;
+      const calendar = url.searchParams.get('sync') === '1' ? {version:1,tenantId:'fixture',scope:'available-connected-source-state',complete:true,
+        mode:requestedSyncToken ? 'sync' : 'baseline',requestedSyncToken,syncToken:'fixture-native',checkedAt:new Date().toISOString(),sourceEvents:[],meetings:[]} : {meetings:[]};
+      res.setHeader('content-type', 'application/json'); if (workHeader) res.setHeader('X-LKB-Work-DB', workHeader);
+      res.end(JSON.stringify(path === '/calendar/upcoming' ? calendar : path === '/gmail/scan' ? {created: 0, autoApproved: 0} : { candidates: [] }));
+    }
   });
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
   const root = mkdtempSync(join(tmpdir(), 'lkb-owner-preflight-')), stateDir = join(root, 'data/webinar-release');
@@ -220,7 +232,7 @@ test('authenticated API owner preflight precedes both discovery loaders and capt
     const recording = join(root, 'proof.webm'); writeFileSync(recording, 'test artifact');
     writeFileSync(join(stateDir, 'live-proof.json'), JSON.stringify({status:'passed',platform:process.platform,backend:'tab',sessionId:'proof-session',audio:true,video:true,verifiedAt:'2026-09-30T12:00:00Z',recording:'proof.webm'}));
     const env = { ...f.deps.env, LKB_API_URL: `http://127.0.0.1:${(server.address() as {port: number}).port}`, LKB_API_KEY: 'fixture-key' };
-    const deps = { ...createPipelineDeps(env), root: f.root, stateDir: f.stateDir, now: () => '2026-09-30T12:00:00Z', log: () => {}, launch: f.deps.launch };
+    const deps = { ...createPipelineDeps(env), root: f.root, stateDir: f.stateDir, now: () => new Date().toISOString(), log: () => {}, launch: f.deps.launch };
     for (const candidate of ['other-tenant', '']) {
       owner = candidate; requests.length = 0;
       await assert.rejects(runPipelineTick(deps, true), /owner/);

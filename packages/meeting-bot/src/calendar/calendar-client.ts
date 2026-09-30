@@ -29,10 +29,11 @@ type Alias = { key: string; identity: string };
 type Occurrence = {
   source: "calendar" | "gmail"; snapshot: Snapshot; providerIds: string[]; aliases: Alias[]; accepted: boolean;
   revision?: string; linkedCalendar?: string; reviewReason?: "invalid-time" | "no-join-link" | "unsafe-join-link";
-  unresolved?: "unknown-tombstone" | "ambiguous-provider" | "contradictory-revision" | "missing-revision" | "ambiguous-identity";
+  unresolved?: "unknown-tombstone" | "ambiguous-provider" | "contradictory-revision" | "missing-revision" | "ambiguous-identity" | "source-discontinuity";
 };
 export interface WebinarReconciliationState {
   version: 1; tenantId: string; checkedAt: string; historyComplete: boolean;
+  coverageScope?: "available-connected-source-state";
   occurrences: Record<string, Occurrence>;
 }
 export interface WebinarReconciliationResult {
@@ -112,9 +113,10 @@ function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occ
 }
 function validateReconciliationState(previous: unknown, tenantId: string, checkedAt: string): WebinarReconciliationState {
   if (previous === undefined) return {version: 1, tenantId, checkedAt, historyComplete: false, occurrences: {}};
-  shape(previous, ["version", "tenantId", "checkedAt", "historyComplete", "occurrences"]);
+  shape(previous, ["version", "tenantId", "checkedAt", "historyComplete", "coverageScope", "occurrences"]);
   if (previous.version !== 1 || previous.tenantId !== tenantId || time(previous.checkedAt) !== previous.checkedAt ||
-      typeof previous.checkedAt !== "string" || previous.checkedAt > checkedAt || typeof previous.historyComplete !== "boolean") fail();
+      typeof previous.checkedAt !== "string" || previous.checkedAt > checkedAt || typeof previous.historyComplete !== "boolean" ||
+      (previous.coverageScope !== undefined && previous.coverageScope !== "available-connected-source-state")) fail();
   shape(previous.occurrences, Object.keys(previous.occurrences ?? {}));
   if (Object.keys(previous.occurrences).length > 20000 || Buffer.byteLength(JSON.stringify(previous)) > 8 * 1024 * 1024) fail();
   for (const [key, value] of Object.entries(previous.occurrences)) {
@@ -126,7 +128,7 @@ function validateReconciliationState(previous: unknown, tenantId: string, checke
         (row.revision !== undefined && (time(row.revision) !== row.revision || Date.parse(row.revision) > Date.parse(checkedAt) + 60000)) ||
         !Array.isArray(row.providerIds) || row.providerIds.length > 64 || (row.accepted ? !row.providerIds.includes(row.snapshot.id) : row.providerIds.length !== 0) ||
         new Set(row.providerIds).size !== row.providerIds.length || !Array.isArray(row.aliases) || row.aliases.length > 128 ||
-        (row.unresolved !== undefined && !["unknown-tombstone", "ambiguous-provider", "contradictory-revision", "missing-revision", "ambiguous-identity"].includes(row.unresolved))) fail();
+        (row.unresolved !== undefined && !["unknown-tombstone", "ambiguous-provider", "contradictory-revision", "missing-revision", "ambiguous-identity", "source-discontinuity"].includes(row.unresolved))) fail();
     row.providerIds.forEach(id => text(id, 1024, true));
     const aliasKeys = new Set<string>();
     for (const alias of row.aliases) {
@@ -168,6 +170,7 @@ function mergeOccurrence(prior: Occurrence | undefined, incoming: Occurrence[]):
       accepted = true;
       const snapshot = minimalCancel ? {...row.snapshot, cancelled: true, providerUpdated: next.snapshot.providerUpdated ?? row.snapshot.providerUpdated} : next.snapshot;
       row = {...row, snapshot, accepted: row.accepted || next.accepted, reviewReason: minimalCancel ? undefined : next.reviewReason, revision: snapshot.providerUpdated};
+      if (row.unresolved === "source-discontinuity" && !next.snapshot.cancelled && (same || newer)) delete row.unresolved;
       if (newer && row.unresolved !== "unknown-tombstone" && row.unresolved !== "ambiguous-provider") delete row.unresolved;
     }
     if (accepted) {
@@ -181,14 +184,26 @@ function mergeOccurrence(prior: Occurrence | undefined, incoming: Occurrence[]):
 /** Caller supplies complete acquisitions, never infers historyComplete from a bounded window.
  * checkedAt is canonical request-start time; no transport, persistence, capture or indexing here. */
 export function reconcileWebinarSources(input: {
-  tenantId: string; checkedAt: string; acquisition: {complete: boolean; historyComplete: boolean}; previous?: unknown;
+  tenantId: string; checkedAt: string;
+  acquisition: {complete: boolean; historyComplete: boolean; scope?: "available-connected-source-state"; discontinuousCalendarIds?: string[]}; previous?: unknown;
   calendarEvents: readonly ReconciliationCalendarEvent[]; candidates: readonly (AutoRecordCandidateInput & {providerUpdated?: string})[];
 }): WebinarReconciliationResult {
   text(input.tenantId, 100, true);
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(input.tenantId) || time(input.checkedAt) !== input.checkedAt) fail();
-  shape(input.acquisition, ["complete", "historyComplete"]);
+  shape(input.acquisition, ["complete", "historyComplete", "scope", "discontinuousCalendarIds"]);
+  const available = input.acquisition.scope === "available-connected-source-state";
+  if (input.acquisition.scope !== undefined && !available) fail();
+  const missing = input.acquisition.discontinuousCalendarIds;
+  if (missing !== undefined && (!available || !Array.isArray(missing) || missing.length > 20000 || new Set(missing).size !== missing.length)) fail();
+  for (const id of missing ?? []) text(id, 1024, true);
   if (input.acquisition.complete !== true || typeof input.acquisition.historyComplete !== "boolean" || !Array.isArray(input.calendarEvents) || !Array.isArray(input.candidates) || input.calendarEvents.length + input.candidates.length > 20000) fail();
   const previous = validateReconciliationState(input.previous, input.tenantId, input.checkedAt);
+  if (missing?.some(id => !Object.values(previous.occurrences).some(row => row.source === "calendar" && row.accepted &&
+    (row.providerIds.includes(id) || row.snapshot.recurringEventId === id)))) fail();
+  for (const row of Object.values(previous.occurrences)) {
+    if (row.source === "calendar" && row.accepted && !row.snapshot.cancelled && missing?.some(id =>
+      row.providerIds.includes(id) || row.snapshot.recurringEventId === id)) row.unresolved = "source-discontinuity";
+  }
   let state = JSON.parse(JSON.stringify(previous)) as WebinarReconciliationState;
   const groups = new Map<string, Occurrence[]>();
   for (const [source, values] of [["calendar", input.calendarEvents], ["gmail", input.candidates]] as const) {
@@ -224,22 +239,27 @@ export function reconcileWebinarSources(input: {
     else if (row.linkedCalendar && targets.length && targets[0] !== row.linkedCalendar) row.unresolved = "ambiguous-identity";
   }
   state.checkedAt = input.checkedAt; state.historyComplete = input.acquisition.historyComplete;
+  if (available) state.coverageScope = input.acquisition.scope; else delete state.coverageScope;
   state = validateReconciliationState(state, input.tenantId, input.checkedAt);
   const calendarEvents: CalendarEvent[] = [], candidates: AutoRecordCandidateInput[] = [], inventory: WebinarReconciliationResult["inventory"] = [], transitions: WebinarReconciliationResult["transitions"] = [];
+  const orphan = Object.values(state.occurrences).some(row => row.unresolved === "unknown-tombstone");
   for (const [key, row] of Object.entries(state.occurrences).sort(([a], [b]) => a.localeCompare(b))) {
     const linked = row.linkedCalendar ? state.occurrences[row.linkedCalendar] : undefined;
+    const unresolved = row.unresolved ?? linked?.unresolved ??
+      (available && orphan && row.source === "gmail" && !linked ? "unproven-calendar-history" : undefined);
     const snapshot: Snapshot = linked ? {...row.snapshot, title: linked.snapshot.title, startTime: linked.snapshot.startTime, endTime: linked.snapshot.endTime,
       meetingUrl: linked.snapshot.meetingUrl, cancelled: linked.snapshot.cancelled} : row.snapshot;
     const current = row.accepted ? identity(snapshot) : undefined, prior = previous.occurrences[key];
     const priorIdentity = prior && identity(prior.linkedCalendar ? previous.occurrences[prior.linkedCalendar]!.snapshot : prior.snapshot);
-    if (row.unresolved || snapshot.cancelled || (priorIdentity && current !== priorIdentity)) transitions.push({occurrenceKey: key,
-      reason: row.unresolved ? "unresolved" : snapshot.cancelled ? "cancelled" : "rescheduled", aliases: row.aliases.map(alias => alias.key), currentKey: current ? webinarSessionKey(current) : undefined});
+    if (unresolved || snapshot.cancelled || (priorIdentity && current !== priorIdentity)) transitions.push({occurrenceKey: key,
+      reason: unresolved ? "unresolved" : snapshot.cancelled ? "cancelled" : "rescheduled", aliases: row.aliases.map(alias => alias.key), currentKey: current ? webinarSessionKey(current) : undefined});
     const classification = classifyWebinarInvite(snapshot.title ?? ""), future = !snapshot.endTime || snapshot.endTime > input.checkedAt;
-    if ((classification !== "meeting" && future) || row.unresolved) inventory.push({occurrenceKey: key, reviewKey: webinarSessionKey(`source-review|${key}`),
-      sessionKey: current ? webinarSessionKey(current) : undefined, classification, snapshot, reason: row.unresolved ?? row.reviewReason ?? (snapshot.cancelled ? "cancelled" : undefined)});
+    if ((classification !== "meeting" && future) || unresolved) inventory.push({occurrenceKey: key, reviewKey: webinarSessionKey(`source-review|${key}`),
+      sessionKey: current ? webinarSessionKey(current) : undefined, classification, snapshot, reason: unresolved ?? linked?.reviewReason ?? row.reviewReason ?? (snapshot.cancelled ? "cancelled" : undefined)});
+    if (available && unresolved) continue;
     if (row.source === "calendar") calendarEvents.push({...snapshot, title: snapshot.title ?? "", startTime: snapshot.startTime ?? "", endTime: snapshot.endTime ?? ""} as CalendarEvent);
     else candidates.push(snapshot as AutoRecordCandidateInput);
   }
-  const newStartsBlocked = !state.historyComplete || Object.values(state.occurrences).some(row => Boolean(row.unresolved));
+  const newStartsBlocked = !available && (!state.historyComplete || Object.values(state.occurrences).some(row => Boolean(row.unresolved)));
   return {state, inventory, transitions, newStartsBlocked, calendarEvents: newStartsBlocked ? [] : calendarEvents, candidates: newStartsBlocked ? [] : candidates};
 }

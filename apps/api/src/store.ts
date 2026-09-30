@@ -30,8 +30,6 @@ import type { HealthDeps } from "./routes/health.js";
 import { probeMongoHealth } from "./health-probe.js";
 import type { GraphReadDeps } from "./routes/graph.js";
 import type { ApiKeySummary, KeysDeps } from "./routes/keys.js";
-import type { CalendarReadDeps } from "./routes/calendar.js";
-import { listUpcomingGwsMeetings } from "./gws-calendar.js";
 import type { MeetingCandidatesDeps } from "./routes/meeting-candidates.js";
 import { scanGmailForMeetingCandidates } from "./gws-gmail.js";
 import { sha256Hex } from "./hash.js";
@@ -148,16 +146,7 @@ export function createMongoGraphReadDeps(): GraphReadDeps {
   };
 }
 
-/** Real `CalendarReadDeps` (routes/calendar.ts) — thin wrapper over the `gws`-backed adapter.
- * The machine's primary calendar belongs only to its explicitly configured operator tenant. */
-export function createGwsCalendarReadDeps(owner = process.env.LKB_TENANT_ID, load = listUpcomingGwsMeetings): CalendarReadDeps {
-  return {
-    async listUpcoming(tenantId, changedSince) {
-      if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) throw new Error("Connected Calendar owner mismatch");
-      return load(14, undefined, changedSince);
-    },
-  };
-}
+export { createGwsCalendarReadDeps } from "./gws-calendar.js";
 
 /** Real `MeetingCandidatesDeps` (routes/meeting-candidates.ts) — wraps the already-real
  * `@lkb/db` `meeting-candidates`/`trusted-senders` accessors plus the `gws`-backed Gmail scan.

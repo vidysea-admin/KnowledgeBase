@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 /** Portable discovery/capture/process runner. Preview default; explicit --run and live proof gate. */
 import { spawn } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
-import { existsSync, mkdirSync, openSync, closeSync, readFileSync, writeFileSync, renameSync, unlinkSync, realpathSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, openSync, closeSync, readFileSync, writeFileSync, unlinkSync, realpathSync, statSync } from 'node:fs';
 import { dirname, join, resolve, relative, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { register } from 'tsx/esm/api';
@@ -11,16 +10,12 @@ const {selectAutoRecordItems} = await import('../../packages/meeting-bot/src/cal
 const {createHttpCalendarLoader, createHttpCandidateLoader, loadWebinarSourcesWithHealth} = await import('../../packages/meeting-bot/src/calendar/schedule-tick.ts');
 const {validateIndexProof} = await import('../../packages/meeting-bot/src/capture/record-commands.ts');
 const {loadTrustedSenderConfig, redactJoinLink} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
-const {createTelegramChannel} = await import('../../packages/meeting-bot/src/capture/telegram-channel.ts');
+const {createTelegramChannel, createOperationNotifications} = await import('../../packages/meeting-bot/src/capture/telegram-channel.ts');
+const {readWebinarOperationState, writeWebinarOperationState, prepareWebinarSourceState} = await import('../../packages/meeting-bot/src/calendar/schedule-state.ts');
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const ID = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const load = (path) => JSON.parse(readFileSync(path, 'utf8'));
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
-function atomic(path, value) {
-  const temporary = `${path}.${randomUUID()}.tmp`;
-  writeFileSync(temporary, JSON.stringify(value, null, 2) + '\n', {flag: 'wx', mode: 0o600});
-  renameSync(temporary, path);
-}
 function safeText(text) {
   // Feed errors can include opaque URLs; leave no query, fragment, userinfo or token in logs.
   return String(text).replace(/https?:\/\/[^\s"']+/gi, (url) => {
@@ -79,6 +74,7 @@ export function createPipelineDeps(env = process.env) {
       } finally { await response.body?.cancel(); }
     },
     loadCalendarEvents: createHttpCalendarLoader(api, env.LKB_API_KEY),
+    loadCalendarAcquisition: createHttpCalendarLoader(api, env.LKB_API_KEY, undefined, {tenantId: env.LKB_TENANT_ID}),
     loadCandidates: async (refresh = false) => {
       if (refresh) {
         const headers = {authorization: `Bearer ${env.LKB_API_KEY}`};
@@ -118,12 +114,7 @@ export async function runPipelineTick(deps, run = false) {
   if (run && (!tenantId || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(tenantId))) throw new Error('LKB_TENANT_ID must explicitly identify this capture lane owner');
   const work = run ? validateRunGate(root, env) : undefined;
   const statePath = join(stateDir, 'operations.json');
-  const state = existsSync(statePath) ? load(statePath) : {version: 1, tenantId, operations: {}};
-  if (state.version !== 1 || !state.operations || typeof state.operations !== 'object' || Array.isArray(state.operations)) throw new Error('Invalid durable operation state; inspect rather than overwrite');
-  const validateOwner = (value) => {
-    if (value.tenantId !== tenantId || Object.values(value.operations).some((row) => !row || row.tenantId !== tenantId)) throw new Error('Durable operation ownership missing or mismatched; inspect before retrying');
-  };
-  if (run) validateOwner(state);
+  const state = readWebinarOperationState(statePath, tenantId, new Date(now()).toISOString());
   if (run) { if (typeof deps.validateTenant !== 'function') throw new Error('Connected API ownership validation required'); await deps.validateTenant(); }
   let calendarEvents, candidates, preview;
   const reconsider = (row) => row?.status === 'action_required' &&
@@ -151,44 +142,15 @@ export async function runPipelineTick(deps, run = false) {
   try { lockFd = openSync(lock, 'wx'); } catch { throw new Error('Another poller owns this lane, or interrupted poller.lock needs inspection'); }
   writeFileSync(lockFd, String(process.pid)); closeSync(lockFd);
   if (existsSync(statePath)) {
-    const latest = load(statePath);
-    if (latest.version !== 1 || !latest.operations || typeof latest.operations !== 'object' || Array.isArray(latest.operations)) {
-      unlinkSync(lock); throw new Error('Durable state changed to invalid shape during discovery');
-    }
-    try { validateOwner(latest); } catch (error) { unlinkSync(lock); throw error; }
-    state.operations = latest.operations;
-    state.discovery = latest.discovery;
+    try {
+      const latest = readWebinarOperationState(statePath, tenantId, new Date(now()).toISOString());
+      for (const key of Object.keys(state)) delete state[key];
+      Object.assign(state, latest);
+    } catch (error) { unlinkSync(lock); throw error; }
   }
-  const save = () => atomic(statePath, state);
-  let notifications = Promise.resolve();
-  const enqueueNotification = (id, feed = false) => {
-    const collection = feed ? state.discovery : state.operations, row = collection[id];
-    if (!feed && !['failed', 'action_required', 'ready'].includes(row.status)) return;
-    const knownReasons = ['retry-limit', 'interrupted-no-recording-artifact', 'missed-while-processing', 'missed-coverage',
-      'cancelled', 'overlap-lost', 'needs-registration', 'needs-review', 'invalid-time', 'unsafe-join-link'];
-    const reason = feed || row.status === 'ready' ? '' : knownReasons.includes(row.reason) ? row.reason : 'pipeline-failed';
-    const fingerprint = `${row.status}:${reason}`, notice = feed ? {feed: id, status: row.status} : {sessionId: id, status: row.status, reason};
-    notifications = notifications.then(async () => {
-      if (collection[id].notification?.acknowledged === fingerprint) return;
-      let delivery = 'disabled', timer;
-      try {
-        if (deps.notifyOperation) {
-          delivery = await Promise.race([
-            Promise.resolve().then(() => deps.notifyOperation(notice)),
-            new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Alert deadline exceeded')), 9000); }),
-          ]);
-          if (!['sent', 'disabled'].includes(delivery)) throw new Error('Invalid alert result');
-        }
-      } catch { delivery = 'failed'; log(`${id}: notification failed; operation status retained`); }
-      finally { clearTimeout(timer); }
-      const previous = collection[id].notification;
-      collection[id] = {...collection[id], notification: {
-        acknowledged: delivery === 'sent' ? fingerprint : previous?.acknowledged,
-        fingerprint, status: delivery, retryable: delivery === 'failed', updatedAt: now(),
-      }};
-      save();
-    }).catch(() => { log(`${id}: notification metadata unavailable; operation status retained`); });
-  };
+  const save = () => writeWebinarOperationState(statePath, state);
+  const notifications = createOperationNotifications({state, save, notifyOperation: deps.notifyOperation, log, now});
+  const enqueueNotification = notifications.enqueue;
   const update = (id, changes) => {
     state.operations[id] = {...state.operations[id], ...changes, tenantId, updatedAt: now()};
     save(); log(`${id}: ${changes.status ?? state.operations[id].status}`);
@@ -220,7 +182,8 @@ export async function runPipelineTick(deps, run = false) {
   }
   try {
     const previous = state.discovery;
-    const loaded = await loadWebinarSourcesWithHealth(deps, now(), previous, true);
+    const checkedAt = new Date(now()).toISOString();
+    const loaded = await loadWebinarSourcesWithHealth(deps, checkedAt, previous, true, {syncToken: state.source?.coverage.calendarSyncToken});
     state.discovery = loaded.health; save();
     for (const feed of ['calendar', 'gmail']) {
       const row = state.discovery[feed];
@@ -228,7 +191,16 @@ export async function runPipelineTick(deps, run = false) {
         (row.status === 'healthy' && row.notification && row.notification.acknowledged !== 'healthy:')) enqueueNotification(feed, true);
     }
     if (loaded.failed) throw Object.assign(new Error('Webinar discovery unavailable; coverage requires attention'), {code: 'WEBINAR_DISCOVERY_UNAVAILABLE'});
-    ({calendarEvents, candidates} = loaded);
+    await notifications.wait();
+    try {
+      const prepared = prepareWebinarSourceState(state, loaded.calendarAcquisition, loaded.candidates, checkedAt);
+      writeWebinarOperationState(statePath, prepared.state);
+      Object.assign(state, prepared.state);
+      ({calendarEvents, candidates} = prepared);
+    } catch {
+      state.discovery.calendar.status = 'failed'; save(); enqueueNotification('calendar', true);
+      throw Object.assign(new Error('Webinar acquisition validation failed; prior source checkpoint retained'), {code: 'WEBINAR_DISCOVERY_UNAVAILABLE'});
+    }
     const selection = select(); preview = projection(selection);
     // Retry delivery independently of recording transitions; all owner gates and lane locking have completed.
     for (const id of Object.keys(state.operations)) {
@@ -255,7 +227,7 @@ export async function runPipelineTick(deps, run = false) {
       if (!ID.test(id)) throw new Error('Unsafe canonical webinar session id');
       if (state.operations[id] && ['ready', 'action_required', 'failed'].includes(state.operations[id].status) && !reconsider(state.operations[id])) continue;
       if (Date.parse(item.endTime) <= Date.parse(now())) { update(id, {status: 'action_required', reason: 'missed-while-processing', title: item.title}); continue; }
-      update(id, {status: 'queued', reason: undefined, title: item.title, startTime: item.startTime, endTime: item.endTime, attempts: 1});
+      update(id, {status: 'queued', reason: undefined, title: item.title, startTime: item.startTime, endTime: item.endTime, attempts: (state.operations[id]?.attempts ?? 0) + 1});
       update(id, {status: 'recording'});
       try { await execute(id, ['record', item.meetingUrl, '--backend', 'tab', '--until', item.endTime,
         '--session-id', id, '--title', item.title, '--transcribe', '--process-video', '--index']); }
@@ -266,13 +238,13 @@ export async function runPipelineTick(deps, run = false) {
         update(skipped.sessionKey, {status: 'action_required', reason: skipped.reason === 'past' ? 'missed-coverage' : 'cancelled'});
       }
       if (['overlap-lost', 'needs-registration', 'needs-review', 'invalid-time', 'unsafe-join-link'].includes(skipped.reason)) {
-        if (ID.test(skipped.sessionKey) && !state.operations[skipped.sessionKey]) update(skipped.sessionKey,
+        if (ID.test(skipped.sessionKey) && (!state.operations[skipped.sessionKey] || state.operations[skipped.sessionKey].status === 'queued')) update(skipped.sessionKey,
           {status: 'action_required', reason: skipped.reason, title: skipped.title});
         else log(`Skipped: ${skipped.reason}`);
       }
     }
     return {...preview, operations: state.operations};
-  } finally { try { await notifications; } finally { unlinkSync(lock); } }
+  } finally { try { await notifications.wait(); } finally { unlinkSync(lock); } }
 }
 export async function runPipelineWatch({run = false, watch = false} = {}, deps = {}) {
   if (watch && !run) throw new Error('--watch requires --run; preview is a single read-only tick');

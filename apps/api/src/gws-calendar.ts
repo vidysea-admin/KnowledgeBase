@@ -20,12 +20,13 @@
  * as a sanitized error; an unavailable calendar must never look like successful empty coverage.
  */
 import { execFile } from "node:child_process";
-import type { UpcomingMeeting } from "./routes/calendar.js";
+import type { UpcomingMeeting, CalendarAcquisition, CalendarReadDeps } from "./routes/calendar.js";
 
 interface GwsEventListResponse {
   items?: GwsCalendarEvent[];
   kind?: string;
   nextPageToken?: string;
+  nextSyncToken?: string;
   error?: unknown;
 }
 
@@ -56,19 +57,30 @@ function meetingUrlOf(event: GwsCalendarEvent): string | undefined {
   return event.conferenceData?.entryPoints?.find((e) => e.entryPointType === "video")?.uri;
 }
 
-function runGws(args: string[]): Promise<string> {
+export function runGws(args: string[], exec = execFile): Promise<string> {
   return new Promise((resolve, reject) => {
-    execFile(process.platform === "win32" ? "cmd" : "gws", process.platform === "win32" ? ["/c", "gws", ...args] : args, { timeout: 15000, maxBuffer: 4 * 1024 * 1024 }, (err, stdout) => {
-      if (err) { reject(err); return; }
+    exec(process.platform === "win32" ? "cmd" : "gws", process.platform === "win32" ? ["/c", "gws", ...args] : args, { timeout: 15000, maxBuffer: 4 * 1024 * 1024 }, (err, stdout) => {
+      if (err) {
+        try { const parsed = parseGwsJson(stdout) as {error?: {code?: unknown}};
+          if (err.code === 1 && !err.killed && !err.signal && parsed?.error?.code === 410) { reject(Object.assign(new Error("Calendar token expired"), {statusCode: 410})); return; }
+        } catch { /* Process errors without structured provider status remain unknown. */ }
+        reject(err); return;
+      }
       resolve(stdout);
     });
   });
 }
 
-export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, changedSince?: string): Promise<UpcomingMeeting[]> {
+type CalendarRun = typeof runGws;
+export function listUpcomingGwsMeetings(windowDays?: number, run?: CalendarRun, changedSince?: string): Promise<UpcomingMeeting[]>;
+export function listUpcomingGwsMeetings(windowDays: number, run: CalendarRun | undefined, changedSince: undefined, acquisition: {syncToken?: string}): Promise<CalendarAcquisition>;
+export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, changedSince?: string, acquisition?: {syncToken?: string}): Promise<UpcomingMeeting[] | CalendarAcquisition> {
   if (!Number.isFinite(windowDays) || windowDays <= 0 || windowDays > 366) throw new Error("Invalid calendar discovery window");
   if (changedSince !== undefined && (typeof changedSince !== "string" || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(changedSince) ||
       !Number.isFinite(Date.parse(changedSince)) || new Date(changedSince).toISOString() !== changedSince)) throw new Error("Invalid calendar change checkpoint");
+  const safeToken = (value: unknown): value is string => typeof value === "string" && /^[A-Za-z0-9._~+/=-]+$/.test(value) && value.length <= 2048;
+  if (acquisition && (changedSince !== undefined || Object.keys(acquisition).some(k => k !== "syncToken") ||
+      (acquisition.syncToken !== undefined && !safeToken(acquisition.syncToken)))) throw new Error("Invalid calendar acquisition");
   const timeMin = new Date().toISOString();
   const timeMax = new Date(Date.now() + windowDays * 24 * 60 * 60 * 1000).toISOString();
   const params = {
@@ -76,25 +88,44 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, cha
   };
 
   try {
-    const passes: Record<string, unknown>[] = [params];
-    if (changedSince !== undefined) passes.push({calendarId: "primary", maxResults: 2500, orderBy: "updated", singleEvents: false, showDeleted: true, updatedMin: changedSince});
-    const events: GwsCalendarEvent[] = [];
-    const liveDeltaMasters = new Set<GwsCalendarEvent>();
-    for (const pass of passes) {
+    const events: GwsCalendarEvent[] = [], liveDeltaMasters = new Set<GwsCalendarEvent>();
+    const sourceParams = {calendarId: "primary", maxResults: 2500, singleEvents: false, showDeleted: true, showHiddenInvitations: true};
+    let syncToken: string | undefined, sourceCount = 0;
+    let mode: CalendarAcquisition["mode"] = acquisition?.syncToken ? "sync" : "baseline";
+    async function collect(pass: Record<string, unknown>, source = false): Promise<GwsCalendarEvent[]> {
       let pageToken: string | undefined;
-      const seen = new Set<string>();
+      const seen = new Set<string>(), rows: GwsCalendarEvent[] = [];
       for (let page = 0; page < 20; page++) {
         const parsed = parseGwsJson(await run(["calendar", "events", "list", "--params", JSON.stringify({...pass, pageToken}), "--format", "json"])) as GwsEventListResponse;
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed) && "error" in parsed &&
+            (parsed.error as {code?: unknown})?.code === 410) throw Object.assign(new Error("Expired Calendar token"), {statusCode: 410});
         if (!parsed || typeof parsed !== "object" || Array.isArray(parsed) || "error" in parsed ||
             (!Array.isArray(parsed.items) && !(parsed.items === undefined && parsed.kind === "calendar#events"))) throw new Error("Invalid calendar response");
-        events.push(...(parsed.items ?? []));
-        if (!pass.singleEvents) for (const event of parsed.items ?? []) {
-          if (event?.status !== "cancelled" && !event?.recurringEventId && Array.isArray(event?.recurrence) && event.recurrence.length) liveDeltaMasters.add(event);
-        }
+        rows.push(...(parsed.items ?? []));
+        if (rows.length > 50000) throw new Error("Calendar row budget exceeded");
         pageToken = parsed.nextPageToken;
-        if (pageToken === undefined) break;
-        if (typeof pageToken !== "string" || !/^[A-Za-z0-9._~+/=-]+$/.test(pageToken) || pageToken.length > 2048 || seen.has(pageToken) || page === 19) throw new Error("Calendar discovery incomplete");
+        if (source && (pageToken !== undefined ? parsed.nextSyncToken !== undefined : !safeToken(parsed.nextSyncToken))) throw new Error("Invalid Calendar terminal token");
+        if (pageToken === undefined) { if (source) syncToken = parsed.nextSyncToken; return rows; }
+        if (!safeToken(pageToken) || seen.has(pageToken) || page === 19) throw new Error("Calendar discovery incomplete");
         seen.add(pageToken);
+      }
+      throw new Error("Calendar discovery incomplete");
+    }
+    if (acquisition) {
+      let source: GwsCalendarEvent[];
+      try { source = await collect({...sourceParams, ...(acquisition.syncToken ? {syncToken: acquisition.syncToken} : {})}, true); }
+      catch (error) {
+        if (!acquisition.syncToken || (error as {statusCode?: unknown})?.statusCode !== 410) throw error;
+        mode = "reset"; source = await collect(sourceParams, true);
+      }
+      events.push(...source); sourceCount = source.length;
+    }
+    const passes: Record<string, unknown>[] = [params];
+    if (changedSince !== undefined) passes.push({calendarId: "primary", maxResults: 2500, orderBy: "updated", singleEvents: false, showDeleted: true, updatedMin: changedSince});
+    for (const pass of passes) {
+      const rows = await collect(pass); events.push(...rows);
+      if (!pass.singleEvents) for (const event of rows) {
+        if (event?.status !== "cancelled" && !event?.recurringEventId && Array.isArray(event?.recurrence) && event.recurrence.length) liveDeltaMasters.add(event);
       }
     }
     const text = (value: unknown, max: number) => typeof value === "string" && value.length > 0 && value.length <= max && !/[\u0000-\u001f]/.test(value);
@@ -111,7 +142,7 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, cha
       if ((v.date === undefined) === (v.dateTime === undefined)) return false;
       return v.dateTime !== undefined ? dateTime(v.dateTime) : date(v.date);
     };
-    const mapped = events.map((e): UpcomingMeeting => {
+    const mapped = events.map((e, index): UpcomingMeeting & {recurrence?: string[]} => {
       if (!e || typeof e !== "object" || Array.isArray(e) || !text(e.id, 1024) ||
           (e.status !== undefined && !["confirmed", "tentative", "cancelled"].includes(e.status)) ||
           (e.summary !== undefined && (typeof e.summary !== "string" || e.summary.length > 2000)) ||
@@ -135,11 +166,38 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, cha
       originalStartTime: e.originalStartTime === undefined ? undefined : e.originalStartTime.date !== undefined
         ? {date: e.originalStartTime.date} : {dateTime: e.originalStartTime.dateTime},
       providerUpdated: e.updated,
+      ...(acquisition && index < sourceCount && e.recurrence ? {recurrence: e.recurrence} : {}),
     }; });
     // A live recurring master describes a series, not an expanded capture occurrence.
     // Validate it above, then omit it only from delta; deleted masters still drive cancellation.
+    if (acquisition) return {version: 1, mode, complete: true, checkedAt: timeMin, scope: "available-connected-source-state",
+      ...(acquisition.syncToken ? {requestedSyncToken: acquisition.syncToken} : {}), syncToken: syncToken!,
+      sourceEvents: mapped.slice(0, sourceCount), meetings: mapped.slice(sourceCount)};
     return mapped.filter((_row, index) => !liveDeltaMasters.has(events[index]!));
   } catch {
     throw new Error("Calendar discovery unavailable");
   }
+}
+
+/** Real `CalendarReadDeps` (routes/calendar.ts) — thin wrapper over the `gws`-backed adapter.
+ * The machine's primary calendar belongs only to its explicitly configured operator tenant. */
+export function createGwsCalendarReadDeps(owner = process.env.LKB_TENANT_ID,
+  load: (days?: number, run?: Parameters<typeof listUpcomingGwsMeetings>[1], changedSince?: string,
+    acquisition?: {syncToken?: string}) => Promise<UpcomingMeeting[] | CalendarAcquisition> = listUpcomingGwsMeetings): CalendarReadDeps {
+  return {
+    async acquire(tenantId, syncToken) {
+      if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) throw new Error("Connected Calendar owner mismatch");
+      const result = await load(14, undefined, undefined, {syncToken});
+      if (!result || Array.isArray(result) || result.version !== 1 || result.complete !== true ||
+          result.scope !== "available-connected-source-state" || !["baseline", "sync", "reset"].includes(result.mode) ||
+          !Array.isArray(result.sourceEvents) || !Array.isArray(result.meetings)) throw new Error("Invalid Calendar acquisition result");
+      return {...result, tenantId};
+    },
+    async listUpcoming(tenantId, changedSince) {
+      if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) throw new Error("Connected Calendar owner mismatch");
+      const result = await load(14, undefined, changedSince);
+      if (!Array.isArray(result)) throw new Error("Invalid Calendar legacy result");
+      return result;
+    },
+  };
 }

@@ -90,3 +90,41 @@ export function createTelegramChannel(deps: TelegramChannelDeps = {}): NotifyCha
     },
   };
 }
+
+/** Serialized delivery queue extracted from the operational runner; no additional transport. */
+export function createOperationNotifications(deps: {
+  state: Record<string, any>; save: () => void; log: (message: string) => void; now: () => string;
+  notifyOperation?: (notice: {feed?: string; sessionId?: string; status: string; reason?: string}) => Promise<string>;
+}): {enqueue: (id: string, feed?: boolean) => void; wait: () => Promise<void>} {
+  const {state, save, log, now, notifyOperation} = deps;
+  let notifications = Promise.resolve();
+  const enqueue = (id: string, feed = false) => {
+    const collection = feed ? state.discovery : state.operations, row = collection[id];
+    if (!feed && !['failed', 'action_required', 'ready'].includes(row.status)) return;
+    const knownReasons = ['retry-limit', 'interrupted-no-recording-artifact', 'missed-while-processing', 'missed-coverage',
+      'cancelled', 'overlap-lost', 'needs-registration', 'needs-review', 'invalid-time', 'unsafe-join-link'];
+    const reason = feed || row.status === 'ready' ? '' : knownReasons.includes(row.reason) ? row.reason : 'pipeline-failed';
+    const fingerprint = `${row.status}:${reason}`, notice = feed ? {feed: id, status: row.status} : {sessionId: id, status: row.status, reason};
+    notifications = notifications.then(async () => {
+      if (collection[id].notification?.acknowledged === fingerprint) return;
+      let delivery = 'disabled', timer: ReturnType<typeof setTimeout> | undefined;
+      try {
+        if (notifyOperation) {
+          delivery = await Promise.race([
+            Promise.resolve().then(() => notifyOperation(notice)),
+            new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error('Alert deadline exceeded')), 9000); }),
+          ]);
+          if (!['sent', 'disabled'].includes(delivery)) throw new Error('Invalid alert result');
+        }
+      } catch { delivery = 'failed'; log(`${id}: notification failed; operation status retained`); }
+      finally { clearTimeout(timer); }
+      const previous = collection[id].notification;
+      collection[id] = {...collection[id], notification: {
+        acknowledged: delivery === 'sent' ? fingerprint : previous?.acknowledged,
+        fingerprint, status: delivery, retryable: delivery === 'failed', updatedAt: now(),
+      }};
+      save();
+    }).catch(() => { log(`${id}: notification metadata unavailable; operation status retained`); });
+  };
+  return {enqueue, wait: () => notifications};
+}

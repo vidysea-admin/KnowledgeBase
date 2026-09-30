@@ -15,6 +15,12 @@ function fixture() {
   const deps = {root, stateDir, env: {MONGO_WORK_DB: 'lkb_work_release', LKB_TENANT_ID: 'fixture'}, now: () => NOW,
     validateTenant: async () => {}, log: (line) => logs.push(line), loadCalendarEvents: async () => [event()], loadCandidates: async () => [],
     launch: async (...args) => calls.push(args)};
+  let generation = 0;
+  deps.loadCalendarAcquisition = async (token, checkedAt) => {
+    const rows = (await deps.loadCalendarEvents()).map(row => ({...row, providerUpdated: row.providerUpdated ?? new Date(Date.parse(NOW) + ++generation).toISOString()}));
+    return {version: 1, tenantId: 'fixture', scope: 'available-connected-source-state', complete: true, mode: token ? 'sync' : 'baseline',
+      checkedAt, requestedSyncToken: token, syncToken: `fixture-${generation}`, sourceEvents: rows, meetings: rows};
+  };
   return {root, stateDir, deps, logs, calls, cleanup: () => rmSync(root, {recursive: true, force: true})};
 }
 async function withFixture(body, ready = false) {
@@ -175,7 +181,7 @@ test('corrected discovery reconsiders prerequisite barriers without duplicate ca
     ['invalid-time', {endTime: '2026-09-30T12:00:00Z'}],
   ]) {
     await withFixture(async (f) => {
-      let candidate = {...event(), id: 'mail-one', status: 'pending', ...before};
+      let candidate = {...event(), id: 'mail-one', status: 'pending', senderEmail: 'host@example.org', senderDomain: 'example.org', providerUpdated: '2026-09-30T11:00:00.000Z', ...before};
       f.deps.loadCalendarEvents = async () => [];
       f.deps.loadCandidates = async () => [candidate];
       const first = await runPipelineTick(f.deps, true);
@@ -184,17 +190,18 @@ test('corrected discovery reconsiders prerequisite barriers without duplicate ca
       assert.equal(first.operations[id].status, 'action_required');
       await runPipelineTick(f.deps, true);
       assert.equal(f.calls.length, 0, 'unchanged prerequisite must remain blocked');
-      candidate = {...event(), id: 'mail-one', status: 'rejected'};
-      await runPipelineTick(f.deps, true);
-      assert.equal(f.calls.length, 0, 'explicit rejection must never be reopened');
-      candidate = {...event(), id: 'mail-one', status: 'pending', registrationOnly: false};
+      candidate = {...candidate, ...event(), registrationOnly: false, providerUpdated: '2026-09-30T11:10:00.000Z'};
       f.deps.launch = async args => { f.calls.push(args); completed(f.root, args[args.indexOf('--session-id') + 1]); };
       const corrected = await runPipelineTick(f.deps, true);
-      assert.equal(f.calls.length, 1);
-      assert.equal(corrected.operations[id].status, 'ready');
-      assert.equal(corrected.operations[id].reason, undefined, 'resolved barrier is not a current failure');
+      const expected = reason === 'needs-registration' ? 0 : 1;
+      assert.equal(f.calls.length, expected, 'toggling the same registration flag cannot bypass a standing barrier');
+      assert.equal(corrected.operations[id].status, expected ? 'ready' : 'action_required');
+      if (expected) assert.equal(corrected.operations[id].reason, undefined, 'resolved prerequisite is not a current failure');
+      candidate = {...candidate, status: 'rejected', providerUpdated: '2026-09-30T11:20:00.000Z'};
+      await runPipelineTick(f.deps, true); assert.equal(f.calls.length, expected);
+      candidate = {...candidate, status: 'pending', providerUpdated: '2026-09-30T11:30:00.000Z'};
       await runPipelineTick(f.deps, true);
-      assert.equal(f.calls.length, 1);
+      assert.equal(f.calls.length, expected, 'explicit rejection cannot be reopened by a pending snapshot');
     }, true);
   }
 });

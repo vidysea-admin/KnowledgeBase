@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeCalendarReadDeps } from "../fixtures.js";
-import { listUpcomingGwsMeetings } from "../gws-calendar.js";
+import { listUpcomingGwsMeetings, runGws } from "../gws-calendar.js";
 import { createGwsCalendarReadDeps } from "../store.js";
 import { selectAutoRecordItems } from "../../../../packages/meeting-bot/src/calendar/auto-join.js";
 import { reconcileWebinarSources } from "../../../../packages/meeting-bot/src/calendar/calendar-client.js";
@@ -279,5 +279,112 @@ test("GET /calendar/upcoming when the source returns nothing yields a real, hone
     assert.deepEqual(body.meetings, []);
   } finally {
     await server.close();
+  }
+});
+
+
+test("native acquisition completes unbounded source state and separate materialization before returning", async () => {
+  const calls: any[] = [], master = {id: "series-native", recurrence: ["RRULE:FREQ=WEEKLY"], summary: "AI webinar"};
+  const old = {id: "old-native", start: {dateTime: "2020-01-01T10:00:00Z"}};
+  const result = await listUpcomingGwsMeetings(14, async args => {
+    const p = JSON.parse(args[args.indexOf("--params") + 1]!); calls.push(p);
+    if (p.singleEvents) return JSON.stringify({items: [{id: "expanded"}]});
+    return JSON.stringify(p.pageToken ? {items: [old], nextSyncToken: "next-sync"} : {items: [master], nextPageToken: "source-page"});
+  }, undefined, {});
+  assert.equal(result.version, 1); assert.equal(result.mode, "baseline"); assert.equal(result.complete, true);
+  assert.equal(result.scope, "available-connected-source-state"); assert.equal(new Date(result.checkedAt).toISOString(), result.checkedAt);
+  assert.equal(result.syncToken, "next-sync"); assert.equal(result.requestedSyncToken, undefined);
+  assert.deepEqual(result.sourceEvents.map(r => r.id), ["series-native", "old-native"]);
+  assert.deepEqual(result.sourceEvents[0]?.recurrence, master.recurrence); assert.deepEqual(result.meetings.map(r => r.id), ["expanded"]);
+  for (const p of calls.slice(0, 2)) {
+    assert.equal(p.calendarId, "primary"); assert.equal(p.maxResults, 2500); assert.equal(p.singleEvents, false);
+    assert.equal(p.showDeleted, true); assert.equal(p.showHiddenInvitations, true);
+    for (const key of ["timeMin", "timeMax", "updatedMin", "orderBy", "q"]) assert.equal(p[key], undefined);
+  }
+  assert.ok(calls[2].timeMin); assert.ok(calls[2].timeMax); assert.equal(calls[2].singleEvents, true);
+});
+
+test("native sync resets only on explicit structured410 and never returns partial acquisition", async () => {
+  const calls: any[] = [];
+  const run = async (args: string[]) => {
+    const p = JSON.parse(args[args.indexOf("--params") + 1]!); calls.push(p);
+    if (p.singleEvents) return JSON.stringify({items: []});
+    if (p.syncToken) return JSON.stringify(p.pageToken ? {error: {code: 410}} : {items: [{id: "discard"}], nextPageToken: "partial"});
+    return JSON.stringify({items: [{id: "baseline"}], nextSyncToken: "reset-token"});
+  };
+  const result = await listUpcomingGwsMeetings(14, run, undefined, {syncToken: "original"});
+  assert.equal(result.mode, "reset"); assert.equal(result.requestedSyncToken, "original"); assert.equal(result.syncToken, "reset-token");
+  assert.deepEqual(result.sourceEvents.map(r => r.id), ["baseline"]); assert.equal(calls.length, 4);
+  assert.equal(calls[1].syncToken, "original"); assert.equal(calls[2].syncToken, undefined);
+  const synced = await listUpcomingGwsMeetings(14, async args => {
+    const p = JSON.parse(args[args.indexOf("--params") + 1]!);
+    return JSON.stringify(p.singleEvents ? {items: []} : {items: [], nextSyncToken: "new-token"});
+  }, undefined, {syncToken: "original"});
+  assert.equal(synced.mode, "sync"); assert.equal(synced.requestedSyncToken, "original");
+  for (const reply of [{items: []}, {items: [], nextSyncToken: ""}, {items: [], nextSyncToken: 1},
+    {items: [], nextSyncToken: "unsafe&echo"}, {items: [], nextPageToken: "page", nextSyncToken: "early"},
+    {error: {code: 403}}, {error: {code: "410"}}]) {
+    await assert.rejects(listUpcomingGwsMeetings(14, async () => JSON.stringify(reply), undefined, {syncToken: "original"}), /unavailable/);
+  }
+  await assert.rejects(listUpcomingGwsMeetings(14, async () => JSON.stringify({error: {code: 410}}), undefined, {}), /unavailable/);
+  await assert.rejects(listUpcomingGwsMeetings(14, async () => JSON.stringify({items: Array(50001).fill({id: "over-budget"}), nextSyncToken: "good"}), undefined, {}), /unavailable/);
+  for (const failure of ["baseline410", "secondpass", "message410", "limit", "badrow"]) {
+    let count = 0;
+    await assert.rejects(listUpcomingGwsMeetings(14, async args => {
+      const p = JSON.parse(args[args.indexOf("--params") + 1]!); count++;
+      if (failure === "message410") throw new Error("410 secret token");
+      if (failure === "baseline410") return JSON.stringify({error: {code: 410}});
+      if (failure === "limit") return JSON.stringify({items: [], nextPageToken: `page${count}`});
+      if (failure === "badrow") return JSON.stringify({items: [{id: 1}], nextSyncToken: "good"});
+      return JSON.stringify(p.singleEvents ? {error: {code: 500}} : {items: [], nextSyncToken: "good"});
+    }, undefined, {syncToken: "original"}), /unavailable/);
+    assert.equal(count, failure === "baseline410" || failure === "secondpass" ? 2 : failure === "limit" ? 20 : failure === "badrow" ? 2 : 1);
+  }
+  for (const syncToken of ["", "bad&echo", "x".repeat(2049)]) {
+    let reads = 0; await assert.rejects(listUpcomingGwsMeetings(14, async () => {reads++; return "{}";}, undefined, {syncToken}), /acquisition/);
+    assert.equal(reads, 0);
+  }
+});
+
+test("native acquisition HTTP remains owner bound and rejects ambiguous query modes before read", async () => {
+  let reads = 0;
+  const calendar = createGwsCalendarReadDeps("tenant-1", async (_days, _run, _since, option) => {
+    reads++; return listUpcomingGwsMeetings(14, async args => {
+      const p = JSON.parse(args[args.indexOf("--params") + 1]!);
+      return JSON.stringify(p.singleEvents ? {items: []} : {items: [], nextSyncToken: "terminal"});
+    }, undefined, option!);
+  });
+  await assert.rejects(createGwsCalendarReadDeps("tenant-1", async () => []).acquire!("tenant-1"), /acquisition/);
+  await assert.rejects(createGwsCalendarReadDeps("tenant-1", async () => ({version: 1} as any)).acquire!("tenant-1"), /acquisition/);
+  await assert.rejects(createGwsCalendarReadDeps("tenant-1", async () => ({version: 1} as any)).listUpcoming("tenant-1"), /legacy/);
+  const server = await startTestServer(buildTestDeps({calendar, keyStore: fakeKeyStore({
+    owner: {tenantId: "tenant-1", scopes: ["calendar"]}, foreign: {tenantId: "tenant-2", scopes: ["calendar"]}})}));
+  try {
+    const headers = {authorization: "Bearer owner"};
+    const response = await fetch(`${server.baseUrl}/calendar/upcoming?discovery=1&sync=1&syncToken=a%2Bb%3D`, {headers});
+    assert.equal(response.status, 200); const body = await response.json() as any;
+    assert.equal(body.tenantId, "tenant-1"); assert.equal(body.requestedSyncToken, "a+b="); assert.equal(body.syncToken, "terminal");
+    for (const query of ["sync=1", "discovery=1&sync=0", "discovery=1&sync=1&sync=1", "discovery=1&sync[x]=1",
+      "discovery=1&sync=1&syncToken=", "discovery=1&syncToken=good", "discovery=1&sync=1&syncToken=good&syncToken=other",
+      "discovery=1&sync=1&changedSince=2026-09-01T00%3A00%3A00.000Z"]) {
+      assert.equal((await fetch(`${server.baseUrl}/calendar/upcoming?${query}`, {headers})).status, 400);
+    }
+    assert.equal((await fetch(`${server.baseUrl}/calendar/upcoming?discovery=1&sync=1`, {headers: {authorization: "Bearer foreign"}})).status, 503);
+    assert.equal((await fetch(`${server.baseUrl}/calendar/upcoming?discovery=1&sync=1`)).status, 401); assert.equal(reads, 1);
+  } finally { await server.close(); }
+});
+
+test("actual CLI error callback distinguishes structured provider410 from process or message guesses", async () => {
+  const execute = (stdout: string, error: Error) => ((_command: unknown, _args: unknown, options: any, callback: any) => {
+    assert.equal(options.timeout, 15000); assert.equal(options.maxBuffer, 4 * 1024 * 1024); callback(error, stdout);
+  }) as unknown as Parameters<typeof runGws>[1];
+  const error = Object.assign(new Error("exit1"), {code: 1});
+  await assert.rejects(runGws([], execute('Diagnostic\n{"error":{"code":410}}', error)), (value: any) => value.statusCode === 410);
+  for (const processError of [{code: "ETIMEDOUT"}, {code: "ENOBUFS"}, {code: 1, killed: true}, {code: 1, signal: "SIGTERM"}, {code: 410}]) {
+    await assert.rejects(runGws([], execute('{"error":{"code":410}}', Object.assign(new Error("process failure"), processError))),
+      (value: any) => value.statusCode === undefined);
+  }
+  for (const stdout of ['{"error":{"code":403}}', '{"error":{"code":429}}', '{"error":{"code":500}}', '{"error":{"code":"410"}}', "noJSON410"]) {
+    await assert.rejects(runGws([], execute(stdout, Object.assign(new Error("stderr410"), {code: "ETIMEDOUT"}))), (value: any) => value.statusCode === undefined);
   }
 });

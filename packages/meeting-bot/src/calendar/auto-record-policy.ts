@@ -14,6 +14,7 @@
  * `loadTrustedSenderConfig` does this). */
 import { createHash } from "node:crypto";
 import { detectPlatform } from "../platform.js";
+import type { WebinarReconciliationResult, CalendarEvent } from "./calendar-client.js";
 
 export interface TrustedSenderConfig {
   emails: string[];
@@ -117,4 +118,52 @@ export function webinarIdentity(url: string, startTime: string): string | undefi
 
 export function webinarSessionKey(identity: string): string {
   return `webinar-${createHash("sha256").update(identity).digest("hex").slice(0, 24)}`;
+}
+
+/** Source inventory uses the same proven identity/alias policy as capture selection. No I/O. */
+export function projectWebinarInventory(previous: Record<string, Record<string, any>>, result: WebinarReconciliationResult,
+  tenantId: string, checkedAt: string, series: (CalendarEvent & {recurrence?: string[]})[] = []) {
+  const operations = JSON.parse(JSON.stringify(previous)) as typeof previous;
+  const terminal = (row: Record<string, any> | undefined) => row &&
+    (["ready", "recording", "processing", "failed"].includes(row.status) || (row.status === "action_required" &&
+      !["needs-review", "invalid-time", "no-join-link", "unsafe-join-link", "source-discontinuity", "unproven-calendar-history"].includes(row.reason)));
+  const put = (id: string, changes: Record<string, any>) => {
+    if (terminal(operations[id])) return;
+    operations[id] = {...operations[id], ...changes, tenantId, updatedAt: checkedAt};
+  };
+  for (const transition of result.transitions) {
+    for (const alias of transition.aliases) {
+      const prior = operations[alias];
+      if (transition.reason === "rescheduled" && transition.currentKey && alias !== transition.currentKey && prior) {
+        const current = operations[transition.currentKey];
+        if (!terminal(current) && terminal(prior)) operations[transition.currentKey] = {...prior, tenantId, updatedAt: checkedAt,
+          status: "action_required", reason: prior.status === "ready" ? "rescheduled-completed" : prior.reason ?? "rescheduled",
+          priorSessionId: alias};
+        else if (!terminal(current) && (prior.attempts ?? 0) > 0) operations[transition.currentKey] = {...current, tenantId, updatedAt: checkedAt,
+          status: (prior.attempts ?? 0) >= 3 ? "action_required" : "queued", reason: (prior.attempts ?? 0) >= 3 ? "retry-limit" : undefined,
+          attempts: Math.max(current?.attempts ?? 0, prior.attempts), priorSessionId: alias};
+      }
+      if (alias !== transition.currentKey || transition.reason !== "rescheduled") {
+        if (prior?.status === "queued") put(alias, {status: "action_required", reason: transition.reason === "unresolved" ? "source-discontinuity" : transition.reason});
+      }
+    }
+  }
+  const inventory = new Map<string, {entry: WebinarReconciliationResult["inventory"][number]; reason?: string}>();
+  for (const entry of result.inventory) {
+    const id = entry.sessionKey ?? entry.reviewKey;
+    const reason = entry.reason ?? (entry.snapshot.status === "rejected" ? "rejected" : entry.snapshot.registrationOnly ? "needs-registration" :
+      entry.classification !== "webinar" ? "needs-review" : undefined);
+    if (!inventory.has(id) || reason) inventory.set(id, {entry, reason});
+  }
+  for (const [id, {entry, reason}] of inventory) {
+    const row = operations[id], attempts = row?.attempts ?? 0;
+    put(id, {status: reason || !entry.sessionKey ? "action_required" : "queued", reason: reason ?? (!entry.sessionKey ? "needs-review" : undefined),
+      title: (entry.snapshot.title ?? "Webinar").replace(/https?:\/\/\S+/gi, "[link removed]"), startTime: entry.snapshot.startTime, endTime: entry.snapshot.endTime, attempts});
+  }
+  for (const row of series) {
+    if (!row.cancelled && classifyWebinarInvite(row.title) === "meeting") continue;
+    put(webinarSessionKey(`source-series|${tenantId}|${row.id}`), {status: "action_required", reason: row.cancelled ? "cancelled" : "recurring-series",
+      title: row.title.replace(/https?:\/\/\S+/gi, "[link removed]"), sourceKind: "series", sourceId: row.id, attempts: 0});
+  }
+  return operations;
 }
