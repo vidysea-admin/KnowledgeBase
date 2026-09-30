@@ -16,9 +16,10 @@ const planned = [
   [python, ['-m', 'seleniumbase', 'get', 'cft']],
   [python, ['-m', 'seleniumbase', 'get', 'uc_driver', 'stable']],
 ];
-function check(name, binary, args, validate = () => true) {
-  const result = spawnSync(binary, args, {cwd: root, env, encoding: 'utf8', timeout: 20000, windowsHide: true});
-  const ok = result.status === 0 && validate(result.stdout ?? '');
+function check(name, binary, args, validate = () => true, childEnv = {}) {
+  const checkEnv = Object.fromEntries(Object.entries({...env, ...childEnv}).filter(([, value]) => value !== undefined));
+  const result = spawnSync(binary, args, {cwd: root, env: checkEnv, encoding: 'utf8', timeout: 20000, windowsHide: true});
+  const ok = !result.error && result.status === 0 && validate(result.stdout ?? '');
   console.log(`${ok ? 'OK' : 'MISSING'} ${name}`);
   if (result.error) console.log(`Check diagnostic: ${result.error.code ?? 'spawn failure'} (${name})`);
   return ok;
@@ -33,11 +34,16 @@ if (process.argv.includes('--install') && !process.argv.includes('--dry-run')) {
 } else console.log('Preview: no dependencies installed. Use --install explicitly.');
 console.log('Project install plan:');
 for (const [binary, args] of planned) console.log(JSON.stringify([binary, ...args]));
+const managerEnv = {COREPACK_ENABLE_NETWORK: '0', COREPACK_DEFAULT_TO_LATEST: '0', COREPACK_ENABLE_AUTO_PIN: '0',
+  COREPACK_ENV_FILE: '0', COREPACK_ENABLE_PROJECT_SPEC: '1', COREPACK_ENABLE_STRICT: '1', npm_config_manage_package_manager_versions: 'false', pnpm_config_pm_on_fail: 'ignore', XDG_CACHE_HOME: process.env.XDG_CACHE_HOME};
+const directPnpm = check('direct pnpm 10.33.0', win ? 'cmd.exe' : 'pnpm',
+  win ? ['/d', '/s', '/c', 'pnpm', '--version'] : ['--version'], output => output.trim() === '10.33.0', managerEnv);
+const cachedPnpm = !directPnpm && check('cached Corepack pnpm 10.33.0', win ? 'cmd.exe' : 'corepack',
+  win ? ['/d', '/s', '/c', 'corepack', 'pnpm', '--version'] : ['pnpm', '--version'], output => output.trim() === '10.33.0', managerEnv);
+const packageCommand = directPnpm ? 'pnpm' : cachedPnpm ? 'corepack pnpm' : undefined;
 const checks = [
   check('Node >=24', process.execPath, ['-e', 'process.exit(Number(process.versions.node.split(".")[0]) >= 24 ? 0 : 1)']),
-  // Windows command shims need cmd; this is a fixed read-only command, no user interpolation.
-  check('pnpm 10.33.0', win ? 'cmd.exe' : 'pnpm', win ? ['/d', '/s', '/c', 'pnpm', '--version'] : ['--version'],
-    (output) => output.trim() === '10.33.0'),
+  directPnpm || cachedPnpm,
   check('ffmpeg', 'ffmpeg', ['-version']), check('ffprobe', 'ffprobe', ['-version']),
   check('project Python + SeleniumBase + PyAutoGUI + psutil + websocket-client', python, ['-c', 'import seleniumbase; import pyautogui; import psutil; import websocket; assert websocket.__version__ == "1.9.2"; assert seleniumbase.__version__ == "4.51.9"; assert psutil.__version__ == "7.2.2"']),
   check('project Chrome for Testing installed', python, ['-c',
@@ -50,6 +56,6 @@ if (!win) {
 }
 console.log(`Set LKB_PYTHON=${python}`);
 console.log('Set LKB_BROWSER_EXECUTABLE=cft; set LKB_CAPTURE_BACKEND=tab');
-console.log('Node dependencies: pnpm install --store-dir .cache/pnpm (run from this directory).');
+console.log(`Node dependencies: ${packageCommand ?? 'pnpm (install pinned 10.33.0 explicitly)'} install --frozen-lockfile --store-dir .cache/pnpm (run from this directory).`);
 if (!win) console.log('Ubuntu needs ffmpeg, a headed X11 display/Xvfb, Chrome shared libraries, and Tk/X11 support for PyAutoGUI. Provision those OS packages separately. DISPLAY and managed browser ownership must be verifiable; Wayland alone is not supported.');
 if (process.argv.includes('--doctor') && checks.some((ok) => !ok)) process.exitCode = 1;
