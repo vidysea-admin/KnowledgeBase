@@ -6,6 +6,8 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { selectAutoRecordItems } from "../../../packages/meeting-bot/src/calendar/auto-join.js";
+import { classifyWebinarInvite } from "../../../packages/meeting-bot/src/calendar/auto-record-policy.js";
 
 import {
   decodeGmailBody,
@@ -14,6 +16,54 @@ import {
   isRegistrationOnly,
   scanGmailForMeetingCandidates,
 } from "./gws-gmail.js";
+
+test("each classifier-positive vocabulary form is discoverable without a known host or sender", async () => {
+  const titles = ["Career webinar", "Career seminar", "Educator Dialogues", "In Focus", "In-Focus", "Online Workshop", "Virtual Conference"];
+  for (const title of titles) {
+    assert.equal(classifyWebinarInvite(title), "webinar");
+    const rows = await scanGmailForMeetingCandidates(100, async args => {
+      const params = JSON.parse(args[args.indexOf("--params") + 1]!);
+      if (args.includes("list")) {
+        const terms: string[] = params.q.slice(1, -1).split(/\s+OR\s+/).map((term: string) => term.replace(/^"|"$/g, "").toLowerCase());
+        const matched = terms.some(term => !term.includes(":") && title.toLowerCase().includes(term));
+        return JSON.stringify({messages: matched ? [{id: "title-only"}] : []});
+      }
+      return JSON.stringify({id: "title-only", payload: {headers: [{name: "From", value: "new@unknown.org"},
+        {name: "Subject", value: title}], body: {data: Buffer.from("Details https://events.unknown.org/live").toString("base64url")}}});
+    });
+    assert.equal(rows.length, 1, `search must discover classifier-positive title ${title}`);
+    assert.equal(rows[0]?.subject, title); assert.equal(rows[0]?.meetingUrl, undefined); assert.equal(rows[0]?.startTime, undefined);
+  }
+});
+
+test("discovery retains old invitations and unknown platforms without fabricating launch evidence", async () => {
+  const messages = [
+    {id: "old", subject: "Student visa webinar", body: "Join https://meet.google.com/abc-defg-hij", date: "Mon, 1 Jan 2024 00:00:00 +0000"},
+    {id: "unknown", subject: "Webinar invitation", body: "Join https://events.example.org/session"},
+    {id: "personal", subject: "Team meeting invitation", body: "Invitation attached; see invite.ics"},
+  ];
+  const candidates = await scanGmailForMeetingCandidates(100, async args => {
+    const params = JSON.parse(args[args.indexOf("--params") + 1]!);
+    if (args.includes("list")) {
+      assert.doesNotMatch(params.q, /newer_than:|after:|older_than:|before:/);
+      for (const term of ['webinar', 'webcast', '"online seminar"', '"virtual conference"', 'invitation', 'filename:ics', 'meet.google.com', 'from:theoutreachcollective.in']) assert.ok(params.q.includes(term));
+      return JSON.stringify({messages: messages.map(({id}) => ({id}))});
+    }
+    const message = messages.find(row => row.id === params.id)!;
+    return JSON.stringify({id: message.id, payload: {headers: [
+      {name: "From", value: "host@example.org"}, {name: "Subject", value: message.subject},
+      {name: "Date", value: message.date ?? "Wed, 30 Sep 2026 00:00:00 +0000"},
+    ], body: {data: Buffer.from(message.body).toString("base64url")}}});
+  });
+  assert.deepEqual(candidates.map(row => row.messageId), ["old", "unknown", "personal"]);
+  assert.equal(candidates[0]?.meetingUrl, "https://meet.google.com/abc-defg-hij");
+  for (const row of candidates.slice(1)) {assert.equal(row.meetingUrl, undefined); assert.equal(row.startTime, undefined); assert.equal(row.endTime, undefined);}
+  const selection = selectAutoRecordItems({calendarEvents: [], candidates: candidates.map(row => ({...row,
+    id: row.messageId, title: row.subject, status: "pending" as const})), now: "2026-09-30T09:59:00Z",
+    leadMinutes: 5, trustedSenders: {emails: [], domains: []}, alreadyScheduled: [], everyWebinar: true});
+  assert.equal(selection.toSchedule.length, 0);
+  assert.equal(selection.skipped.find(row => row.sessionKey === "gmail:personal")?.reason, "not-webinar");
+});
 
 test("Gmail pagination preserves all unique messages and refuses incomplete or malformed coverage", async () => {
   const requests: any[] = [];

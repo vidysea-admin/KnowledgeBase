@@ -4,8 +4,8 @@
  * (`gmail.readonly` is already among its granted scopes). Uses the native CLI on POSIX and its
  * Windows command shim on Windows.
  *
- * Search scope: Gmail's own `q` query restricts the list to recent mail mentioning a known
- * video-conference host, or FROM a known TOC/partner sender — real server-side filtering, not a
+ * Search scope: Gmail's own `q` query selects meeting/webinar language, calendar attachments,
+ * known video-conference hosts and TOC/partner senders, without an age cutoff — real filtering, not a
  * client-side scan of the whole inbox. Each matching message is then fetched with `format=full`
  * (U2: was `format=metadata` — Subject/From/Date only; the body is now read too, since a
  * registration confirmation or a "Day & Date: ... Time: ..." invite states its date only in the
@@ -60,11 +60,13 @@ interface GwsMessageFull extends GwsMessagePart {
   payload?: GwsMessagePart & { headers?: GwsMessageHeader[] };
 }
 
-// U2: widened from the original three video-conference hosts to also cover TOC's actual
-// providers and TOC/partner senders. Quoted recording-link phrases avoid unrelated newsletters
-// with ordinary YouTube icons; exact meeting/recording URLs are extracted independently below.
+// Retain older invitations and unknown-platform webinars for conservative classification/review.
+// Matching invitation language or an ICS attachment does not prove a join URL or parsed time.
+// Pagination must complete; reaching its safety cap is an outage, never complete coverage.
 const MEETING_QUERY =
-  'newer_than:30d (meet.google.com OR zoom.us OR teams.microsoft.com OR zoho.in OR zoho.com OR ' +
+  '(webinar OR seminar OR webcast OR "online seminar" OR "educator dialogues" OR "in focus" OR "in-focus" OR ' +
+  '"online workshop" OR "virtual conference" OR invitation OR filename:ics OR ' +
+  'meet.google.com OR zoom.us OR teams.microsoft.com OR zoho.in OR zoho.com OR ' +
   'cloudonair.withgoogle.com OR "youtube.com/watch" OR "youtube.com/live" OR "youtu.be" OR "drive.google.com/file" OR ' +
   "from:karunn@vidysea.com OR from:theoutreachcollective.in OR from:ashoka.edu.in)";
 
