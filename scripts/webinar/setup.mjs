@@ -24,6 +24,56 @@ function check(name, binary, args, validate = () => true, childEnv = {}) {
   if (result.error) console.log(`Check diagnostic: ${result.error.code ?? 'spawn failure'} (${name})`);
   return ok;
 }
+export function renderServicePreview({platform, projectRoot, node, userSid, display}) {
+  if (!['win32', 'linux'].includes(platform)) throw new Error('Unsupported service platform');
+  const windows = platform === 'win32';
+  for (const value of [projectRoot, node]) {
+    if (typeof value !== 'string' || !value || /[\x00-\x1f\x7f"]/.test(value) ||
+      (windows ? !/^[A-Za-z]:\\/.test(value) || value.length > 240 : !value.startsWith('/'))) {
+      throw new Error('Service paths must be absolute and contain no controls or quotes');
+    }
+  }
+  const runner = `${projectRoot.replace(/[\\/]$/, '')}${windows ? '\\' : '/'}scripts${windows ? '\\' : '/'}webinar${windows ? '\\' : '/'}run-pipeline.mjs`;
+  if (windows) {
+    if (typeof userSid !== 'string' || !/^S-1-5-21-\d+-\d+-\d+-\d+$/.test(userSid)) throw new Error('Windows local/domain user SID required');
+    const xml = value => value.replace(/[&<>"']/g, char => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;'}[char]));
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<Task version="1.3" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <Triggers><LogonTrigger><Enabled>true</Enabled><UserId>${xml(userSid)}</UserId></LogonTrigger></Triggers>
+  <Principals><Principal id="Operator"><UserId>${xml(userSid)}</UserId><LogonType>InteractiveToken</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals>
+  <Settings><MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy><DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries><StopIfGoingOnBatteries>false</StopIfGoingOnBatteries><ExecutionTimeLimit>PT0S</ExecutionTimeLimit><RestartOnFailure><Interval>PT1M</Interval><Count>3</Count></RestartOnFailure></Settings>
+  <Actions Context="Operator"><Exec><Command>${xml(node)}</Command><Arguments>${xml(`"${runner}" --run --watch`)}</Arguments><WorkingDirectory>${xml(projectRoot)}</WorkingDirectory></Exec></Actions>
+</Task>`;
+  }
+  if (typeof display !== 'string' || !/^:\d{1,5}(?:\.\d{1,2})?$/.test(display)) throw new Error('Explicit local X11 DISPLAY required (--display=:0)');
+  const unit = (value, command = false) => '"' + value.replace(/\\/g, '\\\\').replace(/%/g, '%%').replace(/\$/g, command ? '$$$$' : '$$') + '"';
+  return `[Unit]
+Description=Vidysea webinar pipeline (manual live proof required)
+After=graphical-session.target
+PartOf=graphical-session.target
+[Service]
+Type=exec
+WorkingDirectory=${unit(projectRoot)}
+Environment=DISPLAY=${display}
+ExecStart=${unit(node, true)} ${unit(runner, true)} --run --watch
+Restart=on-failure
+RestartSec=60
+[Install]
+WantedBy=graphical-session.target`;
+}
+if (process.argv.includes('--service-preview')) {
+  if (process.argv.includes('--install')) throw new Error('Service preview cannot be combined with dependency installation');
+  const option = name => process.argv.find(arg => arg.startsWith(`--${name}=`))?.slice(name.length + 3);
+  let userSid = option('service-user');
+  if (win) {
+    const identity = spawnSync('whoami.exe', ['/user', '/fo', 'csv', '/nh'], {encoding: 'utf8', timeout: 5000, maxBuffer: 16384, windowsHide: true});
+    const currentSid = identity.stdout?.match(/S-1-5-21-\d+-\d+-\d+-\d+/g);
+    if (identity.error || identity.status !== 0 || currentSid?.length !== 1 || (userSid && userSid !== currentSid[0])) throw new Error('Service preview requires the verified current Windows user');
+    userSid = currentSid[0];
+  }
+  console.log(renderServicePreview({platform: process.platform, projectRoot: root, node: process.execPath,
+    userSid, display: option('display')}));
+} else {
 if (process.argv.includes('--install') && !process.argv.includes('--dry-run')) {
   if (existsSync(venv) && lstatSync(venv).isSymbolicLink()) throw new Error('Refusing installation into a linked .venv');
   for (const [binary, args] of planned) {
@@ -59,3 +109,4 @@ console.log('Set LKB_BROWSER_EXECUTABLE=cft; set LKB_CAPTURE_BACKEND=tab');
 console.log(`Node dependencies: ${packageCommand ?? 'pnpm (install pinned 10.33.0 explicitly)'} install --frozen-lockfile --store-dir .cache/pnpm (run from this directory).`);
 if (!win) console.log('Ubuntu needs ffmpeg, a headed X11 display/Xvfb, Chrome shared libraries, and Tk/X11 support for PyAutoGUI. Provision those OS packages separately. DISPLAY and managed browser ownership must be verifiable; Wayland alone is not supported.');
 if (process.argv.includes('--doctor') && checks.some((ok) => !ok)) process.exitCode = 1;
+}
