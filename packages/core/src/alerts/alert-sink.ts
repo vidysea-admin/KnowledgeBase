@@ -53,9 +53,21 @@ export interface TelegramAlertSinkDeps {
    * live send is an outward-facing action that gates to the human). */
   send?: (token: string, chatId: string, text: string) => Promise<void>;
   log?: (msg: string) => void;
+  /** Injectable clock for the backstop throttle below — tests supply a fake here so throttle
+   * behaviour is deterministic (mirrors notify-channels.ts's `NotifierDeps.now`). */
+  now?: () => number;
+  /** Overrides DEFAULT_THROTTLE_MS below — tests only; production always takes the default. */
+  throttleMs?: number;
 }
 
 const SEND_TIMEOUT_MS = 8_000;
+
+/** ISS-U4BR2-001: `notify-channels.ts`'s generic per-key backstop throttle, mirrored here rather
+ * than imported — `packages/core` may import no workspace package (`core-imports-nothing`,
+ * .dependency-cruiser.cjs), so the two Telegram senders (a disclosed duplication, see this file's
+ * header) must keep this behaviour in sync by hand, not by sharing code. Same default as
+ * notify-channels.ts's `DEFAULT_THROTTLE_MS`. */
+const DEFAULT_THROTTLE_MS = 60_000;
 
 /** Replaces every occurrence of `token` in `s` — mirrors telegram-channel.ts's own `redact`, the
  * one thing standing between a thrown network error and a token landing in a log line. */
@@ -105,17 +117,44 @@ export function defaultTelegramAlertSend(token: string, chatId: string, text: st
  * every other channel in this repo (never throws, never blocks the `/health` probe it reports
  * through). Message text matches meeting-bot's `notifyWatchSilent` wording so an operator sees
  * the same alert shape regardless of which implementation sent it.
+ *
+ * ISS-U4BR2-001: also applies a generic per-key backstop throttle, mirroring
+ * `notify-channels.ts`'s `createNotifier` — `detectSilentWatchers` (health.ts) has no
+ * state-based throttle of its own and re-evaluates + re-alerts every stale source type on every
+ * `/health` hit, so without this the sink would re-send a live Telegram message per stale
+ * (tenant, sourceType) per probe, indefinitely, once something schedules `/health` (U6). The
+ * throttle key is `watchSilent:${tenantId}:${sourceType}` — both fields, deliberately: keying on
+ * sourceType alone would let one tenant's noisy watcher suppress a different tenant's first
+ * alert for the same source type, and keying on tenantId alone would do the same across source
+ * types within one tenant. A bounded set of (tenant, sourceType) pairs keeps the backing Map's
+ * size bounded in practice, same as notify-channels.ts's own per-key Map.
  */
 export function createTelegramAlertSink(deps: TelegramAlertSinkDeps = {}): AlertSink {
   const token = deps.token ?? process.env.TELEGRAM_BOT_TOKEN;
   const chatId = deps.chatId ?? process.env.TELEGRAM_CHAT_ID;
   const log = deps.log ?? ((m: string) => console.log(m));
   const send = deps.send ?? defaultTelegramAlertSend;
+  const now = deps.now ?? (() => Date.now());
+  const throttleMs = deps.throttleMs ?? DEFAULT_THROTTLE_MS;
+  const lastSentAt = new Map<string, number>();
+
+  function throttled(key: string): boolean {
+    const t = now();
+    const last = lastSentAt.get(key);
+    if (last !== undefined && t - last < throttleMs) return true;
+    lastSentAt.set(key, t);
+    return false;
+  }
 
   return {
     notifyWatchSilent(tenantId, sourceType, lastHeartbeatAt, intervalMs) {
       if (!token || !chatId) {
         log("[alert-sink] disabled — TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID not set");
+        return;
+      }
+      const key = `watchSilent:${tenantId}:${sourceType}`;
+      if (throttled(key)) {
+        log(`[alert-sink] throttled (${key})`);
         return;
       }
       const last = lastHeartbeatAt ? `last completed run: ${lastHeartbeatAt}` : "no run has ever completed";

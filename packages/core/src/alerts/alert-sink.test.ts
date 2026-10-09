@@ -102,3 +102,89 @@ test("notifyWatchSilent never returns a Promise the caller could await/throw on"
   const result = sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
   assert.equal(result, undefined);
 });
+
+// --- ISS-U4BR2-001: backstop throttle -------------------------------------------------------
+//
+// Ledger row: qa/issues.u4br2.jsonl, found by qa/verdicts/u4b-r2-alert-interface.md. Both
+// recorded reproductions are re-run verbatim below, at the level of the component this unit
+// changes (the sink), not via apps/api's `detectSilentWatchers` — this unit's edit scope is
+// `packages/core/src/alerts/alert-sink.ts`(+test) only, and a `packages/core` test importing
+// `apps/api` would itself be a new cross-boundary dependency this unit has no authorization to
+// add. The call shapes below are exactly what `detectSilentWatchers` (health.ts:134-155) does on
+// each `/health` hit: for every stale (tenantId, sourceType) still stale on this pass, call
+// `deps.notifyWatchSilent(tenantId, sourceType, lastHeartbeatAt, intervalMs)` — no memory of a
+// prior call. Reproduced here by making exactly the same two rounds of calls the ledger's probe
+// made and asserting the fake transport's call count, matching the ledger's own method.
+
+test("ISS-U4BR2-001 repro 1: two /health-equivalent calls for one stale row now collapse to 1 send (was 2)", async () => {
+  const { calls, send } = fakeTransport();
+  let t = 1_000_000;
+  const sink = createTelegramAlertSink(sinkDeps({ send, now: () => t }));
+  // Round 1: detectSilentWatchers with expectedSourceTypes:['drive'] and one stale row.
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  // Round 2: the very next /health hit, clock barely moved (well inside the 60s throttle window).
+  t += 1_000;
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  await flush();
+  assert.equal(calls.length, 1, "ISS-U4BR2-001 repro 1: expected 1 send (throttled), not 2");
+});
+
+test("ISS-U4BR2-001 repro 2: 3 expected source types x 2 rounds now send 3 alerts (was 6)", async () => {
+  const { calls, send } = fakeTransport();
+  let t = 2_000_000;
+  const sink = createTelegramAlertSink(sinkDeps({ send, now: () => t }));
+  const expectedSourceTypes = ["drive", "gmail", "calendar"]; // EXPECTED_WATCH_SOURCE_TYPES, only 1 row present -> all 3 stale (D-048: a missing row is maximally stale)
+  // Round 1.
+  for (const sourceType of expectedSourceTypes) sink.notifyWatchSilent("toc", sourceType, null, 3_600_000);
+  // Round 2: next /health hit, still inside the throttle window.
+  t += 1_000;
+  for (const sourceType of expectedSourceTypes) sink.notifyWatchSilent("toc", sourceType, null, 3_600_000);
+  await flush();
+  assert.equal(calls.length, 3, "ISS-U4BR2-001 repro 2: expected 3 sends (one per type, round 2 fully throttled), not 6");
+});
+
+test("throttle key includes tenantId, not just sourceType — a different tenant's first alert is never swallowed", async () => {
+  const { calls, send } = fakeTransport();
+  const t = 3_000_000;
+  const sink = createTelegramAlertSink(sinkDeps({ send, now: () => t }));
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  sink.notifyWatchSilent("other-tenant", "drive", null, 3_600_000); // same instant, different tenant
+  await flush();
+  assert.equal(calls.length, 2);
+});
+
+test("throttle key includes sourceType, not just tenantId — a different source type's first alert is never swallowed", async () => {
+  const { calls, send } = fakeTransport();
+  const t = 4_000_000;
+  const sink = createTelegramAlertSink(sinkDeps({ send, now: () => t }));
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  sink.notifyWatchSilent("toc", "gmail", null, 3_600_000); // same instant, same tenant, different source
+  await flush();
+  assert.equal(calls.length, 2);
+});
+
+test("a stale watcher is re-alerted once the throttle window has elapsed — throttle is temporary, not permanent silence", async () => {
+  const { calls, send } = fakeTransport();
+  let t = 5_000_000;
+  const sink = createTelegramAlertSink(sinkDeps({ send, now: () => t, throttleMs: 60_000 }));
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  t += 30_000; // still inside the window
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  t += 31_000; // now 61s after the first send -> window has elapsed
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  await flush();
+  assert.equal(calls.length, 2, "expected the 1st and 3rd calls to send, the 2nd to throttle");
+});
+
+test("default throttle window is 60s, matching notify-channels.ts's DEFAULT_THROTTLE_MS, when no throttleMs override is given", async () => {
+  const { calls, send } = fakeTransport();
+  let t = 6_000_000;
+  const sink = createTelegramAlertSink(sinkDeps({ send, now: () => t })); // no throttleMs override
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  t += 59_999; // 1ms short of 60s
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  t += 2; // now 60_001ms after the first send
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  await flush();
+  assert.equal(calls.length, 2, "expected the 1st and 3rd calls to send, the 2nd (still inside 60s) to throttle");
+});
