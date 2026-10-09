@@ -22,6 +22,7 @@ import { OBSWebSocket } from "obs-websocket-js";
 import type { JoinOpts, JoinResult } from "../joiner.js";
 import type { BrowserJoinerDeps } from "../joiners/browser-joiner.js";
 import { ensureObsReady, type ObsGuardProbes } from "./obs-guard.js";
+import { browserProfileArgs } from "./browser-profile.js";
 
 export interface BotEvent {
   event: string;
@@ -45,6 +46,8 @@ export interface ObsBrowserConfig {
   joinScript: string;
   profileDir: string;
   recordDir: string;
+  browserExecutable?: string;
+  profileDirectory?: string;
   /** Let the bot click Join/computer-audio buttons. Only for web clients that need it (Zoho):
    * on arbitrary sites a "Join" button can be anything (YouTube: channel membership). */
   autoClick?: boolean;
@@ -155,6 +158,7 @@ export interface ObsBrowserDepsOverrides {
 }
 
 export function createObsBrowserDeps(cfg: ObsBrowserConfig, overrides: ObsBrowserDepsOverrides = {}) {
+  const profileArgs = browserProfileArgs(cfg.profileDir, cfg.profileDirectory);
   const log = cfg.log ?? ((m: string) => console.log(`[bot] ${m}`));
   const obs = overrides.obs ?? (new OBSWebSocket() as unknown as ObsClientLike);
   const runs = new Map<string, Run>();
@@ -247,6 +251,8 @@ export function createObsBrowserDeps(cfg: ObsBrowserConfig, overrides: ObsBrowse
 
     // T-031: --reload-file mirrors --stop-file — the audio watchdog's forced-reload channel.
     const pyArgs = [cfg.joinScript, url, "--profile", cfg.profileDir, "--title", title, "--stop-file", stopFile, "--reload-file", path.join(cfg.recordDir, `.reload-${handle}`)];
+    pyArgs.push(...profileArgs);
+    if (cfg.browserExecutable) pyArgs.push("--browser-executable", cfg.browserExecutable);
     if (!cfg.autoClick) pyArgs.push("--no-click");
     // ISS-324: PYTHONUNBUFFERED so the child's own diagnostics arrive line-by-line instead of
     // sitting in a block-buffered pipe until exit — where child.kill() below destroyed them.

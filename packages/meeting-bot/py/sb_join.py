@@ -14,6 +14,7 @@ It never records anything itself: OBS captures this window's audio + video. What
 Usage: python sb_join.py <url> --profile <dir> --title <title> --stop-file <path>
 """
 import argparse
+import contextlib
 import json
 import os
 import sys
@@ -21,6 +22,80 @@ import threading
 import time
 
 from seleniumbase import SB
+
+
+def existing_profile_directory(parent, selected):
+    """An explicit selector reuses a physical subprofile without changing its parent."""
+    if selected is None:
+        return None
+    import pathlib
+    import re
+    if (not isinstance(selected, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 _.-]{0,99}", selected)
+            or ".." in selected or selected.strip() != selected or selected.endswith((".", " "))):
+        raise RuntimeError("Invalid browser profile-directory")
+    root = pathlib.Path(parent)
+    directory, preferences = root / selected, root / selected / "Preferences"
+    if not root.is_absolute():
+        raise RuntimeError("Selected browser profile requires an absolute parent")
+    for target in (root, directory, preferences):
+        try:
+            if any(getattr(os.lstat(part), "st_file_attributes", 0) & 0x400 or part.is_symlink()
+                   for part in (target, *target.parents)):
+                raise RuntimeError("Redirected selected profile refused")
+            if os.path.normcase(os.path.realpath(target)) != os.path.normcase(os.path.abspath(target)):
+                raise RuntimeError("Noncanonical selected profile refused")
+        except OSError as error:
+            raise RuntimeError("Selected browser profile must already exist") from error
+    if not root.is_dir() or not directory.is_dir() or not preferences.is_file():
+        raise RuntimeError("Selected browser profile requires a physical directory and Preferences")
+    return selected
+
+
+def validate_uc_profile_support(selected):
+    if selected is None:
+        return
+    import inspect
+    import seleniumbase
+    from seleniumbase import undetected
+    if seleniumbase.__version__ != "4.51.9" or not isinstance(undetected.Chrome, type):
+        raise RuntimeError("Selected profile requires supported pinned SeleniumBase 4.51.9")
+    try:
+        signature = inspect.signature(undetected.Chrome.__init__)
+    except (TypeError, ValueError) as error:
+        raise RuntimeError("Selected profile constructor capability unsupported") from error
+    for name in ("options", "suppress_welcome"):
+        parameter = signature.parameters.get(name)
+        if parameter is None or parameter.kind not in (inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY):
+            raise RuntimeError("Selected profile constructor capability unsupported")
+
+
+@contextlib.contextmanager
+def selected_uc_profile(selected):
+    """SB omits this documented UC option; scope its constructor adaptation to one launch."""
+    if selected is None:
+        yield
+        return
+    validate_uc_profile_support(selected)
+    from seleniumbase import undetected
+    original = undetected.Chrome
+
+    class SelectedChrome(original):
+        def __init__(self, *args, **kwargs):
+            options = kwargs.get("options", args[0] if args else None)
+            arguments = getattr(options, "arguments", None)
+            if not isinstance(arguments, list) or [arg for arg in arguments if arg.startswith("--profile-directory=")] != ["--profile-directory=" + selected]:
+                raise RuntimeError("Selected profile requires exactly one effective directory argument")
+            for welcome in ("--no-default-browser-check", "--no-first-run", "--no-service-autorun", "--password-store=basic"):
+                if welcome not in arguments:
+                    options.add_argument(welcome)
+            kwargs["suppress_welcome"] = False
+            super().__init__(*args, **kwargs)
+
+    undetected.Chrome = SelectedChrome
+    try:
+        yield
+    finally:
+        undetected.Chrome = original
 
 JOIN_TEXTS = [
     "join now", "join webinar", "join from browser", "join via browser", "join from your browser",
@@ -303,8 +378,9 @@ def should_force_reload(reload_file):
     return bool(reload_file) and os.path.exists(reload_file)
 
 
-def kill_orphans(profile, launch=False, expected_exe=None):
+def kill_orphans(profile, launch=False, expected_exe=None, profile_directory=None):
     """Windows ownership is established before launch; cleanup never scans foreign processes."""
+    existing_profile_directory(profile, profile_directory)
     import subprocess
     if sys.platform.startswith("linux"):
         import signal
@@ -537,14 +613,15 @@ def kill_orphans(profile, launch=False, expected_exe=None):
     # A killed run leaves exit_type=Crashed + saved Sessions, and Chrome then restores old tabs
     # (measured: the bot opened a stale YouTube tab and lost its own). Start from a clean session.
     import shutil
-    sessions = checked(os.path.join(expected, "Default", "Sessions"))
+    selected = profile_directory or "Default"
+    sessions = checked(os.path.join(expected, selected, "Sessions"))
     if os.path.exists(sessions):
         for current, directories, files in os.walk(sessions):
             checked(current)
             for name in directories + files:
                 checked(os.path.join(current, name))
         shutil.rmtree(sessions)
-    prefs = checked(os.path.join(expected, "Default", "Preferences"))
+    prefs = checked(os.path.join(expected, selected, "Preferences"))
     if os.path.exists(prefs):
         with open(prefs, encoding="utf-8") as f:
             p = json.load(f)
@@ -707,6 +784,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("url")
     ap.add_argument("--profile", required=True)
+    ap.add_argument("--profile-directory", default=None, help="existing physical Chrome subprofile under --profile")
     ap.add_argument("--title", required=True)
     ap.add_argument("--stop-file", required=True)
     ap.add_argument("--reload-file", default=None,
@@ -717,6 +795,8 @@ def main():
     ap.add_argument("--cleanup-only", action="store_true", help="terminate only exact owned profile browser processes, without launching")
     ap.add_argument("--registration-stdin", action="store_true", help="single explicit registration attempt from bounded JSON stdin")
     a = ap.parse_args()
+    a.profile_directory = existing_profile_directory(a.profile, a.profile_directory)
+    validate_uc_profile_support(a.profile_directory)
     registration = None
     if a.registration_stdin:
         registration = json.loads(sys.stdin.read(16385))
@@ -745,7 +825,7 @@ def main():
     if a.cleanup_only:
         if not os.path.isabs(a.profile):
             raise RuntimeError("Cleanup requires an absolute owned profile")
-        kill_orphans(a.profile)
+        kill_orphans(a.profile, **({"profile_directory": a.profile_directory} if a.profile_directory is not None else {}))
         emit("cleanup-complete")
         return
 
@@ -781,7 +861,8 @@ def main():
 
     if os.name != "nt":
         os.makedirs(a.profile, exist_ok=True)
-    ownership = kill_orphans(a.profile, launch=os.name == "nt", expected_exe=a.browser_executable)
+    ownership = kill_orphans(a.profile, launch=os.name == "nt", expected_exe=a.browser_executable,
+                             **({"profile_directory": a.profile_directory} if a.profile_directory is not None else {}))
     if os.name == "nt":  # keep the system + display awake while attending (idle sleep would kill the capture)
         import ctypes
         ctypes.windll.kernel32.SetThreadExecutionState(0x80000000 | 0x00000001 | 0x00000002)
@@ -794,11 +875,13 @@ def main():
     import pathlib
     policy_extension = a.capture_extension or str(pathlib.Path(__file__).parent / "tab-capture")
     args += ",--enable-unsafe-extension-debugging"
+    if a.profile_directory is not None:
+        args += ",--profile-directory=" + a.profile_directory
     # ISS-324: tick while SB() brings the browser up. Daemon thread, so a failure inside SB()
     # needs no unwinding here -- __main__ emits "fatal" and the interpreter exits under it.
     boot_done = threading.Event()
     threading.Thread(target=_bootstrap_progress, args=(boot_done, "driver-bringup"), daemon=True).start()
-    with SB(uc=True, headed=True, user_data_dir=a.profile, chromium_arg=args,
+    with selected_uc_profile(a.profile_directory), SB(uc=True, headed=True, user_data_dir=a.profile, chromium_arg=args,
             extension_dir=policy_extension, binary_location=a.browser_executable,
             driver_version=driver_version.split(".")[0] if driver_version else None) as sb:
         if ownership:

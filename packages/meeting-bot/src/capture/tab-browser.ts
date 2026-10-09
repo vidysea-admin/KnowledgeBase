@@ -9,6 +9,7 @@ import { closeSync, copyFileSync, existsSync, lstatSync, fsyncSync, mkdirSync, o
 import path from "node:path";
 import type { BrowserJoinerDeps } from "../joiners/browser-joiner.js";
 import { getProcessStartTime } from "./controller-state.js";
+import { browserProfileArgs } from "./browser-profile.js";
 import type { BotEvent } from "./obs-windows.js";
 import {validateCaptureControlGaps, validateCaptureStatusIdentity, type GapWindow} from "./reconnect-gaps.js";
 
@@ -50,6 +51,7 @@ export interface TabBrowserConfig {
   recordDir: string;
   extensionDir?: string;
   browserExecutable?: string;
+  profileDirectory?: string;
   autoClick?: boolean;
   startupTimeoutMs?: number;
   onEvent?: (handle: string, event: BotEvent) => void;
@@ -135,6 +137,7 @@ export async function createTabCaptureReceiver(output: string, onEvent: (event: 
 }
 
 export function createTabBrowserDeps(cfg: TabBrowserConfig) {
+  const profileArgs = browserProfileArgs(cfg.profileDir, cfg.profileDirectory);
   const log = cfg.log ?? ((message: string) => console.log(`[tab-bot] ${message}`));
   const levels = new Set<(db: number) => void>();
   const runs = new Map<string, {child: ChildProcess; exited: Promise<number | null>; output: string;
@@ -193,6 +196,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
         const args = [cfg.joinScript, url, "--profile", cfg.profileDir, "--title", `LKB-BOT ${handle}`,
           "--stop-file", stopFile, "--reload-file", reloadFile, "--capture-extension", extension];
         if (cfg.browserExecutable) args.push("--browser-executable", cfg.browserExecutable);
+        args.push(...profileArgs);
         if (cfg.autoClick === false) args.push("--no-click");
         const child = spawn(cfg.python, args, {stdio: ["ignore", "pipe", "pipe"], windowsHide: true});
         let done = false;

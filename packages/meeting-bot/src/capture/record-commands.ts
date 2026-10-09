@@ -14,6 +14,7 @@ import { collectGapEvent, installCaptureControl, type GapWindow } from "./reconn
 import { createTelegramNotifier, type TelegramNotifier } from "./telegram-alerts.js";
 import { finalizeRecordingWith, normalizeCapture } from "./record-finalize.js";
 import { createTabBrowserDeps } from "./tab-browser.js";
+import { browserProfileArgs, selectedBrowserProfile } from "./browser-profile.js";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, "..", "..", "..", "..");
 const BOT_PROFILE_DIR = path.resolve(process.env.LKB_BOT_PROFILE_DIR ?? path.join(REPO_ROOT, "data", "bot-profile"));
@@ -49,13 +50,15 @@ export function shouldAutoClick(platform: string): boolean {
   return platform === "zoho" || platform === "zoom" || platform === "meet";
 }
 export async function runLogin(rest: string[]): Promise<void> {
-  const url = rest[0] ?? "https://accounts.google.com";
+  const url = rest[0] && !rest[0].startsWith("--") ? rest[0] : "https://accounts.google.com";
+  const envFile = path.join(REPO_ROOT, ".env");
+  if (existsSync(envFile)) process.loadEnvFile(envFile);
+  const profileDirectory = selectedBrowserProfile(rest, BOT_PROFILE_DIR);
   mkdirSync(RECORD_DIR, { recursive: true });
   const stopFile = path.join(RECORD_DIR, ".stop-login");
   console.log(`bot profile: ${BOT_PROFILE_DIR}\nSign in inside the window, then close it.`);
-  const envFile = path.join(REPO_ROOT, ".env");
-  if (existsSync(envFile)) process.loadEnvFile(envFile);
   const args = [JOIN_SCRIPT, url, "--profile", BOT_PROFILE_DIR, "--title", "LKB-BOT login", "--stop-file", stopFile, "--no-click"];
+  args.push(...browserProfileArgs(BOT_PROFILE_DIR, profileDirectory));
   if (process.env.LKB_BROWSER_EXECUTABLE) args.push("--browser-executable", process.env.LKB_BROWSER_EXECUTABLE);
   const child = spawn(process.env.LKB_PYTHON ?? "python", args, { stdio: "inherit" });
   await new Promise((r) => child.on("exit", r));
@@ -78,6 +81,7 @@ export async function runRecord(rest: string[]): Promise<void> {
   if (rest.includes("--index") && !rest.includes("--process-video")) throw new Error("--index requires --process-video");
   if (rest.includes("--process-video") && !rest.includes("--transcribe")) throw new Error("--process-video requires --transcribe");
   if (existsSync(envFile)) process.loadEnvFile(envFile);
+  const profileDirectory = selectedBrowserProfile(rest, BOT_PROFILE_DIR);
   const backend = recordingBackend(rest);
   const tenantId = captureTenant(rest);
   const obsPassword = process.env.OBS_WS_PASSWORD ?? "";
@@ -109,16 +113,19 @@ export async function runRecord(rest: string[]): Promise<void> {
     python: process.env.LKB_PYTHON ?? "python", joinScript: JOIN_SCRIPT,
     profileDir: BOT_PROFILE_DIR, recordDir: RECORD_DIR, sessionId, tenantId,
     browserExecutable: process.env.LKB_BROWSER_EXECUTABLE,
+    profileDirectory,
     autoClick: shouldAutoClick(platform), onEvent,
   }) : undefined;
   const bot = tab ?? createObsBrowserDeps({
     obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455",
     obsPassword,
     obsExe: OBS_EXE,
-    python: "python",
+    python: process.env.LKB_PYTHON ?? "python",
     joinScript: JOIN_SCRIPT,
     profileDir: BOT_PROFILE_DIR,
     recordDir: RECORD_DIR,
+    browserExecutable: process.env.LKB_BROWSER_EXECUTABLE,
+    profileDirectory,
     autoClick: shouldAutoClick(platform),
     onEvent,
   });
