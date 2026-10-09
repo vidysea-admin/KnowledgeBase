@@ -97,7 +97,7 @@ export class OllamaProvider implements Provider {
       url: `${this.baseUrl}/api/embed`,
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: { model, input: job.texts },
+      body: { model, input: job.texts, truncate: false, options: { num_thread: 1 } },
     });
 
     if (res.status < 200 || res.status >= 300) {
@@ -126,6 +126,9 @@ export class OllamaProvider implements Provider {
         `ollama embed returned a ${vectors[ragged]?.length}-dim vector at index ${ragged} but ` +
           `${dims} at index 0 — a ragged set cannot be compared by cosine`,
       );
+    }
+    if (vectors.some((v) => v.some((value) => !Number.isFinite(value)))) {
+      throw new Error("ollama embed returned non-finite values");
     }
     return { vectors, dims, provider: this.name, model };
   }

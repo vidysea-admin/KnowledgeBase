@@ -1,0 +1,88 @@
+{
+  "unit": "reviewed-toc-recovery",
+  "verdict": "PASS",
+  "cycleChecked": 1,
+  "scope": "source-bound recovery, insert-only isolated import and actual production reads",
+  "issuesWritten": [],
+  "recordedUtc": "2026-10-09T10:35:16Z",
+  "sourceSha256": {
+    "scripts/lib/toc-recovery.mjs": "4528b8fd28fd4f43f86c8ce44b6c4cdaa3d90e908e019d61b05392e92f8e3fc5",
+    "scripts/lib/toc-recovery-import.mjs": "7b3b61270d7d8293c65e11a252dc7ef5577c5bd15b1dcaa7633a85a3fa94b8b1",
+    "scripts/recover-toc.mjs": "d5512274ebe3ca90c7103919a4a5148c1d20b2d44f0a442bbe5d0bf8aec87052",
+    "scripts/lib/toc-recovery.test.mjs": "5e77c992a3faf466094064964ed062d2abfa0969fa6bd168e4a8f9449e4d7012",
+    "scripts/lib/toc-recovery-import.test.mjs": "ecc0a33950d464593e43ed879131376ae32d32528f3b35f681740650a3946216"
+  },
+  "packet": {
+    "packetId": "477255b83bb0f001a7fce53d48af7631bdc8a92c2e24e85b3108a3c9ece749ef",
+    "packetJsonSha256": "268c94cc13d3c70def84ea2f959b9e0da1a22774f8fd7d74b5653866ef976205",
+    "approvedReviewSha256": "8aa7ce9c90ae2b83107fdf815e90491194ac4fea830ae79a4b957d52dc5ea0e5",
+    "originalSessions": 23,
+    "additionalSeptemberSessions": 6,
+    "originalArchivedTurns": 3427,
+    "validTurns": 3424,
+    "excludedInvalidIntervals": 3,
+    "reviewedReplacementProposals": 7,
+    "unresolvedHistoricalClaims": 65,
+    "missingDeclaredSyntheticCases": 6,
+    "treeBytes": 2096418
+  },
+  "independentChecks": [
+    {"name": "approval authority falsifier", "exitCode": 0, "result": "forged self-consistent unrelated support refused", "wallSeconds": 4.3705},
+    {"name": "importer stage", "command": "Node24 --test --import tsx scripts/lib/toc-recovery-import.test.mjs", "exitCode": 0, "passed": 13, "failed": 0, "skipped": 0, "cancelled": 0, "durationMs": 11437.9051},
+    {"name": "actual retained packet dry run", "command": "Node24 scripts/recover-toc.mjs --dry-run --packet <task-work>/toc-recovery-v1", "exitCode": 0, "wallSeconds": 5.6769852, "dbModulesImported": false},
+    {"name": "final five source/test SHA256 inventory", "result": "matches final Cycle1 request"}
+  ],
+  "reusedAttributedMakerChecks": [
+    {"name": "final producer/import stage", "passed": 33, "failed": 0, "skipped": 0, "cancelled": 0, "durationMs": 41448.7439},
+    {"name": "unchanged immediate downstream stage", "passed": 31, "failed": 0, "skipped": 0, "cancelled": 0, "durationMs": 15388.8263},
+    {"name": "git diff --check", "exitCode": 0}
+  ],
+  "contractsVerification": {"command": "Python312 contracts/verify_contracts.py", "exitCode": 0, "wallSeconds": 1.7037376, "result": "PASS by vacuity", "attribution": "fresh independent sibling provider check"},
+  "actualImport": {
+    "completedUtc": "2026-10-09T10:27:54.790Z",
+    "uri": "mongodb://127.0.0.1:27019",
+    "dbName": "lkb_work_20261009_01a11f9c",
+    "tenantId": "toc",
+    "receiptSha256": "61dfd443e0acd52d6c65e1b84e91619a3dc3c3f1a1c97f2dea0a6a8b533bf1bd",
+    "status": "inserted-source-recovery",
+    "insertOnly": true,
+    "crossCollectionAtomicityClaimed": false,
+    "providerCalls": 0
+  },
+  "independentActualProductionRead": {
+    "status": "PASS",
+    "createdUtc": "2026-10-09T10:30:51.359Z",
+    "elapsedMs": 1029,
+    "wholeCommandWallSeconds": 8.7786678,
+    "sessions": 29,
+    "pages": 29,
+    "turns": 3424,
+    "claims": 7,
+    "resolvedReferences": 8,
+    "sourceCount": 29,
+    "gaps": 58,
+    "treeSessionNodes": 29,
+    "searchQuery": "UCAS",
+    "searchHits": 9,
+    "apiKeyPreserved": true,
+    "foreignTenantReadsRefused": true,
+    "legacyIdentityHashPreserved": true,
+    "separateParentSourceByteHashBound": true,
+    "exactTurnDocumentsCompared": true,
+    "readOnly": true,
+    "noProviderCalls": true,
+    "fixtureSetupFailure": "Initial dotenv resolution failed before database access; Node environment-file loader corrected scratch launcher."
+  },
+  "openAcceptance": {
+    "strictIndexAcceptance": false,
+    "humanSemanticAcceptance": false,
+    "corpusVectorsAndVectorRetrieval": false,
+    "boundedSourceHydratingAsk": false,
+    "all23SessionAndOffCorpusAnswerAcceptance": false,
+    "operationalRelease": false,
+    "fullRepositorySuiteClaimed": false,
+    "taskCountBumpAuthorized": false
+  },
+  "timing": {"finalVerificationStartedUtc": "2026-10-09T10:25:29Z", "earlierTriageTimed": false, "totalLaunchToVerdictSeconds": null},
+  "excludedConcurrentChanges": ["calendar work", ".gitignore", "repository skills", "checker-overhead contract", "temporary files"]
+}
