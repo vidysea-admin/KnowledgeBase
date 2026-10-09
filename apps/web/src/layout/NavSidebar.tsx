@@ -21,6 +21,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/sessions", label: "Sessions", icon: <SessionsIcon /> },
   { to: "/ask", label: "Ask", icon: <AskIcon /> },
   { to: "/brain", label: "Brain", icon: <BrainIcon /> },
+  { to: "/explorer", label: "Knowledge explorer", icon: <SessionsIcon /> },
   { to: "/calendar", label: "Calendar", icon: <CalendarIcon /> },
   { to: "/watch", label: "Watch", icon: <GapIcon /> },
   { to: "/sources", label: "Sources", icon: <SourcesIcon /> },
