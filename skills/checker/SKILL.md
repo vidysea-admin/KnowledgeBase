@@ -11,11 +11,15 @@ This is a new repo-local portable workflow, explicitly loaded for this repositor
 
 Record checker launch time immediately. Read the named manifest and packet, applicable AGENTS.md rules, exact relevant contract clauses, affected diff, and the immediate caller/consumer. Verify slug, Fix cycle, and final-file hashes before relying on supplied evidence. Include untracked changes. If the packet lacks necessary scope or provenance, record HOLD with the missing information rather than conducting a broad exploratory survey.
 
+Use the packet's changed-call-site/dependency map to navigate. Read all new code, complete changed logic and the relevant consumer/security boundaries. Read targeted excerpts of unchanged dependencies; expand only when missing context, a contract or observed behavior requires it. Do not reread a whole unchanged runner simply because it calls the changed feature.
+
 Independently determine whether the proposed behavior and tests satisfy the affected contract. Maker explanations are claims to check. Reuse attributed maker evidence when its command, result, fixture, cycle, and checked bytes are clear, while performing a direct source review and independent behavioral check of the change. State precisely which evidence is reused and which is independently reproduced.
 
 ## Run focused verification
 
 Select the smallest checks that exercise the affected behavior, failure boundary, and immediate downstream consumption. Derive at least one meaningful independent probe from the contract or actual boundary when needed; do not merely mirror implementation wording. Check the affected stage on sample data and the immediate downstream stage. Preserve the required contracts/verify_contracts.py check when applicable; if required evidence is absent or fails, withhold PASS.
+
+Use established execution facts: when the same capability has already demonstrated a sandbox restriction in this environment, request the necessary approval directly instead of repeating the known failing attempt. Approval and permission boundaries still apply to the actual action. After scope/hash validation and approvals, start the focused command and retain its running handle while independently reviewing the changed seams, relevant consumers and security behavior. Keep this overlap light on CPU; do not launch competing local suites. Batch independent scoped reads, and inspect every result. Draft the verdict skeleton during review so completion needs only results, limits and final hash checks.
 
 For issue-fix units, read the cited issue from the union of qa/issues.jsonl and qa/issues.*.jsonl and re-run its recorded reproductions verbatim. Report corpus counts by issue ID. Do not substitute a newly authored easier corpus. Name and explain any unreplayed case; required omissions prevent PASS.
 
@@ -31,8 +35,25 @@ Write qa/verdicts/<same-slug>.md with:
 
 - VERDICT: PASS, FAIL, or HOLD; Cycle checked; exact scoped acceptance and remaining whole-task gates.
 - Launch/completion timestamps, total launch-to-verdict elapsed time, and per-command durations. Report any uncertainty in timing rather than presenting an estimate as measured.
+- Phase checkpoints for dispatch/launch, approval requested/resolved, scope-read/review start/end, commands start/end, and draft/persist start/confirmed completion. Record actual timestamps and known waits; mark absent measurements unknown. Review and commands may overlap, so their durations do not automatically add to total elapsed time. Never attribute an unmeasured gap to drafting or approval by subtraction.
 - Checked final-file hashes, contract clauses, independent findings/probes, attributed reused evidence, exact commands/results/output paths, and issue reproduction counts.
 - ISSUES-WRITTEN: none or the actual filed IDs; EXPLANATION including missing evidence or reason for widening.
+
+Use a compact draft, filling only evidence established by this check:
+
+```text
+VERDICT: pending until required checks finish
+Cycle checked: <current cycle>
+Scope / remaining gates:
+Phase timestamps / total elapsed / unknown intervals:
+Commands: exact invocation, duration, exit, counts, output path
+Checked final hashes / relevant clauses:
+Independent findings / attributed reused evidence:
+ISSUES-WRITTEN:
+EXPLANATION:
+```
+
+Keep this draft in working notes until the verdict is supported. The persisted verdict may be longer when security or acceptance evidence needs detail; the template is not a limit on coverage.
 
 Before verdict, recheck relevant final-file hashes. A changed candidate or cycle requires HOLD/resubmission; the verdict cannot certify different bytes. PASS requires complete evidence for this unit's authorized scope, not merely passing selected tests. FAIL identifies a reproducible acceptance violation. HOLD identifies missing prerequisites or incomplete necessary evidence. Only checker may PASS; maker closes the manifest after matching PASS.
 

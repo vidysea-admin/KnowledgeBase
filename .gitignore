@@ -2,6 +2,7 @@
 **/.env
 **/.env.*
 !**/.env.example
+/config/client_secret.json
 
 # node
 **/node_modules/
