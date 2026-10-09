@@ -19,3 +19,7 @@ export type { AskV2Deps, AskV2Result, AuditEntry } from "./ask-v2.js";
 export { computeMAE } from "./eval/calibration.js";
 export type { CalibrationPair, CalibrationDetail, CalibrationResult } from "./eval/calibration.js";
 export { heuristicScorer } from "./eval/heuristic-scorer.js";
+
+// Runtime-only bounded source hydration and production-caller boundaries.
+export { BoundedAskError, SOURCE_LIMITS, payloadBytes, sourceCatalog, sourceQuotes, validateHydration, completionBudget } from "./source-context.js";
+export type { SourceQuote, SourceHydration, HydrateSourcesFn, SourceContextDeps } from "./source-context.js";

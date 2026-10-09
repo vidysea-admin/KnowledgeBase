@@ -118,8 +118,9 @@ const TIMESTAMP_MARKER_RE = /\[(?:(\d{1,2}):)?(\d{1,2}):(\d{2})\]\s*(.+?):\s+/g;
 /**
  * Parses `[MM:SS] SpeakerName: text` markers into `Turn[]` — matches anywhere in the text, not
  * just at line starts (see TIMESTAMP_MARKER_RE comment). `tEnd` for each turn is the NEXT turn's
- * `tStart`; the LAST turn's `tEnd` is its own `tStart + 30` seconds — a documented fallback since
- * the transcript's timestamps alone don't carry a true end time. Text before the first marker
+ * `tStart`; the LAST turn's inferred `tEnd` is its own `tStart + 30` seconds, limited by a
+ * finite positive media duration when its start precedes that duration. Unknown duration and
+ * starts at/after EOF retain the fallback for downstream validation. Text before the first marker
  * (headers, preamble) is dropped; text between two markers belongs entirely to the FIRST one's
  * turn (it is that speaker's continued content, not a separate unparseable line to discard).
  */
@@ -135,7 +136,7 @@ const TIMESTAMP_MARKER_RE = /\[(?:(\d{1,2}):)?(\d{1,2}):(\d{2})\]\s*(.+?):\s+/g;
 // continuing, not a genuine unlabeled speaker change).
 const MAX_PLAUSIBLE_SPEAKER_LABEL_LENGTH = 60;
 
-export function parseDiarizedTranscript(text: string): Turn[] {
+export function parseDiarizedTranscript(text: string, mediaDurationSeconds?: number): Turn[] {
   const matches = [...text.matchAll(TIMESTAMP_MARKER_RE)];
   const parsed: { speakerRef: string; tStart: number; text: string }[] = [];
   let lastPlausibleSpeaker = "spk:0";
@@ -160,10 +161,14 @@ export function parseDiarizedTranscript(text: string): Turn[] {
   }
 
   const LAST_TURN_FALLBACK_SECONDS = 30;
+  const knownDuration = Number.isFinite(mediaDurationSeconds) && mediaDurationSeconds! > 0;
   return parsed.map((turn, i) => ({
     speakerRef: turn.speakerRef,
     tStart: turn.tStart,
-    tEnd: i + 1 < parsed.length ? parsed[i + 1]!.tStart : turn.tStart + LAST_TURN_FALLBACK_SECONDS,
+    tEnd: i + 1 < parsed.length ? parsed[i + 1]!.tStart
+      : knownDuration && turn.tStart < mediaDurationSeconds!
+        ? Math.min(turn.tStart + LAST_TURN_FALLBACK_SECONDS, mediaDurationSeconds!)
+        : turn.tStart + LAST_TURN_FALLBACK_SECONDS,
     text: turn.text,
   }));
 }
@@ -193,7 +198,10 @@ const DIARIZE_PROMPT = [
 
 /** Calls `generateContent` against an already-uploaded file (criterion 1's `uploadFile`). */
 export async function transcribeUploadedAudio(fileUri: string, transport: UploadTransport,
-  apiKey: string, model: string = DEFAULT_MODEL): Promise<TranscribeUploadedResult> {
+  apiKey: string, model: string = DEFAULT_MODEL, mediaDurationSeconds?: number): Promise<TranscribeUploadedResult> {
+  if (mediaDurationSeconds !== undefined && (!Number.isFinite(mediaDurationSeconds) || mediaDurationSeconds <= 0)) {
+    throw new Error("gemini file upload: invalid measured media duration");
+  }
   const res = await transport({
     method: "POST",
     url: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
@@ -239,7 +247,7 @@ export async function transcribeUploadedAudio(fileUri: string, transport: Upload
   }
 
   return {
-    turns: parseDiarizedTranscript(text),
+    turns: parseDiarizedTranscript(text, mediaDurationSeconds),
     usage: {
       inputTokens: body?.usageMetadata?.promptTokenCount ?? 0,
       outputTokens: body?.usageMetadata?.candidatesTokenCount ?? 0,

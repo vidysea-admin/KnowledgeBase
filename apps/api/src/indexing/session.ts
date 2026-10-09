@@ -33,6 +33,41 @@ async function loadTreeRoot(tenantId: string, db: Pick<Db, "collection">): Promi
 }
 
 
+/** Shared validated vector/document preparation; callers choose their persistence policy. */
+export function prepareChunkDocuments(
+  tenantId: string, sessionId: string, plans: ReturnType<typeof buildChunks>,
+  embedded: Awaited<ReturnType<IndexEmbedFn>>,
+): Chunks[] {
+  // The correlation JSON Schema cannot express (the U1.2 verdict's finding): `vector` and
+  // `dims` are independently optional there, so `{vector: [3 items], dims: 99}` validates.
+  // Asserted at the only place that can see both — the write.
+  if (embedded.vectors.length !== plans.length) {
+    throw new Error(
+      `indexSession: embedder returned ${embedded.vectors.length} vector(s) for ${plans.length} chunk(s)`,
+    );
+  }
+  if (!Number.isInteger(embedded.dims) || embedded.dims <= 0 || embedded.vectors.some((v) => v.some((n) => !Number.isFinite(n)))) throw new Error("invalid embedding dimensions/values");
+  const chunkDocs: Chunks[] = plans.map((plan, i) => {
+    const vector = embedded.vectors[i] ?? [];
+    if (vector.length !== embedded.dims) {
+      throw new Error(
+        `indexSession: chunk ${plan.chunkIndex} has ${vector.length} dims, batch reports ${embedded.dims}`,
+      );
+    }
+    return {
+      _id: randomUUID(),
+      tenantId,
+      sourceRef: sessionId,
+      turnRefs: toEvidenceTuple(plan.turnRefs),
+      chunkIndex: plan.chunkIndex,
+      vector: toEvidenceTuple(vector),
+      dims: embedded.dims,
+      embeddingModel: embedded.model,
+    };
+  });
+  return chunkDocs;
+}
+
 export async function writeSessionChunks(
   tenantId: string,
   sessionId: string,
@@ -55,33 +90,7 @@ export async function writeSessionChunks(
   try {
     const embedded = await embed({ kind: "embedding", texts: plans.map((p) => p.text), purpose: "document" });
 
-    // The correlation JSON Schema cannot express (the U1.2 verdict's finding): `vector` and
-    // `dims` are independently optional there, so `{vector: [3 items], dims: 99}` validates.
-    // Asserted at the only place that can see both — the write.
-    if (embedded.vectors.length !== plans.length) {
-      throw new Error(
-        `indexSession: embedder returned ${embedded.vectors.length} vector(s) for ${plans.length} chunk(s)`,
-      );
-    }
-    if (!Number.isInteger(embedded.dims) || embedded.dims <= 0 || embedded.vectors.some((v) => v.some((n) => !Number.isFinite(n)))) throw new Error("invalid embedding dimensions/values");
-    const chunkDocs: Chunks[] = plans.map((plan, i) => {
-      const vector = embedded.vectors[i] ?? [];
-      if (vector.length !== embedded.dims) {
-        throw new Error(
-          `indexSession: chunk ${plan.chunkIndex} has ${vector.length} dims, batch reports ${embedded.dims}`,
-        );
-      }
-      return {
-        _id: randomUUID(),
-        tenantId,
-        sourceRef: sessionId,
-        turnRefs: toEvidenceTuple(plan.turnRefs),
-        chunkIndex: plan.chunkIndex,
-        vector: toEvidenceTuple(vector),
-        dims: embedded.dims,
-        embeddingModel: embedded.model,
-      };
-    });
+    const chunkDocs = prepareChunkDocuments(tenantId, sessionId, plans, embedded);
     // Clean replace, never accumulate — a re-index must not double the corpus. Reached only
     // after every assertion above has passed, so the delete never runs without its replacement.
     if (!persist) return { written: chunkDocs.length, skipped: null };

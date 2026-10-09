@@ -24,7 +24,9 @@ import { createLlmScorer } from "./score.js";
 import { createTavilySearchFn } from "./ask-web-fallback.js";
 import { indexSession, type BoundIndexer } from "./indexing/session.js";
 import { createAskArmsFor } from "./ask-arms.js";
+import { createSourceRequestDepsFor } from "./ask/source-context.js";
 import { withSessionArtifacts } from "./routes/brain.js";
+import { createMongoJobsReadDeps } from "./jobs/store.js";
 
 const ROUTING_CONFIG_PATH = fileURLToPath(new URL("../../../config/ai-routing.yaml", import.meta.url));
 
@@ -190,6 +192,7 @@ export function buildProductionDeps(): ServerDeps {
     whatsapp: createMongoWhatsAppDeps(boundIndexer),
     keys: createMongoKeysDeps(),
     ingest: createMongoIngestDeps(boundIndexer),
+    jobs: createMongoJobsReadDeps(),
     // CORS_ORIGINS is a comma-separated allowlist (e.g. "http://localhost:5173" in dev, the real
     // apps/web deployment origin in prod) — no default beyond "" -> empty list, matching
     // server.ts's safe-by-default stance.
@@ -210,6 +213,11 @@ export function buildProductionDeps(): ServerDeps {
     })(),
     ask: {
       tree: createMongoTreeStore(),
+      requestDepsFor: createSourceRequestDepsFor({
+        dispatch: (job, tenantId) => routeComplete(job.kind === "evaluator" ? "evaluator" : "ask", job, { chains, providers, write: jobWrite, tenantId }),
+        embed: chains.embedding ? (job) => routeEmbed("embedding", job, { chains, providers, write: jobWrite, tenantId: ROUTER_TENANT_ID }) : undefined,
+        treeSearchFn: treeSearch, tavilySearchFn, write: jobWrite,
+      }),
       // U1.5 C6: a FACTORY. There is no tenant at this point in the process, so there is nothing
       // here that could correctly bind the arms — routes/ask.ts calls this with the verified key's
       // tenantId, per request.

@@ -15,6 +15,8 @@ import { selectNodes, type CompleteFn, type NodeSearchFn } from "./select-nodes.
 import { rrfMerge } from "./merge.js";
 import { refine, type RefinableDoc } from "./refine.js";
 import { answer as generateAnswer } from "./answer.js";
+import { sourceCatalog, validateHydration, sourceQuotes, completionBudget, BoundedAskError, SOURCE_LIMITS, type SourceContextDeps } from "./source-context.js";
+import { boundedRefine, contextStrips, type ContextSource } from "./bounded-refine.js";
 
 export interface AuditEntry {
   jobKind: string;
@@ -27,6 +29,8 @@ export interface AuditEntry {
 export interface AskV2Deps {
   complete: CompleteFn;
   scoreFn: ScoreFn;
+  scoreFnForComplete?: (complete: CompleteFn) => ScoreFn;
+  sourceContext?: SourceContextDeps;
   /** `@lkb/index`'s `treeSearch` — injected, never imported (see select-nodes.ts module doc). */
   treeSearchFn: NodeSearchFn;
   webFallbackFn?: WebFallbackFn;
@@ -86,11 +90,13 @@ function collectNodesById(root: TreeIndexNode): Map<string, TreeIndexNode> {
   return byId;
 }
 
-export async function askV2(query: string, tree: TreeIndexNode, deps: AskV2Deps): Promise<AskV2Result> {
-  const { complete, scoreFn, treeSearchFn, webFallbackFn, tavilySearchFn, extraCandidateArmsFn, write, tenantId } = deps;
+async function runAskV2(query: string, tree: TreeIndexNode, deps: AskV2Deps): Promise<AskV2Result> {
+  const { complete: rawComplete, scoreFn: legacyScoreFn, treeSearchFn, webFallbackFn, tavilySearchFn, extraCandidateArmsFn, write, tenantId } = deps;
   const upper = deps.upper ?? UPPER_THRESHOLD;
   const lower = deps.lower ?? LOWER_THRESHOLD;
   const auditLog: AuditEntry[] = [];
+  const budget = deps.sourceContext ? completionBudget(rawComplete) : undefined;
+  const complete = budget?.complete ?? rawComplete;
 
   const loggingComplete = (step: string): CompleteFn => async (job) => {
     const completion = await complete(job);
@@ -108,7 +114,8 @@ export async function askV2(query: string, tree: TreeIndexNode, deps: AskV2Deps)
     return completion;
   };
 
-  const treeCandidates = await selectNodes(query, tree, loggingComplete("select_nodes"), treeSearchFn);
+  const catalog = deps.sourceContext ? sourceCatalog(tree) : tree;
+  const treeCandidates = await selectNodes(query, catalog, loggingComplete("select_nodes"), (_catalog, ids) => treeSearchFn(tree, ids));
 
   // U1.5 hybrid merge. It lives HERE, in the thunk's input, and deliberately not inside `ask()`:
   // plan §10 is explicit that `ask()` already takes candidates via a thunk and is therefore
@@ -161,10 +168,31 @@ export async function askV2(query: string, tree: TreeIndexNode, deps: AskV2Deps)
     }
     candidates = resolved;
   }
+  if (deps.sourceContext) {
+    const byId = collectNodesById(tree);
+    candidates = candidates.map((n) => byId.get(n.node_id)).filter((n): n is TreeIndexNode => n !== undefined);
+    if (candidates.length > SOURCE_LIMITS.candidates) {
+      auditLog.push({ jobKind: "ask.candidates_bounded", step: `${candidates.length - SOURCE_LIMITS.candidates} lower-ranked candidates omitted from bounded scoring` });
+      candidates = candidates.slice(0, SOURCE_LIMITS.candidates);
+    }
+    const hydrated = await deps.sourceContext.hydrate(query, candidates);
+    candidates = validateHydration(hydrated, candidates);
+    if (hydrated.degraded) {
+      await recordJob({ tenantId, kind: "ask.retrieval_degraded", status: "failed", error: hydrated.degraded }, write);
+      auditLog.push({ jobKind: "ask.retrieval_degraded", step: hydrated.degraded });
+    }
+    auditLog.push({ jobKind: "ask.source_hydrated", step: `${candidates.length} source nodes; snapshot ${hydrated.snapshotSHA256}; ${hydrated.sourceBytes} source bytes` });
+  }
+  const scoreFn = deps.scoreFnForComplete ? deps.scoreFnForComplete(loggingComplete("score")) : legacyScoreFn;
   // ask() re-scores `candidates` via `scoreFn` internally (T-005's evaluate()) — reused here, not
   // duplicated. Each candidate's node comes back on `scored[].node`, still the full node object
   // selectNodes/treeSearch resolved (with `summary`), so refine below needs no second lookup.
   let askResult = await ask(query, tree, () => candidates, scoreFn, webFallbackFn, upper, lower);
+
+  budget?.assertHealthy();
+  if (deps.sourceContext && askResult.scored.some((s) => /fell back|heuristic/i.test(s.reason))) {
+    throw new BoundedAskError("evaluator degraded to heuristic scoring");
+  }
 
   // ISS-010 / ISS-274: real async web-search fallback, layered on top of router.ts (never inside
   // it — see AskV2Deps.tavilySearchFn doc). Only reachable when the sync webFallbackFn path
@@ -181,9 +209,14 @@ export async function askV2(query: string, tree: TreeIndexNode, deps: AskV2Deps)
   if (askResult.insufficient_coverage && tavilySearchFn) {
     try {
       const webResults = await tavilySearchFn(query);
+      if (deps.sourceContext && webResults.length === 0) {
+        await recordJob({ tenantId, kind: "ask.web_fallback_empty", status: "failed", error: "web search returned no evidence" }, write);
+        auditLog.push({ jobKind: "ask.web_fallback_empty", step: "web_fallback_unavailable: web search returned no evidence" });
+      } else {
       await recordJob({ tenantId, kind: "ask.web_fallback", status: "done" }, write);
       auditLog.push({ jobKind: "ask.web_fallback", step: "web_fallback" });
       askResult = { ...askResult, web_used: true, insufficient_coverage: false, sources: { ...askResult.sources, web: webResults } };
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       await recordJob({ tenantId, kind: "ask.web_fallback_unavailable", status: "failed", error: message }, write);
@@ -193,7 +226,7 @@ export async function askV2(query: string, tree: TreeIndexNode, deps: AskV2Deps)
     }
   }
 
-  for (const s of askResult.scored) {
+  if (!deps.scoreFnForComplete) for (const s of askResult.scored) {
     await recordJob({ tenantId, kind: "ask.score", status: "done" }, write);
     auditLog.push({ jobKind: "ask.score", step: "score" });
   }
@@ -202,19 +235,40 @@ export async function askV2(query: string, tree: TreeIndexNode, deps: AskV2Deps)
     .filter((s) => s.score >= lower)
     .map((s) => s.node);
 
+  const boundedSources: ContextSource[] = deps.sourceContext ? [
+    ...goodDocNodes.flatMap((n) => sourceQuotes(n).map((q) => ({ id: q.id, text: q.quote, origin: q.origin, source: { speakerRef: q.speakerRef, turnId: q.turnId, sessionRef: q.sessionRef, tStart: q.tStart, tEnd: q.tEnd } }))),
+    ...askResult.sources.web.map((w, i) => ({ id: `web-${i}`, text: webDocText(w), origin: "web-unverified" })),
+  ] : [];
+  if (deps.sourceContext && !boundedSources.length) {
+    return { ...askResult, answer: "No supported internal source was retrieved. Web fallback is unavailable or returned no evidence.", auditLog };
+  }
   let refinedContext: string;
   if (askResult.verdict === "correct") {
     // Internal-first guarantee holds through askV2 too: no refine, no web, on a correct verdict.
-    refinedContext = goodDocNodes.map((n) => n.summary).join(" ");
+    refinedContext = deps.sourceContext ? JSON.stringify(contextStrips(boundedSources)) : goodDocNodes.map((n) => n.summary).join(" ");
   } else {
     const docs: RefinableDoc[] = [
       ...goodDocNodes.map((n) => ({ text: n.summary })),
       ...askResult.sources.web.map((w) => ({ text: webDocText(w) })),
     ];
-    refinedContext = await refine(docs, query, loggingComplete("refine"));
+    refinedContext = deps.sourceContext ? await boundedRefine(boundedSources, query, loggingComplete("refine")) : await refine(docs, query, loggingComplete("refine"));
   }
 
-  const answerResult = await generateAnswer(query, refinedContext, askResult.sources, loggingComplete("answer"));
+  const answerResult = await generateAnswer(query, refinedContext, askResult.sources, loggingComplete("answer"), deps.sourceContext ? { boundedSources } : undefined);
+  budget?.assertHealthy();
 
   return { ...askResult, answer: answerResult.text, auditLog };
+}
+
+/** Bounded refusals are explicit and recorded; legacy callers retain their original behavior. */
+export async function askV2(query: string, tree: TreeIndexNode, deps: AskV2Deps): Promise<AskV2Result> {
+  try { return await runAskV2(query, tree, deps); }
+  catch (err) {
+    if (deps.sourceContext) {
+      const failure = err instanceof BoundedAskError ? err : new BoundedAskError("source or completion processing failed");
+      await recordJob({ tenantId: deps.tenantId, kind: "ask.source_context_refused", status: "failed", error: failure.message }, deps.write);
+      throw failure;
+    }
+    throw err;
+  }
 }

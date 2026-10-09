@@ -4,6 +4,7 @@ export * from "./client.js";
 export * from "./lib/tenantScope.js";
 export * from "./collections/sources.js";
 export * from "./collections/sessions.js";
+export { jobs, listJobs } from "./collections/jobs.js";
 export * from "./collections/turns.js";
 export * from "./collections/claims.js";
 export * from "./collections/session-pages.js";

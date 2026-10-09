@@ -3,7 +3,7 @@ import { useAuth } from "../auth/AuthContext.js";
 import { listKeys, createKey, revokeKey, type ApiKeySummary } from "../api/keys.js";
 import { ApiError } from "../api/client.js";
 
-const AVAILABLE_SCOPES = ["ask", "compete", "sessions", "sources", "gaps", "graph", "search", "citations", "webhooks", "keys"];
+const AVAILABLE_SCOPES = ["ask", "compete", "sessions", "sources", "gaps", "graph", "search", "citations", "webhooks", "keys", "jobs"];
 
 export function SettingsPage(): React.ReactElement {
   const { apiKey } = useAuth();

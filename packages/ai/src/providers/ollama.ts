@@ -11,6 +11,16 @@ const DEFAULT_BASE_URL = "http://localhost:11434";
 /** A dedicated embedding model, not the chat one — `llama3.1` has no embedding endpoint. */
 const DEFAULT_EMBED_MODEL = "nomic-embed-text";
 
+/** Nomic RAG task instructions are part of the model-semantic binding, not source text. */
+export function ollamaEmbeddingInputs(job: EmbedJob, model: string): string[] {
+  if (model.split(":")[0] !== "nomic-embed-text") return [...job.texts];
+  if (job.purpose !== undefined && job.purpose !== "query" && job.purpose !== "document") {
+    throw new Error("invalid nomic embedding purpose");
+  }
+  const prefix = job.purpose === "query" ? "search_query: " : "search_document: ";
+  return job.texts.map(text => prefix + text);
+}
+
 export interface OllamaConfig {
   baseUrl?: string;
   model?: string;
@@ -97,7 +107,7 @@ export class OllamaProvider implements Provider {
       url: `${this.baseUrl}/api/embed`,
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: { model, input: job.texts, truncate: false, options: { num_thread: 1 } },
+      body: { model, input: ollamaEmbeddingInputs(job, model), truncate: false, options: { num_thread: 1 } },
     });
 
     if (res.status < 200 || res.status >= 300) {

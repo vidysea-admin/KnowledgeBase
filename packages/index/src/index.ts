@@ -27,3 +27,5 @@ export { resolveSpeakers, personIdFor, type ResolvedSpeaker, type SpeakerResolut
 export { extractSpeakers, type SpeakersCompleteFn, type SpeakerExtractionResult } from "./pipeline/speakers-llm.js";
 export { looksLikeAName, isDiscourseOnly, containsNameVerbatim, citesNameAsAnIntroduction } from "./pipeline/speaker-name-rules.js";
 export { buildSpeakerDocs, type SessionResolution, type SpeakerCollision, type SpeakerDocsResult } from "./pipeline/speaker-docs.js";
+
+export { buildSourceSlices, sourceSpanText, type SourceSpan, type SourceSlicePlan } from "./chunk/source-spans.js";

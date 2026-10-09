@@ -38,6 +38,7 @@
  * runtime via tsx's programmatic register() API — same mechanism seed-toc.mjs already uses.
  */
 import "dotenv/config";
+import {fileURLToPath} from "node:url";
 import { register } from "tsx/esm/api";
 
 const args = process.argv.slice(2);
@@ -45,8 +46,8 @@ const has = (f) => args.includes(f);
 const val = (f, d) => { const i = args.indexOf(f); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
 
 const SUBCOMMAND = args[0] && !args[0].startsWith("--") ? args[0] : "chunks";
-if (!["chunks", "entities"].includes(SUBCOMMAND)) {
-  console.error(`backfill: unknown subcommand "${SUBCOMMAND}" — expected "chunks" or "entities"`);
+if (!["chunks", "entities", "recovery-chunks"].includes(SUBCOMMAND)) {
+  console.error(`backfill: unknown subcommand "${SUBCOMMAND}" — expected "chunks", "entities" or "recovery-chunks"`);
   process.exit(2);
 }
 const DRY_RUN = has("--dry-run");
@@ -56,6 +57,10 @@ const LIMIT = Number(val("--limit", "0")) || 0;
 
 const unregister = register();
 try {
+  if (SUBCOMMAND === "recovery-chunks") {
+    const {runRecoveryEmbeddingBackfill} = await import("./lib/toc-embedding-backfill.mjs");
+    await runRecoveryEmbeddingBackfill(args.slice(1), {root: fileURLToPath(new URL("../", import.meta.url))});
+  } else {
   const { getDb, connect, close, scopedCollection } = await import("../packages/db/src/index.ts");
   const { buildChunks } = await import("../packages/index/src/index.ts");
   const { writeSessionChunks } = await import("../apps/api/src/indexing/session.ts");
@@ -176,6 +181,7 @@ ${failures.length} session(s) failed promotion:`);
   // Exit non-zero when any session was skipped, so a partial backfill can never be mistaken for a
   // complete one by a caller that only checks the exit code.
   process.exit(failures.length > 0 ? 1 : 0);
+  }
 } finally {
   unregister();
 }

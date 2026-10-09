@@ -31,7 +31,8 @@ import { register } from "tsx/esm/api";
 import { Agent, setGlobalDispatcher } from "undici";
 import { findAudioFile, transcriptTenant } from "./lib/find-audio-file.mjs";
 import { realUploadTransport } from "./lib/real-upload-transport.mjs";
-import { writeTranscriptGeneration } from "./lib/transcript-provenance.mjs";
+import { immutableTranscriptTurns, writeTranscriptGeneration } from "./lib/transcript-provenance.mjs";
+import { validateTurns } from "./webinar/process-video.mjs";
 
 // 30 min: a single-call transcription of a ~60-min recording can exceed 10 min before headers (2026-09-24).
 setGlobalDispatcher(new Agent({ headersTimeout: 1_800_000, bodyTimeout: 1_800_000 }));
@@ -63,8 +64,10 @@ const MIME_BY_EXT = { ".m4a": "audio/mp4", ".mp4": "video/mp4", ".mp3": "audio/m
 function ffprobeDurationSeconds(audioPath) {
   const out = execFileSync("ffprobe", [
     "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", audioPath,
-  ], { encoding: "utf8" });
-  return Number(out.trim());
+  ], { encoding: "utf8", timeout: 15000, windowsHide: true });
+  const duration = Number(out.trim());
+  if (!Number.isFinite(duration) || duration <= 0) throw new Error("recording duration unavailable");
+  return duration;
 }
 
 function ffmpegExtractChunk(audioPath, start, end, outPath) {
@@ -99,7 +102,7 @@ async function main() {
 
   const tmpDir = mkdtempSync(join(tmpdir(), "lkb-chunk-"));
 
-  async function transcribeSpanOnce(bytes, displayName) {
+  async function transcribeSpanOnce(bytes, displayName, mediaDurationSeconds) {
     const { fileUri, name } = await uploadFile(bytes, mimeType, realUploadTransport, apiKey, displayName);
     const MAX_POLLS = 20;
     const POLL_DELAY_MS = 5000;
@@ -112,7 +115,7 @@ async function main() {
       throw new Error(`file never became ACTIVE (last state: ${state}) after ${MAX_POLLS} polls`);
     }
     // GEMINI_STT_MODEL overrides the adapter default (e.g. gemini-3.8-flash for single-call long audio).
-    return transcribeUploadedAudio(fileUri, realUploadTransport, apiKey, process.env.GEMINI_STT_MODEL || undefined);
+    return transcribeUploadedAudio(fileUri, realUploadTransport, apiKey, process.env.GEMINI_STT_MODEL || undefined, mediaDurationSeconds);
   }
 
   /** Returns turns local to `spanStart` (tStart/tEnd relative to the span itself, not the
@@ -122,12 +125,14 @@ async function main() {
     const spanDuration = spanEnd - spanStart;
     const spanPath = join(tmpDir, `span-${label}${ext}`);
     ffmpegExtractChunk(audioPath, spanStart, spanEnd, spanPath);
+    const mediaDurationSeconds = Math.min(ffprobeDurationSeconds(spanPath), spanDuration);
     const bytes = readFileSync(spanPath);
     console.log(`${"  ".repeat(depth + 1)}span ${label} [${spanStart}s-${spanEnd}s] (${(bytes.byteLength / 1024 / 1024).toFixed(1)} MB)`);
 
     let best = { turns: [], lastTEnd: 0 };
     for (let attempt = 1; attempt <= MAX_ATTEMPTS_PER_SPAN; attempt++) {
-      const { turns, usage } = await transcribeSpanOnce(bytes, `${filename}-${label}-a${attempt}`);
+      const { turns, usage } = await transcribeSpanOnce(bytes, `${filename}-${label}-a${attempt}`, mediaDurationSeconds);
+      if (turns.length) validateTurns(immutableTranscriptTurns(tenantId, sessionId, turns), mediaDurationSeconds, { tenantId, sessionId });
       const localGaps = findTimeGaps(turns, GAP_THRESHOLD_SECONDS);
       const lastTEnd = turns.length > 0 ? turns[turns.length - 1].tEnd : 0;
       const shortfall = spanDuration - lastTEnd;
@@ -209,6 +214,7 @@ async function main() {
     console.log("no internal gaps found -- transcript coverage is genuinely continuous");
   }
 
+  validateTurns(immutableTranscriptTurns(tenantId, sessionId, mergedTurns), durationSeconds, { tenantId, sessionId });
   const realTurns = writeTranscriptGeneration(join(DATA_DIR, sessionId), tenantId, sessionId, mergedTurns);
   console.log(`wrote ${realTurns.length} real diarized turns -> ${turnsPath} (replaced ${existingTurns.length} placeholder turn(s))`);
 }

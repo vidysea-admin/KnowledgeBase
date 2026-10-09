@@ -60,3 +60,40 @@ describe("SettingsPage", () => {
     await waitFor(() => expect(screen.getByText("missing keys scope")).toBeInTheDocument());
   });
 });
+
+
+test("jobs permission is explicit opt-in and only selected scopes are submitted", async () => {
+  vi.spyOn(keysApi, "listKeys").mockResolvedValue({ keys: [] });
+  const createSpy = vi.spyOn(keysApi, "createKey").mockResolvedValue({ id: "job-key", key: "fixture-created-key" });
+  renderPage();
+  const jobs = screen.getByRole("checkbox", { name: "jobs" });
+  expect(jobs).not.toBeChecked();
+  const user = userEvent.setup();
+  await user.type(screen.getByLabelText("Label"), "Provider audit reader");
+  await user.click(jobs);
+  await user.click(screen.getByRole("checkbox", { name: "ask" }));
+  await user.click(screen.getByRole("button", { name: "Create key" }));
+  await waitFor(() => expect(createSpy).toHaveBeenCalledWith("test-key", "Provider audit reader", ["jobs"]));
+});
+
+test("actual App navigation mounts Provider jobs and calls the real typed client", async () => {
+  const { App } = await import("../App.js");
+  localStorage.setItem("lkbApiKey", "integration-key");
+  window.history.replaceState(null, "", "/settings");
+  vi.spyOn(keysApi, "listKeys").mockResolvedValue({ keys: [] });
+  const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({
+    jobs: [{ _id: "audit-one", kind: "ask", status: "done", createdAt: "2026-10-09T12:00:00Z", provider: "fixture" }],
+    limit: 50, truncated: false,
+  }), { status: 200, headers: { "content-type": "application/json" } }));
+  const rendered = render(<App />);
+  try {
+    await userEvent.setup().click(screen.getByRole("link", { name: "Provider jobs" }));
+    expect(await screen.findByRole("heading", { name: "Provider jobs" })).toBeInTheDocument();
+    expect(await screen.findByText(/ID: audit-one/)).toBeInTheDocument();
+    expect(fetchSpy).toHaveBeenCalledWith(expect.stringMatching(/\/jobs\?limit=50$/), expect.objectContaining({
+      headers: expect.objectContaining({ authorization: "Bearer integration-key" }),
+    }));
+    expect(window.location.pathname).toBe("/jobs");
+    expect(screen.queryByText("integration-key")).not.toBeInTheDocument();
+  } finally { rendered.unmount(); window.history.replaceState(null, "", "/"); }
+});

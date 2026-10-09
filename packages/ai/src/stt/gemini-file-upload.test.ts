@@ -5,6 +5,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 
 import {
   uploadFile, pollFileState, transcribeUploadedAudio, parseDiarizedTranscript,
@@ -22,6 +23,53 @@ function fakeTransport(handlers: Record<string, (req: UploadTransportRequest) =>
 }
 
 const API_KEY = "fake-key";
+const CAPTURED_SHORT_RESPONSE = "[00:00] spk:0: VDC controlled test. This generated voice is for an authorized private test. [00:08] The video shows a changing pattern and a frame counter. Test number one.";
+const CAPTURED_AV_RESPONSE = "[00:00] spk:0: Vidiac control test. This generated voice is for an authorized private test. [00:06] The video shows a changing pattern and a frame counter. Test number one.";
+
+test("measured final fallback replays both exact 172-byte captures without changing text, labels or default request", async () => {
+  for (const [text, sha256] of [[CAPTURED_SHORT_RESPONSE, "3aba227dfbe45c60a5ff67f09ee43574da4233f2a6c266c11fb54b064b78fb82"],
+    [CAPTURED_AV_RESPONSE, "9169b00d13f90b0a617cd4ecf40e20a84f8e42bef6918d2f4f3847a35564d82f"]]) {
+    assert.equal(Buffer.byteLength(text!), 172);
+    assert.equal(createHash("sha256").update(text!).digest("hex"), sha256);
+    const legacy = parseDiarizedTranscript(text!);
+    assert.equal(legacy[0]!.tEnd, 30);
+    for (const duration of [12.650958, 15]) {
+      let calls = 0;
+      const transport: UploadTransport = async req => {
+        calls++;
+        assert.match(req.url, /models\/gemini-3\.5-flash:generateContent/);
+        assert.deepEqual((req.body as {generationConfig: unknown}).generationConfig, {thinkingConfig: {thinkingBudget: 0}});
+        return {status: 200, headers: {}, body: {candidates: [{content: {parts: [{text}]}, finishReason: "STOP"}]}};
+      };
+      const result = await transcribeUploadedAudio("files/captured", transport, API_KEY, undefined, duration);
+      assert.deepEqual(result.turns, [{...legacy[0], tEnd: duration}]);
+      assert.equal(calls, 1);
+    }
+  }
+});
+
+test("duration fallback changes only final inferred EOF and leaves unknown or invalid starts visible", async () => {
+  const text = "[00:00] Bob: first [00:05] Ann: final";
+  const legacy = parseDiarizedTranscript(text);
+  assert.deepEqual(parseDiarizedTranscript(text, 12.650958), [legacy[0], {...legacy[1], tEnd: 12.650958}]);
+  for (const duration of [undefined, NaN, Infinity, -Infinity, 0, -1]) {
+    assert.deepEqual(parseDiarizedTranscript(text, duration), legacy);
+  }
+  assert.equal(parseDiarizedTranscript("[00:01] Bob: incomplete long recording", 3600)[0]!.tEnd, 31);
+  for (const start of [15, 16]) {
+    const turn = parseDiarizedTranscript(`[00:${start}] Bob: invalid late start`, 15)[0]!;
+    assert.equal(turn.tStart, start); assert.equal(turn.tEnd, start + 30);
+  }
+});
+
+test("invalid supplied STT measurements refuse before the provider transport runs", async () => {
+  let calls = 0;
+  const transport: UploadTransport = async () => {calls++; throw new Error("provider must not run");};
+  for (const duration of [NaN, Infinity, -Infinity, 0, -1]) {
+    await assert.rejects(transcribeUploadedAudio("files/invalid", transport, API_KEY, undefined, duration), /invalid measured media duration/);
+  }
+  assert.equal(calls, 0);
+});
 
 test("uploadFile posts a resumable-upload start, then PUTs bytes to the returned upload URL", async () => {
   let capturedFinalizeUrl = "";

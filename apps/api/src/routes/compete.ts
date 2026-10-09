@@ -9,7 +9,7 @@
 import { randomUUID } from "node:crypto";
 import { Router, type Request, type Response } from "express";
 import type { EvalRuns } from "@lkb/core";
-import { askV2 } from "@lkb/ask";
+import { askV2, BoundedAskError, type AskV2Deps } from "@lkb/ask";
 import { requireScope } from "../auth.js";
 import type { AskRouteDeps } from "./ask.js";
 
@@ -69,7 +69,23 @@ export function createCompeteRouter(deps: CompeteRouteDeps): Router {
       return;
     }
 
-    const result = await askV2(question, tree, { ...deps.askDeps, tenantId });
+    let result: Awaited<ReturnType<typeof askV2>>;
+    try {
+      const requestDeps: Omit<AskV2Deps, "tenantId"> = deps.requestDepsFor ? await deps.requestDepsFor(tenantId) : deps.askDeps;
+      if (deps.requestDepsFor && (!requestDeps ||
+          [requestDeps.complete, requestDeps.scoreFn, requestDeps.treeSearchFn, requestDeps.write,
+            requestDeps.sourceContext?.hydrate].some(value => typeof value !== "function") ||
+          requestDeps.extraCandidateArmsFn !== undefined && typeof requestDeps.extraCandidateArmsFn !== "function")) {
+        throw new BoundedAskError("request dependencies unavailable");
+      }
+      result = await askV2(question, tree, { ...requestDeps, tenantId });
+    } catch (error) {
+      if (deps.requestDepsFor || error instanceof BoundedAskError) {
+        res.status(503).json({error: "source_context_unavailable", message: "Compete could not validate source evidence"});
+        return;
+      }
+      throw error;
+    }
     const evalRunId = randomUUID();
     const counsellor: EvalRuns["counsellor"] = { name: counsellorName };
     if (typeof counsellorOrg === "string" && counsellorOrg.trim() !== "") {

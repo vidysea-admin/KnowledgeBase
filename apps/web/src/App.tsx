@@ -14,6 +14,7 @@ import { IngestPage } from "./pages/IngestPage.js";
 import { MeetingBotPage } from "./pages/MeetingBotPage.js";
 import { WhatsAppPage } from "./pages/WhatsAppPage.js";
 import { WatchPage } from "./pages/WatchPage.js";
+import { JobsPage } from "./pages/jobs/JobsPage.js";
 
 export function App(): React.ReactElement {
   return (
@@ -31,6 +32,7 @@ export function App(): React.ReactElement {
               <Route path="/watch" element={<WatchPage />} />
               <Route path="/sources" element={<SourcesPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/jobs" element={<JobsPage />} />
               <Route path="/ingest" element={<IngestPage />} />
               <Route path="/meeting-bot" element={<MeetingBotPage />} />
               <Route path="/whatsapp" element={<WhatsAppPage />} />

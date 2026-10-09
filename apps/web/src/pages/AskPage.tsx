@@ -39,6 +39,16 @@ function sessionRefOf(source: AskInternalSource): string | null {
   return typeof ref === "string" && ref !== "" ? ref : null;
 }
 
+interface QuoteCitation { id: string; turnId: string; speakerRef: string; tStart: number; tEnd: number; quote: string; origin: string }
+function quoteCitations(source: AskInternalSource): QuoteCitation[] {
+  const quotes = source.evidence?.sourceQuotes;
+  if (!Array.isArray(quotes)) return [];
+  return quotes.filter((q): q is QuoteCitation => q !== null && typeof q === "object"
+    && typeof q.id === "string" && typeof q.turnId === "string" && q.turnId.length > 0
+    && typeof q.speakerRef === "string" && typeof q.quote === "string"
+    && typeof q.origin === "string" && Number.isFinite(q.tStart) && Number.isFinite(q.tEnd));
+}
+
 export function AskPage(): React.ReactElement {
   const { apiKey } = useAuth();
   const [query, setQuery] = useState("");
@@ -131,6 +141,13 @@ export function AskPage(): React.ReactElement {
                     ) : (
                       <span>{source.node_id}</span>
                     )}
+                    {ref && quoteCitations(source).map((q) => <div key={q.id}>
+                      <Link to={`/sessions/${encodeURIComponent(ref)}#turn-${encodeURIComponent(q.turnId)}`}>
+                        {q.speakerRef} · {q.tStart}–{q.tEnd}s
+                      </Link>
+                      <blockquote>{q.quote}</blockquote>
+                      <small>{q.origin === "speech" ? "Source statement; speaker label preserved" : q.origin}</small>
+                    </div>)}
                   </li>
                 );
               })}

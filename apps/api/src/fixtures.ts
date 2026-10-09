@@ -218,28 +218,29 @@ export function fakeCalendarReadDeps(overrides: Partial<CalendarReadDeps> = {}):
   };
 }
 
-/** A REAL in-memory `MeetingCandidatesDeps` (not read-only like the fakes above — scan/approve/
- * reject must stay consistent within one test). `_rows`/`_trust` exposed for assertions. */
+/** Tenant-isolated fixture; `_rows`/`_trust` alias tenant-1 for existing single-tenant tests. */
 export function fakeMeetingCandidatesDeps(overrides: Partial<MeetingCandidatesDeps> = {}): MeetingCandidatesDeps & {
-  _rows: Map<string, MeetingCandidate>; _trust: Map<string, number>;
+  _rows: Map<string, MeetingCandidate>; _trust: Map<string, number>; _rowsFor(tenantId: string): Map<string, MeetingCandidate>; _trustFor(tenantId: string): Map<string, number>;
 } {
-  const rows = new Map<string, MeetingCandidate>();
-  const trust = new Map<string, number>();
+  const rowsByTenant = new Map<string, Map<string, MeetingCandidate>>(), trustByTenant = new Map<string, Map<string, number>>();
+  function scopedMap<T>(maps: Map<string, Map<string, T>>, tenantId: string): Map<string, T> {
+    if (!maps.has(tenantId)) maps.set(tenantId, new Map<string, T>()); return maps.get(tenantId)!;
+  }
+  const rowsFor = (tenantId: string) => scopedMap(rowsByTenant, tenantId), trustFor = (tenantId: string) => scopedMap(trustByTenant, tenantId);
   return {
-    _rows: rows,
-    _trust: trust,
+    _rows: rowsFor("tenant-1"), _trust: trustFor("tenant-1"), _rowsFor: rowsFor, _trustFor: trustFor,
     async scanGmail() { return { created: 0, autoApproved: 0 }; },
-    async listCandidates() { return [...rows.values()]; },
-    async approve(_tenantId, id) {
-      const row = rows.get(id);
+    async listCandidates(tenantId) { return [...rowsFor(tenantId).values()]; },
+    async approve(tenantId, id) {
+      const row = rowsFor(tenantId).get(id), trust = trustFor(tenantId);
       if (!row || row.status !== "pending") return false;
       row.status = "approved";
       row.decidedAt = new Date().toISOString();
       trust.set(row.senderDomain, (trust.get(row.senderDomain) ?? 0) + 1);
       return true;
     },
-    async reject(_tenantId, id) {
-      const row = rows.get(id);
+    async reject(tenantId, id) {
+      const row = rowsFor(tenantId).get(id);
       if (!row || row.status !== "pending") return false;
       row.status = "rejected";
       row.decidedAt = new Date().toISOString();

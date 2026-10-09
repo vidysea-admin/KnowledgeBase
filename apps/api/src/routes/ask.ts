@@ -8,7 +8,7 @@
  */
 import { Router, type Request, type Response } from "express";
 import type { TreeIndexNode } from "@lkb/core";
-import { askV2, type AskV2Deps } from "@lkb/ask";
+import { askV2, BoundedAskError, type AskV2Deps } from "@lkb/ask";
 import { requireScope } from "../auth.js";
 
 /** Injected dependency (C3) — production impl in `store.ts` is Mongo-backed; tests use a fake. */
@@ -18,6 +18,7 @@ export interface TreeStore {
 
 export interface AskRouteDeps {
   tree: TreeStore;
+  requestDepsFor?: (tenantId: string) => Omit<AskV2Deps, "tenantId">;
   /** Everything `askV2` needs except `tenantId`, which comes from the verified key per request. */
   askDeps: Omit<AskV2Deps, "tenantId" | "extraCandidateArmsFn">;
   /**
@@ -47,12 +48,21 @@ export function createAskRouter(deps: AskRouteDeps): Router {
       return;
     }
 
+    try {
     const result = await askV2(body.query, tree, {
       ...deps.askDeps,
+      ...(deps.requestDepsFor ? deps.requestDepsFor(tenantId) : {}),
       tenantId,
-      ...(deps.extraCandidateArmsFor ? { extraCandidateArmsFn: deps.extraCandidateArmsFor(tenantId) } : {}),
+      ...(!deps.requestDepsFor && deps.extraCandidateArmsFor ? { extraCandidateArmsFn: deps.extraCandidateArmsFor(tenantId) } : {}),
     });
     res.status(200).json(result);
+    } catch (error) {
+      if (error instanceof BoundedAskError) {
+        res.status(503).json({ error: error.code, message: error.message });
+        return;
+      }
+      throw error;
+    }
   });
 
   return router;

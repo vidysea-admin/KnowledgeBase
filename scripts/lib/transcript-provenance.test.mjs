@@ -101,7 +101,7 @@ test("real seed dry-run rejects unbound corpus before any database connection", 
 import { copyFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { buildSessionFiles } from "../webinar/session-rows.mjs";
-import { processVideo } from "../webinar/process-video.mjs";
+import { processVideo, validateTurns } from "../webinar/process-video.mjs";
 import { buildAutoSessionSkeleton } from "../watch/lib/session-skeleton.mjs";
 const NODE_HOOK = `import {registerHooks} from 'node:module';
 const moduleURL = text => 'data:text/javascript,' + encodeURIComponent(text);
@@ -119,12 +119,12 @@ registerHooks({resolve(specifier,context,next){
  }
  return next(specifier,context);
 }});`;
-function cliFixture(scriptName) {
+function cliFixture(scriptName, hook = NODE_HOOK) {
   const root = mkdtempSync(join(tmpdir(), "lkb-provenance-cli-")), scripts = join(root, "scripts");
   mkdirSync(join(scripts, "lib"), {recursive: true}); mkdirSync(join(scripts, "webinar"), {recursive: true});
   for (const name of [scriptName, "lib/transcript-provenance.mjs", "lib/find-audio-file.mjs", "lib/real-upload-transport.mjs", "webinar/session-rows.mjs", "webinar/process-video.mjs"])
     copyFileSync(resolve(import.meta.dirname, "..", name), join(scripts, name));
-  writeFileSync(join(root, "hook.mjs"), NODE_HOOK);
+  writeFileSync(join(root, "hook.mjs"), hook);
   const dir = join(root, "data", "toc-migrated", "session1"); mkdirSync(dir, {recursive: true});
   put(dir, "source.json", {_id: "source1", tenantId: "tenant2", audioPath: "fixture.m4a"});
   put(dir, "session.json", {_id: "session1", tenantId: "tenant2"}); writeFileSync(join(root, "fixture.m4a"), "fixture");
@@ -133,6 +133,72 @@ function cliFixture(scriptName) {
     {encoding: "utf8", timeout: 20000, env: {...process.env, GEMINI_API_KEY: "fixture-no-network", MONGODB_URL: "mongodb://fixture.invalid", MONGODB_DB: "lkb_work_fixture", MONGO_WORK_DB: "lkb_work_fixture", PROVENANCE_TRACE: trace, ...env}});
   return {root, dir, trace, run};
 }
+
+const SHORT_CAPTURE = "[00:00] spk:0: VDC controlled test. This generated voice is for an authorized private test. [00:08] The video shows a changing pattern and a frame counter. Test number one.";
+const durationChildSource = `import {writeFileSync,appendFileSync} from 'node:fs';
+const mark=row=>appendFileSync(process.env.PROVENANCE_TRACE,JSON.stringify(row)+'\\n');
+export function spawn(){throw Error('unapproved spawn')}
+export function execFileSync(cmd,args,opts){
+ if(cmd==='ffprobe'){const span=args.at(-1).includes('span-');mark({kind:'probe',span,timeout:opts.timeout});return span?process.env.SPAN_DURATION:process.env.MEDIA_DURATION;}
+ if(cmd==='ffmpeg'){writeFileSync(args.at(-1),'fixture');return '';}
+ throw Error('unapproved child');
+}`;
+const durationTransportSource = `import {appendFileSync} from 'node:fs';
+export async function realUploadTransport(req){
+ appendFileSync(process.env.PROVENANCE_TRACE,JSON.stringify({kind:'provider',method:req.method})+'\\n');
+ if(req.url.includes('generateContent'))return {status:200,headers:{},body:{candidates:[{content:{parts:[{text:process.env.CAPTURED_TRANSCRIPT}]},finishReason:'STOP'}]}};
+ if(req.method==='PUT')return {status:200,headers:{},body:{file:{uri:'files/fixture',name:'files/fixture'}}};
+ if(req.method==='GET')return {status:200,headers:{},body:{state:'ACTIVE'}};
+ return {status:200,headers:{'x-goog-upload-url':'https://fixture.invalid/upload'}};
+}`;
+const DURATION_HOOK = NODE_HOOK
+  .replace(/ if \(specifier==='node:child_process'\).*\n/, ` if (specifier==='node:child_process') return {url:moduleURL(${JSON.stringify(durationChildSource)}),shortCircuit:true};\n`)
+  .replace(/ if \(specifier.endsWith\('gemini-file-upload.ts'\)\).*\n/, ` if (specifier.endsWith('gemini-file-upload.ts')) return {url:${JSON.stringify(new URL('../../packages/ai/src/stt/gemini-file-upload.ts', import.meta.url).href)},shortCircuit:true};\n`)
+  .replace(/ if \(specifier.endsWith\('chunk-audio.ts'\)\).*\n/, ` if (specifier.endsWith('chunk-audio.ts')) return {url:${JSON.stringify(new URL('../../packages/ai/src/stt/chunk-audio.ts', import.meta.url).href)},shortCircuit:true};\n`)
+  .replace(" if (specifier==='undici')", ` if (specifier.endsWith('/real-upload-transport.mjs')) return {url:moduleURL(${JSON.stringify(durationTransportSource)}),shortCircuit:true};\n if (specifier==='undici')`);
+
+test("duration-bound actual long-session CLI probes original and extracted media and preserves provenance", () => {
+  for (const spanDuration of [15, 12.650958, 17]) {
+    const f = cliFixture('transcribe-long-session.mjs', DURATION_HOOK);
+    try {
+      const old = writeTranscriptGeneration(f.dir, 'tenant2', 'session1', [turn('Old cited fact')]);
+      generated(f.dir, old); bindDerivedArtifacts(f.dir);
+      const before = readFileSync(join(f.dir, 'turns.json'));
+      const r = f.run(['session1'], {MEDIA_DURATION:'15',SPAN_DURATION:String(spanDuration),CAPTURED_TRANSCRIPT:SHORT_CAPTURE});
+      assert.equal(r.status, 0, r.stderr);
+      const next = JSON.parse(readFileSync(join(f.dir, 'turns.json')));
+      assert.equal(next[0].tEnd, Math.min(15, spanDuration));
+      assert.equal(next[0].speakerRef, 'spk:0'); assert.equal(next[0].text, SHORT_CAPTURE.slice('[00:00] spk:0: '.length));
+      validateTurns(next, 15, {tenantId:'tenant2',sessionId:'session1'});
+      assert.deepEqual(next, immutableTranscriptTurns('tenant2','session1',next));
+      assert.deepEqual(readFileSync(join(f.dir,'.transcript-history',createHash('sha256').update(before).digest('hex')+'.json')),before);
+      assert.equal(JSON.parse(readFileSync(join(f.dir,'derivation-provenance.json'))).status,'stale');
+      const trace=readFileSync(f.trace,'utf8').trim().split('\n').map(JSON.parse);
+      assert.deepEqual(trace.filter(x=>x.kind==='probe').map(x=>[x.span,x.timeout]),[[false,15000],[true,15000]]);
+      assert.equal(trace.filter(x=>x.kind==='provider').length,4);
+    } finally {rmSync(f.root,{recursive:true,force:true});}
+  }
+});
+
+test("duration-bound CLI refuses invalid original or span probes and late starts without transcript writes", () => {
+  const invalid = ['NaN','Infinity','0','-1'];
+  const cases = [...invalid.map(value=>({MEDIA_DURATION:value,SPAN_DURATION:'15'})),
+    ...invalid.map(value=>({MEDIA_DURATION:'15',SPAN_DURATION:value})),
+    ...[15,16].map(start=>({MEDIA_DURATION:'15',SPAN_DURATION:'15',CAPTURED_TRANSCRIPT:`[00:${start}] spk:0: late`}))];
+  for (const values of cases) {
+    const f=cliFixture('transcribe-long-session.mjs',DURATION_HOOK);
+    try {
+      const old=writeTranscriptGeneration(f.dir,'tenant2','session1',[turn()]); generated(f.dir,old);bindDerivedArtifacts(f.dir);
+      const before=readFileSync(join(f.dir,'turns.json'));
+      const r=f.run(['session1'],{CAPTURED_TRANSCRIPT:SHORT_CAPTURE,...values});
+      assert.equal(r.status,1,r.stderr);
+      assert.deepEqual(readFileSync(join(f.dir,'turns.json')),before);
+      assert.equal(assertDerivedArtifactsCurrent(f.dir).status,'current');
+      const trace=readFileSync(f.trace,'utf8').trim().split('\n').map(JSON.parse);
+      if(!values.CAPTURED_TRANSCRIPT)assert.equal(trace.filter(x=>x.kind==='provider').length,0);
+    } finally {rmSync(f.root,{recursive:true,force:true});}
+  }
+});
 test("both actual transcription CLIs invalidate prior derivations and preserve original bytes on stubbed provider path", () => {
   for (const script of ["transcribe-toc-session.mjs", "transcribe-long-session.mjs"]) {
     const f = cliFixture(script);

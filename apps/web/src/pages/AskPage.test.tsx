@@ -211,3 +211,14 @@ describe("AskPage", () => {
     expect(spy).toHaveBeenCalledWith(expect.anything(), "real question");
   });
 });
+
+
+test("exact source quotes link to actual turn anchors and preserve raw speaker/time labels", async () => {
+  vi.spyOn(askApi, "ask").mockResolvedValue(response({ sources: { internal: [{ node_id: "n1", evidence: {
+    sessionRef: "s1", sourceQuotes: [{ id: "q1", turnId: "s1-t1", speakerRef: "spk:0", tStart: 516, tEnd: 546,
+      quote: "The class has 23 students.", origin: "speech" }] } }], web: [] } }));
+  renderPage(); await submit("class size?");
+  await waitFor(() => expect(screen.getByText("The class has 23 students.")).toBeInTheDocument());
+  expect(screen.getByRole("link", { name: "spk:0 · 516–546s" })).toHaveAttribute("href", "/sessions/s1#turn-s1-t1");
+  expect(screen.queryByText("Professor spk:0")).not.toBeInTheDocument();
+});

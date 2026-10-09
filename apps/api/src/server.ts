@@ -26,6 +26,8 @@ import { createPagesRouter } from "./routes/pages.js";
 import { createStubsRouter } from "./routes/stubs.js";
 import { createRateLimiter, type RateLimitOptions } from "./rate-limit.js";
 import { createCors } from "./cors.js";
+import { createJobsRouter, type JobsReadDeps } from "./jobs/router.js";
+import { unavailableJobsReadDeps } from "./jobs/fixture-store.js";
 
 export interface ServerDeps {
   keyStore: ApiKeyStore;
@@ -42,6 +44,7 @@ export interface ServerDeps {
   whatsapp: WhatsAppRouteDeps;
   keys: KeysDeps;
   ingest: IngestDeps;
+  jobs?: JobsReadDeps;
   rateLimit?: RateLimitOptions;
   /** apps/web's real origin(s) in dev/prod (e.g. "http://localhost:5173") — no default, an
    * empty list means no cross-origin browser call succeeds, which is the safe default until a
@@ -69,6 +72,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createAskRouter(deps.ask));
   app.use(createCompeteRouter({ ...deps.ask, evalRuns: deps.evalRuns }));
   app.use(createBrainRouter(deps.brain));
+  app.use(createJobsRouter(deps.jobs ?? unavailableJobsReadDeps));
   app.use(createWatchedSourcesRouter(deps.watchedSources));
   app.use(createCitationsRouter(deps.citations));
   app.use(createSearchRouter(deps.search));

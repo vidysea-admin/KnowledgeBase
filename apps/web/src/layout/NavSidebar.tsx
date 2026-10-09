@@ -28,6 +28,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/meeting-bot", label: "Meeting Bot", icon: <MeetingBotIcon /> },
   { to: "/whatsapp", label: "WhatsApp", icon: <WhatsAppIcon /> },
   { to: "/settings", label: "Settings", icon: <SettingsIcon /> },
+  { to: "/jobs", label: "Provider jobs", icon: <DocsIcon /> },
 ];
 
 export function NavSidebar(): React.ReactElement {
