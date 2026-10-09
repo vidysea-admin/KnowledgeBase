@@ -1844,3 +1844,12 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Approved-by:** Umesh
 **Changes-authorized:** Machine-migration Git checkpoint/ref publication and portable documentation/evidence only; existing HANDOFF.md and TASKS.md notes, append-only decision history and selected data artifacts. Preserve all existing working source/QA changes without behavioral edits or acceptance-status upgrades. No architecture, contract or enforcement edits, source-submodule visibility change, secret/cookie publication, production writes, paid model calls or scheduler activation.
 **Links:** U2.2, U2.4, U3.1, T-051, T-052; D-115, D-116; HANDOFF.md; .handoffs/machine-migration-inventory-2026-10-09.json; .handoffs/machine-migration-public-audit.json; parent 614d78b8966428296f394b8bf3e6c547d41beca5.
+
+## D-118 | 2026-10-09 | type: decision | status: ACTIVE
+
+**Approved-by:** Umesh
+**What:** Add explicit, verified-account Calendar meeting attendance for umeshsugara@vidysea.com on the interim Windows server, preserving the default webinar-only mode.
+**Why:** Umesh directly requested: "tu tho git repo mai push krr dee live mai khud krr lungaa aur iske alawa kyuki ye current system bhi windows server mai run ho rha hai tho 24*7 run hoga hi tho jabtakk vha run nhi ho rha tho jo koi bhi meeting hogi umeshsugara@vidysea.com prr tho vhaa ki meeting attend krni hai and also like join them". This is an additive account-specific selection exception to D-056, not a replacement of its existing release and safety requirements.
+**Result:** Implementation and scoped Git publication authorized. Actual account credentials, real meeting attendance, playable media/processing and Windows continuous operation remain to be verified; code changes alone provide no live acceptance.
+**Changes-authorized:** Explicit account opt-in in the existing portable runner, a focused policy/source adapter reusing existing Calendar acquisition, a Windows launcher, affected tests and new unit QA evidence. Preserve default webinar behavior, source/account/tenant refusal, declined/cancelled/unsafe-link barriers, serialized capture, native source controls, poller lock and real live-proof/isolated work database gates. No registration forms or organizer messages, fabricated credentials or proof, frozen architecture/contracts/schema changes, enforcement-path edits, production database writes or unrelated working-tree changes.
+**Links:** D-056; T-051; qa/contracts/umesh-calendar-attendance.md; qa/manifests/umesh-calendar-attendance.md; user authorization in current chat.

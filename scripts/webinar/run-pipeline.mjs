@@ -105,6 +105,12 @@ export function createPipelineDeps(env = process.env) {
 export async function runPipelineTick(deps, run = false) {
   const {root, stateDir, env, now, log} = deps;
   const tenantId = env.LKB_TENANT_ID;
+  const attendance = deps.calendarAttendance;
+  if (attendance) {
+    attendance.assertOwner(tenantId);
+    await deps.validateTenant(); await attendance.verifyAccount();
+    if (run) await attendance.checkReady(deps, validateRunGate);
+  }
   if (run && (!tenantId || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(tenantId))) throw new Error('LKB_TENANT_ID must explicitly identify this capture lane owner');
   const work = run ? validateRunGate(root, env) : undefined;
   const statePath = join(stateDir, 'operations.json');
@@ -113,14 +119,17 @@ export async function runPipelineTick(deps, run = false) {
   let calendarEvents, candidates, preview;
   const reconsider = (row) => row?.status === 'action_required' &&
     ['needs-registration', 'needs-review', 'invalid-time', 'unsafe-join-link'].includes(row.reason);
-  const select = () => selectAutoRecordItems({calendarEvents, candidates, now: now(), leadMinutes: 5,
+  const select = () => (attendance ? attendance.select : selectAutoRecordItems)({calendarEvents,
+    candidates: attendance ? [...candidates, ...Object.values(state.source?.reconciliation?.occurrences ?? {}).filter(row => row.source === 'gmail').map(row => row.snapshot)] : candidates,
+    now: now(), leadMinutes: 5,
     trustedSenders: loadTrustedSenderConfig(env), alreadyScheduled: Object.entries(state.operations).filter(([, row]) =>
       ['ready', 'recording', 'processing', 'action_required'].includes(row.status) && !reconsider(row)).map(([id]) => id), everyWebinar: true});
   if (!run) {
     const loaded = await loadWebinarSourcesWithHealth(deps, now());
+    if (attendance) attendance.assertAcquisition(loaded);
     if (loaded.failed) throw new Error('Webinar discovery unavailable');
     ({calendarEvents, candidates} = loaded); preview = projectWebinarSelection(select(), run);
-    log(`Preview: ${preview.toRecord.length} due webinar(s), ${preview.skipped.length} skipped; no writes or captures`); return preview;
+    log(`Preview: ${preview.toRecord.length} due ${attendance ? 'meeting(s)' : 'webinar(s)'}, ${preview.skipped.length} skipped; no writes or captures`); return preview;
   }
   mkdirSync(stateDir, {recursive: true});
   const lock = join(stateDir, 'poller.lock');
@@ -181,7 +190,7 @@ export async function runPipelineTick(deps, run = false) {
       try {
         const prepared = await refresh();
         if (settled || !recording) break;
-        const reason = activeWebinarStopReason(id, originalEnd, prepared);
+        const reason = activeWebinarStopReason(id, originalEnd, prepared) ?? attendance?.activeStopReason(id, prepared);
         if (reason && control && !state.operations[id].stopDisposition) {
           update(id, {reason, stopDisposition: {tenantId, sessionId: id, generation: control.generation, reason, requestedAt: new Date(now()).toISOString()}});
           if (!settled && recording) {
@@ -207,6 +216,7 @@ export async function runPipelineTick(deps, run = false) {
     const previous = state.discovery;
     const checkedAt = new Date(now()).toISOString();
     const loaded = await loadWebinarSourcesWithHealth(deps, checkedAt, previous, true, {syncToken: state.source?.coverage.calendarSyncToken});
+    if (attendance) attendance.assertAcquisition(loaded);
     state.discovery = loaded.health; save();
     for (const feed of ['calendar', 'gmail']) {
       const row = state.discovery[feed];
@@ -216,9 +226,10 @@ export async function runPipelineTick(deps, run = false) {
     if (loaded.failed) throw Object.assign(new Error('Webinar discovery unavailable; coverage requires attention'), {code: 'WEBINAR_DISCOVERY_UNAVAILABLE'});
     await notifications.wait();
     try {
-      const prepared = await reconcileWebinarRegistrationState({state, tenantId, candidates: loaded.candidates, now,
+      const prepared = attendance ? prepareWebinarSourceState(state, loaded.calendarAcquisition, loaded.candidates, checkedAt) : await reconcileWebinarRegistrationState({state, tenantId, candidates: loaded.candidates, now,
         validate: validateWebinarRegistration, confirm: confirmWebinarRegistration, createUUID: randomUUID,
         value: loaded.calendarAcquisition, checkedAt, prepare: prepareWebinarSourceState, persist: value => writeWebinarOperationState(statePath, value)});
+      if (attendance) { Object.assign(state, prepared.state); save(); }
       ({calendarEvents, candidates} = prepared);
       return prepared;
     } catch {
@@ -228,7 +239,7 @@ export async function runPipelineTick(deps, run = false) {
   }
   try {
     const acquired = await refresh();
-    await runWebinarRegistrations({state, tenantId, candidates, acquisition: {...acquired, state: state.source.reconciliation}, now,
+    if (!attendance) await runWebinarRegistrations({state, tenantId, candidates, acquisition: {...acquired, state: state.source.reconciliation}, now,
       config: deps.registrationConfig, register: deps.registerWebinar, update,
       validate: validateWebinarRegistration, confirm: confirmWebinarRegistration, createUUID: randomUUID});
     let selection = select(); preview = projectWebinarSelection(selection, run);
@@ -319,6 +330,17 @@ if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.m
     if (existsSync(join(ROOT, '.env'))) process.loadEnvFile(join(ROOT, '.env'));
     const run = process.argv.includes('--run') && !process.argv.includes('--dry-run');
     const watch = process.argv.includes('--watch');
-    await runPipelineWatch({run, watch});
+    const accountFlags = process.argv.filter(value => value === '--calendar-attendance-account');
+    if (accountFlags.length > 1) throw new Error('Attendance account may be specified only once');
+    const accountIndex = process.argv.indexOf('--calendar-attendance-account');
+    if (accountIndex >= 0) {
+      const {configureCalendarAttendance} = await import('./calendar-attendance-source.mjs');
+      const deps = await configureCalendarAttendance(createPipelineDeps(), process.argv[accountIndex + 1]);
+      if (process.argv.includes('--check-ready')) { await deps.calendarAttendance.checkReady(deps, validateRunGate); console.log('Attendance readiness checks passed; no scheduling or work writes'); }
+      else await runPipelineWatch({run, watch}, {tick: () => runPipelineTick(deps, run)});
+    } else {
+      if (process.argv.includes('--check-ready')) throw new Error('--check-ready requires an explicit attendance account');
+      await runPipelineWatch({run, watch});
+    }
   } catch (error) { console.error(safeText(error.message)); process.exitCode = 1; }
 }
