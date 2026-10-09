@@ -40,9 +40,25 @@
     "remainingHumanGoldAndThresholdGates": "pending"
   },
   "reconciliation": "data/eval/extraction-reconciliation-reviewed.json contains seven independently reviewed exact-source replacement proposals; 65 unreviewed claims preserved",
-  "unitVerdict": "HOLD_BUILDING",
-  "unitHandshakeMayClose": false,
+  "unitVerdict": "PASS_BOUNDED_PROVENANCE_UNIT",
+  "unitHandshakeMayClose": true,
   "mandatoryAffectedStage": {
+    "status": "PASS composite unchanged-source evidence",
+    "tests": 55,
+    "pass": 55,
+    "fail": 0,
+    "skipped": 0,
+    "composite": true,
+    "reranAllCases": false,
+    "priorUnchangedPass": 54,
+    "freshlyRecheckedPreviouslyFailedPass": 1,
+    "originalCommand": "node --test scripts/lib/transcript-provenance.test.mjs scripts/webinar/session-rows.test.mjs scripts/watch/lib/ingest-chain.test.mjs scripts/lib/find-audio-file.test.mjs scripts/webinar/process-video.test.mjs",
+    "originalSourceCheckpoint": "d08d1ec",
+    "sourceHashesReverified": 9,
+    "mediaDependencyEffect": "Other process-video cases inject the command runner/Transport; only the one real-media case previously required installed FFmpeg."
+  },
+  "requiredGate": "AGENTS.md: The affected stage runs green on sample data; the immediate downstream stage consumes the output without error.",
+  "previousMandatoryAffectedStage": {
     "evidenceOwner": "maker terminal result recorded in qa/manifests/toc-transcript-provenance.md",
     "tests": 55,
     "pass": 54,
@@ -50,5 +66,20 @@
     "cause": "real FFmpeg fixture spawn ffmpeg ENOENT",
     "status": "incomplete environmental prerequisite"
   },
-  "requiredGate": "AGENTS.md: The affected stage runs green on sample data; the immediate downstream stage consumes the output without error."
+  "cycleChecked": 2,
+  "currentMediaPrerequisiteProof": {
+    "command": "node --test --test-name-pattern='real ffmpeg synthetic video' scripts/webinar/process-video.test.mjs",
+    "environment": "Per-command PATH task work/ffmpeg and installed Node24; no global PATH modification",
+    "ffmpegVersion": "9.0.2-essentials_build-www.gyan.dev",
+    "ffprobeVersion": "9.0.2-essentials_build-www.gyan.dev",
+    "exit": 0,
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "durationMs": 2985.3318,
+    "fixture": "Actual synthetic video and extracted timestamped playable frames; no provider/browser/database",
+    "rootAcceptedComposition": true
+  }
 }

@@ -14,6 +14,7 @@
 import type { Turns } from "@lkb/core";
 import type { CompleteResult, Job } from "@lkb/ai";
 import { parseJsonLoose } from "@lkb/ai";
+import { runtimeChronologicalTurns, runtimeWindows, runtimeComplete, runtimeRecord, runtimeArray, assertRuntimeCoverage, runtimeInventory, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin, runtimeDigest, runtimeJudge, type RuntimeEvidence, type RuntimeOrigin } from "./grounded.js";
 
 export type ClaimsCompleteFn = (job: Job) => Promise<CompleteResult>;
 
@@ -21,6 +22,9 @@ export interface ExtractedClaim {
   text: string;
   /** Real `turns._id` values, already verified to exist in the session's transcript. */
   evidenceTurnIds: string[];
+  evidence?: RuntimeEvidence[];
+  origin?: RuntimeOrigin;
+  verification?: "unverified";
 }
 
 const CLAIMS_SYSTEM_PROMPT = [
@@ -64,7 +68,11 @@ export interface ClaimsResult {
   degraded: { reason: string } | null;
 }
 
-export async function extractClaims(turns: Turns[], complete: ClaimsCompleteFn): Promise<ClaimsResult> {
+export async function extractClaims(turns: Turns[], complete: ClaimsCompleteFn, options: { strictWebinar?: boolean } = {}): Promise<ClaimsResult> {
+  if (options.strictWebinar) {
+    try { return { claims: await strictRuntimeClaims(turns, complete), degraded: null }; }
+    catch (error) { return { claims: [], degraded: { reason: `strict grounded claims incomplete: ${error instanceof Error ? error.message : String(error)}` } }; }
+  }
   if (turns.length === 0) return { claims: [], degraded: null };
 
   const validTurnIds = new Set(turns.map((t) => t._id));
@@ -99,4 +107,24 @@ export async function extractClaims(turns: Turns[], complete: ClaimsCompleteFn):
     claims.push({ text, evidenceTurnIds });
   }
   return { claims, degraded: null };
+}
+
+async function strictRuntimeClaims(turns: Turns[], complete: ClaimsCompleteFn): Promise<ExtractedClaim[]> {
+  turns = runtimeChronologicalTurns(turns);
+  const result = new Map<string, ExtractedClaim>();
+  for (const spans of runtimeWindows(turns)) {
+    const raw = runtimeRecord(await runtimeComplete(complete, "claims",
+      'Read ALL supplied source spans; return {processed:exact inventory,claims:[{text,origin:speaker-statement|screen-ocr|visual-observation,verification:"unverified",evidence:[{turnId,sessionId,quote}]}]}. Extract atomic factual source statements only. Text equals literal evidence quotes joined by newline, and every quote lies entirely inside a submitted span. Preserve unverified screen origin. Return claims:[] only if no factual claim exists; no made-up facts or speaker identities.',
+      { phase: "extract-claims", spans, inventory: runtimeInventory(spans) }));
+    assertRuntimeCoverage(raw.processed, spans);
+    const proposed = runtimeArray(raw.claims).map((entry) => {
+      const c = runtimeRecord(entry), evidence = runtimeEvidence(c.evidence, turns, spans), origin = runtimeEvidenceOrigin(evidence, turns);
+      if (c.origin !== origin || c.verification !== "unverified") throw new Error("claim source origin mismatch");
+      return { id: runtimeDigest(["claim", evidence]), text: runtimeExtractive(c.text, evidence), origin, verification: "unverified" as const, evidence };
+    });
+    if (new Set(proposed.map((c) => c.id)).size !== proposed.length) throw new Error("duplicate proposed claim");
+    await runtimeJudge(complete, "claims", turns, spans, proposed);
+    for (const c of proposed) result.set(c.id, { text: c.text, evidenceTurnIds: c.evidence.map((e) => e.turnId), evidence: c.evidence, origin: c.origin, verification: c.verification });
+  }
+  return [...result.values()];
 }

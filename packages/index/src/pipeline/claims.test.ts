@@ -288,3 +288,32 @@ test("offline CLI loads reviewed fact labels and rejects drift without exposing 
     const drift = run(); assert.equal(drift.status, 2); assert.equal(JSON.parse(drift.stdout).failures[0].reason, "fact-label-invalid");
   } finally {rmSync(dir, {recursive: true, force: true});}
 });
+
+test("strict claims require literal submitted quotes and separate complete support judgments", async () => {
+  for (const fault of ["none", "wrong-valid", "missing-coverage", "unsupported", "duplicate-verdict", "unknown-verdict", "malformed-entry", "empty-gap"]) {
+    const turns = [turn("c1", "spk:0", "A factual statement."), turn("c2", "spk:1", "Different source.")];
+    const complete: ClaimsCompleteFn = async (job) => {
+      const p = JSON.parse(job.messages[1]!.content);
+      if (p.phase === "extract-claims") {
+        const s = p.spans[0]; const claim = { text: s.text, origin: s.origin, verification: "unverified", evidence: [{ turnId: fault === "wrong-valid" ? "c2" : s.turnId, sessionId: s.sessionId, quote: s.text }] };
+        return completion("", { processed: fault === "missing-coverage" ? [] : p.inventory, claims: fault === "empty-gap" ? [] : fault === "malformed-entry" ? [null] : [claim] });
+      }
+      assert.equal(p.mode, "claim-extraction"); assert.match(job.messages[0]!.content, /fact-free source/);
+      const verdicts = p.items.map((i: { id: string }) => ({ id: fault === "unknown-verdict" ? "unknown" : i.id, supported: fault !== "unsupported", categoryCorrect: true, answerRelevant: true }));
+      if (fault === "duplicate-verdict") verdicts.push(verdicts[0]);
+      return completion("", { processed: p.inventory, complete: true, noContent: false, verdicts });
+    };
+    const result = await extractClaims(turns, complete, { strictWebinar: true });
+    if (fault === "none") { assert.equal(result.degraded, null); assert.equal(result.claims[0]!.evidence![0]!.quote, turns[0]!.text); assert.equal(result.claims[0]!.verification, "unverified"); }
+    else { assert.ok(result.degraded, fault); assert.deepEqual(result.claims, [], fault); }
+  }
+});
+test("strict no-claim result is distinct only after explicit full semantic no-content review", async () => {
+  const complete: ClaimsCompleteFn = async (job) => {
+    const p = JSON.parse(job.messages[1]!.content);
+    if (p.phase === "judge") { assert.equal(p.mode, "claim-extraction"); assert.match(job.messages[0]!.content, /fact-free source/); }
+    return completion("", p.phase === "extract-claims" ? { processed: p.inventory, claims: [] } : { processed: p.inventory, complete: true, noClaims: true, verdicts: [] });
+  };
+  const result = await extractClaims([turn("empty", "spk:0", "Good morning.")], complete, { strictWebinar: true });
+  assert.equal(result.degraded, null); assert.deepEqual(result.claims, []);
+});

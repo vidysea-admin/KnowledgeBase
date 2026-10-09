@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import type { Db } from "mongodb";
 import { getDb, scopedCollection } from "@lkb/db";
 import type { SessionPages, Chunks, Claims, Sessions, TreeIndexRootDocument, Turns } from "@lkb/core";
-import { summarizeSession, extractClaims, buildChunks, buildTree, regenerate, treeIndexRootFilter, type SummarizeCompleteFn } from "@lkb/index";
+import { summarizeSession, extractClaims, buildChunks, buildTree, regenerate, treeIndexRootFilter, type SummarizeCompleteFn, runtimeChronologicalTurns, assertGroundedTurns, validateRuntimePage, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin } from "@lkb/index";
 import { recordVectorGap } from "./vector-gap.js";
 import { promoteAndPersistEntities, type PromotionResult } from "./promote-entities.js";
 import type { IndexEmbedFn, ChunkWriteResult, IndexSessionResult } from "./types.js";
@@ -114,15 +114,21 @@ export async function indexSession(
   const sessionPagesColl = scopedCollection<SessionPages>(db as never, "session_pages");
   const claimsColl = scopedCollection<Claims>(db as never, "claims");
 
-  const turns = await turnsColl(tenantId).find({ sessionId }).toArray();
+  let turns = await turnsColl(tenantId).find({ sessionId }).toArray();
 
+  const strict = deps.strictWebinar === true;
+  if (strict) {
+    try { assertGroundedTurns(turns, tenantId, sessionId); turns = runtimeChronologicalTurns(turns); }
+    catch (error) { await sessionsColl(tenantId).updateOne({ _id: sessionId }, { $set: { "status.index": "failed" } }); throw new Error(`strict webinar index incomplete: ${error instanceof Error ? error.message : String(error)}`); }
+  }
   const [summarizeResult, claimsResult] = await Promise.all([
-    summarizeSession(turns, deps.complete),
-    extractClaims(turns, deps.complete),
+    summarizeSession(turns, deps.complete, { strictWebinar: strict }),
+    extractClaims(turns, deps.complete, { strictWebinar: strict }),
   ]);
   const { page: summary, degraded: summaryDegraded } = summarizeResult;
   const { claims: extractedClaims, degraded: claimsDegraded } = claimsResult;
-  const strict = deps.strictWebinar === true;
+  let preparedTree: ReturnType<typeof regenerate> | undefined;
+  let candidatePage: SessionPages | undefined;
   let preparedEmbed: Awaited<ReturnType<IndexEmbedFn>> | undefined;
   if (strict) {
     let reason = !turns.length ? "empty required transcript" : summaryDegraded?.reason ?? claimsDegraded?.reason;
@@ -134,10 +140,27 @@ export async function indexSession(
         if (prepared.skipped || !prepared.written) reason = `required chunks incomplete: ${prepared.skipped}`;
       } catch (error) { reason = `required embedding failed: ${error instanceof Error ? error.message : String(error)}`; }
     }
-    // Schema-gated grounded extraction must be installed before strict completion is possible.
-    const grounded = summary as unknown as Record<string, unknown>;
-    if (!reason && (!Array.isArray(grounded.citedItems) || !Array.isArray(grounded.qa) || !Array.isArray(grounded.coveredTurnIds) ||
-      turns.some((turn) => !(grounded.coveredTurnIds as unknown[]).includes(turn._id)))) reason = "required grounded extraction/coverage unavailable";
+    if (!reason) {
+      try {
+        Object.assign(summary, validateRuntimePage(turns, summary));
+        for (const claim of extractedClaims) {
+          const evidence = runtimeEvidence(claim.evidence, turns);
+          runtimeExtractive(claim.text, evidence);
+          if (claim.origin !== runtimeEvidenceOrigin(evidence, turns) || claim.verification !== "unverified" || JSON.stringify(claim.evidenceTurnIds) !== JSON.stringify(evidence.map((e) => e.turnId))) throw new Error("invalid grounded claim persistence");
+          claim.evidence = evidence;
+        }
+        const preparedPage: SessionPages = { _id: randomUUID(), tenantId, sessionId, ...summary,
+          evidence: toEvidenceTuple([...summary.citedItems!.flatMap((i) => i.evidence), ...summary.qa!.flatMap((q) => [...q.questionEvidence, ...q.answerEvidence])].map((e) => ({ ...e }))) };
+        candidatePage = preparedPage;
+        const [sessions, pages, root] = await Promise.all([sessionsColl(tenantId).find({}).toArray(), sessionPagesColl(tenantId).find({}).toArray(), loadTreeRoot(tenantId, db)]);
+        if (!sessions.some((s) => s._id === sessionId && s.tenantId === tenantId)) throw new Error("required tree session unavailable");
+        const prospective = [...pages.filter((p) => p.sessionId !== sessionId), preparedPage];
+        preparedTree = root ? regenerate(root, [sessionId], sessions, prospective) : buildTree(sessions, prospective)[tenantId];
+        const containsCandidate = (node: NonNullable<typeof preparedTree>): boolean =>
+          (node.level === "session" && node.evidence?.sessionRef === sessionId && node.summary === candidatePage!.summary) || node.children.some(containsCandidate);
+        if (!preparedTree || preparedTree.node_id !== `tenant:${tenantId}` || !containsCandidate(preparedTree)) throw new Error("required candidate session tree unavailable");
+      } catch (error) { reason = `grounded preflight failed: ${error instanceof Error ? error.message : String(error)}`; }
+    }
     if (reason) {
       await sessionsColl(tenantId).updateOne({ _id: sessionId }, { $set: { "status.index": "failed" } });
       throw new Error(`strict webinar index incomplete: ${reason}`);
@@ -163,7 +186,7 @@ export async function indexSession(
   } else {
     await sessionPagesColl(tenantId).deleteMany({ sessionId });
     if (turns.length > 0) {
-      const page: SessionPages = {
+      const page: SessionPages = candidatePage ?? {
         _id: randomUUID(),
         tenantId,
         sessionId,
@@ -196,7 +219,8 @@ export async function indexSession(
       // human (or a future review pipeline) confirms it, same "needs-review" status T-002's
       // pre-written claims already used for anything not hand-verified.
       status: "needs-review",
-      evidence: toEvidenceTuple(c.evidenceTurnIds.map((turnId) => ({ turnId, sessionId }))),
+      evidence: toEvidenceTuple(c.evidence ?? c.evidenceTurnIds.map((turnId) => ({ turnId, sessionId }))),
+      ...(strict ? { origin: c.origin, verification: c.verification } : {}),
     }));
     await claimsColl(tenantId).insertMany(claimDocs);
   }
@@ -218,9 +242,9 @@ export async function indexSession(
     sessionPagesColl(tenantId).find({}).toArray() as Promise<SessionPages[]>,
     loadTreeRoot(tenantId, db),
   ]);
-  const newRoot = existingRoot
+  const newRoot = preparedTree ?? (existingRoot
     ? regenerate(existingRoot, [sessionId], allSessions, allPages)
-    : buildTree(allSessions, allPages)[tenantId];
+    : buildTree(allSessions, allPages)[tenantId]);
   if (strict && !newRoot) throw new Error("strict webinar index incomplete: required tree unavailable");
   if (newRoot) {
     // Stamp/confirm the real tenantId regardless of which branch produced newRoot -- buildTree's

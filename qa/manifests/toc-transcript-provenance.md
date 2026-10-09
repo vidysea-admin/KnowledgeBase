@@ -1,8 +1,8 @@
 # TOC transcript provenance
 
-**Handshake status:** BUILDING
-Status: BUILDING
-Fix cycle: 1
+**Handshake status:** checked-PASS
+Status: checked-PASS
+Fix cycle: 2
 Task: U2.2 / TOC citation integrity; security/data-write safety class
 Priority: tier 2 newly evidenced stale-citation integrity, following tier3 U2.2 continuation.
 Authorization: user requested goal understood/build on Desktop; root precisely authorized source paths and strict-loader integration; independent checker reviewed plan. No human gold/threshold decision implied.
@@ -28,3 +28,12 @@ No live Mongo concurrency/transaction or full historical72claim correctness clai
 
 ## Checkpoint disposition
 Independent checker27/27 focused checks pass and both identified source blockers are repaired. Required affected-stage gate remains54/55: real FFmpeg fixture fails ENOENT; unit is HOLD/BUILDING, not done. Current storage cannot safely provision FFmpeg/FFprobe. contracts/verify_contracts.py fresh exit0 is explicitly vacuous. No production/whole-corpus acceptance follows.
+
+## Fix cycle 2: previously missing media prerequisite
+2026-10-09: source checkpoint d08d1ec unchanged; verified local FFmpeg and FFprobe9.0.2 now available. Root accepts composite unchanged-stage evidence; this is not a claim that all55 cases were rerun.
+Original affected union command: node --test scripts/lib/transcript-provenance.test.mjs scripts/webinar/session-rows.test.mjs scripts/watch/lib/ingest-chain.test.mjs scripts/lib/find-audio-file.test.mjs scripts/webinar/process-video.test.mjs. Original result54/55, only real FFmpeg fixture failed ENOENT.
+Fresh maker command: node --test --test-name-pattern='real ffmpeg synthetic video' scripts/webinar/process-video.test.mjs; PATH prepends task work/ffmpeg and installed Node24 directory. Exit0,1/1 PASS, zero skipped/cancelled,4651.3257ms. Default sandbox spawn EPERM was replaced with authorized local-process execution; actual test ran.
+Independent checker exact same command: exit0,1/1 PASS, zero skipped/cancelled,2985.3318ms. Checker reverified all9 original source SHA256 hashes unchanged. Composite affected-stage result55/55 uses54 prior unchanged passes plus the formerly failed case, independently rerun. No live/provider/DB/corpus or full product acceptance implied.
+Request fresh independent same-slug Cycle checked2 verdict. Prior HOLD evidence remains historical; full U2.2 and live product gates remain BUILDING.
+
+Cycle2 closeout: independent same-slug verdict Cyclechecked2 scoped PASS; source hashes unchanged and composite affected-stage55/55 explicitly recorded. Full U2.2 and product remain BUILDING.

@@ -15,6 +15,8 @@
 import type { Turns } from "@lkb/core";
 import type { CompleteResult, Job } from "@lkb/ai";
 import { parseJsonLoose } from "@lkb/ai";
+import { produceRuntimeSummary } from "./grounded-summary.js";
+import type { RuntimeItem, RuntimeQA } from "./grounded.js";
 
 export type SummarizeCompleteFn = (job: Job) => Promise<CompleteResult>;
 
@@ -23,6 +25,10 @@ export interface SessionSummaryResult {
   keyInsights: string[];
   decisions: string[];
   actionItems: string[];
+  /** Validated source-local extras; canonical evidence schemas are not rolled out. */
+  citedItems?: RuntimeItem[];
+  qa?: RuntimeQA[];
+  coveredTurnIds?: string[];
 }
 
 /**
@@ -78,7 +84,11 @@ const FALLBACK_SLICE_LENGTH = 500;
  * `complete()` call or an unparseable response degrades to a clearly-labeled fallback (the raw
  * transcript's first slice) rather than blocking the ingest pipeline, and reports `degraded` so
  * the caller can decline to let that fallback overwrite a real prior summary (ISS-059). */
-export async function summarizeSession(turns: Turns[], complete: SummarizeCompleteFn): Promise<SummarizeResult> {
+export async function summarizeSession(turns: Turns[], complete: SummarizeCompleteFn, options: { strictWebinar?: boolean } = {}): Promise<SummarizeResult> {
+  if (options.strictWebinar) {
+    try { return { page: await produceRuntimeSummary(turns, complete), degraded: null }; }
+    catch (error) { return { page: fallbackPage(buildTranscript(turns)), degraded: { reason: `strict grounded summary incomplete: ${error instanceof Error ? error.message : String(error)}` } }; }
+  }
   if (turns.length === 0) {
     return {
       page: { summary: "(no content to summarize)", keyInsights: [], decisions: [], actionItems: [] },

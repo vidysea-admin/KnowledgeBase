@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "date": "2026-10-09",
+  "reviewer": "independent checker agent",
+  "unit": "strict-webinar-runtime-extraction",
+  "cycleChecked": 1,
+  "verdict": "PASS_BOUNDED_RUNTIME_UNIT",
+  "checkedFinalSourceSha256": {
+    "packages/index/src/pipeline/grounded.ts": "96a3a13c1fe2d908102c086d924007a94b16cd84db94449030c7018c929f1234",
+    "packages/index/src/pipeline/grounded-summary.ts": "e4b6f87189e2f868715c9cdf4b619e29f1bd0dea6ed77587f4d541b4a2a4c3e3",
+    "packages/index/src/pipeline/summarize.ts": "980f57ebc83fd7c8b2f7772020f327532808bf87a90778d45b8cc389eb7a04e7",
+    "packages/index/src/pipeline/claims.ts": "df5da3f22ae06b2f9560fd15bfbf5f89b472306f058ec6fbf249d763e9692f8c",
+    "packages/index/src/index.ts": "cf2c375fa26bf56399d2ab48eb15120dd914cee95db19d10a407ad9064d11399",
+    "apps/api/src/indexing/session.ts": "d872f6dc34fceca540b198ccaf651d29ce91c5e3bf6f3ad87b5046003b3e9fc1",
+    "packages/index/src/pipeline/summarize.test.ts": "731601536eab227ad807b50f1821e622536a22b1b62b59be14d83799a4107c6f",
+    "packages/index/src/pipeline/claims.test.ts": "7e8abd4640493dbaddac6ed34faf4ca41a3127147014377e36b4583d143150ad",
+    "apps/api/src/indexing/session.test.ts": "d39d63ba752348c8a5f9cf3015b344c2702084b6dde5ff188a72af506017dee8"
+  },
+  "independentStrictStage": {
+    "command": "node --test --import tsx --test-name-pattern='strict' packages/index/src/pipeline/summarize.test.ts packages/index/src/pipeline/claims.test.ts apps/api/src/indexing/session.test.ts",
+    "exit": 0,
+    "tests": 11,
+    "pass": 11,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "durationMs": 3625.5633,
+    "finalScreenDelta": "Only runtimeOrigin screen identity/file guard tightened after this run; unchanged speech/other behavior remains covered"
+  },
+  "finalScreenGuard": {
+    "command": "node --test --import tsx --test-name-pattern='strict OCR origin' packages/index/src/pipeline/summarize.test.ts",
+    "exit": 0,
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "durationMs": 1385.6983,
+    "cases": "Empty/whitespace frameId/file/control-file refuse; positive OCR/visual and oversized context refusal retained"
+  },
+  "independentAction": {
+    "command": "node --import tsx C:/Users/product/Documents/Codex/2026-10-09/what-is-the-current-update-and/work/check-strict-action.mjs",
+    "exit": 0,
+    "scope": "Explicitly assigned synthetic action retains exact quote and distinct semantic judge",
+    "databaseCalls": 0,
+    "providerCalls": 0
+  },
+  "independentMongo": {
+    "command": "node --import tsx C:/Users/product/Documents/Codex/2026-10-09/what-is-the-current-update-and/work/check-strict-mongo.mjs",
+    "exit": 0,
+    "database": "lkb_work_20261009_01a11f9c_checker_strict_v1",
+    "server": "loopback127.0.0.1:27019",
+    "verifiedAbsentBeforeCreation": true,
+    "ownershipMarkerVerifiedBeforeDrop": true,
+    "verifiedAbsentAfterCleanup": true,
+    "mainWorkDatabaseTouched": false,
+    "realProviderCalls": 0,
+    "fixture": "Synthetic3speechturns inserted in shuffled order; offline completions/vectors; real indexSession/productionMongo accessors",
+    "preserved": {
+      "citedItems": 2,
+      "qa": 1,
+      "questionQuotes": 1,
+      "answerQuotes": 1,
+      "coveredTurns": 3,
+      "claims": 1,
+      "quotedClaimEvidence": 1,
+      "decision": 1,
+      "chunks": 1,
+      "candidateSessionTree": true,
+      "chronologicalCoverage": true,
+      "foreignTenantDetailInvisible": true,
+      "foreignTenantCitationInvisible": true
+    },
+    "sourceHashDuringMongo": {
+      "packages/index/src/pipeline/grounded.ts": "546a8f5ce57d21aab496da451cb4a657ff435388d7e880c70744b291ce68877f",
+      "packages/index/src/pipeline/grounded-summary.ts": "e4b6f87189e2f868715c9cdf4b619e29f1bd0dea6ed77587f4d541b4a2a4c3e3",
+      "packages/index/src/pipeline/summarize.ts": "980f57ebc83fd7c8b2f7772020f327532808bf87a90778d45b8cc389eb7a04e7",
+      "packages/index/src/pipeline/claims.ts": "df5da3f22ae06b2f9560fd15bfbf5f89b472306f058ec6fbf249d763e9692f8c",
+      "packages/index/src/index.ts": "cf2c375fa26bf56399d2ab48eb15120dd914cee95db19d10a407ad9064d11399",
+      "apps/api/src/indexing/session.ts": "d872f6dc34fceca540b198ccaf651d29ce91c5e3bf6f3ad87b5046003b3e9fc1"
+    },
+    "sourceUnchangedDuringProbe": true,
+    "finalPostProbeChange": "grounded.ts screen-only identity guard; speech branch/caller/persistence and remaining five production sources unchanged. No unneeded DB repeat."
+  },
+  "makerFinalStage": {
+    "tests": 62,
+    "pass": 62,
+    "fail": 0,
+    "skipped": 0,
+    "durationMs": 10684.7861
+  },
+  "makerDownstream": {
+    "tests": 35,
+    "pass": 35,
+    "fail": 0,
+    "skipped": 0,
+    "durationMs": 15600.8336,
+    "finalScreenDeltaDoesNotAffectReadTreeAndProductionPaths": true
+  },
+  "makerTypechecks": {
+    "apiExit": 0,
+    "indexExit": 0
+  },
+  "diffCheckExit": 0,
+  "protectedSchemaGeneratedContractArchitectureEnforcementDrift": false,
+  "acceptedScope": "Runtime opt-in extraction/evidence validation, full submitted span coverage, typed local source binding, independent completion judge protocol, prospective real session tree, preflight preservation, evidence persistence/accessor structural proof",
+  "limits": {
+    "syntheticOfflineEvidenceOnly": true,
+    "humanSemanticGoldConfirmed": false,
+    "realModelPrecisionOrCostAccepted": false,
+    "canonicalSchemaRolloutAccepted": false,
+    "crossCollectionTransactionAccepted": false,
+    "realFrameBytesVerifiedByThisUnit": false,
+    "realCorpusRepaired": false,
+    "U22Complete": false,
+    "productReleaseAccepted": false
+  }
+}
