@@ -55,8 +55,10 @@ test("actual login/tab/OBS spawn interfaces preserve parent and carry identical 
     process.env.LKB_BROWSER_PROFILE_DIRECTORY="Profile 1";
     const {runLogin}=await import("./record-commands.js");
     await runLogin([]);
-    assert.ok(calls[0].args.includes("--no-click"));
-    assert.equal(calls[0].args[1],"https://accounts.google.com");
+    const loginCall = calls[0];
+    assert.ok(loginCall, "login must invoke the captured spawn interface");
+    assert.ok(loginCall.args.includes("--no-click"));
+    assert.equal(loginCall.args[1],"https://accounts.google.com");
     login=false;
     const cfg={python:"fixture-python",joinScript:path.resolve("packages/meeting-bot/py/sb_join.py"),
       profileDir:parent,profileDirectory:"Profile 1",recordDir:records,browserExecutable:"cft",autoClick:false};

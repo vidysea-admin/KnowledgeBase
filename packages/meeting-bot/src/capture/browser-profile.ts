@@ -21,8 +21,9 @@ export function browserProfileArgs(parent: string, selected?: string): string[] 
 export function selectedBrowserProfile(rest: string[], parent: string, env: NodeJS.ProcessEnv = process.env): string | undefined {
   const indices = rest.flatMap((arg, index) => arg === "--profile-directory" ? [index] : []);
   if (indices.length > 1) throw new Error("duplicate --profile-directory");
-  const selected = indices.length ? rest[indices[0] + 1] : env.LKB_BROWSER_PROFILE_DIRECTORY;
-  if (indices.length && (selected === undefined || selected.startsWith("--"))) throw new Error("--profile-directory requires a value");
+  const index = indices[0];
+  const selected = index === undefined ? env.LKB_BROWSER_PROFILE_DIRECTORY : rest[index + 1];
+  if (index !== undefined && (selected === undefined || selected.startsWith("--"))) throw new Error("--profile-directory requires a value");
   browserProfileArgs(parent, selected);
   return selected;
 }

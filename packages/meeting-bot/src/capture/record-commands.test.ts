@@ -63,14 +63,20 @@ test("shouldAutoClick forwards Meet join permission and preserves --no-click in 
           if (event.event === "opened") received = (event as unknown as {argv: string[]}).argv;
         }});
       const url = platform === "meet" ? "https://meet.google.com/abc-defg-hij" : "https://example.webex.com/fixture";
-      await assert.rejects(tab.deps.launch(url), /fixture stopped before browser/);
+      await assert.rejects(tab.deps.launch(url, {tenantId: "fixture", consentNote: "fixture capture only"}), /fixture stopped before browser/);
       assert.ok(received, "inspect the actual child argv, without launching Chrome");
       assert.equal(received[0], url);
       assert.equal(received.includes("--no-click"), !autoClick);
       assert.equal(received[received.indexOf("--profile") + 1], profile);
       assert.equal(existsSync(join(profile, ".lkb-tab-capture.lock")), false);
-      assert.equal(existsSync(received[received.indexOf("--capture-extension") + 1]), false);
-      const output = tab.outputPath(received[received.indexOf("--title") + 1].slice("LKB-BOT ".length));
+      const extensionIndex = received.indexOf("--capture-extension"), titleIndex = received.indexOf("--title");
+      assert.ok(extensionIndex >= 0 && titleIndex >= 0, "launcher must provide extension and title flags");
+      const extension = received[extensionIndex + 1], title = received[titleIndex + 1];
+      assert.ok(extension, "launcher must provide a capture-extension path");
+      assert.ok(title, "launcher must provide a title value");
+      assert.ok(title.startsWith("LKB-BOT "), "launcher title must identify the fixture capture");
+      assert.equal(existsSync(extension), false);
+      const output = tab.outputPath(title.slice("LKB-BOT ".length));
       assert.ok(output && existsSync(output), "startup failure remains a registered capture attempt");
       assert.equal(JSON.parse(readFileSync(`${output}.status.json`, "utf8")).state, "failed");
     }
