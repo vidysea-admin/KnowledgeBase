@@ -8,6 +8,23 @@ import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeMeetingCandidatesDeps } from "../fixtures.js";
 import { createMeetingCandidatesDeps } from "../store.js";
 
+test("production factory preserves registration acquisition evidence without inventing absent fields", async () => {
+  const writes: {tenant: string; doc: Record<string, unknown>}[] = [];
+  const deps = createMeetingCandidatesDeps("tenant-1", async () => [
+    {messageId: "mail1", subject: "Webinar", senderEmail: "host@example.org", senderDomain: "example.org",
+      registrationUrl: "https://example.org/register", threadId: "thread_1", registrationOnly: true},
+    {messageId: "mail2", subject: "Webinar", senderEmail: "host@example.org", senderDomain: "example.org"},
+  ], () => "fixture-work", {getTrustedSender: async () => null, createMeetingCandidateIfNew: async (tenant, doc) => {
+    writes.push({tenant, doc}); return true;
+  }});
+  await assert.rejects(deps.scanGmail("foreign"), /owner/); assert.equal(writes.length, 0);
+  assert.deepEqual(await deps.scanGmail("tenant-1"), {created: 2, autoApproved: 0});
+  assert.equal(writes[0]?.tenant, "tenant-1"); assert.equal(writes[0]?.doc.threadId, "thread_1");
+  assert.equal(writes[0]?.doc.registrationUrl, "https://example.org/register");
+  assert.equal(writes[0]?.doc.registrationOnly, true); assert.equal(writes[0]?.doc.status, "pending");
+  assert.equal(Object.hasOwn(writes[1]!.doc, "threadId"), false); assert.equal(Object.hasOwn(writes[1]!.doc, "registrationUrl"), false);
+});
+
 test("POST /gmail/scan with the gmail scope returns a real scan summary", async () => {
   const server = await startTestServer(
     buildTestDeps({

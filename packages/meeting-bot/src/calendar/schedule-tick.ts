@@ -1,31 +1,4 @@
-/**
- * packages/meeting-bot/src/calendar/schedule-tick.ts — U5 (u5-auto-record-scheduler), backs
- * `cli schedule-tick [--dry-run]`. Loads calendar events + meeting candidates, runs them through
- * `selectAutoRecordItems` (auto-join.ts), and in non-dry-run mode hands each to-schedule item to
- * `scripts/webinar/start-record-detached.ps1` through a one-off Windows Scheduled Task
- * (task-scheduler.ts), recording what it scheduled in `schedule-state.ts`'s dedup state.
- *
- * Candidate loading over HTTP, not `@lkb/db` (dependency-cruiser: `meeting-bot -> ingest, core`
- * only, ARCHITECTURE.md §5 — same reason `cli.ts`'s `defaultTranscribe` hits the whisper worker's
- * wire shape over `fetch` instead of importing `@lkb/ai`). New env keys, documented rather than
- * silently invented (no existing generic-CLI API-key env var was found — see the manifest):
- * `LKB_API_URL` (default `http://localhost:3300`), `LKB_API_KEY` (required for a real, non-empty
- * candidate list — a missing key degrades to "0 candidates" rather than throwing, matching this
- * codebase's "never crash a poller tick" convention, e.g. `gws-gmail.ts`/`gws-calendar.ts`).
- *
- * Calendar events: always `[]` today — `qa/contracts/calendar-auto-join.md`'s own disclosed
- * non-goal is "no live wiring into a scheduled job… blocked on missing [Google OAuth]
- * credentials," which still holds. `loadCalendarEvents` is the seam a real `CalendarClient`
- * plugs into once those credentials exist; nothing here needs to change to wire it up then.
- *
- * Fix cycle 2 (checker FAIL, 2026-09-27): the real-schedule loop below no longer builds the
- * Windows Scheduled Task's `/tr` from title/url/sessionId (ISS-317 — command injection). It
- * derives a validated `jobKey` from the item's `sessionKey`, persists the sensitive fields to a
- * per-job JSON file (`schedule-state.ts`'s `writeScheduledJob`), and passes only `jobKey` +
- * the fixed launcher path to `task-scheduler.ts`'s `scheduleOnce`. It also now writes the item's
- * FULL ISO `endTime` into that job file rather than a bare local `HH:mm` (ISS-319 — a session
- * crossing midnight used to get a stop time ~24h in the past).
- */
+/** Scheduling and HTTP acquisition with explicit ownership and persistent job identity. */
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -57,6 +30,9 @@ interface MeetingCandidateApiRow {
   endTime?: string;
   kind?: "past-recording" | "upcoming";
   registrationOnly?: boolean;
+  registrationUrl?: string;
+  messageId?: string;
+  threadId?: string;
 }
 
 export interface ScheduleTickDeps {
@@ -82,6 +58,9 @@ function toCandidateInput(row: MeetingCandidateApiRow): AutoRecordCandidateInput
     endTime: row.endTime,
     kind: row.kind,
     registrationOnly: row.registrationOnly,
+    registrationUrl: row.registrationUrl,
+    messageId: row.messageId,
+    threadId: row.threadId,
   };
 }
 

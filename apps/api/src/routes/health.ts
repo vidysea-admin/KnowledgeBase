@@ -22,6 +22,8 @@ export interface HealthReport {
    * which goes to an operator over a private channel, carries those). Absent when no
    * `WatchSilenceDeps` is wired. */
   watchSilent?: number;
+  /** Failed tenant-scoped heartbeat reads; unknown liveness is not proof of health. */
+  watchUnreadable?: number;
 }
 
 /** One `watch_heartbeat` row, as the detector needs to see it. Structural on purpose: it matches
@@ -125,22 +127,23 @@ export function heartbeatStatuses(
 
 /**
  * Checks every configured tenant's heartbeats and alerts once per silent (tenant, sourceType).
- * Returns the count for the response body. A row that is missing entirely is synthesised as
+ * Returns aggregate silent watchers and unreadable tenant counts. A missing row is synthesised as
  * `lastHeartbeatAt: null`, which `isHeartbeatStale` treats as maximally stale — "this watcher has
  * never proven it is alive" is the loudest version of R2's failure, not an exemption from it.
- * Never throws: a detector that can 503 the health probe by failing would take down the signal it
- * exists to provide.
+ * Failed tenant reads are reported as unknown liveness without fabricating silence alerts.
  */
-export async function detectSilentWatchers(deps: WatchSilenceDeps): Promise<number> {
+export async function detectSilentWatchers(deps: WatchSilenceDeps): Promise<{silent: number; unreadable: number}> {
   const now = deps.now ? deps.now() : new Date();
   const expected = deps.expectedSourceTypes ?? EXPECTED_WATCH_SOURCE_TYPES;
   let silent = 0;
+  let unreadable = 0;
   for (const tenantId of deps.tenantIds) {
     let rows: HeartbeatRow[];
     try {
       rows = await deps.listHeartbeats(tenantId);
     } catch {
-      continue; // an unreadable heartbeat collection is a db problem, already reported by `db`.
+      unreadable += 1;
+      continue;
     }
     for (const status of heartbeatStatuses(tenantId, rows, now, deps.intervalMs, expected).filter((s) => s.stale)) {
       silent += 1;
@@ -152,7 +155,7 @@ export async function detectSilentWatchers(deps: WatchSilenceDeps): Promise<numb
       }
     }
   }
-  return silent;
+  return {silent, unreadable};
 }
 
 export function createHealthRouter(deps: HealthDeps): Router {
@@ -164,13 +167,14 @@ export function createHealthRouter(deps: HealthDeps): Router {
     // silent for the one reason that is already reported by `db: "error"`, alerting on the wrong bug.
     // Spread rather than assign: `checkHealth` may hand back a shared/cached object (fixtures.ts
     // does), and mutating it would leak this probe's count into the next one.
-    const body: HealthReport =
-      deps.watchSilence && report.db === "ok"
-        ? { ...report, watchSilent: await detectSilentWatchers(deps.watchSilence) }
-        : report;
-    // 503 (not 200) when the db ping failed — a health probe's whole job is to make an
-    // unhealthy backend visible to whatever is watching the HTTP status code, not just the body.
-    res.status(body.db === "ok" ? 200 : 503).json(body);
+    const body: HealthReport = {...report};
+    if (deps.watchSilence && report.db === "ok") {
+      const {silent, unreadable} = await detectSilentWatchers(deps.watchSilence);
+      body.watchSilent = silent;
+      body.watchUnreadable = unreadable;
+    }
+    // Unknown watcher reads also make the probe unhealthy; known silence retains its existing status.
+    res.status(body.db === "error" || (body.watchUnreadable ?? 0) > 0 ? 503 : 200).json(body);
   });
 
   return router;

@@ -1,0 +1,31 @@
+{
+  "_id": "synthetic-controlled-1790797565149-src",
+  "tenantId": "synthetic-capture",
+  "kind": "recording",
+  "hash": "19d61eddc47cb4f158d6e2c01b6ac2f532e182c28bab70712d797af2e0a29c77",
+  "captureMode": "silent",
+  "title": "Local synthetic controlled AV",
+  "platform": "unknown",
+  "path": "raw/webinars/synthetic-capability-20260930/cli-controlled-output-1790797565149/tab-1790797565617-434586cc.playable.webm",
+  "audioPath": "raw/webinars/synthetic-controlled-1790797565149.m4a",
+  "audioLevel": {
+    "maxDb": -11.6,
+    "meanDb": -18.4,
+    "silent": false
+  },
+  "gaps": [
+    {
+      "start": "2026-09-30T19:46:48.806Z",
+      "end": "2026-09-30T19:47:35.159Z",
+      "reason": "capture-control-cancelled",
+      "recovered": false
+    }
+  ],
+  "consent": {
+    "given": true,
+    "recordedBy": "Umesh Sugara (registered attendee) via LKB bot",
+    "note": "attendee-side capture for internal KB use; organizer recording not available to attendees",
+    "confirmedNoAlternative": true
+  },
+  "createdAt": "2026-09-30T19:50:01.743Z"
+}

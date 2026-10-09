@@ -29,6 +29,7 @@ a client of that API — with the long-range goal of beating top human counsello
 - `docs/`
   - `docs/adr/`
   - `docs/archive/`
+  - `docs/features/`
 - `migrations/`
 - `packages/` — Application logic, one exported symbol per concept
   - `packages/ai/`
@@ -39,19 +40,24 @@ a client of that API — with the long-range goal of beating top human counsello
   - `packages/ingest/`
   - `packages/meeting-bot/`
 - `qa/`
+  - `qa/audits/`
+  - `qa/briefs/`
   - `qa/contracts/`
   - `qa/debug/`
   - `qa/evidence/`
   - `qa/gates/`
   - `qa/manifests/`
   - `qa/probes/`
+  - `qa/tests/`
   - `qa/verdicts/`
+  - `qa/watch/`
 - `raw/` — Data and source repos
   - `raw/TOC/`
 - `schema/` — JSON Schemas + fixtures + Python validator
   - `schema/fixtures/`
 - `scripts/`
   - `scripts/lib/`
+  - `scripts/watch/`
   - `scripts/webinar/`
 - `sources/` — Data and source repos
   - `sources/whatsapp_msg/`
@@ -85,6 +91,7 @@ a client of that API — with the long-range goal of beating top human counsello
 | tree_index | tenantId | no |
 | trusted_senders | _id, tenantId, senderDomain, approvalCount, autoApprove | no |
 | turns | _id, tenantId, sessionId, speakerRef, tStart, tEnd, text | no |
+| watch_heartbeat | _id, tenantId, sourceType, lastHeartbeatAt | no |
 | watch_reports | _id, tenantId, runAt, mode, digestPath | no |
 | watch_state | _id, tenantId, sourceType, sourceId, status, seenAt | no |
 | watched_sources | _id, tenantId, url, reputationTier, checkIntervalHours, active | no |

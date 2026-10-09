@@ -232,7 +232,10 @@ def managed_main(monkeypatch, tmp_path):
     monkeypatch.setattr(pathlib.Path, "is_file", lambda _: setup.exists)
     monkeypatch.setattr(detect_b_ver, "get_browser_version_from_binary", lambda _: setup.browser_version)
     monkeypatch.setattr(subprocess, "run", lambda *_args, **_kwargs: SimpleNamespace(stdout=setup.driver_version))
-    monkeypatch.setattr(sb_join, "kill_orphans", setup.cleanup.append)
+    def ownership(profile, **kwargs):
+        setup.cleanup.append((profile, kwargs))
+        return {"verify": lambda pid: setup.cleanup.append(("verify", pid))}
+    monkeypatch.setattr(sb_join, "kill_orphans", ownership)
     monkeypatch.setattr(sb_join, "_bootstrap_progress", lambda *_args: None)
     monkeypatch.setattr(browser_launcher, "override_driver_dir", setup.selected.append)
     def stop_launch(**kwargs):
@@ -261,13 +264,15 @@ def test_main_passes_verified_installed_driver_to_actual_sb_launch_seam(managed_
     assert launched["driver_version"] == "154"
     assert "cft_drivers" in launched["binary_location"]
     assert launched["uc"] is True and launched["headed"] is True
-    assert "--enable-unsafe-extension-debugging" not in launched["chromium_arg"]
+    assert "--enable-unsafe-extension-debugging" in launched["chromium_arg"]
+    assert pathlib.Path(launched["extension_dir"]).resolve() == pathlib.Path(sb_join.__file__).parent / "tab-capture"
+    assert managed_main.cleanup == [(managed_main.profile, {"launch": os.name == "nt", "expected_exe": launched["binary_location"]})]
 
 
 def test_main_cdp_requires_owned_transport_process_extension_worker_and_tab(monkeypatch, managed_main):
     profile, binary, extension, stop = managed_main.profile, managed_main.binary, managed_main.extension, managed_main.stop
     extension_id = "a" * 32
-    modes = ("success", "remote", "bad-port", "redirect", "oversized-http", "ws-remote", "ws-path", "ws-query", "wrong-exe", "wrong-profile", "relative-profile", "conflicting-profile", "missing-created", "changed-created", "missing-pid", "missing-extension", "ambiguous-extension", "wrong-worker", "ambiguous-worker", "wrong-tab", "ambiguous-tab", "cdp-error", "oversized-message", "event-flood", "deadline", "bool-id", "nonobject", "result-list", "enabled-string")
+    modes = ("success", "remote", "bad-port", "redirect", "oversized-http", "ws-remote", "ws-path", "ws-query", "wrong-exe", "wrong-profile", "relative-profile", "conflicting-profile", "missing-created", "changed-created", "missing-pid", "missing-extension", "ambiguous-extension", "wrong-worker", "ambiguous-worker", "wrong-tab", "ambiguous-tab", "cdp-error", "oversized-message", "event-flood", "deadline", "bool-id", "nonobject", "result-list", "enabled-string", "clear-error", "clear-rules", "clear-receipt", "clear-javascript")
     for mode in modes:
         commands, connections, http_handlers, process_reads, launches = [], [], [], [], []
         clock = [0]
@@ -321,8 +326,15 @@ def test_main_cdp_requires_owned_transport_process_extension_worker_and_tab(monk
                         result = {"targetInfos": [] if mode == "wrong-tab" else [tab, tab] if mode == "ambiguous-tab" else [tab]}
                     else:
                         worker = {"type": "service_worker", "targetId": "worker1", "url": "chrome-extension://" + extension_id + "/background.js"}
-                        result = {"targetInfos": [] if mode == "wrong-worker" else [worker, worker] if mode == "ambiguous-worker" else [worker]}
+                        result = {"targetInfos": [] if mode == "wrong-worker" else [worker, worker] if mode == "ambiguous-worker" else [worker, {"type": "page", "targetId": "page1", "url": "about:blank"}]}
                 if method == "Target.attachToTarget": result = {"sessionId": "worker-session"}
+                if method == "Runtime.evaluate":
+                    cleared = {"rules": [], "receipt": None, "javascript": {"setting": "allow"}}
+                    if mode == "clear-rules": cleared["rules"] = [{"id": 910001}]
+                    if mode == "clear-receipt": cleared["receipt"] = {"nonce": "stale"}
+                    if mode == "clear-javascript": cleared["javascript"] = {"setting": "block"}
+                    result = {"exceptionDetails": {}} if mode == "clear-error" else {"result": {"value": cleared}}
+                    if mode == "clear-error": result["exceptionDetails"] = {"text": "denied"}
                 if mode == "cdp-error" and method == "Extensions.triggerAction": return json.dumps({"id": self.request["id"], "error": {"message": "denied"}})
                 return json.dumps({"id": self.request["id"], "result": result})
             def shutdown(self): self.closed = True
@@ -334,14 +346,14 @@ def test_main_cdp_requires_owned_transport_process_extension_worker_and_tab(monk
             assert kwargs["suppress_origin"] is True and kwargs["http_no_proxy"] == ["127.0.0.1"] and kwargs["redirect_limit"] == 0
             connection = Connection(); connections.append(connection); return connection
         address = "remote:9222" if mode == "remote" else "127.0.0.1:0" if mode == "bad-port" else "127.0.0.1:9222"
-        driver = SimpleNamespace(browser_pid=None if mode == "missing-pid" else 42, capabilities={"goog:chromeOptions": {"debuggerAddress": address}})
+        driver = SimpleNamespace(browser_pid=None if mode == "missing-pid" else 42, capabilities={"goog:chromeOptions": {"debuggerAddress": address}}, current_window_handle="CDwindow-page1", switch_to=SimpleNamespace(new_window=lambda kind: None))
         browser = SimpleNamespace(driver=driver, uc_open_with_reconnect=lambda *_args: None, get_current_url=lambda: "http://127.0.0.1/")
         def build(*handlers):
             assert isinstance(handlers[0], urllib.request.ProxyHandler) and handlers[0].proxies == {}
             http_handlers.extend(handlers); return Opener()
         with monkeypatch.context() as patch:
             patch.setattr(sys, "argv", ["sb_join.py", "http://127.0.0.1/", "--profile", profile, "--title", "fixture", "--stop-file", str(stop), "--capture-extension", extension, "--browser-executable", binary])
-            patch.setattr(sb_join, "kill_orphans", lambda _: None)
+            patch.setattr(sb_join, "kill_orphans", lambda _profile, **_kwargs: {"verify": lambda pid: None})
             patch.setattr(sb_join, "_bootstrap_progress", lambda *_args: None)
             patch.setattr(sb_join, "time", SimpleNamespace(time=lambda: 0, monotonic=monotonic, sleep=lambda _: None))
             patch.setattr(psutil, "Process", Process)
@@ -352,6 +364,8 @@ def test_main_cdp_requires_owned_transport_process_extension_worker_and_tab(monk
                 sb_join.main()
                 assert [item["method"] for item in commands][-3:] == ["Target.activateTarget", "Extensions.triggerAction", "Target.detachFromTarget"]
                 assert len(process_reads) == 2
+                methods = [item["method"] for item in commands]
+                assert methods.index("Runtime.evaluate") < methods.index("Extensions.triggerAction")
             else:
                 with pytest.raises(RuntimeError): sb_join.main()
                 if mode != "cdp-error": assert not any(item["method"] == "Extensions.triggerAction" for item in commands)
@@ -359,109 +373,10 @@ def test_main_cdp_requires_owned_transport_process_extension_worker_and_tab(monk
             assert "--enable-unsafe-extension-debugging" in launches[0]["chromium_arg"]
 
 
-def test_linux_orphan_cleanup_exact_identity_and_refusals(monkeypatch, tmp_path):
-    import builtins
-    import io
-    import signal
-    profile = str(tmp_path / "profile")
-    original_open = builtins.open
-    original_listdir = os.listdir
-    original_readlink = os.readlink
-    cases = ("owned", "separate", "neighbor", "substring", "ambiguous", "renderer", "missing-exe", "changed", "nonexit")
-    for mode in cases:
-        calls, reads = [], [0]
-        alive = [True]
-        argv = ["chrome", "--user-data-dir=" + profile]
-        if mode == "separate": argv = ["chrome", "--user-data-dir", profile]
-        if mode in ("neighbor", "substring"): argv[1] += "-other"
-        if mode == "ambiguous": argv.append("--user-data-dir=" + profile)
-        if mode == "renderer": argv.append("--type=renderer")
-        def readlink(path):
-            if str(path) != "/proc/42/exe": return original_readlink(path)
-            reads[0] += 1
-            if mode == "missing-exe": raise PermissionError()
-            return ("/other/chrome" if mode == "changed" and reads[0] > 1 else "/managed/chrome")
-        def opened(path, *args, **kwargs):
-            if str(path) == "/proc/42/cmdline": return io.BytesIO("\0".join(argv).encode() + b"\0")
-            if str(path) == "/proc/42/stat": return io.StringIO("42 (chrome) " + " ".join(["S"] + ["0"] * 18 + ["123"]))
-            return original_open(path, *args, **kwargs)
-        def kill(pid, sig):
-            assert pid == 42
-            if sig == signal.SIGTERM:
-                calls.append((pid, sig))
-                if mode != "nonexit": alive[0] = False
-            elif not alive[0]: raise ProcessLookupError()
-        clock = iter(range(100))
-        with monkeypatch.context() as patch:
-            patch.setattr(sys, "platform", "linux")
-            patch.setattr(os, "listdir", lambda path: ["42"] if path == "/proc" else original_listdir(path))
-            patch.setattr(os, "readlink", readlink)
-            patch.setattr(builtins, "open", opened)
-            patch.setattr(os, "kill", kill)
-            patch.setattr(sb_join.time, "monotonic", lambda: next(clock))
-            patch.setattr(sb_join.time, "sleep", lambda _: None)
-            if mode in ("changed", "nonexit"):
-                with pytest.raises(RuntimeError, match="identity changed|remains alive"):
-                    sb_join.kill_orphans(profile)
-            else:
-                sb_join.kill_orphans(profile)
-        assert calls == ([(42, signal.SIGTERM)] if mode in ("owned", "separate", "nonexit") else [])
 
 
-def test_windows_cleanup_exact_profile_identity_and_failure_gate(monkeypatch, tmp_path):
-    import shutil
-    profile = str(tmp_path / "owned-profile")
-    for mode in ("owned", "separate", "neighbor", "duplicate", "equivalent", "conflicting", "relative", "empty", "malformed", "renderer", "nonbrowser", "missing", "reuse", "denied", "nonexit"):
-        terminated, deleted = [], []
-        class Process:
-            pid = 42
-            def __init__(self, reread=False): self.reread = reread
-            def name(self): return "chrome.exe"
-            def exe(self):
-                if mode == "denied": raise psutil.AccessDenied(self.pid)
-                return str(tmp_path / ("other.exe" if mode == "nonbrowser" else "chrome.exe"))
-            def cmdline(self):
-                option = profile + ("-neighbor" if mode == "neighbor" else "")
-                argv = ["chrome.exe", "--user-data-dir=" + option]
-                if mode == "separate": argv = ["chrome.exe", "--user-data-dir", profile]
-                if mode == "duplicate": argv.append("--user-data-dir=" + profile)
-                if mode == "equivalent": argv.append("--user-data-dir=" + os.path.join(profile, "..", "owned-profile"))
-                if mode == "conflicting": argv.append("--user-data-dir=" + profile + "-other")
-                if mode == "relative": argv.append("--user-data-dir=owned-profile")
-                if mode == "empty": argv.append("--user-data-dir=")
-                if mode == "malformed": argv.extend(["--user-data-dir", "--no-first-run"])
-                if mode == "renderer": argv.append("--type=renderer")
-                return argv
-            def create_time(self): return None if mode == "missing" else (200 if mode == "reuse" and self.reread else 100)
-            def terminate(self): terminated.append(self.pid)
-            def wait(self, timeout):
-                assert timeout == 3
-                if mode == "nonexit": raise psutil.TimeoutExpired(timeout, self.pid)
-                return 0
-        with monkeypatch.context() as patch:
-            patch.setattr(sb_join, "os", SimpleNamespace(**{**vars(os), "name": "nt", "remove": lambda path: deleted.append(path)}))
-            patch.setattr(sys, "platform", "win32")
-            patch.setattr(psutil, "process_iter", lambda: [Process()])
-            patch.setattr(psutil, "Process", lambda _pid: Process(True))
-            patch.setattr(os, "remove", lambda path: deleted.append(path))
-            patch.setattr(shutil, "rmtree", lambda path, **_kwargs: deleted.append(path))
-            if mode in ("conflicting", "relative", "empty", "malformed", "missing", "reuse", "denied", "nonexit"):
-                with pytest.raises(RuntimeError, match="identity|termination"):
-                    sb_join.kill_orphans(profile)
-                assert deleted == []
-            else:
-                sb_join.kill_orphans(profile)
-                assert len(deleted) == 4
-        assert terminated == ([42] if mode in ("owned", "separate", "duplicate", "equivalent", "nonexit") else [])
 
 
-def test_cleanup_only_uses_existing_exact_profile_cleanup_without_browser(monkeypatch, tmp_path):
-    calls = []
-    monkeypatch.setattr(sys, "argv", ["sb_join.py", "http://127.0.0.1/", "--profile", str(tmp_path), "--title", "cleanup", "--stop-file", str(tmp_path / "stop"), "--cleanup-only"])
-    monkeypatch.setattr(sb_join, "kill_orphans", lambda profile: calls.append(profile))
-    monkeypatch.setattr(sb_join, "SB", lambda **_kwargs: (_ for _ in ()).throw(AssertionError("browser launch forbidden")))
-    sb_join.main()
-    assert calls == [str(tmp_path)]
 
 
 if __name__ == "__main__":

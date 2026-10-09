@@ -51,8 +51,8 @@ async function generate(collection) {
 /** Domain modules (T-026): every non-test `.ts` file directly under `src/domain/` gets a
  * deterministic re-export line, sorted, so `index.ts` stays 100% generated even though its
  * content now spans two sources (schema/ + domain/) — no hand-edit ever survives `--check`. */
-function domainModuleNames() {
-  const dir = join(ROOT, "packages", "core", "src", "domain");
+function domainModuleNames(subtree = "domain") {
+  const dir = join(ROOT, "packages", "core", "src", subtree);
   if (!existsSync(dir)) return [];
   return readdirSync(dir)
     .filter((f) => f.endsWith(".ts") && !f.endsWith(".test.ts"))
@@ -60,13 +60,15 @@ function domainModuleNames() {
     .sort();
 }
 
-function indexFile(names) {
+export function indexFile(names) {
   const collectionLines = names.map((n) => `export * from "./generated/${n}.js";`);
   const domainLines = domainModuleNames().map((n) => `export * from "./domain/${n}.js";`);
   const body = domainLines.length > 0
     ? `${collectionLines.join("\n")}\n\n${domainLines.join("\n")}\n`
     : `${collectionLines.join("\n")}\n`;
-  return `// @lkb/core — generated types re-exported (schema/ is the source of truth; see scripts/gen-types.mjs).\n// Pure domain functions (no I/O) go in src/domain/<concept>.ts (D-003) — auto re-exported below.\n${body}`;
+  const alerts = domainModuleNames("alerts").map(n => `export * from "./alerts/${n}.js";`);
+  const alertBody = alerts.length ? `\n// U4b/R2 (D-053): the thin alert interface apps/* imports so a real alert can be delivered\n// without apps/* importing packages/meeting-bot (.dependency-cruiser.cjs forbids that edge).\n${alerts.join("\n")}\n` : "";
+  return `// @lkb/core — generated types re-exported (schema/ is the source of truth; see scripts/gen-types.mjs).\n// Pure domain functions (no I/O) go in src/domain/<concept>.ts (D-003) — auto re-exported below.\n${body}${alertBody}`;
 }
 
 async function main() {
@@ -96,7 +98,7 @@ async function main() {
   } else console.log(`done: ${names.length} collection(s), ${drift} file(s) written`);
 }
 
-main().catch((e) => {
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main().catch((e) => {
   console.error(e);
   process.exit(1);
 });

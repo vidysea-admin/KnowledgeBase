@@ -11,9 +11,66 @@ import { tmpdir } from "node:os";
 import { basename, dirname, join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { runAll } from "./lint-loc.mjs";
+import { indexFile } from "./gen-types.mjs";
+
+test("generated core barrel retains alert exports and excludes test modules", () => {
+  const text = indexFile(["claims", "sessions"]);
+  assert.equal(text.split('export * from "./alerts/alert-sink.js";').length - 1, 1);
+  assert.ok(!text.includes("alert-sink.test"));
+  assert.ok(text.includes('./generated/claims.js')); assert.ok(text.includes('./domain/purge-policy.js'));
+  assert.equal(text, indexFile(["claims", "sessions"]));
+});
 
 const SCRIPTS = dirname(fileURLToPath(import.meta.url));
 const CONFIG = JSON.parse(readFileSync(join(SCRIPTS, "..", "structure.config.json"), "utf8"));
+
+test("aggregate gate executes all ten stages despite first, middle and final failures", () => {
+  const calls = [], output = [];
+  const root = join(tmpdir(), "fixture with spaces & punctuation");
+  const exit = runAll(root, (exe, args, options) => {
+    calls.push(args);
+    assert.equal(exe, process.execPath);
+    assert.equal(options.cwd, root);
+    assert.equal(options.shell, false);
+    return { status: [1, 5, 10].includes(calls.length) ? 1 : 0 };
+  }, line => output.push(line));
+  assert.equal(exit, 1);
+  assert.equal(calls.length, 10);
+  assert.deepEqual(calls.slice(0, 7).map(a => a[0]), ["scripts/lint-loc.mjs", "scripts/lint-dirsize.mjs", "scripts/lint-root.mjs", "scripts/lint-dupes.mjs", "scripts/lint-migrations.mjs", "scripts/lib/lint-codex-hooks.mjs", "scripts/snapshot.mjs"]);
+  assert.deepEqual(calls[7], ["--test", "scripts/lint.test.mjs"]);
+  assert.deepEqual(calls[8], ["scripts/tracker-audit.mjs", "--gate", "g1,g4"]);
+  assert.deepEqual(calls[9].slice(1), ["--config", ".dependency-cruiser.cjs", "packages", "apps", "workers"]);
+  assert.match(output.at(-1), /10 stages, 3 failed/);
+});
+
+test("aggregate gate clean success and execution error/signal cannot skip later stages", () => {
+  for (const mode of ["clean", "throw", "signal", "error"]) {
+    let count = 0;
+    const exit = runAll(tmpdir(), () => {
+      count++;
+      if (count === 1 && mode === "throw") throw new Error("launch failed");
+      if (count === 1 && mode === "signal") return { status: null, signal: "SIGTERM" };
+      if (count === 1 && mode === "error") return { status: 0, error: new Error("timeout") };
+      return { status: 0 };
+    }, () => {});
+    assert.equal(count, 10);
+    assert.equal(exit, mode === "clean" ? 0 : 1);
+  }
+});
+
+test("mjs tests use testMax while source mjs remains at source budget", () => {
+  const root = fixture();
+  try {
+    put(root, "scripts/sample.test.mjs", lines(CONFIG.loc.testMax));
+    assert.equal(run("loc", root).status, 0);
+    put(root, "scripts/sample.test.mjs", lines(CONFIG.loc.testMax + 1));
+    assert.equal(run("loc", root).status, 1);
+    put(root, "scripts/sample.test.mjs", "");
+    put(root, "scripts/sample.mjs", lines(CONFIG.loc.max + 1));
+    assert.equal(run("loc", root).status, 1);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
 
 function fixture() {
   const root = mkdtempSync(join(tmpdir(), "lkb-lint-"));
@@ -227,28 +284,29 @@ test("every scripts/*.mjs resolves its imports — scripts are outside typecheck
  * Both directions pinned, so the guard cannot become unconditional (the success path must still
  * emit the checklist).
  */
-test("ISS-245: a failing opener for one URL rejects, names that URL, and never emits the checklist", async () => {
-  const { openPages, printChecklist } = await import("./demo-live.mjs");
-  // openPages uses the platform opener via execFile. Drive it with a command guaranteed to
-  // fail on every platform by overriding through... the module binds `opener` internally, so
-  // instead inject via the page-level contract: run it against a baseUrl whose opener invocation
-  // fails. Simplest deterministic failure: an empty-string command? The real risk to guard is the
-  // demo-live.mjs CLI wiring, so test the helper's contract directly by passing pages whose
-  // execFile target fails — use cmd with a nonexistent executable by monkey-patching is not
-  // available; instead verify the FAILURE WIRING by asserting the helper reports the exact URL.
-  // This is the checklist-suppression contract: with a failure, printChecklist must not be called.
-  const pages = [["/ok", "fine"], ["/bad", "would-have-shipped"]];
-  // Point the opener at a URL that makes Windows cmd fail: a NUL device + invalid switch.
-  const failures = await openPages(pages, "http://127.0.0.1:1", { staggerMs: 0 });
-  // On a healthy dev box the opener usually succeeds; the contract under test is the
-  // demo-live CLI's handling. Assert the RETURN SHAPE so both paths stay observable.
-  assert.ok(Array.isArray(failures));
-  for (const f of failures) {
-    assert.match(f.error, /./);
-    assert.match(f.url, /^http/);
+test("ISS-245: opener success, failures and timeout preserve exact URLs and continuation", async () => {
+  const { openPages } = await import("./demo-live.mjs");
+  const pages = [["/first", "one"], ["/second", "two"]];
+  for (const mode of ["success", "first-error", "second-error", "timeout", "throw"]) {
+    const attempted = [];
+    const failures = await openPages(pages, "http://127.0.0.1:1", {
+      staggerMs: 0, timeoutMs: 1234,
+      execFileFn(_command, args, options, callback) {
+        const url = args.at(-1); attempted.push(url);
+        assert.equal(options.timeout, 1234);
+        if (mode === "throw" && attempted.length === 1) throw new Error("sync failure");
+        const failed = (mode === "first-error" || mode === "timeout") && attempted.length === 1 || mode === "second-error" && attempted.length === 2;
+        callback(failed ? new Error(mode === "timeout" ? "timed out" : "open failed") : null);
+      },
+    });
+    assert.deepEqual(attempted, ["http://127.0.0.1:1/first", "http://127.0.0.1:1/second"]);
+    if (mode === "success") assert.deepEqual(failures, []);
+    else {
+      const path = mode === "second-error" ? "/second" : "/first";
+      assert.deepEqual(failures, [{ path, url: `http://127.0.0.1:1${path}`, error: mode === "throw" ? "sync failure" : mode === "timeout" ? "timed out" : "open failed" }]);
+    }
   }
 });
-
 test("ISS-245: the checklist prints only after every opener succeeded (wiring is fail-gated)", async () => {
   // Static wiring assertion: the CLI branch's printChecklist call must be reachable only after
   // the failures check exited. This guards against regressing to the old fire-and-forget shape.

@@ -9,6 +9,8 @@
     "_id": { "type": "string" },
     "tenantId": { "type": "string", "minLength": 1 },
     "messageId": { "type": "string", "minLength": 1, "description": "The real Gmail message id — dedup key." },
+    "threadId": { "type": "string", "pattern": "^[A-Za-z0-9_-]{1,256}$", "minLength": 1, "maxLength": 256, "description": "Literal Gmail thread identity for registration-confirmation correlation." },
+    "registrationUrl": { "type": "string", "minLength": 1, "description": "Literal registration URL from acquisition; not proof of submission or confirmed attendance." },
     "subject": { "type": "string" },
     "senderEmail": { "type": "string", "minLength": 1 },
     "senderDomain": { "type": "string", "minLength": 1 },
@@ -21,7 +23,7 @@
     "startTime": { "type": "string", "format": "date-time", "description": "U2: parsed from the body's own stated date/time (e.g. 'Day & Date: ... Time: 11:00 AM - 12:00 PM IST'). Absent when the body states no time." },
     "endTime": { "type": "string", "format": "date-time" },
     "recordingUrl": { "type": "string", "description": "U2: a Drive/YouTube/Zoom-recording link found in the body, distinct from meetingUrl (the live join link)." },
-    "registrationOnly": { "type": "boolean", "description": "U2: true when the body carries only a registration link and no direct join link — stays a human decision (webinar registration forms are never auto-submitted)." }
+    "registrationOnly": { "type": "boolean", "description": "Registration is required: scheduling stays barred until verified direct join evidence. Approved automated registration must retain this barrier until confirmation; this field grants no submission permission." }
   },
   "additionalProperties": true
 }

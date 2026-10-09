@@ -7,21 +7,15 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, rmSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { ledgerFiles, readLedgerRows, auditIssueRefs, G4_FROZEN, ROOT } from "./tracker-audit.mjs";
 
-// ---------------------------------------------------------------------------
-// ISS-129 — the ledger UNION declared by D-019.
-//
 // D-019 said "every reader treats the union of qa/issues.jsonl and qa/issues.*.jsonl as the
 // ledger", and then no reader did: both opened the single file by name, so a lane shard whose id
 // is CITED BY D-020 was counted by nothing and surfaced by nothing.
-//
-// Root cause worth keeping: D-019's own `Changes-authorized` named only `.claude/CLAUDE.md`, so
-// the mechanism the rule required was never scoped to a file it was allowed to touch. A governance
-// rule whose mechanism sits outside its own authorization cannot be implemented.
 //
 // These live HERE, beside the module they test, not in lint.test.mjs. Cycle 1 put them there on a
 // rationale that was false twice (ISS-140): scripts/ was 30 against a budget of 32, and this file
@@ -267,5 +261,69 @@ test("G4: a range needs a three-digit id on BOTH sides, in every spelling", () =
   );
   try {
     assert.deepEqual(auditIssueRefs(root, [{ id: "ISS-LANE-001" }, { id: "ISS-LANE-017" }, { id: "ISS-LANE-022" }]), []);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+
+for (const scope of ["canonical", "canonical-shard", "shard-shard"]) {
+  for (const conflicting of [false, true]) {
+    test(`duplicate ledger IDs refuse ${scope} ${conflicting ? "conflicting" : "identical"} rows`, () => {
+      const first = { id: "ISS-DUP-1", status: "open" };
+      const second = conflicting ? { ...first, status: "fixed" } : first;
+      const firstFile = scope === "shard-shard" ? "issues.a.jsonl" : "issues.jsonl";
+      const secondFile = scope === "canonical" ? firstFile : "issues.z.jsonl";
+      const root = ledgerRoot({ [firstFile]: [first] });
+      try {
+        writeFileSync(join(root, "qa", secondFile),
+          (firstFile === secondFile ? JSON.stringify(first) + "\n" : "") + "\nnot-json\n" + JSON.stringify(second) + "\n");
+        assert.throws(() => readLedgerRows(root), error => {
+          assert.match(error.message, /Duplicate ledger id ISS-DUP-1/);
+          assert.ok(error.message.includes(`${join(root, "qa", firstFile)}:1`));
+          assert.ok(error.message.includes(`${join(root, "qa", secondFile)}:${firstFile === secondFile ? 4 : 3}`));
+          return true;
+        });
+      } finally { rmSync(root, { recursive: true, force: true }); }
+    });
+  }
+}
+
+test("ledger IDs retain distinct qualified and repaired IDs with malformed accounting", () => {
+  const rows = [{ id: "ISS-360-OBSFLAKE" }, { id: "ISS-360-HEARTBEAT" }, { id: "ISS-A-001" }, { id: "ISS-B-001" }];
+  const root = ledgerRoot({ "issues.jsonl": rows.slice(0, 2), "issues.z.jsonl": [rows[3]], "issues.a.jsonl": [rows[2]] });
+  try {
+    writeFileSync(join(root, "qa", "issues.a.jsonl"), "\ninvalid\n" + JSON.stringify(rows[2]) + "\n");
+    assert.deepEqual(readLedgerRows(root), { rows, unparseable: 1 });
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("ledger reader preserves parsed non-string IDs and refuses file read errors", () => {
+  const rows = [null, { id: 1 }, { id: 1 }, "value"];
+  const root = ledgerRoot({ "issues.jsonl": rows });
+  try {
+    assert.deepEqual(readLedgerRows(root), { rows, unparseable: 0 });
+    mkdirSync(join(root, "qa", "issues.bad.jsonl"));
+    assert.throws(() => readLedgerRows(root), /EISDIR|EPERM|EACCES/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("selected CLI gate cannot hide duplicate ledger IDs", () => {
+  const root = ledgerRoot({ "issues.jsonl": [{ id: "ISS-DUP-CLI" }], "issues.a.jsonl": [{ id: "ISS-DUP-CLI" }] });
+  try {
+    mkdirSync(join(root, "scripts", "lib"), { recursive: true });
+    mkdirSync(join(root, ".goal"));
+    copyFileSync(join(ROOT, "scripts", "tracker-audit.mjs"), join(root, "scripts", "tracker-audit.mjs"));
+    copyFileSync(join(ROOT, "scripts", "lib", "tracker-audit.mjs"), join(root, "scripts", "lib", "tracker-audit.mjs"));
+    writeFileSync(join(root, ".goal", "goal.json"), JSON.stringify({ tasks: [{ id: "T-001", status: "done" }], progress: { total: 1, done: 1, percent: 100 } }));
+    writeFileSync(join(root, "TASKS.md"), "| T-001 | done | fixture |\n");
+    const run = () => spawnSync(process.execPath, [join(root, "scripts", "tracker-audit.mjs"), "--gate", "g1"], { encoding: "utf8", timeout: 10000 });
+    const collision = run();
+    assert.equal(collision.error, undefined);
+    assert.notEqual(collision.status, 0);
+    assert.match(collision.stderr, /Duplicate ledger id ISS-DUP-CLI/);
+    for (const file of ["issues.jsonl", "issues.a.jsonl"]) assert.ok(collision.stderr.includes(`${join(root, "qa", file)}:1`));
+    writeFileSync(join(root, "qa", "issues.a.jsonl"), JSON.stringify({ id: "ISS-DISTINCT-CLI" }) + "\n");
+    const repaired = run();
+    assert.equal(repaired.error, undefined);
+    assert.equal(repaired.status, 0, repaired.stderr);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

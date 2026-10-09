@@ -14,6 +14,14 @@ export interface MeetingCandidates {
    * The real Gmail message id — dedup key.
    */
   messageId: string;
+  /**
+   * Literal Gmail thread identity for registration-confirmation correlation.
+   */
+  threadId?: string;
+  /**
+   * Literal registration URL from acquisition; not proof of submission or confirmed attendance.
+   */
+  registrationUrl?: string;
   subject: string;
   senderEmail: string;
   senderDomain: string;
@@ -36,7 +44,7 @@ export interface MeetingCandidates {
    */
   recordingUrl?: string;
   /**
-   * U2: true when the body carries only a registration link and no direct join link — stays a human decision (webinar registration forms are never auto-submitted).
+   * Registration is required: scheduling stays barred until verified direct join evidence. Approved automated registration must retain this barrier until confirmation; this field grants no submission permission.
    */
   registrationOnly?: boolean;
   [k: string]: unknown;

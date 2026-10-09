@@ -243,6 +243,15 @@ async function withFetch<T>(impl: typeof fetch, fn: () => Promise<T>): Promise<T
     globalThis.fetch = real;
   }
 }
+test("HTTP candidate mapping preserves original registration/message/thread evidence", async () => {
+  const row = {_id: "original", subject: "Webinar", senderEmail: "host@example.test", senderDomain: "example.test", status: "approved",
+    registrationOnly: true, registrationUrl: "https://example.test/register", messageId: "original-message", threadId: "original-thread"};
+  await withFetch((async () => new Response(JSON.stringify({candidates: [row]}), {status: 200})) as typeof fetch, async () => {
+    const result = await createHttpCandidateLoader("http://localhost:3300", "fixture", () => {}, true)();
+    assert.equal(result[0]!.id, row._id); assert.equal(result[0]!.registrationUrl, row.registrationUrl);
+    assert.equal(result[0]!.messageId, row.messageId); assert.equal(result[0]!.threadId, row.threadId);
+  });
+});
 
 test("createHttpCandidateLoader: no apiKey -> [] without attempting a fetch", async () => {
   let called = false;

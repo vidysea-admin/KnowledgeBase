@@ -1,47 +1,8 @@
 /** Calendar source seam and pure, tenant-bound webinar occurrence reconciliation. */
-import type { AutoRecordCandidateInput } from "./auto-join.js";
+import type { AutoRecordCandidateInput, CalendarEvent, ReconciliationCalendarEvent, WebinarReconciliationState, WebinarReconciliationResult, WebinarSnapshot as Snapshot, WebinarAlias as Alias, WebinarOccurrence as Occurrence } from "@lkb/core";
 import { classifyWebinarInvite, webinarIdentity, webinarSessionKey } from "./auto-record-policy.js";
 
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  /** ISO datetime. */
-  startTime: string;
-  /** ISO datetime. */
-  endTime: string;
-  /** Absent when the event has no video-call link (nothing to auto-join). */
-  meetingUrl?: string;
-  organizer?: string;
-  cancelled?: boolean;
-  recurringEventId?: string;
-  originalStartTime?: { date?: string; dateTime?: string };
-  providerUpdated?: string;
-}
-
-export interface CalendarClient {
-  /** Events starting within the next `windowMinutes` (or already in progress). */
-  listUpcomingEvents(windowMinutes: number): Promise<CalendarEvent[]>;
-}
-
-export type ReconciliationCalendarEvent = Pick<CalendarEvent, "id"> & Partial<CalendarEvent>;
-type Snapshot = ReconciliationCalendarEvent & Partial<AutoRecordCandidateInput>;
-type Alias = { key: string; identity: string };
-type Occurrence = {
-  source: "calendar" | "gmail"; snapshot: Snapshot; providerIds: string[]; aliases: Alias[]; accepted: boolean;
-  revision?: string; linkedCalendar?: string; reviewReason?: "invalid-time" | "no-join-link" | "unsafe-join-link";
-  unresolved?: "unknown-tombstone" | "ambiguous-provider" | "contradictory-revision" | "missing-revision" | "ambiguous-identity" | "source-discontinuity";
-};
-export interface WebinarReconciliationState {
-  version: 1; tenantId: string; checkedAt: string; historyComplete: boolean;
-  coverageScope?: "available-connected-source-state";
-  occurrences: Record<string, Occurrence>;
-}
-export interface WebinarReconciliationResult {
-  state: WebinarReconciliationState; calendarEvents: CalendarEvent[]; candidates: AutoRecordCandidateInput[];
-  inventory: { occurrenceKey: string; reviewKey: string; sessionKey?: string; classification: string; snapshot: Snapshot; reason?: string }[];
-  transitions: { occurrenceKey: string; reason: "cancelled" | "rescheduled" | "unresolved"; aliases: string[]; currentKey?: string; boundaryChanged?: true }[];
-  newStartsBlocked: boolean;
-}
+export type { CalendarEvent, CalendarClient, ReconciliationCalendarEvent, WebinarReconciliationState, WebinarReconciliationResult } from "@lkb/core";
 const fail = (): never => { throw new Error("Invalid webinar reconciliation input or state"); };
 function shape(value: unknown, keys: string[]): asserts value is Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value) || ![Object.prototype, null].includes(Object.getPrototypeOf(value)) ||
@@ -88,7 +49,7 @@ function semantic(row: Occurrence): string {
 }
 function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occurrence {
   const common = ["id", "title", "startTime", "endTime", "meetingUrl", "cancelled", "providerUpdated"];
-  shape(input, [...common, ...(source === "calendar" ? ["organizer", "recurringEventId", "originalStartTime"] : ["senderEmail", "senderDomain", "status", "kind", "registrationOnly"])]);
+  shape(input, [...common, ...(source === "calendar" ? ["organizer", "recurringEventId", "originalStartTime"] : ["senderEmail", "senderDomain", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId"])]);
   text(input.id, 1024, true); text(input.title, 2000); text(input.meetingUrl, 8192);
   text(input.startTime, 128); text(input.endTime, 128); text(input.organizer, 320);
   if (input.cancelled !== undefined && typeof input.cancelled !== "boolean") fail();
@@ -96,8 +57,16 @@ function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occ
       (input.kind !== undefined && !["upcoming", "past-recording"].includes(input.kind)) ||
       (input.registrationOnly !== undefined && typeof input.registrationOnly !== "boolean"))) fail();
   if (source === "gmail") { text(input.senderEmail, 320, true); text(input.senderDomain, 320, true); }
+  if (source === "gmail") {
+    text(input.registrationUrl, 8192);
+    for (const id of [input.messageId, input.threadId]) if (id !== undefined && (typeof id !== "string" || !/^[A-Za-z0-9_-]{1,256}$/.test(id))) fail();
+    if (input.registrationUrl !== undefined) {
+      let url: URL; try { url = new URL(input.registrationUrl); } catch { fail(); }
+      if (url!.protocol !== "https:" || url!.username || url!.password) fail();
+    }
+  }
   const snapshot: Snapshot = {id: input.id, title: input.title ?? "", cancelled: input.cancelled ?? false};
-  for (const key of source === "calendar" ? ["meetingUrl", "organizer", "recurringEventId"] : ["meetingUrl", "senderEmail", "senderDomain", "status", "kind", "registrationOnly"]) {
+  for (const key of source === "calendar" ? ["meetingUrl", "organizer", "recurringEventId"] : ["meetingUrl", "senderEmail", "senderDomain", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId"]) {
     const value = input[key as keyof Snapshot];
     if (value !== undefined) Object.assign(snapshot, {[key]: value});
   }

@@ -154,7 +154,8 @@ export { createGwsCalendarReadDeps } from "./gws-calendar.js";
  * than in the route: a candidate whose sender already crossed `AUTO_APPROVE_THRESHOLD` is filed
  * straight in as `auto_approved`, never sitting in the pending review queue Umesh has to clear
  * by hand for a sender he's already trusted three times over. */
-export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, scan = scanGmailForMeetingCandidates, databaseName = () => getDb().databaseName): MeetingCandidatesDeps {
+export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, scan = scanGmailForMeetingCandidates, databaseName = () => getDb().databaseName,
+  persistence = {getTrustedSender, createMeetingCandidateIfNew}): MeetingCandidatesDeps {
   return {
     getWorkDatabase(tenantId) {
       if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) return undefined;
@@ -166,12 +167,12 @@ export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, s
       const found = await scan();
       let created = 0, autoApproved = 0;
       // U2: pass through every optional scan field the same way meetingUrl already was — present -> included.
-      const OPTIONAL_CANDIDATE_FIELDS = ["meetingUrl", "kind", "startTime", "endTime", "recordingUrl", "registrationOnly"] as const;
+      const OPTIONAL_CANDIDATE_FIELDS = ["meetingUrl", "kind", "startTime", "endTime", "recordingUrl", "registrationOnly", "registrationUrl", "threadId"] as const;
       for (const candidate of found) {
-        const trusted = await getTrustedSender(tenantId, candidate.senderDomain);
+        const trusted = await persistence.getTrustedSender(tenantId, candidate.senderDomain);
         const status = trusted?.autoApprove ? "auto_approved" : "pending";
         const extra = Object.fromEntries(OPTIONAL_CANDIDATE_FIELDS.filter((k) => candidate[k] !== undefined).map((k) => [k, candidate[k]]));
-        const wrote = await createMeetingCandidateIfNew(tenantId, {
+        const wrote = await persistence.createMeetingCandidateIfNew(tenantId, {
           _id: randomUUID(),
           messageId: candidate.messageId,
           subject: candidate.subject,

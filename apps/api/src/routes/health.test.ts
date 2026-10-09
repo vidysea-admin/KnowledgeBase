@@ -83,13 +83,13 @@ test("GET /health reports 503, not 200, when the db is unhealthy", async () => {
 test("R2: a watcher whose heartbeat is older than the interval produces exactly one alert", async () => {
   const stale = { tenantId: "toc", sourceType: "drive", lastHeartbeatAt: new Date(NOW.getTime() - 3 * HOUR).toISOString() };
   const { deps, alerts } = fakeWatchSilence({ toc: [stale, fresh("toc", "gmail"), fresh("toc", "calendar")] });
-  assert.equal(await detectSilentWatchers(deps), 1);
+  assert.deepEqual(await detectSilentWatchers(deps), {silent: 1, unreadable: 0});
   assert.deepEqual(alerts, [["toc", "drive", stale.lastHeartbeatAt, HOUR]]);
 });
 
 test("R2: all-fresh heartbeats produce NO alert (the detector is not a blanket alarm)", async () => {
   const { deps, alerts } = fakeWatchSilence({ toc: allFresh("toc") });
-  assert.equal(await detectSilentWatchers(deps), 0);
+  assert.deepEqual(await detectSilentWatchers(deps), {silent: 0, unreadable: 0});
   assert.deepEqual(alerts, []);
 });
 
@@ -97,7 +97,7 @@ test("R2: a source type with NO row at all alerts — absence is the failure mod
   // The missing row is the whole point of a separate collection: a field on rows that stop being
   // written cannot detect that they stopped.
   const { deps, alerts } = fakeWatchSilence({ toc: [fresh("toc", "drive")] });
-  assert.equal(await detectSilentWatchers(deps), 2);
+  assert.deepEqual(await detectSilentWatchers(deps), {silent: 2, unreadable: 0});
   assert.deepEqual(alerts.map((a) => a[1]).sort(), ["calendar", "gmail"]);
   // `lastHeartbeatAt` is reported as null, so the operator reads "no run has ever completed".
   assert.deepEqual(alerts.map((a) => a[2]), [null, null]);
@@ -105,7 +105,7 @@ test("R2: a source type with NO row at all alerts — absence is the failure mod
 
 test("R2: an entirely empty collection alerts once per expected source type, and no more", async () => {
   const { deps, alerts } = fakeWatchSilence({ toc: [] });
-  assert.equal(await detectSilentWatchers(deps), 3);
+  assert.deepEqual(await detectSilentWatchers(deps), {silent: 3, unreadable: 0});
   assert.deepEqual(alerts.map((a) => a[1]).sort(), ["calendar", "drive", "gmail"]);
 });
 
@@ -113,8 +113,8 @@ test("R2: the exact interval boundary is fresh, one millisecond past it is silen
   const at = (ms: number) => new Date(NOW.getTime() - ms).toISOString();
   const rowsAt = (ms: number) =>
     ["drive", "gmail", "calendar"].map((s) => ({ tenantId: "toc", sourceType: s, lastHeartbeatAt: at(ms) }));
-  assert.equal(await detectSilentWatchers(fakeWatchSilence({ toc: rowsAt(HOUR) }).deps), 0);
-  assert.equal(await detectSilentWatchers(fakeWatchSilence({ toc: rowsAt(HOUR + 1) }).deps), 3);
+  assert.deepEqual(await detectSilentWatchers(fakeWatchSilence({ toc: rowsAt(HOUR) }).deps), {silent: 0, unreadable: 0});
+  assert.deepEqual(await detectSilentWatchers(fakeWatchSilence({ toc: rowsAt(HOUR + 1) }).deps), {silent: 3, unreadable: 0});
 });
 
 test("R8: each tenant is read through its own scoped call, and one tenant's staleness never alerts as another's", async () => {
@@ -127,7 +127,7 @@ test("R8: each tenant is read through its own scoped call, and one tenant's stal
       fresh("other", "calendar"),
     ],
   });
-  assert.equal(await detectSilentWatchers(deps), 1);
+  assert.deepEqual(await detectSilentWatchers(deps), {silent: 1, unreadable: 0});
   // One read per tenant, each carrying that tenant's id — never a single unscoped read of everything.
   assert.deepEqual(reads, ["toc", "other"]);
   assert.deepEqual(alerts, [["other", "drive", staleAt, HOUR]]);
@@ -135,17 +135,19 @@ test("R8: each tenant is read through its own scoped call, and one tenant's stal
 });
 
 test("R2: an unreadable heartbeat collection for one tenant does not stop the others or throw", async () => {
-  const { deps, alerts } = fakeWatchSilence(
+  const { deps, alerts, reads } = fakeWatchSilence(
     { broken: [], toc: [] },
     {
       listHeartbeats: async (t) => {
+        reads.push(t);
         if (t === "broken") throw new Error("db down");
-        return allFresh(t);
+        return [];
       },
     },
   );
-  assert.equal(await detectSilentWatchers(deps), 0);
-  assert.deepEqual(alerts, []);
+  assert.deepEqual(await detectSilentWatchers(deps), {silent: 3, unreadable: 1});
+  assert.deepEqual(reads, ["broken", "toc"]);
+  assert.deepEqual(alerts, ["drive", "gmail", "calendar"].map(source => ["toc", source, null, HOUR]));
 });
 
 test("R2: a throwing alert sink is swallowed — the probe must not die of its own notifier", async () => {
@@ -154,7 +156,7 @@ test("R2: a throwing alert sink is swallowed — the probe must not die of its o
       throw new Error("transport down");
     },
   });
-  assert.equal(await detectSilentWatchers(deps), 3);
+  assert.deepEqual(await detectSilentWatchers(deps), {silent: 3, unreadable: 0});
 });
 
 test("R2: /health reports watchSilent as an aggregate count and names no tenant or source type", async () => {
@@ -186,7 +188,7 @@ test("R2: /health with an all-fresh watcher set reports watchSilent: 0", async (
 });
 
 test("R2: when the db ping fails the detector does not run — every watcher would look silent for that one reason", async () => {
-  const { deps, alerts } = fakeWatchSilence({ toc: [] });
+  const { deps, alerts, reads } = fakeWatchSilence({ toc: [] });
   const server = await startTestServer(
     buildTestDeps({
       health: fakeHealthDeps({ checkHealth: async () => ({ db: "error", collections: {} }), watchSilence: deps }),
@@ -195,8 +197,11 @@ test("R2: when the db ping fails the detector does not run — every watcher wou
   try {
     const res = await fetch(`${server.baseUrl}/health`);
     assert.equal(res.status, 503);
-    assert.equal(((await res.json()) as { watchSilent?: number }).watchSilent, undefined);
+    const body = await res.json() as {watchSilent?: number; watchUnreadable?: number};
+    assert.equal(body.watchSilent, undefined);
+    assert.equal(body.watchUnreadable, undefined);
     assert.deepEqual(alerts, []);
+    assert.deepEqual(reads, []);
   } finally {
     await server.close();
   }
@@ -220,6 +225,7 @@ test("R2: with no watchSilence wired, /health behaves exactly as before U4b (no 
   try {
     const body = (await (await fetch(`${server.baseUrl}/health`)).json()) as Record<string, unknown>;
     assert.equal("watchSilent" in body, false);
+    assert.equal("watchUnreadable" in body, false);
   } finally {
     await server.close();
   }
@@ -256,11 +262,83 @@ test("health.ts's local isStale agrees with scripts/watch/lib/heartbeat.mjs case
       { toc: [{ tenantId: "toc", sourceType: "drive", lastHeartbeatAt }] },
       { expectedSourceTypes: ["drive"] },
     );
-    const detectorSaysStale = (await detectSilentWatchers(deps)) === 1;
+    const detected = await detectSilentWatchers(deps);
+    assert.equal(detected.unreadable, 0);
+    const detectorSaysStale = detected.silent === 1;
     assert.equal(
       detectorSaysStale,
       lib.isHeartbeatStale(lastHeartbeatAt, NOW, HOUR),
       `disagreement on lastHeartbeatAt=${String(lastHeartbeatAt)}`,
     );
   }
+});
+
+
+test("ISS-368: HTTP distinguishes unreadable watchers from readable fresh watchers without leaks", async () => {
+  for (const unreadable of [true, false]) {
+    const {deps, reads, alerts} = fakeWatchSilence({"private-tenant": []}, {
+      listHeartbeats: async tenant => {
+        reads.push(tenant);
+        if (unreadable) throw new Error("private database credential failure");
+        return allFresh(tenant);
+      },
+    });
+    const server = await startTestServer(buildTestDeps({health: fakeHealthDeps({watchSilence: deps})}));
+    try {
+      const res = await fetch(`${server.baseUrl}/health`);
+      assert.equal(res.status, unreadable ? 503 : 200);
+      const raw = await res.text();
+      assert.deepEqual(JSON.parse(raw), {db: "ok", collections: {sessions: 1, claims: 1}, watchSilent: 0, watchUnreadable: unreadable ? 1 : 0});
+      assert.deepEqual(reads, ["private-tenant"]);
+      assert.deepEqual(alerts, []);
+      for (const secret of ["private-tenant", "private database credential failure", "drive", "gmail", "calendar"])
+        assert.equal(raw.includes(secret), false, `leaked ${secret}`);
+    } finally { await server.close(); }
+  }
+});
+
+test("ISS-368: partial reads still alert only known silent tenants and report 503", async () => {
+  const {deps, reads, alerts} = fakeWatchSilence({broken: [], toc: []}, {
+    listHeartbeats: async tenant => {
+      reads.push(tenant);
+      if (tenant === "broken") throw new Error("sensitive read failure");
+      return [];
+    },
+  });
+  const server = await startTestServer(buildTestDeps({health: fakeHealthDeps({watchSilence: deps})}));
+  try {
+    const res = await fetch(`${server.baseUrl}/health`);
+    assert.equal(res.status, 503);
+    const raw = await res.text();
+    assert.deepEqual(JSON.parse(raw), {db: "ok", collections: {sessions: 1, claims: 1}, watchSilent: 3, watchUnreadable: 1});
+    assert.deepEqual(reads, ["broken", "toc"]);
+    assert.deepEqual(alerts, ["drive", "gmail", "calendar"].map(source => ["toc", source, null, HOUR]));
+    for (const secret of ["broken", "toc", "sensitive read failure", "drive", "gmail", "calendar"])
+      assert.equal(raw.includes(secret), false, `leaked ${secret}`);
+  } finally { await server.close(); }
+});
+
+test("ISS-368: recovery uses fresh counts without mutating a cached health report", async () => {
+  const cached = Object.freeze({db: "ok" as const, collections: Object.freeze({sessions: 1})});
+  let failed = true;
+  const {deps, reads, alerts} = fakeWatchSilence({toc: []}, {
+    listHeartbeats: async tenant => {
+      reads.push(tenant);
+      if (failed) throw new Error("private recovery failure");
+      return allFresh(tenant);
+    },
+  });
+  const server = await startTestServer(buildTestDeps({health: fakeHealthDeps({checkHealth: async () => cached, watchSilence: deps})}));
+  try {
+    const first = await fetch(`${server.baseUrl}/health`);
+    assert.equal(first.status, 503);
+    assert.deepEqual(await first.json(), {db: "ok", collections: {sessions: 1}, watchSilent: 0, watchUnreadable: 1});
+    failed = false;
+    const recovered = await fetch(`${server.baseUrl}/health`);
+    assert.equal(recovered.status, 200);
+    assert.deepEqual(await recovered.json(), {db: "ok", collections: {sessions: 1}, watchSilent: 0, watchUnreadable: 0});
+    assert.deepEqual(cached, {db: "ok", collections: {sessions: 1}});
+    assert.deepEqual(reads, ["toc", "toc"]);
+    assert.deepEqual(alerts, []);
+  } finally { await server.close(); }
 });

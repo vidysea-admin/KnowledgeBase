@@ -1,37 +1,18 @@
-/**
- * apps/api/src/gws-gmail.ts — T-028, extended by U2 (source-watcher). Real Gmail scan for
- * meeting-shaped mail, backed by the same already-authenticated `gws` CLI as `gws-calendar.ts`
- * (`gmail.readonly` is already among its granted scopes). Uses the native CLI on POSIX and its
- * Windows command shim on Windows.
- *
- * Search scope: Gmail's own `q` query selects meeting/webinar language, calendar attachments,
- * known video-conference hosts and TOC/partner senders, without an age cutoff — real filtering, not a
- * client-side scan of the whole inbox. Each matching message is then fetched with `format=full`
- * (U2: was `format=metadata` — Subject/From/Date only; the body is now read too, since a
- * registration confirmation or a "Day & Date: ... Time: ..." invite states its date only in the
- * body, never the subject) to build a candidate row. A meeting/recording URL, or a start/end
- * time, is extracted ONLY when it literally appears in the message's own body text (a real
- * substring/regex match) — never fabricated when absent; those fields stay undefined in that
- * case, same "real data or an honest gap" rule the calendar adapter follows.
- *
- * Failed or incomplete discovery throws a sanitized error instead of claiming empty coverage.
- */
+/** Gmail discovery: literal evidence only; configured intake never grants join approval. */
 import { execFile } from "node:child_process";
 
 export interface GmailMeetingCandidate {
   messageId: string;
+  threadId?: string;
+  registrationUrl?: string;
   subject: string;
   senderEmail: string;
   senderDomain: string;
   meetingUrl?: string;
-  /** U2: a Drive/YouTube/Zoom-recording link found in the body — distinct from `meetingUrl`
-   * (the live join link). Present only for a `kind: "past-recording"` candidate that actually
-   * states one. */
+  /** Literal recording link, distinct from the live join link. */
   recordingUrl?: string;
-  /** U2: "past-recording" when the body/subject describes a recording already held;
-   * "upcoming" when it describes a session still to come. Best-effort — see `classifyMeetingKind`. */
+  /** Best-effort classification from literal body/subject evidence. */
   kind?: "past-recording" | "upcoming";
-  /** U2: parsed from the body's own stated date/time. Absent when the body states none. */
   startTime?: string;
   endTime?: string;
   /** U2: true when the body carries only a registration link and no direct join link — the
@@ -55,6 +36,7 @@ interface GwsMessagePart {
 }
 interface GwsMessageFull extends GwsMessagePart {
   id: string;
+  threadId?: string;
   snippet?: string;
   headers?: GwsMessageHeader[];
   payload?: GwsMessagePart & { headers?: GwsMessageHeader[] };
@@ -70,10 +52,7 @@ const MEETING_QUERY =
   'cloudonair.withgoogle.com OR "youtube.com/watch" OR "youtube.com/live" OR "youtu.be" OR "drive.google.com/file" OR ' +
   "from:karunn@vidysea.com OR from:theoutreachcollective.in OR from:ashoka.edu.in)";
 
-// Kept as a single (non-global) regex used via `.exec()` for a first-match lookup — a `g` flag
-// here would carry `lastIndex` state across calls on different message bodies, corrupting
-// results when `fetchOne` runs concurrently via `Promise.all` (ISS class this file avoided once
-// already: MEETING_URL_RE has never had a `g` flag).
+// Shared regex is non-global; each all-match scan creates its own regex to avoid shared state.
 const MEETING_URL_RE =
   /https?:\/\/[^\s"'<>]*(?:meet\.google\.com|zoom\.us|teams\.microsoft\.com|zoho\.in|zoho\.com|cloudonair\.withgoogle\.com|youtube\.com\/live)[^\s"'<>]*/i;
 
@@ -281,14 +260,19 @@ async function fetchOne(messageId: string, run = runGws): Promise<GmailMeetingCa
   const subject = header(headers, "Subject") || "(no subject)";
 
   const bodyText = decodeGmailBody(msg.payload) || msg.snippet || "";
-  const meetingUrl = MEETING_URL_RE.exec(bodyText)?.[0] ?? MEETING_URL_RE.exec(msg.snippet ?? "")?.[0];
+  if (msg.threadId !== undefined && (typeof msg.threadId !== "string" || !/^[A-Za-z0-9_-]{1,256}$/.test(msg.threadId))) throw new Error("Invalid Gmail thread");
+  const registrationUrl = REGISTER_URL_RE.exec(bodyText)?.[0];
+  const meetingUrl = DIRECT_JOIN_RE.exec(bodyText)?.[0] ?? DIRECT_JOIN_RE.exec(msg.snippet ?? "")?.[0] ?? [bodyText, msg.snippet ?? ""].flatMap(text =>
+    [...text.matchAll(new RegExp(MEETING_URL_RE.source, "gi"))].map(match => match[0])).find(url => !REGISTER_URL_RE.test(url));
   const recordingUrl = RECORDING_URL_RE.exec(bodyText)?.[0];
   const { startTime, endTime } = extractSessionDateTime(bodyText);
   const kind = classifyMeetingKind({ subject, bodyText, recordingUrl, startTime, now: new Date() });
-  const registrationOnly = isRegistrationOnly(bodyText);
+  const registrationOnly = isRegistrationOnly(`${bodyText}\n${msg.snippet ?? ""}`);
 
   return {
     messageId: msg.id,
+    ...(msg.threadId ? {threadId: msg.threadId} : {}),
+    ...(registrationUrl ? {registrationUrl} : {}),
     subject,
     senderEmail,
     senderDomain,
@@ -301,14 +285,29 @@ async function fetchOne(messageId: string, run = runGws): Promise<GmailMeetingCa
   };
 }
 
-export async function scanGmailForMeetingCandidates(maxMessages = 100, run = runGws): Promise<GmailMeetingCandidate[]> {
+export async function scanGmailForMeetingCandidates(maxMessages = 100, run = runGws, intake: {aliases?: string; labelIds?: string} = {
+  aliases: process.env.LKB_GMAIL_ALIASES, labelIds: process.env.LKB_GMAIL_LABEL_IDS,
+}): Promise<GmailMeetingCandidate[]> {
   if (!Number.isInteger(maxMessages) || maxMessages <= 0 || maxMessages > 500) throw new Error("Invalid Gmail page size");
   try {
+    const parse = (value: string | undefined, pattern: RegExp) => {
+      if (value === undefined || value === "") return [];
+      if (typeof value !== "string" || value.length > 2048 || /[\x00-\x1f\x7f]/.test(value)) throw new Error("Invalid intake");
+      const entries = value.split(",").map(v => v.trim());
+      if (entries.length > 20 || entries.some(v => !pattern.test(v))) throw new Error("Invalid intake");
+      return [...new Set(entries)];
+    };
+    const aliases = parse(intake.aliases, /^[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/);
+    const labels = parse(intake.labelIds, /^[A-Za-z0-9_-]{1,128}$/);
+    const scopes = [{q: aliases.length ? `(${MEETING_QUERY} OR ${aliases.map(a => `deliveredto:${a}`).join(" OR ")})` : MEETING_QUERY},
+      ...labels.map(id => ({labelIds: [id]}))];
+    const ids = new Set<string>();
+    for (const scope of scopes) {
     let pageToken: string | undefined;
-    const seen = new Set<string>(), ids = new Set<string>();
+    const seen = new Set<string>();
     for (let page = 0; page < 20; page++) {
       const list = parseGwsJson(await run(["gmail", "users", "messages", "list", "--params",
-        JSON.stringify({userId: "me", q: MEETING_QUERY, maxResults: maxMessages, pageToken}), "--format", "json"])) as GwsMessageListResponse;
+        JSON.stringify({userId: "me", ...scope, maxResults: maxMessages, pageToken}), "--format", "json"])) as GwsMessageListResponse;
       if (!list || typeof list !== "object" || Array.isArray(list) || "error" in list ||
           (list.messages !== undefined && !Array.isArray(list.messages)) ||
           (list.messages === undefined && Object.keys(list).some(k => !["resultSizeEstimate", "nextPageToken"].includes(k))) ||
@@ -319,6 +318,7 @@ export async function scanGmailForMeetingCandidates(maxMessages = 100, run = run
       if (pageToken === undefined) break;
       if (typeof pageToken !== "string" || !/^[A-Za-z0-9._~+/=-]+$/.test(pageToken) || pageToken.length > 2048 || seen.has(pageToken) || page === 19) throw new Error("Gmail discovery incomplete");
       seen.add(pageToken);
+    }
     }
     const results: (GmailMeetingCandidate | null)[] = [], ordered = [...ids];
     for (let start = 0; start < ordered.length; start += 10) results.push(...await Promise.all(ordered.slice(start, start + 10).map(id => fetchOne(id, run))));

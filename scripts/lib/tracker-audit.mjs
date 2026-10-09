@@ -65,10 +65,18 @@ export function ledgerFiles(root) {
 export function readLedgerRows(root) {
   const rows = [];
   let unparseable = 0;
+  const firstLocations = new Map();
   for (const file of ledgerFiles(root)) {
-    for (const line of readFileSync(file, "utf8").split("\n")) {
+    for (const [index, line] of readFileSync(file, "utf8").split("\n").entries()) {
       if (!line.trim()) continue;
-      try { rows.push(JSON.parse(line)); } catch { unparseable++; }
+      let row;
+      try { row = JSON.parse(line); } catch { unparseable++; continue; }
+      if (typeof row?.id === "string") {
+        const location = `${file}:${index + 1}`, first = firstLocations.get(row.id);
+        if (first) throw new Error(`Duplicate ledger id ${row.id}: ${first} and ${location}`);
+        firstLocations.set(row.id, location);
+      }
+      rows.push(row);
     }
   }
   return { rows, unparseable };

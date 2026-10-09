@@ -6,8 +6,6 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { selectAutoRecordItems } from "../../../packages/meeting-bot/src/calendar/auto-join.js";
-import { classifyWebinarInvite } from "../../../packages/meeting-bot/src/calendar/auto-record-policy.js";
 
 import {
   decodeGmailBody,
@@ -17,53 +15,76 @@ import {
   scanGmailForMeetingCandidates,
 } from "./gws-gmail.js";
 
-test("each classifier-positive vocabulary form is discoverable without a known host or sender", async () => {
-  const titles = ["Career webinar", "Career seminar", "Educator Dialogues", "In Focus", "In-Focus", "Online Workshop", "Virtual Conference"];
-  for (const title of titles) {
-    assert.equal(classifyWebinarInvite(title), "webinar");
-    const rows = await scanGmailForMeetingCandidates(100, async args => {
-      const params = JSON.parse(args[args.indexOf("--params") + 1]!);
-      if (args.includes("list")) {
-        const terms: string[] = params.q.slice(1, -1).split(/\s+OR\s+/).map((term: string) => term.replace(/^"|"$/g, "").toLowerCase());
-        const matched = terms.some(term => !term.includes(":") && title.toLowerCase().includes(term));
-        return JSON.stringify({messages: matched ? [{id: "title-only"}] : []});
-      }
-      return JSON.stringify({id: "title-only", payload: {headers: [{name: "From", value: "new@unknown.org"},
-        {name: "Subject", value: title}], body: {data: Buffer.from("Details https://events.unknown.org/live").toString("base64url")}}});
-    });
-    assert.equal(rows.length, 1, `search must discover classifier-positive title ${title}`);
-    assert.equal(rows[0]?.subject, title); assert.equal(rows[0]?.meetingUrl, undefined); assert.equal(rows[0]?.startTime, undefined);
+test("registration acquisition separates literal registration and join URLs and validates thread identity", async () => {
+  const register = "https://zoom.us/webinar/register/abc";
+  for (const join of [undefined, "https://zoom.us/j/123", "https://meeting.zoho.com/session/123"]) {
+    const rows = await scanGmailForMeetingCandidates(100, async args => args.includes("list") ?
+      JSON.stringify({messages: [{id: "mail1"}]}) : JSON.stringify({id: "mail1", threadId: "thread_1", payload: {
+        headers: [{name: "From", value: "host@example.org"}], body: {data: Buffer.from(`${register} ${join ?? ""}`).toString("base64url")}}}), {});
+    assert.equal(rows[0]?.registrationUrl, register); assert.equal(rows[0]?.threadId, "thread_1");
+    assert.equal(rows[0]?.meetingUrl, join); assert.equal(rows[0]?.startTime, undefined);
+    if (!join) assert.equal(rows[0]?.registrationOnly, true);
+  }
+  for (const threadId of [undefined, "valid-1", "invalid\nthread", "", 123, "a".repeat(257)]) {
+    const run = async (args: string[]) => args.includes("list") ? JSON.stringify({messages: [{id: "mail1"}]}) :
+      JSON.stringify({id: "mail1", threadId, payload: {headers: [{name: "From", value: "host@example.org"}],
+        body: {data: Buffer.from("https://meet.google.com/abc-defg-hij").toString("base64url")}}});
+    if (threadId !== undefined && (typeof threadId !== "string" || !/^[A-Za-z0-9_-]{1,256}$/.test(threadId))) await assert.rejects(scanGmailForMeetingCandidates(100, run, {}), /Gmail discovery unavailable/);
+    else {const [row] = await scanGmailForMeetingCandidates(100, run, {}); assert.equal(row?.threadId, threadId); assert.equal(row?.registrationUrl, undefined);}
   }
 });
 
-test("discovery retains old invitations and unknown platforms without fabricating launch evidence", async () => {
-  const messages = [
-    {id: "old", subject: "Student visa webinar", body: "Join https://meet.google.com/abc-defg-hij", date: "Mon, 1 Jan 2024 00:00:00 +0000"},
-    {id: "unknown", subject: "Webinar invitation", body: "Join https://events.example.org/session"},
-    {id: "personal", subject: "Team meeting invitation", body: "Invitation attached; see invite.ics"},
-  ];
-  const candidates = await scanGmailForMeetingCandidates(100, async args => {
+test("direct snippet join wins over generic body link without losing registration evidence", async () => {
+  const registrationUrl = "https://zoom.us/webinar/register/abc", meetingUrl = "https://zoom.us/j/123";
+  const [row] = await scanGmailForMeetingCandidates(100, async args => args.includes("list") ?
+    JSON.stringify({messages: [{id: "mail1"}]}) : JSON.stringify({id: "mail1", snippet: meetingUrl, payload: {
+      headers: [{name: "From", value: "host@example.org"}],
+      body: {data: Buffer.from(`${registrationUrl} https://meeting.zoho.com/session/123`).toString("base64url")}}}), {});
+  assert.equal(row?.meetingUrl, meetingUrl); assert.equal(row?.registrationUrl, registrationUrl);
+  assert.equal(row?.registrationOnly, undefined);
+});
+
+test("alias and label intake unions neutral mail with broad discovery and fetches duplicates once", async () => {
+  const fetched: string[] = [], listed: Record<string, unknown>[] = [];
+  const rows = await scanGmailForMeetingCandidates(100, async args => {
     const params = JSON.parse(args[args.indexOf("--params") + 1]!);
     if (args.includes("list")) {
-      assert.doesNotMatch(params.q, /newer_than:|after:|older_than:|before:/);
-      for (const term of ['webinar', 'webcast', '"online seminar"', '"virtual conference"', 'invitation', 'filename:ics', 'meet.google.com', 'from:theoutreachcollective.in']) assert.ok(params.q.includes(term));
-      return JSON.stringify({messages: messages.map(({id}) => ({id}))});
+      listed.push(params);
+      if (params.labelIds) {
+        assert.deepEqual(params.labelIds, ["Label_123"]);
+        assert.equal(params.q, undefined);
+        return JSON.stringify({ messages: [{id: "alias"}, {id: "label"}] });
+      }
+      assert.match(params.q, /webinar.* OR deliveredto:seminars@example.org/);
+      return JSON.stringify({ messages: [{id: "broad"}, {id: "alias"}] });
     }
-    const message = messages.find(row => row.id === params.id)!;
-    return JSON.stringify({id: message.id, payload: {headers: [
-      {name: "From", value: "host@example.org"}, {name: "Subject", value: message.subject},
-      {name: "Date", value: message.date ?? "Wed, 30 Sep 2026 00:00:00 +0000"},
-    ], body: {data: Buffer.from(message.body).toString("base64url")}}});
-  });
-  assert.deepEqual(candidates.map(row => row.messageId), ["old", "unknown", "personal"]);
-  assert.equal(candidates[0]?.meetingUrl, "https://meet.google.com/abc-defg-hij");
-  for (const row of candidates.slice(1)) {assert.equal(row.meetingUrl, undefined); assert.equal(row.startTime, undefined); assert.equal(row.endTime, undefined);}
-  const selection = selectAutoRecordItems({calendarEvents: [], candidates: candidates.map(row => ({...row,
-    id: row.messageId, title: row.subject, status: "pending" as const})), now: "2026-09-30T09:59:00Z",
-    leadMinutes: 5, trustedSenders: {emails: [], domains: []}, alreadyScheduled: [], everyWebinar: true});
-  assert.equal(selection.toSchedule.length, 0);
-  assert.equal(selection.skipped.find(row => row.sessionKey === "gmail:personal")?.reason, "not-webinar");
+    fetched.push(params.id);
+    return JSON.stringify({ id: params.id, payload: { headers: [{name: "From", value: "host@example.org"},
+      {name: "Subject", value: "Details enclosed"}], body: {data: Buffer.from("Register https://example.org/register").toString("base64url")} } });
+  }, {aliases: "seminars@example.org, seminars@example.org", labelIds: "Label_123,Label_123"});
+  assert.equal(listed.length, 2);
+  assert.deepEqual(fetched.sort(), ["alias", "broad", "label"]);
+  assert.deepEqual(rows.map(r => r.messageId).sort(), fetched);
+  for (const row of rows) {assert.equal(row.registrationOnly, true); assert.equal(row.startTime, undefined);}
 });
+
+test("invalid intake calls no provider; incomplete label acquisition fails whole discovery", async () => {
+  for (const intake of [{aliases: 'bad@example.org OR in:anywhere'}, {aliases: 'a@example.org\n'},
+    {labelIds: 'Label_1, '}, {labelIds: 'Label_1&whoami'}]) {
+    let called = false;
+    await assert.rejects(scanGmailForMeetingCandidates(100, async () => {called = true; return '{}';}, intake), /^Error: Gmail discovery unavailable$/);
+    assert.equal(called, false);
+  }
+  let labels = 0;
+  await assert.rejects(scanGmailForMeetingCandidates(100, async args => {
+    const p = JSON.parse(args[args.indexOf("--params") + 1]!);
+    if (p.q) return '{}';
+    labels++; return JSON.stringify({nextPageToken: 'repeat'});
+  }, {labelIds: "Label_1"}), /unavailable/);
+  assert.equal(labels, 2);
+});
+
+
 
 test("Gmail pagination preserves all unique messages and refuses incomplete or malformed coverage", async () => {
   const requests: any[] = [];

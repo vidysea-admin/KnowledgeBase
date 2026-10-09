@@ -1,0 +1,4728 @@
+{
+  "version": 1,
+  "tool": "offline-extraction-measurement-v1",
+  "manifestSha256": "66ca2da2f58902626ee7469d44969169b90a121d3287663ebcfb80b043771661",
+  "complete": false,
+  "declaredCases": 35,
+  "baseline": {
+    "measured": true,
+    "expectedClaims": 72,
+    "expectedEvidence": 80,
+    "actualClaims": 72,
+    "actualEvidence": 80,
+    "referenceIdentityMatches": true,
+    "newlyMissing": [],
+    "previouslyMissingNowResolved": [],
+    "hashDrift": []
+  },
+  "coverageNote": "Every current migrated directory declared, including synthetic/incomplete directories. Historical29 transcripts versus original23 TOC provenance reconciliation remains unresolved. Raw completions and independent semantic gold are unavailable.",
+  "loadedCases": 29,
+  "artifactBytes": 2411576,
+  "failures": [
+    {
+      "id": "synthetic-cli-20260930",
+      "reason": "artifact-missing"
+    },
+    {
+      "id": "synthetic-controlled-1790797565149",
+      "reason": "artifact-missing"
+    },
+    {
+      "id": "synthetic-controlled-1790798758779",
+      "reason": "artifact-missing"
+    },
+    {
+      "id": "synthetic-controlled-1790799479728",
+      "reason": "artifact-missing"
+    },
+    {
+      "id": "synthetic-production-cli-20260930",
+      "reason": "artifact-missing"
+    },
+    {
+      "id": "synthetic-production-interrupt-20260930",
+      "reason": "artifact-missing"
+    }
+  ],
+  "inventory": {
+    "measured": true,
+    "directories": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "2026-05-08-funding-dreams-loans-forex",
+      "2026-05-20-telling-your-brand-story-better",
+      "2026-05-22-uniaccess-xavier-university",
+      "2026-05-23-uniaccess-atlas-skilltech",
+      "2026-05-28-in-focus-1",
+      "2026-05-29-decoding-ever-expanding-cast",
+      "2026-06-03-dual-enrollment-pathway",
+      "2026-06-19-entrance-exams-pathways-india-part1",
+      "2026-06-25-in-focus-2",
+      "2026-06-30-exploring-identity-success-counseling",
+      "2026-07-03-inside-the-uc-session",
+      "2026-07-08-beyond-black-robes-law-careers",
+      "2026-07-15-creative-futures",
+      "2026-07-22-uniaccess-cept-university",
+      "2026-07-28-metrics-and-mingling",
+      "2026-07-30-in-focus-3",
+      "2026-08-03-uk-beyond-offer-letters",
+      "2026-08-03-uk-beyond-offer-letters-reupload",
+      "2026-08-10-ucas-what-changed-what-matters",
+      "2026-08-12-uniaccess-ashoka-university",
+      "2026-08-24-uniaccess-leeds-arts-university",
+      "2026-08-27-in-focus-4",
+      "2026-09-02-india-test-series-part2",
+      "2026-09-09-global-test-prep-pathways",
+      "2026-09-16-pathways-in-psychology",
+      "2026-09-21-uniaccess-japan",
+      "2026-09-24-in-focus",
+      "2026-09-24-zoho-next-european-study-destinations",
+      "synthetic-cli-20260930",
+      "synthetic-controlled-1790797565149",
+      "synthetic-controlled-1790798758779",
+      "synthetic-controlled-1790799479728",
+      "synthetic-production-cli-20260930",
+      "synthetic-production-interrupt-20260930"
+    ],
+    "otherEntries": [],
+    "undeclared": [],
+    "outsideInventory": []
+  },
+  "artifacts": [
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "artifactHash": "a505d02d3a6fc994a4571341509a80ebf266a544a58908889a433ccb9b53b29d",
+      "hashes": {
+        "persisted": "7b3736e2bed1435fde763405a3cbcbb544a3c5fa296165a3a2b86999be1b977e",
+        "turns": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9"
+      }
+    },
+    {
+      "id": "2026-05-08-funding-dreams-loans-forex",
+      "artifactHash": "cfa9981955a28ae392bf91fb70ee1488fe6581ab3ad418c50cd96651477c3ad8",
+      "hashes": {
+        "persisted": "994caa059c44902441c79d44b11b1d48bb0e739b40dbfc269f817f143836808e",
+        "turns": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a"
+      }
+    },
+    {
+      "id": "2026-05-20-telling-your-brand-story-better",
+      "artifactHash": "e9d489478173440fa4d59ba0183c7e68b8df2a41c63a6e7cad404d76eec73572",
+      "hashes": {
+        "persisted": "159e46f0c93ff279270b0b3f52ff2a28f04362cc1e5f87b0320adc2ff50ee486",
+        "turns": "5c982fe673d5bdda527d6576cba6113327ab5e8284bc06be1837513ef0266b9e"
+      }
+    },
+    {
+      "id": "2026-05-22-uniaccess-xavier-university",
+      "artifactHash": "bb890030b4f969877b0d70109899ba46d7ddcda1dd8252e13b51b26e0d41a045",
+      "hashes": {
+        "persisted": "db9a2a66e45c801bb98e70efe6cddab9f24e4ecd20f574b764d443954073dabd",
+        "turns": "8809e80ce6af8c0f72ead587c3b40245726258659217015aa13474858dd7ccbb"
+      }
+    },
+    {
+      "id": "2026-05-23-uniaccess-atlas-skilltech",
+      "artifactHash": "5b3830132a92d96e2199f1326069657525944a31484a621ca5103d599f776a01",
+      "hashes": {
+        "persisted": "1ca43e5f1bfcf975fff2a5cc877285118338a8ece8d8b7ef9d1e2af523618261",
+        "turns": "edd79a5447c222145df9738c30009c5ece51825958e2ea78266e35b252043043"
+      }
+    },
+    {
+      "id": "2026-05-28-in-focus-1",
+      "artifactHash": "c53649bcf96fa131073243a642201ea05f1aeda0579f8d0b5e7fc9fdc925aec5",
+      "hashes": {
+        "persisted": "92dd436ea5dbb190d351d4ee541e1da02594e1c9a8c5f6e5316e5811336ee0fd",
+        "turns": "155e69c048c3c12f2dafddf32db6db0d1ed88f5dd38769276c668e03ae74fc7c"
+      }
+    },
+    {
+      "id": "2026-05-29-decoding-ever-expanding-cast",
+      "artifactHash": "fd69c5ac612cc8a01d3d1f729d90a6305e87d90aaa59e4b57b6d89aa4c9fea73",
+      "hashes": {
+        "persisted": "479f7b6bb6a3f88ad11dcc043e9694d5c55edeed6aff3dd62b7ffecbca8d47e9",
+        "turns": "f93002ba741a978cd1e8fce7a9954896a14ae1e657a7d57eec41815ccf98db72"
+      }
+    },
+    {
+      "id": "2026-06-03-dual-enrollment-pathway",
+      "artifactHash": "7bf6f5f005d749f97b45a27810012a0ee58cdbdee7bc0173f793ed64e984418d",
+      "hashes": {
+        "persisted": "5bb0eeda41f1fadfbd49225f50827b88caa00a7a7662c5de50369e5ab8ac815a",
+        "turns": "0117d6be63f6d788167cd742299d69e694a61ee440e937128af89fbc2aef27d3"
+      }
+    },
+    {
+      "id": "2026-06-19-entrance-exams-pathways-india-part1",
+      "artifactHash": "f83100507a1080135cdd008ae337743bcf19f7cfb8d4d0c329d7f8df544bc578",
+      "hashes": {
+        "persisted": "c49be3d05e6829f267f0644961d2da47d55094a5d1ed61e208f2c58e321f0e9a",
+        "turns": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2"
+      }
+    },
+    {
+      "id": "2026-06-25-in-focus-2",
+      "artifactHash": "94217378eb51cbd1c3c7cd68155315f273a95c19e404f31e8d608d299daa2742",
+      "hashes": {
+        "persisted": "017ea0894d3b908fa8bf449885d0ad3ff686c9f9193616643a2cfc06de20b24e",
+        "turns": "13751a71cff2b4d3e3253b20bb0a4e5e7625d4cb847d1d50d4f47572a00ff65d"
+      }
+    },
+    {
+      "id": "2026-06-30-exploring-identity-success-counseling",
+      "artifactHash": "8609465e0bb19c90de6f498e4314866022627a37d3a74861a0e9532ddd523b72",
+      "hashes": {
+        "persisted": "f446a1e98bf45d90cddc9080afaa8ccb62a71902941151366fa82a5e0fb421c5",
+        "turns": "d3169ba6536072aa7e40872839c503bdcca9304c6167a55c67a7658a48d01c78"
+      }
+    },
+    {
+      "id": "2026-07-03-inside-the-uc-session",
+      "artifactHash": "7c1a72b219e24cc33e855ab7580cc4a2f914206a380510c31cac5a9ca80a8b37",
+      "hashes": {
+        "persisted": "0dbf689c7d2992fd1a3a62d2d6f1ef9e6ae211c8370f4d3e03c2bc57ee62a7f7",
+        "turns": "cea1ea840042fee4572f42f4406ba7a0e30b5a184c1f2dc9f101d961a0581858"
+      }
+    },
+    {
+      "id": "2026-07-08-beyond-black-robes-law-careers",
+      "artifactHash": "5057015794b9f898467c880721f14d919dd9e22a859c45ce44fb9cee41a580db",
+      "hashes": {
+        "persisted": "b591a5b04ad8987d64278bb0b09239a696e42d780bdaca69d93d122c541d5c25",
+        "turns": "75d65d97c41f237fe7b75a440fa932ce2001c2e0f1a8acb3e8ea2365c78975b8"
+      }
+    },
+    {
+      "id": "2026-07-15-creative-futures",
+      "artifactHash": "286058eb1780a17adec40ea443e2b2ebe31cd18292dbac0df4ff869c0489dcde",
+      "hashes": {
+        "persisted": "2c886ed266acc9f64dcbf0737958d4ef1001d8466aba56124362c57a735b4c99",
+        "turns": "e0802d0f7934e41f9982924fcf813e57d5a67a205ebff85c4d9a36785e6e1288"
+      }
+    },
+    {
+      "id": "2026-07-22-uniaccess-cept-university",
+      "artifactHash": "58db1f3af2f2846036f9934785f44cb12368fd813fc8d64c233059d1698b7b37",
+      "hashes": {
+        "persisted": "7fcde036a5b9053f02340eb2679bc4dc04f0656df9858bb43fe29ed7619309a7",
+        "turns": "27a260ca24052977071f2b4ccf4fbb25a844d316ccc0cfd92d53243cf94bb773"
+      }
+    },
+    {
+      "id": "2026-07-28-metrics-and-mingling",
+      "artifactHash": "36af8782da74f44237fa514da879d4036e7722dca18de29d87a2dc6047c674b8",
+      "hashes": {
+        "persisted": "cee3b4bacef84a49933d7baa247262e4a747239287756379447020b686a84d11",
+        "turns": "6b77117c6253c72f522d3290d26785e0a8bfad8d63ce198ec5483530aaa7d88a"
+      }
+    },
+    {
+      "id": "2026-07-30-in-focus-3",
+      "artifactHash": "bacd6df7348d4b54e477d4bcd298b8eca4224ebddb3a8da792c947715292ceb3",
+      "hashes": {
+        "persisted": "351b28b429e89d827a297e4f56f3964e7ac3f15864af03699481d86e326eacb3",
+        "turns": "8a4db7b7e7a037566ac52371425f6c57ab973642006a0737fe3bbc1e298ff407"
+      }
+    },
+    {
+      "id": "2026-08-03-uk-beyond-offer-letters",
+      "artifactHash": "6e57ec1410c5133d32d0bbb62ed68c0b77ef4cc5089c25d7ce2fa8077d163148",
+      "hashes": {
+        "persisted": "a3246bf7e5e63030c485ac6e3c3177e2c9063037a2c555dc131fa23a8e74f421",
+        "turns": "990ba09970e0b2f55fbf1ec3bf9cf20f6497d21a1d5f058f2a2a09d8fb773666"
+      }
+    },
+    {
+      "id": "2026-08-03-uk-beyond-offer-letters-reupload",
+      "artifactHash": "c2e412c90e5dea1167a05aa2def58434ccbeb0ec839019bbf07d1464fac5122a",
+      "hashes": {
+        "persisted": "c6fa529ced6d8a0b9f58a81d57d6130ab0a3a6393d27b1aa43452b260608c628",
+        "turns": "d3929dbaa1aca0e909f66570924310c04b5cff0befc5b6a2fb4516081af8eeb9"
+      }
+    },
+    {
+      "id": "2026-08-10-ucas-what-changed-what-matters",
+      "artifactHash": "5021924e09e35ff6e8a66b9116c5c8a5799855a4d427f2c41c3c929700b30a76",
+      "hashes": {
+        "persisted": "8de6fcb0d4cde5dff5fae7d143e1409401cd20bddf774800762b61ca7e5755e1",
+        "turns": "31fe2627aa9bf6287acb51401925a4563bd320600704c3bb624fcfe274c37d6f"
+      }
+    },
+    {
+      "id": "2026-08-12-uniaccess-ashoka-university",
+      "artifactHash": "75e36f1ea9fe650a64426943c540365c5ee31b11b6eecc41383d1bd982d4228a",
+      "hashes": {
+        "persisted": "bc4d274d03b0a9ea788f293cd0ed4f14c295fcfb13d089faacc8b9156587e1a7",
+        "turns": "a0e8eabe5300cc91dd2cccf2b725c87200a4bfa86c23fb1106965f4d05bd0387"
+      }
+    },
+    {
+      "id": "2026-08-24-uniaccess-leeds-arts-university",
+      "artifactHash": "c0738997ad6958208eb584addf1288933072b54cfcaa3bb448ce18e00c2f8e41",
+      "hashes": {
+        "persisted": "218182b20a849721194ee7d549e6998aec7520bac1a7c0bac8173a1f918ccc3e",
+        "turns": "a195884b2c4f5131663d2d4c5df4d30b0b602c41bbd0dd4a0ed22caf2597a7ea"
+      }
+    },
+    {
+      "id": "2026-08-27-in-focus-4",
+      "artifactHash": "603c3f44fd6201d99e25e7a472d32fd0cabe46395344a9861649ac907f8a6340",
+      "hashes": {
+        "persisted": "b0797f2bbde03e7545b3a606e697eac9788b620da172c4a47e1f636f8dd05d05",
+        "turns": "1ade9c5ebf5792d320286d82ceba6b2785e3bba3c96490cdeb1e99f9b6d3c044"
+      }
+    },
+    {
+      "id": "2026-09-02-india-test-series-part2",
+      "artifactHash": "636cbfd8e7eac0ccc4c6c3454d8369514419977180b59b5253460ca943b50132",
+      "hashes": {
+        "persisted": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+        "turns": "8a23f29ae0f25238c9073a33b875c99af5545a2e3008d6abe7f220dc914e773f"
+      }
+    },
+    {
+      "id": "2026-09-09-global-test-prep-pathways",
+      "artifactHash": "6f2ba1d62aac780b7f74551fd80d30b8c77ddfbe8cbc77e15efd9ced852b84da",
+      "hashes": {
+        "persisted": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+        "turns": "4167fe49e5e018728c03cc1dae358843f1fa491693c16699567e63d87b55690e"
+      }
+    },
+    {
+      "id": "2026-09-16-pathways-in-psychology",
+      "artifactHash": "14f96b3cea9e3ded36adb81b28965f26adb9449c794ec843f3a8287c63fb95e8",
+      "hashes": {
+        "persisted": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+        "turns": "dbb5283630a73795dc9130a7c7fd5d7d8d46f9f00f4c50beeba5642e85f7423c"
+      }
+    },
+    {
+      "id": "2026-09-21-uniaccess-japan",
+      "artifactHash": "852905b908b03c237d57d707464820044bb85284b189255117137285c0af722b",
+      "hashes": {
+        "persisted": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+        "turns": "e3a747e72e94ae7e83c088c5101fdd412bb79d376689ef04536b7b9655f39bfa"
+      }
+    },
+    {
+      "id": "2026-09-24-in-focus",
+      "artifactHash": "010cdc007c97320021114e439075431aff3ea8d3ab5d17866a90eaa82f3f81d8",
+      "hashes": {
+        "persisted": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "turns": "bb94cf56dbd771564f73dde5620d6017049f17d23f7d9ffaea9c0f59bca5510e"
+      }
+    },
+    {
+      "id": "2026-09-24-zoho-next-european-study-destinations",
+      "artifactHash": "33ec1597f305e91bad19562be87c951552d7af301c3de037cc51db02ad3185f9",
+      "hashes": {
+        "persisted": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+        "turns": "a1d8c1f966c318d1b0793154b98d8309e78da89e2e803db9474e9dfdc6a5dc63"
+      }
+    }
+  ],
+  "summary": {
+    "version": 1,
+    "cases": 29,
+    "completeCases": 26,
+    "sourceTurns": 3427,
+    "incompleteCases": [
+      {
+        "id": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "reasons": [
+          "invalid-turn-time"
+        ]
+      },
+      {
+        "id": "2026-06-03-dual-enrollment-pathway",
+        "reasons": [
+          "invalid-turn-time"
+        ]
+      },
+      {
+        "id": "2026-08-10-ucas-what-changed-what-matters",
+        "reasons": [
+          "invalid-turn-time"
+        ]
+      }
+    ],
+    "stages": {
+      "raw": {
+        "availableCases": 0,
+        "unavailableCases": 29,
+        "rows": null,
+        "affectedClaims": 0,
+        "invalidCitationRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "parsed": {
+        "availableCases": 0,
+        "unavailableCases": 29,
+        "rows": null,
+        "affectedClaims": 0,
+        "invalidCitationRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "filtered": {
+        "availableCases": 0,
+        "unavailableCases": 29,
+        "rows": null,
+        "affectedClaims": 0,
+        "invalidCitationRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "persisted": {
+        "availableCases": 29,
+        "unavailableCases": 0,
+        "rows": 72,
+        "affectedClaims": 14,
+        "invalidCitationRate": {
+          "numerator": 14,
+          "denominator": 80,
+          "value": 0.175
+        }
+      }
+    },
+    "semantic": {
+      "labeledCases": 0,
+      "unmeasuredCases": 29,
+      "unsupportedRate": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null
+      },
+      "coverage": {
+        "numerator": 0,
+        "denominator": 72,
+        "value": 0
+      }
+    },
+    "unresolvedReferences": [
+      {
+        "caseId": "2026-05-20-telling-your-brand-story-better",
+        "claimId": "2026-05-20-telling-your-brand-story-better-c01",
+        "turnId": "2026-05-20-telling-your-brand-story-better-t049",
+        "sessionId": "2026-05-20-telling-your-brand-story-better"
+      },
+      {
+        "caseId": "2026-05-29-decoding-ever-expanding-cast",
+        "claimId": "2026-05-29-decoding-ever-expanding-cast-c02",
+        "turnId": "2026-05-29-decoding-ever-expanding-cast-t161",
+        "sessionId": "2026-05-29-decoding-ever-expanding-cast"
+      },
+      {
+        "caseId": "2026-05-29-decoding-ever-expanding-cast",
+        "claimId": "2026-05-29-decoding-ever-expanding-cast-c03",
+        "turnId": "2026-05-29-decoding-ever-expanding-cast-t190",
+        "sessionId": "2026-05-29-decoding-ever-expanding-cast"
+      },
+      {
+        "caseId": "2026-06-03-dual-enrollment-pathway",
+        "claimId": "2026-06-03-dual-enrollment-pathway-c02",
+        "turnId": "2026-06-03-dual-enrollment-pathway-t092",
+        "sessionId": "2026-06-03-dual-enrollment-pathway"
+      },
+      {
+        "caseId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c02",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t051",
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+      },
+      {
+        "caseId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c03",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t060",
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+      },
+      {
+        "caseId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c04",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t059",
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+      },
+      {
+        "caseId": "2026-06-30-exploring-identity-success-counseling",
+        "claimId": "2026-06-30-exploring-identity-success-counseling-c01",
+        "turnId": "2026-06-30-exploring-identity-success-counseling-t085",
+        "sessionId": "2026-06-30-exploring-identity-success-counseling"
+      },
+      {
+        "caseId": "2026-06-30-exploring-identity-success-counseling",
+        "claimId": "2026-06-30-exploring-identity-success-counseling-c02",
+        "turnId": "2026-06-30-exploring-identity-success-counseling-t073",
+        "sessionId": "2026-06-30-exploring-identity-success-counseling"
+      },
+      {
+        "caseId": "2026-08-03-uk-beyond-offer-letters",
+        "claimId": "2026-08-03-uk-beyond-offer-letters-c02",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-t061",
+        "sessionId": "2026-08-03-uk-beyond-offer-letters"
+      },
+      {
+        "caseId": "2026-08-12-uniaccess-ashoka-university",
+        "claimId": "2026-08-12-uniaccess-ashoka-university-c01",
+        "turnId": "2026-08-12-uniaccess-ashoka-university-t106",
+        "sessionId": "2026-08-12-uniaccess-ashoka-university"
+      },
+      {
+        "caseId": "2026-08-12-uniaccess-ashoka-university",
+        "claimId": "2026-08-12-uniaccess-ashoka-university-c02",
+        "turnId": "2026-08-12-uniaccess-ashoka-university-t084",
+        "sessionId": "2026-08-12-uniaccess-ashoka-university"
+      },
+      {
+        "caseId": "2026-08-12-uniaccess-ashoka-university",
+        "claimId": "2026-08-12-uniaccess-ashoka-university-c03",
+        "turnId": "2026-08-12-uniaccess-ashoka-university-t058",
+        "sessionId": "2026-08-12-uniaccess-ashoka-university"
+      },
+      {
+        "caseId": "2026-08-27-in-focus-4",
+        "claimId": "2026-08-27-in-focus-4-c03",
+        "turnId": "2026-08-27-in-focus-4-t102",
+        "sessionId": "2026-08-27-in-focus-4"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "version": 1,
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "tenantId": "toc",
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "artifactHash": "a505d02d3a6fc994a4571341509a80ebf266a544a58908889a433ccb9b53b29d",
+      "complete": false,
+      "sourceTurns": 291,
+      "sourceIssues": [
+        "invalid-turn-time"
+      ],
+      "incompleteReasons": [
+        "invalid-turn-time"
+      ],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 6,
+          "wellFormedClaims": 6,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 7,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz-c01",
+            "2026-04-21-visa-blueprint-part2-italy-france-nz-c02",
+            "2026-04-21-visa-blueprint-part2-italy-france-nz-c03",
+            "2026-04-21-visa-blueprint-part2-italy-france-nz-c04",
+            "2026-04-21-visa-blueprint-part2-italy-france-nz-c05",
+            "2026-04-21-visa-blueprint-part2-italy-france-nz-c06"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 6,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-05-08-funding-dreams-loans-forex",
+      "tenantId": "toc",
+      "sessionId": "2026-05-08-funding-dreams-loans-forex",
+      "artifactHash": "cfa9981955a28ae392bf91fb70ee1488fe6581ab3ad418c50cd96651477c3ad8",
+      "complete": true,
+      "sourceTurns": 83,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 5,
+          "wellFormedClaims": 5,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 6,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-05-08-funding-dreams-loans-forex-c01",
+            "2026-05-08-funding-dreams-loans-forex-c02",
+            "2026-05-08-funding-dreams-loans-forex-c03",
+            "2026-05-08-funding-dreams-loans-forex-c04",
+            "2026-05-08-funding-dreams-loans-forex-c05"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 5,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 5,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-05-20-telling-your-brand-story-better",
+      "tenantId": "toc",
+      "sessionId": "2026-05-20-telling-your-brand-story-better",
+      "artifactHash": "e9d489478173440fa4d59ba0183c7e68b8df2a41c63a6e7cad404d76eec73572",
+      "complete": true,
+      "sourceTurns": 31,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 2,
+          "wellFormedClaims": 2,
+          "invalidCitationRate": {
+            "numerator": 1,
+            "denominator": 2,
+            "value": 0.5
+          },
+          "affectedClaims": 1,
+          "claimIds": [
+            "2026-05-20-telling-your-brand-story-better-c01",
+            "2026-05-20-telling-your-brand-story-better-c02"
+          ],
+          "issues": [
+            {
+              "claimId": "2026-05-20-telling-your-brand-story-better-c01",
+              "code": "missing-turn",
+              "turnId": "2026-05-20-telling-your-brand-story-better-t049",
+              "sessionId": "2026-05-20-telling-your-brand-story-better"
+            }
+          ],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 2,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 2,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-05-22-uniaccess-xavier-university",
+      "tenantId": "toc",
+      "sessionId": "2026-05-22-uniaccess-xavier-university",
+      "artifactHash": "bb890030b4f969877b0d70109899ba46d7ddcda1dd8252e13b51b26e0d41a045",
+      "complete": true,
+      "sourceTurns": 64,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 3,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-05-22-uniaccess-xavier-university-c01",
+            "2026-05-22-uniaccess-xavier-university-c02",
+            "2026-05-22-uniaccess-xavier-university-c03"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-05-23-uniaccess-atlas-skilltech",
+      "tenantId": "toc",
+      "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+      "artifactHash": "5b3830132a92d96e2199f1326069657525944a31484a621ca5103d599f776a01",
+      "complete": true,
+      "sourceTurns": 8,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 4,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-05-23-uniaccess-atlas-skilltech-c01",
+            "2026-05-23-uniaccess-atlas-skilltech-c02",
+            "2026-05-23-uniaccess-atlas-skilltech-c03"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-05-28-in-focus-1",
+      "tenantId": "toc",
+      "sessionId": "2026-05-28-in-focus-1",
+      "artifactHash": "c53649bcf96fa131073243a642201ea05f1aeda0579f8d0b5e7fc9fdc925aec5",
+      "complete": true,
+      "sourceTurns": 59,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 3,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-05-28-in-focus-1-c01",
+            "2026-05-28-in-focus-1-c02",
+            "2026-05-28-in-focus-1-c03"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-05-29-decoding-ever-expanding-cast",
+      "tenantId": "toc",
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "artifactHash": "fd69c5ac612cc8a01d3d1f729d90a6305e87d90aaa59e4b57b6d89aa4c9fea73",
+      "complete": true,
+      "sourceTurns": 15,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 2,
+            "denominator": 3,
+            "value": 0.6666666666666666
+          },
+          "affectedClaims": 2,
+          "claimIds": [
+            "2026-05-29-decoding-ever-expanding-cast-c01",
+            "2026-05-29-decoding-ever-expanding-cast-c02",
+            "2026-05-29-decoding-ever-expanding-cast-c03"
+          ],
+          "issues": [
+            {
+              "claimId": "2026-05-29-decoding-ever-expanding-cast-c02",
+              "code": "missing-turn",
+              "turnId": "2026-05-29-decoding-ever-expanding-cast-t161",
+              "sessionId": "2026-05-29-decoding-ever-expanding-cast"
+            },
+            {
+              "claimId": "2026-05-29-decoding-ever-expanding-cast-c03",
+              "code": "missing-turn",
+              "turnId": "2026-05-29-decoding-ever-expanding-cast-t190",
+              "sessionId": "2026-05-29-decoding-ever-expanding-cast"
+            }
+          ],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-06-03-dual-enrollment-pathway",
+      "tenantId": "toc",
+      "sessionId": "2026-06-03-dual-enrollment-pathway",
+      "artifactHash": "7bf6f5f005d749f97b45a27810012a0ee58cdbdee7bc0173f793ed64e984418d",
+      "complete": false,
+      "sourceTurns": 90,
+      "sourceIssues": [
+        "invalid-turn-time"
+      ],
+      "incompleteReasons": [
+        "invalid-turn-time"
+      ],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 1,
+            "denominator": 3,
+            "value": 0.3333333333333333
+          },
+          "affectedClaims": 1,
+          "claimIds": [
+            "2026-06-03-dual-enrollment-pathway-c01",
+            "2026-06-03-dual-enrollment-pathway-c02",
+            "2026-06-03-dual-enrollment-pathway-c03"
+          ],
+          "issues": [
+            {
+              "claimId": "2026-06-03-dual-enrollment-pathway-c02",
+              "code": "missing-turn",
+              "turnId": "2026-06-03-dual-enrollment-pathway-t092",
+              "sessionId": "2026-06-03-dual-enrollment-pathway"
+            }
+          ],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-06-19-entrance-exams-pathways-india-part1",
+      "tenantId": "toc",
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "artifactHash": "f83100507a1080135cdd008ae337743bcf19f7cfb8d4d0c329d7f8df544bc578",
+      "complete": true,
+      "sourceTurns": 38,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 4,
+          "wellFormedClaims": 4,
+          "invalidCitationRate": {
+            "numerator": 3,
+            "denominator": 5,
+            "value": 0.6
+          },
+          "affectedClaims": 3,
+          "claimIds": [
+            "2026-06-19-entrance-exams-pathways-india-part1-c01",
+            "2026-06-19-entrance-exams-pathways-india-part1-c02",
+            "2026-06-19-entrance-exams-pathways-india-part1-c03",
+            "2026-06-19-entrance-exams-pathways-india-part1-c04"
+          ],
+          "issues": [
+            {
+              "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c02",
+              "code": "missing-turn",
+              "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t051",
+              "sessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+            },
+            {
+              "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c03",
+              "code": "missing-turn",
+              "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t060",
+              "sessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+            },
+            {
+              "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c04",
+              "code": "missing-turn",
+              "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t059",
+              "sessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+            }
+          ],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 4,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 4,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-06-25-in-focus-2",
+      "tenantId": "toc",
+      "sessionId": "2026-06-25-in-focus-2",
+      "artifactHash": "94217378eb51cbd1c3c7cd68155315f273a95c19e404f31e8d608d299daa2742",
+      "complete": true,
+      "sourceTurns": 69,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 4,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-06-25-in-focus-2-c01",
+            "2026-06-25-in-focus-2-c02",
+            "2026-06-25-in-focus-2-c03"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-06-30-exploring-identity-success-counseling",
+      "tenantId": "toc",
+      "sessionId": "2026-06-30-exploring-identity-success-counseling",
+      "artifactHash": "8609465e0bb19c90de6f498e4314866022627a37d3a74861a0e9532ddd523b72",
+      "complete": true,
+      "sourceTurns": 16,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 2,
+          "wellFormedClaims": 2,
+          "invalidCitationRate": {
+            "numerator": 2,
+            "denominator": 2,
+            "value": 1
+          },
+          "affectedClaims": 2,
+          "claimIds": [
+            "2026-06-30-exploring-identity-success-counseling-c01",
+            "2026-06-30-exploring-identity-success-counseling-c02"
+          ],
+          "issues": [
+            {
+              "claimId": "2026-06-30-exploring-identity-success-counseling-c01",
+              "code": "missing-turn",
+              "turnId": "2026-06-30-exploring-identity-success-counseling-t085",
+              "sessionId": "2026-06-30-exploring-identity-success-counseling"
+            },
+            {
+              "claimId": "2026-06-30-exploring-identity-success-counseling-c02",
+              "code": "missing-turn",
+              "turnId": "2026-06-30-exploring-identity-success-counseling-t073",
+              "sessionId": "2026-06-30-exploring-identity-success-counseling"
+            }
+          ],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 2,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 2,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-07-03-inside-the-uc-session",
+      "tenantId": "toc",
+      "sessionId": "2026-07-03-inside-the-uc-session",
+      "artifactHash": "7c1a72b219e24cc33e855ab7580cc4a2f914206a380510c31cac5a9ca80a8b37",
+      "complete": true,
+      "sourceTurns": 50,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 4,
+          "wellFormedClaims": 4,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 4,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-07-03-inside-the-uc-session-c01",
+            "2026-07-03-inside-the-uc-session-c02",
+            "2026-07-03-inside-the-uc-session-c03",
+            "2026-07-03-inside-the-uc-session-c04"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 4,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 4,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-07-08-beyond-black-robes-law-careers",
+      "tenantId": "toc",
+      "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+      "artifactHash": "5057015794b9f898467c880721f14d919dd9e22a859c45ce44fb9cee41a580db",
+      "complete": true,
+      "sourceTurns": 134,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 4,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-07-08-beyond-black-robes-law-careers-c01",
+            "2026-07-08-beyond-black-robes-law-careers-c02",
+            "2026-07-08-beyond-black-robes-law-careers-c03"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-07-15-creative-futures",
+      "tenantId": "toc",
+      "sessionId": "2026-07-15-creative-futures",
+      "artifactHash": "286058eb1780a17adec40ea443e2b2ebe31cd18292dbac0df4ff869c0489dcde",
+      "complete": true,
+      "sourceTurns": 269,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 3,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-07-15-creative-futures-c01",
+            "2026-07-15-creative-futures-c02",
+            "2026-07-15-creative-futures-c03"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-07-22-uniaccess-cept-university",
+      "tenantId": "toc",
+      "sessionId": "2026-07-22-uniaccess-cept-university",
+      "artifactHash": "58db1f3af2f2846036f9934785f44cb12368fd813fc8d64c233059d1698b7b37",
+      "complete": true,
+      "sourceTurns": 56,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 4,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-07-22-uniaccess-cept-university-c01",
+            "2026-07-22-uniaccess-cept-university-c02",
+            "2026-07-22-uniaccess-cept-university-c03"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-07-28-metrics-and-mingling",
+      "tenantId": "toc",
+      "sessionId": "2026-07-28-metrics-and-mingling",
+      "artifactHash": "36af8782da74f44237fa514da879d4036e7722dca18de29d87a2dc6047c674b8",
+      "complete": true,
+      "sourceTurns": 83,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 3,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-07-28-metrics-and-mingling-c01",
+            "2026-07-28-metrics-and-mingling-c02",
+            "2026-07-28-metrics-and-mingling-c03"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-07-30-in-focus-3",
+      "tenantId": "toc",
+      "sessionId": "2026-07-30-in-focus-3",
+      "artifactHash": "bacd6df7348d4b54e477d4bcd298b8eca4224ebddb3a8da792c947715292ceb3",
+      "complete": true,
+      "sourceTurns": 96,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 3,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-07-30-in-focus-3-c01",
+            "2026-07-30-in-focus-3-c02",
+            "2026-07-30-in-focus-3-c03"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-08-03-uk-beyond-offer-letters",
+      "tenantId": "toc",
+      "sessionId": "2026-08-03-uk-beyond-offer-letters",
+      "artifactHash": "6e57ec1410c5133d32d0bbb62ed68c0b77ef4cc5089c25d7ce2fa8077d163148",
+      "complete": true,
+      "sourceTurns": 46,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 2,
+          "wellFormedClaims": 2,
+          "invalidCitationRate": {
+            "numerator": 1,
+            "denominator": 3,
+            "value": 0.3333333333333333
+          },
+          "affectedClaims": 1,
+          "claimIds": [
+            "2026-08-03-uk-beyond-offer-letters-c01",
+            "2026-08-03-uk-beyond-offer-letters-c02"
+          ],
+          "issues": [
+            {
+              "claimId": "2026-08-03-uk-beyond-offer-letters-c02",
+              "code": "missing-turn",
+              "turnId": "2026-08-03-uk-beyond-offer-letters-t061",
+              "sessionId": "2026-08-03-uk-beyond-offer-letters"
+            }
+          ],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 2,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 2,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-08-03-uk-beyond-offer-letters-reupload",
+      "tenantId": "toc",
+      "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+      "artifactHash": "c2e412c90e5dea1167a05aa2def58434ccbeb0ec839019bbf07d1464fac5122a",
+      "complete": true,
+      "sourceTurns": 43,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 2,
+          "wellFormedClaims": 2,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 2,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-08-03-uk-beyond-offer-letters-reupload-c01",
+            "2026-08-03-uk-beyond-offer-letters-reupload-c02"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 2,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 2,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-08-10-ucas-what-changed-what-matters",
+      "tenantId": "toc",
+      "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+      "artifactHash": "5021924e09e35ff6e8a66b9116c5c8a5799855a4d427f2c41c3c929700b30a76",
+      "complete": false,
+      "sourceTurns": 230,
+      "sourceIssues": [
+        "invalid-turn-time"
+      ],
+      "incompleteReasons": [
+        "invalid-turn-time"
+      ],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 3,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-08-10-ucas-what-changed-what-matters-c01",
+            "2026-08-10-ucas-what-changed-what-matters-c02",
+            "2026-08-10-ucas-what-changed-what-matters-c03"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-08-12-uniaccess-ashoka-university",
+      "tenantId": "toc",
+      "sessionId": "2026-08-12-uniaccess-ashoka-university",
+      "artifactHash": "75e36f1ea9fe650a64426943c540365c5ee31b11b6eecc41383d1bd982d4228a",
+      "complete": true,
+      "sourceTurns": 26,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 3,
+            "denominator": 3,
+            "value": 1
+          },
+          "affectedClaims": 3,
+          "claimIds": [
+            "2026-08-12-uniaccess-ashoka-university-c01",
+            "2026-08-12-uniaccess-ashoka-university-c02",
+            "2026-08-12-uniaccess-ashoka-university-c03"
+          ],
+          "issues": [
+            {
+              "claimId": "2026-08-12-uniaccess-ashoka-university-c01",
+              "code": "missing-turn",
+              "turnId": "2026-08-12-uniaccess-ashoka-university-t106",
+              "sessionId": "2026-08-12-uniaccess-ashoka-university"
+            },
+            {
+              "claimId": "2026-08-12-uniaccess-ashoka-university-c02",
+              "code": "missing-turn",
+              "turnId": "2026-08-12-uniaccess-ashoka-university-t084",
+              "sessionId": "2026-08-12-uniaccess-ashoka-university"
+            },
+            {
+              "claimId": "2026-08-12-uniaccess-ashoka-university-c03",
+              "code": "missing-turn",
+              "turnId": "2026-08-12-uniaccess-ashoka-university-t058",
+              "sessionId": "2026-08-12-uniaccess-ashoka-university"
+            }
+          ],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-08-24-uniaccess-leeds-arts-university",
+      "tenantId": "toc",
+      "sessionId": "2026-08-24-uniaccess-leeds-arts-university",
+      "artifactHash": "c0738997ad6958208eb584addf1288933072b54cfcaa3bb448ce18e00c2f8e41",
+      "complete": true,
+      "sourceTurns": 102,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 3,
+            "value": 0
+          },
+          "affectedClaims": 0,
+          "claimIds": [
+            "2026-08-24-uniaccess-leeds-arts-university-c01",
+            "2026-08-24-uniaccess-leeds-arts-university-c02",
+            "2026-08-24-uniaccess-leeds-arts-university-c03"
+          ],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-08-27-in-focus-4",
+      "tenantId": "toc",
+      "sessionId": "2026-08-27-in-focus-4",
+      "artifactHash": "603c3f44fd6201d99e25e7a472d32fd0cabe46395344a9861649ac907f8a6340",
+      "complete": true,
+      "sourceTurns": 51,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 3,
+          "wellFormedClaims": 3,
+          "invalidCitationRate": {
+            "numerator": 1,
+            "denominator": 3,
+            "value": 0.3333333333333333
+          },
+          "affectedClaims": 1,
+          "claimIds": [
+            "2026-08-27-in-focus-4-c01",
+            "2026-08-27-in-focus-4-c02",
+            "2026-08-27-in-focus-4-c03"
+          ],
+          "issues": [
+            {
+              "claimId": "2026-08-27-in-focus-4-c03",
+              "code": "missing-turn",
+              "turnId": "2026-08-27-in-focus-4-t102",
+              "sessionId": "2026-08-27-in-focus-4"
+            }
+          ],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 3,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 3,
+          "value": 0
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-09-02-india-test-series-part2",
+      "tenantId": "toc",
+      "sessionId": "2026-09-02-india-test-series-part2",
+      "artifactHash": "636cbfd8e7eac0ccc4c6c3454d8369514419977180b59b5253460ca943b50132",
+      "complete": true,
+      "sourceTurns": 150,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 0,
+          "wellFormedClaims": 0,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 0,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-09-09-global-test-prep-pathways",
+      "tenantId": "toc",
+      "sessionId": "2026-09-09-global-test-prep-pathways",
+      "artifactHash": "6f2ba1d62aac780b7f74551fd80d30b8c77ddfbe8cbc77e15efd9ced852b84da",
+      "complete": true,
+      "sourceTurns": 257,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 0,
+          "wellFormedClaims": 0,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 0,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-09-16-pathways-in-psychology",
+      "tenantId": "toc",
+      "sessionId": "2026-09-16-pathways-in-psychology",
+      "artifactHash": "14f96b3cea9e3ded36adb81b28965f26adb9449c794ec843f3a8287c63fb95e8",
+      "complete": true,
+      "sourceTurns": 396,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 0,
+          "wellFormedClaims": 0,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 0,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-09-21-uniaccess-japan",
+      "tenantId": "toc",
+      "sessionId": "2026-09-21-uniaccess-japan",
+      "artifactHash": "852905b908b03c237d57d707464820044bb85284b189255117137285c0af722b",
+      "complete": true,
+      "sourceTurns": 553,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 0,
+          "wellFormedClaims": 0,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 0,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-09-24-in-focus",
+      "tenantId": "toc",
+      "sessionId": "2026-09-24-in-focus",
+      "artifactHash": "010cdc007c97320021114e439075431aff3ea8d3ab5d17866a90eaa82f3f81d8",
+      "complete": true,
+      "sourceTurns": 41,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 0,
+          "wellFormedClaims": 0,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 0,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    },
+    {
+      "version": 1,
+      "id": "2026-09-24-zoho-next-european-study-destinations",
+      "tenantId": "toc",
+      "sessionId": "2026-09-24-zoho-next-european-study-destinations",
+      "artifactHash": "33ec1597f305e91bad19562be87c951552d7af301c3de037cc51db02ad3185f9",
+      "complete": true,
+      "sourceTurns": 80,
+      "sourceIssues": [],
+      "incompleteReasons": [],
+      "stages": {
+        "raw": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "parsed": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "filtered": {
+          "available": false,
+          "reason": "artifact-absent",
+          "rows": null,
+          "wellFormedClaims": null,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        },
+        "persisted": {
+          "available": true,
+          "reason": null,
+          "rows": 0,
+          "wellFormedClaims": 0,
+          "invalidCitationRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "affectedClaims": 0,
+          "claimIds": [],
+          "issues": [],
+          "optionalChecks": {
+            "span": 0,
+            "attribution": 0,
+            "excerpt": 0
+          }
+        }
+      },
+      "filterLoss": null,
+      "semantic": {
+        "measured": false,
+        "labeled": 0,
+        "eligible": 0,
+        "coverage": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "counts": {
+          "supported": 0,
+          "unsupported": 0,
+          "contradicted": 0,
+          "uncertain": 0,
+          "omitted": 0
+        },
+        "unsupportedRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "omissionRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "entities": {
+        "topic": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "person": {
+          "measured": false,
+          "labeled": 0,
+          "predicted": 0,
+          "precision": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        }
+      }
+    }
+  ]
+}

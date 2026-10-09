@@ -93,14 +93,14 @@ async function isUp(url) {
   }
 }
 
-export async function openPages(pages, baseUrl, { staggerMs = 350 } = {}) {
+export async function openPages(pages, baseUrl, { staggerMs = 350, execFileFn = execFile, timeoutMs = 10000 } = {}) {
   const [cmd, baseArgs] = opener;
   const failures = [];
   for (const [path] of pages) {
     const url = `${baseUrl}${path}`;
     try {
       await new Promise((resolve, reject) => {
-        execFile(cmd, [...baseArgs, url], (err) => (err ? reject(err) : resolve()));
+        execFileFn(cmd, [...baseArgs, url], { timeout: timeoutMs }, (err) => (err ? reject(err) : resolve()));
       });
     } catch (err) {
       failures.push({ path, url, error: err instanceof Error ? err.message : String(err) });

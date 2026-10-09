@@ -6,8 +6,8 @@
  *
  * Webinar-release mode follows D-056: classify first, preserve rejection/registration.
  */
-import type { CalendarEvent } from "./calendar-client.js";
-import { isTrustedSender, classifyWebinarInvite, webinarIdentity, webinarSessionKey, type TrustedSenderConfig } from "./auto-record-policy.js";
+import type { CalendarEvent, TrustedSenderConfig, AutoRecordCandidateInput, AutoRecordItem, SkipReason, SkippedItem, SelectAutoRecordItemsInput, SelectAutoRecordItemsResult } from "@lkb/core";
+import { isTrustedSender, classifyWebinarInvite, webinarIdentity, webinarSessionKey } from "./auto-record-policy.js";
 // Re-exported so existing callers/tests that imported these from auto-join.js before the U5
 // LOC-budget split (see auto-record-policy.ts's header) keep working without an import-path change.
 export { redactJoinLink, loadTrustedSenderConfig } from "./auto-record-policy.js";
@@ -33,80 +33,11 @@ export function selectEventsToAutoJoin(events: CalendarEvent[], now: string,
     .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 }
 
-// ---------------------------------------------------------------------------------------------
+
 // U5 — selectAutoRecordItems: the richer sibling used by `cli schedule-tick`.
-// ---------------------------------------------------------------------------------------------
 
-/** HTTP-mapped candidate subset; preserves the meeting-bot dependency boundary. */
-export interface AutoRecordCandidateInput {
-  id: string;
-  title: string;
-  senderEmail: string;
-  senderDomain: string;
-  status: "pending" | "approved" | "rejected" | "auto_approved";
-  meetingUrl?: string;
-  startTime?: string;
-  endTime?: string;
-  kind?: "past-recording" | "upcoming";
-  registrationOnly?: boolean;
-  cancelled?: boolean;
-}
 
-/** One item this tick decided to (attempt to) auto-record. `sessionKey` is the stable dedup
- * identity across ticks — `cal:<calendarEventId>` or `gmail:<candidateId>` — never the raw
- * `meetingUrl` (which can carry a rotating join token). */
-export interface AutoRecordItem {
-  sessionKey: string;
-  source: "calendar" | "gmail";
-  sourceId: string;
-  title: string;
-  startTime: string;
-  endTime: string;
-  meetingUrl: string;
-  sender?: string;
-}
-
-export type SkipReason =
-  | "no-join-link"
-  | "past"
-  | "untrusted-sender"
-  | "needs-registration"
-  | "duplicate-session"
-  | "overlap-lost"
-  | "not-webinar"
-  | "needs-review"
-  | "cancelled"
-  | "invalid-time"
-  | "unsafe-join-link";
-
-export interface SkippedItem {
-  sessionKey: string;
-  source: "calendar" | "gmail";
-  sourceId: string;
-  title: string;
-  reason: SkipReason;
-  /** Human-readable extra context — e.g. which session it lost to on "overlap-lost". Never
-   * contains a `meetingUrl` (see `redactJoinLink`). */
-  detail?: string;
-}
-
-export interface SelectAutoRecordItemsInput {
-  calendarEvents: CalendarEvent[];
-  candidates: AutoRecordCandidateInput[];
-  now: string;
-  leadMinutes: number;
-  trustedSenders: TrustedSenderConfig;
-  /** sessionKeys already scheduled by an earlier tick (from the persisted dedup state) —
-   * anything matching here is reported as `duplicate-session`, never re-scheduled. */
-  alreadyScheduled: ReadonlySet<string> | readonly string[];
-  /** Approved release policy; legacy callers retain trusted-sender behaviour when absent. */
-  everyWebinar?: boolean;
-}
-
-export interface SelectAutoRecordItemsResult {
-  toSchedule: AutoRecordItem[];
-  skipped: SkippedItem[];
-}
+export type { AutoRecordCandidateInput, AutoRecordItem, SkipReason, SkippedItem, SelectAutoRecordItemsInput, SelectAutoRecordItemsResult } from "@lkb/core";
 
 interface NormalizedItem {
   sessionKey: string;

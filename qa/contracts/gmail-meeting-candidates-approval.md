@@ -178,3 +178,34 @@ $ python -c "... db.trusted_senders.find_one({'tenantId':'toc','senderDomain':'v
   transmission, no student/applicant data. Verified by u2-source-watcher's checker unit check
   (`qa/verdicts/u2-source-watcher.md`, cycle 0): existing callers/tests unaffected (195/195
   `@lkb/api`, up from 193), `meetingUrl` extraction still never fabricates.
+
+## Amendment 2 — scoped T-036 alias/label acquisition slice (2026-10-05, checker-owned)
+
+This additive slice governs `t036-alias-label-intake` only. Original criteria 1–9 and Amendment 1 remain full-product obligations; this slice's PASS does not discharge migration/live Gmail/Mongo/browser evidence, T-036 completion, or R1. Intake configuration does not create an alias/filter, forward mail, register with organizers, or authorize capture.
+
+- **[A1]** Optional server configuration `LKB_GMAIL_ALIASES` and `LKB_GMAIL_LABEL_IDS` is consumed by the existing scanner; absent configuration preserves broad discovery. Literal validated aliases extend broad query using `deliveredto:` OR terms; labels each form an independent `labelIds: [id]` scope without broad-query restriction.
+- **[A2]** All scopes paginate independently with token-loop and 20-page safeguards; union IDs before message fetch, fetch each unique ID once. Malformed/incomplete/provider-failed acquisition in any scope rejects the complete scan with a sanitized error, never a partial success.
+- **[A3]** Invalid configuration rejects before any provider call: query/shell operators, control characters, empty list entries, more than 20 entries, oversized values and invalid literal identifiers. Configuration grants no additional credentials.
+- **[A4]** Gmail tests and API typecheck pass. LOC check must disclose existing violations; Gmail source introduces none. No assertion of full workspace health from these limited checks.
+- **[AI1]** Existing owner/tenant/work-database guards, rejected/non-webinar/registration-only scheduling controls and literal evidence extraction remain intact.
+- **[AI2]** Verification performs no real Gmail call, alias/filter setup, registration, capture, model call or database write; live configured-mailbox proof remains pending.
+
+## Amendment 3 — scoped T-052 registration acquisition (2026-10-05, checker-owned)
+
+This additive scanner-only slice governs `t052-registration-acquisition`. Original criteria 1–9 and previous amendments remain full-product obligations. No schema/persistence, registration submission or confirmation correlation is licensed or certified here. T-052 remains pending until durable correlation and real supported-organizer proof; full live Gmail/Mongo/browser requirements remain required.
+
+- **[R1]** Scanner returns exact literal body registration URL (snippet when body absent), including unknown organizer domains, separately from meetingUrl; absent registration evidence remains absent. Optional provider threadId must match a 1–256-character alphanumeric/underscore/hyphen identifier; missing remains absent, malformed rejects sanitized acquisition.
+- **[R2]** Literal direct body join precedes literal direct snippet join; both precede generic platform matches. Generic matches exclude registration URLs. Combined body/snippet evidence supplies registrationOnly, preserving registration barriers and avoiding fabricated launch evidence.
+- **[R3]** Gmail, route/work-boundary and downstream selection tests plus API typecheck pass. Existing global LOC violations are disclosed with no Gmail-source violation.
+- **[RI1]** Scanner-only fields are not falsely represented as persisted: store whitelist/schema remain unchanged. No external request, submission, confirmation, capture, production write or full-feature completion claim.
+- **[RI2]** Existing owner/tenant/work guards and registration-only/rejected/non-webinar barriers remain intact; literal acquisition grants no scheduling authority.
+
+## Amendment 4 — scoped T-052 persistence plumbing (2026-10-05, checker-owned)
+
+Governed by prior D-075 schema/store authorization and D-076 generator repair. Applies only to `t052-registration-persistence`; does not revise the historical scanner-only Amendment 3 verdict. Original full-product/live criteria remain obligations. This slice verifies canonical shape and injected actual-factory payload/HTTP plumbing, not actual Mongo durability or registration/confirmation completion.
+
+- **[P1]** Canonical optional registrationUrl and threadId fields and generated types exist. Thread identifiers reject empty/nonstring/control/over-256 values and accept valid 1/256 boundaries; absent optional fields remain valid.
+- **[P2]** Existing production factory preserves registrationUrl/threadId and all six preceding optional fields verbatim in tenant-bound createIfNew payloads; missing evidence stays absent and unapproved extra fields remain excluded. Existing GET route represents fields literally from supplied stored rows.
+- **[P3]** Schema27, Gmail/route regressions, immediate scheduling downstream tests and API/core types pass. Generator runs twice without changes and --check passes, retaining D-053 alerts and excluding test modules. Existing global LOC debt remains disclosed.
+- **[PI1]** Owner/work-database/tenant and registration-only/rejected scheduling barriers remain intact; evidence fields confer no registration or scheduling permission.
+- **[PI2]** No actual Mongo write/durability, real organizer submission, confirmation correlation or full T-052 completion is claimed by this PASS.

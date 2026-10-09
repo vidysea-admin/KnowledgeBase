@@ -6,7 +6,7 @@
     "extensions": [".ts", ".py", ".mjs"],
     "max": 300,
     "testMax": 400,
-    "testPatterns": ["\\.test\\.ts$", "^test_.*\\.py$"]
+    "testPatterns": ["\\.test\\.ts$", "^test_.*\\.py$", "\\.test\\.mjs$"]
   },
   "dirsize": { "maxFiles": 30, "overrides": { "scripts": 32, "apps/api/src": 31 } },
   "root": {

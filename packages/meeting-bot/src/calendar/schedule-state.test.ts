@@ -15,9 +15,51 @@ import {
   writeScheduledJob, readScheduledJob,
   prepareWebinarSourceState, readWebinarOperationState, writeWebinarOperationState, validateWebinarCalendarAcquisition,
   webinarCompletionState,
+  validateWebinarRegistration, confirmWebinarRegistration,
 } from "./schedule-state.js";
 import { createHttpCalendarLoader } from "./schedule-tick.js";
 import { selectAutoRecordItems } from "./auto-join.js";
+import { webinarSessionKey } from "./auto-record-policy.js";
+
+test("registration attempt round-trips strictly and confirmation requires unique matching evidence", () => {
+  withTempDir(dir => {
+    const checkedAt = "2026-10-05T08:00:00.000Z";
+    const attempt = {tenantId: "owner", sourceId: "candidate-original", sourceMessageId: "mail-original", threadId: "thread-original",
+      registrationUrl: "https://organizer.example/register", organizerEmail: "host@organizer.example", startTime: "2026-10-05T10:00:00.000Z",
+      endTime: "2026-10-05T11:00:00.000Z", attemptId: "12345678-1234-4123-8123-123456789abc", attemptedAt: checkedAt, phase: "submitting" as const,
+      baselineMessageIds: ["mail-original"]};
+    const file = path.join(dir, "operations.json");
+    const source = webinarSessionKey(JSON.stringify(["source", "owner", "gmail", "candidates", attempt.sourceId, "single"]));
+    const key = webinarSessionKey(`source-review|${source}`);
+    writeWebinarOperationState(file, {version: 1, tenantId: "owner", operations: {[key]: {tenantId: "owner", status: "action_required", registration: attempt}}});
+    assert.deepEqual(readWebinarOperationState(file, "owner", checkedAt).operations[key]!.registration, attempt);
+    assert.throws(() => writeWebinarOperationState(file, {version: 1, tenantId: "owner", operations: {wrong: {tenantId: "owner", status: "action_required", registration: attempt}}}));
+    const confirmation = {id: "candidate-confirmation", title: "Webinar", senderEmail: attempt.organizerEmail, senderDomain: "organizer.example",
+      status: "approved" as const, messageId: "mail-confirmation", threadId: attempt.threadId, startTime: attempt.startTime, endTime: attempt.endTime,
+      meetingUrl: "https://meet.google.com/abc-defg-hij"};
+    const confirmed = confirmWebinarRegistration(attempt, "owner", [confirmation], checkedAt)!;
+    assert.equal(confirmWebinarRegistration({...attempt, baselineMessageIds: undefined}, "owner", [confirmation], checkedAt), undefined);
+    assert.equal(confirmWebinarRegistration({...attempt, baselineMessageIds: ["mail-original", "mail-confirmation"]}, "owner", [confirmation], checkedAt), undefined);
+    for (const baselineMessageIds of [["mail-original", "mail-original"], ["bad\n"], [], ["mail-original", ...Array(20000).fill("extra")]])
+      assert.throws(() => validateWebinarRegistration({...attempt, baselineMessageIds}, "owner", checkedAt));
+    assert.equal(confirmed.phase, "confirmed"); assert.equal(confirmed.sourceId, attempt.sourceId);
+    assert.equal(confirmed.confirmationMessageId, confirmation.messageId);
+    for (const change of [{threadId: "wrong-thread"}, {messageId: attempt.sourceMessageId}, {senderEmail: "other@organizer.example"},
+      {startTime: "2026-10-05T10:01:00.000Z"}, {endTime: "2026-10-05T11:01:00.000Z"}, {status: "rejected" as const},
+      {cancelled: true}, {registrationOnly: true}, {meetingUrl: "https://organizer.example/register"},
+      {meetingUrl: "https://zoom.us/webinar/register/foo"}, {meetingUrl: "https://zoom.us/"}, {meetingUrl: "https://user@meet.google.com/abc-defg-hij"}]) {
+      assert.equal(confirmWebinarRegistration(attempt, "owner", [{...confirmation, ...change}], checkedAt), undefined);
+    }
+    assert.equal(confirmWebinarRegistration(attempt, "owner", [confirmation, {...confirmation, messageId: "other-message"}], checkedAt), undefined);
+    for (const change of [{tenantId: "foreign"}, {attemptId: "bad"}, {attemptedAt: "2026-10-05T08:01:00.000Z"}, {threadId: "bad\n"},
+      {phase: "new"}, {confirmationMessageId: "forged"}, {registrationUrl: "http://organizer.example/register"}]) {
+      assert.throws(() => validateWebinarRegistration({...attempt, ...change}, "owner", checkedAt));
+    }
+    writeWebinarOperationState(file, {version: 1, tenantId: "owner", operations: {[key]: {tenantId: "owner", status: "action_required", registration: confirmed}}});
+    assert.deepEqual(readWebinarOperationState(file, "owner", checkedAt).operations[key]!.registration, confirmed);
+    assert.throws(() => readWebinarOperationState(file, "foreign", checkedAt));
+  });
+});
 
 function withTempDir(fn: (dir: string) => void): void {
   const dir = mkdtempSync(path.join(tmpdir(), "lkb-schedule-state-"));

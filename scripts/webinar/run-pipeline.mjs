@@ -3,15 +3,17 @@
 import { existsSync, mkdirSync, openSync, closeSync, readFileSync, writeFileSync, unlinkSync, realpathSync, statSync } from 'node:fs';
 import { dirname, join, resolve, relative, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import {randomUUID} from 'node:crypto';
 import { register } from 'tsx/esm/api';
 register();
 const {selectAutoRecordItems} = await import('../../packages/meeting-bot/src/calendar/auto-join.ts');
 const {createHttpCalendarLoader, createHttpCandidateLoader, loadWebinarSourcesWithHealth} = await import('../../packages/meeting-bot/src/calendar/schedule-tick.ts');
 const {validateIndexProof} = await import('../../packages/meeting-bot/src/capture/record-commands.ts');
-const {loadTrustedSenderConfig, redactJoinLink, activeWebinarStopReason} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
+const {loadTrustedSenderConfig, redactJoinLink, activeWebinarStopReason, runWebinarRegistrations, reconcileWebinarRegistrationState, projectWebinarSelection} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
 const {launchControlledRecording} = await import('../../packages/meeting-bot/src/capture/reconnect-gaps.ts');
 const {createTelegramChannel, createOperationNotifications} = await import('../../packages/meeting-bot/src/capture/telegram-channel.ts');
-const {readWebinarOperationState, writeWebinarOperationState, prepareWebinarSourceState, webinarCompletionState} = await import('../../packages/meeting-bot/src/calendar/schedule-state.ts');
+const {readWebinarOperationState, writeWebinarOperationState, prepareWebinarSourceState, webinarCompletionState, validateWebinarRegistration, confirmWebinarRegistration} = await import('../../packages/meeting-bot/src/calendar/schedule-state.ts');
+const {createBrowserRegistrationExecutor} = await import('../../packages/meeting-bot/src/joiners/browser-joiner.ts');
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const ID = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const load = (path) => JSON.parse(readFileSync(path, 'utf8'));
@@ -65,6 +67,7 @@ export function createPipelineDeps(env = process.env) {
       } finally { await response.body?.cancel(); }
     },
     loadCalendarEvents: createHttpCalendarLoader(api, env.LKB_API_KEY),
+    ...createBrowserRegistrationExecutor(env, ROOT),
     loadCalendarAcquisition: createHttpCalendarLoader(api, env.LKB_API_KEY, undefined, {tenantId: env.LKB_TENANT_ID}),
     loadCandidates: async (refresh = false) => {
       if (refresh) {
@@ -113,11 +116,10 @@ export async function runPipelineTick(deps, run = false) {
   const select = () => selectAutoRecordItems({calendarEvents, candidates, now: now(), leadMinutes: 5,
     trustedSenders: loadTrustedSenderConfig(env), alreadyScheduled: Object.entries(state.operations).filter(([, row]) =>
       ['ready', 'recording', 'processing', 'action_required'].includes(row.status) && !reconsider(row)).map(([id]) => id), everyWebinar: true});
-  const projection = selection => ({status: run ? 'running' : 'preview', toRecord: selection.toSchedule.map(({meetingUrl: _secret, ...item}) => item), skipped: selection.skipped});
   if (!run) {
     const loaded = await loadWebinarSourcesWithHealth(deps, now());
     if (loaded.failed) throw new Error('Webinar discovery unavailable');
-    ({calendarEvents, candidates} = loaded); preview = projection(select());
+    ({calendarEvents, candidates} = loaded); preview = projectWebinarSelection(select(), run);
     log(`Preview: ${preview.toRecord.length} due webinar(s), ${preview.skipped.length} skipped; no writes or captures`); return preview;
   }
   mkdirSync(stateDir, {recursive: true});
@@ -214,9 +216,9 @@ export async function runPipelineTick(deps, run = false) {
     if (loaded.failed) throw Object.assign(new Error('Webinar discovery unavailable; coverage requires attention'), {code: 'WEBINAR_DISCOVERY_UNAVAILABLE'});
     await notifications.wait();
     try {
-      const prepared = prepareWebinarSourceState(state, loaded.calendarAcquisition, loaded.candidates, checkedAt);
-      writeWebinarOperationState(statePath, prepared.state);
-      Object.assign(state, prepared.state);
+      const prepared = await reconcileWebinarRegistrationState({state, tenantId, candidates: loaded.candidates, now,
+        validate: validateWebinarRegistration, confirm: confirmWebinarRegistration, createUUID: randomUUID,
+        value: loaded.calendarAcquisition, checkedAt, prepare: prepareWebinarSourceState, persist: value => writeWebinarOperationState(statePath, value)});
       ({calendarEvents, candidates} = prepared);
       return prepared;
     } catch {
@@ -225,8 +227,11 @@ export async function runPipelineTick(deps, run = false) {
     }
   }
   try {
-    await refresh();
-    let selection = select(); preview = projection(selection);
+    const acquired = await refresh();
+    await runWebinarRegistrations({state, tenantId, candidates, acquisition: {...acquired, state: state.source.reconciliation}, now,
+      config: deps.registrationConfig, register: deps.registerWebinar, update,
+      validate: validateWebinarRegistration, confirm: confirmWebinarRegistration, createUUID: randomUUID});
+    let selection = select(); preview = projectWebinarSelection(selection, run);
     // Retry delivery independently of recording transitions; all owner gates and lane locking have completed.
     for (const id of Object.keys(state.operations)) {
       if (!ID.test(id)) throw new Error('Unsafe operation id in persisted state');
@@ -276,8 +281,32 @@ export async function runPipelineTick(deps, run = false) {
 export async function runPipelineWatch({run = false, watch = false} = {}, deps = {}) {
   if (watch && !run) throw new Error('--watch requires --run; preview is a single read-only tick');
   const tick = deps.tick ?? (() => runPipelineTick(createPipelineDeps(), run)), wait = deps.wait ?? sleep, log = deps.log ?? console.log;
+  const statuses = ['queued', 'recording', 'processing', 'failed', 'ready', 'action_required'];
+  const phases = ['submitting', 'awaiting-confirmation', 'uncertain', 'action_required', 'confirmed'];
+  const reasons = ['retry-limit', 'interrupted-no-recording-artifact', 'missed-while-processing', 'missed-coverage', 'cancelled',
+    'controller-disconnected', 'coverage-review', 'overlap-lost', 'needs-registration', 'needs-review', 'invalid-time',
+    'unsafe-join-link', 'no-join-link', 'source-discontinuity', 'unproven-calendar-history', 'rejected', 'rescheduled',
+    'rescheduled-completed', 'recurring-series', 'unknown-tombstone', 'ambiguous-provider', 'contradictory-revision',
+    'missing-revision', 'ambiguous-identity'];
+  const timestamp = value => typeof value === 'string' && Number.isFinite(Date.parse(value)) &&
+    new Date(value).toISOString() === value ? safeText(value) : undefined;
   do {
-    try { log(JSON.stringify(await tick(), null, 2)); }
+    try {
+      const result = await tick();
+      const rows = result?.operations && typeof result.operations === 'object' && !Array.isArray(result.operations)
+        ? Object.entries(result.operations) : [];
+      const items = rows.slice(0, 200).flatMap(([id, row]) => !ID.test(id) || !row || typeof row !== 'object' ? [] : [{
+        id: safeText(id), status: statuses.includes(row.status) ? safeText(row.status) : undefined,
+        registrationPhase: phases.includes(row.registration?.phase) ? safeText(row.registration.phase) : undefined,
+        reason: row.reason === undefined ? undefined : reasons.includes(row.reason) ? safeText(row.reason) : 'details-private',
+        updatedAt: timestamp(row.updatedAt), startTime: timestamp(row.startTime), endTime: timestamp(row.endTime),
+        completedAt: timestamp(row.completedAt),
+      }]);
+      log(JSON.stringify({status: ['preview', 'running'].includes(result?.status) ? result.status : 'unavailable',
+        toRecord: Array.isArray(result?.toRecord) ? result.toRecord.length : 0,
+        skipped: Array.isArray(result?.skipped) ? result.skipped.length : 0,
+        operations: {total: rows.length, omitted: rows.length - items.length, items}}, null, 2));
+    }
     catch (error) {
       if (!watch || error?.code !== 'WEBINAR_DISCOVERY_UNAVAILABLE') throw error;
       log('Webinar discovery unavailable; retrying next tick; coverage requires attention');

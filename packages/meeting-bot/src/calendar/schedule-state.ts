@@ -1,24 +1,11 @@
-/**
- * packages/meeting-bot/src/calendar/schedule-state.ts — U5 (u5-auto-record-scheduler). Persisted
- * dedup state: which `sessionKey`s `cli schedule-tick` has already handed to the Windows
- * scheduler, so a later tick (run every few minutes per docs/plan.md U6, not yet built) never
- * re-schedules the same session twice.
- *
- * A local JSON file, not a new Mongo collection — same "real-by-default, no new infra unless
- * needed" precedent as `capture/controller-state.ts` (which this file's shape deliberately
- * mirrors: read/write/remove, never throws on a missing or corrupt file). [ASSUMPTION] a file
- * fits here because dedup state is local-machine, single-poller-instance data (like the record
- * controller's own state), not something another tenant/service needs to query — unlike
- * `meeting_candidates`, which genuinely needed a shared, queryable Mongo collection. If a second
- * poller instance or a cross-machine view is ever needed, this should move to Mongo (a schema +
- * migration, per repo convention) — flagged here rather than silently built that way.
- */
+
 import { existsSync, readFileSync, writeFileSync, mkdirSync, statSync, renameSync, unlinkSync, openSync, closeSync, fsyncSync, lstatSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { reconcileWebinarSources, type CalendarEvent, type WebinarReconciliationState } from "./calendar-client.js";
 import type { AutoRecordCandidateInput } from "./auto-join.js";
-import { projectWebinarInventory } from "./auto-record-policy.js";
+import { projectWebinarInventory, projectWebinarRegistrations, webinarSessionKey, isDirectWebinarJoin, type WebinarRegistrationAttempt } from "./auto-record-policy.js";
+export type { WebinarRegistrationAttempt } from "./auto-record-policy.js";
 
 export interface WebinarCalendarAcquisition {
   version: 1; tenantId: string; scope: "available-connected-source-state"; complete: true;
@@ -51,7 +38,7 @@ function calendarRows(rows: unknown): asserts rows is WebinarCalendarAcquisition
       row.recurrence.some((rule: unknown) => typeof rule !== "string" || !rule.length || rule.length > 8192 || /[\x00-\x1f\x7f]/.test(rule)))) invalid();
   }
 }
-/** The native token is accepted only for the requested owner, mode and completed generation. */
+
 export function validateWebinarCalendarAcquisition(value: unknown, tenantId: string, requestedSyncToken?: string, requestStartedAt?: string): WebinarCalendarAcquisition {
   object(value, ["version", "tenantId", "scope", "complete", "mode", "checkedAt", "requestedSyncToken", "syncToken", "sourceEvents", "meetings"]);
   if (value.version !== 1 || value.tenantId !== tenantId || value.scope !== "available-connected-source-state" || value.complete !== true ||
@@ -76,6 +63,11 @@ function validateOperations(value: unknown, tenantId: string, checkedAt: string)
       !["queued", "recording", "processing", "failed", "ready", "action_required"].includes(row.status) ||
       (row.attempts !== undefined && (!Number.isSafeInteger(row.attempts) || row.attempts < 0)) ||
       (row.priorSessionId !== undefined && (!ID.test(row.priorSessionId) || value.operations[row.priorSessionId]?.tenantId !== tenantId))) invalid();
+    if (row.registration !== undefined) {
+      const attempt = validateWebinarRegistration(row.registration, tenantId, checkedAt);
+      const source = webinarSessionKey(JSON.stringify(["source", tenantId, "gmail", "candidates", attempt.sourceId, "single"]));
+      if (id !== webinarSessionKey(`source-review|${source}`)) invalid();
+    }
     if (row.stopDisposition !== undefined) {
       object(row.stopDisposition, ["tenantId", "sessionId", "generation", "reason", "requestedAt", "acknowledged"]);
       const stop = row.stopDisposition;
@@ -106,7 +98,39 @@ function validateOperations(value: unknown, tenantId: string, checkedAt: string)
     acquisition: {complete: true, historyComplete: false, scope: coverage.scope}, candidates: [],
     calendarEvents: rows.map(({recurrence: _series, ...row}) => row)});
 }
-/** Strict source history deliberately does not use the legacy corrupt-file reset below. */
+
+export function validateWebinarRegistration(value: unknown, tenantId: string, checkedAt: string): WebinarRegistrationAttempt {
+  object(value, ["tenantId", "sourceId", "sourceMessageId", "threadId", "registrationUrl", "organizerEmail", "startTime", "endTime", "attemptId", "attemptedAt", "phase", "confirmationMessageId", "confirmedAt", "meetingUrl", "baselineMessageIds"]);
+  const identifier = (id: unknown) => typeof id === "string" && /^[A-Za-z0-9_-]{1,256}$/.test(id);
+  if (value.baselineMessageIds !== undefined && (!Array.isArray(value.baselineMessageIds) || value.baselineMessageIds.length > 20000 ||
+      value.baselineMessageIds.some(id => !identifier(id)) || new Set(value.baselineMessageIds).size !== value.baselineMessageIds.length || !value.baselineMessageIds.includes(value.sourceMessageId))) invalid();
+  let url: URL; try { url = new URL(value.registrationUrl); } catch { invalid(); }
+  if (value.tenantId !== tenantId || typeof value.sourceId !== "string" || !value.sourceId || value.sourceId.length > 1024 || /[\x00-\x1f\x7f]/.test(value.sourceId) ||
+      !identifier(value.sourceMessageId) || !identifier(value.threadId) || url!.protocol !== "https:" || url!.username || url!.password ||
+      typeof value.organizerEmail !== "string" || !/^[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value.organizerEmail) ||
+      !stamp(value.startTime) || !stamp(value.endTime) || value.endTime <= value.startTime || !stamp(value.attemptedAt) || value.attemptedAt > checkedAt ||
+      typeof value.attemptId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value.attemptId) ||
+      !["submitting", "awaiting-confirmation", "uncertain", "action_required", "confirmed"].includes(value.phase)) invalid();
+  if (value.phase === "confirmed") {
+    if (!value.baselineMessageIds || value.baselineMessageIds.includes(value.confirmationMessageId) || !identifier(value.confirmationMessageId) || value.confirmationMessageId === value.sourceMessageId || !stamp(value.confirmedAt) ||
+        value.confirmedAt < value.attemptedAt || value.confirmedAt > checkedAt || !isDirectWebinarJoin(value.meetingUrl, value.startTime)) invalid();
+  } else if ([value.confirmationMessageId, value.confirmedAt, value.meetingUrl].some(item => item !== undefined)) invalid();
+  return value as WebinarRegistrationAttempt;
+}
+
+export function confirmWebinarRegistration(attempt: WebinarRegistrationAttempt, tenantId: string, candidates: AutoRecordCandidateInput[], checkedAt: string): WebinarRegistrationAttempt | undefined {
+  validateWebinarRegistration(attempt, tenantId, checkedAt);
+  if (!attempt.baselineMessageIds || attempt.phase === "confirmed" || attempt.phase === "action_required") return undefined;
+  const matches = candidates.filter(row => row.threadId === attempt.threadId && !attempt.baselineMessageIds!.includes(row.messageId!) && row.messageId !== attempt.sourceMessageId &&
+    typeof row.messageId === "string" && /^[A-Za-z0-9_-]{1,256}$/.test(row.messageId) && row.senderEmail === attempt.organizerEmail &&
+    row.startTime === attempt.startTime && row.endTime === attempt.endTime && row.status !== "rejected" && !row.cancelled &&
+    row.registrationOnly !== true && isDirectWebinarJoin(row.meetingUrl, row.startTime));
+  if (matches.length !== 1) return undefined;
+  const confirmed: WebinarRegistrationAttempt = {...attempt, phase: "confirmed", confirmationMessageId: matches[0]!.messageId,
+    confirmedAt: checkedAt, meetingUrl: matches[0]!.meetingUrl};
+  return validateWebinarRegistration(confirmed, tenantId, checkedAt);
+}
+
 export function readWebinarOperationState(file: string, tenantId: string, checkedAt: string): WebinarOperationState {
   if (existsSync(file) && statSync(file).size > CAP) invalid();
   const value = existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : {version: 1, tenantId, operations: {}};
@@ -126,7 +150,7 @@ export function writeWebinarOperationState(file: string, value: WebinarOperation
     if (created && existsSync(temporary)) unlinkSync(temporary);
   }
 }
-/** A successful index cannot erase a persisted stop or the managed child's incomplete tail. */
+
 export function webinarCompletionState(sourceFile: string, tenantId: string, sessionId: string, row: Operation, completedAt: string) {
   let childReason: string | undefined;
   if (existsSync(sourceFile)) {
@@ -146,7 +170,7 @@ export function webinarCompletionState(sourceFile: string, tenantId: string, ses
   const reason = row.stopDisposition?.reason ?? childReason ?? (row.monitorGap ? "coverage-review" : undefined);
   return {status: reason ? "action_required" : "ready", reason, completedAt};
 }
-/** Prepare a new generation without mutating the committed source, operations or checkpoint. */
+
 export function prepareWebinarSourceState(previous: WebinarOperationState, value: unknown, candidates: AutoRecordCandidateInput[], requestStartedAt: string) {
   validateOperations(previous, previous.tenantId, requestStartedAt);
   const acquired = validateWebinarCalendarAcquisition(value, previous.tenantId, previous.source?.coverage.calendarSyncToken, requestStartedAt);
@@ -177,6 +201,8 @@ export function prepareWebinarSourceState(previous: WebinarOperationState, value
   const reconciled = reconcileWebinarSources({tenantId: previous.tenantId, checkedAt: requestStartedAt, previous: previous.source?.reconciliation,
     acquisition: {complete: true, historyComplete: false, scope: acquired.scope, discontinuousCalendarIds: [...new Set(discontinuousCalendarIds)]},
     calendarEvents: fresh.map(({recurrence: _series, ...row}) => row), candidates});
+  projectWebinarRegistrations({registrations: Object.values(previous.operations).map(row => row.registration), previous: previous.source?.reconciliation,
+    reconciled, candidates, tenantId: previous.tenantId, checkedAt: requestStartedAt, validate: validateWebinarRegistration, confirm: confirmWebinarRegistration});
   const series = all.filter(row => row.recurrence || (row.cancelled && previous.source?.mirror[row.id]?.some(prior => prior.recurrence)));
   const state: WebinarOperationState = {...JSON.parse(JSON.stringify(previous)), source: {
     coverage: {scope: acquired.scope, baselineComplete: true, continuousSince: acquired.mode === "sync" ? previous.source!.coverage.continuousSince : requestStartedAt,
@@ -190,8 +216,7 @@ export function prepareWebinarSourceState(previous: WebinarOperationState, value
 export interface ScheduledEntry {
   sessionKey: string;
   title: string;
-  /** ISO timestamp of when this tick scheduled it — never the meetingUrl (never persist a join
-   * token to disk any more than to a log). */
+  
   scheduledAt: string;
 }
 
@@ -201,8 +226,7 @@ export function scheduleStateFilePath(stateDir: string): string {
   return path.join(stateDir, "schedule-state.json");
 }
 
-/** Never throws — a missing or corrupt file is treated as "nothing scheduled yet," matching
- * `readControllerState`'s conservative-on-read-failure convention. */
+
 export function readScheduleState(stateDir: string): ScheduleState {
   const p = scheduleStateFilePath(stateDir);
   if (!existsSync(p)) return {};
@@ -214,14 +238,12 @@ export function readScheduleState(stateDir: string): ScheduleState {
   }
 }
 
-/** The set of sessionKeys already scheduled — the shape `selectAutoRecordItems`'
- * `alreadyScheduled` input expects. */
+
 export function readScheduledKeys(stateDir: string): Set<string> {
   return new Set(Object.keys(readScheduleState(stateDir)));
 }
 
-/** Records one newly-scheduled session, upserting the state file. Creates `stateDir` if it
- * doesn't exist yet (mirrors `controller-state.ts` callers' `New-Item -Force`-style tolerance). */
+
 export function recordScheduled(stateDir: string, entry: ScheduledEntry): void {
   mkdirSync(stateDir, { recursive: true });
   const state = readScheduleState(stateDir);
@@ -229,25 +251,13 @@ export function recordScheduled(stateDir: string, entry: ScheduledEntry): void {
   writeFileSync(scheduleStateFilePath(stateDir), JSON.stringify(state, null, 2) + "\n");
 }
 
-// ---------------------------------------------------------------------------------------------
-// ISS-317 fix (cycle 2): per-job JSON files under `<stateDir>/scheduled/<jobKey>.json`. The
-// sensitive fields (url with its join token, full end datetime, title, sessionId) used to be
-// interpolated straight into the Scheduled Task's `/tr` command line — now they are persisted
-// here instead, and `start-record-detached.ps1 -Job <jobKey>` reads this file at launch time.
-// Keyed by `jobKey` (task-scheduler.ts's `deriveJobKey`), never the raw `sessionKey` — sessionKey
-// can contain a `:` (`gmail:<id>`), which is not a safe/legal Windows filename character.
-// ---------------------------------------------------------------------------------------------
-
 export interface ScheduledJob {
-  /** The real join URL (with its join token) — never persisted to the Task Scheduler command
-   * line, only here (this file lives under the gitignored `raw/webinars/` tree). */
+  
   url: string;
-  /** Full ISO end datetime (ISS-319 fix) — NOT a bare local `HH:mm`, so a session crossing
-   * midnight still resolves to a stop time after its own start, not ~24h in the past. */
+  
   until: string;
   title: string;
-  /** The original sessionKey (`gmail:<id>` / `cal:<id>`), kept for logging/debugging — never
-   * used as a filesystem path component itself (that's `jobKey`'s job). */
+  
   sessionId: string;
 }
 
@@ -259,18 +269,7 @@ export function scheduledJobFilePath(stateDir: string, jobKey: string): string {
   return path.join(scheduledJobDir(stateDir), `${jobKey}.json`);
 }
 
-/**
- * Writes (or overwrites) the job file for `jobKey`. Creates `<stateDir>/scheduled/` if needed.
- *
- * **ISS-321 collision guard.** `jobKey` is now derived from a hash of the full `sessionKey`
- * (`task-scheduler.ts`'s `deriveJobKey`), so a genuine collision between two DIFFERENT sessions is
- * cryptographically unlikely — but "unlikely" is not "impossible, so never check": before writing,
- * this reads whatever job file already exists at this jobKey's path. If one exists and belongs to
- * a different session (`existing.sessionId !== job.sessionId`), this throws rather than silently
- * overwriting it — the ISS-321 defect was exactly this overwrite happening with no detection at
- * all. Re-scheduling the SAME session (a corrective tick, a retry) is expected and always allowed:
- * the check is keyed on sessionId equality, not "a file is already there."
- */
+
 export function writeScheduledJob(stateDir: string, jobKey: string, job: ScheduledJob): void {
   const existing = readScheduledJob(stateDir, jobKey);
   if (existing && existing.sessionId !== job.sessionId) {
@@ -284,8 +283,7 @@ export function writeScheduledJob(stateDir: string, jobKey: string, job: Schedul
   writeFileSync(scheduledJobFilePath(stateDir, jobKey), JSON.stringify(job, null, 2) + "\n");
 }
 
-/** Never throws — a missing or corrupt job file returns `null` (mirrors `readScheduleState`'s
- * conservative-on-read-failure convention). */
+
 export function readScheduledJob(stateDir: string, jobKey: string): ScheduledJob | null {
   const p = scheduledJobFilePath(stateDir, jobKey);
   if (!existsSync(p)) return null;

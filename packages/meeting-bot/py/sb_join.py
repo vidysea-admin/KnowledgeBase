@@ -303,9 +303,8 @@ def should_force_reload(reload_file):
     return bool(reload_file) and os.path.exists(reload_file)
 
 
-def kill_orphans(profile):
-    """A previous bot run that was killed leaves its Chrome holding the profile lock, and the
-    next launch then hangs silently. Kill only processes whose command line names this profile."""
+def kill_orphans(profile, launch=False, expected_exe=None):
+    """Windows ownership is established before launch; cleanup never scans foreign processes."""
     import subprocess
     if sys.platform.startswith("linux"):
         import signal
@@ -371,69 +370,337 @@ def kill_orphans(profile):
         return  # Never delete Linux Singleton files, which may be live symlinks.
     if os.name != "nt":
         raise RuntimeError("Unsupported recorder process-cleanup platform")
+    import ctypes
+    from ctypes import wintypes as w
     import math
+    import msvcrt
+    import pathlib
     import psutil
-    expected = os.path.normcase(os.path.realpath(profile))
+    import uuid
+    expected = os.path.normcase(os.path.abspath(profile))
 
-    def windows_identity(process):
-        executable = os.path.normcase(os.path.realpath(process.exe()))
-        if os.path.basename(executable).lower() not in ("chrome.exe", "chromium.exe"):
-            return None
-        argv = process.cmdline()
-        if any(arg == "--type" or arg.startswith("--type=") for arg in argv):
-            return None
-        profiles = []
-        for index, arg in enumerate(argv):
-            if arg.startswith("--user-data-dir="):
-                profiles.append(arg.split("=", 1)[1])
-            elif arg == "--user-data-dir":
-                profiles.append(argv[index + 1] if index + 1 < len(argv) else "")
-        normalized = [os.path.normcase(os.path.realpath(p)) if p and os.path.isabs(p) else None for p in profiles]
-        if expected not in normalized:
-            return None
-        if any(value != expected for value in normalized):
-            raise RuntimeError("Ambiguous recorder browser profile identity")
-        created = process.create_time()
-        if not isinstance(process.pid, int) or isinstance(process.pid, bool) or process.pid <= 0 or not isinstance(created, (int, float)) or isinstance(created, bool) or not math.isfinite(created) or created <= 0:
-            raise RuntimeError("Missing recorder browser process identity")
-        return process.pid, executable, expected, created
+    def checked(target):
+        target = pathlib.Path(target)
+        for component in [target, *target.parents]:
+            if component.exists() and os.lstat(component).st_file_attributes & 0x400:
+                raise RuntimeError("Redirected owned profile refused")
+        if os.path.normcase(os.path.realpath(target)) != os.path.normcase(os.path.abspath(target)):
+            raise RuntimeError("Noncanonical owned profile refused")
+        return str(target)
 
+    checked(expected)
+    os.makedirs(expected, exist_ok=True)
+    lock_path = checked(os.path.join(expected, ".lkb-profile.lock"))
+    lock = open(lock_path, "a+b")
     try:
-        for process in psutil.process_iter():
-            try:
-                if process.name().lower() not in ("chrome.exe", "chromium.exe"):
-                    continue
-                before = windows_identity(process)
-                if before is None:
-                    continue
-                current = psutil.Process(process.pid)
-                if windows_identity(current) != before:
-                    raise RuntimeError("Recorder browser process identity changed before cleanup")
-                current.terminate()
-                current.wait(timeout=3)
-            except psutil.NoSuchProcess:
-                continue
-    except (psutil.AccessDenied, psutil.TimeoutExpired, OSError) as error:
-        raise RuntimeError("Cannot verify owned recorder browser termination") from error
-    for name in ("SingletonLock", "SingletonCookie", "SingletonSocket"):
+        if os.path.getsize(lock_path) == 0:
+            lock.write(b"0"); lock.flush()
+        lock.seek(0); msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
+    except Exception:
+        lock.close(); raise RuntimeError("Owned profile is occupied")
+    ledger_path = checked(os.path.join(expected, ".lkb-ownership.json"))
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    signatures = {
+        "CreateJobObjectW": ([ctypes.c_void_p, w.LPCWSTR], w.HANDLE),
+        "OpenJobObjectW": ([w.DWORD, w.BOOL, w.LPCWSTR], w.HANDLE),
+        "SetInformationJobObject": ([w.HANDLE, ctypes.c_int, ctypes.c_void_p, w.DWORD], w.BOOL),
+        "AssignProcessToJobObject": ([w.HANDLE, w.HANDLE], w.BOOL),
+        "IsProcessInJob": ([w.HANDLE, w.HANDLE, ctypes.POINTER(w.BOOL)], w.BOOL),
+        "QueryInformationJobObject": ([w.HANDLE, ctypes.c_int, ctypes.c_void_p, w.DWORD, ctypes.c_void_p], w.BOOL),
+        "TerminateJobObject": ([w.HANDLE, w.UINT], w.BOOL),
+        "OpenProcess": ([w.DWORD, w.BOOL, w.DWORD], w.HANDLE),
+        "CloseHandle": ([w.HANDLE], w.BOOL), "GetCurrentProcess": ([], w.HANDLE)}
+    for name, (args, result) in signatures.items():
+        getattr(kernel, name).argtypes = args; getattr(kernel, name).restype = result
+
+    class Basic(ctypes.Structure):
+        _fields_ = [("ProcessTime", ctypes.c_longlong), ("JobTime", ctypes.c_longlong), ("Flags", w.DWORD),
+                    ("MinWorking", ctypes.c_size_t), ("MaxWorking", ctypes.c_size_t), ("ActiveLimit", w.DWORD),
+                    ("Affinity", ctypes.c_size_t), ("Priority", w.DWORD), ("Scheduling", w.DWORD)]
+
+    class IO(ctypes.Structure):
+        _fields_ = [(name, ctypes.c_ulonglong) for name in ("ReadOps", "WriteOps", "OtherOps", "ReadBytes", "WriteBytes", "OtherBytes")]
+
+    class Extended(ctypes.Structure):
+        _fields_ = [("Basic", Basic), ("IO", IO), ("ProcessMemory", ctypes.c_size_t), ("JobMemory", ctypes.c_size_t),
+                    ("PeakProcessMemory", ctypes.c_size_t), ("PeakJobMemory", ctypes.c_size_t)]
+
+    class Accounting(ctypes.Structure):
+        _fields_ = [(name, ctypes.c_longlong) for name in ("User", "Kernel", "PeriodUser", "PeriodKernel")] + [
+            (name, w.DWORD) for name in ("Faults", "Total", "Active", "Terminated")]
+
+    def active(job):
+        value = Accounting()
+        if not kernel.QueryInformationJobObject(job, 1, ctypes.byref(value), ctypes.sizeof(value), None):
+            raise RuntimeError("Cannot query owned Job accounting")
+        return value.Active
+
+    def identity(pid):
+        if not isinstance(pid, int) or isinstance(pid, bool) or pid <= 0:
+            raise RuntimeError("Invalid owned PID")
+        process = psutil.Process(pid)
+        created = process.create_time()
+        if not isinstance(created, (int, float)) or not math.isfinite(created) or created <= 0:
+            raise RuntimeError("Invalid owned creation time")
+        return {"pid": pid, "created": created, "exe": os.path.normcase(os.path.realpath(process.exe()))}
+
+    def persist(record):
+        if len(json.dumps(record).encode("utf-8")) > 8192:
+            raise RuntimeError("Owned ledger exceeds bound")
+        temporary = checked(ledger_path + "." + str(uuid.uuid4()) + ".tmp")
         try:
-            os.remove(os.path.join(profile, name))
-        except OSError:
-            pass
+            with open(temporary, "x", encoding="utf-8") as file:
+                json.dump(record, file); file.flush(); os.fsync(file.fileno())
+            os.replace(temporary, ledger_path)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
+
+    if os.path.exists(ledger_path):
+        if os.path.getsize(ledger_path) > 8192:
+            raise RuntimeError("Owned ledger too large")
+        with open(ledger_path, encoding="utf-8") as file:
+            record = json.load(file)
+        if (not isinstance(record, dict) or set(record) - {"version", "profile", "nonce", "job", "phase", "owner", "browserExe", "browser"}
+                or record.get("version") != 1 or record.get("profile") != expected
+                or record.get("phase") not in ("contained", "browser", "cleaned")
+                or str(uuid.UUID(record.get("nonce", ""))) != record["nonce"]
+                or record.get("job") != "Local\\LKB-" + record["nonce"]
+                or not isinstance(record.get("owner"), dict) or set(record["owner"]) != {"pid", "created", "exe"}
+                or not isinstance(record.get("browserExe"), str) or not os.path.isabs(record["browserExe"])):
+            raise RuntimeError("Incomplete owned ledger refused")
+        for item in [record["owner"], *([record["browser"]] if "browser" in record else [])]:
+            if (not isinstance(item, dict) or set(item) != {"pid", "created", "exe"}
+                    or not isinstance(item["pid"], int) or isinstance(item["pid"], bool) or item["pid"] <= 0
+                    or not isinstance(item["created"], (int, float)) or isinstance(item["created"], bool)
+                    or not math.isfinite(item["created"]) or item["created"] <= 0
+                    or not isinstance(item["exe"], str) or not os.path.isabs(item["exe"])
+                    or os.path.normcase(os.path.realpath(item["exe"])) != item["exe"]):
+                raise RuntimeError("Malformed recorded process identity")
+        if record["phase"] == "browser" and ("browser" not in record or record["browser"]["exe"] != record["browserExe"]):
+            raise RuntimeError("Missing recorded browser ownership")
+        if record["phase"] == "contained" and "browser" in record:
+            raise RuntimeError("Inconsistent contained ledger")
+        try:
+            owner = identity(record["owner"]["pid"])
+        except psutil.NoSuchProcess:
+            owner = None
+        if owner is not None:
+            if owner != record["owner"]:
+                raise RuntimeError("Reused owner PID refused")
+            raise RuntimeError("Owned browser parent is still alive")
+        browser_alive = False
+        if "browser" in record:
+            if not isinstance(record["browser"], dict) or set(record["browser"]) != {"pid", "created", "exe"}:
+                raise RuntimeError("Malformed owned browser identity")
+            try:
+                if identity(record["browser"]["pid"]) != record["browser"]:
+                    raise RuntimeError("Reused browser PID refused")
+                browser_alive = True
+            except psutil.NoSuchProcess:
+                pass
+        job = kernel.OpenJobObjectW(0x000C, False, record["job"])
+        if job:
+            try:
+                limits = Extended()
+                if (not kernel.QueryInformationJobObject(job, 9, ctypes.byref(limits), ctypes.sizeof(limits), None)
+                        or limits.Basic.Flags != 0x2000):
+                    raise RuntimeError("Owned Job containment changed")
+                if browser_alive:
+                    process = kernel.OpenProcess(0x1000, False, record["browser"]["pid"])
+                    if not process:
+                        raise RuntimeError("Cannot verify recorded browser membership")
+                    try:
+                        member = w.BOOL()
+                        if not kernel.IsProcessInJob(process, job, ctypes.byref(member)) or not member.value:
+                            raise RuntimeError("Recorded browser is outside owned Job")
+                    finally:
+                        kernel.CloseHandle(process)
+                if not kernel.TerminateJobObject(job, 1):
+                    raise RuntimeError("Owned Job termination refused")
+                deadline = time.monotonic() + 5
+                while active(job):
+                    if time.monotonic() >= deadline:
+                        raise RuntimeError("Owned Job still active")
+                    time.sleep(0.05)
+            finally:
+                kernel.CloseHandle(job)
+        elif ctypes.get_last_error() != 2 or browser_alive:
+            raise RuntimeError("Cannot inspect owned Job")
+        record["phase"] = "cleaned"; persist(record)
+    elif any(name != ".lkb-profile.lock" for name in os.listdir(expected)):
+        raise RuntimeError("Legacy occupied or unproved profile refused")
+    for name in ("SingletonLock", "SingletonCookie", "SingletonSocket"):
+        target = checked(os.path.join(expected, name))
+        if os.path.exists(target):
+            os.remove(target)
     # A killed run leaves exit_type=Crashed + saved Sessions, and Chrome then restores old tabs
     # (measured: the bot opened a stale YouTube tab and lost its own). Start from a clean session.
     import shutil
-    shutil.rmtree(os.path.join(profile, "Default", "Sessions"), ignore_errors=True)
-    prefs = os.path.join(profile, "Default", "Preferences")
-    try:
+    sessions = checked(os.path.join(expected, "Default", "Sessions"))
+    if os.path.exists(sessions):
+        for current, directories, files in os.walk(sessions):
+            checked(current)
+            for name in directories + files:
+                checked(os.path.join(current, name))
+        shutil.rmtree(sessions)
+    prefs = checked(os.path.join(expected, "Default", "Preferences"))
+    if os.path.exists(prefs):
         with open(prefs, encoding="utf-8") as f:
             p = json.load(f)
         p.setdefault("profile", {})["exit_type"] = "Normal"
         p["profile"]["exited_cleanly"] = True
         with open(prefs, "w", encoding="utf-8") as f:
             json.dump(p, f)
-    except (OSError, ValueError):
-        pass
+    if not launch:
+        lock.close()
+        return
+    if not expected_exe or not os.path.isabs(expected_exe):
+        raise RuntimeError("Explicit managed Windows browser required")
+    executable = os.path.normcase(os.path.realpath(expected_exe))
+    if not os.path.isfile(executable) or os.path.basename(executable) not in ("chrome.exe", "chromium.exe"):
+        raise RuntimeError("Owned browser executable refused")
+    nonce = str(uuid.uuid4())
+    record = {"version": 1, "profile": expected, "nonce": nonce, "job": "Local\\LKB-" + nonce,
+              "phase": "contained", "owner": identity(os.getpid()), "browserExe": executable}
+    job = kernel.CreateJobObjectW(None, record["job"])
+    if not job or ctypes.get_last_error() == 183:
+        raise RuntimeError("Cannot create exclusive owned Job")
+    limits = Extended(); limits.Basic.Flags = 0x2000
+    if (not kernel.SetInformationJobObject(job, 9, ctypes.byref(limits), ctypes.sizeof(limits))
+            or not kernel.AssignProcessToJobObject(job, kernel.GetCurrentProcess())):
+        kernel.CloseHandle(job)
+        raise RuntimeError("Cannot contain owned browser before launch")
+    persist(record)
+
+    def verify(browser_pid):
+        browser = identity(browser_pid)
+        if browser["exe"] != executable:
+            raise RuntimeError("Owned browser executable changed")
+        argv = psutil.Process(browser_pid).cmdline()
+        profiles = [arg.split("=", 1)[1] for arg in argv if arg.startswith("--user-data-dir=")]
+        profiles += [argv[index + 1] for index, arg in enumerate(argv[:-1]) if arg == "--user-data-dir"]
+        if len(profiles) != 1 or os.path.normcase(os.path.realpath(profiles[0])) != expected:
+            raise RuntimeError("Owned browser profile identity changed")
+        process = kernel.OpenProcess(0x1000, False, browser_pid)
+        if not process:
+            raise RuntimeError("Cannot inspect owned browser membership")
+        try:
+            member = w.BOOL()
+            if not kernel.IsProcessInJob(process, job, ctypes.byref(member)) or not member.value or identity(browser_pid) != browser:
+                raise RuntimeError("Owned browser escaped containment")
+        finally:
+            kernel.CloseHandle(process)
+        record.update({"phase": "browser", "browser": browser}); persist(record)
+
+    # Retain the kernel handle until interpreter exit: closing a self-containing Job kills Python.
+    return {"job": job, "lock": lock, "verify": verify}
+
+
+def register_form(sb, instructions, script_isolated=False, policy_check=None):
+    """One submit attempt; positive result is awaiting confirmation, never registration proof."""
+    if not script_isolated:
+        return {"status": "action_required", "reason": "script_isolation_unproved"}
+    import re
+    from urllib.parse import urlsplit
+    hosts = instructions.get("allowedHosts")
+    raw_url = instructions.get("url", "")
+    if not isinstance(raw_url, str) or not raw_url or len(raw_url) > 8192:
+        return {"status": "action_required", "reason": "request_policy_refused"}
+    try:
+        parsed = urlsplit(raw_url)
+        origin_port = parsed.port if parsed.port is not None else (443 if parsed.scheme == "https" else 80)
+    except ValueError:
+        return {"status": "action_required", "reason": "request_policy_refused"}
+    local = instructions.get("localFixture") is True and parsed.hostname in ("127.0.0.1", "localhost")
+    if (not isinstance(hosts, list) or not 1 <= len(hosts) <= 20
+            or any(not isinstance(host, str) or not re.fullmatch(r"[a-z0-9.-]{1,253}", host)
+                   or any(not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?", label)
+                          for label in (host[:-1] if host.endswith(".") else host).split(".")) for host in hosts)
+            or parsed.username or parsed.password or parsed.fragment
+            or any(ord(char) < 32 or ord(char) == 127 for char in raw_url)
+            or not 1 <= origin_port <= 65535
+            or parsed.scheme == "http" and any(host not in ("127.0.0.1", "localhost") for host in hosts)
+            or parsed.scheme != "https" and not (local and parsed.scheme == "http")):
+        return {"status": "action_required", "reason": "request_policy_refused"}
+    if parsed.hostname not in hosts:
+        return {"status": "action_required", "reason": "redirect_host"}
+    sources = [parsed.scheme + "://" + host + ":" + str(origin_port) for host in hosts]
+    policy = "form-action " + " ".join(sources)
+    script = r"""
+    const i = arguments[0], action = arguments[1];
+    const blocked = reason => ({status:'action_required', reason});
+    const expected = new URL(i.url), current = new URL(location.href);
+    const port = url => url.port || (url.protocol === 'https:' ? '443' : '80');
+    if (!i.allowedHosts.includes(current.hostname) || current.protocol !== expected.protocol
+      || port(current) !== port(expected)) return blocked('redirect_host');
+    if (document.querySelector('input[type=password],iframe[src*="captcha"],iframe[src*="recaptcha"],iframe[src*="hcaptcha"],[data-sitekey],input[autocomplete^="cc-"]')) return blocked('challenge_payment_login');
+    const text = document.body.innerText.toLowerCase();
+    if (/captcha|payment required|credit card|sign in to register|log in to register/.test(text)) return blocked('challenge_payment_login');
+    const forms = document.querySelectorAll(i.form.formSelector);
+    if (forms.length !== 1 || !(forms[0] instanceof HTMLFormElement)) return blocked('form_mismatch');
+    const form = forms[0], mapped = [];
+    for (const [key, selector] of Object.entries(i.form.fields)) {
+      const controls = form.querySelectorAll(selector);
+      if (controls.length !== 1 || !(controls[0] instanceof HTMLInputElement)
+        || !['text','email','tel'].includes(controls[0].type) || controls[0].disabled
+        || controls[0].readOnly || !controls[0].getClientRects().length) return blocked('field_mismatch');
+      mapped.push(controls[0]);
+    }
+    for (const control of form.elements) {
+      if (control.type === 'checkbox' && control.required) return blocked('required_consent');
+      if (['checkbox','radio'].includes(control.type) && control.checked && !control.disabled) return blocked('unconfigured_consent');
+      if (control.required && !mapped.includes(control)) return blocked('unknown_required');
+    }
+    const submits = form.querySelectorAll(i.form.submitSelector);
+    if (submits.length !== 1 || submits[0].type !== 'submit' || submits[0].disabled) return blocked('submit_mismatch');
+    const submit = submits[0], target = new URL(submit.getAttribute('formaction') || form.action, location.href);
+    const method = (submit.getAttribute('formmethod') || form.method).toLowerCase();
+    const encoding = (submit.getAttribute('formenctype') || form.enctype).toLowerCase();
+    if (!i.allowedHosts.includes(target.hostname) || target.protocol !== expected.protocol
+      || port(target) !== port(expected)
+      || target.username || target.password || (submit.formTarget || form.target)) return blocked('redirect_host');
+    if (method !== 'post' || encoding !== 'application/x-www-form-urlencoded') return blocked('unsupported_form');
+    if (action === 'inspect') return {status:'ready',reason:'ready'};
+    for (const [key, selector] of Object.entries(i.form.fields)) {
+      const element = form.querySelector(selector);
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(element,i.operator[key]);
+    }
+    if (!form.checkValidity()) return blocked('invalid_values');
+    form.action = target.href;
+    form.method = method;
+    form.enctype = encoding;
+    HTMLFormElement.prototype.submit.call(form);
+    return {status:'submitted',reason:'awaiting_confirmation'};
+    """
+    try:
+        driver = getattr(sb, "driver", sb)
+        for command, arguments in (("Network.enable", {}), ("Network.setBypassServiceWorker", {"bypass": True})):
+            if not isinstance(driver.execute_cdp_cmd(command, arguments), dict):
+                return {"status": "action_required", "reason": "request_policy_unproved"}
+        if not callable(policy_check) or policy_check() is not True:
+            return {"status": "action_required", "reason": "persistent_policy_unproved"}
+        result = sb.execute_script(script, instructions, "inspect")
+        if result.get("status") != "ready":
+            return result
+        installed = sb.execute_script(r"""
+        if (!document.head) return false;
+        const policy = document.createElement('meta');
+        policy.httpEquiv = 'Content-Security-Policy'; policy.content = arguments[0];
+        document.head.appendChild(policy);
+        return policy.isConnected && policy.content === arguments[0];
+        """, policy)
+        if installed is not True:
+            return {"status": "action_required", "reason": "request_policy_unproved"}
+        for command, arguments in (("Network.enable", {}), ("Network.setBypassServiceWorker", {"bypass": True})):
+            if not isinstance(driver.execute_cdp_cmd(command, arguments), dict):
+                return {"status": "action_required", "reason": "request_policy_unproved"}
+        if policy_check() is not True:
+            return {"status": "action_required", "reason": "persistent_policy_unproved"}
+        result = sb.execute_script(script, instructions, "submit")
+        return result if isinstance(result, dict) else {"status": "uncertain", "reason": "navigation_during_submit"}
+    except Exception:
+        return {"status": "uncertain", "reason": "browser_failure"}
 
 
 def main():
@@ -448,7 +715,33 @@ def main():
     ap.add_argument("--capture-extension", default=None, help="unpacked tab audio/video recorder extension")
     ap.add_argument("--browser-executable", default=None, help="project-managed Chromium/Chrome for Testing binary")
     ap.add_argument("--cleanup-only", action="store_true", help="terminate only exact owned profile browser processes, without launching")
+    ap.add_argument("--registration-stdin", action="store_true", help="single explicit registration attempt from bounded JSON stdin")
     a = ap.parse_args()
+    registration = None
+    if a.registration_stdin:
+        registration = json.loads(sys.stdin.read(16385))
+        if len(json.dumps(registration)) > 16384:
+            raise RuntimeError("Registration instructions refused")
+        a.url = registration["url"]
+        from urllib.parse import urlsplit
+        parsed = urlsplit(a.url)
+        hosts = registration.get("allowedHosts", [])
+        operator, form = registration.get("operator", {}), registration.get("form", {})
+        fields = form.get("fields", {})
+        keys = {"firstName", "lastName", "email", "organization"}
+        values = list(operator.values()) + list(fields.values()) + [form.get("formSelector"), form.get("submitSelector")]
+        if (form.get("mode") != "native-html" or not isinstance(hosts, list) or not 1 <= len(hosts) <= 20
+                or not all(isinstance(h, str) and h == h.lower() and len(h) <= 253 for h in hosts)
+                or set(operator) != set(fields) or not {"firstName", "lastName", "email"} <= set(fields)
+                or not set(fields) <= keys or len(set(fields.values())) != len(fields)
+                or not all(isinstance(v, str) and v.strip() and len(v) <= 256
+                           and all(ord(c) >= 32 and ord(c) != 127 for c in v) for v in values)):
+            raise RuntimeError("Registration operator or form refused")
+        local = registration.get("localFixture") is True and parsed.hostname in ("127.0.0.1", "localhost")
+        if (parsed.scheme != "https" and not (local and parsed.scheme == "http")
+                or parsed.username or parsed.password or parsed.fragment or parsed.hostname not in hosts
+                or a.capture_extension or a.cleanup_only):
+            raise RuntimeError("Registration URL refused")
     if a.cleanup_only:
         if not os.path.isabs(a.profile):
             raise RuntimeError("Cleanup requires an absolute owned profile")
@@ -486,8 +779,9 @@ def main():
         browser_launcher.override_driver_dir(str(driver_dir))
         emit("managed-driver", browser_version=browser_version, driver_version=driver_version)
 
-    os.makedirs(a.profile, exist_ok=True)
-    kill_orphans(a.profile)
+    if os.name != "nt":
+        os.makedirs(a.profile, exist_ok=True)
+    ownership = kill_orphans(a.profile, launch=os.name == "nt", expected_exe=a.browser_executable)
     if os.name == "nt":  # keep the system + display awake while attending (idle sleep would kill the capture)
         import ctypes
         ctypes.windll.kernel32.SetThreadExecutionState(0x80000000 | 0x00000001 | 0x00000002)
@@ -497,21 +791,21 @@ def main():
         "--deny-permission-prompts",  # mic/camera/notifications: every prompt auto-denied
         "--start-maximized",
     ])
-    if a.capture_extension:
-        args += ",--enable-unsafe-extension-debugging"
+    import pathlib
+    policy_extension = a.capture_extension or str(pathlib.Path(__file__).parent / "tab-capture")
+    args += ",--enable-unsafe-extension-debugging"
     # ISS-324: tick while SB() brings the browser up. Daemon thread, so a failure inside SB()
     # needs no unwinding here -- __main__ emits "fatal" and the interpreter exits under it.
     boot_done = threading.Event()
     threading.Thread(target=_bootstrap_progress, args=(boot_done, "driver-bringup"), daemon=True).start()
     with SB(uc=True, headed=True, user_data_dir=a.profile, chromium_arg=args,
-            extension_dir=a.capture_extension, binary_location=a.browser_executable,
+            extension_dir=policy_extension, binary_location=a.browser_executable,
             driver_version=driver_version.split(".")[0] if driver_version else None) as sb:
+        if ownership:
+            ownership["verify"](getattr(sb.driver, "browser_pid", None))
         boot_done.set()
         emit("driver-ready")
-        emit("navigating", url=a.url)
-        sb.uc_open_with_reconnect(a.url, 4)
-        emit("opened", url=sb.get_current_url())
-        if a.capture_extension:
+        if policy_extension:
             import math
             import re
             import psutil
@@ -574,11 +868,14 @@ def main():
                         raise RuntimeError("Recorder browser websocket ownership refused")
                     connection = websocket.create_connection(endpoint, timeout=remaining(), suppress_origin=True,
                                                              http_no_proxy=["127.0.0.1"], redirect_limit=0)
-                    def command(method, params=None):
+                    def command(method, params=None, session=None):
                         nonlocal sequence
                         sequence += 1
                         connection.settimeout(remaining())
-                        connection.send(json.dumps({"id": sequence, "method": method, "params": params or {}}))
+                        request = {"id": sequence, "method": method, "params": params or {}}
+                        if session:
+                            request["sessionId"] = session
+                        connection.send(json.dumps(request))
                         for _ in range(64):
                             connection.settimeout(remaining())
                             reply = connection.recv()
@@ -595,7 +892,7 @@ def main():
                                 return reply["result"]
                         raise RuntimeError("Recorder CDP event limit exceeded")
                     extensions = command("Extensions.getExtensions").get("extensions", [])
-                    expected_extension = os.path.normcase(os.path.realpath(a.capture_extension))
+                    expected_extension = os.path.normcase(os.path.realpath(policy_extension))
                     owned = [item for item in extensions if item.get("enabled") is True and item.get("path") and os.path.normcase(os.path.realpath(item["path"])) == expected_extension]
                     if len(owned) != 1 or not re.fullmatch(r"[a-p]{32}", owned[0].get("id", "")):
                         raise RuntimeError("Recorder extension ownership mapping refused")
@@ -613,14 +910,95 @@ def main():
                     worker_session = command("Target.attachToTarget", {"targetId": workers[0]["targetId"], "flatten": True}).get("sessionId")
                     if not isinstance(worker_session, str) or not worker_session:
                         raise RuntimeError("Recorder extension worker attachment refused")
+                    # A clean blank target replaces every restored registration page before policy changes.
+                    sb.driver.switch_to.new_window("tab")
+                    current_target = sb.driver.current_window_handle.removeprefix("CDwindow-")
+                    pages = [item for item in command("Target.getTargets").get("targetInfos", []) if item.get("type") == "page"]
+                    if not any(item.get("targetId") == current_target and item.get("url") == "about:blank" for item in pages):
+                        raise RuntimeError("Registration blank target ownership refused")
+                    for item in pages:
+                        if item.get("targetId") != current_target:
+                            if command("Target.closeTarget", {"targetId": item["targetId"]}).get("success") is not True:
+                                raise RuntimeError("Restored registration target removal unproved")
+                    while True:
+                        remaining_pages = [item for item in command("Target.getTargets").get("targetInfos", []) if item.get("type") == "page"]
+                        if len(remaining_pages) == 1 and remaining_pages[0].get("targetId") == current_target:
+                            break
+                        time.sleep(min(0.1, remaining()))
+                def evaluate_policy(expression):
+                    answer = command("Runtime.evaluate", {"expression": expression, "awaitPromise": True, "returnByValue": True}, worker_session)
+                    if answer.get("exceptionDetails"):
+                        raise RuntimeError("Registration policy evaluation refused")
+                    return answer.get("result", {}).get("value")
+                policy_check = None
+                if registration:
+                    import hashlib
+                    import uuid
+                    from urllib.parse import urlsplit
+                    allowed = registration["allowedHosts"]
+                    parsed_policy_url = urlsplit(a.url)
+                    scheme = parsed_policy_url.scheme
+                    port = parsed_policy_url.port if parsed_policy_url.port is not None else (443 if scheme == "https" else 80)
+                    local_http = registration.get("localFixture") is True and parsed_policy_url.hostname in ("127.0.0.1", "localhost")
+                    if not 1 <= port <= 65535 or scheme != "https" and not (scheme == "http" and local_http):
+                        raise RuntimeError("Registration policy origin refused")
+                    port_pattern = "(:" + str(port) + ")?" if port == (443 if scheme == "https" else 80) else ":" + str(port)
+                    resources = ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "object", "xmlhttprequest", "ping", "csp_report", "media", "websocket", "webtransport", "webbundle", "other"]
+                    rules = [{"id": 910001, "priority": 1, "action": {"type": "block"}, "condition": {"urlFilter": "*", "resourceTypes": resources}}]
+                    for host in sorted(set(allowed)):
+                        if (not re.fullmatch(r"[a-z0-9.-]{1,253}", host)
+                            or any(not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?", label)
+                                   for label in (host[:-1] if host.endswith(".") else host).split("."))):
+                            raise RuntimeError("Registration policy host refused")
+                        if scheme == "http" and host not in ("127.0.0.1", "localhost"):
+                            raise RuntimeError("Registration policy local origin refused")
+                        rules.append({"id": 910001 + len(rules), "priority": 2, "action": {"type": "allow"},
+                                      "condition": {"regexFilter": "^" + scheme + "://" + re.escape(host) + port_pattern + "/", "resourceTypes": resources}})
+                    fingerprint = hashlib.sha256(json.dumps(rules, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+                    receipt = {"nonce": str(uuid.uuid4()), "browserPid": browser_pid, "browserCreatedAt": identity[3],
+                               "profile": expected_profile, "extensionId": extension_id, "fingerprint": fingerprint}
+                    expected = {"receipt": receipt, "rules": rules, "javascript": {"setting": "block"}}
+                    policy_origin = parsed_policy_url.scheme + "://" + parsed_policy_url.netloc + "/"
+                    installed = evaluate_policy("installRegistrationPolicy(" + json.dumps({"receipt": receipt, "rules": rules, "primaryUrl": policy_origin}) + ")")
+                    def verify_policy():
+                        nonlocal deadline
+                        deadline = time.monotonic() + 10
+                        process = psutil.Process(browser_pid)
+                        if process.create_time() != receipt["browserCreatedAt"] or os.path.normcase(os.path.realpath(process.exe())) != expected_exe:
+                            raise RuntimeError("Registration browser identity changed")
+                        value = evaluate_policy("readRegistrationPolicy(" + json.dumps(policy_origin) + ")")
+                        if value != expected:
+                            raise RuntimeError("Registration policy receipt mismatch")
+                        return True
+                    if installed != expected or verify_policy() is not True:
+                        raise RuntimeError("Registration policy installation unproved")
+                    policy_check = verify_policy
+                else:
+                    cleared = evaluate_policy("clearRegistrationPolicy(" + json.dumps({"extensionId": extension_id, "priorTargetsGone": True, "primaryUrl": a.url}) + ")")
+                    if (not isinstance(cleared, dict) or cleared.get("rules") or cleared.get("receipt") is not None
+                            or cleared.get("javascript") != {"setting": "allow"}):
+                        raise RuntimeError("Registration policy removal unproved")
+                if registration:
+                    sb.driver.set_page_load_timeout(30)
+                    sb.driver.set_script_timeout(10)
+                    for method, arguments in (("Network.enable", {}), ("Network.setBypassServiceWorker", {"bypass": True})):
+                        if not isinstance(sb.driver.execute_cdp_cmd(method, arguments), dict):
+                            raise RuntimeError("Registration network isolation not acknowledged")
+                    sb.driver.execute_cdp_cmd("Emulation.setScriptExecutionDisabled", {"value": True})
+                    sb.driver.default_get(a.url)
+                    emit("registration-result", **register_form(sb, registration, script_isolated=True, policy_check=policy_check))
+                    return
+                sb.uc_open_with_reconnect(a.url, 4)
+                emit("opened", url=sb.get_current_url())
+                if a.capture_extension:
+                    deadline = time.monotonic() + 15
                     targets = command("Target.getTargets", {"filter": [{"type": "tab", "exclude": False}, {"exclude": True}]}).get("targetInfos", [])
-                    current_url = sb.get_current_url()
-                    tabs = [item for item in targets if item.get("type") == "tab" and item.get("url") == current_url]
-                    if len(tabs) != 1 or not isinstance(tabs[0].get("targetId"), str) or not tabs[0]["targetId"]:
+                    tabs = [item for item in targets if item.get("type") == "tab" and item.get("url") == sb.get_current_url()]
+                    if len(tabs) != 1:
                         raise RuntimeError("Recorder current tab ownership mapping refused")
-                command("Target.activateTarget", {"targetId": tabs[0]["targetId"]})
-                command("Extensions.triggerAction", {"id": extension_id, "targetId": tabs[0]["targetId"]})
-                emit("capture-invoked")
+                    command("Target.activateTarget", {"targetId": tabs[0]["targetId"]})
+                    command("Extensions.triggerAction", {"id": extension_id, "targetId": tabs[0]["targetId"]})
+                    emit("capture-invoked")
             finally:
                 if connection is not None:
                     if worker_session is not None:
@@ -739,5 +1117,5 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        emit("fatal", error=str(e)[:500])
+        emit("fatal", error="Registration browser failed" if "--registration-stdin" in sys.argv else str(e)[:500])
         sys.exit(1)

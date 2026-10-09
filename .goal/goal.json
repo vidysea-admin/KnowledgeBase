@@ -4,15 +4,15 @@
   "north_star": "Build the Vidysea Living Knowledge Base as the brain for an AI virtual counsellor that matches and then beats every living top human counsellor in head-to-head evaluation (public championship, AlphaGo-style). Phase 1 exit: POST /ask over the 23 TOC sessions returns speaker+timestamp-cited internal answers, with web-fallback for off-corpus questions.",
   "status": "active",
   "created": "2026-09-03T07:01:15",
-  "updated": "2026-09-27T23:01:02",
+  "updated": "2026-10-09T12:46:22",
   "progress": {
-    "total": 84,
+    "total": 95,
     "done": 51,
-    "in_progress": 2,
+    "in_progress": 5,
     "blocked": 0,
-    "pending": 31,
-    "current": "U2.4",
-    "percent": 61
+    "pending": 39,
+    "current": "U2.2",
+    "percent": 54
   },
   "tasks": [
     {
@@ -23,7 +23,8 @@
       "deps": [],
       "criticality": "low",
       "reopen_reason": "sweep 2026-09-03T02:15Z: contract C8 (validate.py exit 0) no longer held — ISS-004",
-      "completed": "2026-09-03T08:31:05"
+      "completed": "2026-09-03T08:31:05",
+      "delivery_group": "G4"
     },
     {
       "id": "T-002",
@@ -34,7 +35,8 @@
         "T-018"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T11:58:27"
+      "completed": "2026-09-03T11:58:27",
+      "delivery_group": "G4"
     },
     {
       "id": "T-003",
@@ -46,7 +48,8 @@
       ],
       "note": "23/23 TOC sessions genuinely transcribed. The 4 remaining placeholders were fixed by commit c07674d (real root cause of the chunking stalls); re-verified 2026-09-07 by counting real turns.json content across all 23 session dirs. This note previously still said 19/23 and \"Not done until 23/23\", which understated a completed task -- TASKS.md was right and this note was stale.",
       "criticality": "critical",
-      "completed": "2026-09-04T19:56:06"
+      "completed": "2026-09-04T19:56:06",
+      "delivery_group": "G3"
     },
     {
       "id": "T-004",
@@ -57,7 +60,8 @@
         "T-002"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T07:07:41"
+      "completed": "2026-09-03T07:07:41",
+      "delivery_group": "G5"
     },
     {
       "id": "T-005",
@@ -68,7 +72,8 @@
         "T-004"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T07:41:34"
+      "completed": "2026-09-03T07:41:34",
+      "delivery_group": "G5"
     },
     {
       "id": "T-006",
@@ -79,7 +84,8 @@
         "T-018"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T12:37:42"
+      "completed": "2026-09-03T12:37:42",
+      "delivery_group": "G1"
     },
     {
       "id": "T-007",
@@ -90,7 +96,8 @@
         "T-020"
       ],
       "note": "needs Q4 consent decision first",
-      "criticality": "low"
+      "criticality": "low",
+      "delivery_group": "G1"
     },
     {
       "id": "T-008",
@@ -100,7 +107,8 @@
       "deps": [
         "T-007"
       ],
-      "criticality": "low"
+      "criticality": "low",
+      "delivery_group": "G5"
     },
     {
       "id": "T-009",
@@ -111,7 +119,8 @@
         "T-005b"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T12:14:41"
+      "completed": "2026-09-03T12:14:41",
+      "delivery_group": "G9"
     },
     {
       "id": "T-010",
@@ -123,7 +132,8 @@
       ],
       "note": "needs Q2 stack decision",
       "criticality": "low",
-      "completed": "2026-09-04T20:05:31"
+      "completed": "2026-09-04T20:05:31",
+      "delivery_group": "G6"
     },
     {
       "id": "T-011",
@@ -134,7 +144,8 @@
         "T-024"
       ],
       "note": "Stays pending, and correctly so: this task is the FULL meeting bot (auto-join, consent, live capture). All three joiners (vexa/browser/system-audio) are explicit stubs and the package is imported by nothing -- confirmed 2026-09-07, and scored STUB by the catalogue (A10). TASKS.md row T-011 is a NARROWER deliverable (Phase-B browser-profile privacy slice) that genuinely PASSed; same id, different scope. Not drift in the trackers so much as one id doing two jobs.",
-      "criticality": "low"
+      "criticality": "low",
+      "delivery_group": "G2"
     },
     {
       "id": "T-012",
@@ -146,7 +157,8 @@
       ],
       "note": "internal tier first (D-007); public tier needs independent panel",
       "criticality": "low",
-      "completed": "2026-09-03T12:48:44"
+      "completed": "2026-09-03T12:48:44",
+      "delivery_group": "G8"
     },
     {
       "id": "T-013",
@@ -156,7 +168,8 @@
       "deps": [
         "T-009"
       ],
-      "criticality": "low"
+      "criticality": "low",
+      "delivery_group": "G7"
     },
     {
       "id": "T-014",
@@ -168,7 +181,8 @@
         "T-013"
       ],
       "note": "outward-facing public event",
-      "criticality": "low"
+      "criticality": "low",
+      "delivery_group": "G8"
     },
     {
       "id": "T-015",
@@ -179,7 +193,8 @@
         "T-002"
       ],
       "note": "needs explicit approval before any data export",
-      "criticality": "low"
+      "criticality": "low",
+      "delivery_group": "G10"
     },
     {
       "id": "T-016",
@@ -188,7 +203,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "completed": "2026-09-03T08:47:40"
+      "completed": "2026-09-03T08:47:40",
+      "delivery_group": "G9"
     },
     {
       "id": "T-017",
@@ -199,7 +215,8 @@
         "T-016"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T09:00:36"
+      "completed": "2026-09-03T09:00:36",
+      "delivery_group": "G9"
     },
     {
       "id": "T-018",
@@ -210,7 +227,8 @@
         "T-016"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T10:16:26"
+      "completed": "2026-09-03T10:16:26",
+      "delivery_group": "G9"
     },
     {
       "id": "T-019",
@@ -221,7 +239,8 @@
         "T-016"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T10:26:27"
+      "completed": "2026-09-03T10:26:27",
+      "delivery_group": "G9"
     },
     {
       "id": "T-020",
@@ -232,7 +251,8 @@
         "T-018"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T10:35:21"
+      "completed": "2026-09-03T10:35:21",
+      "delivery_group": "G9"
     },
     {
       "id": "T-005b",
@@ -243,7 +263,8 @@
         "T-019"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T11:10:51"
+      "completed": "2026-09-03T11:10:51",
+      "delivery_group": "G5"
     },
     {
       "id": "T-021",
@@ -255,7 +276,8 @@
       ],
       "criticality": "low",
       "completed": "2026-09-03T13:45:00",
-      "note": "UNBLOCKED 2026-09-08: qa/gates/golden-set-redesign.md is ANSWERED - Option C, regenerate the golden set from raw transcripts (data/toc-migrated/<sessionId>/turns.json), by a different model+prompt than the summarizer, phrased as real student questions, with near-neighbour distractors. This task IS that unit. Binding acceptance conditions from the gate: cite the question-blind control (0.217) beside every score; PASS = recall@5 STRICTLY between 0.217 and 1.000 with a non-zero miss count - 1.000 is a FAILURE of the remedy and escalates to Option B; re-run the verbatim-overlap and single-unique-token-pin diagnostics (pin rate must fall well below 63%). The gate is answered but NOT closed - it closes when this unit satisfies those conditions."
+      "note": "UNBLOCKED 2026-09-08: qa/gates/golden-set-redesign.md is ANSWERED - Option C, regenerate the golden set from raw transcripts (data/toc-migrated/<sessionId>/turns.json), by a different model+prompt than the summarizer, phrased as real student questions, with near-neighbour distractors. This task IS that unit. Binding acceptance conditions from the gate: cite the question-blind control (0.217) beside every score; PASS = recall@5 STRICTLY between 0.217 and 1.000 with a non-zero miss count - 1.000 is a FAILURE of the remedy and escalates to Option B; re-run the verbatim-overlap and single-unique-token-pin diagnostics (pin rate must fall well below 63%). The gate is answered but NOT closed - it closes when this unit satisfies those conditions.",
+      "delivery_group": "G8"
     },
     {
       "id": "T-022",
@@ -267,7 +289,8 @@
       ],
       "criticality": "low",
       "completed": "2026-09-03T13:46:01",
-      "note": "depends T-021. NOT gate-blocked - the gate file says so explicitly. Blocked only by its dependency: calibration needs a non-saturated golden set to calibrate against."
+      "note": "depends T-021. NOT gate-blocked - the gate file says so explicitly. Blocked only by its dependency: calibration needs a non-saturated golden set to calibrate against.",
+      "delivery_group": "G8"
     },
     {
       "id": "T-023",
@@ -278,7 +301,8 @@
         "T-020"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T13:30:00"
+      "completed": "2026-09-03T13:30:00",
+      "delivery_group": "G1"
     },
     {
       "id": "T-024",
@@ -291,7 +315,8 @@
         "T-020"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T11:29:33"
+      "completed": "2026-09-03T11:29:33",
+      "delivery_group": "G2"
     },
     {
       "id": "T-025",
@@ -302,7 +327,8 @@
         "T-024"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T13:57:56"
+      "completed": "2026-09-03T13:57:56",
+      "delivery_group": "G9"
     },
     {
       "id": "T-026",
@@ -312,7 +338,8 @@
       "deps": [
         "T-024"
       ],
-      "criticality": "low"
+      "criticality": "low",
+      "delivery_group": "G9"
     },
     {
       "id": "T-027",
@@ -322,7 +349,8 @@
       "deps": [
         "T-023"
       ],
-      "criticality": "low"
+      "criticality": "low",
+      "delivery_group": "G1"
     },
     {
       "id": "T-017b",
@@ -333,7 +361,8 @@
         "T-017"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T09:30:49"
+      "completed": "2026-09-03T09:30:49",
+      "delivery_group": "G9"
     },
     {
       "id": "T-000",
@@ -341,7 +370,8 @@
       "status": "done",
       "deps": [],
       "note": "Answered inline -- D-001.",
-      "base_criticality": "low"
+      "base_criticality": "low",
+      "delivery_group": "G9"
     },
     {
       "id": "T-004b",
@@ -351,7 +381,8 @@
         "T-004"
       ],
       "note": "checker PASS 5/5, verdict 15e4ecf.",
-      "base_criticality": "low"
+      "base_criticality": "low",
+      "delivery_group": "G5"
     },
     {
       "id": "T-004c",
@@ -361,7 +392,8 @@
         "T-004b"
       ],
       "note": "checker PASS 4/4, verdict qa/verdicts/regenerate-year-migration.md, commit 8ae94f4.",
-      "base_criticality": "low"
+      "base_criticality": "low",
+      "delivery_group": "G5"
     },
     {
       "id": "T-009b",
@@ -371,7 +403,8 @@
         "T-009"
       ],
       "note": "checker PASS 6/6, verdict 089d2b6. Replaces the heuristic keyword-overlap scorer.",
-      "base_criticality": "low"
+      "base_criticality": "low",
+      "delivery_group": "G5"
     },
     {
       "id": "T-028",
@@ -382,7 +415,8 @@
       ],
       "note": "Explicitly deferred by Umesh (\"baad mein dekh lenge\").",
       "base_criticality": "low",
-      "criticality": "low"
+      "criticality": "low",
+      "delivery_group": "G10"
     },
     {
       "id": "T-011a",
@@ -392,7 +426,8 @@
         "T-024"
       ],
       "note": "Split out of T-011 on 2026-09-07: this narrower slice genuinely PASSed (qa/verdicts/browser-profile-privacy.md, commit 59dc2db), while T-011 (the full meeting bot) remains open. One id was doing two jobs and made the bot look done.",
-      "base_criticality": "low"
+      "base_criticality": "low",
+      "delivery_group": "G9"
     },
     {
       "id": "U0.5",
@@ -401,7 +436,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "medium",
-      "note": "plan §10 Phase 0"
+      "note": "plan §10 Phase 0",
+      "delivery_group": "G9"
     },
     {
       "id": "U0.6",
@@ -410,7 +446,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "medium",
-      "note": "plan §10 Phase 0"
+      "note": "plan §10 Phase 0",
+      "delivery_group": "G9"
     },
     {
       "id": "U0.7",
@@ -419,7 +456,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "medium",
-      "note": "plan §10 Phase 0"
+      "note": "plan §10 Phase 0",
+      "delivery_group": "G9"
     },
     {
       "id": "U0.8",
@@ -428,7 +466,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "medium",
-      "note": "plan §10 Phase 0"
+      "note": "plan §10 Phase 0",
+      "delivery_group": "G9"
     },
     {
       "id": "U0.9",
@@ -437,7 +476,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "medium",
-      "note": "plan §10 Phase 0"
+      "note": "plan §10 Phase 0",
+      "delivery_group": "G9"
     },
     {
       "id": "U0.10",
@@ -446,7 +486,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "UNBLOCKED 2026-09-08: the gate is ANSWERED (Option C). An earlier note here claimed it needed the human gate answered first - that was written from a stale read and is false. This unit is the Option C regeneration; see T-021 for the binding acceptance conditions. NOTE for U1.4/U1.5: gate condition 4 says their delta-vs-baseline and >=0.85 exit criteria may not be re-pointed at the new set until conditions 2-3 hold, and until then must not be cited as passed."
+      "note": "UNBLOCKED 2026-09-08: the gate is ANSWERED (Option C). An earlier note here claimed it needed the human gate answered first - that was written from a stale read and is false. This unit is the Option C regeneration; see T-021 for the binding acceptance conditions. NOTE for U1.4/U1.5: gate condition 4 says their delta-vs-baseline and >=0.85 exit criteria may not be re-pointed at the new set until conditions 2-3 hold, and until then must not be cited as passed.",
+      "delivery_group": "G8"
     },
     {
       "id": "U1.1",
@@ -456,7 +497,8 @@
       "deps": [],
       "criticality": "low",
       "note": "plan §10 Phase 1. packages/ai/src/provider.ts exists; zero embed references today.",
-      "completed": "2026-09-08T14:58:30"
+      "completed": "2026-09-08T14:58:30",
+      "delivery_group": "G5"
     },
     {
       "id": "U1.2",
@@ -468,7 +510,8 @@
       ],
       "criticality": "low",
       "note": "embeddingRef is a string pointer; cosine needs the numbers in the doc",
-      "completed": "2026-09-08T15:57:11"
+      "completed": "2026-09-08T15:57:11",
+      "delivery_group": "G5"
     },
     {
       "id": "U1.3",
@@ -479,7 +522,8 @@
         "U1.2"
       ],
       "criticality": "critical",
-      "completed": "2026-09-08T16:12:28"
+      "completed": "2026-09-08T16:12:28",
+      "delivery_group": "G5"
     },
     {
       "id": "U1.0",
@@ -491,7 +535,8 @@
         "U1.2",
         "U1.3"
       ],
-      "evidence": "qa/verdicts/chunk-backfill.md - PASS 8/8 cycle 1 (226fa06). Live: chunks 0 -> 1452, 26/26 sessions, 0 dim mismatches, 2118/2118 turnRefs resolve. Discharges C8 + ISS-113; fixes ISS-116."
+      "evidence": "qa/verdicts/chunk-backfill.md - PASS 8/8 cycle 1 (226fa06). Live: chunks 0 -> 1452, 26/26 sessions, 0 dim mismatches, 2118/2118 turnRefs resolve. Discharges C8 + ISS-113; fixes ISS-116.",
+      "delivery_group": "G5"
     },
     {
       "id": "U1.0b",
@@ -501,7 +546,8 @@
       "deps": [
         "U1.0"
       ],
-      "evidence": "qa/verdicts/index-skip-surfacing.md - PASS 11/11 cycle 1 (a9f95a5). Mutation split reproduced 122/2. Follow-up ISS-118 (high): operator warn untested/deletable."
+      "evidence": "qa/verdicts/index-skip-surfacing.md - PASS 11/11 cycle 1 (a9f95a5). Mutation split reproduced 122/2. Follow-up ISS-118 (high): operator warn untested/deletable.",
+      "delivery_group": "G5"
     },
     {
       "id": "U1.0c",
@@ -512,7 +558,8 @@
         "U1.0b"
       ],
       "evidence": "qa/verdicts/vector-gap-record.md - PASS 8/8 cycle 1 (f59fb3a). Checker verified LIVE on scratch tenants and filed ISS-121.",
-      "criticality": "high"
+      "criticality": "high",
+      "delivery_group": "G5"
     },
     {
       "id": "U1.0d",
@@ -523,7 +570,8 @@
         "U1.0c"
       ],
       "evidence": "qa/verdicts/vector-gap-tenant-id.md - PASS 11/11 cycle 1 (2817fd2). Verified live cross-tenant; pre-fix E11000 re-derived on the same path. Seam now at 2 PASSes = CLOSED per the class-based round cap.",
-      "criticality": "high"
+      "criticality": "high",
+      "delivery_group": "G5"
     },
     {
       "id": "U1.4",
@@ -535,7 +583,8 @@
       ],
       "criticality": "low",
       "note": "D-a: Atlas Vector Search unavailable (self-hosted Mongo, no +srv). Its recall delta claim additionally needs U0.10.",
-      "evidence": "qa/verdicts/vector-cosine-retriever.md - PASS 7/7 cycle 2 (6d4b397). recall@5 0.935 (86/92) vs heuristic 0.391, control 0.217; p95 62ms. FLOOR only - may not settle U1.5's >=0.85 while sibling ambiguity is open."
+      "evidence": "qa/verdicts/vector-cosine-retriever.md - PASS 7/7 cycle 2 (6d4b397). recall@5 0.935 (86/92) vs heuristic 0.391, control 0.217; p95 62ms. FLOOR only - may not settle U1.5's >=0.85 while sibling ambiguity is open.",
+      "delivery_group": "G5"
     },
     {
       "id": "U1.5",
@@ -547,7 +596,8 @@
       ],
       "criticality": "critical",
       "note": "do NOT rewrite router.ts — ask() already takes candidates via a thunk",
-      "evidence": "checker PASS 11/11, cycle 3, verdict 31134f1 (qa/verdicts/hybrid-arms-binding.md). Part 1 = packages/ask rrfMerge; part 2 = apps/api per-request arm binding. NOT credited: hybrid recall is 0.870 vs pure vector 0.935 - the merge is correct, tenant-safe and honestly measured, not good. The >=0.85 quality gate stays open."
+      "evidence": "checker PASS 11/11, cycle 3, verdict 31134f1 (qa/verdicts/hybrid-arms-binding.md). Part 1 = packages/ask rrfMerge; part 2 = apps/api per-request arm binding. NOT credited: hybrid recall is 0.870 vs pure vector 0.935 - the merge is correct, tenant-safe and honestly measured, not good. The >=0.85 quality gate stays open.",
+      "delivery_group": "G5"
     },
     {
       "id": "U2.1",
@@ -557,7 +607,8 @@
       "deps": [],
       "criticality": "low",
       "note": "cheapest real Phase 2 win; also backfills claims.topicRefs, which nothing has ever written",
-      "evidence": "qa/verdicts/promote-tree-entities.md - PASS cycle 3 (ba7cf7e), recorded U2.1-PARTIAL. Mechanism shipped+tested; live backfill deliberately NOT run (131/137 topic slugs single-session, several are person names). topics/orgs still 0 rows, catalogue NOT upgraded. Blocked follow-up: ISS-C-CLAIMS-TARGETING-001 must close before U2.2/U2.3 enables a live backfill."
+      "evidence": "qa/verdicts/promote-tree-entities.md - PASS cycle 3 (ba7cf7e), recorded U2.1-PARTIAL. Mechanism shipped+tested; live backfill deliberately NOT run (131/137 topic slugs single-session, several are person names). topics/orgs still 0 rows, catalogue NOT upgraded. Blocked follow-up: ISS-C-CLAIMS-TARGETING-001 must close before U2.2/U2.3 enables a live backfill.",
+      "delivery_group": "G4"
     },
     {
       "id": "U2.1b",
@@ -568,7 +619,8 @@
         "U2.1"
       ],
       "evidence": "qa/verdicts/claims-write-targeting.md - PASS cycle 1 (2dbeffa). 2/2 recorded reproductions killed; the U2.2/U2.3 precondition is SATISFIED. One medium filed (ISS-C-TOPICREFS-ARG-001, fixture limitation).",
-      "criticality": "high"
+      "criticality": "high",
+      "delivery_group": "G4"
     },
     {
       "id": "U2.1c",
@@ -579,18 +631,20 @@
         "U2.1b"
       ],
       "evidence": "qa/verdicts/entity-id-tenant-namespace.md - PASS cycle 2, 9/9, 4/4 invariants. C6 met (E11000 reproduced live before the fix, re-verified after); C3 mandatory mutation now killed independently on topics AND orgs. ISS-156 closed in the same close-out.",
-      "criticality": "critical"
+      "criticality": "critical",
+      "delivery_group": "G4"
     },
     {
       "id": "U2.2",
       "title": "Extraction-quality harness + golden set (built BEFORE the LLM extractors)",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [
         "U2.1"
       ],
       "criticality": "low",
-      "note": "metrics incl. hallucination rate = cited id absent from turns"
+      "note": "metrics incl. hallucination rate = cited id absent from turns",
+      "delivery_group": "G4"
     },
     {
       "id": "U2.3",
@@ -601,7 +655,8 @@
         "U2.2"
       ],
       "criticality": "low",
-      "note": "keep the regex heuristic as degradation fallback"
+      "note": "keep the regex heuristic as degradation fallback",
+      "delivery_group": "G4"
     },
     {
       "id": "U2.4",
@@ -612,7 +667,8 @@
         "U2.2"
       ],
       "criticality": "low",
-      "note": "leave low-confidence speakers UNRESOLVED rather than guessing"
+      "note": "leave low-confidence speakers UNRESOLVED rather than guessing",
+      "delivery_group": "G3"
     },
     {
       "id": "U2.5",
@@ -622,7 +678,8 @@
       "deps": [
         "U2.2"
       ],
-      "criticality": "low"
+      "criticality": "low",
+      "delivery_group": "G4"
     },
     {
       "id": "U2.6",
@@ -634,7 +691,8 @@
       ],
       "criticality": "critical",
       "note": "do NOT reshape flatten-graph.ts — map in routes/graph.ts | 2026-09-24: live evidence D-027/D-028; awaiting checker (webinar-bot-live) — ISS-288",
-      "completed": "2026-09-25T02:21:30"
+      "completed": "2026-09-25T02:21:30",
+      "delivery_group": "G6"
     },
     {
       "id": "U3.1",
@@ -643,7 +701,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "IN FLIGHT in a concurrent maker session: apps/web/src/pages/AskPage.tsx + api/ask.ts exist"
+      "note": "IN FLIGHT in a concurrent maker session: apps/web/src/pages/AskPage.tsx + api/ask.ts exist",
+      "delivery_group": "G5"
     },
     {
       "id": "U3.2",
@@ -654,7 +713,8 @@
         "U3.1"
       ],
       "criticality": "low",
-      "note": "builds on U0.7 + U1.5"
+      "note": "builds on U0.7 + U1.5",
+      "delivery_group": "G5"
     },
     {
       "id": "U4.1",
@@ -663,7 +723,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "workers/transcribe is a 3-line placeholder; packages/ingest recording adapter is real but unwired"
+      "note": "workers/transcribe is a 3-line placeholder; packages/ingest recording adapter is real but unwired",
+      "delivery_group": "G2"
     },
     {
       "id": "U4.2",
@@ -675,7 +736,8 @@
       ],
       "criticality": "low",
       "note": "three stubs + a package imported by nothing is negative-value inventory | 2026-09-24: live evidence D-027/D-028; awaiting checker (webinar-bot-live) — ISS-288",
-      "completed": "2026-09-25T02:21:20"
+      "completed": "2026-09-25T02:21:20",
+      "delivery_group": "G2"
     },
     {
       "id": "T-029",
@@ -685,7 +747,8 @@
       "deps": [],
       "criticality": "low",
       "note": "seen live 2026-09-24 ~16:03, fixed by hand",
-      "completed": "2026-09-25T04:41:23"
+      "completed": "2026-09-25T04:41:23",
+      "delivery_group": "G2"
     },
     {
       "id": "T-030",
@@ -695,7 +758,8 @@
       "deps": [],
       "criticality": "low",
       "note": "Umesh had to ask for status on the first live run",
-      "completed": "2026-09-25T04:41:17"
+      "completed": "2026-09-25T04:41:17",
+      "delivery_group": "G9"
     },
     {
       "id": "T-031",
@@ -705,7 +769,8 @@
       "deps": [],
       "criticality": "low",
       "note": "depends T-029",
-      "completed": "2026-09-26T23:09:57"
+      "completed": "2026-09-26T23:09:57",
+      "delivery_group": "G2"
     },
     {
       "id": "T-032",
@@ -715,7 +780,8 @@
       "deps": [],
       "criticality": "low",
       "note": "force-killed OBS relaunched in Safe Mode on 2026-09-24",
-      "completed": "2026-09-25T02:22:09"
+      "completed": "2026-09-25T02:22:09",
+      "delivery_group": "G9"
     },
     {
       "id": "T-033",
@@ -725,7 +791,8 @@
       "deps": [],
       "criticality": "low",
       "note": "closes U4.2",
-      "completed": "2026-09-26T23:10:00"
+      "completed": "2026-09-26T23:10:00",
+      "delivery_group": "G9"
     },
     {
       "id": "T-034",
@@ -734,7 +801,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "removes OBS; enables parallel meetings"
+      "note": "removes OBS; enables parallel meetings",
+      "delivery_group": "G2"
     },
     {
       "id": "T-035",
@@ -743,7 +811,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "live run measured ~2.7 GB/hour"
+      "note": "live run measured ~2.7 GB/hour",
+      "delivery_group": "G2"
     },
     {
       "id": "T-036",
@@ -752,7 +821,9 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "extends apps/api gws-gmail.ts / gws-calendar.ts"
+      "note": "extends apps/api gws-gmail.ts / gws-calendar.ts",
+      "delivery_group": "G1",
+      "scope_extension": "Existing inbox plus alias/dedicated label intake and relevant public organizer webinar discovery; preserve rejection, deduplication and coverage gaps."
     },
     {
       "id": "T-037",
@@ -761,7 +832,9 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "Read AI pattern"
+      "note": "Read AI pattern",
+      "delivery_group": "G1",
+      "scope_extension": "Relevance rules and approved operator registration profile/scope; approval does not prove registration success."
     },
     {
       "id": "T-038",
@@ -770,7 +843,9 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "replaces one-off Windows tasks; depends T-034, T-036, T-037"
+      "note": "replaces one-off Windows tasks; depends T-034, T-036, T-037",
+      "delivery_group": "G2",
+      "registration_lane_dependency": "T-052; direct join-link lane can complete independently, full registration coverage cannot."
     },
     {
       "id": "T-039",
@@ -779,7 +854,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027"
+      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027",
+      "delivery_group": "G2"
     },
     {
       "id": "T-040",
@@ -788,7 +864,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027"
+      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027",
+      "delivery_group": "G4"
     },
     {
       "id": "T-041",
@@ -797,7 +874,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "video capture proven live 2026-09-24"
+      "note": "video capture proven live 2026-09-24",
+      "delivery_group": "G4"
     },
     {
       "id": "T-042",
@@ -806,7 +884,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "relates U2.4"
+      "note": "relates U2.4",
+      "delivery_group": "G3"
     },
     {
       "id": "T-043",
@@ -815,7 +894,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027"
+      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027",
+      "delivery_group": "G5"
     },
     {
       "id": "T-044",
@@ -824,7 +904,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "measured 223 s of turns on 186 s of audio"
+      "note": "measured 223 s of turns on 186 s of audio",
+      "delivery_group": "G3"
     },
     {
       "id": "T-045",
@@ -833,7 +914,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027"
+      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027",
+      "delivery_group": "G1"
     },
     {
       "id": "T-046",
@@ -842,7 +924,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027"
+      "note": "webinar bot roadmap (docs/meeting-bot-roadmap.md), D-027",
+      "delivery_group": "G9"
     },
     {
       "id": "T-047",
@@ -852,7 +935,8 @@
       "deps": [],
       "criticality": "low",
       "note": "2026-09-24: controller died 16:30:56 (console closed, Ctrl+C exit); OBS + bot kept going; recovered by hand with `lkb finalize --stop-obs`",
-      "completed": "2026-09-25T02:21:13"
+      "completed": "2026-09-25T02:21:13",
+      "delivery_group": "G2"
     },
     {
       "id": "T-049",
@@ -861,7 +945,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "Vidysea standard rule 5 (brain `patterns/agentic-architecture-standard.md`): self-hosted only, TELEMETRY_ENABLED=false, no enterprise key; approved by Umesh 2026-09-24"
+      "note": "Vidysea standard rule 5 (brain `patterns/agentic-architecture-standard.md`): self-hosted only, TELEMETRY_ENABLED=false, no enterprise key; approved by Umesh 2026-09-24",
+      "delivery_group": "G9"
     },
     {
       "id": "T-050",
@@ -870,7 +955,8 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "standard: graph = wiring only, logic stays in functions/skills; multi-agent (Deep Agents) only for the counsellor (T-013); approved by Umesh 2026-09-24"
+      "note": "standard: graph = wiring only, logic stays in functions/skills; multi-agent (Deep Agents) only for the counsellor (T-013); approved by Umesh 2026-09-24",
+      "delivery_group": "G9"
     },
     {
       "id": "T-048",
@@ -879,7 +965,166 @@
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "D-028: one call fixed speaker attribution + no gaps; first re-run one TOC session to compare"
+      "note": "D-028: one call fixed speaker attribution + no gaps; first re-run one TOC session to compare",
+      "delivery_group": "G3"
+    },
+    {
+      "id": "T-051",
+      "title": "Webinar to Knowledge Base Windows operational release; independently verified Ubuntu deployment",
+      "status": "in_progress",
+      "deps": [
+        "T-036",
+        "T-037",
+        "T-038",
+        "T-040",
+        "T-043",
+        "T-044"
+      ],
+      "base_criticality": "HIGH",
+      "note": "Existing TASKS.md release record. Bounded synthetic capture evidence exists; full connected real-webinar/provider/index/Ask/alerts/restart/Ubuntu acceptance NOT VERIFIED.",
+      "delivery_group": "G9",
+      "criticality": "critical"
+    },
+    {
+      "id": "T-052",
+      "title": "Automatic webinar registration and confirmation-email join-link correlation",
+      "status": "in_progress",
+      "deps": [
+        "T-036",
+        "T-037"
+      ],
+      "base_criticality": "HIGH",
+      "note": "New user scope: approved operator profile, registration deduplication, confirmation correlation; CAPTCHA/payment/missing required data become visible action_required; never claim successful registration without confirmation evidence.",
+      "delivery_group": "G1",
+      "criticality": "critical"
+    },
+    {
+      "id": "T-053",
+      "title": "Connector expansion public/on-demand intake missing-recording workflow and watched-source verification",
+      "status": "pending",
+      "deps": [
+        "T-006",
+        "T-023",
+        "T-025",
+        "T-027",
+        "T-045"
+      ],
+      "delivery_group": "G1",
+      "base_criticality": "MEDIUM",
+      "note": "Remaining catalogue scope; umbrella acceptance requires each assigned feature independently verified. Existing implementations reused; no completion or live claim.",
+      "criticality": "low"
+    },
+    {
+      "id": "T-054",
+      "title": "Transcript review and speaker mapping UI",
+      "status": "pending",
+      "deps": [
+        "T-003",
+        "U2.4",
+        "T-044"
+      ],
+      "delivery_group": "G3",
+      "base_criticality": "MEDIUM",
+      "note": "Remaining catalogue scope; umbrella acceptance requires each assigned feature independently verified. Existing implementations reused; no completion or live claim.",
+      "criticality": "low"
+    },
+    {
+      "id": "T-055",
+      "title": "Page-evidenced documents topic/speaker pages collections and resource directories",
+      "status": "pending",
+      "deps": [
+        "T-020",
+        "U2.2",
+        "U2.3",
+        "U2.4"
+      ],
+      "delivery_group": "G4",
+      "base_criticality": "MEDIUM",
+      "note": "Remaining catalogue scope; umbrella acceptance requires each assigned feature independently verified. Existing implementations reused; no completion or live claim.",
+      "criticality": "low"
+    },
+    {
+      "id": "T-056",
+      "title": "Full cited-answer UX policies conflicts review queue and unstructured search acceptance",
+      "status": "pending",
+      "deps": [
+        "U3.1",
+        "U3.2",
+        "T-007",
+        "T-008",
+        "T-022"
+      ],
+      "delivery_group": "G5",
+      "base_criticality": "MEDIUM",
+      "note": "Remaining catalogue scope; umbrella acceptance requires each assigned feature independently verified. Existing implementations reused; no completion or live claim.",
+      "criticality": "low"
+    },
+    {
+      "id": "T-057",
+      "title": "Sessions explorer graph health jobs analytics notifications Sheets and setup UI",
+      "status": "pending",
+      "deps": [
+        "T-010",
+        "U2.6",
+        "T-006"
+      ],
+      "delivery_group": "G6",
+      "base_criticality": "MEDIUM",
+      "note": "Remaining catalogue scope; umbrella acceptance requires each assigned feature independently verified. Existing implementations reused; no completion or live claim.",
+      "criticality": "low"
+    },
+    {
+      "id": "T-058",
+      "title": "FAQ reports and meeting preparation builders",
+      "status": "pending",
+      "deps": [
+        "T-056"
+      ],
+      "delivery_group": "G7",
+      "base_criticality": "MEDIUM",
+      "note": "Remaining catalogue scope; umbrella acceptance requires each assigned feature independently verified. Existing implementations reused; no completion or live claim.",
+      "criticality": "low"
+    },
+    {
+      "id": "T-059",
+      "title": "Evaluation loss to gap capture re-index and re-test flywheel",
+      "status": "pending",
+      "deps": [
+        "T-021",
+        "T-022",
+        "T-043"
+      ],
+      "delivery_group": "G8",
+      "base_criticality": "MEDIUM",
+      "note": "Remaining catalogue scope; umbrella acceptance requires each assigned feature independently verified. Existing implementations reused; no completion or live claim.",
+      "criticality": "low"
+    },
+    {
+      "id": "T-060",
+      "title": "Multi-tenant hosting roles audit API webhooks security and retention completion",
+      "status": "pending",
+      "deps": [
+        "T-009",
+        "T-018",
+        "T-026",
+        "T-051"
+      ],
+      "delivery_group": "G9",
+      "base_criticality": "HIGH",
+      "note": "Remaining catalogue scope; umbrella acceptance requires each assigned feature independently verified. Existing implementations reused; no completion or live claim.",
+      "criticality": "low"
+    },
+    {
+      "id": "T-061",
+      "title": "Wider application automation and bot-monitored operations",
+      "status": "pending",
+      "deps": [
+        "T-060"
+      ],
+      "delivery_group": "G10",
+      "base_criticality": "MEDIUM",
+      "note": "Remaining catalogue scope; umbrella acceptance requires each assigned feature independently verified. Existing implementations reused; no completion or live claim.",
+      "criticality": "low"
     }
   ],
   "decisions": [],
@@ -947,6 +1192,20 @@
       "message": "U2.1c is CRITICAL — human required",
       "task_id": "U2.1c",
       "acked": false
+    },
+    {
+      "ts": "2026-10-05T16:26:02",
+      "level": "critical",
+      "message": "T-051 is CRITICAL — human required",
+      "task_id": "T-051",
+      "acked": false
+    },
+    {
+      "ts": "2026-10-05T16:26:02",
+      "level": "critical",
+      "message": "T-052 is CRITICAL — human required",
+      "task_id": "T-052",
+      "acked": false
     }
   ],
   "preferences": {
@@ -955,8 +1214,290 @@
     "risk_tolerance": "conservative"
   },
   "analytics": {
-    "velocity_per_day": 1.22,
-    "eta_days": 27.0
+    "velocity_per_day": 0.83,
+    "eta_days": 53.0
   },
-  "last_deterministic_tick": "2026-09-27T23:01:02"
+  "last_deterministic_tick": "2026-10-09T12:46:22",
+  "delivery_groups": [
+    {
+      "id": "G1",
+      "title": "Source discovery & intake",
+      "catalogue_features": [
+        "A5",
+        "A7",
+        "A8",
+        "A12",
+        "A13"
+      ],
+      "task_ids": [
+        "T-006",
+        "T-007",
+        "T-023",
+        "T-027",
+        "T-036",
+        "T-037",
+        "T-045",
+        "T-052",
+        "T-053"
+      ],
+      "completion": "Built, independently verified and live are separate evidence states; no catalogue upgrade from grouping."
+    },
+    {
+      "id": "G2",
+      "title": "Automated capture & ingestion",
+      "catalogue_features": [
+        "A1",
+        "A10",
+        "A11"
+      ],
+      "task_ids": [
+        "T-011",
+        "T-024",
+        "U4.1",
+        "U4.2",
+        "T-029",
+        "T-031",
+        "T-034",
+        "T-035",
+        "T-038",
+        "T-039",
+        "T-047"
+      ],
+      "completion": "Built, independently verified and live are separate evidence states; no catalogue upgrade from grouping."
+    },
+    {
+      "id": "G3",
+      "title": "Transcript & expert identity",
+      "catalogue_features": [
+        "A2",
+        "A3",
+        "B3"
+      ],
+      "task_ids": [
+        "T-003",
+        "U2.4",
+        "T-042",
+        "T-044",
+        "T-048",
+        "T-054"
+      ],
+      "completion": "Built, independently verified and live are separate evidence states; no catalogue upgrade from grouping."
+    },
+    {
+      "id": "G4",
+      "title": "Knowledge enrichment & organization",
+      "catalogue_features": [
+        "A6",
+        "A9",
+        "B2",
+        "B4",
+        "B9",
+        "B11",
+        "B12",
+        "B13",
+        "B10"
+      ],
+      "task_ids": [
+        "T-001",
+        "T-002",
+        "U2.1",
+        "U2.1b",
+        "U2.1c",
+        "U2.2",
+        "U2.3",
+        "U2.5",
+        "T-040",
+        "T-041",
+        "T-055"
+      ],
+      "completion": "Built, independently verified and live are separate evidence states; no catalogue upgrade from grouping."
+    },
+    {
+      "id": "G5",
+      "title": "Search retrieval & cited answers",
+      "catalogue_features": [
+        "B5",
+        "B6",
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9"
+      ],
+      "task_ids": [
+        "T-004",
+        "T-005",
+        "T-008",
+        "T-005b",
+        "T-004b",
+        "T-004c",
+        "T-009b",
+        "U1.1",
+        "U1.2",
+        "U1.3",
+        "U1.0",
+        "U1.0b",
+        "U1.0c",
+        "U1.0d",
+        "U1.4",
+        "U1.5",
+        "U3.1",
+        "U3.2",
+        "T-043",
+        "T-056"
+      ],
+      "completion": "Built, independently verified and live are separate evidence states; no catalogue upgrade from grouping."
+    },
+    {
+      "id": "G6",
+      "title": "Knowledge Base product experience",
+      "catalogue_features": [
+        "A4",
+        "B7",
+        "B8",
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "E4"
+      ],
+      "task_ids": [
+        "T-010",
+        "U2.6",
+        "T-057"
+      ],
+      "completion": "Built, independently verified and live are separate evidence states; no catalogue upgrade from grouping."
+    },
+    {
+      "id": "G7",
+      "title": "Knowledge outputs & counsellor client",
+      "catalogue_features": [
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14"
+      ],
+      "task_ids": [
+        "T-013",
+        "T-058"
+      ],
+      "completion": "Built, independently verified and live are separate evidence states; no catalogue upgrade from grouping."
+    },
+    {
+      "id": "G8",
+      "title": "Evaluation & continuous improvement",
+      "catalogue_features": [
+        "D7",
+        "D8"
+      ],
+      "task_ids": [
+        "T-012",
+        "T-014",
+        "T-021",
+        "T-022",
+        "U0.10",
+        "T-059"
+      ],
+      "completion": "Built, independently verified and live are separate evidence states; no catalogue upgrade from grouping."
+    },
+    {
+      "id": "G9",
+      "title": "Hosting security & operations",
+      "catalogue_features": [
+        "E1",
+        "E2",
+        "E3",
+        "E5",
+        "E6",
+        "B1"
+      ],
+      "task_ids": [
+        "T-009",
+        "T-016",
+        "T-017",
+        "T-018",
+        "T-019",
+        "T-020",
+        "T-025",
+        "T-026",
+        "T-017b",
+        "T-000",
+        "T-011a",
+        "U0.5",
+        "U0.6",
+        "U0.7",
+        "U0.8",
+        "U0.9",
+        "T-030",
+        "T-032",
+        "T-033",
+        "T-046",
+        "T-049",
+        "T-050",
+        "T-051",
+        "T-060"
+      ],
+      "completion": "Built, independently verified and live are separate evidence states; no catalogue upgrade from grouping."
+    },
+    {
+      "id": "G10",
+      "title": "Later explicitly retained",
+      "catalogue_features": [
+        "E7",
+        "F1",
+        "F2"
+      ],
+      "task_ids": [
+        "T-015",
+        "T-028",
+        "T-061"
+      ],
+      "completion": "Built, independently verified and live are separate evidence states; no catalogue upgrade from grouping."
+    }
+  ],
+  "release_order": [
+    {
+      "id": "R1",
+      "title": "Immediate operational release",
+      "groups": [
+        "G1",
+        "G2",
+        "G9"
+      ],
+      "acceptance": "Real inbox/alias invite or discovered webinar -> register where required -> join -> usable capture -> actual alert; recover after interruption; Windows first, Ubuntu independently verified."
+    },
+    {
+      "id": "R2",
+      "title": "Complete usable Knowledge Base",
+      "groups": [
+        "G3",
+        "G4",
+        "G5",
+        "G6",
+        "G8"
+      ],
+      "acceptance": "Old TOC, WhatsApp and new webinar knowledge validated and searchable with speaker/timestamp citations; extraction/retrieval/answer gates pass."
+    },
+    {
+      "id": "R3",
+      "title": "Full counsellor product",
+      "groups": [
+        "G6",
+        "G7",
+        "G8",
+        "G9"
+      ],
+      "acceptance": "Remaining product/platform and counsellor championship requirements independently verified; existing training-export approvals and account deferral remain.",
+      "retained_deferred_groups": [
+        "G10"
+      ]
+    }
+  ]
 }
