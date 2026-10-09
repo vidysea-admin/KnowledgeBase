@@ -22,6 +22,7 @@ import { captureTenant, finalizeRecordingWith, isSilentCapture, runFinalize, sho
 import type { ObsClientLike } from "./obs-windows.js";
 import {finalizeControllerRecording} from "./controller-state.js";
 import {webinarCompletionState} from "../calendar/schedule-state.js";
+import { createTabBrowserDeps } from "./tab-browser.js";
 
 // Same derivation record-commands.ts uses for its own REPO_ROOT (this file lives in the same
 // directory) — used ONLY to assert absence, never to write; see the test below.
@@ -35,16 +36,45 @@ test("isSilentCapture: -50 dB (the boundary) is NOT silent, -50.1 dB IS", () => 
   assert.equal(isSilentCapture(-49.9), false, "above the boundary must not be silent");
 });
 
-// --- shouldAutoClick: U0 zoom autoClick selection (pure) ----------------------------------------
+// --- shouldAutoClick: bounded platform join selection -----------------------------------------
 
-test("shouldAutoClick: zoom and zoho get autoClick, everything else does not", () => {
+test("shouldAutoClick: meet, zoom and zoho get bounded join clicks", () => {
   assert.equal(shouldAutoClick("zoho"), true, "T-024b baseline — must not regress");
-  assert.equal(shouldAutoClick("zoom"), true, "U0 — the new capability this unit adds");
+  assert.equal(shouldAutoClick("zoom"), true, "existing Zoom joins must not regress");
   assert.equal(shouldAutoClick("webex"), false);
   assert.equal(shouldAutoClick("cloudonair"), false);
-  assert.equal(shouldAutoClick("meet"), false);
+  assert.equal(shouldAutoClick("meet"), true, "Meet must reach the existing Join now allowlist");
   assert.equal(shouldAutoClick("teams"), false);
   assert.equal(shouldAutoClick("unknown"), false);
+});
+
+test("shouldAutoClick forwards Meet join permission and preserves --no-click in the tab launcher", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "meet-join-argv-"));
+  const script = join(dir, "inspect-argv.mjs");
+  writeFileSync(script, 'console.log(JSON.stringify({event:"opened",argv:process.argv.slice(2)}));\n' +
+    'console.log(JSON.stringify({event:"fatal",error:"fixture stopped before browser"}));\n');
+  try {
+    for (const [platform, autoClick] of [["meet", shouldAutoClick("meet")], ["webex", shouldAutoClick("webex")], ["meet", false]] as const) {
+      const profile = join(dir, `profile-${platform}-${autoClick}`), record = join(dir, `record-${platform}-${autoClick}`);
+      let received: string[] | undefined;
+      const tab = createTabBrowserDeps({python: process.execPath, joinScript: script, profileDir: profile,
+        recordDir: record, extensionDir: join(REPO_ROOT, "packages/meeting-bot/py/tab-capture"), autoClick,
+        startupTimeoutMs: 3000, log: () => {}, onEvent: (_handle, event) => {
+          if (event.event === "opened") received = (event as unknown as {argv: string[]}).argv;
+        }});
+      const url = platform === "meet" ? "https://meet.google.com/abc-defg-hij" : "https://example.webex.com/fixture";
+      await assert.rejects(tab.deps.launch(url), /fixture stopped before browser/);
+      assert.ok(received, "inspect the actual child argv, without launching Chrome");
+      assert.equal(received[0], url);
+      assert.equal(received.includes("--no-click"), !autoClick);
+      assert.equal(received[received.indexOf("--profile") + 1], profile);
+      assert.equal(existsSync(join(profile, ".lkb-tab-capture.lock")), false);
+      assert.equal(existsSync(received[received.indexOf("--capture-extension") + 1]), false);
+      const output = tab.outputPath(received[received.indexOf("--title") + 1].slice("LKB-BOT ".length));
+      assert.ok(output && existsSync(output), "startup failure remains a registered capture attempt");
+      assert.equal(JSON.parse(readFileSync(`${output}.status.json`, "utf8")).state, "failed");
+    }
+  } finally { rmSync(dir, {recursive: true, force: true}); }
 });
 
 // --- todayAt: ISS-319 fix (u5-auto-record-scheduler, fix cycle 2) ----------------------------

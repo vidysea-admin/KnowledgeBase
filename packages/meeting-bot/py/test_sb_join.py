@@ -220,6 +220,11 @@ def test_join_texts_contains_the_verified_zoom_web_client_button():
     assert "join from browser" in {t.lower() for t in JOIN_TEXTS}
 
 
+def test_join_texts_contains_exact_meet_join_now_without_media_controls():
+    assert "join now" in JOIN_TEXTS
+    assert not ({"turn on microphone", "turn on camera", "unmute", "allow"} & set(JOIN_TEXTS))
+
+
 @pytest.fixture
 def managed_main(monkeypatch, tmp_path):
     stop = tmp_path / "stop"
@@ -265,6 +270,9 @@ def test_main_passes_verified_installed_driver_to_actual_sb_launch_seam(managed_
     assert "cft_drivers" in launched["binary_location"]
     assert launched["uc"] is True and launched["headed"] is True
     assert "--enable-unsafe-extension-debugging" in launched["chromium_arg"]
+    assert "--deny-permission-prompts" in launched["chromium_arg"].split(",")
+    assert "use-fake-ui-for-media-stream" not in launched["chromium_arg"]
+    assert "use-fake-device-for-media-stream" not in launched["chromium_arg"]
     assert pathlib.Path(launched["extension_dir"]).resolve() == pathlib.Path(sb_join.__file__).parent / "tab-capture"
     assert managed_main.cleanup == [(managed_main.profile, {"launch": os.name == "nt", "expected_exe": launched["binary_location"]})]
 
