@@ -8,7 +8,7 @@
  * `--dry-run` (required to PASS T-002 C6) reads every file, computes per-collection insert
  * counts, and prints them WITHOUT ever calling packages/db's connect() — same
  * unreachable-DB fallback precedent as T-018's `migrate-mongo status`. A live run (no flag)
- * connects using MONGODB_URL / MONGODB_DB (same env vars as migrate-mongo-config.cjs) and
+ * requires explicit MONGODB_URL and isolated MONGO_WORK_DB (MONGODB_DB must match if set) and
  * inserts for real; it is not required to PASS this unit.
  *
  * packages/db is TypeScript with no build step (package.json main is src/index.ts) — this
@@ -20,6 +20,7 @@ import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import "dotenv/config";
 import { register } from "tsx/esm/api";
+import { assertDerivedArtifactsCurrent, requireWorkDatabase } from "./lib/transcript-provenance.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA_DIR = join(ROOT, "data", "toc-migrated");
@@ -64,16 +65,18 @@ function loadSessionDocs() {
   const docs = { sources: [], sessions: [], turns: [], session_pages: [], claims: [] };
   for (const sessionId of sessionIds) {
     const dir = join(DATA_DIR, sessionId);
-    docs.sources.push(loadJson(join(dir, "source.json")));
-    docs.sessions.push(loadJson(join(dir, "session.json")));
-    docs.turns.push(...loadJson(join(dir, "turns.json")));
-    docs.session_pages.push(loadJson(join(dir, "session_page.json")));
-    docs.claims.push(...loadJson(join(dir, "claims.json")));
+    const snapshot = assertDerivedArtifactsCurrent(dir).documents;
+    docs.sources.push(snapshot.source);
+    docs.sessions.push(snapshot.session);
+    docs.turns.push(...snapshot.turns);
+    docs.session_pages.push(snapshot.page);
+    docs.claims.push(...snapshot.claims);
   }
   return { sessionIds, docs };
 }
 
 async function seedLive(docs) {
+  const {url, dbName} = requireWorkDatabase(process.env);
   const { connect, close } = await import("../packages/db/src/client.js");
   const { sources } = await import("../packages/db/src/collections/sources.js");
   const { sessions } = await import("../packages/db/src/collections/sessions.js");
@@ -81,21 +84,19 @@ async function seedLive(docs) {
   const { claims } = await import("../packages/db/src/collections/claims.js");
   const { sessionPages } = await import("../packages/db/src/collections/session-pages.js");
 
-  const url = process.env.MONGODB_URL || "mongodb://localhost:27017";
-  const dbName = process.env.MONGODB_DB || "lkb";
   await connect(url, dbName);
   try {
-    const tenantId = "toc";
+    const owner = doc => {if (!doc?.tenantId) throw new Error("source tenant missing"); return doc.tenantId;};
     const counts = {};
-    for (const doc of docs.sources) { await sources(tenantId).insertOne(withoutTenant(doc)); }
+    for (const doc of docs.sources) { await sources(owner(doc)).insertOne(withoutTenant(doc)); }
     counts.sources = docs.sources.length;
-    for (const doc of docs.sessions) { await sessions(tenantId).insertOne(withoutTenant(doc)); }
+    for (const doc of docs.sessions) { await sessions(owner(doc)).insertOne(withoutTenant(doc)); }
     counts.sessions = docs.sessions.length;
-    for (const doc of docs.turns) { await turns(tenantId).insertOne(withoutTenant(doc)); }
+    for (const doc of docs.turns) { await turns(owner(doc)).insertOne(withoutTenant(doc)); }
     counts.turns = docs.turns.length;
-    for (const doc of docs.session_pages) { await sessionPages(tenantId).insertOne(withoutTenant(doc)); }
+    for (const doc of docs.session_pages) { await sessionPages(owner(doc)).insertOne(withoutTenant(doc)); }
     counts.session_pages = docs.session_pages.length;
-    for (const doc of docs.claims) { await claims(tenantId).insertOne(withoutTenant(doc)); }
+    for (const doc of docs.claims) { await claims(owner(doc)).insertOne(withoutTenant(doc)); }
     counts.claims = docs.claims.length;
     return counts;
   } finally {

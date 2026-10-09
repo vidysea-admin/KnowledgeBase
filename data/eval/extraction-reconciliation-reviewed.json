@@ -1,0 +1,281 @@
+{
+  "version": 1,
+  "status": "INDEPENDENTLY_REVIEWED_REPLACEMENT_PROPOSALS",
+  "scope": "Seven exact current-source citation mappings. This is neither accepted original persisted citations nor human golden truth, binding numerical thresholds, production/backfill authorization, or complete U2.2/product acceptance.",
+  "reviewer": "independent checker agent",
+  "reviewedClaims": 7,
+  "unreviewedClaimIds": [
+    "2026-04-21-visa-blueprint-part2-italy-france-nz-c01",
+    "2026-04-21-visa-blueprint-part2-italy-france-nz-c03",
+    "2026-04-21-visa-blueprint-part2-italy-france-nz-c04",
+    "2026-04-21-visa-blueprint-part2-italy-france-nz-c05",
+    "2026-04-21-visa-blueprint-part2-italy-france-nz-c06",
+    "2026-05-08-funding-dreams-loans-forex-c01",
+    "2026-05-08-funding-dreams-loans-forex-c02",
+    "2026-05-08-funding-dreams-loans-forex-c03",
+    "2026-05-08-funding-dreams-loans-forex-c04",
+    "2026-05-08-funding-dreams-loans-forex-c05",
+    "2026-05-20-telling-your-brand-story-better-c01",
+    "2026-05-20-telling-your-brand-story-better-c02",
+    "2026-05-22-uniaccess-xavier-university-c02",
+    "2026-05-22-uniaccess-xavier-university-c03",
+    "2026-05-23-uniaccess-atlas-skilltech-c01",
+    "2026-05-23-uniaccess-atlas-skilltech-c02",
+    "2026-05-23-uniaccess-atlas-skilltech-c03",
+    "2026-05-28-in-focus-1-c01",
+    "2026-05-28-in-focus-1-c02",
+    "2026-05-28-in-focus-1-c03",
+    "2026-05-29-decoding-ever-expanding-cast-c01",
+    "2026-05-29-decoding-ever-expanding-cast-c02",
+    "2026-05-29-decoding-ever-expanding-cast-c03",
+    "2026-06-03-dual-enrollment-pathway-c01",
+    "2026-06-03-dual-enrollment-pathway-c02",
+    "2026-06-03-dual-enrollment-pathway-c03",
+    "2026-06-19-entrance-exams-pathways-india-part1-c01",
+    "2026-06-19-entrance-exams-pathways-india-part1-c02",
+    "2026-06-19-entrance-exams-pathways-india-part1-c03",
+    "2026-06-19-entrance-exams-pathways-india-part1-c04",
+    "2026-06-25-in-focus-2-c01",
+    "2026-06-25-in-focus-2-c02",
+    "2026-06-25-in-focus-2-c03",
+    "2026-06-30-exploring-identity-success-counseling-c01",
+    "2026-06-30-exploring-identity-success-counseling-c02",
+    "2026-07-03-inside-the-uc-session-c01",
+    "2026-07-03-inside-the-uc-session-c02",
+    "2026-07-03-inside-the-uc-session-c03",
+    "2026-07-03-inside-the-uc-session-c04",
+    "2026-07-08-beyond-black-robes-law-careers-c01",
+    "2026-07-08-beyond-black-robes-law-careers-c02",
+    "2026-07-08-beyond-black-robes-law-careers-c03",
+    "2026-07-15-creative-futures-c02",
+    "2026-07-22-uniaccess-cept-university-c02",
+    "2026-07-22-uniaccess-cept-university-c03",
+    "2026-07-28-metrics-and-mingling-c01",
+    "2026-07-28-metrics-and-mingling-c02",
+    "2026-07-28-metrics-and-mingling-c03",
+    "2026-07-30-in-focus-3-c01",
+    "2026-07-30-in-focus-3-c02",
+    "2026-07-30-in-focus-3-c03",
+    "2026-08-03-uk-beyond-offer-letters-c01",
+    "2026-08-03-uk-beyond-offer-letters-c02",
+    "2026-08-03-uk-beyond-offer-letters-reupload-c01",
+    "2026-08-03-uk-beyond-offer-letters-reupload-c02",
+    "2026-08-10-ucas-what-changed-what-matters-c01",
+    "2026-08-10-ucas-what-changed-what-matters-c03",
+    "2026-08-12-uniaccess-ashoka-university-c02",
+    "2026-08-12-uniaccess-ashoka-university-c03",
+    "2026-08-24-uniaccess-leeds-arts-university-c01",
+    "2026-08-24-uniaccess-leeds-arts-university-c02",
+    "2026-08-24-uniaccess-leeds-arts-university-c03",
+    "2026-08-27-in-focus-4-c01",
+    "2026-08-27-in-focus-4-c02",
+    "2026-08-27-in-focus-4-c03"
+  ],
+  "mappings": [
+    {
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c02",
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "tenantId": "toc",
+      "claimText": "New Zealand Master's tuition ranges from INR 18 lakhs to INR 50 lakhs depending on the university.",
+      "claimTextSha256": "f7139b109783da5808c7299b2d8e925b5c03c1f5070c4d60d1cf81375e1e7b7a",
+      "currentTurnsSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+      "originalClaimsSha256": "40b13b59f5134853affa90ab87392b3d23466484cac7286ef7c34b6d6d554a69",
+      "originalEvidence": [
+        {
+          "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t022",
+          "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz"
+        }
+      ],
+      "proposedEvidence": [
+        {
+          "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t088",
+          "turnTextSha256": "c78e1ded563698e59aaeac65bc65f547277fbd582e839760a8192cdb9cfc0de6",
+          "tStart": 1166,
+          "tEnd": 1186,
+          "speakerRef": "spk:1",
+          "reviewRole": "assertion support"
+        },
+        {
+          "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t089",
+          "turnTextSha256": "f9975c21729b60a51600c61fdcddcfc08aa14f58c7e6ca87141aa00dce078429",
+          "tStart": 1186,
+          "tEnd": 1199,
+          "speakerRef": "spk:1",
+          "reviewRole": "country context"
+        }
+      ],
+      "reviewStatus": "INDEPENDENTLY_REVIEWED_REPLACEMENT_PROPOSAL",
+      "rationale": "Directly inspected the complete current cited turn(s). Assertion is supported as presented in the transcript; external factual truth and speaker identity remain separate gates. The t089 context is required to bind the t088 numerical assertion to New Zealand in a mixed-country session."
+    },
+    {
+      "claimId": "2026-05-22-uniaccess-xavier-university-c01",
+      "sessionId": "2026-05-22-uniaccess-xavier-university",
+      "tenantId": "toc",
+      "claimText": "Xavier University has an 11:1 student-to-faculty ratio and an average class size of about 23 students.",
+      "claimTextSha256": "72754f05f81cd82db3abf58d67cc15fee1989494111769e0b23823be380c7b64",
+      "currentTurnsSha256": "9540ce875b248339533cec077615dbb111a2f5562c1b795f5627c1b32b9d17ab",
+      "originalClaimsSha256": "c7afdd00600f6f3af24e1be5e8995494c13dcb2e8cd939ef0a9060235e0582fd",
+      "originalEvidence": [
+        {
+          "turnId": "2026-05-22-uniaccess-xavier-university-t020",
+          "sessionId": "2026-05-22-uniaccess-xavier-university"
+        }
+      ],
+      "proposedEvidence": [
+        {
+          "sessionId": "2026-05-22-uniaccess-xavier-university",
+          "turnId": "2026-05-22-uniaccess-xavier-university-t030",
+          "turnTextSha256": "8a0a63098bba1720a1245ca8e0f94e8bdef9f2940fbce2f6232aefdfe47dfb3e",
+          "tStart": 516,
+          "tEnd": 546,
+          "speakerRef": "Sandeep",
+          "reviewRole": "assertion support"
+        }
+      ],
+      "reviewStatus": "INDEPENDENTLY_REVIEWED_REPLACEMENT_PROPOSAL",
+      "rationale": "Directly inspected the complete current cited turn(s). Assertion is supported as presented in the transcript; external factual truth and speaker identity remain separate gates."
+    },
+    {
+      "claimId": "2026-07-15-creative-futures-c01",
+      "sessionId": "2026-07-15-creative-futures",
+      "tenantId": "toc",
+      "claimText": "According to SCAD's presentation, roughly 85% of career success comes from soft skills and 15% from technical skills.",
+      "claimTextSha256": "d7018acbd0a145cb88894309f9690b74001ab6f49cdbd06643ecef2e349658aa",
+      "currentTurnsSha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+      "originalClaimsSha256": "a441c46403478c2dc48301c3837d1c815a17ce9d20ce761e59cdbf38d577362f",
+      "originalEvidence": [
+        {
+          "turnId": "2026-07-15-creative-futures-t015",
+          "sessionId": "2026-07-15-creative-futures"
+        }
+      ],
+      "proposedEvidence": [
+        {
+          "sessionId": "2026-07-15-creative-futures",
+          "turnId": "2026-07-15-creative-futures-t009",
+          "turnTextSha256": "dbcd89e0b43a17ea3b5f0a962c03543782dcf3db1faeb8f1146be56d0d96c70b",
+          "tStart": 491,
+          "tEnd": 524,
+          "speakerRef": "Emily Lee",
+          "reviewRole": "assertion support"
+        }
+      ],
+      "reviewStatus": "INDEPENDENTLY_REVIEWED_REPLACEMENT_PROPOSAL",
+      "rationale": "Directly inspected the complete current cited turn(s). Assertion is supported as presented in the transcript; external factual truth and speaker identity remain separate gates."
+    },
+    {
+      "claimId": "2026-07-15-creative-futures-c03",
+      "sessionId": "2026-07-15-creative-futures",
+      "tenantId": "toc",
+      "claimText": "SCADpro is SCAD's in-house collaborative innovation studio that pairs students with real companies on live projects.",
+      "claimTextSha256": "f3e3d255fa532f6ffd82cc93f5b34e36f3de0a2a028d6e63df3a4d63f6c7d4b9",
+      "currentTurnsSha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+      "originalClaimsSha256": "a441c46403478c2dc48301c3837d1c815a17ce9d20ce761e59cdbf38d577362f",
+      "originalEvidence": [
+        {
+          "turnId": "2026-07-15-creative-futures-t026",
+          "sessionId": "2026-07-15-creative-futures"
+        }
+      ],
+      "proposedEvidence": [
+        {
+          "sessionId": "2026-07-15-creative-futures",
+          "turnId": "2026-07-15-creative-futures-t021",
+          "turnTextSha256": "92e12dda455f8ce3b3118fa9e35610d7b4b2d8bf7cee94e63871a881a0377a3e",
+          "tStart": 858,
+          "tEnd": 892,
+          "speakerRef": "Emily Lee",
+          "reviewRole": "assertion support"
+        }
+      ],
+      "reviewStatus": "INDEPENDENTLY_REVIEWED_REPLACEMENT_PROPOSAL",
+      "rationale": "Directly inspected the complete current cited turn(s). Assertion is supported as presented in the transcript; external factual truth and speaker identity remain separate gates."
+    },
+    {
+      "claimId": "2026-07-22-uniaccess-cept-university-c01",
+      "sessionId": "2026-07-22-uniaccess-cept-university",
+      "tenantId": "toc",
+      "claimText": "CEPT University was established in 1962 by architect B.V. Doshi.",
+      "claimTextSha256": "414c35876cded96e8cda6935b1fd571beb0e0db32a88ead6ddf6e6d638caf729",
+      "currentTurnsSha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+      "originalClaimsSha256": "62dd1a9ebb3c32d8ab01724ed9a1e1ba322cce12032db727d3d853bbcb9e67e3",
+      "originalEvidence": [
+        {
+          "turnId": "2026-07-22-uniaccess-cept-university-t004",
+          "sessionId": "2026-07-22-uniaccess-cept-university"
+        }
+      ],
+      "proposedEvidence": [
+        {
+          "sessionId": "2026-07-22-uniaccess-cept-university",
+          "turnId": "2026-07-22-uniaccess-cept-university-t004",
+          "turnTextSha256": "3fd70be34155e0fbfc0c0dabb63201c765f9776efdc04b98470a663e0efb04b2",
+          "tStart": 145,
+          "tEnd": 682,
+          "speakerRef": "Nilesh",
+          "reviewRole": "assertion support"
+        }
+      ],
+      "reviewStatus": "INDEPENDENTLY_REVIEWED_REPLACEMENT_PROPOSAL",
+      "rationale": "Directly inspected the complete current cited turn(s). Assertion is supported as presented in the transcript; external factual truth and speaker identity remain separate gates."
+    },
+    {
+      "claimId": "2026-08-10-ucas-what-changed-what-matters-c02",
+      "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+      "tenantId": "toc",
+      "claimText": "Each of the three UCAS personal statement prompts must contain at least 350 characters.",
+      "claimTextSha256": "87f0906797549cc16715bea12bb6c961d118e4dd5ff39abeefd89a58f268fa61",
+      "currentTurnsSha256": "d2078954432f8d780c84bdbf62fa5dab4454b07b173fa375a78fd940278cd416",
+      "originalClaimsSha256": "2c534693139018a907bff1e60d2e5b4d68c4159ac1ea45c0cf07845606e5eaee",
+      "originalEvidence": [
+        {
+          "turnId": "2026-08-10-ucas-what-changed-what-matters-t136",
+          "sessionId": "2026-08-10-ucas-what-changed-what-matters"
+        }
+      ],
+      "proposedEvidence": [
+        {
+          "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+          "turnId": "2026-08-10-ucas-what-changed-what-matters-t135",
+          "turnTextSha256": "f02fab4429540035aa009e5cb6c582389cb38b5198f923ef947efe13976ade9e",
+          "tStart": 2320,
+          "tEnd": 2448,
+          "speakerRef": "Sapna Goyal",
+          "reviewRole": "assertion support"
+        }
+      ],
+      "reviewStatus": "INDEPENDENTLY_REVIEWED_REPLACEMENT_PROPOSAL",
+      "rationale": "Directly inspected the complete current cited turn(s). Assertion is supported as presented in the transcript; external factual truth and speaker identity remain separate gates."
+    },
+    {
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c01",
+      "sessionId": "2026-08-12-uniaccess-ashoka-university",
+      "tenantId": "toc",
+      "claimText": "About 260+ companies come to campus for Ashoka University's placement process.",
+      "claimTextSha256": "0286b566a00d7bd10633669579e3cfde28ee2f57df209d958af8368513de3255",
+      "currentTurnsSha256": "fcc2b56c91966ac80c75719e135dd238d62e6a092b8227b71978de7cdb58f306",
+      "originalClaimsSha256": "425c13c85419cb9a8217dd32bde3d0e780cf45bd19d687ecdd6cc79aba4c0dc3",
+      "originalEvidence": [
+        {
+          "turnId": "2026-08-12-uniaccess-ashoka-university-t106",
+          "sessionId": "2026-08-12-uniaccess-ashoka-university"
+        }
+      ],
+      "proposedEvidence": [
+        {
+          "sessionId": "2026-08-12-uniaccess-ashoka-university",
+          "turnId": "2026-08-12-uniaccess-ashoka-university-t014",
+          "turnTextSha256": "780bc5e3a05639939ef247b1f5bedfe5e293ead702e69839e67ad62a6f0bce9e",
+          "tStart": 2891,
+          "tEnd": 2957,
+          "speakerRef": "Anju",
+          "reviewRole": "assertion support"
+        }
+      ],
+      "reviewStatus": "INDEPENDENTLY_REVIEWED_REPLACEMENT_PROPOSAL",
+      "rationale": "Directly inspected the complete current cited turn(s). Assertion is supported as presented in the transcript; external factual truth and speaker identity remain separate gates."
+    }
+  ]
+}

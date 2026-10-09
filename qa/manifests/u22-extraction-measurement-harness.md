@@ -34,3 +34,6 @@ Report data/eval/extraction-report.json SHA2560af6a160fdf2a2321992fd118b35668e27
 
 ## Remaining gates
 Independently owned extraction QA contract; independent semantic gold/omission/entity labels and threshold decision; lawful scripts capacity; completed-feature code/AI review and independent checker verdict. Full KB/provider/webinar/WhatsApp/UI/Ubuntu gates remain. U2.2 not marked done or ready-for-check; BUILDING retained.
+
+## Desktop continuation 2026-10-09
+Scoped reviewed-metric implementation and stale-citation prevention have separate manifests u22-reviewed-measurement-metrics.md and toc-transcript-provenance.md. Original full harness remains BUILDING: no human gold/threshold/full-corpus acceptance inferred. Target extraction22/22 and index typecheck pass; affected provenance13/13 and immediate downstream29/29 pass. Real FFmpeg fixture remains unavailable (ENOENT). Original real corpus is unchanged.

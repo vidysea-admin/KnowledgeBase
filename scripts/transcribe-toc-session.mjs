@@ -16,6 +16,7 @@ import { register } from "tsx/esm/api";
 import { Agent, setGlobalDispatcher } from "undici";
 import { findAudioFile, transcriptTenant } from "./lib/find-audio-file.mjs";
 import { realUploadTransport } from "./lib/real-upload-transport.mjs";
+import { writeTranscriptGeneration } from "./lib/transcript-provenance.mjs";
 
 // Real audio transcription (generateContent processing a large uploaded file server-side) can
 // legitimately take several minutes to return headers — undici's default headersTimeout (300s)
@@ -84,16 +85,7 @@ async function main() {
       `existing turn(s) are on disk — refusing to overwrite. Investigate the raw response before retrying.`,
     );
   }
-  const realTurns = turns.map((t, i) => ({
-    _id: `${sessionId}-t${String(i + 1).padStart(3, "0")}`,
-    tenantId,
-    sessionId,
-    speakerRef: t.speakerRef,
-    tStart: t.tStart,
-    tEnd: t.tEnd,
-    text: t.text,
-  }));
-  writeFileSync(turnsPath, JSON.stringify(realTurns, null, 2) + "\n", "utf8");
+  const realTurns = writeTranscriptGeneration(join(DATA_DIR, sessionId), tenantId, sessionId, turns);
   console.log(`wrote ${realTurns.length} real diarized turns -> ${turnsPath} (replaced ${existingTurns.length} placeholder turn(s))`);
 }
 

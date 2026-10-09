@@ -212,3 +212,79 @@ test("explicit omission and topic/person labels report only reviewed coverage", 
   assert.equal(r.entities.topic.precision.value, 0); assert.equal(r.entities.person.measured, false);
   assert.throws(() => evaluateExtractionCase({...base, entityLabels: [{caseId: "foreign", artifactHash: "a".repeat(64), id: "topic1", kind: "topic", correct: true}]}), /Invalid entity label/);
 });
+
+test("reviewed fact labels measure zero omission and expose partial review coverage", () => {
+  const label = {caseId: "case1", artifactHash: "a".repeat(64), factId: "fact1", status: "covered", stage: "parsed", claimId: "row:0"};
+  const base = evalCase({parsed: [{text: "x", turnIds: ["t1"]}], expectedFacts: [{id: "fact1"}, {id: "fact2"}]});
+  const r = evaluateExtractionCase({...base, factLabels: [label]});
+  assert.deepEqual(r.semantic.omissionRate, {numerator: 0, denominator: 1, value: 0});
+  assert.deepEqual(r.semantic.factCoverage, {numerator: 1, denominator: 2, value: 0.5});
+  assert.equal(r.semantic.factsMeasured, true); assert.equal(r.semantic.unsupportedRate.value, null);
+  const unknown = evaluateExtractionCase(base);
+  assert.equal(unknown.semantic.omissionRate.value, null); assert.equal(unknown.semantic.factsMeasured, false);
+  assert.equal(unknown.semantic.factCoverage.value, 0);
+  for (const bad of [{...label, artifactHash: "b".repeat(64)}, {...label, caseId: "foreign"}, {...label, factId: "missing"},
+    {...label, stage: "persisted"}, {...label, claimId: "missing"}, {...label, status: "assumed"}, {...label, status: ["covered"]}, {...label, stage: ["parsed"]}])
+    assert.throws(() => evaluateExtractionCase({...base, factLabels: [bad]}), /Invalid fact label/);
+  assert.throws(() => evaluateExtractionCase({...base, factLabels: [label, label]}), /Invalid fact label duplicate/);
+  assert.throws(() => evaluateExtractionCase({...base, parsed: [{_id: "c", text: "x", turnIds: ["t1"]}, {_id: "c", text: "x", turnIds: ["t1"]}],
+    factLabels: [{...label, claimId: "c"}]}), /Invalid fact label target/);
+});
+test("omitted facts are reviewed targets with shared uniqueness across legacy and new labels", () => {
+  const common = {caseId: "case1", artifactHash: "a".repeat(64)};
+  const legacy = {...common, claimId: "fact1", status: "omitted"};
+  const omitted = {...common, factId: "fact1", status: "omitted"};
+  const base = evalCase({parsed: [], expectedFacts: [{id: "fact1"}, {id: "fact2"}]});
+  const r = evaluateExtractionCase({...base, factLabels: [omitted]});
+  assert.deepEqual(r.semantic.omissionRate, {numerator: 1, denominator: 1, value: 1});
+  assert.equal(r.semantic.factCoverage.value, 0.5);
+  assert.throws(() => evaluateExtractionCase({...base, labels: [legacy, {...legacy, stage: "parsed"}]}), /Invalid human label duplicate/);
+  assert.throws(() => evaluateExtractionCase({...base, labels: [legacy], factLabels: [omitted]}), /Invalid fact label duplicate/);
+  for (const bad of [{...omitted, stage: "parsed"}, {...omitted, claimId: "row:0"}])
+    assert.throws(() => evaluateExtractionCase({...base, factLabels: [bad]}), /Invalid fact label target/);
+  const uncertain = evaluateExtractionCase(evalCase({parsed: [{text: "x", turnIds: ["t1"]}],
+    labels: [{...common, claimId: "row:0", stage: "parsed", status: "uncertain"}]}));
+  assert.equal(uncertain.semantic.unsupportedRate.value, null);
+});
+test("aggregate fact and entity measurements sum reviewed denominators and retain unknown coverage", () => {
+  const common = {caseId: "case1", artifactHash: "a".repeat(64)};
+  const a = evaluateExtractionCase(evalCase({parsed: [{text: "x", turnIds: ["t1"]}],
+    expectedFacts: [{id: "f1"}, {id: "f2"}, {id: "f3"}], factLabels: ["f1", "f2"].map(factId =>
+      ({...common, factId, status: "covered", stage: "parsed", claimId: "row:0"})),
+    predictedEntities: ["p1", "p2", "p3"].map(id => ({id, kind: "topic"})),
+    entityLabels: ["p1", "p2"].map(id => ({...common, id, kind: "topic", correct: true}))}));
+  const b = evaluateExtractionCase(evalCase({id: "case2", parsed: [], expectedFacts: [{id: "f1"}],
+    factLabels: [{...common, caseId: "case2", factId: "f1", status: "omitted"}],
+    predictedEntities: [{id: "p1", kind: "topic"}],
+    entityLabels: [{...common, caseId: "case2", id: "p1", kind: "topic", correct: false}]}));
+  const c = evaluateExtractionCase(evalCase({id: "case3", parsed: [], expectedFacts: [{id: "f1"}],
+    predictedEntities: [{id: "speaker1", kind: "person"}]}));
+  const r = aggregateExtractionReports([a, b, c]);
+  assert.deepEqual(r.semantic.omissionRate, {numerator: 1, denominator: 3, value: 1 / 3});
+  assert.deepEqual(r.semantic.factCoverage, {numerator: 3, denominator: 5, value: 0.6});
+  assert.equal(r.semantic.factMeasuredCases, 2); assert.equal(r.semantic.factUnmeasuredCases, 1);
+  assert.deepEqual(r.entities.topic.precision, {numerator: 2, denominator: 3, value: 2 / 3});
+  assert.deepEqual(r.entities.topic.coverage, {numerator: 3, denominator: 4, value: 0.75});
+  assert.equal(r.entities.person.precision.value, null); assert.equal(r.entities.person.coverage.value, 0);
+  assert.equal(a.entities.topic.coverage.value, 2 / 3);
+  assert.equal(evaluateExtractionCase(evalCase({parsed: []})).entities.topic.coverage.value, null);
+});
+test("offline CLI loads reviewed fact labels and rejects drift without exposing labels", () => {
+  const dir = mkdtempSync(join(tmpdir(), "extraction-facts-test-"));
+  const script = resolve(import.meta.dirname, "../../../../scripts/eval-extraction.mjs");
+  try {
+    writeFileSync(join(dir, "turns.json"), JSON.stringify([turn("t1", "spk:0", "private source")]));
+    writeFileSync(join(dir, "parsed.json"), JSON.stringify([{text: "private claim", turnIds: ["t1"]}]));
+    const c = {id: "case1", tenantId: "t1", sessionId: "s1", artifacts: {turns: "turns.json", parsed: "parsed.json"}, expectedFacts: [{id: "f1"}]};
+    const path = join(dir, "corpus.json"), run = () => spawnSync(process.execPath, [script, "--input", path], {encoding: "utf8", timeout: 20000});
+    writeFileSync(path, JSON.stringify({version: 1, cases: [c]}));
+    const hash = JSON.parse(run().stdout).artifacts[0].artifactHash;
+    const factLabels = [{caseId: "case1", artifactHash: hash, factId: "f1", status: "covered", stage: "parsed", claimId: "row:0"}];
+    writeFileSync(path, JSON.stringify({version: 1, cases: [{...c, factLabels}]}));
+    const measured = run(); assert.equal(measured.status, 0);
+    const report = JSON.parse(measured.stdout); assert.equal(report.summary.semantic.omissionRate.value, 0);
+    assert.equal(report.summary.semantic.factCoverage.value, 1); assert.ok(!measured.stdout.includes("private source"));
+    writeFileSync(join(dir, "parsed.json"), JSON.stringify([{text: "changed claim", turnIds: ["t1"]}]));
+    const drift = run(); assert.equal(drift.status, 2); assert.equal(JSON.parse(drift.stdout).failures[0].reason, "fact-label-invalid");
+  } finally {rmSync(dir, {recursive: true, force: true});}
+});

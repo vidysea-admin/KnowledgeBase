@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "date": "2026-10-09",
+  "verdict": "PASS_BOUNDED_PROVENANCE_IMPLEMENTATION",
+  "reviewer": "independent checker agent",
+  "command": "node --test scripts/lib/transcript-provenance.test.mjs scripts/webinar/session-inputs.test.mjs scripts/webinar/session-rows.test.mjs",
+  "result": {
+    "exit": 0,
+    "tests": 27,
+    "pass": 27,
+    "fail": 0,
+    "skipped": 0,
+    "durationMs": 13311.5184
+  },
+  "diffCheckExit": 0,
+  "checkedSourceSha256": {
+    "scripts/lib/transcript-provenance.mjs": "31141efefa5eba184b866fdb4963853a92d32d225bbfb999a05b35cf5265fde6",
+    "scripts/lib/transcript-provenance.test.mjs": "ce2c1a04934df9bb362239d5b9ae3f00684e12b1f4db8b422f2b6479543f8977",
+    "scripts/transcribe-toc-session.mjs": "6e1767f7d4e027a7bc2cd9fcd6b1b3f84227164f1e69add5e40eda0ce3f9a0a9",
+    "scripts/transcribe-long-session.mjs": "844e6e2dbcf6baf4756fce7bc50472c5fa3c5366aa046dc135b0439c266fcedf",
+    "scripts/seed-toc.mjs": "8b68f1e04932e655a2cb57b869cd1385d3d36f916f9a7d66dffc213390f1cad8",
+    "scripts/sync-real-turns.mjs": "c98096393bb646216a5579f7869e50d832a1fc028660a6822bd0bf9b8c9b2b35",
+    "scripts/watch/lib/ingest-chain.mjs": "fe67950e1be0980f72b739be1fb36e5a1ea1038613a0a29f669a7613bffebe0a",
+    "scripts/webinar/sync-session.mjs": "92321a111087c2d1f5aac1ced3fbe01d7e021ae32dcbfe974f1675e1b78ffcf5",
+    "scripts/webinar/session-rows.mjs": "dcfab547313c465e365aef9144c13816e2b34bd8272943ee6853e8f5939c48c0"
+  },
+  "checkedBehavior": [
+    "Immutable transcript identities, exact history preservation, invalidation before replacement and injected failure refusal",
+    "Explicit source-owned work database; actual bound seed and stale-sync zero-write refusal",
+    "Exact-byte frozen snapshot prevents mixed-generation seed",
+    "Explicit strictly validated combined speech and screen selection, frame hashes and optional artifact removal refusal",
+    "Existing strict loader identity/path/provenance floor and downstream safe generation swap"
+  ],
+  "scopeLimits": {
+    "realDatabaseProviderBrowserCalls": 0,
+    "realCorpusRewritten": false,
+    "extractionSemanticsAccepted": false,
+    "U22Complete": false,
+    "productReleaseAccepted": false,
+    "remainingHumanGoldAndThresholdGates": "pending"
+  },
+  "reconciliation": "data/eval/extraction-reconciliation-reviewed.json contains seven independently reviewed exact-source replacement proposals; 65 unreviewed claims preserved",
+  "unitVerdict": "HOLD_BUILDING",
+  "unitHandshakeMayClose": false,
+  "mandatoryAffectedStage": {
+    "evidenceOwner": "maker terminal result recorded in qa/manifests/toc-transcript-provenance.md",
+    "tests": 55,
+    "pass": 54,
+    "fail": 1,
+    "cause": "real FFmpeg fixture spawn ffmpeg ENOENT",
+    "status": "incomplete environmental prerequisite"
+  },
+  "requiredGate": "AGENTS.md: The affected stage runs green on sample data; the immediate downstream stage consumes the output without error."
+}

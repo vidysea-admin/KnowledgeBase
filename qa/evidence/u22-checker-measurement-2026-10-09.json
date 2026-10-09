@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "date": "2026-10-09",
+  "verdict": "PASS_BOUNDED_MEASUREMENT_PATCH",
+  "task": "U2.2",
+  "taskCompletionAccepted": false,
+  "goldHumanAdjudicated": false,
+  "bindingThresholds": null,
+  "checkedSourceSha256": {
+    "packages/index/src/eval/extraction.ts": "4635544428cd9805c52316ca31429f77e8a9c1004e75423b5c4fa748757c3362",
+    "scripts/eval-extraction.mjs": "b20c03cab71f5822b65605e77871e642d467f16f20692136348e18dd6d7f8c71",
+    "packages/index/src/pipeline/claims.test.ts": "b7bfcf05ba4b47c3e9ccd04b3041a96ad6fa5c32e6022d8100a9986e7bbea557"
+  },
+  "checks": [
+    {
+      "command": "node --test --import tsx packages/index/src/pipeline/claims.test.ts",
+      "exit": 0,
+      "pass": 22,
+      "fail": 0,
+      "skipped": 0
+    },
+    {
+      "command": "node <task-work>/check-extraction.mjs",
+      "exit": 0,
+      "pass": 21,
+      "description": "Independent adversarial malformed/hash/foreign/duplicate/fact-target and weighted unknown-coverage probes."
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc --noEmit -p packages/index/tsconfig.json",
+      "exit": 0
+    }
+  ],
+  "originalCorpusReplay": {
+    "exit": 2,
+    "loadedCases": 29,
+    "claims": 72,
+    "citationOccurrences": 80,
+    "invalidReferences": 14,
+    "missingSyntheticArtifacts": 6,
+    "semanticGoldCases": 0,
+    "referenceIdentityMatches": true,
+    "rawHashDrifts": 16,
+    "LFNormalizedBaselineMatches": "16/16",
+    "rawHashDriftCause": "Fresh Windows checkout converted original LF text files to CRLF; newline-normalized bytes match every stored baseline pair."
+  },
+  "reviewedSampleReplay": {
+    "cases": 4,
+    "labels": 13,
+    "supported": 0,
+    "unsupportedByCitedText": 11,
+    "uncertainMissingCitation": 2,
+    "adjudicatedUnsupportedRate": "11/11",
+    "acquisitionExit": 0,
+    "qualityAcceptance": false,
+    "artifact": "data/eval/extraction-reviewed-preliminary.json"
+  },
+  "reconciliationProposals": {
+    "artifact": "data/eval/extraction-reconciliation-reviewed.json",
+    "sha256": "8aa7ce9c90ae2b83107fdf815e90491194ac4fea830ae79a4b957d52dc5ea0e5",
+    "reviewed": 7,
+    "unreviewed": 65
+  },
+  "remainingGates": [
+    "Binding Umesh/checker quality thresholds and human gold adjudication",
+    "Full corpus provenance/source quality and exact replacement review",
+    "Existing global structure/QA failures",
+    "Real webinar/provider/index/Ask/alerts/restart and actual Ubuntu acceptance"
+  ]
+}

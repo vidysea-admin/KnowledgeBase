@@ -1,3 +1,4 @@
+import { bindDerivedArtifacts } from "../../lib/transcript-provenance.mjs";
 /**
  * scripts/watch/lib/ingest-chain.mjs — U2 source-watcher `--ingest`. The full auto-ingest chain
  * for ONE new Drive recording: download -> ffmpeg -> transcribe -> skeleton -> seed-toc -> index.
@@ -228,6 +229,7 @@ export async function ingestOneDriveFile(gdrive, gwsRun, file, monthName, deps) 
   writeFileSync(join(finalDataDir, "session.json"), JSON.stringify(skeleton.session, null, 2));
   writeFileSync(join(finalDataDir, "session_page.json"), JSON.stringify(skeleton.sessionPage, null, 2));
   writeFileSync(join(finalDataDir, "claims.json"), JSON.stringify(skeleton.claims, null, 2));
+  bindDerivedArtifacts(finalDataDir);
 
   execFileSync("node", [join(ROOT, "scripts", "seed-toc.mjs"), "--sessions", sessionId], { timeout: 5 * 60 * 1000, stdio: "inherit" });
 

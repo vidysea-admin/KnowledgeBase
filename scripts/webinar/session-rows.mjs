@@ -28,7 +28,7 @@ import { join, relative, isAbsolute } from "node:path";
 import { screenEvidenceTurns } from "./process-video.mjs";
 
 /** Resolve validated speech/screen generation and safe metadata for unattended recordings. */
-export function loadWebinarSession(dir, sessionId) {
+export function loadWebinarSession(dir, sessionId, readBytes = readFileSync) {
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(sessionId)) throw new Error("invalid sessionId");
   dir = realpathSync(dir);
   const file = (name) => {
@@ -37,7 +37,7 @@ export function loadWebinarSession(dir, sessionId) {
     return actual;
   };
   const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
-  const read = (name) => JSON.parse(readFileSync(file(name), "utf8"));
+  const read = (name) => JSON.parse(readBytes(file(name), "utf8"));
   const source = read("source.json");
   if (!source.tenantId || !source._id || !source.title || source.audioLevel?.silent) throw new Error("invalid/silent webinar source");
   const validation = existsSync(join(dir, "validation.json")) ? read("validation.json") : undefined;
@@ -53,7 +53,7 @@ export function loadWebinarSession(dir, sessionId) {
     const stage = read("video-stage.json");
     if (stage.status !== "done") throw new Error("screen stage incomplete; refusing partial knowledge ingestion");
     for (const name of ["knowledge-turns.json", "screen-evidence.json", "notes.json"]) {
-      const bytes = readFileSync(file(name));
+      const bytes = readBytes(file(name));
       if (sha(bytes) !== stage.outputs?.[name]) throw new Error(`screen artifact hash mismatch: ${name}`);
     }
     rawTurns = read("knowledge-turns.json");
@@ -61,7 +61,7 @@ export function loadWebinarSession(dir, sessionId) {
     if (screenEvidence.sessionId !== sessionId || notes.sessionId !== sessionId) throw new Error("screen session identity mismatch");
     const expected = screenEvidenceTurns(sessionId, source.tenantId, screenEvidence);
     for (const frame of screenEvidence.frames) {
-      if (sha(readFileSync(file(frame.file))) !== frame.hash) throw new Error("screen frame byte hash mismatch");
+      if (sha(readBytes(file(frame.file))) !== frame.hash) throw new Error("screen frame byte hash mismatch");
       if (frame.id !== `${sessionId}-frame-${sha(`${frame.hash}|${frame.tStart}`).slice(0, 32)}`) throw new Error("screen frame identity mismatch");
     }
     if (!Array.isArray(rawTurns)) throw new Error("invalid screen knowledge turns");

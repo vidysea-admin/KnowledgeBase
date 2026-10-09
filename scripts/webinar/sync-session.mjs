@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { bindDerivedArtifacts } from "../lib/transcript-provenance.mjs";
 /**
  * scripts/webinar/sync-session.mjs (moved from scripts/sync-webinar-session.mjs 2026-09-24,
  * fix cycle 1 — lint-dirsize budget: scripts/ was 33/32, this was the only new file in the diff,
@@ -156,6 +157,7 @@ if (EMIT_FILES) {
     if (!DRY_RUN) writeFileSync(join(dir, name), `${JSON.stringify(doc, null, 2)}\n`);
     console.log(`  ${DRY_RUN ? "would write" : "wrote"} ${name}`);
   }
+  if (!DRY_RUN) bindDerivedArtifacts(dir, {turnArtifact: screenEvidence ? "knowledge-turns.json" : "turns.json"});
 }
 
 register();

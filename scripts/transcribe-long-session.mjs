@@ -31,6 +31,7 @@ import { register } from "tsx/esm/api";
 import { Agent, setGlobalDispatcher } from "undici";
 import { findAudioFile, transcriptTenant } from "./lib/find-audio-file.mjs";
 import { realUploadTransport } from "./lib/real-upload-transport.mjs";
+import { writeTranscriptGeneration } from "./lib/transcript-provenance.mjs";
 
 // 30 min: a single-call transcription of a ~60-min recording can exceed 10 min before headers (2026-09-24).
 setGlobalDispatcher(new Agent({ headersTimeout: 1_800_000, bodyTimeout: 1_800_000 }));
@@ -208,16 +209,7 @@ async function main() {
     console.log("no internal gaps found -- transcript coverage is genuinely continuous");
   }
 
-  const realTurns = mergedTurns.map((t, i) => ({
-    _id: `${sessionId}-t${String(i + 1).padStart(3, "0")}`,
-    tenantId,
-    sessionId,
-    speakerRef: t.speakerRef,
-    tStart: t.tStart,
-    tEnd: t.tEnd,
-    text: t.text,
-  }));
-  writeFileSync(turnsPath, JSON.stringify(realTurns, null, 2) + "\n", "utf8");
+  const realTurns = writeTranscriptGeneration(join(DATA_DIR, sessionId), tenantId, sessionId, mergedTurns);
   console.log(`wrote ${realTurns.length} real diarized turns -> ${turnsPath} (replaced ${existingTurns.length} placeholder turn(s))`);
 }
 

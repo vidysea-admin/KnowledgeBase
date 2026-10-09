@@ -1,0 +1,414 @@
+{
+  "version": 1,
+  "scope": "Preliminary independent AI-checker adjudication of a deliberately inspected 4-session sample. 11 current claims unsupported by cited text, 2 uncertain because cited turns are missing. Not human golden truth, representative population evidence, binding quality thresholds, extraction acceptance, or approval to rewrite source/production data.",
+  "sourceCorpusSha256": "7518a03e924486ba15a2b43402de6a896235f16dd7fb111485e966785a397027",
+  "cause": {
+    "historicalMigrationCommit": "907c9c9",
+    "transcriptionReplacementCommit": "e0fef9c",
+    "writer": "scripts/transcribe-toc-session.mjs:87-96",
+    "behavior": "Sequential turn IDs are reused while turns.json is replaced; preexisting claims.json and session_page.json are not refreshed. Seed loads these together.",
+    "bindingAcceptance": false
+  },
+  "independentJudgments": [
+    {
+      "caseId": "2026-05-28-in-focus-1",
+      "artifactHash": "0a11bbd9cc17e79809a963223b65a081e076bf7b5d9ec9409c1b1a0712e5f212",
+      "claimId": "2026-05-28-in-focus-1-c01",
+      "claim": "Innovique states it can provide a project-matching solution to a counselor within 48 hours.",
+      "status": "unsupported",
+      "rationale": "The existing current cited text does not entail the persisted assertion; this is not a judgment that the assertion itself is false.",
+      "evidence": [
+        {
+          "turnId": "2026-05-28-in-focus-1-t035",
+          "current": {
+            "_id": "2026-05-28-in-focus-1-t035",
+            "tenantId": "toc",
+            "sessionId": "2026-05-28-in-focus-1",
+            "speakerRef": "Yavya",
+            "tStart": 2284,
+            "tEnd": 2291,
+            "text": "Great. Could you maybe also talk a little bit about the mentorship you received and how you think that benefited you to come up with these ideas?"
+          },
+          "previousMigrationCommit": "907c9c9",
+          "previous": {
+            "_id": "2026-05-28-in-focus-1-t035",
+            "tenantId": "toc",
+            "sessionId": "2026-05-28-in-focus-1",
+            "speakerRef": "unknown",
+            "tStart": 940,
+            "tEnd": 965,
+            "text": "Makrand Rajadhyaksha: So what do we promise? The first thing that we promise, and I say this with a lot of conviction, is that we require just 48 hours to provide a solution to any education counselor in any complex domain. We have our own network, and we believe that we would be able to mobilize that network very, very efficiently."
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2026-05-28-in-focus-1",
+      "artifactHash": "0a11bbd9cc17e79809a963223b65a081e076bf7b5d9ec9409c1b1a0712e5f212",
+      "claimId": "2026-05-28-in-focus-1-c02",
+      "claim": "Innovique secures a copyright certificate from the Government of India for student passion-project inventions.",
+      "status": "unsupported",
+      "rationale": "The existing current cited text does not entail the persisted assertion; this is not a judgment that the assertion itself is false.",
+      "evidence": [
+        {
+          "turnId": "2026-05-28-in-focus-1-t041",
+          "current": {
+            "_id": "2026-05-28-in-focus-1-t041",
+            "tenantId": "toc",
+            "sessionId": "2026-05-28-in-focus-1",
+            "speakerRef": "Makrand",
+            "tStart": 2476,
+            "tEnd": 2478,
+            "text": "I will hand over to Pranav Patel."
+          },
+          "previousMigrationCommit": "907c9c9",
+          "previous": {
+            "_id": "2026-05-28-in-focus-1-t041",
+            "tenantId": "toc",
+            "sessionId": "2026-05-28-in-focus-1",
+            "speakerRef": "unknown",
+            "tStart": 1095,
+            "tEnd": 1128,
+            "text": "Makrand Rajadhyaksha: Sure. A quick case study: passion project in sustainable soundproof materials. This was done by a student at Manastu Space Technologies. The point I'm trying to make out here is that we may not go after any awards, but we would do something which is more credible. And what we do in terms of passion projects is actually secure a copyright certificate from the Government of India that favors the student and the MSME."
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2026-05-28-in-focus-1",
+      "artifactHash": "0a11bbd9cc17e79809a963223b65a081e076bf7b5d9ec9409c1b1a0712e5f212",
+      "claimId": "2026-05-28-in-focus-1-c03",
+      "claim": "Artiste 360 students produce 12-15 final portfolio works as part of its flagship program.",
+      "status": "unsupported",
+      "rationale": "The existing current cited text does not entail the persisted assertion; this is not a judgment that the assertion itself is false.",
+      "evidence": [
+        {
+          "turnId": "2026-05-28-in-focus-1-t056",
+          "current": {
+            "_id": "2026-05-28-in-focus-1-t056",
+            "tenantId": "toc",
+            "sessionId": "2026-05-28-in-focus-1",
+            "speakerRef": "Makrand",
+            "tStart": 2968,
+            "tEnd": 2969,
+            "text": "Thank you very much."
+          },
+          "previousMigrationCommit": "907c9c9",
+          "previous": {
+            "_id": "2026-05-28-in-focus-1-t056",
+            "tenantId": "toc",
+            "sessionId": "2026-05-28-in-focus-1",
+            "speakerRef": "unknown",
+            "tStart": 1546,
+            "tEnd": 1589,
+            "text": "Yavya Jain: So students create 12 to 15 final works based on the requirements of international colleges, like the ones in the UK, US, Singapore, Australia, and beyond. They work 1-on-1 with our team of specialized artists and designers to create original works. So throughout the year, every piece that they create is an extension of who they are. It's about their identity and their representation of that. It's how they see the world, what they care about, etc. So originality is at the foundation, and we teach them the critical as well as creative thinking skills to achieve this."
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2026-05-22-uniaccess-xavier-university",
+      "artifactHash": "930ba8a242629ae9c33205f99f05218bc2385339e30c55fe920785cc65be732a",
+      "claimId": "2026-05-22-uniaccess-xavier-university-c01",
+      "claim": "Xavier University has an 11:1 student-to-faculty ratio and an average class size of about 23 students.",
+      "status": "unsupported",
+      "rationale": "The existing current cited text does not entail the persisted assertion; this is not a judgment that the assertion itself is false.",
+      "evidence": [
+        {
+          "turnId": "2026-05-22-uniaccess-xavier-university-t020",
+          "current": {
+            "_id": "2026-05-22-uniaccess-xavier-university-t020",
+            "tenantId": "toc",
+            "sessionId": "2026-05-22-uniaccess-xavier-university",
+            "speakerRef": "Sandeep",
+            "tStart": 307,
+            "tEnd": 339,
+            "text": "direction, and purpose. A A lot of learning really happens outside the classroom as well. Through leadership opportunities, student organization organizations, service experiences, internships, and, most importantly, the conversations that shape students personally and professionally. Honestly, if I were just to think about, as a counselor, we speak a lot about families and counselors."
+          },
+          "previousMigrationCommit": "907c9c9",
+          "previous": {
+            "_id": "2026-05-22-uniaccess-xavier-university-t020",
+            "tenantId": "toc",
+            "sessionId": "2026-05-22-uniaccess-xavier-university",
+            "speakerRef": "unknown",
+            "tStart": 527,
+            "tEnd": 581,
+            "text": "Sandeep Bhalla: And I feel that's an important conversation to have, honestly. At Xavier, the model of teaching is intentionally different. With an 11:1 student-to-faculty ratio and an average class size of 23 students, the university is built around interaction and accessibility, not anonymity. Students are able to engage directly with professors, ask questions, visit office hours, and build mentorship relationships that continue well beyond a single semester. And I feel that becomes important because access really changes the outcomes. Research consistently shows that students who develop a meaningful relationship with faculty are likely to stay engaged academically. They seek internships, leadership opportunities, and most importantly, feel a stronger sense of belonging on campus."
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2026-05-22-uniaccess-xavier-university",
+      "artifactHash": "930ba8a242629ae9c33205f99f05218bc2385339e30c55fe920785cc65be732a",
+      "claimId": "2026-05-22-uniaccess-xavier-university-c02",
+      "claim": "Xavier was awarded a $2.8 million grant from the NIH, one of only six institutions selected in that inaugural cohort.",
+      "status": "unsupported",
+      "rationale": "The existing current cited text does not entail the persisted assertion; this is not a judgment that the assertion itself is false.",
+      "evidence": [
+        {
+          "turnId": "2026-05-22-uniaccess-xavier-university-t038",
+          "current": {
+            "_id": "2026-05-22-uniaccess-xavier-university-t038",
+            "tenantId": "toc",
+            "sessionId": "2026-05-22-uniaccess-xavier-university",
+            "speakerRef": "Sandeep",
+            "tStart": 738,
+            "tEnd": 760,
+            "text": "students may choose a university for academics or rankings, at least at the initial aspect, but the experience they remember is more often than not shaped by relationships they build there. That human element is a huge part of what what makes Xavier different than the rest of the people that you may have ever and ever engaged with. But just to get an understanding from you, do you feel this is something that would make Xavier different, according to you? Do you think so? Do you think it might not really make that big of a difference? What do you think about that? Any ideas, any questions, maybe? What do you think?"
+          },
+          "previousMigrationCommit": "907c9c9",
+          "previous": {
+            "_id": "2026-05-22-uniaccess-xavier-university-t038",
+            "tenantId": "toc",
+            "sessionId": "2026-05-22-uniaccess-xavier-university",
+            "speakerRef": "unknown",
+            "tStart": 1097,
+            "tEnd": 1150,
+            "text": "Sandeep Bhalla: If we come to the next slide, on an academic front, and I know that's important, Xavier was really awarded $2.8 million from NIH, and notably it was one of the only six institutions selected in the inaugural cohort. For counselors, this matters because it signals that undergraduate institutions like Xavier, they are not just teaching-focused, but they are also contributing to serious research ecosystem, and students get exposure to that early on. At the same time, student experience isn't one-dimensional. Xavier has 19 Division I varsity teams competing in the BIG EAST Conference, which means a very active, high-energy campus environment. And even for students who are not athletes, this translate to strong school spirit, high engagement, and a sense of shared identity."
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2026-05-22-uniaccess-xavier-university",
+      "artifactHash": "930ba8a242629ae9c33205f99f05218bc2385339e30c55fe920785cc65be732a",
+      "claimId": "2026-05-22-uniaccess-xavier-university-c03",
+      "claim": "Xavier's international merit scholarships range from $23,000 to $36,000 annually, and effective annual tuition after aid can be as low as $11,500.",
+      "status": "unsupported",
+      "rationale": "The existing current cited text does not entail the persisted assertion; this is not a judgment that the assertion itself is false.",
+      "evidence": [
+        {
+          "turnId": "2026-05-22-uniaccess-xavier-university-t050",
+          "current": {
+            "_id": "2026-05-22-uniaccess-xavier-university-t050",
+            "tenantId": "toc",
+            "sessionId": "2026-05-22-uniaccess-xavier-university",
+            "speakerRef": "Sandeep",
+            "tStart": 1733,
+            "tEnd": 1737,
+            "text": "So, I'm guessing this was it. Thank you so much."
+          },
+          "previousMigrationCommit": "907c9c9",
+          "previous": {
+            "_id": "2026-05-22-uniaccess-xavier-university-t050",
+            "tenantId": "toc",
+            "sessionId": "2026-05-22-uniaccess-xavier-university",
+            "speakerRef": "unknown",
+            "tStart": 1597,
+            "tEnd": 1636,
+            "text": "Sandeep Bhalla: Every student receives a scholarship opportunity, and nearly half of the students receive additional financial aid as well. Students can actually benefit from merit scholarships ranging from $23,000 to $36,000 annually, along with additional grants and financial aid options, making Xavier high-quality US education which is far more attainable as well. In fact, for many students, the annual tuition cost can sometimes even come down to as low as $11,500. This happened this year. I'm not supposed to even put that number, but then I had thought, why not?"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2026-07-03-inside-the-uc-session",
+      "artifactHash": "f15a8555b616a05c190e6cee78a10ac4e894c9270ed7ea39fb787451a653d3f2",
+      "claimId": "2026-07-03-inside-the-uc-session-c01",
+      "claim": "The UC system has 10 campuses total, but only 9 offer undergraduate programs.",
+      "status": "unsupported",
+      "rationale": "The existing current cited text does not entail the persisted assertion; this is not a judgment that the assertion itself is false.",
+      "evidence": [
+        {
+          "turnId": "2026-07-03-inside-the-uc-session-t011",
+          "current": {
+            "_id": "2026-07-03-inside-the-uc-session-t011",
+            "tenantId": "toc",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "speakerRef": "Amrita",
+            "tStart": 169,
+            "tEnd": 178,
+            "text": "Bijoya, when you feel majority have responded, you could share the poll results."
+          },
+          "previousMigrationCommit": "907c9c9",
+          "previous": {
+            "_id": "2026-07-03-inside-the-uc-session-t011",
+            "tenantId": "toc",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "speakerRef": "unknown",
+            "tStart": 208,
+            "tEnd": 262,
+            "text": "Aastha Chhikara: Yeah, so I see that a majority of us have the right answers, but for the ones that are, you know, that may have answered differently as well: So, \"How many University of California campuses are there?\" So this was again a trick question because there are in fact 10 campuses. However, only nine of them offer undergraduate programs; the UC San Francisco campus is only a master's, you know, campus. So of course we'll cover that in depth as well. \"How many students are studying at the UC campuses?\" So it's over 300,000, so over 3 lakh students at the various campuses. \"Which campus was originally known as the Farm?\" So this was actually UC Davis, so we have a majority of us that have answered this correctly as well. And \"Which is the oldest UC campus?\" is Berkeley. So, yeah."
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2026-07-03-inside-the-uc-session",
+      "artifactHash": "f15a8555b616a05c190e6cee78a10ac4e894c9270ed7ea39fb787451a653d3f2",
+      "claimId": "2026-07-03-inside-the-uc-session-c02",
+      "claim": "Over 300,000 students are enrolled across the UC system's various campuses.",
+      "status": "unsupported",
+      "rationale": "The existing current cited text does not entail the persisted assertion; this is not a judgment that the assertion itself is false.",
+      "evidence": [
+        {
+          "turnId": "2026-07-03-inside-the-uc-session-t011",
+          "current": {
+            "_id": "2026-07-03-inside-the-uc-session-t011",
+            "tenantId": "toc",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "speakerRef": "Amrita",
+            "tStart": 169,
+            "tEnd": 178,
+            "text": "Bijoya, when you feel majority have responded, you could share the poll results."
+          },
+          "previousMigrationCommit": "907c9c9",
+          "previous": {
+            "_id": "2026-07-03-inside-the-uc-session-t011",
+            "tenantId": "toc",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "speakerRef": "unknown",
+            "tStart": 208,
+            "tEnd": 262,
+            "text": "Aastha Chhikara: Yeah, so I see that a majority of us have the right answers, but for the ones that are, you know, that may have answered differently as well: So, \"How many University of California campuses are there?\" So this was again a trick question because there are in fact 10 campuses. However, only nine of them offer undergraduate programs; the UC San Francisco campus is only a master's, you know, campus. So of course we'll cover that in depth as well. \"How many students are studying at the UC campuses?\" So it's over 300,000, so over 3 lakh students at the various campuses. \"Which campus was originally known as the Farm?\" So this was actually UC Davis, so we have a majority of us that have answered this correctly as well. And \"Which is the oldest UC campus?\" is Berkeley. So, yeah."
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2026-07-03-inside-the-uc-session",
+      "artifactHash": "f15a8555b616a05c190e6cee78a10ac4e894c9270ed7ea39fb787451a653d3f2",
+      "claimId": "2026-07-03-inside-the-uc-session-c03",
+      "claim": "UC is a test-blind, test-free system: SAT/ACT scores are not reviewed at all in admissions decisions.",
+      "status": "unsupported",
+      "rationale": "The existing current cited text does not entail the persisted assertion; this is not a judgment that the assertion itself is false.",
+      "evidence": [
+        {
+          "turnId": "2026-07-03-inside-the-uc-session-t019",
+          "current": {
+            "_id": "2026-07-03-inside-the-uc-session-t019",
+            "tenantId": "toc",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "speakerRef": "Vaishnavi",
+            "tStart": 336,
+            "tEnd": 352,
+            "text": "Yeah. Um, hi, everyone. Good evening. My name is Vaishnavi Kotiyal. I am based out of Delhi, and I'm an in-country representative for University of California, Merced. Um, so happy to be here and look forward to interacting with you all. Thank you."
+          },
+          "previousMigrationCommit": "907c9c9",
+          "previous": {
+            "_id": "2026-07-03-inside-the-uc-session-t019",
+            "tenantId": "toc",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "speakerRef": "unknown",
+            "tStart": 2124,
+            "tEnd": 2533,
+            "text": "Vaishnavi Kotiyal: Thank you, Beauti. So from here I'll take on the test scores. So, Aastha, can you go for the next slide? So first is English language proficiency. So English proficiency is not required, so you don't have to send in your TOEFL, IELTS, or Duolingo scores. Students from your school, English language of instruction, which is this is this exam is basically waived off for all of you. You don't have to send in any of these scores, it is not going to be required. We see that there is SAT and ACT on here, that's only going to be used to meet the English proficiency, which you don't need. So there is no other section on the UC application that will allow you to submit any ACT or SAT score. The total score, right, it is not going to be reviewed. We are test-blind and test-free UC system. None of us are going to review your ACT or SAT scores, not for your admission purpose, not for your scholarship purpose. And none of us are going to look at the scores even if you try to send them in from the College Board. So this is not just for the Merced or any particular campus, but all of us, the UCs, are not reviewing any test scores at all. Next slide, Aastha. So this is basically your AP exam. So if you're trying to add on your AP exam, so international exam, this is the area where you can add them in. So this is this is for exam only, not for your AP, IB coursework. For the ones you're planning to take, for the ones you already have scores for. So this is something that you can add exams that you have taken or you already have score for. Next slide, Aastha. So this is also IB exams, wherein you just have to fill in that you are taking IB or not, and if you have the scores, you can just add on to it. Next slide. So this is your international exams. So people we in India have CBSE, GCSE, ICSE, O Level, so this is for them as well. So you just have to add on. Next slide, if you can just turn the next slide, Aastha. So if you can see that you can just choose India, which year, and you just have to add the exam type, and you just have to then continue, Save and continue. Yeah, so this is how it will be. So if you have received the score, you can just add on your score; if you have the predicted, not received, accordingly you can just add on to it. Next one. So, activities and awards. So your application is—yeah, so your application is just not your academics only. There is this activities and award section that is reviewed and considered as well. So first, this whole section allows you to add up up to 20 different activities across six different categories. So up to 20 activities does not mean that we require you to add all the 20 activities, okay? So it's not that you have to add 20 activities, it's just that you also we allow you to add up to 20. If you don't have 20, that's completely fine. You only have to add five activities if you have, as meaningful to you, and add those five activities and that's completely fine. Remember, it is not the quantity, it is the quality over the quantity of your activities that we look forward to. If there are unfamiliar acronyms, so don't expect us to understand them. Make sure you spell the entire acronym when you list down all the activities. When you're putting in this section, how should you list your activities or your awards? That's very important. So my recommendation and tip is that you put them in the order of your how meaningful it is to you and how much time you have committed to that activity instead of listing it in order of time, suppose, I say. It is not chronological. We do prefer you to list it in the order of importance, which is very, very important. So order of importance to you, how meaningful it is this activity to you. If you have committed to an activity or extracurricular program for the entire 4 years of your high school or career, you know you commit a lot of hours every week to that activity. So that takes is something which is very meaningful and probably very, you know, important to you. So the okay, so list in order of the importance and the order of the ones that's more meaningful to you, not chronological. That's the tip. Second, slide continued. So here it is very important that you focus on the on your roles and responsibilities and why you accomplished them, not just describing the activity, what the activity is. Don't forget if you're planning to do that even after you graduate, after you say suppose you complete your 12th grade, you can also check in check that off in the section here. So we won't ask you any certification or completion, we don't verify that with your school, we don't ask for any awards for you to send that in, but we that but do remember that we also have signed the verification of statement of integrity, that is application integrity. So everything that you list in this section should be something that you have completed and should be something that you are able to talk about, that you have accomplished and that is meaningful to you. So then the activities and awards... The third is basically the activities and awards of educational prep programs. That's how going to be listed in according to it. Slide three, Aastha. Yeah. So as for scholarship and support programs, we don't have any specific link to it. It's just that it's a merit-based thing. So Aastha, Beauti, and I have also discussed that we have a separate scholarship that will be automatically given to you once you fill in your application."
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2026-07-03-inside-the-uc-session",
+      "artifactHash": "f15a8555b616a05c190e6cee78a10ac4e894c9270ed7ea39fb787451a653d3f2",
+      "claimId": "2026-07-03-inside-the-uc-session-c04",
+      "claim": "UC Riverside's non-resident merit scholarship for international students can go up to $89,100 spread across 4 years.",
+      "status": "unsupported",
+      "rationale": "The existing current cited text does not entail the persisted assertion; this is not a judgment that the assertion itself is false.",
+      "evidence": [
+        {
+          "turnId": "2026-07-03-inside-the-uc-session-t016",
+          "current": {
+            "_id": "2026-07-03-inside-the-uc-session-t016",
+            "tenantId": "toc",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "speakerRef": "Amrita",
+            "tStart": 262,
+            "tEnd": 297,
+            "text": "Awesome. So, all of you can pat your back for getting the answers right. Um, and I think what we'll do in the interest of time is skip the next poll, maybe we'll bring it up back later when we're, you know, but I just want to, you know, Aastha, Beauty, and Vaishnavi hand it to you to lead in, you know, to start the session with the overview of the UC system, and then we move into the application, and then particularly the PIQs and, you know, that's the order in which we are going to go over today's session. Thank you."
+          },
+          "previousMigrationCommit": "907c9c9",
+          "previous": {
+            "_id": "2026-07-03-inside-the-uc-session-t016",
+            "tenantId": "toc",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "speakerRef": "unknown",
+            "tStart": 353,
+            "tEnd": 893,
+            "text": "Aastha Chhikara: Perfect. Thank you all so much. So taking us directly into, you know, the part of the presentation that has a lot of learning, you know, involved. So, University of California, like we have, you know, seen in the poll as well, there are 10, you know, campuses. And ideally the University of California, you know, campuses are very beautifully situated across the entire state of California. You can see my mouse moving with the state as well. So there are four UCs in Northern California, there are five UCs in Southern California. Now, the University of California system is a public university system. You have—may have heard of public universities, private universities in the U.S., state universities as well. So the UC system and the focus areas and, you know, what the UCs really stand out for, or why students actually want to come and study at a University of California campus: The gist of that you can see on the right-hand side of your screen. So one of course is academic and research excellence. So when we're talking about even undergraduate education, you have opportunities to do research, you have opportunities to work with faculty, and of course you're essentially studying and learning with faculty that is required to do research while they're teaching students as well. So that's an ongoing process that they're a part of, and you as a student, you know, also have the option, you know, to join them as well. The second thing is our campuses, in terms of the location, they're very nicely spread out, you know, throughout the entire state. While they're spread out, they're also located very close to, you know, hubs that are important for students right from the bachelor's level to start exploring, you know, options in terms of internships and opportunities for themselves as well, right? So the campuses are very diverse, even the programs and the majors that they may study are very, very diverse across the campuses. We have, you know, a link that we'll be sharing, you know, and different links that we'll be sharing with you through the course of this, but at this time please know that you can apply, you know, to so many different majors at any of the campuses all through just this one University of California, you know, application that one student does. So out of these, four UCs you will see up in the north: UC Davis, UC Berkeley, Santa Cruz, and Merced. Now these four UCs are in and around the Silicon Valley area, very ideally situated as well. And then moving further south to Southern California, you have Santa Barbara, you have Los Angeles, Riverside, Irvine, and San Diego. Now these five UCs are actually close to the entertainment industry, which is near Los Angeles; the agricultural industry near Riverside; and also the biotech industry, which is Oceanside area. It's actually in between Irvine, Riverside, and San Diego area. So ideally even in terms of, you know, prospects that students, you know, see for their future as well, there's a lot that you can learn in and around this area. Also, as a University of California student, you get to be part of the fabulous alumni network that you can, you know, use and also, you know, support in the future as well. All of the campuses are, you know, they're not stand-alone buildings; they've been around for over 100 years. Some campuses, you know, even more, and some campuses are, you know, newer campuses as well. But they all offer, you know, very, very vibrant student life. There's a lot of resources in terms of like a shared library that is actually shared between all of the UCs together, even in terms of, you know, extracurriculars or learning opportunities outside of classrooms as well. These, you know, organizations and clubs, you know, that we have to offer on campus, actually are offered at a majority of these campuses. If we feel we don't even find, you know, one organization that I want to be part of, you're very welcome to actually create one with five other students and, you know, an advisor, faculty advisor, you know, as well. All of these campuses are globally recognized. All of the campuses also fall amongst the top 100 institutions in the U.S. according to the U.S. News Report as well. So, yeah, globally recognized institutions, and some of the campuses do also offer scholarships. So this is one big myth that I want to, you know, sort of bust right now and really clarify that the UC system does offer scholarships for international students, out-of-state students as well, and we will talk about that during, you know, our presentation also. So in the interest of time, I want to quickly, you know, now start with institutional introductions, and then we will, you know, take you all through the University of California application. The University of California application, you can see in the center of this slide, these essentially are the only sections on your application. So it is pretty, you know, easy when you look at it like this. When you're filling it out, we recommend that you do it sequentially, just so that you don't miss out on any one of the subsections that does open up in your application. But essentially it's an \"About you\" section in which we learn about you, where you're studying, where the student is from—which city, which country, which place they're from—their family, how many siblings they have, you know, how their parents have been supporting them; different campuses and majors is, you know, what you get to pick and choose—we'll take you through that as well; the academic history; activities and awards; and scholarships—now these are the three and the personal insight, are the three major sections that you will essentially be, you know, focusing on today. So before we start the application, one quick, you know, round of introduction to our campuses. First I'm going to focus on Riverside, that's the institution and the campus that I represent. You can see it in my background as well. So University of California, Riverside is in the Southern California region. We're about an hour east of Los Angeles, about an hour and a half north of Riverside—north of San Diego, in the city called Riverside. Now, one of my favorite parts of having been an international student studying in Southern California is just the access to opportunities where you're studying as an undergrad student. So at Riverside, you actually are in the center where you can essentially reach the beaches, the ski mountains, Disneyland, Palm Springs, Temecula—all of these places within, you know, between 45 minutes to an hour and a half's drive. Even further south down to Mexico in 2 hours. So ideally, in terms of, you know, things that you want to explore with friends, you want to, you know, meet new people... California itself, you know, it's a very, very diverse, you know, state, welcoming students and people from all nationalities. But, yeah, you won't find anything that you would miss essentially in the Southern California region. You'd find a lot of Indian students and Indian families, and, you know, families from around the world, you know, as well. So UC Riverside, I just want to highlight maybe a couple of programs, you know, like our Psychology, our Entomology program, our Physics, Astrophysics concentration area. We are one of the UCs that does offer Business Analytics and Business Administration as well. And even in terms of the support that students do require, so we have a set international, you know, office that will help students, you know, figure out how to navigate coming to a new country. I do want to highlight something: So of course UC campuses do also have Nobel laureates that are teaching students as well. So UC Riverside actually has two Nobel laureates, one in Physics and one in Chemistry, Dr. Barish and Dr. Strock, and they are teaching students biosciences as well. That's our mascot on the very left, Scotty the Bear. And with regards to scholarship, we do cover more than one year's tuition, living expenses, personal expenses with the Academic Merit Scholarship that students can, you know, get as well. So this scholarship is based off of the GPA that students essentially have, and this scholarship goes up to $89,100, and that is spread across your 4 years. So I will now pass on to UC Merced, taking you guys up north."
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2026-05-29-decoding-ever-expanding-cast",
+      "artifactHash": "defbcff9d32a61f500de82d44002dc827e3f82a3ace671f858f9494059066646",
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c01",
+      "claim": "The facilitators mapped out roughly 24 distinct professional roles active across a student's educational journey.",
+      "status": "unsupported",
+      "rationale": "The existing current cited text does not entail the persisted assertion; this is not a judgment that the assertion itself is false.",
+      "evidence": [
+        {
+          "turnId": "2026-05-29-decoding-ever-expanding-cast-t012",
+          "current": {
+            "_id": "2026-05-29-decoding-ever-expanding-cast-t012",
+            "tenantId": "toc",
+            "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+            "speakerRef": "Bhakti",
+            "tStart": 389,
+            "tEnd": 446,
+            "text": "Yeah, I mean, that's a That's a fair point. The parent is missing because the parent is the So, if you look at, uh, how we are looking at this, the parent, the family, the student is in the center of it. Right? This is the They are the sun. We're talking about the planets that are revolving around them, the the surrounding ecosystem. That's but obvious. The family is in the center and, uh, that's not a professional. That's not an organization, right, that's external. Exactly, Jay, parents are internal, families are internal. So, we're not talking about them in the, like you said, Shweta, in the formal structure, but absolutely, like they are core. And and again, I think that's a whole conversation for a separate workshop which is also, by the way, a great segue into the next segment that Amrita is going to talk about the next slide. But, um, the whole conversation around the role of the parent and is the parent and the student one unit or are we looking at them as two different units? That's a great conversation to have. Right."
+          },
+          "previousMigrationCommit": "907c9c9",
+          "previous": {
+            "_id": "2026-05-29-decoding-ever-expanding-cast-t012",
+            "tenantId": "toc",
+            "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+            "speakerRef": "unknown",
+            "tStart": 253,
+            "tEnd": 303,
+            "text": "Bhakti: So this is the current cast. These are the roles. So we actually mapped them out and they are 24 at this point and we could well be missing some of them. You know, we really, really scratched our heads and we were like, kaun, kaun, kaun? [who, who, who?] and we were like looking at every step in the lifecycle and and this is what we were able to come up with based on our experience and everything. I mean, I literally went through the Outreach Collective member directory, I was looking at all the roles everyone plays and this is basically the the cast. At this point according at at our count, it's 24, but Devesh, you could well be right, it could be over 50. These are umbrellas, right? Like these are umbrella categories. So yes, there could be subcategories within them, but these are the broader categories that we have mapped."
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2026-05-29-decoding-ever-expanding-cast",
+      "artifactHash": "defbcff9d32a61f500de82d44002dc827e3f82a3ace671f858f9494059066646",
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c02",
+      "claim": "75% of workshop participants identified university enrollment-yield goals versus family cost reality as the ecosystem's sharpest tension.",
+      "status": "uncertain",
+      "rationale": "Current cited turn is absent; semantic support remains unknown.",
+      "evidence": [
+        {
+          "turnId": "2026-05-29-decoding-ever-expanding-cast-t161",
+          "current": null,
+          "previousMigrationCommit": "907c9c9",
+          "previous": {
+            "_id": "2026-05-29-decoding-ever-expanding-cast-t161",
+            "tenantId": "toc",
+            "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+            "speakerRef": "unknown",
+            "tStart": 3861,
+            "tEnd": 3890,
+            "text": "Bhakti: Okay, awesome, awesome. All right, so good, good. So we're looking at currently 75% of you, and the largest is universities' enrollment goals versus families' cost reality. I actually did not expect this to come out on top. I was actually thinking it would be between one and two: the pre-enrollment agent and first-fit counseling, and school counselor capacity and family expectations. Amrita, go for it. This is so interesting."
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2026-05-29-decoding-ever-expanding-cast",
+      "artifactHash": "defbcff9d32a61f500de82d44002dc827e3f82a3ace671f858f9494059066646",
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c03",
+      "claim": "One proposed rule of engagement is to respect professional hand-offs and stay in your own lane of expertise.",
+      "status": "uncertain",
+      "rationale": "Current cited turn is absent; semantic support remains unknown.",
+      "evidence": [
+        {
+          "turnId": "2026-05-29-decoding-ever-expanding-cast-t190",
+          "current": null,
+          "previousMigrationCommit": "907c9c9",
+          "previous": {
+            "_id": "2026-05-29-decoding-ever-expanding-cast-t190",
+            "tenantId": "toc",
+            "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+            "speakerRef": "unknown",
+            "tStart": 4759,
+            "tEnd": 4792,
+            "text": "Bhakti: Respect the handoff, okay? I think like don't reach past the introduction, right? Like, you know, if if you have been sort of put in touch with a student, right, respect and be in your lane, and it kind of ties in with the next one also: there's a specific expertise that has been, you know, that has the case has come to you for, stick to that, you know. Don't overreach, don't try to poach, and I think these are basic professional rules that everyone should follow, ideally."
+          }
+        }
+      ]
+    }
+  ]
+}

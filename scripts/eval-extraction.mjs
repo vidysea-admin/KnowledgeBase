@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /** Offline artifact replay. Usage: node scripts/eval-extraction.mjs --input corpus.json
  * Manifest v1: cases[{id,tenantId,sessionId,artifacts:{turns,persisted?,rawText?,parsed?,filtered?},
- * labels?,expectedFacts?,predictedEntities?,entityLabels?,mediaDuration?}], optional inventoryDirectory.
+ * labels?,expectedFacts?,factLabels?,predictedEntities?,entityLabels?,mediaDuration?}], optional inventoryDirectory.
  * Artifact paths are relative to manifest; labels bind the case artifactHash in the report.
  * JSON only stdout. No provider, Mongo, dotenv, or quality thresholds. */
 import { readFileSync, readdirSync, statSync } from "node:fs";
@@ -39,12 +39,13 @@ export function loadManifest(path) {
         input[kind] = kind === "rawText" ? data.toString("utf8") : JSON.parse(data.toString("utf8"));
       }
       input.artifactHash = sha(JSON.stringify({version: 1, id: c.id, tenantId: c.tenantId, sessionId: c.sessionId, mediaDuration: c.mediaDuration, expectedFacts: c.expectedFacts, predictedEntities: c.predictedEntities, hashes}));
-      for (const k of ["mediaDuration", "labels", "expectedFacts", "predictedEntities", "entityLabels"]) if (c[k] !== undefined) input[k] = c[k];
+      for (const k of ["mediaDuration", "labels", "expectedFacts", "factLabels", "predictedEntities", "entityLabels"]) if (c[k] !== undefined) input[k] = c[k];
       reports.push(evaluateExtractionCase(input)); artifacts.push({id: c.id, artifactHash: input.artifactHash, hashes});
       declared.add(dirname(paths.turns));
     } catch (e) {
       const reason = e?.code === "ENOENT" ? "artifact-missing" : e instanceof SyntaxError ? "artifact-json-invalid" :
         String(e?.message).startsWith("Invalid human label") ? "human-label-invalid" :
+        String(e?.message).startsWith("Invalid fact label") ? "fact-label-invalid" :
         ["artifact-size-limit", "missing-turn-artifact", "invalid-artifact-path"].includes(e?.message) ? e.message : "invalid-case-artifact";
       failures.push({id: c.id, reason});
     }

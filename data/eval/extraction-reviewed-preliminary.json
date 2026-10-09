@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "coverageNote": "Preliminary independent AI-checker adjudication of a deliberately inspected 4-session sample. 11 current claims unsupported by cited text, 2 uncertain because cited turns are missing. Not human golden truth, representative population evidence, binding quality thresholds, extraction acceptance, or approval to rewrite source/production data.",
+  "review": {
+    "reviewer": "independent checker agent",
+    "method": "Direct comparison of persisted claim with every current cited turn; historical migration used only to establish stale-provenance cause.",
+    "bindingHumanAdjudication": false,
+    "thresholds": null
+  },
+  "cases": [
+    {
+      "id": "2026-05-28-in-focus-1",
+      "tenantId": "toc",
+      "sessionId": "2026-05-28-in-focus-1",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-05-28-in-focus-1/turns.json",
+        "persisted": "../toc-migrated/2026-05-28-in-focus-1/claims.json"
+      },
+      "labels": [
+        {
+          "caseId": "2026-05-28-in-focus-1",
+          "artifactHash": "0a11bbd9cc17e79809a963223b65a081e076bf7b5d9ec9409c1b1a0712e5f212",
+          "stage": "persisted",
+          "claimId": "2026-05-28-in-focus-1-c01",
+          "status": "unsupported"
+        },
+        {
+          "caseId": "2026-05-28-in-focus-1",
+          "artifactHash": "0a11bbd9cc17e79809a963223b65a081e076bf7b5d9ec9409c1b1a0712e5f212",
+          "stage": "persisted",
+          "claimId": "2026-05-28-in-focus-1-c02",
+          "status": "unsupported"
+        },
+        {
+          "caseId": "2026-05-28-in-focus-1",
+          "artifactHash": "0a11bbd9cc17e79809a963223b65a081e076bf7b5d9ec9409c1b1a0712e5f212",
+          "stage": "persisted",
+          "claimId": "2026-05-28-in-focus-1-c03",
+          "status": "unsupported"
+        }
+      ]
+    },
+    {
+      "id": "2026-05-22-uniaccess-xavier-university",
+      "tenantId": "toc",
+      "sessionId": "2026-05-22-uniaccess-xavier-university",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-05-22-uniaccess-xavier-university/turns.json",
+        "persisted": "../toc-migrated/2026-05-22-uniaccess-xavier-university/claims.json"
+      },
+      "labels": [
+        {
+          "caseId": "2026-05-22-uniaccess-xavier-university",
+          "artifactHash": "930ba8a242629ae9c33205f99f05218bc2385339e30c55fe920785cc65be732a",
+          "stage": "persisted",
+          "claimId": "2026-05-22-uniaccess-xavier-university-c01",
+          "status": "unsupported"
+        },
+        {
+          "caseId": "2026-05-22-uniaccess-xavier-university",
+          "artifactHash": "930ba8a242629ae9c33205f99f05218bc2385339e30c55fe920785cc65be732a",
+          "stage": "persisted",
+          "claimId": "2026-05-22-uniaccess-xavier-university-c02",
+          "status": "unsupported"
+        },
+        {
+          "caseId": "2026-05-22-uniaccess-xavier-university",
+          "artifactHash": "930ba8a242629ae9c33205f99f05218bc2385339e30c55fe920785cc65be732a",
+          "stage": "persisted",
+          "claimId": "2026-05-22-uniaccess-xavier-university-c03",
+          "status": "unsupported"
+        }
+      ]
+    },
+    {
+      "id": "2026-07-03-inside-the-uc-session",
+      "tenantId": "toc",
+      "sessionId": "2026-07-03-inside-the-uc-session",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+        "persisted": "../toc-migrated/2026-07-03-inside-the-uc-session/claims.json"
+      },
+      "labels": [
+        {
+          "caseId": "2026-07-03-inside-the-uc-session",
+          "artifactHash": "f15a8555b616a05c190e6cee78a10ac4e894c9270ed7ea39fb787451a653d3f2",
+          "stage": "persisted",
+          "claimId": "2026-07-03-inside-the-uc-session-c01",
+          "status": "unsupported"
+        },
+        {
+          "caseId": "2026-07-03-inside-the-uc-session",
+          "artifactHash": "f15a8555b616a05c190e6cee78a10ac4e894c9270ed7ea39fb787451a653d3f2",
+          "stage": "persisted",
+          "claimId": "2026-07-03-inside-the-uc-session-c02",
+          "status": "unsupported"
+        },
+        {
+          "caseId": "2026-07-03-inside-the-uc-session",
+          "artifactHash": "f15a8555b616a05c190e6cee78a10ac4e894c9270ed7ea39fb787451a653d3f2",
+          "stage": "persisted",
+          "claimId": "2026-07-03-inside-the-uc-session-c03",
+          "status": "unsupported"
+        },
+        {
+          "caseId": "2026-07-03-inside-the-uc-session",
+          "artifactHash": "f15a8555b616a05c190e6cee78a10ac4e894c9270ed7ea39fb787451a653d3f2",
+          "stage": "persisted",
+          "claimId": "2026-07-03-inside-the-uc-session-c04",
+          "status": "unsupported"
+        }
+      ]
+    },
+    {
+      "id": "2026-05-29-decoding-ever-expanding-cast",
+      "tenantId": "toc",
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-05-29-decoding-ever-expanding-cast/turns.json",
+        "persisted": "../toc-migrated/2026-05-29-decoding-ever-expanding-cast/claims.json"
+      },
+      "labels": [
+        {
+          "caseId": "2026-05-29-decoding-ever-expanding-cast",
+          "artifactHash": "defbcff9d32a61f500de82d44002dc827e3f82a3ace671f858f9494059066646",
+          "stage": "persisted",
+          "claimId": "2026-05-29-decoding-ever-expanding-cast-c01",
+          "status": "unsupported"
+        },
+        {
+          "caseId": "2026-05-29-decoding-ever-expanding-cast",
+          "artifactHash": "defbcff9d32a61f500de82d44002dc827e3f82a3ace671f858f9494059066646",
+          "stage": "persisted",
+          "claimId": "2026-05-29-decoding-ever-expanding-cast-c02",
+          "status": "uncertain"
+        },
+        {
+          "caseId": "2026-05-29-decoding-ever-expanding-cast",
+          "artifactHash": "defbcff9d32a61f500de82d44002dc827e3f82a3ace671f858f9494059066646",
+          "stage": "persisted",
+          "claimId": "2026-05-29-decoding-ever-expanding-cast-c03",
+          "status": "uncertain"
+        }
+      ]
+    }
+  ]
+}
