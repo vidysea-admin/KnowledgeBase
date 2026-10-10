@@ -49,3 +49,73 @@ Restoration: `git hash-object packages/meeting-bot/src/send-now.ts` = 5cb33bfb09
 ISSUES-WRITTEN: ISS-T039-001 (medium: Meet non-code first path segment collapses to one key, wrong refusal), ISS-T039-002 (medium: Teams/Webex/Zoho spellings of one live meeting do not dedupe, second bot admitted) in qa/issues.t039.jsonl.
 
 EXPLANATION: The security-critical part is sound: exact/dot-bounded host matching, https-only, no userinfo, no port, backslash/control refusal, and no look-alike host reaches an ok plan. FAIL is solely on the dedupe criterion (no in-flight meeting may get a second bot; a real meeting must not be wrongly refused). Both defects are small and local to `meetingIdentity`. Low notes (not filed): request stores the raw string rather than `u.href`; unknown status is fail-open; far-past/future and locale-string `now` accepted; redirect detection is key-name based; ZWSP U+200B at the end of a path is accepted and yields a distinct key (host still genuine). Round cap: no prior PASS names this seam.
+
+---
+
+# Cycle 1 (fix cycle 1, commit dc1c7bf)
+
+VERDICT: FAIL
+Cycle checked: 1
+Checked commit: dc1c7bf (lane/t039). Checker launch 2026-10-10 about 19:00Z (first command); total wall time and most per-command durations unmeasured. Environment note: the C: drive hit 0 bytes free at launch and the first test run failed with ENOSPC; checks resumed once about 60 MB was freed externally (I deleted nothing).
+
+Scope / remaining gates: planner only; T-039 stays open (no entry point). FAIL is solely on "no non-meeting page is planned": one path-only fallback is left (cloudonair). The cycle-0 defects are otherwise fixed.
+
+## Commands (all under timeout, no network, no full suite)
+- `timeout 120 node --import tsx --test src/send-now.test.ts src/platform.test.ts src/strategy.test.ts` -> tests 39, pass 39, fail 0, exit 0 (2.3 s).
+- `timeout 180 node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` -> tsc-exit=0 (31 s).
+- Probe (scratchpad t039check2/p.mts, q.mts; output out.txt) -> exit 0, never threw.
+- Mutation harness (scratchpad t039check2/mut.mjs): per-mutation byte backup, restore in finally plus SIGINT/SIGTERM handlers, 90 s spawn timeout per run, byte comparison, then git hash-object.
+- Budgets by the repo counter: send-now.ts 173 lines, send-now.test.ts 254 lines (as claimed).
+
+## D-015 replay of each issue's own recorded reproductions, verbatim
+ISS-T039-001: 8/8 (checker-replayed). lookup/abcdeg vs live lookup/abcdef -> ok:true (different meeting admitted); keys `meet:lookup:abcdef` != `meet:lookup:abcdeg`; `/new`, `/`, `/landing` (Meet) and `zoom.us/`, `zoom.us/foo` -> refused `not-a-meeting-url`.
+ISS-T039-002: 7/7 (checker-replayed). teams.live.com/meet/9876543210 vs live `?p=abc` -> ok:false (duplicate); meetup-join with context A live and context B requested -> ok:false; no context requested -> ok:false; teams.microsoft.com vs teams.live.com host swap on /meet/<id> -> ok:false; unencoded raw-JSON context in either order -> one key.
+Both rows are left at status open in the shard because the verdict is FAIL (set to verified only on PASS).
+
+## Same-meeting table (each group collapses to ONE key; 11/11)
+| Platform | Spellings tested | Key |
+|---|---|---|
+| Meet code | host case, code case, trailing slash, authuser/hl/pli/utm, fragment | `meet:abc-defg-hij` |
+| Meet lookup | id case, trailing slash, `%61` encoding | `meet:lookup:abc123` |
+| Zoom numeric | /j /w /s /wc/join/ID /wc/ID/join, us02web., www., zoom.com, pwd, utm, fragment, trailing slash, `%31%32` | `zoom:12345678901` |
+| Zoom /my | subdomain, name case, pwd | `zoom:my:john.doe` |
+| Teams meetup-join | `%3a`/`%3A`, `%40`/`@`, with/without `/0`, trailing slash, `p`, tenantId, context absent/A/B/raw JSON, teams.live.com vs teams.microsoft.com | `teams:thread:19:meeting_abc@thread.v2` |
+| Teams /meet | `?p=`, fragment, trailing slash, either host | `teams:meet:9876543210` |
+| Webex room | host case, name case, /meet vs /join | `webex:room:acme.webex.com:jdoe` |
+| Webex MTID | MTID/mtid case, pwd, fragment | `webex:mtid:m123abc` |
+| Zoho key / sessionId | KEY/key, utm, different path | `zoho:key:k123`, `zoho:session:s1` |
+| cloudonair | host case, trailing slash, utm, fragment | `cloudonair:/events/foo` |
+
+## Different-meeting table (every group distinct; 10/10, no false merge found)
+Meet code off by one letter; Meet lookup abcdef/abcdeg; Meet code vs lookup of the same characters (`meet:abc-defg-hij` vs `meet:lookup:abc-defg-hij`); Zoom id off by one and numeric vs `/my/<same digits>` (`zoom:my:12345678901`); Teams threads differing by one character inside the encoded part, `thread.v2` vs `thread.v1`, thread vs `/meet/<id>`, two /meet ids; Webex same room name on acme vs beta host, jdoe vs jdoe2; Webex MTID off by one and MTID vs MK with the same value; Zoho key vs sessionId with the same value; cloudonair foo vs foo2; Zoom vs Meet.
+
+## Case-folding, Teams context, refused shapes
+- Lower-casing: Meet codes, lookup ids, Zoom /my names, Webex room names and Zoom ids are case-insensitive or numeric (safe). Teams thread ids (`19:meeting_<base64-like>@thread.v2`), Webex MTIDs and Zoho keys may be case-sensitive on the real platform; `AbC` and `abc` fold to one key (probe CASE group). I could not establish from the repo or offline whether they are case-sensitive. A false merge needs two real ids differing only in letter case, negligible for 20+ character random identifiers, and the failure direction is a refusal (safe). Low, not filed.
+- Teams context ignored: one thread id can be reused by recurring meeting instances and channel meetings, so a second genuinely different live instance on the same thread would be refused (false refusal, not a second bot). More likely in practice: a `queued` job for a later occurrence of a recurring link blocks a manual send now to the current one (same for Zoom id and Meet code; a property of counting `queued` as live, not new). Safe-direction residual risk; not filed.
+- Refused shapes: `/onstage/g.php?MTID=` is NOT refused (accepted through MTID). Refused: Webex `/j/<n>` (appears only as a mock fixture in joiners.test.ts, not a real invitation), Teams `/l/channel/...` and launcher pages, Zoom `/wc/<name>`, `/signin`, `/test`, `/j/<1-4 digits>`. The scheduler's own auto-join path (`isDirectWebinarJoin`, auto-record-policy.ts:220) accepts only Meet code, Zoom /j and /w digits, and Teams meetup-join; send-now accepts a superset of that, so there is no inconsistency. Not filed.
+
+## Hostile inputs (re-checked)
+All refused: `zoom.us.evil.tld`, `evilzoom.us`, `meet.google.com.evil.tld` (unsupported-host); `user@zoom.us`, `meet.google.com@evil.tld` (credentials-in-url); `:8443` (unexpected-port); backslash, NUL, tab (malformed-url); `?next=https://evil.tld`, double-encoded redirect, `?url=` (embedded-redirect); `http://`, `javascript:` (not-https).
+Stored URL: `planSendNow("  HTTPS://ZOOM.US:443/j/12345678?pwd=A#f ")` -> meetingUrl `https://zoom.us/j/12345678?pwd=A#f`. Validation and `u.href` use the same `u` parsed from `trimmed`; `meetingIdentity(trimmed)` re-parses the same string with the same parser, so key and stored destination cannot diverge. OK.
+
+## Status rule (fail-closed)
+Refuse (live): queued, joining, recording, Recording, " recording", "", waiting-room, undefined, null, 5, {}, [], Ready, "ready ", FAILED, "processing\n". Admit (not live): exactly processing, ready, failed, action_required. Confirmed.
+Drift guard (send-now.test.ts:141): reads schedule-state.ts, extracts the literal `["queued", ...].includes(row.status)` with a regex, and deepEquals the sorted set against TERMINAL plus queued/recording. A new in-flight status added to that array changes the set and fails the test; a new terminal status also fails (forces a deliberate decision). Parsing is brittle to reformatting, but brittleness fails loudly ("status literal not found"), not silently, so acceptable. Judged by reading; not mutation-run on schedule-state.ts (outside the unit).
+
+## Defect found
+cloudonair: `planSendNow("https://cloudonair.withgoogle.com/landing", now)` -> `ok:true`, key `cloudonair:/landing`; `/events` -> `cloudonair:/events`. The default branch of `meetingIdentity` still keys on the bare path (`id = path ? path : undefined`), the one path-only fallback left; the test only asserts `/` is refused. This is the cycle-0 non-meeting-page class on the one platform not converted. Filed ISS-T039-003 (medium); one-line fix: accept only `/events/<slug>`.
+
+## Mutation table (send-now.test.ts, per-mutation backup, restore in finally)
+| Mutation | Result |
+|---|---|
+| M1 restore path-plus-query fallback | KILLED (24 pass / 2 fail) |
+| M2 unknown status treated as not live | KILLED (25 / 1) |
+| M3 Teams key includes query (p) | KILLED (24 / 2) |
+| M4 Meet lookup keyed by literal "lookup" | KILLED (24 / 2) |
+| M5 path not lower-cased | KILLED (23 / 3) |
+M1 was killed by tests on other platforms; no test asserts a cloudonair non-event path is refused, which is why ISS-T039-003 escaped.
+HEAD fidelity after mutations: `git hash-object packages/meeting-bot/src/send-now.ts` = d565a7a5c17f990f48d9e494a5529f052947ca1f = `git rev-parse HEAD:` same; send-now.test.ts b9e6c6db61e51b732fc9e8aa431385bb12f297fa = HEAD blob. Harness reported restored-identical-to-original: true.
+
+ISSUES-WRITTEN: ISS-T039-003 (medium: cloudonair path-only identity plans non-meeting pages) in qa/issues.t039.jsonl.
+
+EXPLANATION: The per-platform identity work is sound: 11/11 same-meeting groups share one key, 10/10 different-meeting groups stay distinct, both cycle-0 issues replay clean (8/8, 7/7), hostile hosts are all refused, status handling is fail-closed. The unit fails the stated PASS rule on exactly one remaining path-based plan (cloudonair). Fix: restrict cloudonair to `/events/<slug>` and add a refusal test. Low notes (not filed): possible false merges from lower-casing case-sensitive Teams/Webex/Zoho ids (safe direction); recurring-link false refusals; far-past/locale `now` strings still accepted (carried from cycle 0).
