@@ -8,13 +8,17 @@
  *   POST /calendar/join-rules/opt-outs     body { eventId }
  *
  * The tenant is ALWAYS `req.auth!.tenantId` (as routes/calendar.ts does); URL, query, headers and body
- * never name it, and a body field `tenantId` is rejected (400). Scope: "calendar".
+ * never name it, and a body field `tenantId` is rejected (400). Scopes: GET needs "calendar" (read); PUT and
+ * both POSTs need the dedicated WRITE scope "join-rules" (a "calendar" read key must not gain write power).
  * Writes for one tenant are serialised in-process by a promise-chain mutex. Multi-PROCESS writers are
  * still unsupported (the store's read-modify-write is unlocked).
  */
 import { Router, type Request, type Response } from "express";
 import { requireScope } from "../auth.js";
 import type { JoinRulesDeps } from "./deps.js";
+
+/** Dedicated write scope (sibling mutating routes use their own scope: gmail, sources, ingest, keys, compete). */
+export const WRITE_SCOPE = "join-rules";
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 
@@ -78,7 +82,7 @@ export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
     } catch { storeFailure(res); }
   });
 
-  router.put("/calendar/join-rules", requireScope("calendar"), (req: Request, res: Response) =>
+  router.put("/calendar/join-rules", requireScope(WRITE_SCOPE), (req: Request, res: Response) =>
     guarded(req, res, async tenantId => {
       const input: unknown = req.body;
       if (!isObj(input)) throw new BadRequest("body must be a JSON object");
@@ -95,7 +99,7 @@ export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
       return { ruleSet, state: existing.state };
     }));
 
-  router.post("/calendar/join-rules/approvals", requireScope("calendar"), (req: Request, res: Response) =>
+  router.post("/calendar/join-rules/approvals", requireScope(WRITE_SCOPE), (req: Request, res: Response) =>
     guarded(req, res, async tenantId => {
       const body = bodyOf(req, ["kind", "value"]);
       if ((body.kind !== "sender" && body.kind !== "domain") || typeof body.value !== "string" || body.value === "" || body.value.length > 320) {
@@ -109,7 +113,7 @@ export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
       }
     }));
 
-  router.post("/calendar/join-rules/opt-outs", requireScope("calendar"), (req: Request, res: Response) =>
+  router.post("/calendar/join-rules/opt-outs", requireScope(WRITE_SCOPE), (req: Request, res: Response) =>
     guarded(req, res, async tenantId => {
       const body = bodyOf(req, ["eventId"]);
       if (typeof body.eventId !== "string" || body.eventId === "" || body.eventId.length > 1024) {

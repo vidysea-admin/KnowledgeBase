@@ -62,8 +62,8 @@ function fakeStore(opts: { delayMs?: number; sizeCap?: number } = {}) {
 }
 
 const KEYS = {
-  "a-key": { tenantId: "tenant-a", scopes: ["calendar"] },
-  "b-key": { tenantId: "tenant-b", scopes: ["calendar"] },
+  "a-key": { tenantId: "tenant-a", scopes: ["calendar", "join-rules"] },
+  "b-key": { tenantId: "tenant-b", scopes: ["calendar", "join-rules"] },
   "noscope-key": { tenantId: "tenant-a", scopes: ["sources"] },
 };
 const RULES = { version: 1, ownDomains: ["own.example"], rules: [{ id: "r1", effect: "allow", match: { domain: "trusted.example" } }] };
@@ -98,7 +98,7 @@ test("unauthenticated requests are refused (401) and touch nothing", async () =>
   assert.equal(s.log.length, 0);
 });
 
-test("a key without the calendar scope is refused (403) on every route and touches nothing", async () => {
+test("a key without the required scope is refused (403) on every route and touches nothing", async () => {
   const s = fakeStore();
   await withServer(s.deps, async (_srv, call) => {
     for (const [m, p, b] of ALL) assert.equal((await call(m, p, "noscope-key", b)).status, 403, `${m} ${p}`);

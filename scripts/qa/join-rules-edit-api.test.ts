@@ -19,8 +19,8 @@ import { loadJoinRules, saveJoinRules, recordTenantApproval, recordTenantOptOut,
 import { validateJoinRuleSet } from "../../packages/meeting-bot/src/calendar/join-rules.js";
 
 const KEYS: Record<string, { tenantId: string; scopes: string[] }> = {
-  "a-key": { tenantId: "tenant-a", scopes: ["calendar"] },
-  "b-key": { tenantId: "tenant-b", scopes: ["calendar"] },
+  "a-key": { tenantId: "tenant-a", scopes: ["calendar", "join-rules"] },
+  "b-key": { tenantId: "tenant-b", scopes: ["calendar", "join-rules"] },
 };
 const RULES = { version: 1, ownDomains: ["own.example"], rules: [{ id: "r1", effect: "allow", match: { domain: "Trusted.Example" } }] };
 
