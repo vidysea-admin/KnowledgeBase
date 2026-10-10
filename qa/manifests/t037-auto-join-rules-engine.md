@@ -1,6 +1,7 @@
 # t037-auto-join-rules-engine
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t037-auto-join-rules-engine.md (cycle 2, 9f71808)
 Fix cycle: 2
 Priority tier: 3 — next unblocked roadmap task (T-037)
 Security class: approval/trust logic (what may join without a click) — FULL checker ceremony, uncapped
@@ -72,6 +73,7 @@ Persistence of rules/state; API routes and UI for editing; scheduler switch-over
 2. UI for editing rules, approve-once, per-meeting opt-out.
 3. Scheduler (`schedule-tick`/`selectAutoRecordItems`) calls `evaluateJoinRules` via `ruleSetFromTrustedSenderConfig` plus stored state.
 4. Gmail-candidate approval flow writes `recordApproval`; sender authentication per ISS-322/333.
+5. The scheduler must guard each evaluateJoinRules call: it throws on a null event or a throwing-getter/Proxy event or state.
 
 ## Fix cycle 2
 
