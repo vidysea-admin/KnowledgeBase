@@ -46,6 +46,7 @@ import { createSystemAudioJoiner } from "./joiners/system-audio-joiner.js";
 import { runFinalize, runLogin, runRecord } from "./capture/record-commands.js";
 import { runWatchdog } from "./capture/watchdog.js";
 import { runScheduleTick } from "./calendar/schedule-tick.js";
+import { defaultSendNowDeps, runSendNow } from "./send-now-command.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_FIXTURE_PATH = path.join(HERE, "..", "fixtures", "sample-recording.wav");
@@ -159,6 +160,7 @@ function buildFakeJoiners(fixturePath: string): Record<JoinStrategy, Joiner> {
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
   if (argv[0] === "record") return runRecord(argv.slice(1));
+  if (argv[0] === "send-now") { process.exitCode = await runSendNow(argv.slice(1), await defaultSendNowDeps()); return; }
   if (argv[0] === "finalize") return runFinalize(argv.slice(1));
   if (argv[0] === "login") return runLogin(argv.slice(1));
   if (argv[0] === "watchdog") return runWatchdog(argv.slice(1));
