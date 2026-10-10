@@ -21,6 +21,7 @@ import { ConfidenceGraphPage } from "./pages/graph-confidence/ConfidenceGraphPag
 import { KnowledgeGapsPage } from "./pages/gaps/KnowledgeGapsPage.js";
 import { ActivityHealthPage } from "./pages/activity-health/ActivityHealthPage.js";
 import { AnalyticsPage } from "./pages/analytics/AnalyticsPage.js";
+import { JoinRulesPage } from "./pages/join-rules/JoinRulesPage.js";
 
 export function App(): React.ReactElement {
   return (
@@ -40,6 +41,7 @@ export function App(): React.ReactElement {
               <Route path="/gaps" element={<KnowledgeGapsPage />} />
               <Route path="/activity-health" element={<ActivityHealthPage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/join-rules" element={<JoinRulesPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/watch" element={<WatchPage />} />
               <Route path="/sources" element={<SourcesPage />} />
