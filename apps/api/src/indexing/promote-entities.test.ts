@@ -13,7 +13,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { promoteAndPersistEntities, entityId } from "./promote-entities.js";
+import { promoteAndPersistEntities, entityId, topicPreviewLine } from "./promote-entities.js";
 import { indexSession } from "./session.js";
 import { fakeDb, completeWith, type Call } from "./testutils.js";
 import type { TreeIndexNode } from "@lkb/core";
@@ -400,4 +400,18 @@ test("ISS-154: every entity write is tenant-scoped ON THE FILTER, not merely in 
     assert.equal(w.filter?.tenantId, "t",
       `${w.coll}.updateOne filter lost its tenantId — a bare db.collection() handle would look exactly like this`);
   }
+});
+
+// ISS-155. Recorded reproduction: `backfill.mjs entities --dry-run` printed the BARE slug (`uk`) while
+// the live path writes entityId(tenantId, slug) = `<tenant>:uk`. The preview must print the written id.
+test("ISS-155: the dry-run preview prints the NAMESPACED id the live path writes, not the bare slug", async () => {
+  const line = topicPreviewLine("toc", { _id: "uk", sessionRefs: ["s1", "s2"] });
+  assert.equal(line, "topic toc:uk <- 2 session(s)");
+  assert.ok(!/^topic uk /.test(line), "the bare slug must not be previewed");
+  // The previewed id and the live write's _id agree for the same inputs.
+  const live = fakeDb();
+  await promoteAndPersistEntities("toc", "s1", treeRoot(), live.db, { tagClaims: false });
+  const writtenId = (writes(live.calls, "topics")[0]!.filter as Record<string, unknown>)._id;
+  assert.equal(writtenId, "toc:visa-rules");
+  assert.equal(topicPreviewLine("toc", { _id: "visa-rules", sessionRefs: ["s1"] }).split(" ")[1], writtenId);
 });
