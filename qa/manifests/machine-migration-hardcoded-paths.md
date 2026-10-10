@@ -52,5 +52,6 @@ Toolchain: node v24.19.0 (codex runtime). Worktree has no node_modules junction;
 5. No `D:\ai_os` dependency exists in runnable code (nothing to list).
 6. Scheduled task `Vidysea-Umesh-Calendar-Attendance` (and any task registered via start-record-detached / start-calendar-attendance `-InstallTask`) was registered on the old machine and must be re-registered here (its action embeds the old NodePath and launcher path). Not inspected on this machine; not changed.
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/machine-migration-hardcoded-paths.md (cycle 0, 3519f27)
 Fix cycle: 0
