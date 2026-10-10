@@ -1,6 +1,7 @@
 # Manifest - iss-260-retro-web-auth-review (retroactive per-commit review)
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/iss-260-retro-web-auth-review.md (cycle 0, 8b6ca16)
 Fix cycle: 0
 
 **This is a review record. It fixes nothing and edits no source or tests.** Lane ISS260, branch lane/iss260 from 8c8429d. Reviews fd1a5b3, 2ad648d, dd6a3b2, 026a5a6, 91d7ed2 against ISS-260 (high). Related: ISS-281.
