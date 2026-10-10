@@ -1,7 +1,7 @@
 # u2-4-phase3-resume-c2
 
 Status: ready-for-check
-Fix cycle: 3
+Fix cycle: 4
 Priority tier: 2 - open critical ISS-282 / ISS-104 and high ISS-283 / ISS-289 (also medium ISS-284, ISS-290). Authorized by D-122 (Approver ruling 2026-10-10: `origin/wave/u2-4-phase3-fix` is RESUMED through the maker-checker pair).
 Security class: data-write precondition (U2.4 phase-4 persists identities) - full ceremony, uncapped.
 Lane: `lane/ph3` (worktree KnowledgeBase-lanes/ph3), base 536a56a. Ledger shard: `qa/issues.ph3.jsonl` (one low row).
@@ -97,3 +97,78 @@ OPEN, by name: none among the recorded cases. Not measured: any fresh live run.
 
 ## Not delivered (unchanged in substance)
 The live gate is still outstanding and NOT claimed: Ollama qwen3:8b digest 500a1f067a9f, 2340 calls, `04-regate-eval.mts --runs 1,2,3 --tag c2` then `05-score.mjs --tag c2`. The five gate bars are not evidenced. Contract change C14 stays deferred to the Approver; qa/contracts is untouched. ISS-283 not delivered. No ledger status changed.
+
+---
+
+# Fix cycle 4 (checker verdict u2-4-phase3-resume-c2, cycle 3: FAIL; ISS-PH3-004 critical, ISS-PH3-005 low)
+
+## What failed, and why the cycle-3 differential missed it
+`relationGate` applied `isReportedAt` only on the third-party routes; self-identification got `isQuotedAt` plus the base cue, and `hasNamingCue` strips commas, colons and full stops before looking for "i am" and never looks at the sentence around it. So "He said I am Nikhil.", "She told us, I'm Nikhil.", "Do you think I am Nikhil?", "I am, Nikhil, still waiting" and the rest passed. The lane's block-location path (a cited turn only LOCATES a block; cycle 1b) then turned the base's refusal (the cited neighbour does not contain the name) into a shipment. The cycle-3 differential missed it twice over: (1) its grid had no reported, hearsay, question, hypothetical, negation, address or relation self-identification forms (its "reported" tag covered handover and thanks forms only); (2) its allow-list was "anything the base accepts when the model cites the turn directly", which contains the base's own wrong acceptances, so any such form was waved through whatever the lane did. Run alone it also did not kill "drop the quoted-speech guard", because no quoted self-identification template was in the grid.
+
+## Route-independent guards (speaker-relation-rules.ts, speaker-reported-rules.ts, new speaker-selfid-rules.ts)
+`occurrenceAccepted(route, text, name, at)` is the single per-occurrence decision: name-shaped and not a function word; then, for EVERY route and before any pattern, `isReportedAt` (quoted OR reported: a quote of any style, a reporting verb earlier in the clause, a reporting verb then a colon, a reporting verb right after the name); then the route's base protection (self-identification: the base cue `hasNamingCueAt`; third parties: not a place or organisation reading); then the route's pattern (`PATTERNS[route]`, a table, so a route cannot be added without passing the guards). `relationGate(route, text, name)` = route switched on in the frozen table AND some occurrence passes `occurrenceAccepted`. Self-identification's pattern is `isCleanSelfIdentificationAt` (speaker-selfid-rules.ts), which also requires the cue to sit DIRECTLY before the name (no comma or full stop between; the base strips them) and refuses questions, hedges, negation and a longer possessive name.
+Reporting-guard tuning: `like` stays a quotative ("they were like, I'm X") but not in "would like / I'd like / like to"; "I should say:" / "let me add:" (the speaker introducing their own next words) is exempt, which the existing ISS-255 test "call me Ruby" requires.
+
+## Families now refused (each example refused at predicate level and in all 10 binding layouts)
+- Reported / quoted: "He said I am X." / "She told us, I'm X." / "He said: I am X, and left." / "People go, I am X, and stall." / "She wrote: my name is X." / 'He said "I am X"' / "The slide shows “My name is X.”".
+- Hearsay: "I was told my name is X." (refused: `told`), "My colleague says my name is X.", "Apparently I am X.". Decision: hearsay about one's own name is refused. "They call me X." / "Call me X." are ACCEPTED on purpose: they state what the speaker is called, with no reporting verb.
+- Questions: "Do you think I am X?", "Am I X?", "Is my name X?", "What if I am X?" (sentence ends in "?" or opens with an auxiliary or wh-word).
+- Hypotheticals and hedges: "If I were X, ...", "Suppose I am X.", "I wonder whether I am X." (if, suppose, imagine, assume, whether, unless, wish, maybe, perhaps, might, probably, guess, think*, believe*, wonder*, hope*, doubt*, were).
+- Negation (in the clause): "I am not X.", "I'm no X.", "My name is not X.", "Please don't call me X.".
+- Address (name set off by commas or a full stop): "I am, X, still waiting for the slides.", "I am. X, are you there?".
+- Relation, not identity: "I am X's colleague." (a possessive is no occurrence), "I am with X.", "I am next to X.", "This is for X.", "This is X's view.", "This is X Sharma's view." (name followed by a longer possessive name), "I am sure X will join.", "I am glad X is here." (the cue must be directly before the name).
+Kept ACCEPTED, deliberately: my name is / my name's / I am / I'm / call me / they call me X; "X here" and "X speaking" opening a clause; "This is <Full Name>" opening a clause; "Hello everyone, I would like to introduce myself, I'm X.". Recall limits I knowingly accept: a hedge, negation, reporting or question word earlier in the same sentence refuses ("I think I'm X", "Before we go ahead, I'm X"; but "I think we start. I'm X." is two sentences and still ships); curly-apostrophe "I’m X" does not match the base cue and is refused, as in the base.
+
+## Block-binding rule (namingTurns; speakers-llm.ts untouched at 300)
+A self-identification binds ONLY the label whose OWN turn contains it. A cited turn only LOCATES a block of the proposed label (its own, or the label's block right before or after the cited turn). Evidence is a turn that (a) lies inside that block, (b) is spoken by the proposed label itself (explicit `speakerRef === label` filter added), and (c) passes `relationGate("selfIdentification")`, i.e. every guard above. The cited turn itself is never evidence unless it also satisfies (a)-(c). A neighbour of a different label is never evidence for this label (handover and thanks are OFF), so a self-identification spoken by another label never binds the proposed one. Tested layouts (speaker-selfid-ledger.test.ts, 10): own turn cited; neighbour cited, same label (own next turn; other label's trailing turn); label = speaker citing the next block; boundary (T last in the block, cite first turn or next block; T first in the block, cite the preceding turn); DIFFERENT label (T cited; filler cited; T after the block): refused.
+
+## ISS-PH3-005
+`RELATION_ROUTES` is `Object.freeze({...} as const)`. The `routes` override parameter is removed from `relationGate` and the three predicates (arity 3 and 2, pinned by a test). The forced-ON tests use `occurrenceAccepted`, which ignores the switch, is documented TEST SEAM ONLY, and a test scans every non-test source file under packages/index/src to confirm only speaker-relation-rules.ts mentions it. Handover and thanks stay OFF.
+
+## The repaired differential test (speakers-differential.test.ts, 144 non-blank lines)
+Grid: 14 names (5 persons incl. two multi-token; 9 place, organisation, role, calendar, language and function words) x 52 templates (8 genuine self-identifications; 7 reported; 3 hearsay; 5 quoted; 4 question; 3 hypothetical; 4 negation; 2 address; 8 relation; 9 third-party handover, thanks, address) x 7 layouts (own turn; own first of block; own last of block (boundary); preceding; following; both neighbours; between blocks) x 2 proposed labels (spk:0 and spk:1, so label = speaker is covered) x EVERY cited turn: 29,120 end-to-end cells through `extractSpeakers`, base and lane; plus 728 predicate cells. All seven ISS-PH3-004 recorded forms and every family above are in the grid.
+Allowed class, defined POSITIVELY by `oracle(T, N)`, written for the test with no call into production code: the WHOLE turn is an optional greeting followed by exactly one of `My name is N` / `I am|I'm N` / `Call me|They call me N` / `N here` / `N speaking` / `This is N speaking`, with the name directly after the cue, and the turn contains no quote mark, question mark, or word from {said, says, told, tell, wrote, go, goes, went, like, think, thought, if, not, no, never, wish, suppose, whether, wonder, apparently, were, n't}. The test asserts EVERY lane shipment (not only lane-only ones) has evidence that is spoken by the shipped label and oracle-clean. An oracle self-check test pins that it accepts only the "genuine" templates (a weak oracle would make the test vacuous).
+Result (printed by the test): `DIFF predicate: 728 cells, base accepts 354, lane accepts 79, violations 0`; `DIFF end-to-end: 29120 cells, base ships 5664, lane ships 1422, lane-only 790, outside the oracle class 0, base-only (recall lost) 5032`.
+Lane-only 790 by class (form / name kind): call-me 100 person + 120 place-org-role; i-am 100 + 120; my-name-is 50 + 60; x-here 50 + 60; x-speaking 50 + 60; this-is-speaking 20 person (multi-token names only). Persons 370, place-org-role 420. Each is a genuine own-turn self-identification reached through a neighbouring citation; none is quoted, reported, a question, negation, address or relation.
+Proof that the repaired test fails on the old code and on the named mutation (each run on the differential test ALONE; per-mutation byte backup in memory, restore in `finally`, `git hash-object` compared with the pre-mutation blob after every run):
+| Mutation | Result |
+|---|---|
+| cycle-3 sources of speaker-relation-rules.ts and speaker-reported-rules.ts (`git show d5c8912:...`) | KILLED: 3 fail; 167 predicate acceptances outside base-or-oracle, 3006 lane shipments outside the allowed class, plus the frozen-routes test |
+| drop the quoted-speech guard (`isQuotedAt` always false) | KILLED: 2 fail; 33 predicate acceptances and 594 lane shipments outside the class (the cycle-3 differential: SURVIVED) |
+| `occurrenceAccepted` drops `isReportedAt` | KILLED: 2 fail |
+| `isCleanSelfIdentificationAt` always true | KILLED: 2 fail |
+| `RELATION_ROUTES` not frozen | KILLED: differential 1 fail; speaker-selfid-ledger 1 fail |
+The harness is a scratch script outside the repo (backup and `finally` restore, not a trap); after every restore the blob hash equalled the pre-mutation hash; the final HEAD-fidelity check is below.
+
+## D-015 by issue id (recorded reproductions verbatim; predicate level and end to end; all layouts)
+| Issue | Corpus | Result |
+|---|---|---|
+| ISS-PH3-004 | 7 recorded forms x 14 names listed in the row (98 texts) | predicate 98/98 refused; end to end 980/980 refused (98 texts x 10 binding layouts, including the recorded layouts A and B) |
+| ISS-PH3-001 | 3 recorded texts | refused, predicate and all layouts (speaker-relation-ledger.test.ts) |
+| ISS-PH3-002 | 6 recorded texts | refused, predicate and all layouts |
+| ISS-104 | 20 recorded attacks | predicate 20/20, own turn 20/20, preceding 20/20, following 20/20 refused |
+| ISS-282 | 8 recorded wrong links | `qa/probes/iss282-c0-replay.mts`: `--- ISS-282 recorded wrong links refused: 8/8` |
+| ISS-093 | 20-case corpus | still asserted in speaker-name-rules.test.ts (106/106 pass) |
+OPEN, by name: none among the recorded cases. ISS-PH3-003's unpinned-session and 01-block-stats parts remain open (unchanged).
+
+## Replay (offline, recorded c1 model text; no model, no network)
+`08-replay.mts --from c1 --tag c4r`, then `node --import tsx 05-score.mjs --tag c4r --raw-tag c1` (05-score needs `--import tsx`):
+| Code | accepted | correct | wrong | additions |
+|---|---|---|---|---|
+| base 536a56a (the cycle-3 checker's measurement of the frozen base, same replay) | 15 | 0 | 15 | 0 |
+| lane cycle 3 | 3 | 3 | 0 | 0 |
+| lane cycle 4 | 3 | 3 | 0 | 0 |
+Same names as cycle 3 (Jubin Thakkar, spk:0 leeds; one per run); no correct name dropped by the stricter rules. wrongPairs 0, ISS255 "4/4", stableAll true. Phase-3 bar 5 (at least one correct addition) is NOT met even offline: additions 0. Nothing was tuned. New files: `measurement-summary.c4r.json`, `run-results.c4r.jsonl` (same naming as c2r, c3r).
+
+## Places, organisations and role words under "I am X": D-052
+Behaviour NOT changed. Base and lane both ship "Hello, I'm Google.", "My name is Paris.", "Hi all, India here.", "I am Moderator today." (probe: Paris, India, Google, Moderator, Diwali, English, Amazon, Mumbai and Chair are all accepted under "Hello, I'm N." / "My name is N." / "Hi all, N here."; Everyone, Not and Sorry are refused as function words). In the differential grid 420 of the 790 lane-only acceptances are of this kind (call-me 120, i-am 120, my-name-is 60, x-here 60, x-speaking 60; names Paris, India, Google, Moderator, Diwali, English); they are inside the oracle class by definition (a clean first-person self-identification).
+What D-052 says (docs/DECISIONS.md, `## D-052 | 2026-09-28`, Ruling 2, Approver Umesh): "The remaining speaker bypasses (India, Mumbai, Google) are place/organisation names that are each also a real person's name, so no word list can separate them — only the surrounding sentence can. Umesh chose 'add a place-vs-person signal' over accepting the residue, over a place-name lookup list, and over parking it. ... A place-name lookup list was specifically NOT chosen, because it wrongly rejects real people named India or Paris and the list never ends." So D-052 authorizes a contextual signal and rejects any name list; it does not itself mention an explicit "Hello, I'm Google." introduction. The code (speaker-name-rules.ts, `readsAsAPlaceOrOrg`) reads the ruling as keeping "my name is Paris" resolvable while demoting only the weak after-cues. Role words (Moderator, Chair) are not mentioned by D-052 at all. For the Approver: a speaker's explicit introduction as a place, organisation or role word cannot be told from a person of that name without the lookup D-052 rejected; the lane inherits the base's behaviour exactly here.
+
+## Evidence (cycle 4; node v24.19.0, from packages/index unless noted, each under timeout)
+- `node --test --import tsx src/pipeline/<file>.test.ts`: speaker-relation-rules `tests 10 pass 10 fail 0`; speaker-relation-ledger `8/8`; speaker-selfid-ledger (new) `8/8`; speakers-differential `pass 5 fail 0` (about 40 s); speakers-llm `50/50`; speaker-name-rules `106/106`; speakers-windows `29/29`; speakers `16/16`; speaker-docs `13/13`. From the repo root: `node --test qa/evidence/u2-4-phase3-precision-regate-2026-09-22/corpus-lock.test.mjs` `pass 4 fail 0`.
+- `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json`: no output, exit 0.
+- `node scripts/lint-dirsize.mjs`: `lint-dirsize: OK (110 dir(s) within budget)` before and after. `lint-loc.mjs`: the same 7 pre-existing violations, none in speaker files; `lint-dupes.mjs`: the same 1 pre-existing (`recordApproval`). Non-blank lines: speaker-relation-rules.ts 100, speaker-reported-rules.ts 44, speaker-selfid-rules.ts 49, speakers-llm.ts 300 (not touched), speakers-differential.test.ts 144, speaker-selfid-ledger.test.ts 110.
+- `node --import tsx qa/probes/iss282-c0-replay.mts`: `--- ISS-282 recorded wrong links refused: 8/8`.
+
+## Not delivered (unchanged in substance)
+The live gate is still outstanding and NOT claimed: Ollama qwen3:8b digest 500a1f067a9f, 2340 calls, `04-regate-eval.mts --runs 1,2,3 --tag c2` then `05-score.mjs --tag c2`. The five gate bars are not evidenced. Bar 5 (a correct addition) is not met even offline (additions 0). Handover and thanks are OFF. Contract change C14 stays deferred to the Approver; qa/contracts is untouched. ISS-283 not delivered. No ledger status changed. Unverified: behaviour on live model output; the oracle and the guards are English-only; the hedge and negation word lists were not tuned against real transcripts beyond the recorded corpus.
