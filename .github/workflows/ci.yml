@@ -8,6 +8,9 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    # Without this a hung test (e.g. a stuck ffmpeg/browser child) runs to GitHub's 6-hour default.
+    # 30 minutes is several times the expected runtime of this single job, so it only ever trips on a hang.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,6 +34,24 @@ jobs:
 
       - name: Python validator deps
         run: python -m pip install --quiet jsonschema
+
+      # Tests shell out to ffmpeg/ffprobe (capture/record-backend remux test, upload, watch, ingest
+      # chain, process-video). ubuntu-latest does not guarantee them, so install explicitly.
+      - name: Install ffmpeg (provides ffprobe)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg
+
+      # The remux test needs libvpx (VP8/VP9) and libopus encoders. Fail here, with a clear message,
+      # if the packaged build lacks them, instead of as a confusing test failure later.
+      - name: Check ffmpeg encoders
+        run: |
+          ffmpeg -version
+          ffprobe -version
+          if ! ffmpeg -hide_banner -encoders | grep -E "libvpx|libopus"; then
+            echo "::error::ENVIRONMENT PROBLEM, not a test failure: this ffmpeg build lacks the libvpx/libopus encoders the record-backend remux test needs."
+            exit 1
+          fi
 
       - name: Typecheck
         run: pnpm -r typecheck
