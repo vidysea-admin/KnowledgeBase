@@ -11,10 +11,13 @@ import { selectJoinStrategy, type JoinStrategy } from "./strategy.js";
 
 export const MAX_SEND_NOW_URL_LENGTH = 2048;
 
-/** Job states that mean the bot is, or is about to be, in the meeting. Anything else (processing,
- * ready, failed, ended, action_required) has left the meeting and does not block a new join. */
+/** Job states that mean the bot is, or is about to be, in the meeting. */
 export const LIVE_JOB_STATUSES = ["queued", "joining", "recording"] as const;
 export type LiveJobStatus = (typeof LIVE_JOB_STATUSES)[number];
+/** Job states that have left the meeting (calendar/schedule-state.ts:63 minus queued/recording; a test
+ * pins that literal so this cannot drift). ONLY these exact values stop blocking: an unknown, missing or
+ * differently cased status counts as LIVE (fail closed - this guard exists to prevent a second bot). */
+export const TERMINAL_JOB_STATUSES = ["processing", "ready", "failed", "action_required"] as const;
 
 /** Minimal view of an existing job the planner needs. `status` is a plain string so the scheduler's
  * `Operation.status` values (calendar/schedule-state.ts) can be passed through unconverted. */
@@ -34,6 +37,7 @@ export type SendNowRefusal =
   | "unexpected-port"
   | "embedded-redirect"
   | "unsupported-host"
+  | "not-a-meeting-url"
   | "duplicate-live-job";
 
 /** Same fields the existing join path consumes (`AutoRecordItem`: sessionKey/meetingUrl/startTime),
@@ -54,7 +58,6 @@ export type SendNowPlan =
 
 const refuse = (reason: SendNowRefusal, detail?: string): SendNowPlan => ({ ok: false, reason, ...(detail ? { detail } : {}) });
 
-const TRACKING_KEY = /^(utm_.*|fbclid|gclid|mc_.*|_ga|tk|token|access_token|pwd|password|authuser|pli|hl)$/i;
 const REDIRECT_KEY = /^(redirect|redirect_?uri|redirect_?url|return|return_?url|return_?to|next|continue|url|goto|dest|destination|target|callback)$/i;
 const URL_VALUE = /^\s*([a-z][a-z0-9+.-]*:|\/\/|\\)/i;
 
@@ -78,28 +81,59 @@ function hasEmbeddedRedirect(u: URL): boolean {
   return false;
 }
 
-/** Normalised identity of a meeting, or undefined when the URL is not an accepted meeting URL.
- * Case of host, trailing slashes, fragments, tracking/credential params and the zoom regional
- * subdomain never change it. Meet codes and zoom ids collapse across URL variants; other platforms
- * use host + path + remaining sorted query. */
+/** Identity of the meeting a URL names, built ONLY from the platform's own meeting identifier (never
+ * path-plus-query), or undefined when the URL carries none that we can parse - callers refuse that.
+ * Passcodes (pwd, p), `context`, tracking params, fragments, host case, regional subdomains and the
+ * host a Teams link was served from never change the key. Identifiers are lower-cased: a false
+ * "same meeting" refuses a join, a false "different meeting" admits a second bot. */
 export function meetingIdentity(url: string): string | undefined {
   let u: URL;
   try { u = new URL(url); } catch { return undefined; }
   const platform = detectPlatform(url);
   if (platform === "unknown") return undefined;
-  const path = decodeAll(u.pathname).replace(/\/+/g, "/").replace(/\/+$/, "");
-  if (platform === "meet") {
-    const code = path.split("/").filter(Boolean)[0];
-    if (code) return `meet:${code.toLowerCase()}`;
+  const path = decodeAll(u.pathname).replace(/\/+/g, "/").replace(/\/+$/, "").toLowerCase();
+  const host = u.hostname.toLowerCase();
+  const param = (name: string) => {
+    for (const [k, v] of u.searchParams) if (k.toLowerCase() === name && v.trim()) return v.trim().toLowerCase();
+    return undefined;
+  };
+  const m = (re: RegExp) => re.exec(path);
+  let id: string | undefined;
+  switch (platform) {
+    case "meet": {
+      const code = m(/^\/([a-z]{3}-[a-z]{4}-[a-z]{3})$/)?.[1];
+      const lookup = m(/^\/lookup\/([a-z0-9_-]+)$/)?.[1];
+      id = code ?? (lookup && `lookup:${lookup}`);
+      break;
+    }
+    case "zoom": {
+      const num = m(/^\/(?:(?:j|w|s|wc\/join)\/(\d{5,})|wc\/(\d{5,})\/join)$/);
+      const personal = m(/^\/my\/([a-z0-9._-]+)$/)?.[1];
+      id = (num && (num[1] ?? num[2])) || (personal && `my:${personal}`) || undefined;
+      break;
+    }
+    case "teams": {
+      const room = m(/^\/meet\/(\d{6,})$/)?.[1];
+      const thread = m(/^\/l\/meetup-join\/(19:[^/]+@thread\.[a-z0-9]+)(?:\/.*)?$/)?.[1];
+      id = room ? `meet:${room}` : thread && `thread:${thread}`;
+      break;
+    }
+    case "webex": {
+      const room = m(/^\/(?:meet|join)\/([a-z0-9._-]+)$/)?.[1];
+      const info = m(/\/meeting\/(?:info|download)\/([a-z0-9]+)$/)?.[1];
+      const mtid = param("mtid"), mk = param("mk");
+      id = (room && `room:${host}:${room}`) || (info && `id:${info}`) || (mtid && `mtid:${mtid}`) || (mk && `mk:${mk}`) || undefined;
+      break;
+    }
+    case "zoho": {
+      const key = param("key"), session = param("sessionid");
+      id = (key && `key:${key}`) || (session && `session:${session}`) || undefined;
+      break;
+    }
+    default: // cloudonair: the event path is the identifier
+      id = path ? path : undefined;
   }
-  if (platform === "zoom") {
-    const m = /^\/(?:(?:j|w|s|wc\/join)\/(\d{5,})|wc\/(\d{5,})\/join)$/i.exec(path);
-    const id = m && (m[1] ?? m[2]);
-    if (id) return `zoom:${id}`;
-  }
-  const params = [...u.searchParams].filter(([k]) => !TRACKING_KEY.test(k)).map(([k, v]) => `${k.toLowerCase()}=${v}`).sort();
-  const keepCase = platform === "teams" || platform === "webex" ? path : path.toLowerCase();
-  return `${platform}:${u.hostname.toLowerCase()}${keepCase}${params.length ? `?${params.join("&")}` : ""}`;
+  return id ? `${platform}:${id}` : undefined;
 }
 
 function toIso(now: Date | string): string | undefined {
@@ -127,10 +161,13 @@ export function planSendNow(url: string, now: Date | string, liveJobs: readonly 
   const platform = detectPlatform(trimmed);
   if (platform === "unknown") return refuse("unsupported-host", u.hostname);
 
-  const meetingKey = meetingIdentity(trimmed)!;
+  const meetingKey = meetingIdentity(trimmed);
+  if (!meetingKey) return refuse("not-a-meeting-url", u.hostname);
   for (const job of Array.isArray(liveJobs) ? liveJobs : []) {
-    if (!job || typeof job.meetingUrl !== "string" || !(LIVE_JOB_STATUSES as readonly string[]).includes(job.status)) continue;
+    if (!job || typeof job.meetingUrl !== "string" || (TERMINAL_JOB_STATUSES as readonly unknown[]).includes(job.status)) continue;
     if (meetingIdentity(job.meetingUrl) === meetingKey) return refuse("duplicate-live-job", meetingKey);
   }
-  return { ok: true, request: { source: "manual", meetingUrl: trimmed, platform, strategy: selectJoinStrategy(platform), startTime, meetingKey } };
+  // `u.href` (WHATWG-normalised), not the raw string: the join path (capture/Joiner.join take a URL string and
+  // re-parse it with `new URL`) sees the same destination that was validated here.
+  return { ok: true, request: { source: "manual", meetingUrl: u.href, platform, strategy: selectJoinStrategy(platform), startTime, meetingKey } };
 }
