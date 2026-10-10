@@ -198,7 +198,7 @@ function endsTheClause(tail: string): boolean {
  * "Mumbai Sharma" is a person whatever the turn says about Mumbai. And a possessive occurrence is
  * not a place ("at Priya's desk" is a person's desk), so it is skipped.
  */
-function readsAsAPlaceOrOrg(text: string, name: string): boolean {
+export function readsAsAPlaceOrOrg(text: string, name: string): boolean {
   if (name.trim().split(/\s+/).filter(Boolean).length > 1) return false;
   const governed = new RegExp(`(?:^|\\s)(?:${LOCATIVE_GOVERNORS.join("|")})$`, "iu");
   return nameOccurrences(text, name).some((at) => {

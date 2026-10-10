@@ -1,7 +1,7 @@
 # u2-4-phase3-resume-c2
 
 Status: ready-for-check
-Fix cycle: 2
+Fix cycle: 3
 Priority tier: 2 - open critical ISS-282 / ISS-104 and high ISS-283 / ISS-289 (also medium ISS-284, ISS-290). Authorized by D-122 (Approver ruling 2026-10-10: `origin/wave/u2-4-phase3-fix` is RESUMED through the maker-checker pair).
 Security class: data-write precondition (U2.4 phase-4 persists identities) - full ceremony, uncapped.
 Lane: `lane/ph3` (worktree KnowledgeBase-lanes/ph3), base 536a56a. Ledger shard: `qa/issues.ph3.jsonl` (one low row).
@@ -46,3 +46,54 @@ The branch added to `qa/contracts/speaker-resolution-llm.md` a section "Phase-3 
 4. Not run: mutation runs (checker's job, `scripts/lib/mutate.mjs`), the full test suite, a monorepo build, browsers. Only packages/index was typechecked.
 5. Known gap, filed low as ISS-PH3-001: `citesNameAsHandover("He said over to you, Nikhil, and left.", "Nikhil")` is true (reported speech is not caught when the reporting verb precedes the cue). Not in any recorded reproduction.
 6. Ledger statuses (ISS-282/283/284/289/290/104) are not touched; closing them is the checker's.
+
+NOTE (cycle 3): the cycle-2 sentences above that say the relation predicates "call `hasNamingCueAt` FIRST" and "can only narrow what the base accepts", the ISS-104 "no regression" line, and item 5 are SUPERSEDED by the next section. They were false for handover and thanks.
+
+# Fix cycle 3 (checker verdict u2-4-phase3-resume-c2, cycle 2: FAIL; ISS-PH3-001 and ISS-PH3-002, both critical)
+
+## What failed, and why the cycle-2 claim was false
+`citesNameAsHandover` and `citesNameAsThanks` never called `hasNamingCueAt`; only `citesNameAsSelfIdentification` did. The place-versus-person signal, the organisation refusal and the ISS-255 handover refusal were bypassed on the two new routes, and reported speech was caught only when `said` sat next to the NAME. Run against the base: 432 of 2640 end-to-end cases (30 names x 22 templates x 4 layouts) shipped on the lane and not on the base ("Coming up next, Mumbai from the west zone." as a preceding turn, "Over to you, India.", "Thank you, Google.", "He said over to you, Nikhil, and left."). I never ran the base beside the lane; the 20/20 ISS-104 figure was measured only with the evidence in the label's own turn.
+
+## The gate (speaker-relation-rules.ts, `relationGate`)
+ONE wrapper decides whether an occurrence may bind. A predicate is written as `relationGate(route, text, name, check, routes?)`: it supplies only its pattern check, and `check` can only ADD conditions. The gate applies, in order: route switched on; `looksLikeAName`; not `isDiscourseOnly` (the denylist); not inside quoted speech (`isQuotedAt`, any style: straight and curly double quotes, guillemets, CJK corner brackets, single quotes, a name straight after a quote mark); then
+- self-identification: the BASE cue `hasNamingCueAt` (place-versus-person, organisation, ISS-255 handover refusal);
+- handover / thanks: not a place or organisation reading of the citing turn (`readsAsAPlaceOrOrg`, now exported) and not reported speech (`isReportedAt` in the new `speaker-reported-rules.ts`: a reporting verb anywhere earlier in the clause, a reporting verb then a colon, or a reporting verb right after the name: said, told, asked, wrote, added, heard, according to, like, go/goes/went, ...). When in doubt it refuses.
+All three exported predicates are built through the gate, so a new predicate cannot skip it. `speaker-name-rules.ts` changed by one word versus cycle 2 (`export` on `readsAsAPlaceOrOrg`).
+
+## Routes: self-identification ON; handover OFF; thanks OFF (`RELATION_ROUTES`)
+Handover and thanks are DISABLED. The base refuses every handover context by design (ISS-255), so `hasNamingCueAt` cannot be applied to them, and the remaining protections cannot separate a bare capitalised word that is a person from one that is not without the place lookup D-052 ruled out: "Over to you, India.", "Thank you, Google.", "Coming up next, Mumbai from the west zone." pass every contextual test. With the routes forced ON (test `forced ON`), the gate still refuses all quoted, reported, place-governed and function-word cases, but 202 third-party acceptances of plain-looking names the base refused remain (Nikhil, Rashi, ..., and also India, Google, Mumbai). I did not keep the routes on to improve the replay. Re-enabling is a decision for after the live run.
+Recall consequence, stated plainly: the true positives of cycle 1b that were named only by a neighbour's handover or thanks (cycle-2 replay: visa spk:0 Rashi, creative-futures spk:1 Sumit, in-focus-3 spk:1 Nikhil, leeds spk:2 Nupur) are no longer shipped. `speakers-windows.test.ts` (5 tests) and `speaker-relation-rules.test.ts` (2 tests removed or replaced) were changed from asserting handover/thanks binding to asserting refusal; the [id:...] test now uses a self-identification.
+
+## Differential harness (committed): `speakers-differential.test.ts`
+Chosen: a FROZEN VERBATIM COPY of the base in `packages/index/src/pipeline/frozen-base-536a56a/` (`speaker-name-rules.mts`, `speaker-name-data.mts`, `speakers-llm.mts`, from `git show 536a56a:...`, imports adjusted, header marked "frozen reference, differential testing only"). `.mts` so the loc and dupes lints and tsc do not see them; `speakers.ts` is unchanged between base and lane and imported as-is. Not a golden table, because the end-to-end decision needs the base `extractSpeakers`. Budgets: dirsize OK (pipeline dir now 23 files, limit 30); the `.mts` copies are outside the loc counter (extensions .ts/.py/.mjs), which I note as the cost of this choice.
+Grid: 32 names (persons, a multi-token name, places, organisations, function words, calendar/festival words) x 40 templates (self-introduction, address, handover, thanks, place-governed, and 16 quoted or reported forms in every quote style) x 5 layouts (own turn; own block, other turn; preceding turn; following turn; both neighbours), citing the template turn, the label's turn, or the last turn.
+Result (`DIFF` lines printed by the test):
+- predicate level: 1280 cells, base accepts 450, lane accepts 152, lane-only acceptances 0 (cycle 2: 160 of 660).
+- end to end: 15360 cells, base ships 2700, lane ships 608, lane-only acceptances 304, of which on the allow-list 304 and NOT allowed 0 (cycle 2: 432 of 2640 unaccounted for). Base-only (recall lost versus base) 2396; most of these are base shipments the contract calls wrong (an address making the addressee the speaker, ISS-282), but the count is reported unfiltered.
+- ALLOW-LIST, one class: OWN_BLOCK_SELF_ID. T is a turn of the label's OWN block that the base accepts when cited directly; the model cited a different turn that sits in or next to that block. Same turn, same cue, same protections, same label; only the citation differs. Layouts where T belongs to another speaker are never allowed.
+
+## D-015 by issue id (each row's own recorded reproductions; predicate / end to end: own turn, preceding turn, following turn)
+- ISS-104: 20 recorded attacks (`speaker-relation-ledger.test.ts`, verbatim from `qa/probes/iss104-rederive.mts`). Lane predicates 20/20 refused (India included: self-identification needs "X speaking" to open the clause); end to end 20/20, 20/20, 20/20 refused (the Mumbai preceding-turn case is now refused). The base predicate probe itself still gives `--- refused 19/20` (India), unchanged base code, so that one is a base residue the lane closes.
+- ISS-282: `node --import tsx qa/probes/iss282-c0-replay.mts` gives `--- ISS-282 recorded wrong links refused: 8/8`; the 8 real-corpus cases also stay in `speakers-windows.test.ts`.
+- ISS-PH3-001: all 3 recorded cases ("He said over to you, Nikhil, and left."; "Someone said: over to you, Nikhil."; "The chair told me earlier that it was over to you, Nikhil.") refused at predicate level and end to end in all 3 layouts, and refused with the routes forced ON.
+- ISS-PH3-002: all 6 recorded cases (Mumbai x2, India as preceding turn; Paris, Google, Amazon as following turn) refused at predicate level and in all 3 layouts. With the routes forced ON only Paris (place signal in the same turn) would still be refused; Mumbai, India, Google and Amazon would ship, which is why the routes are OFF.
+- ISS-255: replay `ISS255 "4/4"` (cycle 2: 3/4) and legacy `wrongPairs` 0 (cycle 2: 18): every evidence turn that ships now passes the base cue `citesNameAsAnIntroduction` itself. Meaning: the 12 pairs that exposed the bypass are gone because the routes that produced them are off, not because they were repaired.
+- ISS-093: the 20-case corpus is still asserted in `speaker-name-rules.test.ts` (106/106 pass).
+OPEN, by name: none among the recorded cases. Not measured: any fresh live run.
+
+## Replay (offline, recorded c1 model text; no model, no network)
+`08-replay.mts --from c1 --tag c3r` then `05-score.mjs --tag c3r --raw-tag c1`: accepted 3, correct 3, precision 1, wrongIdentities 0, wrongPairs 0 (c2: 18), wrongPairsRelational 0, floorTurns 2, floorCoveredTurns 42, contradicted 0, stableAll true, additions 0 (c2: 4), ISS255 "4/4" (c2: 3/4). The accepted count fell from 12 to 3 and the 4 additions are gone. Phase-3 bar 5 (at least one correct addition) is therefore NOT met even offline now. I did not tune any rule to recover it.
+
+## Test gaps the checker named
+- M7 (possessive exemption in `readsAsAPlaceOrOrg`): it is an EQUIVALENT mutant. `nameOccurrences` already drops "Priya's" because the apostrophe is a NAME_JOINER, so the branch is unreachable and no test can kill it. The ledger test now pins what protects "At Priya's desk, Priya here." (the occurrence list). Not a production change.
+- Corpus-lock (ISS-PH3-003): `qa/evidence/u2-4-phase3-precision-regate-2026-09-22/corpus-lock.test.mjs` (4 tests, `node --test`): a synthetic one-session corpus in a temp dir; an appended byte makes `verifyCorpus` AND the real `05-score.mjs` refuse; a missing session and a lock-only entry refuse; `04-regate-eval.mts` calls `verifyCorpus` before any provider call. Mutation M8 (verifyCorpus a no-op) is now killed (2 fail). Remaining of ISS-PH3-003: unpinned sessions are still only printed, and `01-block-stats.mjs` is not covered.
+
+## Evidence (cycle 3; node v24.19.0, from packages/index unless noted, each under timeout 170)
+- `node --test --import tsx src/pipeline/<file>`: speaker-relation-rules `pass 10 fail 0`; speaker-relation-ledger `pass 8 fail 0`; speakers-differential `pass 5 fail 0` (about 15 s); speakers-llm `pass 50 fail 0`; speaker-name-rules `pass 106 fail 0`; speakers-windows `pass 29 fail 0`; speakers `pass 16 fail 0`; speaker-docs `pass 13 fail 0`. From the repo root: `node --test qa/evidence/u2-4-phase3-precision-regate-2026-09-22/corpus-lock.test.mjs` `pass 4 fail 0`.
+- `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json`: no output, exit 0.
+- `node scripts/lint-dirsize.mjs`: `OK (110 dir(s) within budget)`. `node scripts/lint-loc.mjs`: the same 7 pre-existing violations, none in speaker files. Loc: speaker-relation-rules.ts 119, speaker-reported-rules.ts 39, speaker-name-rules.ts 275, speakers-llm.ts 300 (unchanged), speaker-relation-ledger.test.ts 87, speakers-differential.test.ts 131, speakers-windows.test.ts 332, speaker-relation-rules.test.ts 54.
+- Mutations (per-mutation byte backup, restore in `finally`, `cmp` verified after each): gate drops the base cue on self-identification, killed (2 fail); handover route ON, killed (3 fail); third-party gate skips the place check, killed (1 fail); skips the reported check, killed (1 fail); gate drops `isQuotedAt`, killed by the quoted-self-identification test (1 fail); M7, equivalent; M8 killed.
+- Replay and probes as above. `qa/probes/iss282-c0-replay.mts`: 8/8. `qa/probes/iss104-rederive.mts`: 19/20 (base predicate).
+
+## Not delivered (unchanged in substance)
+The live gate is still outstanding and NOT claimed: Ollama qwen3:8b digest 500a1f067a9f, 2340 calls, `04-regate-eval.mts --runs 1,2,3 --tag c2` then `05-score.mjs --tag c2`. The five gate bars are not evidenced. Contract change C14 stays deferred to the Approver; qa/contracts is untouched. ISS-283 not delivered. No ledger status changed.

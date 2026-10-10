@@ -12,7 +12,7 @@ import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
 
 import { extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
-import { citesNameAsSelfIdentification, citesNameAsHandover, citesNameAsThanks } from "./speaker-relation-rules.js";
+import { citesNameAsSelfIdentification } from "./speaker-relation-rules.js";
 
 const turn = (id: string, speakerRef: string, text: string): Turns =>
   ({ _id: id, tenantId: "t1", sessionId: "s1", speakerRef, tStart: 0, tEnd: 0, text });
@@ -43,18 +43,6 @@ for (const [text, name] of NOT_SELF) {
   });
 }
 
-test("handover: forward cues bind the NEXT speaker; a quoted address names nobody", () => {
-  assert.equal(citesNameAsHandover("Thanks all. Over to you, Nikhil.", "Nikhil"), true);
-  assert.equal(citesNameAsHandover("Okay. Rashi, I'll pass it on back to you.", "Rashi"), true);
-  assert.equal(citesNameAsHandover('People often go, "Priya, what do you think", and stall.', "Priya"), false);
-});
-
-test("thanks: a clause-opening thank-you names the previous speaker; two names bind neither", () => {
-  assert.equal(citesNameAsThanks("Thank you, Sonal. That was helpful.", "Sonal"), true);
-  assert.equal(citesNameAsThanks("Thank you, Kshitij. Thanks, Anisha.", "Anisha"), false);
-  assert.equal(citesNameAsThanks("I want to say thank you to the team, Sonal is next.", "Sonal"), false);
-});
-
 test("ISS-282: addressing a person on the single turn does not make the speaker that person", async () => {
   for (const [text, name] of [
     ["Good morning Doris Day, please go ahead.", "Doris Day"],
@@ -65,10 +53,8 @@ test("ISS-282: addressing a person on the single turn does not make the speaker 
   }
 });
 
-test("ISS-282: a thanks turn after a block names that block's speaker, once", async () => {
+test("fix cycle 3: with the thanks route OFF, a thank-you after a block names nobody", async () => {
   const turns = [turn("t1", "Host", "Welcome."), turn("t2", "spk:0", "Glad to be here, a short overview."), turn("t3", "Host", "Thank you, Sonal. Next question.")];
   const { resolved } = await extractSpeakers(turns, replies([{ speakerRef: "spk:0", displayName: "Sonal", turnIds: ["t2"] }]));
-  assert.equal(resolved.length, 1);
-  assert.equal(resolved[0]?.displayName, "Sonal");
-  assert.deepEqual(resolved[0]?.evidence.map((e) => e.turnId), ["t3"]);
+  assert.deepEqual(resolved, []);
 });

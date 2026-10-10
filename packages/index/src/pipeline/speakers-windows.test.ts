@@ -237,15 +237,14 @@ test("ISS-282: the label's OWN self-identifying turn binds, scoped to that ONE b
   assert.deepEqual(resolved[0]?.blocks, [{ startTurnIndex: 2, endTurnIndex: 3 }], "the block holding the evidence, not spk:0's first block");
 });
 
-test("ISS-282: a handover by ANOTHER speaker binds the label whose block immediately FOLLOWS it", async () => {
+test("fix cycle 3: a handover by ANOTHER speaker no longer binds the label whose block FOLLOWS it (route OFF, ISS-PH3-002)", async () => {
   const turns = [
     turn("t1", "Anchor", "Good morning Prasanti, please go ahead."),
     turn("t2", "spk:1", "Thank you so much."),
     turn("t3", "spk:1", "Let me share my screen."),
   ];
   const { resolved } = await extractSpeakers(turns, replies([{ speakerRef: "spk:1", displayName: "Prasanti", turnIds: ["t1"] }]));
-  assert.equal(resolved.length, 1, "handover-then-block is the greeting class this path exists to admit");
-  assert.deepEqual(resolved[0]?.blocks, [{ startTurnIndex: 1, endTurnIndex: 2 }]);
+  assert.deepEqual(resolved, [], "the handover route is OFF until the live gate: it cannot tell a person from 'Over to you, India.'");
   // Thanks look BACKWARD: "Thank you, Bhavya." before spk:4 names the previous speaker (ISS-282 #5 shape).
   const thanks = [turn("t1", "Jasminder", "Thank you, Bhavya. Thank you, Bhakti."), turn("t2", "spk:4", "Thank you all.")];
   const back = await extractSpeakers(thanks, replies([{ speakerRef: "spk:4", displayName: "Bhavya", turnIds: ["t1"] }]));
@@ -255,12 +254,12 @@ test("ISS-282: a handover by ANOTHER speaker binds the label whose block immedia
 test("ISS-282: one evidence turn never binds two labels", async () => {
   const turns = [turn("t1", "spk:1", "I'm Kshitij, and over to Ruby."), turn("t2", "spk:0", "Hello all.")];
   const alone = await extractSpeakers(turns, replies([{ speakerRef: "spk:1", displayName: "Kshitij", turnIds: ["t1"] }]));
-  assert.equal(alone.resolved.length, 1, "on its own, t1 binds spk:1 by self-identification");
+  assert.deepEqual(alone.resolved.map((r) => r.displayName), ["Kshitij"], "on its own, t1 binds spk:1 by self-identification");
   const both = await extractSpeakers(turns, replies([
     { speakerRef: "spk:1", displayName: "Kshitij", turnIds: ["t1"] },
     { speakerRef: "spk:0", displayName: "Ruby", turnIds: ["t1"] },
   ]));
-  assert.deepEqual(both.resolved, [], "a turn claimed as evidence by two labels settles neither");
+  assert.deepEqual(both.resolved.map((r) => r.displayName), ["Kshitij"], "the handover (Ruby) route is off, so t1 binds only its own speaker");
 });
 
 /**
@@ -272,22 +271,21 @@ test("ISS-282: one evidence turn never binds two labels", async () => {
 const VISA = "2026-04-21-visa-blueprint-part2-italy-france-nz";
 const LEEDS = "2026-08-24-uniaccess-leeds-arts-university";
 
-test("c1b: a REAL true positive c1 refused — spk:0 -> Rashi, located by its own block, named by its neighbours", async () => {
+test("fix cycle 3 (recall loss, accepted): spk:0 -> Rashi, named only by its neighbours, is no longer shipped", async () => {
   // Recorded 3/3 internal runs in outer run 1: the model cites spk:0's block t142-t144, none of which says "Rashi".
   // t141 [spk:1] "Rashi, I'll pass it on back to you." hands over; t145 [Shagun] "Thank you so much, Rashi, for inviting me".
   const { resolved } = await extractSpeakers(corpus(VISA), replies([
     { speakerRef: "spk:0", displayName: "Rashi", turnIds: [`${VISA}-t142`, `${VISA}-t143`, `${VISA}-t144`] },
   ]));
-  assert.deepEqual(resolved.map((r) => `${r.speakerRef}|${r.displayName}`), ["spk:0|Rashi"]);
-  assert.deepEqual(resolved[0]?.evidence.map((e) => e.turnId), [`${VISA}-t141`, `${VISA}-t145`], "the NAMING turns ship, in transcript order");
-  assert.deepEqual(resolved[0]?.blocks, [{ startTurnIndex: 141, endTurnIndex: 143 }], "that one block, gold Rashi");
+  // The true positive of fix cycle 1b. Handover/thanks cannot be told from "Over to you, India." / "Thank you, Google.",
+  // so the routes are OFF and this correct name is a RECALL LOSS, by decision: a wrong name is the critical defect.
+  assert.deepEqual(resolved, []);
 });
 
 test("c1b: the model's copied [id:...] prefix still locates the real turn", async () => {
-  const { resolved } = await extractSpeakers(corpus(VISA), replies([
-    { speakerRef: "spk:0", displayName: "Rashi", turnIds: [`id:${VISA}-t143`] },
-  ]));
-  assert.deepEqual(resolved.map((r) => r.displayName), ["Rashi"]);
+  const turns = [turn("t1", "Anchor", "Next slide."), turn("t2", "spk:0", "Hello, Ruby here."), turn("t3", "spk:0", "I lead admissions.")];
+  const { resolved } = await extractSpeakers(turns, replies([{ speakerRef: "spk:0", displayName: "Ruby", turnIds: ["id:t3"] }]));
+  assert.deepEqual(resolved.map((r) => r.displayName), ["Ruby"]);
 });
 
 test("c1b: 'I do see Ankit here' is the host spotting a panelist, not Ankit naming himself (recorded 6x, gold Jubin Thakkar)", async () => {
@@ -316,7 +314,7 @@ test("c1b: a mid-turn quoted call is not a handover; a turn thanking two people 
   assert.deepEqual(two.resolved, [], "which of the two spoke last is not in the text");
   const one = [turn("t1", "spk:3", "So that is the timeline."), turn("t2", "Host", "Thank you, Kshitij, for that.")];
   const ok = await extractSpeakers(one, replies([{ speakerRef: "spk:3", displayName: "Kshitij", turnIds: ["t1"] }]));
-  assert.deepEqual(ok.resolved.map((r) => r.displayName), ["Kshitij"], "a single opening thank-you names who just spoke");
+  assert.deepEqual(ok.resolved, [], "thanks route OFF (fix cycle 3): 'Thank you, Google.' is not distinguishable from a person");
 });
 
 test("c1b review: quoted or reported speech names nobody, even in a SHORT turn (no length accident)", async () => {
