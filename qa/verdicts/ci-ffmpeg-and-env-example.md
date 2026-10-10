@@ -76,3 +76,42 @@ Accurate on the diff and the 17/45/6 counts. It states plainly that the workflow
 
 ## EXPLANATION
 Sensitive-data review: clean. .env.example: accurate on everything checked. ci.yml: valid, additive, correctly placed, timeout at job level. The one defect is that the encoder guard is an OR, not an AND, so a missing required encoder can slip through and surface later as the same confusing test failure the step was written to prevent. Small fix: check each encoder separately (and anchor `libvpx` so `libvpx-vp9` does not satisfy it). Cycle 0 FAIL; re-check after that one-step fix.
+
+
+---
+
+# Verdict - ci-ffmpeg-and-env-example - Cycle checked: 1
+
+**VERDICT:** PASS
+**Cycle checked:** 1
+**Commit checked:** e71e113 (diff base 2c69f84), lane/ci
+**ISSUES-WRITTEN:** none
+
+## What I ran
+- `git diff 2c69f84 e71e113 --stat`: only `.github/workflows/ci.yml` (+23/-6) and `qa/manifests/ci-ffmpeg-and-env-example.md`. `.env.example` unchanged, so the cycle-0 sensitive-data review stands. The ci.yml diff contains no sensitive data.
+- YAML (`python -I -c "import yaml..."`): `45 [None x4, 'Install', 'Python validator deps', 'Install ffmpeg (provides ffprobe)', 'Check ffmpeg encoders', 'Typecheck', 'Unit tests', 'Generated types match schema/', 'Schema fixtures validate', 'Structure budgets + dependency rules', 'Catalogue score reproducibility', 'Linter negative tests']`. 15 steps, job-level timeout 45, both ffmpeg steps before Typecheck and Unit tests. Removed diff lines are only the old comment/timeout and the old check step; no step removed, reordered or weakened. grep finds no `continue-on-error` and no `|| true`; no test filter.
+- Shell logic executed for real: the step's `run:` extracted from the parsed YAML and run with `bash -e -o pipefail` against fake `ffmpeg`/`ffprobe` first on PATH. The fake `-encoders` output includes the legend block (` V..... = Video`, ` ------`), an `mpeg4` row, an `opus` row ("Opus (decoders: opus libopus)"), and rows for `libvpx` ("libvpx VP8"), `libvpx-vp9` ("libvpx VP9"), `libopus` ("libopus Opus") as listed per case.
+
+## Case table
+| Case | Exit | Error lines |
+|---|---|---|
+| both present | 0 | none ("all present") |
+| only libvpx (+vp9 row, opus look-alike row remains) | 1 | lacks libopus |
+| libvpx-vp9 + libopus only (D-015 recorded reproduction) | 1 | lacks libvpx |
+| libvpx-vp9 only (opus look-alike rows remain) | 1 | lacks libvpx; lacks libopus (both in one run) |
+| only libvpx, no vp9 | 1 | lacks libopus |
+| only libopus | 1 | lacks libvpx |
+| ffmpeg absent | 1 | ffmpeg not on PATH |
+| ffprobe absent (encoders present) | 1 | ffprobe not on PATH |
+| `-encoders` exits 3 | 1 | '-encoders' failed |
+| CRLF output, both present | 0 | none (CR lands on the last field, so `$2` is unaffected; irrelevant on Linux anyway) |
+
+D-015: ISS-CI-001's recorded reproduction (only libvpx-vp9 plus libopus) now exits 1 naming libvpx: 1/1 refused. The look-alike rows (description text containing libvpx/libopus, the `opus` row) never satisfy the exact `$2 == e` test.
+
+## Observations
+- Low: the step no longer prints `-version` lines; versions would aid diagnosing a CI failure. Not a defect, not filed.
+- Manifest Fix cycle 1 section matches observation (logic verbatim, step, timeout 45), lists the predicted next failures as UNVERIFIED (Fix cycle 1 item 6 and cycle-0 list), and states the workflow change is UNVERIFIED until it runs on GitHub. It reports a 7-case table; I ran 10 including realistic output.
+- Not verified: real ffmpeg column layout is assumed (flags, name, description), consistent with ffmpeg's documented format.
+
+## EXPLANATION
+Each required encoder is tested separately and exactly; failure paths print the intended errors; nothing else changed. ISS-CI-001 set to verified.
