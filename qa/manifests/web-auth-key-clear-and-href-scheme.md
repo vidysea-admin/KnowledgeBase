@@ -88,5 +88,6 @@ An event whose detail is missing, or whose apiKey is not a non-empty string, is 
 ## NOT DONE (D-024), still owed
 Live browser check cannot run on this machine now (CPU shared with the production worker; no browser). It must look at: (a) two real tabs: key A in tab 1, key B pasted in tab 2, force a 401 for A in tab 1, confirm tab 1 shows the login prompt and tab 2 still holds B; and the reverse (tab holds B, late 401 for A, stays logged in, including with storage blocked); (b) a `javascript:alert(1)` meeting URL shows plain text in the Agenda list and the event detail panel, a normal https Meet link opens in a new tab; (c) private-browsing window loads and the gate works with storage blocked.
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/web-auth-key-clear-and-href-scheme.md (cycle 1, da89ec7) - SOURCE SCOPE ONLY; live-browser validation under D-024 still owed
 Fix cycle: 1
