@@ -127,5 +127,6 @@ Sizes: retention-sweep.ts 232 lines, strict-record.ts 92, retention-sweep.test.t
 
 Not verified: depcruise (unavailable); no DB or full suite run (shared CPU).
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t046-retention-sweep-planner.md (cycle 1, 09e8443)
 Fix cycle: 1
