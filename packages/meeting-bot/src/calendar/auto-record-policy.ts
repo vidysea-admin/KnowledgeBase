@@ -14,6 +14,7 @@
  * `loadTrustedSenderConfig` does this). */
 import { createHash } from "node:crypto";
 import { detectPlatform } from "../platform.js";
+import { parseStrictEmail, normalizeDomain } from "./join-rules.js";
 import type { WebinarReconciliationResult, WebinarReconciliationState, CalendarEvent } from "@lkb/core";
 import type { TrustedSenderConfig, AutoRecordCandidateInput, AutoRecordItem, SkippedItem } from "@lkb/core";
 
@@ -41,22 +42,17 @@ export function redactJoinLink(url: string): string {
   }
 }
 
-function domainOf(email: string): string {
-  const at = email.lastIndexOf("@");
-  return at === -1 ? "" : email.slice(at + 1).toLowerCase();
-}
-
-/** True iff `email`/`domain` matches the config allowlist. `domain` defaults to the part of
- * `email` after `@` when not given separately (calendar `organizer` has no separate domain
- * field). */
+/** True iff the sender matches the config allowlist. ISS-CAPTURE-001: the decision is made from a
+ * strictly parsed `email` only (see `parseStrictEmail`); the domain used for the domain match is the
+ * one PARSED FROM THE EMAIL. A supplied `domain` never grants trust on its own: if given (not
+ * undefined/null) it must equal the email's parsed domain after normalisation, otherwise the result is
+ * false. No valid email -> false. Domain matching stays exact (no subdomains). */
 export function isTrustedSender(email: string | undefined, domain: string | undefined,
   cfg: TrustedSenderConfig): boolean {
-  if (!email && !domain) return false;
-  const emailLc = email?.toLowerCase();
-  const domainLc = (domain ?? (email ? domainOf(email) : undefined))?.toLowerCase();
-  if (emailLc && cfg.emails.includes(emailLc)) return true;
-  if (domainLc && cfg.domains.includes(domainLc)) return true;
-  return false;
+  const parsed = parseStrictEmail(email);
+  if (!parsed) return false;
+  if (domain !== undefined && domain !== null && normalizeDomain(domain) !== parsed.domain) return false;
+  return cfg.emails.includes(parsed.email) || cfg.domains.includes(parsed.domain);
 }
 
 // ISS-318 (fix cycle 2): zoho.com/zoom.us were removed from the defaults. They are the

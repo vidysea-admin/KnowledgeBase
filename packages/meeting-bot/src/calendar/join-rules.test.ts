@@ -262,8 +262,10 @@ test("adapter: rule set from TrustedSenderConfig is equivalent to isTrustedSende
 test("adapter: documented deliberate divergence from isTrustedSender on malformed senders", () => {
   const cfg = { emails: [], domains: ["ashoka.edu.in"] };
   const rs = ruleSetFromTrustedSenderConfig(cfg);
-  // legacy takes everything after the LAST @; the engine rejects multi-@ addresses outright
-  assert.equal(isTrustedSender("evil@x.com@ashoka.edu.in", undefined, cfg), true);
+  // legacy took everything after the LAST @; the engine rejects multi-@ addresses outright.
+  // ISS-CAPTURE-001: isTrustedSender used to return true here (the unsafe behaviour this test
+  // documented); it now rejects multi-@ too, so the divergence on this input is closed.
+  assert.equal(isTrustedSender("evil@x.com@ashoka.edu.in", undefined, cfg), false);
   assert.equal(evaluateJoinRules(ev("evil@x.com@ashoka.edu.in"), rs).action, "needs-approval");
   // legacy does not trim; the engine does
   assert.equal(isTrustedSender("a@ashoka.edu.in ", undefined, cfg), false);
