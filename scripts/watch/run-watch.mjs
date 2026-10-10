@@ -29,13 +29,13 @@
  * function this claim rests on; this script is a thin composition around it).
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { basename, join, dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { basename, join, dirname } from "node:path";
 import { execFile } from "node:child_process";
 import "dotenv/config";
 import { register } from "tsx/esm/api";
 import { ingestOneDriveFile, decideReingestAction, assertIndexed } from "./lib/ingest-chain.mjs";
 import { buildHeartbeatDoc } from "./lib/heartbeat.mjs";
+import { resolveWatchRoot, mainTreeCandidates } from "./lib/main-tree.mjs";
 
 register(); // let subsequent dynamic import()s of packages/*'s .ts sources resolve
 
@@ -48,9 +48,7 @@ register(); // let subsequent dynamic import()s of packages/*'s .ts sources reso
 // runs under, so the FIXED CODE (committed only in the worktree, per this unit's hard rule) can
 // still act on production data/raw/Mongo exactly as a normal `--ingest` run would. Unset (the
 // default), behavior is identical to before this change.
-const ROOT = process.env.LKB_MAIN_TREE_ROOT
-  ? resolve(process.env.LKB_MAIN_TREE_ROOT)
-  : resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const ROOT = resolveWatchRoot(import.meta.url);
 const TENANT = "toc";
 const DRIVE_ROOT_FOLDER_ID = "1STZ-ctQbiy_zV82xbqnbeJRHhmGemewh";
 const RECORDINGS_DIR = join(ROOT, "raw", "TOC", "TOC-Materials", "Recordings");
@@ -138,7 +136,7 @@ function loadIngestedDriveIds(now) {
   // manifest for why LKB_MAIN_TREE_ROOT exists.
   const month = MONTHS[now.getUTCMonth()];
   const rel = join("raw", "TOC", "TOC-Materials", "Recordings", month, "_drive-manifest.json");
-  const candidates = [join(ROOT, rel), join(process.env.LKB_MAIN_TREE_ROOT || "D:/KnowledgeBase", rel)];
+  const candidates = mainTreeCandidates(ROOT, rel);
   const ids = new Set();
   for (const p of candidates) {
     if (!existsSync(p)) continue;
