@@ -48,5 +48,6 @@ ISS-367: 4/4 replayed.
 - root: 18 loose root files vs budget 15. Fixing needs moving tracked root config files or raising the budget; Approver decision.
 - tracker: 6 G4 findings cite bare ISS-001/002 in qa/manifests and qa/verdicts of other units; verdicts are not editable by the maker; needs qualification by their owners/checker.
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/iss-367-structure-stages-green-c2.md (cycle 2, 74cb76d) - partial; ISS-367 stays open
 Fix cycle: 2
