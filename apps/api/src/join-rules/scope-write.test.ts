@@ -17,9 +17,10 @@ const KEYS = {
   "both-key": { tenantId: "tenant-a", scopes: ["calendar", "join-rules"] },
   "other-key": { tenantId: "tenant-a", scopes: ["sources", "gmail", "keys", "ingest", "compete", "ask"] },
 };
-const RULES = { version: 1, ownDomains: ["x.example"], rules: [{ id: "r1", effect: "allow", match: { platform: "meet" } }] };
+// ISS-T037API-002 recorded reproductions, verbatim: the match-every-Meet rule, then approvals gmail.com and co.uk
+const RULES = { version: 1, ownDomains: [], rules: [{ id: "a", effect: "allow", match: { platform: "meet" } }] };
 const WRITES: [string, string, unknown][] = [
-  ["PUT", P, RULES], ["POST", `${P}/approvals`, { kind: "domain", value: "gmail.com" }], ["POST", `${P}/opt-outs`, { eventId: "e1" }],
+  ["PUT", P, RULES], ["POST", `${P}/approvals`, { kind: "domain", value: "gmail.com" }], ["POST", `${P}/approvals`, { kind: "domain", value: "co.uk" }], ["POST", `${P}/opt-outs`, { eventId: "e1" }],
 ];
 const ALL: [string, string, unknown][] = [["GET", P, undefined], ...WRITES];
 

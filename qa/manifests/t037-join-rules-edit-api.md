@@ -1,7 +1,7 @@
 # t037-join-rules-edit-api
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Priority tier: 3 - next unblocked roadmap task (T-037)
 Security class: auth + tenancy + data writes (edits the data that decides a no-click join) - FULL checker ceremony
 Exit criterion advanced (docs/meeting-bot-roadmap.md:60): "rules are editable, and a trusted sender's next webinar is scheduled with no click" - the API half of "rules are editable" only.
@@ -19,7 +19,7 @@ Delivered: an injected-dependency Express router (`createJoinRulesRouter(deps: J
 - `apps/api/src/server.ts` (+5 lines, now 114): optional `ServerDeps.joinRules`; absent -> 503 router (fail closed)
 - A new sub-directory was used because `apps/api/src/routes` (30 files) and `apps/api/src` (31) are at their budgets.
 
-## Route table (all require a valid key AND scope `calendar`; tenant = `req.auth!.tenantId`)
+## Route table (cycle 0 table; the scope per route CHANGED in fix cycle 1, see below)
 
 | Verb path | Body | Result |
 |---|---|---|
@@ -58,9 +58,46 @@ No D-015 corpus applies (no filed issue is fixed). No new ledger issue filed (`q
 
 - Production wiring (above); until then 503.
 - Single-process lock only; no cross-process or file lock.
-- Scope reuse: one `calendar` scope guards both read and write (no separate write scope exists in the key scheme); any `calendar` key can change what auto-joins.
+- Scope reuse: RESOLVED in fix cycle 1 (writes now need the dedicated `join-rules` scope, below).
 - No audit trail of who changed rules; no per-rule PATCH/DELETE; no endpoint to revoke an approval or opt-out (the engine has no such helper).
 - GET is not under the lock (the store's atomic rename keeps reads whole).
 - Body-size cap is express.json's default 100 kB, below the store's 1 MiB cap; oversize is 413 either way.
 - Rate limiting is only the server-wide per-key limiter.
 - Not run: depcruise on the whole repo, the full apps/api suite, other lint:structure checks, mutation testing beyond the lock mutation (checker's job).
+
+## Fix cycle 1 (checker cycle 0 verdict FAIL: ISS-T037API-001, ISS-T037API-002)
+
+What failed: production code held on auth, tenancy and state preservation, but (001) no test pinned the tenant source on the write routes (mutations M1 header-tenant and M8 body-tenant survived), and (002) PUT and both POSTs were guarded by the read scope `calendar`.
+
+### Fix
+- Scope (002): new dedicated write scope `join-rules` (`WRITE_SCOPE` in router.ts). Scopes in this repo are free-form strings checked by `requireScope` (`auth.ts`); there is NO central vocabulary, enum, schema list or DB migration, so none was edited (`routes/keys.ts` accepts any non-empty string array; `schema/api_keys.schema.json` is `items: string`). No key issuance, storage, UI or enforcement-path file changed.
+- Updated route table:
+
+| Verb path | Scope required |
+|---|---|
+| GET /calendar/join-rules | `calendar` (read; same sensitivity as `GET /calendar/upcoming`, which already exposes the same meetings) |
+| PUT /calendar/join-rules | `join-rules` |
+| POST /calendar/join-rules/approvals | `join-rules` |
+| POST /calendar/join-rules/opt-outs | `join-rules` |
+| (unwired 503 router, any method) | `calendar` |
+
+- GET choice: a `join-rules`-only key may NOT GET (403); least privilege, reading needs `calendar`. A write response still echoes the stored value of its own tenant. A key holding both works.
+- Which existing keys hold `join-rules` after this change: NONE. Scopes are stored per key; nothing grants it implicitly and there is no wildcard or "all scopes" key type in the API. Two scripts mint keys with a hard-coded scope list: `scripts/mint-key.mjs` (`ALL_SCOPES`) and `scripts/demo/seed-demo-server.mjs`. They were deliberately NOT edited, so keys they mint also do not hold `join-rules`; adding it there (or issuing a key via `POST /keys` with `scopes:["join-rules"]`) is a deliberate step for the Approver. Production wiring is still not delivered, so no live exposure either way.
+- Tests (001): `tenant-source.test.ts` (6 tests) and `scope-write.test.ts` (7 tests), helper `test-store.ts` (a byte-level store that spies the tenant argument of every dep call). Hostile hints: headers x-tenant-id, x-tenant, tenant-id, x-forwarded-tenant, x-tenantid, tenantid, tenant; 5 query variants; path variants; body fields tenantId, tenant, tenant_id, __proto__, constructor, prototype (string / object / array values, raw JSON so `__proto__` stays an own key) plus nested `meta`/`state`. Assertions: every dep call named tenant-a only; tenant-b stored bytes unchanged; tenant-a's change landed; GET returns tenant-a's value. Existing `router.test.ts` and the qa round-trip keys were given the `join-rules` scope (no other change).
+- Part C: M6 (a failed save poisoning the queue) had only been killed incidentally by broad tests; added "a failed save does not poison the tenant queue" (scope-write.test.ts). M2/M7 are covered by the per-route 403 tests, M3 by the corrupt-file test, M4 by the concurrency test, M5 by the validation test; those were killed by tests about the property.
+
+### Evidence (from the worktree; codex Node prepended to PATH; each under `timeout`)
+- `cd apps/api && node --test --import tsx src/join-rules/router.test.ts src/join-rules/tenant-source.test.ts src/join-rules/scope-write.test.ts` -> tests 26, pass 26, fail 0 (before adding co.uk/verbatim rule to scope-write: 13+6+7); final `scope-write.test.ts` alone -> tests 7, pass 7, fail 0.
+- `cd apps/api && node --test --import tsx src/server.test.ts src/routes/calendar.test.ts src/routes/keys.test.ts src/routes/pages.test.ts` -> tests 35, pass 35, fail 0. No test enumerates or snapshots a scope vocabulary (none exists); none needed updating.
+- `node --test --import tsx scripts/qa/join-rules-edit-api.test.ts` -> tests 4, pass 4, fail 0.
+- `cd apps/api && node <main>\node_modules\typescript\lib\tsc.js --noEmit -p tsconfig.json` -> exit 0.
+- `node scripts/lint-dirsize.mjs` before and after: `OK (110 dir(s) within budget)`. Files: router.ts 139, test-store.ts 53, tenant-source.test.ts 138, scope-write.test.ts 94, router.test.ts 273.
+- Mutations (per-mutation byte backup of router.ts held in memory, 100 s timeout per run, restore in `finally`, `git hash-object` compared to `git rev-parse HEAD:` after each; run on commit f608a7f):
+  - M1 (tenant from `x-tenant-id` in guarded()): KILLED, failing: "every tenant-naming HEADER is ignored ..."
+  - M8 (approvals takes tenant from body `tenant`): KILLED, failing: "a tenant named in the BODY ..." and "a valid approval/opt-out/PUT body carrying `tenant` ...".
+  - Extra: GET tenant from header: KILLED (header test and the older client-supplied-tenant test); PUT / approvals / opt-outs each reverted to scope `calendar`: all three KILLED ("a calendar-only (read) key gets 403 ..." and "join-rules-only key ... may NOT GET" style tests); M6 poisoned queue: KILLED, including the new "failed save does not poison" test.
+  - After every mutation `git hash-object router.ts` = `git rev-parse HEAD:router.ts` = 0051bd0ffc3d959aa6c87e6b61bcc4f4265e882f; worktree clean.
+- D-015 counts against the ledger rows' own recorded reproductions: `ISS-T037API-001: 2/2` (M1 and M8, the two recorded survivors, both now killed; the row's other six mutations stay killed). `ISS-T037API-002: 4/4 refused` (recorded calendar-only key: PUT of `{version:1,ownDomains:[],rules:[{id:"a",effect:"allow",match:{platform:"meet"}}]}` -> 403, POST approvals `gmail.com` -> 403, `co.uk` -> 403, plus opt-outs -> 403; nothing read or written). None left open.
+
+### Still not delivered
+Production wiring (`joinRules` is not supplied by `buildProductionDeps`; deployed routes answer 503), cross-process locking, audit trail, revocation endpoints, UI. A key with `join-rules` must be issued deliberately before any write is possible.
