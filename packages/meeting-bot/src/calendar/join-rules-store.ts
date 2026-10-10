@@ -13,7 +13,11 @@
  *  - writes validate first, then temp file + fsync + rename (as schedule-state.ts); a failed write leaves
  *    the previous file intact and removes its temp file.
  * Validation is the engine's own `validateJoinRuleSet` / `validateJoinRuleState`; none is duplicated here.
- * Concurrency: the mutate helpers are read-modify-write with no lock (single scheduler process assumed).
+ * Concurrency (unit `t037-join-rules-store-lock`): EVERY mutation (save, record approval, record opt-out) holds an exclusive
+ * per-tenant lock file `<stateDir>/join-rules/<tenant>.lock` (join-rules-store-lock.ts) for the whole read-validate-modify-write,
+ * released in a `finally`. Timeout -> `locked`, nothing written; a stale lock is reported, never stolen. Loading takes NO lock:
+ * the write is temp file + rename, so a reader sees the old or the new file, never a partial one. The lock is ADVISORY.
+ * `saveJoinRules` refuses to replace an unreadable / corrupt / wrong-tenant file unless `overwriteInvalid: true` (the repair path).
  */
 import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync, unlinkSync, openSync, closeSync, fsyncSync, lstatSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -22,6 +26,7 @@ import {
   EMPTY_JOIN_RULE_STATE, recordRuleApproval as applyApproval, recordOptOut as applyOptOut,
   validateJoinRuleSet, validateJoinRuleState, type JoinRuleSet, type JoinRuleState,
 } from "./join-rules.js";
+import { acquireLock, releaseLock, sleep, LockFailure } from "./join-rules-store-lock.js";
 
 export const JOIN_RULES_MAX_BYTES = 1024 * 1024;
 const TENANT_ID = /^[a-z0-9][a-z0-9_-]{0,63}$/;
@@ -30,7 +35,7 @@ const WINDOWS_DEVICE = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/;
 export interface StoredJoinRules { ruleSet: JoinRuleSet; state: JoinRuleState }
 
 export class JoinRulesStoreError extends Error {
-  constructor(public readonly code: "bad-tenant" | "corrupt" | "too-large" | "invalid" | "tenant-mismatch" | "not-a-file" | "write-failed", detail: string) {
+  constructor(public readonly code: "bad-tenant" | "corrupt" | "too-large" | "invalid" | "tenant-mismatch" | "not-a-file" | "write-failed" | "locked" | "lock-failed", detail: string) {
     super(`join-rules store: ${code}: ${detail}`);
     this.name = "JoinRulesStoreError";
   }
@@ -89,20 +94,60 @@ export function loadJoinRules(stateDir: string, tenantId: string): StoredJoinRul
   return checkedCopy({ ruleSet: parsed.ruleSet, state: parsed.state });
 }
 
-/** Atomic write. `io.rename` exists only so tests can inject a failure. */
-export function saveJoinRules(stateDir: string, tenantId: string, value: StoredJoinRules, io: { rename?: typeof renameSync } = {}): void {
-  const file = joinRulesFilePath(stateDir, tenantId);
+/**
+ * Options. `lockWaitMs` / `lockStaleMs` tune the lock per call (never global state). `rename` and `afterRead` exist only so tests
+ * can inject a failure / widen the read-to-write window; production never sets them.
+ */
+export interface StoreOptions {
+  lockWaitMs?: number; lockStaleMs?: number; rename?: typeof renameSync; afterRead?: () => void;
+  /** saveJoinRules only: allow replacing an existing unreadable / corrupt / wrong-tenant file (the explicit repair path). */
+  overwriteInvalid?: boolean;
+}
+
+function encode(tenantId: string, value: StoredJoinRules): string {
   const clean = checkedCopy(value);
   const bytes = JSON.stringify({ version: 1, tenantId, ruleSet: clean.ruleSet, state: clean.state }, null, 2) + "\n";
   if (Buffer.byteLength(bytes) > JOIN_RULES_MAX_BYTES) throw new JoinRulesStoreError("too-large", "serialised rules exceed the size cap");
-  if (entryExists(file) && !lstatSync(file).isFile()) throw new JoinRulesStoreError("not-a-file", `${file} is not a regular file`);
-  mkdirSync(path.dirname(file), { recursive: true });
+  return bytes;
+}
+
+/** Runs `fn` holding the tenant's lock; the lock is released in a `finally`. */
+function withTenantLock<T>(file: string, o: StoreOptions, fn: () => T): T {
+  const lockPath = file.slice(0, -".json".length) + ".lock";
+  let token: string;
+  try {
+    mkdirSync(path.dirname(file), { recursive: true });
+    token = acquireLock(lockPath, { waitMs: o.lockWaitMs, staleMs: o.lockStaleMs });
+  } catch (e) {
+    if (e instanceof LockFailure) throw new JoinRulesStoreError(e.code, e.message);
+    throw new JoinRulesStoreError("lock-failed", e instanceof Error ? e.message : String(e));
+  }
+  try { return fn(); } finally { releaseLock(lockPath, token); }
+}
+
+/**
+ * Windows refuses to rename over a file a reader has open at that instant (EPERM/EACCES/EBUSY); it is transient, and the old
+ * file stays whole meanwhile. Retry within a bounded ~3s (we hold the tenant lock); any other error, or exhaustion, propagates.
+ */
+function renameReplacing(rename: typeof renameSync, from: string, to: string): void {
+  const start = Date.now();
+  for (;;) {
+    try { rename(from, to); return; }
+    catch (e: any) {
+      if (!["EPERM", "EACCES", "EBUSY"].includes(e?.code) || Date.now() - start > 3000) throw e;
+      sleep(2 + Math.floor(Math.random() * 8));
+    }
+  }
+}
+
+/** Atomic write. Caller holds the lock. */
+function writeAtomic(file: string, bytes: string, rename: typeof renameSync | undefined): void {
   const temporary = `${file}.${randomUUID()}.tmp`;
   let descriptor: number | undefined, created = false;
   try {
     descriptor = openSync(temporary, "wx", 0o600); created = true;
     writeFileSync(descriptor, bytes); fsyncSync(descriptor); closeSync(descriptor); descriptor = undefined;
-    (io.rename ?? renameSync)(temporary, file);
+    renameReplacing(rename ?? renameSync, temporary, file);
   } catch (e) {
     throw new JoinRulesStoreError("write-failed", e instanceof Error ? e.message : String(e));
   } finally {
@@ -111,20 +156,43 @@ export function saveJoinRules(stateDir: string, tenantId: string, value: StoredJ
   }
 }
 
-/** Approve-once for a sender or domain; loads first, so a bad stored file blocks the write. */
-export function recordTenantApproval(stateDir: string, tenantId: string, approval: { kind: "sender" | "domain"; value: string }): JoinRuleState {
-  const cur = loadJoinRules(stateDir, tenantId);
-  let state!: JoinRuleState;
-  wrapInvalid(() => { state = applyApproval(cur.state, approval); });
-  saveJoinRules(stateDir, tenantId, { ruleSet: cur.ruleSet, state });
-  return state;
+/**
+ * Full replace of a tenant's rules, under the tenant lock. By default an existing file that is unreadable, corrupt, oversized,
+ * schema-invalid or embeds another tenant is REFUSED with the load error (nothing written), so a caller saving
+ * `{newRules, emptyState}` cannot silently discard approvals / opt-outs. `{ overwriteInvalid: true }` is the explicit repair.
+ * A non-regular file (directory, link) is refused either way.
+ */
+export function saveJoinRules(stateDir: string, tenantId: string, value: StoredJoinRules, io: StoreOptions = {}): void {
+  const file = joinRulesFilePath(stateDir, tenantId);
+  const bytes = encode(tenantId, value);
+  withTenantLock(file, io, () => {
+    if (entryExists(file)) {
+      if (!lstatSync(file).isFile()) throw new JoinRulesStoreError("not-a-file", `${file} is not a regular file`);
+      if (!io.overwriteInvalid) loadJoinRules(stateDir, tenantId);
+    }
+    writeAtomic(file, bytes, io.rename);
+  });
 }
 
-/** Per-meeting opt-out; same load-first behaviour. */
-export function recordTenantOptOut(stateDir: string, tenantId: string, eventId: string): JoinRuleState {
-  const cur = loadJoinRules(stateDir, tenantId);
-  let state!: JoinRuleState;
-  wrapInvalid(() => { state = applyOptOut(cur.state, eventId); });
-  saveJoinRules(stateDir, tenantId, { ruleSet: cur.ruleSet, state });
-  return state;
+/** Locked load -> apply -> validate -> write. A bad stored file blocks the write (load throws). */
+function mutateState(stateDir: string, tenantId: string, o: StoreOptions, apply: (s: JoinRuleState) => JoinRuleState): JoinRuleState {
+  const file = joinRulesFilePath(stateDir, tenantId);
+  return withTenantLock(file, o, () => {
+    const cur = loadJoinRules(stateDir, tenantId);
+    o.afterRead?.();
+    let state!: JoinRuleState;
+    wrapInvalid(() => { state = apply(cur.state); });
+    writeAtomic(file, encode(tenantId, { ruleSet: cur.ruleSet, state }), o.rename);
+    return state;
+  });
+}
+
+/** Approve-once for a sender or domain; loads first, so a bad stored file blocks the write. */
+export function recordTenantApproval(stateDir: string, tenantId: string, approval: { kind: "sender" | "domain"; value: string }, opts: Omit<StoreOptions, "overwriteInvalid"> = {}): JoinRuleState {
+  return mutateState(stateDir, tenantId, opts, s => applyApproval(s, approval));
+}
+
+/** Per-meeting opt-out; same lock and load-first behaviour. */
+export function recordTenantOptOut(stateDir: string, tenantId: string, eventId: string, opts: Omit<StoreOptions, "overwriteInvalid"> = {}): JoinRuleState {
+  return mutateState(stateDir, tenantId, opts, s => applyOptOut(s, eventId));
 }
