@@ -92,3 +92,38 @@ export function checkerCommits(root, pattern, { exec = execFileSync } = {}) {
   const out = exec("git", ["-C", root, "log", "--all", "--format=%H %s", `--grep=${pattern}`], { encoding: "utf8" });
   return out.split(/\r?\n/).filter((l) => l.includes("checker:")).map((l) => l.split(" ")[0]).filter(Boolean);
 }
+
+/**
+ * ISS-146. Divergence across EVERY lane, not just the one whose pattern a caller remembered to pass.
+ * `checkerCommits` accepts any pattern but its only call site passed 'speaker', so divergence in any
+ * other lane (b-golden-set, c-unrun-writers, ...) surfaced nowhere. An empty `--grep` matches every
+ * checker commit, so this is the lane-agnostic form; a caller reports any non-empty result.
+ */
+export function deriveAllDivergence(root, { exec = execFileSync, union } = {}) {
+  return deriveDivergence(root, checkerCommits(root, "", { exec }), { exec, union });
+}
+
+/**
+ * ISS-145. Parse the "### The mapping, complete" table out of `qa/gates/ledger-id-divergence.md`
+ * into the same `{filed, carriedBy, state}` shape `deriveDivergence` emits, so the hand-pasted gate
+ * copy can be compared against the derivation instead of trusted. Returns `[]` when the table is
+ * missing (which a comparing test then reports as a mismatch, never a silent pass).
+ */
+export function parseGateMapping(text) {
+  const start = text.indexOf("### The mapping, complete");
+  if (start < 0) return [];
+  const out = [];
+  for (const line of text.slice(start).split(/\r?\n/).slice(1)) {
+    if (/^#{1,3} /.test(line)) break; // next section
+    const cells = line.split("|").map((c) => c.trim());
+    if (cells.length < 4) continue;
+    const filed = /^ISS-\d+$/.exec(cells[1])?.[0];
+    if (!filed) continue; // header and separator rows
+    out.push({
+      filed,
+      carriedBy: cells[2].match(/ISS-\d+/g) ?? [],
+      state: cells[3].replace(/\*/g, "").trim(),
+    });
+  }
+  return out;
+}

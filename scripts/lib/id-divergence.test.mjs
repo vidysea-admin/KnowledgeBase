@@ -8,7 +8,8 @@
  */
 import test from "node:test";
 import assert from "node:assert/strict";
-import { canonicalTitle, deriveDivergence, checkerCommits, unionRows } from "./id-divergence.mjs";
+import { readFileSync } from "node:fs";
+import { canonicalTitle, deriveDivergence, checkerCommits, unionRows, deriveAllDivergence, parseGateMapping } from "./id-divergence.mjs";
 
 const row = (id, title) => JSON.stringify({ id, title });
 /** A fake `git show` driven by a {ref: [rows]} map. */
@@ -97,4 +98,55 @@ test("the REAL speaker-lane divergence is the twelve rows the gate's table got w
     "ISS-095->ISS-106", "ISS-096->ISS-107", "ISS-097->ISS-108", "ISS-098->ISS-109",
     "ISS-099->ISS-110", "ISS-100->ISS-101/ISS-111", "ISS-102->ISS-114", "ISS-103->ISS-115",
   ]);
+});
+
+// ---- ISS-145: the gate file's hand-pasted table cannot drift from the derivation -------------------
+let speakerOnce; // the git walk is the slow part; derive the speaker lane once for both tests below
+const speakerDerived = () => (speakerOnce ??= deriveDivergence(".", checkerCommits(".", "speaker")));
+const shape = (rows) => rows.map((r) => `${r.filed}->${[...r.carriedBy].sort().join("/")}:${r.state}`).sort();
+
+test("ISS-145: the mapping table in qa/gates/ledger-id-divergence.md equals deriveDivergence('speaker')", () => {
+  const gate = parseGateMapping(readFileSync("qa/gates/ledger-id-divergence.md", "utf8"));
+  assert.equal(gate.length, 12, "the gate file must carry the twelve-row table");
+  assert.deepEqual(shape(gate), shape(speakerDerived()));
+});
+
+test("ISS-145: a corrupted copy of the gate table IS caught by the comparison", () => {
+  const good = readFileSync("qa/gates/ledger-id-divergence.md", "utf8");
+  const corrupted = good.replace("| ISS-093 | **ISS-104** | displaced |", "| ISS-093 | **ISS-111** | displaced |");
+  assert.notEqual(corrupted, good, "the corruption must actually change the text");
+  const derived = shape(speakerDerived());
+  assert.notDeepEqual(shape(parseGateMapping(corrupted)), derived);
+  assert.deepEqual(parseGateMapping("no table here"), [], "a missing table parses to nothing, which the comparison rejects");
+});
+
+// ---- ISS-146: a lane-agnostic sweep, so divergence outside the speaker lane is not invisible ------
+test("ISS-146: deriveAllDivergence reports divergence from every lane's checker commits, not one pattern's", () => {
+  const union = new Map([
+    ["ISS-9", { id: "ISS-9", title: "golden finding" }],
+    ["ISS-8", { id: "ISS-8", title: "writers finding" }],
+  ]);
+  const refs = {
+    aaa: [row("ISS-1", "golden finding")], "aaa^": [],
+    bbb: [row("ISS-2", "writers finding")], "bbb^": [],
+  };
+  const patterns = [];
+  const exec = (cmd, args) => {
+    if (args.includes("log")) {
+      patterns.push(args.find((a) => a.startsWith("--grep=")));
+      return "aaa checker: b-golden-set - PASS\nbbb checker: c-unrun-writers - PASS\nccc maker: not a checker commit\n";
+    }
+    return fakeExec(refs)(cmd, args);
+  };
+  const all = deriveAllDivergence(".", { union, exec });
+  assert.deepEqual(patterns, ["--grep="], "no lane pattern is applied");
+  assert.deepEqual(all.map((r) => `${r.filed}->${r.carriedBy}`).sort(), ["ISS-1->ISS-9", "ISS-2->ISS-8"]);
+});
+
+test("ISS-146: on the REAL repo the all-lane sweep contains the twelve speaker rows plus rows from other lanes", () => {
+  const speaker = shape(speakerDerived());
+  const all = deriveAllDivergence(".");
+  const allShape = shape(all);
+  for (const s of speaker) assert.ok(allShape.includes(s), `all-lane sweep lost speaker row ${s}`);
+  assert.ok(all.length > speaker.length, "divergence exists outside the speaker lane (e.g. ISS-308->ISS-311); the sweep must surface it");
 });
