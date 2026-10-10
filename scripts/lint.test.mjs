@@ -39,7 +39,7 @@ test("aggregate gate executes all ten stages despite first, middle and final fai
   assert.equal(calls.length, 10);
   assert.deepEqual(calls.slice(0, 7).map(a => a[0]), ["scripts/lint-loc.mjs", "scripts/lint-dirsize.mjs", "scripts/lint-root.mjs", "scripts/lint-dupes.mjs", "scripts/lint-migrations.mjs", "scripts/lib/lint-codex-hooks.mjs", "scripts/snapshot.mjs"]);
   assert.deepEqual(calls[7], ["--test", "scripts/lint.test.mjs"]);
-  assert.deepEqual(calls[8], ["scripts/tracker-audit.mjs", "--gate", "g1,g4"]);
+  assert.deepEqual(calls[8], ["scripts/tracker-audit.mjs", "--gate", "g1,g4,g5"]);
   assert.deepEqual(calls[9].slice(1), ["--config", ".dependency-cruiser.cjs", "packages", "apps", "workers"]);
   assert.match(output.at(-1), /10 stages, 3 failed/);
 });

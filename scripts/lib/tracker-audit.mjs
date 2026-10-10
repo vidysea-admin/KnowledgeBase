@@ -145,12 +145,13 @@ export function audit(root = ROOT, { exec = execFileSync } = {}) {
   if (goal.progress?.done !== done) findings.push(`G1 progress.done says ${goal.progress?.done}, ${done} tasks are done`);
   if (goal.progress?.percent !== pct) findings.push(`G1 progress.percent says ${goal.progress?.percent}%, the rows give ${pct}%`);
 
-  // ---- G2: a fix nobody verified is not a fix.
+  // ---- G2: a fix nobody verified is not a fix. (G5, below, shares this read: a ledger line that
+  // does not parse is fully in the author's control and clearable in the same commit -- ISS-315.)
   const ledgerPaths = ledgerFiles(root);
   if (ledgerPaths.length > 0) {
     const { rows, unparseable } = readLedgerRows(root);
     const unverified = rows.filter((r) => r.status === "fixed" && !r.verified_date).map((r) => r.id);
-    if (unparseable > 0) findings.push(`G2 ledger: ${unparseable} unparseable line(s) — a line-by-line consumer skips or crashes on them`);
+    if (unparseable > 0) findings.push(`G5 ledger: ${unparseable} unparseable line(s) — a line-by-line consumer skips or crashes on them`);
     if (unverified.length > 0) {
       findings.push(`G2 unverified: ${unverified.length} issue(s) are "fixed" with no verified_date — ${unverified.slice(0, 8).join(", ")}${unverified.length > 8 ? ", …" : ""}`);
     }
