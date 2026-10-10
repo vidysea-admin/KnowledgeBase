@@ -30,5 +30,6 @@ capture/ has 30 files (at the 30 budget) plus one subfolder, capture/browser/ (b
 ## Remains red in lint:structure
 loc (4: speakers-llm, sb_join.py, record-commands, run-watch: other lanes / Approver), root (18 loose files vs 15: Approver decision), tracker (G4 findings), dependencies exit 327 (observed in this worktree via junctioned node_modules; not investigated, unchanged by this unit).
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/structure-dupes-and-record-commands-loc.md (cycle 0, f3d5ea5)
 Fix cycle: 0
