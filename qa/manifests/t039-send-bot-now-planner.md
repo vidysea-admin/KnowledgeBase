@@ -1,7 +1,7 @@
 # t039-send-bot-now-planner
 
 Status: ready-for-check
-Fix cycle: 1
+Fix cycle: 2
 Priority tier: 3 - next unblocked roadmap task (T-039)
 Security class: untrusted operator-supplied URL that will drive a browser/bot join - FULL checker ceremony
 Lane: lane/t039 (issue ledger shard qa/issues.t039.jsonl, none filed yet)
@@ -75,7 +75,7 @@ Handshake: `Status: ready-for-check`, `Fix cycle: 1` (top of file). Responds to 
 | Teams | `/meet/<digits>` -> `teams:meet:<id>`; `/l/meetup-join/<19:...@thread.x>/...` -> decoded thread id | p, context (JSON, any order, or absent), host (live/microsoft) |
 | Webex | `/meet|join/<room>` -> room+host; `MTID`; `MK`; `/meeting/info|download/<id>` | pwd, utm, case |
 | Zoho | `key=` or `sessionId=` query | other params, case of name |
-| cloudonair | event path (root refused) | query, case |
+| cloudonair | `/events/<slug>` only -> `cloudonair:/events/<slug>` (cycle 2) | query, case, trailing slash |
 
 Context is not needed to distinguish Teams meetings (thread id is unique), so it is ignored entirely. Not keyed, therefore refused: Webex `/<site>/onstage/` and other unlisted Webex shapes, Zoho path-style join links, Teams short links (`teams.microsoft.com/l/...` other than meetup-join), Zoom vanity/`/wc/<name>` forms, Meet codes not 3-4-3 letters, any marketing path. If a real user link uses such a form the planner refuses it rather than risk a second bot. Zoho and Webex shapes are limited to those documented/observed in tests; unverified against live links.
 
@@ -95,3 +95,31 @@ D-015 counts, replayed verbatim from `qa/issues.t039.jsonl` in test "regression 
 - ISS-T039-002: 7/7 (Teams /meet with and without `p`, both directions; meetup-join with context A/B/none in all pairings; other host). Left open: none. Webex/Zoho items in the issue's fix_direction are covered by the per-platform SAME/DIFF tables, not recorded reproductions.
 
 Not run: full suite, monorepo build, browsers, network. Low notes still open: far-past/future `now` accepted; redirect detection is key-name based.
+
+## Fix cycle 2
+
+Handshake: `Status: ready-for-check`, `Fix cycle: 2`. Responds to the cycle-1 FAIL: ISS-T039-003 (medium).
+
+**What failed.** cloudonair was the one platform still keyed from the bare path (`id = path ? path : undefined`): `/landing` and `/events` were planned (`cloudonair:/landing`, `cloudonair:/events`), `/events/foo/bar` too. Same non-meeting-page defect as cycle 0.
+
+**Why cycle 1 missed it.** The conversion was done platform by platform and the `default:` branch of the switch silently caught the one platform I did not touch; the non-meeting test list had a single cloudonair row (the root). The class was closed by enumeration of hosts I remembered, not by construction.
+
+**Fix** (send-now.ts 180 lines, test 293; platform.ts untouched).
+- ONE table `PLATFORM_EXTRACTORS: Record<Exclude<Platform,"unknown">, Extractor>`; `meetingIdentity` looks up the platform's extractor and returns `platform:<id>` only if it returned an id, else undefined (-> `not-a-meeting-url`). There is no `default`/fallback branch and no code that reads a raw path or query into a key. Adding a platform without an extractor is a tsc error.
+- cloudonair accepts exactly `/events/<slug>` (one segment, `[a-z0-9][a-z0-9._~-]*`), key `cloudonair:/events/<slug>`. Evidence in repo: only `/events/<slug>` (send-now.test.ts, platform.test.ts); no session sub-path link exists anywhere, so `/events/<slug>/...` is refused, not guessed. Lower-cased: no evidence slugs are case-sensitive, and a false "same" only refuses a join while a false "different" admits a second bot.
+- New table-driven test enumerates `PLATFORMS` (calendar/join-rules.ts, read-only) and asserts every non-unknown platform has a host entry AND an extractor, then that host root, `/landing`, `/new`, `/foo`, empty path (each with "", "/" and `?utm_source=x` suffix) are refused `not-a-meeting-url`.
+
+### Evidence
+```
+$ cd packages/meeting-bot && timeout 120 node --test --import tsx src/send-now.test.ts src/platform.test.ts src/strategy.test.ts
+ℹ tests 41   ℹ pass 41   ℹ fail 0
+$ timeout 180 node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json
+tsc-exit=0
+```
+D-015 counts (tests "regression ISS-T039-001/002/003", ledger reproductions verbatim):
+- ISS-T039-001: 8/8. Left open: none.
+- ISS-T039-002: 7/7. Left open: none.
+- ISS-T039-003: 5/5 (`/landing`, `/events` refused not-a-meeting-url; `/events/foo/bar` refused; `/events/foo`, `/events/Foo/?utm_x=1`, host-case/fragment spellings share key `cloudonair:/events/foo`; live `/events/FOO/` dedupes `/events/foo?tk=2`). Left open: none.
+- All-platform table: 6 platforms x 5 paths x 3 suffixes, all refused.
+
+Not run: full suite, monorepo build, browsers, network. Unverified: real cloudonair event slugs beyond `/events/weeklies`-style; a sub-path link, if one exists, would now be refused.

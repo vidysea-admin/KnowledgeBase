@@ -5,8 +5,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { readFileSync } from "node:fs";
-import { planSendNow, meetingIdentity, MAX_SEND_NOW_URL_LENGTH, TERMINAL_JOB_STATUSES, type SendNowJob } from "./send-now.js";
-import { detectPlatform } from "./platform.js";
+import { planSendNow, meetingIdentity, PLATFORM_EXTRACTORS, MAX_SEND_NOW_URL_LENGTH, TERMINAL_JOB_STATUSES, type SendNowJob } from "./send-now.js";
+import { detectPlatform, type Platform } from "./platform.js";
+import { PLATFORMS } from "./calendar/join-rules.js";
 
 const NOW = "2026-10-10T12:00:00.000Z";
 const ok = (url: string, jobs: SendNowJob[] = []) => {
@@ -221,7 +222,8 @@ test("recognised host without an extractable meeting id is refused, never planne
     "https://teams.microsoft.com/", "https://teams.microsoft.com/l/meetup-join/notathread/0", "https://teams.live.com/meet/", "https://teams.live.com/download",
     "https://acme.webex.com/", "https://acme.webex.com/products/pricing", "https://acme.webex.com/acme/j.php",
     "https://meeting.zoho.com/", "https://meeting.zoho.com/join", "https://webinar.zoho.in/meeting/register",
-    "https://cloudonair.withgoogle.com/",
+    "https://cloudonair.withgoogle.com/", "https://cloudonair.withgoogle.com/landing", "https://cloudonair.withgoogle.com/events", "https://cloudonair.withgoogle.com/events/",
+    "https://cloudonair.withgoogle.com/events/foo/bar", "https://cloudonair.withgoogle.com/events//", "https://cloudonair.withgoogle.com/?x=1",
   ]) {
     const p = planSendNow(u, NOW, []);
     assert.deepEqual([u, p.ok, p.ok ? "" : p.reason], [u, false, "not-a-meeting-url"]);
@@ -251,4 +253,41 @@ test("planner is pure: inputs are not mutated and repeat calls agree", () => {
   const a = planSendNow("https://meet.google.com/abc-defg-hij", NOW, jobs);
   const b = planSendNow("https://meet.google.com/abc-defg-hij", NOW, jobs);
   assert.deepEqual(a, b);
+});
+
+test("regression ISS-T039-003: every recorded reproduction, verbatim", () => {
+  const NOWD = new Date("2026-10-10T10:00:00Z");
+  for (const u of ["https://cloudonair.withgoogle.com/landing", "https://cloudonair.withgoogle.com/events"]) {
+    const p = planSendNow(u, NOWD);
+    assert.deepEqual([p.ok, p.ok ? "" : p.reason], [false, "not-a-meeting-url"], u);
+  }
+  const p = planSendNow("https://cloudonair.withgoogle.com/events/foo/bar", NOWD);
+  assert.equal(p.ok, false); // recorded as accepted at cycle 1
+  // fix_direction regression: one key across spellings of /events/foo
+  const keys = new Set(["https://cloudonair.withgoogle.com/events/foo", "https://cloudonair.withgoogle.com/events/Foo/?utm_x=1", "https://CLOUDONAIR.withgoogle.com/events/foo/#a"].map((u) => meetingIdentity(u)));
+  assert.deepEqual([...keys], ["cloudonair:/events/foo"]);
+  refused("https://cloudonair.withgoogle.com/events/foo?tk=2", "duplicate-live-job", [live("https://cloudonair.withgoogle.com/events/FOO/")]);
+});
+
+// One representative host per platform. Typed over every non-unknown Platform (compile error if one is missing).
+const HOSTS: Record<Exclude<Platform, "unknown">, string> = {
+  meet: "meet.google.com", teams: "teams.microsoft.com", zoom: "zoom.us", webex: "acme.webex.com",
+  zoho: "meeting.zoho.com", cloudonair: "cloudonair.withgoogle.com",
+};
+test("EVERY platform: host root, /landing, /new, /foo and an empty path are refused as not-a-meeting-url", () => {
+  const platforms = PLATFORMS.filter((p) => p !== "unknown");
+  assert.deepEqual([...platforms].sort(), Object.keys(HOSTS).sort(), "HOSTS covers every platform");
+  assert.deepEqual([...platforms].sort(), Object.keys(PLATFORM_EXTRACTORS).sort(), "an extractor exists for every platform");
+  for (const p of platforms) {
+    const host = HOSTS[p as Exclude<Platform, "unknown">];
+    assert.equal(detectPlatform(`https://${host}/`), p);
+    for (const path of ["/", "/landing", "/new", "/foo", ""]) {
+      for (const suffix of ["", "/", "?utm_source=x"]) {
+        const u = `https://${host}${path}${suffix}`;
+        const r = planSendNow(u, NOW, []);
+        assert.deepEqual([u, r.ok, r.ok ? "" : r.reason], [u, false, "not-a-meeting-url"]);
+        assert.equal(meetingIdentity(u), undefined, u);
+      }
+    }
+  }
 });
