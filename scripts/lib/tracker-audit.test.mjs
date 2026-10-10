@@ -315,3 +315,17 @@ test("filterByGate accepts a comma-separated list, so one run can gate G1 and G4
   assert.deepEqual(filterByGate(f, "G1"), ["G1 a"], "a single gate still behaves exactly as before");
   assert.deepEqual(filterByGate(f, null), f, "no gate named means no filtering");
 });
+
+// ISS-164: replays the issue's recorded case verbatim -- G4 reddened on qa/contracts/entity-promotion.md,
+// a checker-authored file landed ten minutes earlier -- plus the manifest case that must keep gating.
+test("ISS-164 splitAdvisory: checker-owned G4 findings are advisory, qa/manifests/ findings still gate", async () => {
+  const { splitAdvisory } = await import("../tracker-audit.mjs");
+  const g4 = (rel) => `G4 ambiguous issue ref: ${rel} cites ISS-017 bare, but a lane shard numbers the same finding(s) — qualify as ISS-<LANE>-NNN`;
+  const contract = g4("qa/contracts/entity-promotion.md");
+  const verdict = g4("qa/verdicts/t-031-audio-watchdog.md");
+  const manifest = g4("qa/manifests/t-033-bot-tests.md");
+  const g1 = "G1 status: T-001 is \"done\" in goal.json but \"open\" in TASKS.md";
+  const r = splitAdvisory([contract, verdict, manifest, g1]);
+  assert.deepEqual(r.gating, [manifest, g1]);
+  assert.deepEqual(r.advisory, [contract, verdict]);
+});
