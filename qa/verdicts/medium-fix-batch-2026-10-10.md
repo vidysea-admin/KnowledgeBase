@@ -71,3 +71,21 @@ Note: a first M2 attempt hit a transient "No space left on device" on the shared
 ISSUES-WRITTEN: none (ISS-MEDFIX-001 severity corrected medium -> low in qa/issues.medfix.jsonl)
 
 EXPLANATION: Three of four commits are correct, independently reproduced and mutation-checked. 5e7b1c0 maps a reset-for-rebuild unit to `paused`; the approved handshake-liveness contract (4.2) maps `reset-awaiting-rebuild` to `building`, and `paused` would hide an owed rebuild. The maker correctly flagged the vocabulary question, but the chosen value is wrong, so the batch is FAIL with 5e7b1c0 excluded from merge. Observations (not backlog): the real-repo ISS-146 test is slow and history-dependent; the all-lane sweep reports in-place retitles (ISS-113) as `absent`; the `entities` backfill branch has no direct test.
+
+---
+
+# Cycle 1 (re-check after revert 4bd9bd8 and manifest update 987b466)
+
+VERDICT: FAIL
+Cycle checked: 1
+Checked HEAD: 987b466
+
+## Checks
+1. `git diff 29f0eb3 987b466 --stat`: 3 files (delivery-gate-manifest-blindness.md, write-guard-enforcement-gaps.md, this unit's manifest), 9 insertions, 3 deletions. `git diff 29f0eb3 987b466 -- apps scripts packages`: 0 bytes. HOLDS.
+2. `git diff 5e7b1c0^ 987b466 -- qa/manifests/write-guard-enforcement-gaps.md qa/manifests/delivery-gate-manifest-blindness.md`: 0 bytes. Revert exact. HOLDS.
+3. Manifest truthfulness: FAILS. Handshake lines read `Status: ready-for-check` / `Fix cycle: 1` and the D-015 lines for ISS-155, ISS-171, ISS-145, ISS-146 are unchanged from cycle 0 (the only diff vs 29f0eb3 is the Fix-cycle line and the new "Fix cycle 1" section). But the body still claims ISS-369: line 5 lists "ISS-369 5e7b1c0" among the unit's commits; lines 34-39 still carry the section "## ISS-369 - FIXED (documentation only)", describing the `paused` mapping as applied, the "VOCABULARY DECISION TAKEN" paragraph, "D-015: ISS-369: 4/4" and "Verified: ... returns paused". 5e7b1c0 no longer exists in effect (reverted), so those statements are now false, and the new section's "NOT claimed by this unit any more" contradicts them.
+4. Smoke (all at HEAD 987b466): apps/api `node --test --import tsx src/indexing/promote-entities.test.ts src/ask-arms.test.ts`: tests 32, pass 32, fail 0. `node --check scripts/backfill.mjs`: CHECK_OK. Not run: scripts/lib/id-divergence.test.mjs (slow real-repo history test; scripts/ is byte-identical to cycle 0, which passed 13/13).
+
+ISSUES-WRITTEN: none
+
+EXPLANATION: The code, tests and revert are correct and unchanged from what cycle 0 passed for ISS-155 (dry-run id half), ISS-171, ISS-145, ISS-146. The sole defect is documentary: the manifest's header line and the "ISS-369 - FIXED" section were left in place, so the manifest still asserts a fix that was reverted. Required fix (maker, manifest only): remove ISS-369 5e7b1c0 from the Commits line, and delete or rewrite the "## ISS-369" section as "WITHDRAWN, reverted by 4bd9bd8, ISS-369 stays open" (drop the FIXED claim, the vocabulary-decision paragraph, the 4/4 D-015 line and the "Verified" line); bump to Fix cycle 2. No source or test change is needed. Recommended ledger changes when the unit later passes: ISS-171, ISS-145, ISS-146 fixed and verified; ISS-155 verified for the id half with a pointer to ISS-MEDFIX-001; ISS-369 stays open (withdrawn from the unit). qa/issues.jsonl and shards not edited by this checker.
