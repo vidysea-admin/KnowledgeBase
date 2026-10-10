@@ -1,6 +1,7 @@
 # t037-join-rules-edit-api
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t037-join-rules-edit-api.md (cycle 1, 8f732d3)
 Fix cycle: 1
 Priority tier: 3 - next unblocked roadmap task (T-037)
 Security class: auth + tenancy + data writes (edits the data that decides a no-click join) - FULL checker ceremony
