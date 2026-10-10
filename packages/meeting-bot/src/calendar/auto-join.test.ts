@@ -93,8 +93,12 @@ test("isTrustedSender: domain match, derived from email when no separate domain 
   assert.equal(isTrustedSender("someone@unknown.example", undefined, TRUSTED), false);
 });
 
-test("isTrustedSender: explicit domain wins even if email itself isn't in the list", () => {
-  assert.equal(isTrustedSender("random@random.example", "ashoka.edu.in", TRUSTED), true);
+// ISS-CAPTURE-001: this test previously asserted `true` for a supplied domain that disagrees with the
+// email's own domain ("explicit domain wins"). That expectation was the unsafe behaviour: a caller-
+// supplied domain must never grant trust on its own. Now: mismatch -> not trusted; agreeing -> trusted.
+test("isTrustedSender: a supplied domain that disagrees with the email's domain never grants trust (ISS-CAPTURE-001)", () => {
+  assert.equal(isTrustedSender("random@random.example", "ashoka.edu.in", TRUSTED), false);
+  assert.equal(isTrustedSender("random@ashoka.edu.in", "ashoka.edu.in", TRUSTED), true);
 });
 
 test("isTrustedSender: neither email nor domain given -> false", () => {
