@@ -67,5 +67,6 @@ Env: node v24.19.0 (codex runtime), junctions to the main tree's node_modules (r
 - Non-blank lines: trace-file-sink.ts 131, trace-file-sink.test.ts 164.
 - Not run: full suite, apps/api tsc, mutation re-run of the cycle-0 mutants.
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t049-tracer-wiring.md (cycle 1, 2d978be) - tracing is off by default; no Langfuse sink; seam now at the round cap
 Fix cycle: 1
