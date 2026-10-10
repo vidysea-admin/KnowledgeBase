@@ -22,26 +22,52 @@ export interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// Storage can throw (private mode, blocked site data): a provider must never crash on it.
+function readStoredKey(): string | null {
+  try {
+    return window.localStorage.getItem(AUTH_KEY_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function removeStoredKey(): void {
+  try {
+    window.localStorage.removeItem(AUTH_KEY_STORAGE_KEY);
+  } catch {
+    // non-fatal: in-memory state still resets
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
-  const [apiKey, setApiKeyState] = useState<string | null>(() => localStorage.getItem(AUTH_KEY_STORAGE_KEY));
+  const [apiKey, setApiKeyState] = useState<string | null>(readStoredKey);
 
   const setApiKey = useCallback((key: string) => {
-    localStorage.setItem(AUTH_KEY_STORAGE_KEY, key);
+    try {
+      window.localStorage.setItem(AUTH_KEY_STORAGE_KEY, key);
+    } catch {
+      // non-fatal: the key still works for this tab's session from memory
+    }
     setApiKeyState(key);
   }, []);
 
+  // Explicit sign-out: the user chose to clear, so storage is cleared unconditionally.
   const clearApiKey = useCallback(() => {
-    localStorage.removeItem(AUTH_KEY_STORAGE_KEY);
+    removeStoredKey();
     setApiKeyState(null);
   }, []);
 
   const handleAuthInvalidated = useCallback((event: Event) => {
     const detail = (event as CustomEvent<AuthInvalidationEventDetail>).detail;
-    const storageKey = localStorage.getItem(AUTH_KEY_STORAGE_KEY);
     if (!detail) return;
+    const storageKey = readStoredKey();
     if (detail.apiKey !== apiKey && detail.apiKey !== storageKey && storageKey !== null) return;
-    clearApiKey();
-  }, [apiKey, clearApiKey]);
+    // Compare-and-clear (same guard as client.ts): a late 401 for an old key must not delete a
+    // newer key another tab stored. This tab always drops its in-memory key and shows the prompt;
+    // it never adopts a stored key it did not itself receive from the user.
+    if (storageKey === null || storageKey === detail.apiKey) removeStoredKey();
+    setApiKeyState(null);
+  }, [apiKey]);
 
   useEffect(() => {
     window.addEventListener(AUTH_INVALIDATED_EVENT, handleAuthInvalidated);
