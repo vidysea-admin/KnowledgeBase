@@ -1,6 +1,7 @@
 # t039-send-now-command
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t039-send-now-command.md (cycle 0, ffd853b) - unfinished slice: manual and poller launches leave no record the duplicate check reads (ISS-T039CMD-001/002); the tab-capture lock is the only guard
 Fix cycle: 0
 Priority tier: 3 - next unblocked roadmap task (T-039)
 Security class: operator-supplied URL drives a browser join; a failed duplicate check puts a second bot in a live meeting - FULL ceremony
