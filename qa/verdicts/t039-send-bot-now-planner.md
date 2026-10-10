@@ -119,3 +119,53 @@ HEAD fidelity after mutations: `git hash-object packages/meeting-bot/src/send-no
 ISSUES-WRITTEN: ISS-T039-003 (medium: cloudonair path-only identity plans non-meeting pages) in qa/issues.t039.jsonl.
 
 EXPLANATION: The per-platform identity work is sound: 11/11 same-meeting groups share one key, 10/10 different-meeting groups stay distinct, both cycle-0 issues replay clean (8/8, 7/7), hostile hosts are all refused, status handling is fail-closed. The unit fails the stated PASS rule on exactly one remaining path-based plan (cloudonair). Fix: restrict cloudonair to `/events/<slug>` and add a refusal test. Low notes (not filed): possible false merges from lower-casing case-sensitive Teams/Webex/Zoho ids (safe direction); recurring-link false refusals; far-past/locale `now` strings still accepted (carried from cycle 0).
+
+---
+
+# Cycle 2 (fix cycle 2, commit bd96833)
+
+VERDICT: PASS
+Cycle checked: 2
+Checked commit: bd96833 (lane/t039). Checker launch 2026-10-10 (times of individual commands unmeasured).
+
+Scope / remaining gates: planner only; T-039 stays open (no entry point; 60 s clause unmeasured). Round cap: no prior PASS names this seam.
+
+## Commands (timeouts used; no network, no full suite)
+- `timeout 120 node --test --import tsx src/send-now.test.ts src/platform.test.ts src/strategy.test.ts` -> tests 41, pass 41, fail 0.
+- `timeout 180 node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` -> tsc-exit=0.
+- Probes (scratchpad c2/p.mts, q.mts, r.mts): about 60 paths on each of 6 platform hosts, plus replay script; never threw.
+- Budgets (wc -l): send-now.ts 180, send-now.test.ts 293 (as claimed).
+
+## D-015 replay of each issue's recorded reproductions, verbatim (checker-run)
+- ISS-T039-001: 8/8 (lookup/abcdeg admitted against live lookup/abcdef and keys distinct; same URL still duplicate; /new, /, /landing on Meet and zoom.us/, zoom.us/foo refused not-a-meeting-url).
+- ISS-T039-002: 7/7 (Teams /meet with/without p; meetup-join context A live vs B / absent; live.com vs microsoft host; raw-JSON context order; encoding; /0 suffix).
+- ISS-T039-003: 8/8 (`/landing`, `/events`, `/events/`, `/events/foo/bar` refused not-a-meeting-url; `/events/foo` = `/events/Foo/?utm_x=1` = `CLOUDONAIR.../events/foo#x` -> `cloudonair:/events/foo`; duplicate refused; different slug admitted).
+Earlier-established properties spot-checked (3 each): same-meeting collapse (Meet case/authuser/fragment, Zoom wc/join + regional host -> `zoom:12345678901`, Webex), distinct meetings (zoom id off by one, webex acme vs beta host), host validation (`zoom.us.evil.tld` unsupported-host, `user@zoom.us` credentials-in-url, `http://` not-https), status rule ("Recording", "", "waiting-room", undefined all live = refuse). No regression.
+
+## Structure review (meetingIdentity, PLATFORM_EXTRACTORS, each extractor)
+- One key-building site: `id ? platform:id : undefined`; no default branch, no path-plus-query fallback. Callers refuse undefined as not-a-meeting-url.
+- Type guarantee is real: `Platform` is imported from platform.ts, the same type `detectPlatform` returns; the record is `Record<Exclude<Platform,"unknown">, Extractor>` so a new platform fails to compile. Test HOSTS is typed likewise, and the test deepEquals `PLATFORMS` (calendar/join-rules.ts:34, typed `readonly Platform[]`, so it cannot hold a non-Platform) against HOSTS and PLATFORM_EXTRACTORS keys, so a Platform omitted from PLATFORMS fails the test.
+- Lookup guard: there is no own-property check, and none is needed: `PLATFORM_EXTRACTORS[platform]` is reached only after `platform === "unknown"` returns, with `platform` produced by detectPlatform, which can only return the six literals. "constructor"/"__proto__" cannot arrive. `extract?.` is a harmless extra. `meetingIdentity` takes only a URL string, so no caller supplies a platform. Low (defence in depth absent), not filed.
+
+## Non-meeting inputs per platform (host root, /landing, /new, /foo, empty path, each also with trailing slash and ?utm_source=x; 6 hosts)
+All refused not-a-meeting-url on every platform, including the extra generic segments /events, /events/, /join, /meet, /j, /my, /wc, /lookup, /lookup/, /l/meetup-join; empty-after-decoding ids (/j/%20, /events/%2F, /meet/%00, /meet/%20, /join/%20, /my/%20, /wc/join/%20, /l/meetup-join/%20, /lookup/%20); `/j/1234` (too short); empty-valued ?key=, ?mtid=, ?mk=, ?sessionid=; cloudonair /events/a%2Fb, /events/.., /events/%2e%2e, /events/%2e%2e/x, /events/-, /events/.x, /events/~, /events/x%20. Identifier only in a query on a path-keyed platform (e.g. zoom /landing?mtid) is ignored; identifier only in the path on a query-keyed platform (zoho /events/x) is refused.
+Accepted (identifier present, so by design): zoom /j/12345 (5 digits) -> zoom:12345; zoom /j/%31%32%33%34%35 -> zoom:12345; teams /l/meetup-join/19:x@thread.v2 -> teams:thread:19:x@thread.v2; webex /?mtid=m1 and /landing?mtid=m1 -> webex:mtid:m1 (mtid is the identifier); webex /meet/abc?mtid=m -> room key; zoho /?key=k1 and /events?key=k1 -> zoho:key:k1 (key is the identifier); cloudonair //events/x, /events//x, /events/x/ -> cloudonair:/events/x; 1.5 KB slug accepted under the 2048 URL cap.
+Accepted but arguably not real identifiers (punctuation-only segment where the platform's pattern allows it, low): meet /lookup/--- and /lookup/___ -> meet:lookup:---; zoom /my/--- , /my/___ , /my/..x -> zoom:my:...; webex /meet/--- , /join/___ , /meet/... (and %2e%2e%2e) -> webex:room:acme.webex.com:...; webex /meet/- . cloudonair rejects these. They cannot be told from an unusual vanity name without the platform, and the failure direction is one extra join attempt on a page that would fail, not a duplicate bot. Not filed (low).
+
+## cloudonair
+- Real links in the repo: `rg -i cloudonair`: only /events/<slug> shapes (send-now.test.ts:33,191,210,260-269; platform.test.ts:39 `/events/weeklies-x`). No fixture, doc, raw/ sample or QA evidence contains a cloudonair link with a sub-path (apps/api/src/gws-gmail.ts:55,60 matches the host only). Refusing `/events/foo/bar` is acceptable; no defect.
+- Dedupe: query, fragment, trailing slash, host case, double slashes all collapse to `cloudonair:/events/<slug>`.
+
+## Mutation table (send-now.test.ts, per-mutation byte backup, restore in finally, 90 s timeout)
+| Mutation | Result |
+|---|---|
+| M1 default-style fallback `?? (path \|\| undefined)` after extractor | KILLED (24 pass / 4 fail) |
+| M2 Meet lookup regex `+` -> `*` (empty id valid) | SURVIVED; equivalent mutant: the path is normalised without trailing slash, so `/lookup/` becomes `/lookup` and never matches `^/lookup/(...)$` |
+| M3 cloudonair `/events/` made optional | KILLED (25 / 3) |
+| M4 cloudonair allows sub-path segments | KILLED (26 / 2) |
+Own-property guard mutation: not applicable (no such guard exists; see above).
+HEAD fidelity after mutations: `git hash-object packages/meeting-bot/src/send-now.ts` = 258b60df1ae1d983b0864fa3b97dc968072fd058 = `git rev-parse HEAD:` same; send-now.test.ts 3acb68fd4304d831d952b954ef94269661f89384 = HEAD blob. Harness reported restored-identical: true (both runs).
+
+ISSUES-WRITTEN: none. ISS-T039-001, -002, -003 set to verified in qa/issues.t039.jsonl.
+
+EXPLANATION: The cycle-1 failure class is closed structurally: every key now comes from one typed table of extractors and an extractor that finds no identifier yields a refusal, so a recognised host with no meeting or event identifier cannot produce ok:true on any of the six platforms (probed about 60 shapes each). All 23 recorded reproductions replay clean and the earlier properties hold. Low notes (not filed): punctuation-only vanity segments accepted on Meet lookup, Zoom /my and Webex while cloudonair rejects them; no runtime own-property guard (unreachable today); case-folding of case-sensitive ids and recurring-link false refusals carried from cycle 1; far-past/locale `now` strings accepted.
