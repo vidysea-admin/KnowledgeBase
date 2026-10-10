@@ -55,5 +55,6 @@ Files: join-rules-select.ts 67 lines, join-rules-select.test.ts 141 lines. No ex
 - Which id the product records for opt-outs (event id vs session key) is not verified end to end; both are honoured.
 - T-037 stays in progress.
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t037-join-rules-veto-select.md (cycle 0, 2fb5e84) - unwired library; wiring preconditions W1-W6 in the contract
 Fix cycle: 0
