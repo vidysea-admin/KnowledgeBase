@@ -1,7 +1,8 @@
 # t057-analytics-page
 
-Status: ready-for-check
-**Handshake status:** ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t057-analytics-page.md (cycle 0, c8db266) - SOURCE SCOPE ONLY; live-browser validation under D-024 still owed
+**Handshake status:** checked-PASS
 Fix cycle: 0
 
 Task T-057 (Sessions explorer graph health jobs analytics notifications Sheets and setup UI), the "analytics" part only. Lane T057AN (branch lane/t057an, base 536a56a). Read-only page; no API route added or changed, no dependency added, no write path. UI-touching (D-024): this unit can reach ready-for-check but CANNOT PASS until a live browser check is run (no browser on this machine now). No qa/contracts file exists for this unit; the checker must supply one. No ledger issue is being fixed (D-015 corpus not applicable). No new issues filed (qa/issues.t057an.jsonl not created).
