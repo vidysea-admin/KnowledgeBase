@@ -160,19 +160,21 @@ export function traceProvider(provider: Provider, opts: TraceOptions): Provider 
     return result;
   };
 
-  const wrapped = Object.create(provider) as Provider;
-  wrapped.complete = (job: Job): Promise<CompleteResult> =>
+  const finite = (n: unknown): number | null => (typeof n === "number" && Number.isFinite(n) ? n : null);
+  const overrides: Record<string, unknown> = {};
+  overrides.complete = (job: Job): Promise<CompleteResult> =>
     run(
       "complete", job.kind,
       size(() => job.messages.reduce((n, m) => n + m.content.length, 0)),
       () => provider.complete(job),
       (r) => ({
-        model: r.model ?? opts.model ?? null, outputChars: r.text.length,
-        inputTokens: r.usage.inputTokens, outputTokens: r.usage.outputTokens, costUsd: r.costUsd,
+        model: r.model ?? opts.model ?? null, outputChars: finite(r.text?.length),
+        inputTokens: finite(r.usage?.inputTokens), outputTokens: finite(r.usage?.outputTokens),
+        costUsd: finite(r.costUsd),
       }),
     );
   if (typeof provider.embed === "function") {
-    wrapped.embed = (job: EmbedJob): Promise<EmbedResult> =>
+    overrides.embed = (job: EmbedJob): Promise<EmbedResult> =>
       run(
         "embed", job.kind,
         size(() => job.texts.reduce((n, t) => n + t.length, 0)),
@@ -180,5 +182,13 @@ export function traceProvider(provider: Provider, opts: TraceOptions): Provider 
         (r) => ({ model: r.model ?? opts.model ?? null }),
       );
   }
-  return wrapped;
+  // A Proxy (not Object.create) so every NON-traced member runs with `this` = the ORIGINAL provider:
+  // an adapter using `#private` fields or a WeakMap keyed on itself keeps working.
+  return new Proxy(provider, {
+    get(target, prop) {
+      if (typeof prop === "string" && Object.prototype.hasOwnProperty.call(overrides, prop)) return overrides[prop];
+      const v = Reflect.get(target, prop, target);
+      return typeof v === "function" ? (v as (...a: unknown[]) => unknown).bind(target) : v;
+    },
+  });
 }
