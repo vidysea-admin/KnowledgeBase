@@ -2,7 +2,8 @@
 
 Lane: RECFIN (branch lane/recfin, base 78d482b)
 Tier: 3 (roadmap/structure; ISS-367 high, ISS-STRUCTFIX-001)
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/record-commands-finalize-extraction.md (cycle 0, c62faa8)
 Fix cycle: 0
 
 ## Purpose
