@@ -5,13 +5,15 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, writeFileSync, mkdirSync, existsSync, rmSync, readdirSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync, mkdirSync, existsSync, rmSync, readdirSync, utimesSync } from "node:fs";
+import { spawn, spawnSync, type ChildProcess } from "node:child_process";
+import { pathToFileURL } from "node:url";
 import os from "node:os";
 import path from "node:path";
 import { startTestServer } from "../../apps/api/src/testUtils.js";
 import { buildTestDeps, fakeKeyStore } from "../../apps/api/src/fixtures.js";
 import { joinRulesFilePath } from "../../packages/meeting-bot/src/calendar/join-rules-store.js";
-import { acquireHostLock, createJoinRulesDeps, HOST_PID_FILE, prepareStateDir, resolveStateDir } from "./join-rules-host.js";
+import { acquireHostLock, BOOT_JITTER_MS, createJoinRulesDeps, currentBootTimeMs, HOST_PID_FILE, prepareStateDir, resolveStateDir } from "./join-rules-host.js";
 
 const KEYS: Record<string, { tenantId: string; scopes: string[] }> = {
   "a-key": { tenantId: "tenant-a", scopes: ["calendar", "join-rules"] },
@@ -104,18 +106,155 @@ test("state directory: resolves like the scheduler, is created, and refusals are
   const blocker = path.join(dir, "file");
   writeFileSync(blocker, "x");
   assert.throws(() => prepareStateDir(path.join(blocker, "sub")), /cannot be created or is not writable/);
+  // writability check specifically (a mutation removing the access check must die): mkdir ok, access denied
+  const denied = Object.assign(new Error("denied"), { code: "EACCES" });
+  assert.throws(() => prepareStateDir(path.join(dir, "ro"), { mkdir: () => {}, access: () => { throw denied; } }), /not writable \(EACCES\)/);
+  assert.throws(() => prepareStateDir(path.join(dir, "ro2"), { mkdir: () => { throw denied; }, access: () => {} }), /cannot be created/);
 }));
 
-test("single-host guard: second host refused, leftover file never stolen, released on shutdown", () => withDir(async dir => {
-  const release = acquireHostLock(dir, 4242);
-  const file = path.join(dir, HOST_PID_FILE);
-  assert.equal(readFileSync(file, "utf8"), "4242\n");
-  assert.throws(() => acquireHostLock(dir, 1), /another host owns this state directory/);
-  assert.equal(readFileSync(file, "utf8"), "4242\n", "owner's file untouched by the refused attempt");
-  release(); release(); // idempotent
-  assert.ok(!existsSync(file));
+// ---------- single-host lock (ISS-T037HOST-001) ----------
+const HOST_URL = pathToFileURL(path.join(import.meta.dirname, "join-rules-host.ts")).href;
+const TOKEN = (c: string) => c.repeat(32);
+const rec = (o: Partial<{ pid: number; token: string; startedAt: number; boot: number }> = {}) =>
+  JSON.stringify({ pid: process.pid, token: TOKEN("a"), startedAt: Date.now(), boot: currentBootTimeMs(), ...o }) + "\n";
+const lockFile = (dir: string) => path.join(dir, HOST_PID_FILE);
+const logs = () => { const l: string[] = []; return { l, log: (m: string) => void l.push(m) }; };
+function deadPid(): number {
+  const r = spawnSync(process.execPath, ["-e", "process.stdout.write(String(process.pid))"], { encoding: "utf8" });
+  return Number(r.stdout);
+}
+/** Child: waits until GO_AT, tries the lock, prints WON / HELD:<msg>, keeps the lock until stdin ends. */
+function childScript(dir: string): string {
+  const f = path.join(dir, "child.mjs");
+  writeFileSync(f, `import { acquireHostLock } from ${JSON.stringify(HOST_URL)};
+const [,, stateDir, goAt] = process.argv;
+while (Date.now() < Number(goAt)) {}
+let rel;
+try { rel = acquireHostLock(stateDir); console.log("WON"); }
+catch (e) { console.log("HELD:" + e.message); }
+process.stdin.on("data", () => {}); process.stdin.on("end", () => { rel && rel(); process.exit(0); }); process.stdin.resume();
+`);
+  return f;
+}
+function runChild(script: string, stateDir: string, goAt = 0) {
+  const proc = spawn(process.execPath, ["--import", "tsx", script, stateDir, String(goAt)], { stdio: ["pipe", "pipe", "inherit"], cwd: path.resolve(import.meta.dirname, "..", "..") });
+  let onLine: (s: string) => void = () => {};
+  const first = new Promise<string>(r => { onLine = r; });
+  let buf = "";
+  proc.stdout!.on("data", d => { buf += d; const m = /^(WON|HELD:[^\r\n]*)/m.exec(buf); if (m) onLine(m[1]!); });
+  const closed = new Promise<void>(r => proc.on("close", () => r()));
+  return { proc, first, closed, finish: async () => { proc.stdin!.end(); await closed; } };
+}
+
+test("ISS-T037HOST-001 replay: a pid file left by a process that no longer exists is taken over and the reason is logged", () => withDir(async dir => {
+  const dead = deadPid();
+  const old = new Date(Date.now() - 120_000);
+  // the ledger's recorded repro "999999\n" (legacy bare pid, unparseable now -> abandoned by age), plus a bare dead pid and a full record of a dead pid
+  const cases: Array<[string, boolean]> = [["999999\n", true], [`${dead}\n`, true], [rec({ pid: dead }), false]];
+  let ok = 0;
+  for (const [content, aged] of cases) {
+    const f = lockFile(dir);
+    writeFileSync(f, content);
+    if (aged) utimesSync(f, old, old);
+    const { l, log } = logs();
+    const release = acquireHostLock(dir, process.pid, { log });
+    assert.equal(l.length, 1);
+    assert.match(l[0]!, /took over stale lock .*(pid is not running|abandoned partial write)/);
+    assert.equal(JSON.parse(readFileSync(f, "utf8")).pid, process.pid);
+    release();
+    assert.ok(!existsSync(f));
+    ok++;
+  }
+  console.log(`ISS-T037HOST-001: ${ok}/${cases.length}`);
+  assert.equal(ok, cases.length);
+}));
+
+test("lock content, wx path, refusal names file and holder pid, release deletes only our own lock", () => withDir(async dir => {
+  const f = lockFile(dir);
+  const release = acquireHostLock(dir, 4242, { kill: () => {} });
+  const r = JSON.parse(readFileSync(f, "utf8"));
+  assert.deepEqual(Object.keys(r).sort(), ["boot", "pid", "startedAt", "token"]);
+  assert.equal(r.pid, 4242);
+  assert.match(r.token, /^[0-9a-f]{32}$/);
+  assert.throws(() => acquireHostLock(dir, 1, { kill: () => {} }), (e: Error) => e.message.includes(f) && e.message.includes("pid 4242") && /held by another host/.test(e.message));
+  assert.equal(JSON.parse(readFileSync(f, "utf8")).token, r.token, "owner's file untouched by the refused attempt");
+  const foreign = rec({ pid: 77, token: TOKEN("b") });
+  writeFileSync(f, foreign); // another host's lock: our release must not delete it
+  release(); release();
+  assert.equal(readFileSync(f, "utf8"), foreign);
+  rmSync(f);
   acquireHostLock(dir, 7)();
-  writeFileSync(file, "999\n"); // simulated crash leftover
-  assert.throws(() => acquireHostLock(dir, 8), /Not starting/);
-  assert.equal(readFileSync(file, "utf8"), "999\n");
+  assert.ok(!existsSync(f));
+}));
+
+test("decision table: other boot taken over even with a live pid; same boot + live pid refused; EPERM/unknown = alive; garbage fresh refused, old taken over", () => withDir(async dir => {
+  const f = lockFile(dir);
+  writeFileSync(f, rec({ boot: currentBootTimeMs() - 10 * 60_000 })); // pid IS alive (ours): boot mismatch decides
+  let { l, log } = logs();
+  acquireHostLock(dir, process.pid, { log })();
+  assert.match(l[0]!, /reboot detected/);
+  writeFileSync(f, rec({ boot: currentBootTimeMs() - BOOT_JITTER_MS + 30_000 })); // inside the jitter allowance, live pid
+  assert.throws(() => acquireHostLock(dir, 1), /held by another host/);
+  writeFileSync(f, rec({ pid: deadPid() })); // current boot, dead pid
+  ({ l, log } = logs());
+  acquireHostLock(dir, process.pid, { log })();
+  assert.match(l[0]!, /pid is not running/);
+  for (const code of ["EPERM", "EWHATEVER"]) {
+    const content = rec({ pid: 31337 });
+    writeFileSync(f, content);
+    assert.throws(() => acquireHostLock(dir, 1, { kill: () => { throw Object.assign(new Error("x"), { code }); } }), /held by another host \(pid 31337/);
+    assert.equal(readFileSync(f, "utf8"), content);
+  }
+  for (const g of ["", "\n", "{\"pid\":12", "garbage", JSON.stringify({ pid: -1, token: "x" })]) {
+    writeFileSync(f, g);
+    assert.throws(() => acquireHostLock(dir, 1, { kill: () => { throw new Error("must not be consulted"); } }), /held by another host/, JSON.stringify(g));
+    assert.equal(readFileSync(f, "utf8"), g);
+    const old = new Date(Date.now() - 61_000);
+    utimesSync(f, old, old);
+    ({ l, log } = logs());
+    acquireHostLock(dir, process.pid, { log })();
+    assert.match(l[0]!, /abandoned partial write; old pid unknown/, JSON.stringify(g));
+  }
+  assert.deepEqual(readdirSync(dir), [], "no temp or mutex files left behind");
+}));
+
+test("a lock held by a LIVE child process is refused and stays intact; a lock left by a killed child is taken over", () => withDir(async dir => {
+  const script = childScript(dir);
+  const live = runChild(script, dir);
+  try {
+    assert.equal(await live.first, "WON");
+    const before = readFileSync(lockFile(dir), "utf8");
+    assert.equal(JSON.parse(before).pid, live.proc.pid);
+    assert.throws(() => acquireHostLock(dir), (e: Error) => e.message.includes(lockFile(dir)) && e.message.includes(`pid ${live.proc.pid}`));
+    assert.equal(readFileSync(lockFile(dir), "utf8"), before);
+  } finally { await live.finish(); }
+  assert.ok(!existsSync(lockFile(dir)), "child released on clean shutdown");
+  const doomed = runChild(script, dir);
+  assert.equal(await doomed.first, "WON");
+  doomed.proc.kill();
+  await doomed.closed;
+  assert.ok(existsSync(lockFile(dir)), "a kill leaves the lock behind");
+  const { l, log } = logs();
+  acquireHostLock(dir, process.pid, { log })();
+  assert.match(l[0]!, /pid is not running/);
+}));
+
+test("two real starters race for one stale lock: exactly one wins every round", () => withDir(async dir => {
+  const script = childScript(dir);
+  const winners: number[] = [];
+  for (let round = 0; round < 4; round++) {
+    writeFileSync(lockFile(dir), rec({ pid: deadPid() }));
+    const goAt = Date.now() + 5000;
+    const kids = [runChild(script, dir, goAt), runChild(script, dir, goAt)];
+    try {
+      const res = await Promise.all(kids.map(k => k.first));
+      const won = res.filter(r => r === "WON").length;
+      winners.push(won);
+      assert.equal(won, 1, `round ${round}: ${JSON.stringify(res)}`);
+      assert.ok(res.some(r => /held by another host/.test(r)), JSON.stringify(res));
+      assert.equal(JSON.parse(readFileSync(lockFile(dir), "utf8")).pid, kids[res.indexOf("WON")]!.proc.pid, "file belongs to the winner");
+    } finally { await Promise.all(kids.map(k => k.finish())); }
+    assert.ok(!existsSync(lockFile(dir)) && !existsSync(`${lockFile(dir)}.takeover`));
+  }
+  console.log(`race rounds: ${winners.length}, winners per round: ${winners.join(",")}`);
 }));
