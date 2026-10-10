@@ -221,3 +221,36 @@ export function normalizeCapture(video: string): string {
   if (normalized.status !== 0) throw new Error("WebM finalization failed; original stream retained");
   return output;
 }
+export function processRecordingArtifacts(video: string, sessionId: string, rest: string[]): void {
+  if (!rest.includes("--process-video")) return;
+  if (!rest.includes("--transcribe")) throw new Error("--process-video requires --transcribe");
+  const state = path.join(REPO_ROOT, "data", "toc-migrated", sessionId, "pipeline-state.json");
+  let stage = "screen";
+  let proof: Record<string, unknown> | undefined;
+  const report = (status: string, error?: string) => writeFileSync(state, JSON.stringify({ ...proof, sessionId, stage, status, error, updatedAt: new Date().toISOString() }) + "\n");
+  report("processing");
+  try {
+    const processed = spawnSync("node", [path.join(REPO_ROOT, "scripts", "webinar", "process-video.mjs"),
+      sessionId, "--recording", path.relative(REPO_ROOT, video)], { cwd: REPO_ROOT, stdio: "inherit", timeout: 3_600_000 });
+    if (processed.status !== 0) throw new Error("screen processing failed; recording retained for retry");
+    if (rest.includes("--index")) {
+      stage = "index"; report("processing");
+      const indexed = spawnSync("node", [path.join(REPO_ROOT, "scripts", "webinar", "sync-session.mjs"),
+        sessionId, "--emit-files", "--index"], { cwd: REPO_ROOT, stdio: "inherit", timeout: 3_600_000 });
+      if (indexed.status !== 0) throw new Error("knowledge indexing failed; retry from retained artifacts");
+      proof = validateIndexProof(path.dirname(state), sessionId);
+    }
+    report("done");
+  } catch (error) { report("failed", String(error)); throw error; }
+}
+export function validateIndexProof(dir: string, sessionId: string): Record<string, unknown> {
+  const read = (name: string) => JSON.parse(readFileSync(path.join(dir, name), "utf8"));
+  const proof = read("index-proof.json"), source = read("source.json");
+  const inputHash = createHash("sha256").update(readFileSync(path.join(dir, "knowledge-turns.json"))).digest("hex");
+  if (proof.version !== 2 || proof.sessionId !== sessionId || proof.tenantId !== source.tenantId || proof.inputHash !== inputHash ||
+    !proof.generation || proof.strict !== true || proof.status !== "done" || proof.semanticSupport !== "passed" ||
+    !Number.isInteger(proof.turnCount) || proof.turnCount <= 0 || ["summary", "claims", "chunks", "tree"].some((key) => proof[key] !== "done")) {
+    throw new Error("required fresh strict index proof unavailable");
+  }
+  return proof;
+}
