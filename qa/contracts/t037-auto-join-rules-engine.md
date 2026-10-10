@@ -26,3 +26,6 @@ never for an input that a rule author did not mean to allow, including rule data
 11. **Adapter equivalence.** `ruleSetFromTrustedSenderConfig(cfg)` yields `join` for every sender `isTrustedSender` trusts and `needs-approval` for every sender it rejects, except documented differences that are STRICTER or pure normalisation of the same mailbox.
 12. **Regression and bounds.** `join-rules.test.ts` passes; `auto-join.test.ts` and `webinar-policy.test.ts` still pass; meeting-bot `tsc --noEmit` clean; the commit changes no existing source file; engine not wired into the scheduler.
 13. **Test strength.** A mutation of each security-relevant behaviour (default-deny, label boundary, opt-out, deny, approval scope, normalisation, validator strictness, unverifiable-sender, empty matcher) fails at least one test.
+
+> Note 2026-10-10 (checker, cycle 2): C10 is satisfied by the evaluator validating its own inputs and failing closed (needs-approval, reason invalid-rule-set); skip on a matching per-meeting opt-out is also acceptable on invalid data. Criteria text above is unchanged.
+

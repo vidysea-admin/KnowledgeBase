@@ -1,7 +1,8 @@
 # Verdict — t037-auto-join-rules-engine
 
-VERDICT: FAIL
-Cycle checked: 1
+VERDICT: PASS
+Cycle checked: 2
+(Cycle 1 was VERDICT: FAIL, ISSUES-WRITTEN: ISS-CAPTURE-002; its record below is kept intact. Cycle 2 section at the end.)
 Scope: maker commit bd2aa47 (pure engine only; T-037 not claimed complete). Contract `qa/contracts/t037-auto-join-rules-engine.md` C1-C13. Security class, uncapped. Lane `lane/capture`.
 
 ## Independent results
@@ -50,3 +51,54 @@ Real and reproducible in existing code, and the row's mitigation sentence is wro
 
 ISSUES-WRITTEN: ISS-CAPTURE-002
 EXPLANATION: The engine is well built: default-deny, label-boundary domain matching, approval scope, precedence, purity and validator strictness all hold on my own probes, and the tests are strong (13/13 mutants killed, file restored to the HEAD blob). It fails C10 on one point: given an allow rule that the validator would reject but the evaluator accepts, an out-of-enum `scope` joins every external sender (the inverse of an intended `internal` rule), which contradicts the "fail-closed for allow" claim in the code and manifest. Because this is trust logic gating unattended joining, any unjustified `join` fails the unit. The fix is small (make `ruleMatches` reject out-of-domain values or require a validated set, plus tests with unvalidated bad values); cycle 2 can re-check it.
+
+---
+
+## Cycle 2 (fix cycle 2: af90e13 code+tests, c02ff90 manifest)
+
+VERDICT: PASS
+Cycle checked: 2
+ISSUES-WRITTEN: none
+
+### Bounds
+`git diff --name-only 9c3a9e2 c02ff90` = join-rules.ts, join-rules.test.ts, the manifest only. Test-file diff reviewed in full: the original 20 tests are byte-unchanged (only the import line gained `validateJoinRuleState`; 82 added lines/4 new tests). Lane tree clean apart from my files.
+
+### Re-run
+`join-rules.test.ts` tests 24 pass 24 fail 0; `auto-join.test.ts` 33/33; `webinar-policy.test.ts` 19/19; meeting-bot `tsc --noEmit` exit 0.
+
+### D-015 measurement (own probe, probe3.ts, not the maker's tests)
+Re-ran every recorded reproduction verbatim against the new code: the 7 scope values (`"Internal"`, `"INTERNAL"`, `"both"`, `""`, `null`, `1`, `true`) x external sender `a@other.com` and x internal sender `a@corp.com` (14), `subdomains:"false"` + `a@sub.x.com` (1), `[deny{*.evil.com}, allow{evil.com}]` + `a@evil.com` (1), `deny{scope:"Internal"}` + allow (1).
+**ISS-CAPTURE-002: 17/17 refused** (all `needs-approval/invalid-rule-set`, none join; before the fix the 7 external-sender cases, the subdomains case and the deny cases joined).
+The maker's regression test "ISS-CAPTURE-002 recorded reproductions (verbatim)" uses exactly these inputs and asserts `17/17 refused`; no recorded case is missing or altered. The one case the ledger row described only in words (`deny{scope:"Internal"}`) is paired with an allow of the maker's choosing; my pairing also refuses.
+
+### New-hole probes (all non-join unless the set and state are valid and an allow rule/approval covers the sender)
+- Invalid rule-set shapes: nested-array rules, numeric-key object as rules, throwing getter, Proxy that throws on get/ownKeys, `NaN` version, Symbol/BigInt domain, extra field in match, object in ownDomains -> `needs-approval/invalid-rule-set`, no throw. 200,000-rule valid list evaluates fine. Symbol-keyed extra property on a rule is ignored (valid, same decision as without it).
+- Invalid state: BigInt opt-out id, null state, bad approved entries, valid state + invalid set, invalid state + valid set -> `invalid-rule-set` (one bad half invalidates all; never join). Sparse array holes in state are skipped by `.map` and not rejected: harmless (no approval is created).
+- Opt-out shortcut on invalid data: with an invalid set (`{version:9}`) and/or junk approvals, opt-out for the event id -> `skip/meeting-opt-out`; with a non-matching or array-like-with-overridden-`includes` state -> `invalid-rule-set`. It never produces `join`.
+- Valid-set meaning unchanged: table of valid cases reproduces the cycle-1 outcomes (subdomain join, look-alike refused, internal/external scope, deny beats allow, sender approval, exact domain approval, default-deny, `co.uk` operator note). Original 20 tests pass unchanged.
+- Event-field robustness (decision: NOTE, not a defect at this scope): `evaluateJoinRules(null, ...)`, `undefined`, and an event with a throwing getter throw; a Proxy or throwing-getter STATE throws at the opt-out shortcut (rule-set Proxies are caught). Events and state are typed internal data, attacker influence reaches only string field values, and all string variants (non-string organizer incl. throwing `toString`, object meetingUrl, 5 MB URL, 0.5 MB organizer) return a decision. The scheduler must wrap the call per event. Also pre-existing: `cancelled:"true"` (string) is not treated as cancelled; typed boolean, note only.
+- Adapter: default config diffs vs `isTrustedSender` over 16 senders = 0. Custom config with duplicates and unrepresentable entries: de-duplication changes nothing (before, a duplicate made a validated set throw; now it is valid). Dropping unrepresentable entries (`"bad"`, single-label `com`/`localhost`) only makes those entries stop matching, as in cycle 1 (stricter; legacy trusted `z@com`, `z@localhost`, `bad`). Padded/dotted config entries (` r.org. `) are normalised so `z@r.org` joins where legacy (raw compare) says false; same host the admin named, safe. No previously untrusted legitimate sender becomes trusted except via config-entry normalisation; none of the differences yields a join for a non-configured mailbox. Passing an invalid `ownDomains` to the adapter now makes every decision `invalid-rule-set` (fail closed; note: the adapter does not validate `ownDomains`).
+
+### Mutations on the new code (per-mutation byte backup, 60 s timeout, try/finally, hash check after each restore)
+| Mutation | Result |
+|---|---|
+| N1 state validation skipped | KILLED (1) |
+| N2 join returned on validation failure | KILLED (4) |
+| N3 rule-set validation skipped | KILLED (2) |
+| N4 opt-out shortcut returns join | KILLED (3) |
+| N5 adapter e-mail de-duplication dropped | KILLED (1) |
+| N6 scope validation dropped (invalid rule kept) | KILLED (3) |
+| N7 invalid approved sender accepted | KILLED (1) |
+| N8 subdomains type check dropped | KILLED (3) |
+| N9 opt-out `typeof event.id === "string"` guard dropped | SURVIVED (equivalent for safety: a non-string id can only produce `skip`, never `join`; not filed) |
+
+8/9 killed; 0 timeouts. Final `git hash-object` = `git rev-parse HEAD:` = b9e9091136cbc43b02e5d14b48b5ecc0068523a3 for join-rules.ts, verified after every restore and at the end.
+
+### Contract status
+C10 now PASS (17/17 refused, malformed shapes and states fail closed). C1-C9, C11, C12, C13 unchanged PASS; C12 re-run counts above; C13 re-evidenced by N1-N8 plus the cycle-1 13/13.
+
+### Ledger
+ISS-CAPTURE-002 marked `verified` (fixed 2026-10-10, af90e13, regression_check filled). ISS-CAPTURE-001 stays `open` (separate existing-code defect, not fixed here; my cycle-1 note recommending high severity stands).
+
+ISSUES-WRITTEN: none
+EXPLANATION: The fix is the right shape: the evaluator runs the same validators that guard persistence on both the rule set and the state and fails closed, so a single bad rule invalidates all rules and a broken deny can no longer let a later allow win. The recorded corpus is measured verbatim and refused 17/17 on my own probe; mutation testing of the new paths kills every behaviour-changing mutant. Remaining notes (not filed, low): evaluator throws on a null/throwing event or a throwing-getter state, so the scheduler must guard per event; sparse state arrays are not rejected; the adapter does not validate `ownDomains`; `cancelled` is only honoured as boolean true. T-037 itself is still open (persistence, editing API/UI, scheduler switch-over, ISS-322/333/CAPTURE-001, registration scope).
