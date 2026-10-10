@@ -29,4 +29,5 @@ Line counts (non-blank, repo counter `node scripts/lint-loc.mjs`): obs-windows.t
 - No full suite, no monorepo build, no live capture / OBS / browser.
 - ISS-340 status not edited (qa/issues.jsonl untouched by rule); checker/orchestrator closes it.
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/obs-windows-bot-child-extraction.md (cycle 0, c1e0737)
