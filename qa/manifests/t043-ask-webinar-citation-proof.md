@@ -1,6 +1,7 @@
 # t043-ask-webinar-citation-proof
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t043-ask-webinar-citation-proof.md (cycle 1, 79680ec)
 Fix cycle: 1
 Priority tier: 3 - next unblocked roadmap task (T-043)
 Security class: YES - touches tenant read isolation on the Ask path (cross-tenant read class, cf. ISS-078). Takes the full check.
@@ -56,6 +57,6 @@ Mutation testing not run (checker's job). No D-015 corpus applies: the unit does
 
 - Live path: `sync-session --index` against a work DB followed by a real `/ask` (Mongo, LLM, embeddings). Retrieval quality of the real selector/scorer on real transcripts is untested; the scorer and model here are deterministic fakes.
 - Tenant filtering inside the injected seams is outside `packages/ask`: `scopedCollection` in `createSourceHydrator` and the vector/lexical arms (`apps/api/src/ask/source-context.ts`, `createAskArmsFor`), and `deps.tree.load(tenantId)` in the store. A proving test must live in `apps/api` against a two-tenant fake DB (cf. ISS-078 class). These tests show only the package does not widen what those seams return.
-- Empty/missing tenant is not rejected by `askV2`; it is stamped verbatim on job rows. Rejection happens (if at all) at `requireScope("ask")` in apps/api, unverified here.
+- Empty/missing tenant is not rejected by `askV2`; it is stamped verbatim on job rows. Rejection actually happens in the DB layer: `scopedCollection` throws on a falsy tenantId, and `tree.load("")` matches nothing so the route returns 404 (corrected after check; traced by the checker, not verified here).
 - The answer-sentence-to-quote link is not returned to callers, so the "citation" asserted is the validated quote inventory of `sources.internal` plus the strip tuple the answer was grounded on.
 - T-043 remains open.
