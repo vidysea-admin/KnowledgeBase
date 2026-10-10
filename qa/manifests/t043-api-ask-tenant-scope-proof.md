@@ -1,6 +1,7 @@
 # t043-api-ask-tenant-scope-proof
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t043-api-ask-tenant-scope-proof.md (cycle 1, d9dbaf3)
 Fix cycle: 1
 Priority tier: 3 - next unblocked roadmap task (T-043)
 Security class: YES - tenant read isolation on the Ask path (cross-tenant read class, cf. ISS-078 / ISS-5A). Takes the full check.
@@ -60,3 +61,4 @@ Mutation testing not run (checker's job). No D-015 corpus applies: the unit fixe
 - Ranking-level leakage: with shared session ids B's rows would map onto A's own tree node, so the load-bearing checks are the recorded filters and returned-row counts, not returned ids.
 - `compete.ts` (also calls `tree.load`) and other routes are out of scope.
 - T-043 stays open pending the live `sync-session --index` + `/ask` run.
+- Wiring needed (added after check): The real createMongoTreeStore.load body (apps/api/src/store.ts ~55-62) is not exercised: it uses a global getDb(); make the store's db injectable so a two-tenant test can run it. Lane test runs resolve @lkb/* to the main tree's packages (identical content at check time).
