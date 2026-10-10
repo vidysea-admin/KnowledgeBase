@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  evaluateJoinRules, recordApproval, recordOptOut, ruleSetFromTrustedSenderConfig, validateJoinRuleSet,
+  evaluateJoinRules, recordRuleApproval, recordOptOut, ruleSetFromTrustedSenderConfig, validateJoinRuleSet,
   JoinRuleSetValidationError, validateJoinRuleState, EMPTY_JOIN_RULE_STATE, normalizeDomain, normalizeEmail,
   type JoinRuleSet, type JoinRuleState, type JoinRuleEvent, type JoinRule,
 } from "./join-rules.js";
@@ -105,13 +105,13 @@ test("approve-once flow", () => {
   const rs = set();
   const first = evaluateJoinRules(ev("host@uni.edu", { id: "w1" }), rs, EMPTY_JOIN_RULE_STATE);
   assert.equal(first.action, "needs-approval");
-  const st = recordApproval(EMPTY_JOIN_RULE_STATE, { kind: "sender", value: "Host@Uni.edu " });
+  const st = recordRuleApproval(EMPTY_JOIN_RULE_STATE, { kind: "sender", value: "Host@Uni.edu " });
   const next = evaluateJoinRules(ev("host@uni.edu", { id: "w2" }), rs, st);
   assert.deepEqual(next, { action: "join", reason: "approved-sender", ruleId: "approval:sender:host@uni.edu" });
   // sender-level approval does not extend to another sender at the same domain
   assert.equal(evaluateJoinRules(ev("other@uni.edu", { id: "w3" }), rs, st).action, "needs-approval");
   // domain-level approval is exact-domain only
-  const dst = recordApproval(EMPTY_JOIN_RULE_STATE, { kind: "domain", value: "uni.edu" });
+  const dst = recordRuleApproval(EMPTY_JOIN_RULE_STATE, { kind: "domain", value: "uni.edu" });
   assert.equal(evaluateJoinRules(ev("other@uni.edu"), rs, dst).action, "join");
   assert.equal(evaluateJoinRules(ev("other@sub.uni.edu"), rs, dst).action, "needs-approval");
   assert.equal(evaluateJoinRules(ev("other@evil-uni.edu"), rs, dst).action, "needs-approval");
@@ -120,7 +120,7 @@ test("approve-once flow", () => {
 
 test("opt-out is per meeting and beats approval and allow rule", () => {
   const rs = set([allow("a", { domain: "uni.edu" })]);
-  let st = recordApproval(EMPTY_JOIN_RULE_STATE, { kind: "sender", value: "host@uni.edu" });
+  let st = recordRuleApproval(EMPTY_JOIN_RULE_STATE, { kind: "sender", value: "host@uni.edu" });
   st = recordOptOut(st, "w1");
   assert.equal(evaluateJoinRules(ev("host@uni.edu", { id: "w1" }), rs, st).action, "skip");
   assert.equal(evaluateJoinRules(ev("host@uni.edu", { id: "w2" }), rs, st).action, "join");
@@ -160,8 +160,8 @@ test("state helpers are pure", () => {
     approvedSenders: Object.freeze(["a@x.com"]), approvedDomains: Object.freeze([]), optedOutEventIds: Object.freeze([]),
   }) as JoinRuleState;
   const snapshot = JSON.stringify(frozen);
-  const s1 = recordApproval(frozen, { kind: "sender", value: "b@x.com" });
-  const s2 = recordApproval(frozen, { kind: "domain", value: "y.org" });
+  const s1 = recordRuleApproval(frozen, { kind: "sender", value: "b@x.com" });
+  const s2 = recordRuleApproval(frozen, { kind: "domain", value: "y.org" });
   const s3 = recordOptOut(frozen, "e9");
   assert.equal(JSON.stringify(frozen), snapshot);
   assert.deepEqual(s1.approvedSenders, ["a@x.com", "b@x.com"]);
@@ -170,12 +170,12 @@ test("state helpers are pure", () => {
   assert.notEqual(s1, frozen);
   assert.notEqual(s1.approvedDomains, frozen.approvedDomains);
   // idempotent, no duplicates
-  assert.deepEqual(recordApproval(s1, { kind: "sender", value: "B@X.com" }).approvedSenders, ["a@x.com", "b@x.com"]);
+  assert.deepEqual(recordRuleApproval(s1, { kind: "sender", value: "B@X.com" }).approvedSenders, ["a@x.com", "b@x.com"]);
   assert.deepEqual(recordOptOut(s3, "e9").optedOutEventIds, ["e9"]);
   // invalid input throws and leaves state untouched
-  assert.throws(() => recordApproval(frozen, { kind: "sender", value: "nope" }));
-  assert.throws(() => recordApproval(frozen, { kind: "domain", value: "evil/.com" }));
-  assert.throws(() => recordApproval(frozen, { kind: "weird" as "sender", value: "a@x.com" }));
+  assert.throws(() => recordRuleApproval(frozen, { kind: "sender", value: "nope" }));
+  assert.throws(() => recordRuleApproval(frozen, { kind: "domain", value: "evil/.com" }));
+  assert.throws(() => recordRuleApproval(frozen, { kind: "weird" as "sender", value: "a@x.com" }));
   assert.throws(() => recordOptOut(frozen, ""));
   assert.equal(JSON.stringify(frozen), snapshot);
 });
