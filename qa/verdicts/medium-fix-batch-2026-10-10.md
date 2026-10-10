@@ -89,3 +89,26 @@ Checked HEAD: 987b466
 ISSUES-WRITTEN: none
 
 EXPLANATION: The code, tests and revert are correct and unchanged from what cycle 0 passed for ISS-155 (dry-run id half), ISS-171, ISS-145, ISS-146. The sole defect is documentary: the manifest's header line and the "ISS-369 - FIXED" section were left in place, so the manifest still asserts a fix that was reverted. Required fix (maker, manifest only): remove ISS-369 5e7b1c0 from the Commits line, and delete or rewrite the "## ISS-369" section as "WITHDRAWN, reverted by 4bd9bd8, ISS-369 stays open" (drop the FIXED claim, the vocabulary-decision paragraph, the 4/4 D-015 line and the "Verified" line); bump to Fix cycle 2. No source or test change is needed. Recommended ledger changes when the unit later passes: ISS-171, ISS-145, ISS-146 fixed and verified; ISS-155 verified for the id half with a pointer to ISS-MEDFIX-001; ISS-369 stays open (withdrawn from the unit). qa/issues.jsonl and shards not edited by this checker.
+
+---
+
+# Cycle 2 (manifest-only re-check after c407167)
+
+VERDICT: PASS
+Cycle checked: 2
+Checked HEAD: c407167
+
+## Checks
+1. `git diff 37fad30 c407167 --stat`: 1 file changed (qa/manifests/medium-fix-batch-2026-10-10.md), 10 insertions, 8 deletions. HOLDS.
+2. `grep -n "ISS-369\|5e7b1c0"` on the manifest. Line 5: "The ISS-369 commit 5e7b1c0 was reverted in 4bd9bd8 and is not part of this unit." Line 34: "## ISS-369 - WITHDRAWN, still open (commit 5e7b1c0 reverted in 4bd9bd8)". Line 36: "...Nothing in this unit fixes ISS-369 and no D-015 count is claimed for it." Line 37: "...ISS-369 stays open in the ledger." Line 49: "ISS-369 stays open and is NOT claimed by this unit any more." Line 47 (cycle 0 history) refers to the ISS-369 commit as failed. No line claims it fixed; Commits line does not list 5e7b1c0 as part of the unit. HOLDS.
+3. Exact handshake text: `**Status:** ready-for-check` and `**Fix cycle:** 2`. `git diff 29f0eb3 c407167` hunks: Commits line, the ISS-369 section, the Fix-cycle line, and the two appended fix-cycle sections only; ISS-155, ISS-171, ISS-145, ISS-146 D-015 lines untouched. HOLDS.
+4. `grep -i "five|four|5 issues|4 issues"`: no matches; no count or summary line made untrue. HOLDS.
+
+## Ledger status recommendations (orchestrator applies on merge)
+- ISS-171, ISS-145, ISS-146 -> verified.
+- ISS-155 -> verified for the dry-run id half; tagClaims item carried by ISS-MEDFIX-001.
+- ISS-369 -> stays open (withdrawn from the unit, commit reverted).
+
+ISSUES-WRITTEN: none
+
+EXPLANATION: PASS covers ISS-155 (dry-run id half), ISS-171, ISS-145 and ISS-146 only. ISS-369 was withdrawn from the unit and stays open. Code, tests and revert were verified at cycles 0 and 1 and are unchanged; this cycle only confirmed the manifest no longer asserts the reverted fix. qa/issues.jsonl and shards not edited by this checker.
