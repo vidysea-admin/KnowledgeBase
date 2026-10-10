@@ -34,5 +34,6 @@ Runner replaced apps/api/src/auth.ts with `git show HEAD:` content, ran require-
 1. A `keys` holder can mint any scope, including ones it lacks (`routes/keys.ts:40-51`, `POST /keys` only validates shape). Pre-existing; needs the owner's decision.
 2. Audit stored keys for non-array scopes (read-only, not run): `db.api_keys.find({ $or: [ { scopes: { $not: { $type: "array" } } }, { scopes: { $elemMatch: { $not: { $type: "string" } } } } ] }, { _id: 1, tenantId: 1, label: 1, scopes: 1 })`. Any hit is now a scopeless (inert) key.
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/auth-require-scope-exact-match.md (cycle 0, 4251ced)
 Fix cycle: 0
