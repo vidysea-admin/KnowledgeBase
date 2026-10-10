@@ -14,7 +14,7 @@ import { collectGapEvent, installCaptureControl, type GapWindow } from "./reconn
 import { createTelegramNotifier, type TelegramNotifier } from "./telegram-alerts.js";
 import { finalizeRecordingWith, normalizeCapture } from "./record-finalize.js";
 import { createTabBrowserDeps } from "./tab-browser.js";
-import { browserProfileArgs, selectedBrowserProfile } from "./browser-profile.js";
+import { browserProfileArgs, selectedBrowserProfile } from "./browser/browser-profile.js";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, "..", "..", "..", "..");
 const BOT_PROFILE_DIR = path.resolve(process.env.LKB_BOT_PROFILE_DIR ?? path.join(REPO_ROOT, "data", "bot-profile"));

@@ -7,8 +7,8 @@ import * as cp from "node:child_process";
 import { createRequire, syncBuiltinESMExports } from "node:module";
 import { EventEmitter } from "node:events";
 import { browserProfileArgs, selectedBrowserProfile } from "./browser-profile.js";
-import { createTabBrowserDeps } from "./tab-browser.js";
-import { createObsBrowserDeps } from "./obs-windows.js";
+import { createTabBrowserDeps } from "../tab-browser.js";
+import { createObsBrowserDeps } from "../obs-windows.js";
 
 test("explicit existing profile boundary and CLI/environment precedence", () => {
   const root = mkdtempSync(path.join(tmpdir(), "lkb-profile-"));
@@ -53,10 +53,12 @@ test("actual login/tab/OBS spawn interfaces preserve parent and carry identical 
     process.env.LKB_BOT_PROFILE_DIR=parent; process.env.LKB_RECORD_DIR=records;
     process.env.LKB_PYTHON="fixture-python"; process.env.LKB_BROWSER_EXECUTABLE="cft";
     process.env.LKB_BROWSER_PROFILE_DIRECTORY="Profile 1";
-    const {runLogin}=await import("./record-commands.js");
+    const {runLogin}=await import("../record-commands.js");
     await runLogin([]);
-    assert.ok(calls[0].args.includes("--no-click"));
-    assert.equal(calls[0].args[1],"https://accounts.google.com");
+    const loginCall = calls[0];
+    assert.ok(loginCall, "login must invoke the captured spawn interface");
+    assert.ok(loginCall.args.includes("--no-click"));
+    assert.equal(loginCall.args[1],"https://accounts.google.com");
     login=false;
     const cfg={python:"fixture-python",joinScript:path.resolve("packages/meeting-bot/py/sb_join.py"),
       profileDir:parent,profileDirectory:"Profile 1",recordDir:records,browserExecutable:"cft",autoClick:false};

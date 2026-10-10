@@ -22,7 +22,7 @@ import { OBSWebSocket } from "obs-websocket-js";
 import type { JoinOpts, JoinResult } from "../joiner.js";
 import type { BrowserJoinerDeps } from "../joiners/browser-joiner.js";
 import { ensureObsReady, type ObsGuardProbes } from "./obs-guard.js";
-import { browserProfileArgs } from "./browser-profile.js";
+import { browserProfileArgs } from "./browser/browser-profile.js";
 
 export interface BotEvent {
   event: string;
