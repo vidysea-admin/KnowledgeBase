@@ -22,7 +22,7 @@
     "lint:structure": "node scripts/lint-loc.mjs --all",
     "lint:score": "node scripts/catalogue-score.mjs --check",
     "test": "pnpm -r test",
-    "test:lint": "node --test scripts/lint.test.mjs scripts/snapshot.test.mjs scripts/catalogue.test.mjs scripts/catalogue-cli.test.mjs scripts/lib/tracker-audit.test.mjs scripts/lib/mutate.test.mjs scripts/lib/find-audio-file.test.mjs scripts/lib/eval-recall.test.mjs scripts/lib/lint-codex-hooks.test.mjs scripts/watch/lib/heartbeat.test.mjs scripts/webinar/session-rows.test.mjs scripts/webinar/start-record-detached.test.mjs",
+    "test:lint": "node --test scripts/lint.test.mjs scripts/snapshot.test.mjs scripts/catalogue.test.mjs scripts/catalogue-cli.test.mjs scripts/lib/tracker-audit.test.mjs scripts/qa/unmerged-worktrees.test.mjs scripts/lib/mutate.test.mjs scripts/lib/find-audio-file.test.mjs scripts/lib/eval-recall.test.mjs scripts/lib/lint-codex-hooks.test.mjs scripts/watch/lib/heartbeat.test.mjs scripts/webinar/session-rows.test.mjs scripts/webinar/start-record-detached.test.mjs",
     "typecheck": "pnpm -r typecheck"
   },
   "devDependencies": {

@@ -10,20 +10,24 @@
  */
 import { pathToFileURL } from "node:url";
 import { audit, parseGateArg, filterByGate } from "./lib/tracker-audit.mjs";
+import { listUnmergedWorktrees, formatReport } from "./qa/unmerged-worktrees.mjs";
 
 function main(argv) {
   const gate = parseGateArg(argv);
   const all = audit();
   const findings = filterByGate(all, gate);
+  // Report only: unmerged worktree commits are the Approver's call, so they never alter the exit code.
+  const unmerged = gate ? null : listUnmergedWorktrees(process.cwd());
   const scope = gate ? `gate ${gate}` : "G1 trackers agree · G2 no unverified fixes · G3 sweep not stale";
   if (argv.includes("--json")) {
-    console.log(JSON.stringify({ ok: findings.length === 0, gate, findings }, null, 2));
+    console.log(JSON.stringify({ ok: findings.length === 0, gate, findings, unmergedWorktrees: unmerged }, null, 2));
   } else if (findings.length === 0) {
     console.log(`tracker-audit: OK (${scope})`);
   } else {
     console.error(`tracker-audit${gate ? ` --gate ${gate}` : ""}: ${findings.length} finding(s)`);
     for (const f of findings) console.error(`  ${f}`);
   }
+  if (!gate && !argv.includes("--json")) for (const line of formatReport(unmerged)) console.log(line);
   process.exit(findings.length === 0 ? 0 : 1);
 }
 
