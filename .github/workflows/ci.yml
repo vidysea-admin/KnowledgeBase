@@ -9,8 +9,8 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     # Without this a hung test (e.g. a stuck ffmpeg/browser child) runs to GitHub's 6-hour default.
-    # 30 minutes is several times the expected runtime of this single job, so it only ever trips on a hang.
-    timeout-minutes: 30
+    # 45 minutes is well above the expected 10-20 minute runtime of this single job, so it only ever trips on a hang.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,12 +46,29 @@ jobs:
       # if the packaged build lacks them, instead of as a confusing test failure later.
       - name: Check ffmpeg encoders
         run: |
-          ffmpeg -version
-          ffprobe -version
-          if ! ffmpeg -hide_banner -encoders | grep -E "libvpx|libopus"; then
-            echo "::error::ENVIRONMENT PROBLEM, not a test failure: this ffmpeg build lacks the libvpx/libopus encoders the record-backend remux test needs."
+          missing=0
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            echo "::error::ENVIRONMENT PROBLEM, not a test failure: ffmpeg is not on PATH in this CI runner."
             exit 1
           fi
+          if ! command -v ffprobe >/dev/null 2>&1; then
+            echo "::error::ENVIRONMENT PROBLEM, not a test failure: ffprobe is not on PATH in this CI runner (the record-backend test uses it)."
+            missing=1
+          fi
+          if ! encoders="$(ffmpeg -hide_banner -encoders 2>&1)"; then
+            echo "::error::ENVIRONMENT PROBLEM, not a test failure: 'ffmpeg -hide_banner -encoders' failed on this CI runner."
+            exit 1
+          fi
+          for enc in libvpx libopus; do
+            if ! printf '%s\n' "$encoders" | awk -v e="$enc" '$2 == e {found=1} END {exit !found}'; then
+              echo "::error::ENVIRONMENT PROBLEM, not a test failure: the CI runner's ffmpeg build lacks the $enc encoder the record-backend remux test needs."
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+          echo "ffmpeg, ffprobe, libvpx and libopus all present."
 
       - name: Typecheck
         run: pnpm -r typecheck

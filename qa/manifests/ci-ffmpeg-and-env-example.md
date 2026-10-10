@@ -140,6 +140,7 @@ Passes to the `api` container: MONGODB_URL (required), MONGODB_DB (default lkb),
 3. Split CI into parallel jobs (typecheck, test, schema/types, lint) so one failure does not hide the rest.
 4. Pass the missing runtime variables to the api container (above).
 5. Remove the 6 unused .env.example entries after verification.
+6. Checker's UNVERIFIED predictions of what may fail next in CI once ffmpeg is present (none confirmed): tests using the Windows path `.venv/Scripts/python.exe` (packages/ai router.test.ts ~line 137); PowerShell-based tests (start-calendar-attendance, start-record-detached); Python worker and joiner tests lacking their pip dependencies (scripts/upload queue.test.mjs ~line 141, joiners.test.ts ~line 76); any test needing a live mongod; `lint:structure` staying red.
 
 ## UNVERIFIED
 The workflow change is UNVERIFIED until the next push runs it; GitHub Actions cannot be run from this machine. Validation done: `python -I -c "import yaml..."` (PyYAML 6.0.3) parses the file; 15 steps, `timeout-minutes` = 30. After the push, look at:
@@ -148,5 +149,53 @@ The workflow change is UNVERIFIED until the next push runs it; GitHub Actions ca
 - which step fails next.
 `lint:structure` is expected to STAY RED (file-length budget on three files, root loose-files budget awaiting the owner, ambiguous issue-id citations): other lanes own those and this unit neither fixes nor hides them. Other tests may still fail for non-ffmpeg reasons. Existing "not read" entries were judged by name search in apps/packages/scripts/workers only.
 
+
+## Fix cycle 1 (ISS-CI-001, medium)
+**What failed (cycle 0 FAIL):** the guard `ffmpeg -encoders | grep -E "libvpx|libopus"` passed with only ONE encoder present, and `libvpx` also matched `libvpx-vp9`. The test (record-backend.test.ts ~line 22) uses both `-c:v libvpx` and `-c:a libopus`.
+
+**Change (ci.yml only):** "Check ffmpeg encoders" step replaced; job `timeout-minutes` 30 -> 45 (checker judged 30 probably enough at 10-20 min expected, but too low a value would itself turn CI red; 45 still guards a hang vs the 6-hour default). Note: the step no longer prints `ffmpeg -version`/`ffprobe -version`.
+
+New check logic, verbatim:
+```bash
+missing=0
+if ! command -v ffmpeg >/dev/null 2>&1; then
+  echo "::error::ENVIRONMENT PROBLEM, not a test failure: ffmpeg is not on PATH in this CI runner."
+  exit 1
+fi
+if ! command -v ffprobe >/dev/null 2>&1; then
+  echo "::error::ENVIRONMENT PROBLEM, not a test failure: ffprobe is not on PATH in this CI runner (the record-backend test uses it)."
+  missing=1
+fi
+if ! encoders="$(ffmpeg -hide_banner -encoders 2>&1)"; then
+  echo "::error::ENVIRONMENT PROBLEM, not a test failure: 'ffmpeg -hide_banner -encoders' failed on this CI runner."
+  exit 1
+fi
+for enc in libvpx libopus; do
+  if ! printf '%s
+' "$encoders" | awk -v e="$enc" '$2 == e {found=1} END {exit !found}'; then
+    echo "::error::ENVIRONMENT PROBLEM, not a test failure: the CI runner's ffmpeg build lacks the $enc encoder the record-backend remux test needs."
+    missing=1
+  fi
+done
+if [ "$missing" -ne 0 ]; then
+  exit 1
+fi
+echo "ffmpeg, ffprobe, libvpx and libopus all present."
+```
+
+**D-015 replay (ISS-CI-001): 7/7 cases behave as intended.** Step script extracted from the YAML and run with `bash -e -o pipefail` against fake ffmpeg/ffprobe on PATH (temp dir, deleted afterwards):
+
+| Case | Exit | Error lines |
+|---|---|---|
+| both present | 0 | none ("all present") |
+| only libvpx | 1 | lacks libopus |
+| only libopus | 1 | lacks libvpx |
+| libvpx-vp9 + libopus (recorded reproduction) | 1 | lacks libvpx |
+| neither | 1 | lacks libvpx; lacks libopus (both reported in one run) |
+| ffmpeg missing | 1 | ffmpeg is not on PATH |
+| ffprobe missing | 1 | ffprobe is not on PATH |
+
+YAML: `python -I -c "import yaml..."` parses; 15 steps, `timeout-minutes` = 45. The workflow change remains UNVERIFIED until it runs on GitHub (fake ffmpeg only; real `ffmpeg -encoders` column layout assumed: flags, name, description).
+
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
