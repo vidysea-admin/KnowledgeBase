@@ -1,7 +1,7 @@
 # t037-auto-join-rules-engine
 
 Status: ready-for-check
-Fix cycle: 1
+Fix cycle: 2
 Priority tier: 3 — next unblocked roadmap task (T-037)
 Security class: approval/trust logic (what may join without a click) — FULL checker ceremony, uncapped
 Lane: lane/capture
@@ -40,7 +40,7 @@ No barrel export added (index.ts exports only calendar-client and auto-join, not
 - Sender = `senderEmail ?? organizer`. Strict parse: exactly one `@`, no whitespace, multi-label domain; `Name <a@b>`, `a@b@c` etc. are malformed -> never join (deny rules are still evaluated first; scope rules cannot match without a sender).
 - Trim + lowercase; one trailing dot on a domain is dropped.
 - Deny rules are evaluated before the cancelled/no-URL/sender checks so the reported reason is the policy one.
-- Invalid values inside a rule never match (fail-closed for allow). Caveat: an invalid deny rule would fail to deny; the validator rejects such rules and callers must validate before use.
+- ~~Invalid values inside a rule never match (fail-closed for allow). Caveat: an invalid deny rule would fail to deny; the validator rejects such rules and callers must validate before use.~~ **FALSE - CORRECTED in fix cycle 2 (see below).** The cycle-1 checker showed an out-of-enum `scope` or string `subdomains` made an allow rule join (ISS-CAPTURE-002).
 - `recordApproval/recordOptOut` throw on invalid input; idempotent; no mutation.
 - Adapter domain rules are `subdomains:false` because `isTrustedSender` is exact-domain only.
 - Deliberate divergence from `isTrustedSender` (tested): multi-@ senders (legacy uses the last `@`) are rejected; surrounding whitespace is trimmed.
@@ -72,3 +72,29 @@ Persistence of rules/state; API routes and UI for editing; scheduler switch-over
 2. UI for editing rules, approve-once, per-meeting opt-out.
 3. Scheduler (`schedule-tick`/`selectAutoRecordItems`) calls `evaluateJoinRules` via `ruleSetFromTrustedSenderConfig` plus stored state.
 4. Gmail-candidate approval flow writes `recordApproval`; sender authentication per ISS-322/333.
+
+## Fix cycle 2
+
+**What failed (verdict cycle 1, C10, ISS-CAPTURE-002).** `evaluateJoinRules` trusted its input type. An unvalidated allow rule with `scope` of `"Internal"`, `"INTERNAL"`, `"both"`, `""`, `null`, `1`, `true` joined every external sender; `subdomains:"false"` joined `a@sub.x.com`; an invalid deny rule (`*.evil.com`, `scope:"Internal"`) failed to deny so a later allow joined. The cycle-1 claim "invalid values never match (fail-closed for allow)" was false.
+
+**What changed (`join-rules.ts` only, plus tests).**
+- `evaluateJoinRules` now runs `validateJoinRuleSet(ruleSet)` and a new `validateJoinRuleState(state)` before matching, and matches against their normalised output. These are the same validators used at the persistence boundary: one implementation, no per-field guards in the matcher.
+- Any throw (non-object/null/undefined set, wrong types, unknown field/kind/enum value (case-sensitive), bad domain/email/platform, non-boolean flag, duplicate id, non-array list, malformed state) -> `{action:"needs-approval", reason:"invalid-rule-set", ruleId:"invalid-rule-set"}`. One invalid rule invalidates the whole set.
+- A per-meeting opt-out is still honoured as `skip` when `state.optedOutEventIds` is an array containing the event id, even if the rest is invalid (skip can only narrow access).
+- Corrected statement: **the evaluator fails closed; on any invalid rule set or state it never returns `join`.** Valid sets behave identically; all pre-existing tests pass unchanged.
+- Adapter `ruleSetFromTrustedSenderConfig` now de-duplicates on the normalised value and drops entries the engine cannot represent (as it always effectively did), so env configs with duplicate emails/domains remain valid instead of becoming "never join". Rule ids use the normalised value.
+
+**D-015 count against the ledger's recorded reproductions.** `ISS-CAPTURE-002: 17/17 refused` (none `join`, all `invalid-rule-set`). Cases run verbatim from the row: scope in {Internal, INTERNAL, both, "", null, 1, true} with external `a@other.com` (7); the same seven with internal `a@corp.com` (7, the verdict's counterpart); `subdomains:"false"` + `a@sub.x.com` (1); `[deny{domain:"*.evil.com"}, allow{domain:"evil.com"}]` + `a@evil.com` (1); `deny{scope:"Internal"}` followed by an allow (1). None left unfixed.
+
+**Additional cases (mine, reported separately).** 22 invalid rule-set shapes (null/undefined/array/string set, bad version, unknown top/rule/matcher fields, non-array rules/ownDomains, bad ownDomain, duplicate id, `ALLOW`, missing/empty match, `Zoom`, non-string platform/domain, bad email, `subdomains` 0 or without domain, valid rule + one broken rule); the internal-sender inversion for internal/external/subdomain senders; 12 malformed-state shapes; opt-out still skips with invalid state and with a null rule set; `validateJoinRuleState` normalisation; adapter duplicate/unrepresentable-entry test.
+
+**Notes decided.** (1) `co.uk`-style public-suffix rule: NOT addressed (operator-config risk, needs a public-suffix list; outside C10). (2) Duplicate adapter emails: fixed and tested. (3) `detectPlatform` ignoring URL scheme: another file, out of scope.
+
+**Evidence (from `packages/meeting-bot`).**
+- `node --test --import tsx src/calendar/join-rules.test.ts` -> tests 24, pass 24, fail 0
+- `auto-join.test.ts` -> tests 33, pass 33, fail 0
+- `webinar-policy.test.ts` -> tests 19, pass 19, fail 0
+- `tsc.js --noEmit -p tsconfig.json` -> no output, exit 0
+Mutation testing not run (checker's job).
+
+**Still not covered.** Everything under "NOT covered" above; validation runs on every evaluation (pure, small sets, not optimised); a throwing getter or non-object `event` still throws (crash, not join); control/zero-width characters in email local parts; public-suffix rules.
