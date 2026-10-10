@@ -128,3 +128,65 @@ test("requireAuth: a valid key sets req.auth to the verified key and calls next 
     assert.deepEqual(s.calls, ["k1"], h);
   }
 });
+
+// ---- auth-require-scope-exact-match (ISS-TESTGAPS-001): exact array-element match only ----
+test("ISS-TESTGAPS-001 recorded reproductions, verbatim: a STRING scopes value never substring-matches", async () => {
+  const recorded: Array<[string, string]> = [["calendar", "calendar:read"], ["keys", "join-rules calendar keys"]];
+  let refused = 0;
+  for (const [required, stored] of recorded) { assertRefused(await drive(required, key(stored)), `${stored} vs ${required}`, [stored]); refused++; }
+  assert.equal(refused, recorded.length); // reported as ISS-TESTGAPS-001: 2/2
+  for (const s of ["calendar", "calendar calendar", "calendar,keys", "keys"]) assertRefused(await drive(REQUIRED, key(s)), `string ${s}`);
+});
+
+test("requireScope: every non-array shape is refused with the standard 403 (even when it would 'contain' the scope)", async () => {
+  const wrapper = new String(REQUIRED); // eslint-disable-line no-new-wrappers
+  const shapes: Array<[string, unknown]> = [
+    ["null", null], ["undefined", undefined], ["number", 7], ["boolean", true], ["plain object", { calendar: true }],
+    ["array-like with includes", { length: 1, 0: REQUIRED, includes: () => true }],
+    ["array-like with length", { length: 1, 0: REQUIRED }], ["Set", new Set([REQUIRED])], ["Map", new Map([[REQUIRED, 1]])],
+    ["String wrapper", wrapper], ["function", () => REQUIRED],
+  ];
+  for (const [label, v] of shapes) assertRefused(await drive(REQUIRED, key(v)), label);
+});
+
+test("requireScope: only STRING elements strictly equal to the scope match (nested arrays, toString objects, wrappers, non-strings refused)", async () => {
+  const toStr = { toString: () => REQUIRED };
+  const lists: Array<[string, unknown[]]> = [
+    ["nested array", [[REQUIRED]]], ["toString object", [toStr]], ["String wrapper", [new String(REQUIRED)]], // eslint-disable-line no-new-wrappers
+    ["numbers/null/bool", [1, null, undefined, true]], ["object", [{ scope: REQUIRED }]], ["empty", []], ["sparse", new Array(3)],
+  ];
+  for (const [label, l] of lists) assertRefused(await drive(REQUIRED, key(l)), label);
+  // a valid string element still matches next to garbage elements
+  for (const l of [[toStr, REQUIRED], [null, 1, REQUIRED, [REQUIRED]]]) {
+    const o = await drive(REQUIRED, key(l));
+    assert.equal(o.nextCalls, 1);
+    assert.equal(o.status, null);
+  }
+});
+
+test("requireScope: the refusal is byte-identical to the historical missing-scope 403 for every malformed shape", async () => {
+  const expected = { error: "forbidden", message: `this key is missing the required "${REQUIRED}" scope` };
+  for (const v of ["calendar:read", null, 7, {}, new Set(), [[REQUIRED]], []]) {
+    const o = await drive(REQUIRED, key(v));
+    assert.equal(o.status, 403);
+    assert.deepEqual(o.body, expected);
+  }
+});
+
+test("requireAuth: a stored record with malformed scopes authenticates with NO scopes (fail closed, no throw, no 500, never split)", async () => {
+  const bad: unknown[] = ["calendar:read", "join-rules calendar keys", "calendar,keys", null, undefined, 7, {}, new Set(["calendar"]), [["calendar"]], ["calendar", 1], { length: 1, 0: "calendar" }];
+  for (const scopes of bad) {
+    const o = await driveAuth(store({ tenantId: "t", scopes } as unknown as VerifiedKey), "Bearer k");
+    assert.equal(o.status, null, `no error response for ${JSON.stringify(scopes)}`); // not 500, not 401
+    assert.equal(o.nextCalls, 1);
+    assert.deepEqual(o.req.auth, { tenantId: "t", scopes: [] });
+    for (const required of ["calendar", "keys", "join-rules"]) assertRefused(await drive(required, o.req.auth), `${JSON.stringify(scopes)} vs ${required}`);
+  }
+});
+
+test("requireAuth: a well-formed record is passed through untouched (same object, duplicates kept)", async () => {
+  const v = { tenantId: "t", scopes: ["calendar", "calendar", "keys"] };
+  const o = await driveAuth(store(v), "Bearer k");
+  assert.equal(o.req.auth, v);
+  assert.equal((await drive("keys", o.req.auth)).nextCalls, 1);
+});

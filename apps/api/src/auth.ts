@@ -41,14 +41,21 @@ export function requireAuth(store: ApiKeyStore): RequestHandler {
       res.status(401).json({ error: "unauthorized", message: "invalid or revoked API key" });
       return;
     }
-    req.auth = verified;
+    // Fail closed on a corrupted record: scopes that are not an array of strings authenticate as a key
+    // with NO scopes (every scoped route 403s). Never coerced (no splitting a string into scopes).
+    const scopes: unknown = verified.scopes;
+    const wellFormed = Array.isArray(scopes) && scopes.every((s) => typeof s === "string");
+    req.auth = wellFormed ? verified : { ...verified, scopes: [] };
     next();
   };
 }
 
 export function requireScope(scope: string): RequestHandler {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.auth || !req.auth.scopes.includes(scope)) {
+    // Exact match only: an ARRAY holding an element strictly equal to `scope`. A string value would
+    // substring-match under `.includes`, so never call it on an unvalidated value (ISS-TESTGAPS-001).
+    const held: unknown = req.auth?.scopes;
+    if (!Array.isArray(held) || !held.some((s) => typeof s === "string" && s === scope)) {
       res.status(403).json({ error: "forbidden", message: `this key is missing the required "${scope}" scope` });
       return;
     }
