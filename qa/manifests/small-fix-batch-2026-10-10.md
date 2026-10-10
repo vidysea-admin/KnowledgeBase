@@ -15,5 +15,6 @@ Tier: medium issues, light ceremony (severity gate). Round cap: no PASSed verdic
 - Before: node --test src/routes/ask/ask.test.ts -> tests 3, pass 3, fail 0. After: unchanged (no edit), same result. No commit; no TypeScript changed in apps/api so no api tsc run.
 - D-015: ISS-T057-B8-KNOWLEDGE-EXPLORER-004: 1/1 recorded reproduction passes (HTTP 200, legacyFactory 0, embedCalls 1, s-t1 citation retained).
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/small-fix-batch-2026-10-10.md (cycle 0, dbdd9d4) - SOURCE SCOPE ONLY; live-browser validation under D-024 still owed
 Fix cycle: 0
