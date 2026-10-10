@@ -1,6 +1,7 @@
 # t039-send-bot-now-planner
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t039-send-bot-now-planner.md (cycle 2, d7a9836)
 Fix cycle: 2
 Priority tier: 3 - next unblocked roadmap task (T-039)
 Security class: untrusted operator-supplied URL that will drive a browser/bot join - FULL checker ceremony
