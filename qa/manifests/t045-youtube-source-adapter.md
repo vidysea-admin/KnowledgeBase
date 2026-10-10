@@ -43,5 +43,6 @@ Node: `C:\Users\product\.cache\codex-runtimes\codex-primary-runtime\dependencies
 - No real STT, no full suite, no monorepo build run. `sources.schema.json` `kind` enum has no "youtube", so `kind:"url"` is used with extra `sourceMeta` (schema allows additional properties); not validated against the schema in a test.
 - Tenant/data-write touching: the adapter writes no DB; persistence is the caller's.
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t045-youtube-source-adapter.md (cycle 0, 53773ae)
 Fix cycle: 0
