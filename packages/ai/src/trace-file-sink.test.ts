@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import * as fsp from "node:fs/promises";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -118,6 +119,55 @@ test("fileSinkFromEnv: no path -> no-op sink and one warning; path -> real sink"
     s.record(rec());
     await s.flush();
     assert.equal((await readFile(path, "utf8")).trim().split("\n").length, 1);
+    assert.equal(warns.length, 1);
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});
+
+test("ISS-T049WIRE-001 replay: 100,000 records against a never-settling append stay bounded", async () => {
+  const dir = await tmp();
+  const hung = (() => new Promise<void>(() => undefined)) as unknown as typeof fsp.appendFile;
+  try {
+    const warns: string[] = [];
+    const s = fileSink({ path: join(dir, "t.jsonl"), maxPending: 1000, appendFile: hung, warn: (m) => warns.push(m) });
+    const heap0 = process.memoryUsage().heapUsed;
+    let maxSeen = 0;
+    for (let i = 0; i < 100_000; i++) {
+      s.record(rec(i));
+      if (s.stats.pending > maxSeen) maxSeen = s.stats.pending;
+      if (i === 5) await new Promise((r) => setTimeout(r, 20)); // let the first append start and hang
+    }
+    const grown = process.memoryUsage().heapUsed - heap0;
+    console.log(`ISS-T049WIRE-001: pending max=${maxSeen} dropped=${s.stats.dropped} heapGrowthMiB=${(grown / 1048576).toFixed(1)}`);
+    assert.equal(maxSeen, 1000);
+    assert.equal(s.stats.pending, 1000);
+    assert.equal(s.stats.dropped, 99_000);
+    assert.ok(grown < 10 * 1048576, `heap grew ${grown}`);
+    assert.equal(warns.length, 1);
+    assert.match(warns[0]!, /dropped/);
+    console.log("ISS-T049WIRE-001: 1/1");
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});
+
+test("slow append with a burst over the cap: first N written in order, rest dropped, then accepts again", async () => {
+  const dir = await tmp();
+  const real = fsp.appendFile;
+  const slow = (async (...a: Parameters<typeof real>) => {
+    await new Promise((r) => setTimeout(r, 5));
+    return real(...a);
+  }) as typeof real;
+  try {
+    const path = join(dir, "t.jsonl");
+    const warns: string[] = [];
+    const s = fileSink({ path, maxPending: 5, appendFile: slow, warn: (m) => warns.push(m) });
+    for (let i = 0; i < 12; i++) s.record(rec(i));
+    assert.deepEqual({ ...s.stats }, { written: 0, failures: 0, dropped: 7, pending: 5, stoppedBySize: false });
+    await s.flush();
+    assert.equal(s.stats.pending, 0);
+    s.record(rec(100));
+    await s.flush();
+    const got = (await readFile(path, "utf8")).trim().split("\n").map((l) => (JSON.parse(l) as TraceRecord).startedAtMs);
+    assert.deepEqual(got, [0, 1, 2, 3, 4, 100]);
+    assert.deepEqual({ ...s.stats }, { written: 6, failures: 0, dropped: 7, pending: 0, stoppedBySize: false });
     assert.equal(warns.length, 1);
   } finally { await rm(dir, { recursive: true, force: true }); }
 });

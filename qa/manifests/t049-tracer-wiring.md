@@ -50,5 +50,22 @@ Env: node v24.19.0 (codex runtime), junctions to the main tree's node_modules (r
 - Non-blank line counts: trace.ts 176, trace-registry.ts 36, trace-file-sink.ts 109, router.ts 129; tests: trace.test.ts 164, trace-registry.test.ts 66, trace-file-sink.test.ts 116.
 - Not run: full suite, monorepo build, apps/api tsc (CPU shared with production worker).
 
+## Fix cycle 1
+**Failed:** ISS-T049WIRE-001 (medium). The sink's queue of pending records had no bound: 100,000 records against a never-settling `appendFile` grew the heap by about 63 MiB with 0 dropped.
+**Fix (packages/ai/src/trace-file-sink.ts only, plus its test):**
+- Bound: `maxPending` option, default `DEFAULT_TRACE_MAX_PENDING = 1000` records (non-positive or missing falls back to the default). No byte bound (records are small and fixed-shape; the record cap bounds memory).
+- Policy: when `pending >= maxPending`, the NEWEST record is dropped (keeps order; never blocks or throws): `stats.dropped` += 1 and ONE warning "trace file cannot keep up (N records pending); new traces are being dropped".
+- Counters: `stats` now also has `pending` (alongside written, failures, dropped, stoppedBySize); no I/O to read them.
+- No write timeout added. With a hung append, the head write never settles, pending stays at the cap and every later record is dropped and counted. That is accepted: memory stays bounded; the sink recovers only if the append eventually settles.
+- Test seam: optional `appendFile` option (defaults to fs `appendFile`), needed because ESM fs exports cannot be mocked.
+- Unchanged: `record()` never throws or returns a promise; one append per record; lines never interleave; size guard; restart counts existing bytes; failures warn once.
+**Evidence** (node v24.19.0; run in packages/ai):
+- `node --test --import tsx src/trace.test.ts src/trace-registry.test.ts src/trace-file-sink.test.ts src/provider.test.ts src/providers.test.ts src/router.test.ts src/jobs.test.ts src/routing-config.test.ts`: `tests 62 / pass 62 / fail 0` (60 prior + 2 new).
+- D-015 replay of the recorded reproduction (100,000 records, never-settling append): output `ISS-T049WIRE-001: pending max=1000 dropped=99000 heapGrowthMiB=0.6` then `ISS-T049WIRE-001: 1/1`. Before the fix the same replay grew about 63 MiB.
+- Slow-append burst test (cap 5, 12 records): 5 written in order, 7 dropped, pending back to 0, a later record accepted (file lines 0..4,100), one warning.
+- `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json`: no output, exit 0.
+- Non-blank lines: trace-file-sink.ts 131, trace-file-sink.test.ts 164.
+- Not run: full suite, apps/api tsc, mutation re-run of the cycle-0 mutants.
+
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
