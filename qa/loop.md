@@ -43,7 +43,7 @@ Steps:
 
 Stop: named terminal states, per `/maker`'s own contract —
 `ADVANCED` (one unit moved on evidence) → continue · `BACKLOG_EMPTY` (no pending handshake, no
-open issues, no queue rows, sweep fresh, and no unblocked pending roadmap task in
+open critical/high/medium issues per D-013 -- open low issues do not keep the loop alive --, no queue rows, sweep fresh, and no unblocked pending roadmap task in
 `.goal/goal.json` or `TASKS.md`) → stop · `HUMAN_GATE` (next unit needs a decision only Umesh can
 make, nothing else unblocked) → heartbeat up to 8×, then stop · `STALLED` (max fix
 cycles hit) → diagnose via `/agent-debugger`, then stop · `EXHAUSTED` (tick/token bound hit) →

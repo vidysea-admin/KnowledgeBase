@@ -35,7 +35,7 @@ export function runAll(root, execute = spawnSync, log = console.log) {
     ["codex-hooks", ["scripts/lib/lint-codex-hooks.mjs"]],
     ["snapshot", ["scripts/snapshot.mjs", "--check"]],
     ["lint-tests", ["--test", "scripts/lint.test.mjs"]],
-    ["tracker", ["scripts/tracker-audit.mjs", "--gate", "g1,g4"]],
+    ["tracker", ["scripts/tracker-audit.mjs", "--gate", "g1,g4,g5"]],
     ["dependencies", ["node_modules/dependency-cruiser/bin/dependency-cruise.mjs", "--config", ".dependency-cruiser.cjs", "packages", "apps", "workers"]],
   ];
   const results = [];

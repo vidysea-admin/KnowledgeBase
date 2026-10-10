@@ -315,3 +315,31 @@ test("filterByGate accepts a comma-separated list, so one run can gate G1 and G4
   assert.deepEqual(filterByGate(f, "G1"), ["G1 a"], "a single gate still behaves exactly as before");
   assert.deepEqual(filterByGate(f, null), f, "no gate named means no filtering");
 });
+
+// ISS-164: replays the issue's recorded case verbatim -- G4 reddened on qa/contracts/entity-promotion.md,
+// a checker-authored file landed ten minutes earlier -- plus the manifest case that must keep gating.
+test("ISS-164 splitAdvisory: checker-owned G4 findings are advisory, qa/manifests/ findings still gate", async () => {
+  const { splitAdvisory } = await import("../tracker-audit.mjs");
+  const g4 = (rel) => `G4 ambiguous issue ref: ${rel} cites ISS-017 bare, but a lane shard numbers the same finding(s) — qualify as ISS-<LANE>-NNN`;
+  const contract = g4("qa/contracts/entity-promotion.md");
+  const verdict = g4("qa/verdicts/t-031-audio-watchdog.md");
+  const manifest = g4("qa/manifests/t-033-bot-tests.md");
+  const g1 = "G1 status: T-001 is \"done\" in goal.json but \"open\" in TASKS.md";
+  const r = splitAdvisory([contract, verdict, manifest, g1]);
+  assert.deepEqual(r.gating, [manifest, g1]);
+  assert.deepEqual(r.advisory, [contract, verdict]);
+});
+
+// ISS-315: replays the issue's recorded failure -- hand-appended rows with an unescaped backslash
+// (ISS-307 `\s`, ISS-U1-3 `\[\d`) -- and shows the COMMIT gate keeps it, not only the sweep.
+test("ISS-315 an unparseable ledger line is a G5 finding that the commit gate (g1,g4,g5) keeps", () => {
+  const root = fixtureRoot();
+  try {
+    writeFileSync(join(root, "qa", "issues.jsonl"), String.raw`{"id":"ISS-307","p":"\s+","status":"open"}` + "\n");
+    writeFileSync(join(root, "qa", "issues.u1.jsonl"), String.raw`{"id":"ISS-U1-3","re":"\[\d{1,2}","status":"open"}` + "\n");
+    const gated = filterByGate(audit(root), "G5");
+    assert.equal(gated.length, 1);
+    assert.match(gated[0], /^G5 ledger: 2 unparseable line\(s\)/);
+    assert.deepEqual(filterByGate(audit(root), "G1,G4,G5").filter((f) => f.startsWith("G5")), gated);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

@@ -60,8 +60,7 @@ it — and makes a careless blanket qualification visibly wrong instead of silen
 **Verdicts are checker-owned and I did not touch them.** 66 of the 96 refs live in
 `qa/verdicts/`; a maker rewriting a verdict is the self-certification this pair exists to prevent.
 Those four files are named in `G4_FROZEN` — the debt is *frozen and visible* rather than tolerated:
-any **new** ambiguous ref anywhere fails, and the list can only shrink. A checker that rewrites its
-own verdict deletes its own line.
+any **new** ambiguous ref in any *other* file fails. (Corrected per ISS-162: the skip is per file, not per ref, so a new ambiguous ref added inside one of the four frozen verdicts is also unreported; the original sentence here and in the `G4_FROZEN` comment claimed "anywhere".) A checker that qualifies its own verdict deletes its own line.
 
 **G4 gates commits, G2/G3 still do not.** G1's stated criterion for gating is that it is fully in
 the author's control and clearable in the same commit. G4 meets it exactly. G2 and G3 depend on
@@ -380,3 +379,16 @@ committed by a checker ten minutes earlier, and the gate really was exit 0 at `3
 `qa/contracts/` the checker cleared it itself, so master is green again.
 
 **Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree
+
+## Addendum (ISS-163, medfix2 batch 2026-10-10) — the standing test was narrowed, disclosed here late
+
+At ccd81d4 the standing assertion `G4: master's manifests and verdicts are clean under this gate`
+(`scripts/lib/ledger-union.test.mjs`) was **narrowed**: `assert.deepEqual(auditIssueRefs(...), [])`
+became a filter to `/qa/(manifests|verdicts)//`, which **excludes `qa/contracts/`** from the assertion
+while the gate itself still judges it. The reason is in the test's code comment (a concurrent lane
+adds contracts continuously and `qa/contracts/entity-promotion.md` reddened it mid-check); the
+narrowing was not stated in this manifest. Consequence: that test can be green while
+`pnpm lint:structure` is red on a contract. Since ISS-164 (commit 9b98ee7) the gate itself treats
+verdict and contract findings as advisory and gates only on `qa/manifests/`, so the restoration
+ISS-163 asks for is to widen this assertion back to the *gating* set once the lane manifests that
+are currently flagged are qualified; that is left open, not done here.
