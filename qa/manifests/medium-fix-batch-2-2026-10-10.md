@@ -79,5 +79,6 @@ File: `qa/manifests/iss-346-round-cap-mechanical-check.md`. The C4 row is marked
 
 `node --test scripts/lib/tracker-audit.test.mjs scripts/lib/ledger-union.test.mjs scripts/lint.test.mjs`: tests 66, pass 64, fail 2. The 2 failures are pre-existing and unrelated: `G4: master's manifests ... clean` fails on the four lane manifests above, and `selected CLI gate cannot hide duplicate ledger IDs` fails with ERR_MODULE_NOT_FOUND for `scripts/qa/unmerged-worktrees.mjs` in its temp fixture (the fixture copy lacks that import, which predates this batch). Not checked against a pristine base run. `node scripts/lint-dirsize.mjs`: OK. No TypeScript changed, so no `tsc`.
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/medium-fix-batch-2-2026-10-10.md (cycle 0, c3dafba)
 Fix cycle: 0
