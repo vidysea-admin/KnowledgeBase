@@ -72,7 +72,7 @@ const TRUSTED: TrustedSenderConfig = {
 function candidate(overrides: Partial<AutoRecordCandidateInput> = {}): AutoRecordCandidateInput {
   return {
     id: "c1", title: "TOC webinar", senderEmail: "ops@theoutreachcollective.in",
-    senderDomain: "theoutreachcollective.in", status: "auto_approved",
+    senderDomain: "theoutreachcollective.in", senderAuthenticated: true, status: "auto_approved",
     meetingUrl: "https://zoho.com/meeting/abc?tk=SECRET123",
     startTime: "2026-09-28T12:30:00Z", endTime: "2026-09-28T13:30:00Z",
     kind: "upcoming",

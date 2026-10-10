@@ -51,6 +51,8 @@ export interface AutoRecordCandidateInput {
   title: string;
   senderEmail: string;
   senderDomain: string;
+  /** ISS-322: set only by the authenticated Gmail scan; absent/false never earns config or auto trust. */
+  senderAuthenticated?: boolean;
   status: "pending" | "approved" | "rejected" | "auto_approved";
   meetingUrl?: string;
   startTime?: string;

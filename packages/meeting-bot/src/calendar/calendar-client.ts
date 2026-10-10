@@ -49,13 +49,14 @@ function semantic(row: Occurrence): string {
 }
 function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occurrence {
   const common = ["id", "title", "startTime", "endTime", "meetingUrl", "cancelled", "providerUpdated"];
-  shape(input, [...common, ...(source === "calendar" ? ["organizer", "recurringEventId", "originalStartTime"] : ["senderEmail", "senderDomain", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId"])]);
+  shape(input, [...common, ...(source === "calendar" ? ["organizer", "recurringEventId", "originalStartTime"] : ["senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId"])]);
   text(input.id, 1024, true); text(input.title, 2000); text(input.meetingUrl, 8192);
   text(input.startTime, 128); text(input.endTime, 128); text(input.organizer, 320);
   if (input.cancelled !== undefined && typeof input.cancelled !== "boolean") fail();
   if (source === "gmail" && (!["pending", "approved", "rejected", "auto_approved"].includes(input.status ?? "") ||
       (input.kind !== undefined && !["upcoming", "past-recording"].includes(input.kind)) ||
-      (input.registrationOnly !== undefined && typeof input.registrationOnly !== "boolean"))) fail();
+      (input.registrationOnly !== undefined && typeof input.registrationOnly !== "boolean") ||
+      (input.senderAuthenticated !== undefined && typeof input.senderAuthenticated !== "boolean"))) fail();
   if (source === "gmail") { text(input.senderEmail, 320, true); text(input.senderDomain, 320, true); }
   if (source === "gmail") {
     text(input.registrationUrl, 8192);
@@ -66,7 +67,7 @@ function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occ
     }
   }
   const snapshot: Snapshot = {id: input.id, title: input.title ?? "", cancelled: input.cancelled ?? false};
-  for (const key of source === "calendar" ? ["meetingUrl", "organizer", "recurringEventId"] : ["meetingUrl", "senderEmail", "senderDomain", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId"]) {
+  for (const key of source === "calendar" ? ["meetingUrl", "organizer", "recurringEventId"] : ["meetingUrl", "senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId"]) {
     const value = input[key as keyof Snapshot];
     if (value !== undefined) Object.assign(snapshot, {[key]: value});
   }

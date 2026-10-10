@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeMeetingCandidatesDeps } from "../fixtures.js";
 import { createMeetingCandidatesDeps } from "../store.js";
+import { scanGmailForMeetingCandidates } from "../gws-gmail.js";
 
 function seededMeetingCandidates() {
   const deps = fakeMeetingCandidatesDeps();
@@ -257,4 +258,47 @@ test("rejecting a pending candidate flips its status", async () => {
   } finally {
     await server.close();
   }
+});
+
+// ISS-333 / ISS-322 / ISS-CAPTURE-003 (D-015): the ledger rows' recorded reproductions through the REAL scan
+// (gws-gmail.ts fetchOne) into the REAL store.ts filing logic; only the gws CLI and Mongo are faked.
+async function fileFrom(from: string, ...authResults: string[]): Promise<{ status?: unknown; authenticated?: unknown; n: number }> {
+  const run = async (args: string[]) => args.includes("list") ? JSON.stringify({ messages: [{ id: "m1" }] }) : JSON.stringify({ id: "m1",
+    payload: { headers: [{ name: "From", value: from }, { name: "Subject", value: "Webinar" },
+      ...authResults.map((value) => ({ name: "Authentication-Results", value }))],
+    body: { data: Buffer.from("Join https://zoom.us/j/123456789").toString("base64url") } } });
+  const writes: Record<string, unknown>[] = [];
+  const deps = createMeetingCandidatesDeps("tenant-1", () => scanGmailForMeetingCandidates(100, run, {}), () => "fixture-work",
+    { getTrustedSender: async () => ({ autoApprove: true }) as never, createMeetingCandidateIfNew: async (_t, doc) => { writes.push(doc); return true; } });
+  await deps.scanGmail("tenant-1");
+  return { status: writes[0]?.status, authenticated: writes[0]?.senderAuthenticated, n: writes.length };
+}
+const PASS = "mx.google.com; dkim=pass header.i=@ashoka.edu.in header.s=google; spf=pass (google.com: domain of host@ashoka.edu.in designates 1.2.3.4 as permitted sender) smtp.mailfrom=host@ashoka.edu.in; dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=ashoka.edu.in";
+
+test("ISS-333 recorded reproductions (a)(b)(c) through scan -> store: unauthenticated never auto_approved, authenticated still is", async () => {
+  const a = await fileFrom("host@ashoka.edu.in", "mx.google.com; dkim=fail header.i=@ashoka.edu.in");
+  const b = await fileFrom("host@ashoka.edu.in");
+  const c = await fileFrom("host@ashoka.edu.in", PASS);
+  assert.equal(a.status, "pending"); assert.equal(b.status, "pending"); // (a) dkim=fail, (b) header absent
+  assert.equal(c.status, "auto_approved"); assert.equal(c.authenticated, true); // (c) real path, no regression
+  console.log(`ISS-333 (api side, a+b+c): ${[a.status === "pending", b.status === "pending", c.status === "auto_approved"].filter(Boolean).length}/3 behave as recorded`);
+});
+
+test("ISS-322 / ISS-333 extra spoofs: pass for another domain, injected pass beside Gmail's fail, comment trick, foreign server", async () => {
+  const gFail = "mx.google.com; dkim=neutral header.i=@evil.com; dmarc=fail (p=REJECT) header.from=ashoka.edu.in";
+  const cases: Array<[string, string[]]> = [
+    ["pass for the attacker's own domain", ["mx.google.com; dkim=pass header.i=@evil.com; spf=pass smtp.mailfrom=a@evil.com; dmarc=pass header.from=evil.com"]],
+    ["injected full pass + Gmail's real fail", [PASS, gFail]],
+    ["Gmail's real fail + injected full pass", [gFail, PASS]],
+    ["comment trick", ["mx.google.com; dmarc=fail (dmarc=pass header.from=ashoka.edu.in) header.from=evil.com"]],
+    ["only a foreign authserv-id claims pass", [PASS.replace("mx.google.com", "mail.evil.com")]],
+    ["header present but unparseable", ["mx.google.com; ((dmarc=pass header.from=ashoka.edu.in"]],
+  ];
+  for (const [label, headers] of cases) assert.equal((await fileFrom("host@ashoka.edu.in", ...headers)).status, "pending", label);
+});
+
+test("ISS-CAPTURE-003 recorded reproduction: From x@ashoka.edu.in@evil.com is dropped, not given the first-@ domain", async () => {
+  const r = await fileFrom("x@ashoka.edu.in@evil.com", PASS);
+  assert.equal(r.n, 0);
+  console.log(`ISS-CAPTURE-003: ${r.n === 0 ? 1 : 0}/1 refused`);
 });

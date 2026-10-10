@@ -1,5 +1,6 @@
 /** Gmail discovery: literal evidence only; configured intake never grants join approval. */
 import { execFile } from "node:child_process";
+import { assessSender } from "@lkb/core";
 
 export interface GmailMeetingCandidate {
   messageId: string;
@@ -8,6 +9,8 @@ export interface GmailMeetingCandidate {
   subject: string;
   senderEmail: string;
   senderDomain: string;
+  /** ISS-322: the receiving provider authenticated this sender (see core sender-authentication). Absent = false. */
+  senderAuthenticated?: boolean;
   meetingUrl?: string;
   /** Literal recording link, distinct from the live join link. */
   recordingUrl?: string;
@@ -65,8 +68,6 @@ const DIRECT_JOIN_RE =
 
 const RECORDING_HINT_RE = /\b(recording|recap|watch again|now available|shared a recording)\b/i;
 
-const FROM_RE = /<?([^\s<>]+@[^\s<>]+)>?\s*$/;
-
 function parseGwsJson(stdout: string): unknown {
   const lines = stdout.split("\n");
   const startIdx = lines.findIndex((l) => l.trim().startsWith("{") || l.trim().startsWith("["));
@@ -85,11 +86,6 @@ function runGws(args: string[]): Promise<string> {
 
 function header(headers: GwsMessageHeader[] | undefined, name: string): string {
   return headers?.find((h) => h.name.toLowerCase() === name.toLowerCase())?.value ?? "";
-}
-
-function extractEmail(fromHeader: string): string {
-  const match = FROM_RE.exec(fromHeader.trim());
-  return (match?.[1] ?? fromHeader).toLowerCase();
 }
 
 // --- U2: body decode + date/time/kind extraction. Each is a pure function on already-fetched
@@ -254,9 +250,8 @@ async function fetchOne(messageId: string, run = runGws): Promise<GmailMeetingCa
       !msg.payload || typeof msg.payload !== "object" || Array.isArray(msg.payload) ||
       !Array.isArray(msg.payload.headers) || msg.payload.headers.some(h => !h || typeof h.name !== "string" || typeof h.value !== "string")) throw new Error("Invalid Gmail message");
   const headers = msg.payload?.headers;
-  const senderEmail = extractEmail(header(headers, "From"));
-  if (!senderEmail.includes("@")) return null;
-  const senderDomain = senderEmail.split("@")[1] ?? "";
+  const sender = assessSender(headers); // ISS-322/CAPTURE-003: strict From + Authentication-Results verdict
+  if (!sender) return null;
   const subject = header(headers, "Subject") || "(no subject)";
 
   const bodyText = decodeGmailBody(msg.payload) || msg.snippet || "";
@@ -274,8 +269,7 @@ async function fetchOne(messageId: string, run = runGws): Promise<GmailMeetingCa
     ...(msg.threadId ? {threadId: msg.threadId} : {}),
     ...(registrationUrl ? {registrationUrl} : {}),
     subject,
-    senderEmail,
-    senderDomain,
+    ...sender,
     ...(meetingUrl ? { meetingUrl } : {}),
     ...(recordingUrl ? { recordingUrl } : {}),
     ...(startTime ? { startTime } : {}),

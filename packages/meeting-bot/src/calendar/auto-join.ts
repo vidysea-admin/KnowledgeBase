@@ -49,6 +49,8 @@ interface NormalizedItem {
   meetingUrl?: string;
   sender?: string;
   senderDomain?: string;
+  /** ISS-322: sender identity is verified (authenticated Gmail scan, or a calendar organizer the Calendar API attests). */
+  senderVerified: boolean;
   registrationOnly?: boolean;
   /** Approved Gmail candidates bypass the legacy sender allowlist. */
   preTrusted: boolean;
@@ -67,6 +69,7 @@ function normalizeCalendarEvent(e: CalendarEvent): NormalizedItem {
     endTime: e.endTime,
     meetingUrl: e.meetingUrl,
     sender: e.organizer,
+    senderVerified: true,
     preTrusted: false,
     rejected: false,
     cancelled: e.cancelled,
@@ -84,11 +87,14 @@ function normalizeCandidate(c: AutoRecordCandidateInput): NormalizedItem {
     meetingUrl: c.meetingUrl,
     sender: c.senderEmail,
     senderDomain: c.senderDomain,
+    senderVerified: c.senderAuthenticated === true,
     registrationOnly: c.registrationOnly,
     // Candidates the Gmail approval flow already decided are trusted; "pending" is not — a
     // pending candidate falls through to the same config-allowlist check a calendar organizer
     // gets, so a known-trusted sender's mail doesn't have to wait out a human click.
-    preTrusted: c.status === "approved" || c.status === "auto_approved",
+    // ISS-333: auto_approved is a header-derived trust claim, so it counts only with an authenticated sender;
+    // a human "approved" decision is not a header claim and stays trusted.
+    preTrusted: c.status === "approved" || (c.status === "auto_approved" && c.senderAuthenticated === true),
     rejected: c.status === "rejected",
     cancelled: c.cancelled,
   };
@@ -181,7 +187,7 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
       skipped.push({ ...base, reason: "untrusted-sender" });
       continue;
     }
-    if (!input.everyWebinar && !item.preTrusted && !isTrustedSender(item.sender, item.senderDomain, trustedSenders)) {
+    if (!input.everyWebinar && !item.preTrusted && !(item.senderVerified && isTrustedSender(item.sender, item.senderDomain, trustedSenders))) {
       skipped.push({ ...base, reason: "untrusted-sender" });
       continue;
     }

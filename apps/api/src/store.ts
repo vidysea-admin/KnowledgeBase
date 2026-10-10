@@ -167,9 +167,10 @@ export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, s
       const found = await scan();
       let created = 0, autoApproved = 0;
       // U2: pass through every optional scan field the same way meetingUrl already was — present -> included.
-      const OPTIONAL_CANDIDATE_FIELDS = ["meetingUrl", "kind", "startTime", "endTime", "recordingUrl", "registrationOnly", "registrationUrl", "threadId"] as const;
+      const OPTIONAL_CANDIDATE_FIELDS = ["meetingUrl", "kind", "startTime", "endTime", "recordingUrl", "registrationOnly", "registrationUrl", "threadId", "senderAuthenticated"] as const;
       for (const candidate of found) {
-        const trusted = await persistence.getTrustedSender(tenantId, candidate.senderDomain);
+        // ISS-322/333: a From header is not trust. Only an authenticated sender can reach auto_approved; the rest wait for a human.
+        const trusted = candidate.senderAuthenticated === true ? await persistence.getTrustedSender(tenantId, candidate.senderDomain) : undefined;
         const status = trusted?.autoApprove ? "auto_approved" : "pending";
         const extra = Object.fromEntries(OPTIONAL_CANDIDATE_FIELDS.filter((k) => candidate[k] !== undefined).map((k) => [k, candidate[k]]));
         const wrote = await persistence.createMeetingCandidateIfNew(tenantId, {

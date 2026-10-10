@@ -24,6 +24,7 @@ interface MeetingCandidateApiRow {
   subject: string;
   senderEmail: string;
   senderDomain: string;
+  senderAuthenticated?: boolean;
   status: "pending" | "approved" | "rejected" | "auto_approved";
   meetingUrl?: string;
   startTime?: string;
@@ -52,6 +53,7 @@ function toCandidateInput(row: MeetingCandidateApiRow): AutoRecordCandidateInput
     title: row.subject,
     senderEmail: row.senderEmail,
     senderDomain: row.senderDomain,
+    senderAuthenticated: row.senderAuthenticated === true,
     status: row.status,
     meetingUrl: row.meetingUrl,
     startTime: row.startTime,
