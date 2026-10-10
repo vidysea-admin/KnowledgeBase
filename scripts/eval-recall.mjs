@@ -86,7 +86,7 @@ export function computeFilterBias({ rejectedPathExists, rejectedQs, keptResult, 
 async function embedQuestionsAndLoadChunks(questions, tenantId, opts = {}) {
   const { connect, close, getDb, scopedCollection } = await import("../packages/db/src/index.ts");
   const { embed: routeEmbed } = await import("../packages/ai/src/index.ts");
-  const { buildRouting } = await import("../apps/api/src/production.ts");
+  const { buildRouting } = await import("../apps/api/src/composition/production.ts");
 
   await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", process.env.MONGODB_DB || "lkb");
   try {

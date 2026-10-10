@@ -35,7 +35,7 @@ export interface WhatsAppIngestResult {
 }
 
 export interface WhatsAppRouteDeps {
-  listGroups(): Promise<WhatsAppGroup[]>;
+  listGroups(tenantId: string): Promise<WhatsAppGroup[]>;
   /** `ownerUserId` is intentionally NOT a parameter here — the real implementation resolves it
    * itself from the live trackable-groups list, so a caller can never ingest on behalf of an
    * owner it didn't actually look up via `listGroups()`. */
@@ -45,8 +45,8 @@ export interface WhatsAppRouteDeps {
 export function createWhatsAppRouter(deps: WhatsAppRouteDeps): Router {
   const router = Router();
 
-  router.get("/whatsapp/groups", requireScope("whatsapp"), async (_req: Request, res: Response) => {
-    const groups = await deps.listGroups();
+  router.get("/whatsapp/groups", requireScope("whatsapp"), async (req: Request, res: Response) => {
+    const groups = await deps.listGroups(req.auth!.tenantId);
     res.status(200).json({ groups });
   });
 

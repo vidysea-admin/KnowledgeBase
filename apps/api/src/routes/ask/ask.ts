@@ -9,7 +9,7 @@
 import { Router, type Request, type Response } from "express";
 import type { TreeIndexNode } from "@lkb/core";
 import { askV2, BoundedAskError, type AskV2Deps } from "@lkb/ask";
-import { requireScope } from "../auth.js";
+import { requireScope } from "../../auth.js";
 
 /** Injected dependency (C3) — production impl in `store.ts` is Mongo-backed; tests use a fake. */
 export interface TreeStore {

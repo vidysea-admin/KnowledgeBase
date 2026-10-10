@@ -4,7 +4,7 @@ import type { Db } from "mongodb";
 import { jobs } from "@lkb/db";
 import { buildTestDeps, fakeKeyStore } from "../fixtures.js";
 import { startTestServer } from "../testUtils.js";
-import { buildProductionDeps } from "../production.js";
+import { buildProductionDeps } from "../composition/production.js";
 import { createMongoJobsReadDeps } from "./store.js";
 import { unavailableJobsReadDeps } from "./fixture-store.js";
 

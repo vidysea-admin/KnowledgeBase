@@ -13,7 +13,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { buildProductionDeps } from "./production.js";
+import { buildProductionDeps } from "./composition/production.js";
 
 test("ISS-274: buildProductionDeps wires tavilySearchFn into askDeps even with no TAVILY_API_KEY set", () => {
   const prev = process.env.TAVILY_API_KEY;

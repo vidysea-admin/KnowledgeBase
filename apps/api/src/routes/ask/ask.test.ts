@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Db } from "mongodb";
-import { createSourceRequestDepsFor } from "../ask/source-context.js";
+import { createSourceRequestDepsFor } from "../../ask/source-context.js";
 import { BoundedAskError } from "@lkb/ask";
-import { startTestServer } from "../testUtils.js";
-import { buildTestDeps, fakeKeyStore, fakeAskDeps } from "../fixtures.js";
+import { startTestServer } from "../../testUtils.js";
+import { buildTestDeps, fakeKeyStore, fakeAskDeps } from "../../fixtures.js";
 
 test("POST /ask binds request factory to verified tenant and returns explicit audited source refusal", async () => {
   const base = buildTestDeps({ keyStore: fakeKeyStore({ "a-key": { tenantId: "tenant-a", scopes: ["ask"] } }) });
@@ -71,8 +71,12 @@ test("actual HTTP composition gives request factory sole ownership of arms and s
       if (job.kind === "ask.select_nodes") return complete({ node_ids: [] });
       if (job.kind === "evaluator") return complete({ score: 0.9, reason: "source answers" });
       if (job.kind === "ask.answer_grounding") return complete({ decisions: [{ id: "sentence-0", supported: true, answersQuery: true }] });
-      const context = JSON.parse(JSON.parse(job.messages[1]!.content).context);
-      return complete({ sentences: [{ text: "The source says forms open in October.", sourceIds: [context[0].sourceId] }] });
+      const context = JSON.parse(job.messages[1]!.content).context;
+      assert.equal(context.strips[0]?.sourceIndex, 0);
+      assert.equal(context.strips[0]?.text, "Visa forms open in October.");
+      assert.deepEqual(context.sources[0]?.source, { speakerRef: "spk:0", turnId: "s-t1", sessionRef: "s", tStart: 10, tEnd: 20 });
+      assert.equal(typeof context.sources[0]?.sourceId, "string");
+      return complete({ sentences: [{ text: "The source says forms open in October.", sourceIds: [context.sources[context.strips[0].sourceIndex].sourceId] }] });
     },
   });
   const server = await startTestServer(base);

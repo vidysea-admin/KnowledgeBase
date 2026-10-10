@@ -10,9 +10,9 @@ import { MongoClient, ObjectId, type Db } from "mongodb";
 import { getDb as getAppDb } from "@lkb/db";
 import type { Sources, Sessions, Turns } from "@lkb/core";
 import { createWhatsAppSource, type WhatsAppFetcher, type WhatsAppMessage, type ConsentContext, type Turn } from "@lkb/ingest";
-import type { WhatsAppRouteDeps, WhatsAppGroup, WhatsAppIngestResult } from "./routes/whatsapp.js";
-import { sha256Hex } from "./hash.js";
-import type { BoundIndexer } from "./indexing/session.js";
+import type { WhatsAppRouteDeps, WhatsAppGroup, WhatsAppIngestResult } from "../routes/whatsapp.js";
+import { sha256Hex } from "../hash.js";
+import type { BoundIndexer } from "../indexing/session.js";
 
 let client: MongoClient | null = null;
 let db: Db | null = null;
@@ -50,7 +50,7 @@ export const fetchWhatsAppMessages: WhatsAppFetcher = async (groupJid, ownerUser
     .toArray();
 
   const personIds = [...new Set(messages.map((m) => m.personId.toString()))].map((id) => new ObjectId(id));
-  const people = await wadb.collection<PersonDoc>("people").find({ _id: { $in: personIds } }).toArray();
+  const people = await wadb.collection<PersonDoc>("people").find({ _id: { $in: personIds }, ownerUserId: new ObjectId(ownerUserId) }).toArray();
   const peopleById = new Map(people.map((p) => [p._id.toString(), p]));
 
   return messages.map((m): WhatsAppMessage => ({
@@ -71,10 +71,10 @@ export interface TrackableGroup {
 
 /** Real, live-queried list of groups the archiver is actually tracking, so a caller can see
  * what's really capturable before ingesting anything — never a hardcoded/fixture list. */
-export async function listTrackableGroups(): Promise<TrackableGroup[]> {
+export async function listTrackableGroups(ownerUserId: string): Promise<TrackableGroup[]> {
   const wadb = await getWhatsAppDb();
-  const groups = await wadb.collection<GroupDoc>("groups").find({ isTracked: true }).toArray();
-  const tracking = await wadb.collection<{ groupJid: string }>("tracking").find({}).toArray();
+  const groups = await wadb.collection<GroupDoc>("groups").find({ isTracked: true, ownerUserId: new ObjectId(ownerUserId) }).toArray();
+  const tracking = await wadb.collection<{ groupJid: string }>("tracking").find({ ownerUserId: new ObjectId(ownerUserId) }).toArray();
 
   const countByGroup = new Map<string, number>();
   for (const t of tracking) countByGroup.set(t.groupJid, (countByGroup.get(t.groupJid) ?? 0) + 1);
@@ -98,35 +98,55 @@ export async function listTrackableGroups(): Promise<TrackableGroup[]> {
  * (never a positional index), so running this twice with no new messages leaves the corpus
  * byte-identical, and running it after N new messages arrive adds exactly N new turns — never a
  * duplicate-key failure, never a re-write of the group's whole history. */
-export function createMongoWhatsAppDeps(indexSession?: BoundIndexer): WhatsAppRouteDeps {
-  const whatsAppSource = createWhatsAppSource({ hasher: sha256Hex, fetcher: fetchWhatsAppMessages });
+export interface WhatsAppStoreOptions {
+  resolveOwner?: (authenticatedTenantId: string) => Promise<string | null>;
+  appDb?: () => Db;
+  listGroups?: typeof listTrackableGroups;
+  fetchMessages?: WhatsAppFetcher;
+}
+/** Trusted server-only resolver; omitted mappings fail before upstream/app database access. */
+export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: WhatsAppStoreOptions = {}): WhatsAppRouteDeps {
+  const listGroups = options.listGroups ?? listTrackableGroups;
+  const fetchMessages = options.fetchMessages ?? fetchWhatsAppMessages;
+  const appDb = options.appDb ?? getAppDb;
+  async function ownerFor(tenantId: string): Promise<string> {
+    const owner = await options.resolveOwner?.(tenantId);
+    if (!owner || !ObjectId.isValid(owner)) throw new Error("WhatsApp owner authorization unavailable");
+    return owner;
+  }
 
   return {
-    listGroups: listTrackableGroups,
+    async listGroups(tenantId) { return listGroups(await ownerFor(tenantId)); },
 
     async ingestGroup(tenantId, groupJid): Promise<WhatsAppIngestResult> {
       // Real bug fixed per this session's data-engineer review: ownerUserId used to come straight
       // from the request body (routes/whatsapp.ts), letting any `whatsapp`-scoped key ingest any
       // archiver owner's private groups. It is now ALWAYS resolved here, from the live trackable-
       // groups list, by the groupJid the caller actually asked to ingest -- never client-supplied.
-      const groups = await listTrackableGroups();
-      const group = groups.find((g) => g.groupJid === groupJid);
+      const ownerUserId = await ownerFor(tenantId);
+      const groups = await listGroups(ownerUserId);
+      const group = groups.find((g) => g.groupJid === groupJid && g.ownerUserId === ownerUserId);
       if (!group) throw new Error(`no tracked WhatsApp group with jid "${groupJid}"`);
-      const ownerUserId = group.ownerUserId;
+      // Owner is bound to the authenticated tenant, never selected from an unscoped group.
 
       // The archiver only captures a sender the account owner explicitly selected for tracking
       // (its own D-002/D-005) -- a deliberate, informed choice, never a background silent
       // capture (D-008 provided-first ordering).
       const consent: ConsentContext = { captureMode: "provided", given: true, recordedBy: `whatsapp-owner:${ownerUserId}` };
+      // One authorized request-local snapshot supplies both identities and adapter payloads.
+      const messages = Object.freeze((await fetchMessages(groupJid, ownerUserId)).map((m): WhatsAppMessage => Object.freeze({
+        messageId: String(m.messageId),
+        personId: String(m.personId),
+        displayName: m.displayName == null ? "" : String(m.displayName),
+        text: String(m.text),
+        ts: new Date(m.ts).toISOString(),
+      })));
+      const whatsAppSource = createWhatsAppSource({ hasher: sha256Hex, fetcher: async () => [...messages] });
       const { source } = await whatsAppSource.fetch({ kind: "whatsapp", groupJid, ownerUserId, tenantId }, consent);
-      await getAppDb().collection<Sources>("sources")
+      await appDb().collection<Sources>("sources")
         .replaceOne({ _id: source._id, tenantId }, source, { upsert: true });
 
-      // Fetched once here (real messages, with the real messageId each turn keys on) AND once
-      // more inside `toTurns()` below -- a disclosed, low-severity duplicate read (same
-      // deterministic query, no correctness cost) rather than widening the shared `Source`
-      // adapter interface just for this one adapter's stable-id needs.
-      const messages = await fetchWhatsAppMessages(groupJid, ownerUserId);
+      // IDs, session date and turns consume the same frozen authorized message snapshot.
       const turns = await whatsAppSource.toTurns(source);
 
       const sessionId = source._id; // stable per (groupJid, ownerUserId) -- see whatsapp.ts
@@ -138,7 +158,7 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer): WhatsAppRo
         date: (messages[0]?.ts ?? new Date().toISOString()).slice(0, 10),
         status: { transcribe: "done", index: "pending" },
       };
-      await getAppDb().collection<Sessions>("sessions")
+      await appDb().collection<Sessions>("sessions")
         .replaceOne({ _id: sessionId, tenantId }, session, { upsert: true });
 
       const turnDocs: Turns[] = turns.map((t: Turn, i: number) => ({
@@ -156,7 +176,7 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer): WhatsAppRo
         ...(t.occurredAt ? { occurredAt: t.occurredAt } : {}),
       }));
       if (turnDocs.length > 0) {
-        await getAppDb().collection<Turns>("turns").bulkWrite(
+        await appDb().collection<Turns>("turns").bulkWrite(
           turnDocs.map((doc) => ({
             replaceOne: { filter: { _id: doc._id, tenantId }, replacement: doc, upsert: true },
           })),

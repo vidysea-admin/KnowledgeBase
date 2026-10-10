@@ -12,23 +12,25 @@ import { complete as routeComplete, embed as routeEmbed, parseRoutingYaml, Gemin
 import { treeSearch } from "@lkb/index";
 import { listHeartbeats, listWatchState } from "@lkb/db";
 import { createTelegramAlertSink } from "@lkb/core";
-import type { ServerDeps } from "./server.js";
-import type { WatchSilenceDeps } from "./routes/health.js";
+import type { ServerDeps } from "../server.js";
+import type { WatchSilenceDeps } from "../routes/health.js";
 import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, createMongoTreeStore, createMongoBrainReadDeps,
-  createMongoWatchedSourceDeps, createMongoCitationsDeps, createMongoHealthDeps, createMongoGraphReadDeps, createGwsCalendarReadDeps, createMeetingCandidatesDeps, createMongoKeysDeps } from "./store.js";
-import { createMongoIngestDeps } from "./ingest-store.js";
-import { createMongoSearchDeps } from "./search-store.js";
-import { createMongoWhatsAppDeps } from "./whatsapp-store.js";
-import { realTransport } from "./ai-transport.js";
-import { createLlmScorer } from "./score.js";
-import { createTavilySearchFn } from "./ask-web-fallback.js";
-import { indexSession, type BoundIndexer } from "./indexing/session.js";
-import { createAskArmsFor } from "./ask-arms.js";
-import { createSourceRequestDepsFor } from "./ask/source-context.js";
-import { withSessionArtifacts } from "./routes/brain.js";
-import { createMongoJobsReadDeps } from "./jobs/store.js";
+  createMongoWatchedSourceDeps, createMongoCitationsDeps, createMongoHealthDeps, createMongoGraphReadDeps, createGwsCalendarReadDeps, createMeetingCandidatesDeps, createMongoKeysDeps } from "../store.js";
+import { createMongoIngestDeps } from "../ingest-store.js";
+import { createMongoSearchDeps } from "../search-store.js";
+import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
+import { createConfiguredWhatsAppOwnerResolver } from "../whatsapp/owner-config.js";
+import { realTransport } from "../ai-transport.js";
+import { createLlmScorer } from "../score.js";
+import { createTavilySearchFn } from "../ask-web-fallback.js";
+import { indexSession, type BoundIndexer } from "../indexing/session.js";
+import { createAskArmsFor } from "../ask-arms.js";
+import { createSourceRequestDepsFor } from "../ask/source-context.js";
+import { withSessionArtifacts } from "../routes/brain.js";
+import { createMongoJobsReadDeps } from "../jobs/store.js";
+import { createConfiguredActivityHealthDeps } from "../activity-health/queue-reader.js";
 
-const ROUTING_CONFIG_PATH = fileURLToPath(new URL("../../../config/ai-routing.yaml", import.meta.url));
+const ROUTING_CONFIG_PATH = fileURLToPath(new URL("../../../../config/ai-routing.yaml", import.meta.url));
 
 /** U4b/R2 (D-048): the real, Mongo-backed watcher-silence detector `/health` runs on every probe.
  * Lives here rather than in `store.ts` for a measured reason — `store.ts` is at 299 non-blank lines
@@ -178,7 +180,7 @@ export function buildProductionDeps(): ServerDeps {
   return {
     keyStore: createMongoApiKeyStore(),
     evalRuns: createMongoEvalRunStore(),
-    brain: withSessionArtifacts(createMongoBrainReadDeps(), fileURLToPath(new URL("../../../", import.meta.url))),
+    brain: withSessionArtifacts(createMongoBrainReadDeps(), fileURLToPath(new URL("../../../../", import.meta.url))),
     citations: createMongoCitationsDeps(),
     // U4b/R2: the same Mongo health deps as before, plus the injected watcher-silence detector.
     health: { ...createMongoHealthDeps(), watchSilence: createMongoWatchSilenceDeps() },
@@ -189,10 +191,11 @@ export function buildProductionDeps(): ServerDeps {
     graph: createMongoGraphReadDeps(),
     calendar: createGwsCalendarReadDeps(),
     meetingCandidates: createMeetingCandidatesDeps(),
-    whatsapp: createMongoWhatsAppDeps(boundIndexer),
+    whatsapp: createMongoWhatsAppDeps(boundIndexer, { resolveOwner: createConfiguredWhatsAppOwnerResolver(process.env.WHATSAPP_TENANT_OWNER_MAP) }),
     keys: createMongoKeysDeps(),
     ingest: createMongoIngestDeps(boundIndexer),
     jobs: createMongoJobsReadDeps(),
+    activityHealth: createConfiguredActivityHealthDeps(),
     // CORS_ORIGINS is a comma-separated allowlist (e.g. "http://localhost:5173" in dev, the real
     // apps/web deployment origin in prod) — no default beyond "" -> empty list, matching
     // server.ts's safe-by-default stance.

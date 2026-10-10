@@ -11,7 +11,7 @@ import { Router, type Request, type Response } from "express";
 import type { EvalRuns } from "@lkb/core";
 import { askV2, BoundedAskError, type AskV2Deps } from "@lkb/ask";
 import { requireScope } from "../auth.js";
-import type { AskRouteDeps } from "./ask.js";
+import type { AskRouteDeps } from "./ask/ask.js";
 
 /** Injected dependency (C3) — production impl in `store.ts` wraps `@lkb/db`'s `eval-runs.ts`
  * accessor; tests use a fake, matching `TreeStore`/`ApiKeyStore`'s existing injection pattern. */
