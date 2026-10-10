@@ -18,7 +18,7 @@ import type { ApiKeys, Jobs, TreeIndexNode, TreeIndexRootDocument } from "@lkb/c
 import type { WriteJobFn } from "@lkb/ai";
 import { buildKnowledgeGraph, treeIndexRootFilter, type KnowledgeGraph } from "@lkb/index";
 import type { ApiKeyStore, VerifiedKey } from "./auth.js";
-import type { TreeStore } from "./routes/ask.js";
+import type { TreeStore } from "./routes/ask/ask.js";
 import type { EvalRunStore } from "./routes/compete.js";
 import { createHash } from "node:crypto";
 import { createWatchedSource, listActive as listActiveWatchedSources, recordFetch as recordWatchedFetch } from "@lkb/db";

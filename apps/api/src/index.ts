@@ -5,7 +5,7 @@ import path from "node:path";
 import { config as loadEnv } from "dotenv";
 import { connect } from "@lkb/db";
 import { startServer } from "./server.js";
-import { buildProductionDeps } from "./production.js";
+import { buildProductionDeps } from "./composition/production.js";
 
 export { createServer, startServer, type ServerDeps } from "./server.js";
 

@@ -7,7 +7,7 @@ import type { CompleteResult } from "@lkb/ai";
 import type { EvalRuns, TreeIndexNode, WatchedSources } from "@lkb/core";
 import type { AskV2Deps } from "@lkb/ask";
 import type { ApiKeyStore, VerifiedKey } from "./auth.js";
-import type { TreeStore } from "./routes/ask.js";
+import type { TreeStore } from "./routes/ask/ask.js";
 import type { EvalRunStore } from "./routes/compete.js";
 import { randomUUID } from "node:crypto";
 import type { WatchedSourceDeps } from "./routes/watched-sources.js";
