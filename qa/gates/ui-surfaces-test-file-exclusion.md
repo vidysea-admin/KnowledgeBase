@@ -42,4 +42,12 @@ with the instrument lock recorded separately as `LIVE-BROWSER: SKIP`. This gate 
 test-only unit does not have to re-derive that ruling by hand — it is a durability question, not a
 blocker.
 
-**Gate status:** OPEN — still unanswered, opened 2026-09-09, the oldest live gate in this directory. Field added 2026-09-28: the ISS-348 canonicalization left this file unstamped because its markers matched no known convention, and sweep shard 2 has since read it in full and confirmed `**Answered:** —` is accurate. Absent from the count is not the same as answered, which is exactly the gap ISS-348 exists to close
+
+## Ruling (recorded 2026-10-10)
+
+**Answered:** 2026-10-10 - APPROVED - Umesh (Approver), answering a direct multiple-choice prompt in the orchestrating session; recorded by the orchestrating agent.
+**Ruled by:** Umesh (Approver).
+**Choice:** APPROVED as the checker recommended: exclude `*.test.*` files from the D-024 live-browser trigger (`qa/ui-surfaces.json`), with the whole-changed-set reasoning recorded in the file.
+**Limits:** the trigger is read by `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1`, which does not exist on this machine; this ruling alone changes no file. Any edit to an enforcement path additionally needs a DECISIONS entry carrying `**Approved-by:** Umesh`.
+
+**Gate status:** ANSWERED - recorded inline: 2026-10-10 - approved - Umesh (Approver)
