@@ -384,7 +384,7 @@ count — and the checker notes a **count-based** cap would have closed this sea
 which is the same arithmetic that would have shipped ISS-078. So ISS-180 is a real unit, just not
 this one. Stopping here is the cycle limit doing its job, not the defect being dismissed.
 
-**Handshake status:** STALLED — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree
+**Handshake status:** paused — ISS-369: the ISS-350 backfill derived STALLED, but D-041 ruling 5 (2026-09-28) then reset this unit (legacy Status line: reset-awaiting-rebuild). That value is not in HANDSHAKE_VOCAB, so the reset is mapped to the existing `paused` (not ready-for-check, not a live STALLED); the two status lines now agree in meaning, not in spelling
 
 ## Cycle reset — 2026-09-28 (D-041 ruling 5)
 
