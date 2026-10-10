@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { SkippedItem } from "@lkb/core";
-import { buildAttentionAlerts, selectNewAlerts, neutralizeText, renderStart } from "./attention-alerts.js";
+import { buildAttentionAlerts, selectNewAlerts, neutralizeText, renderStart, alertIdFor } from "./attention-alerts.js";
 
 const NOW = "2026-10-10T00:00:00.000Z";
 const sk = (reason: string, key = "cal:e1", title = "Weekly Webinar"): SkippedItem =>
@@ -35,11 +35,11 @@ test("action_required job rows: mapped reasons and generic reason", () => {
     c: { status: "action_required", reason: "evil <b>reason</b>", title: "C" },
     d: { status: "ready", title: "D" },
   } });
-  const by = Object.fromEntries(r.alerts.map((a) => [a.sessionKey, a])) as Record<string, (typeof r.alerts)[number]>;
-  assert.equal(by.a!.case, "needs-registration");
-  assert.equal(by.b!.case, "action-required");
-  assert.match(by.b!.body, /Reason: retry-limit\./);
-  assert.match(by.c!.body, /Reason: unspecified\./);
+  const by = Object.fromEntries(r.alerts.map((a) => [a.id, a])) as Record<string, (typeof r.alerts)[number]>;
+  assert.equal(by[alertIdFor("a")]!.case, "needs-registration");
+  assert.equal(by[alertIdFor("b")]!.case, "action-required");
+  assert.match(by[alertIdFor("b")]!.body, /Reason: retry-limit\./);
+  assert.match(by[alertIdFor("c")]!.body, /Reason: unspecified\./);
   assert.equal(r.ignored.reasons["job-not-action-required"], 1);
 });
 
@@ -50,7 +50,8 @@ test("dedupe key stable across ticks, differs by event and case, has no time or 
   assert.equal(a1.key, a2.key);
   assert.notEqual(a1.key, run({ skipped: [sk("overlap-lost", "cal:e2")] }).alerts[0]!.key);
   assert.notEqual(a1.key, run({ skipped: [sk("needs-registration")] }).alerts[0]!.key);
-  assert.equal(a1.key, "attn:overlap-lost:cal:e1");
+  assert.equal(a1.key, `attn:overlap-lost:${alertIdFor("cal:e1")}`);
+  assert.match(a1.key, /^attn:overlap-lost:[0-9a-f]{20}$/);
   // same situation seen as skip and as job row dedupes together
   const j = run({ jobs: { "cal:e1": { status: "action_required", reason: "overlap-lost", title: "x" } } }).alerts[0]!;
   assert.equal(j.key, a1.key);
@@ -81,7 +82,7 @@ test("hostile titles are neutralised and bounded", () => {
     assert.doesNotMatch(a.body.split("\n")[1]!, /[*_`[\]<>\\\r]|javascript:/i);
     assert.equal(a.body.split("\n").length, 4); // no injected lines
   }
-  assert.ok(neutralizeText("A".repeat(5000)).endsWith("\u2026"));
+  assert.ok(neutralizeText("word ".repeat(1000)).endsWith("\u2026"));
   assert.equal(neutralizeText("   \n "), "(untitled)");
   assert.equal(neutralizeText(42), "(untitled)");
 });
@@ -100,7 +101,7 @@ test("ordering by start time then key; past starts dropped", () => {
     skipped: [sk("overlap-lost", "cal:b"), sk("overlap-lost", "cal:a"), sk("overlap-lost", "cal:c"), sk("overlap-lost", "cal:old"), sk("overlap-lost", "cal:nostart")],
     startTimes: { "cal:b": "2026-10-12T00:00:00Z", "cal:a": "2026-10-12T00:00:00Z", "cal:c": "2026-10-11T00:00:00Z", "cal:old": "2026-10-09T00:00:00Z" },
   });
-  assert.deepEqual(r.alerts.map((a) => a.sessionKey), ["cal:c", "cal:a", "cal:b", "cal:nostart"]);
+  assert.deepEqual(r.alerts.map((a) => a.id), [alertIdFor("cal:c"), ...["cal:a", "cal:b"].map(alertIdFor).sort(), alertIdFor("cal:nostart")]);
   assert.equal(r.ignored.reasons["already-started"], 1);
 });
 

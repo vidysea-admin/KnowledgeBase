@@ -4,22 +4,25 @@
  * No I/O, no sending, no clock, no machine time zone. Nothing here is wired to a sender yet.
  *
  * Telegram sinks in this repo POST `{chat_id, text}` with NO parse_mode (plain text), so nothing
- * is interpreted today; markup characters are still stripped so a later parse_mode cannot turn an
- * attacker-controlled invitation title into formatting or a link. No link is ever included.
+ * is interpreted today. Titles go through the allowlist renderer in alert-text.ts (no link, secret,
+ * number run or markup survives), and the raw session key is never emitted: only its opaque hash id.
  */
+import { createHash } from "node:crypto";
 import type { SkippedItem } from "@lkb/core";
+import { neutralizeText } from "./alert-text.js";
 
 export type AttentionCase = "needs-registration" | "overlap-lost" | "action-required" | "untrusted-sender" | "join-link";
 export type AttentionSeverity = "high" | "medium";
 
 export interface AttentionAlert {
-  /** Stable across ticks: `attn:<case>:<sessionKey>[:<reason>]`. Never time- or URL-derived. */
+  /** Stable across ticks: `attn:<case>:<id>[:<reason>]`. Never time- or URL-derived. */
   key: string;
   case: AttentionCase;
   severity: AttentionSeverity;
   title: string;
   body: string;
-  sessionKey: string;
+  /** alertIdFor(sessionKey): opaque; the raw key is never in an alert. A consumer keeps its own id-to-key map. */
+  id: string;
   /** ISO start time when the caller supplied one; used for ordering. */
   startTime?: string;
   source: "skipped" | "job";
@@ -41,38 +44,37 @@ export interface AttentionResult {
   ignored: { count: number; reasons: Record<string, number> };
 }
 
-const MAX_TITLE = 80;
-const BIDI = /[\u200e\u200f\u061c\u202a-\u202e\u2066-\u2069\u2028\u2029\ufeff]/g;
-const URLISH = /\b(?:[a-z][a-z0-9+.-]*:\/\/|javascript:|data:|vbscript:|www\.)\S*/gi;
-const EMAIL = /[^\s<>()@]+@[^\s<>()@]+/g;
-const SECRETISH = /\b(?:pwd|passcode|password|token|tk|access_token)\s*[=:]\s*\S+/gi;
-const MARKUP = /[*_`~[\]<>|\\{}#]/g;
+export { neutralizeText };
 
-/** Plain-text, single-line, bounded rendering of attacker-controlled text. */
-export function neutralizeText(raw: unknown, max = MAX_TITLE): string {
-  let s = typeof raw === "string" ? raw : "";
-  s = s.slice(0, 2000).replace(URLISH, "[link]").replace(SECRETISH, "[secret]").replace(EMAIL, "[email]");
-  // eslint-disable-next-line no-control-regex
-  s = s.replace(/[\u0000-\u001f\u007f-\u009f]/g, " ").replace(BIDI, "").replace(MARKUP, "").replace(/\s+/g, " ").trim();
-  if (!s) return "(untitled)";
-  const chars = Array.from(s);
-  return chars.length > max ? chars.slice(0, max - 1).join("") + "\u2026" : s;
+/** The zone string itself, only if Intl accepts it AND it has a plain zone-name charset; else "UTC". Printed unchanged (underscores kept). */
+function validZone(z: unknown): string {
+  if (typeof z !== "string" || !/^[A-Za-z0-9_+:/-]{1,64}$/.test(z)) return "UTC";
+  try { new Intl.DateTimeFormat("en-US", { timeZone: z }); return z; } catch { return "UTC"; }
 }
 
 /** "2026-10-11 00:30 (Asia/Kolkata)"; an unparseable time or zone degrades, never throws. */
 export function renderStart(iso: string | undefined, timeZone: string): string {
   const ms = typeof iso === "string" ? Date.parse(iso) : NaN;
   if (!Number.isFinite(ms)) return "start time unknown";
-  let zone = "UTC";
-  try { new Intl.DateTimeFormat("en-US", { timeZone }); zone = timeZone; } catch { /* keep UTC */ }
+  const zone = validZone(timeZone);
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: zone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
   }).formatToParts(new Date(ms));
   const p = (t: string) => parts.find((x) => x.type === t)?.value ?? "??";
-  return `${p("year")}-${p("month")}-${p("day")} ${p("hour")}:${p("minute")} (${neutralizeText(zone, 40)})`;
+  return `${p("year")}-${p("month")}-${p("day")} ${p("hour")}:${p("minute")} (${zone})`;
 }
 
-const keyPart = (s: string) => s.replace(/[^A-Za-z0-9:._|-]/g, "_").slice(0, 160);
+/**
+ * Opaque id for a session key: first 20 hex chars (80 bits) of SHA-256 over the exact UTF-16 code units
+ * of the key. Birthday collision odds for n keys ~ n^2 / 2^81 (about 4e-19 for 500), so negligible; a
+ * lone surrogate hashes distinctly (utf8 would map it to U+FFFD). Keys differing only in case,
+ * whitespace or Unicode normalisation are different strings and get different ids on purpose.
+ */
+export function alertIdFor(sessionKey: string): string {
+  return createHash("sha256").update(Buffer.from(sessionKey, "utf16le")).digest("hex").slice(0, 20);
+}
+const safeReasonKey = (r: unknown) => (typeof r === "string" && /^[a-z0-9-]{1,40}$/.test(r) ? r : "other");
+const own = (o: object, k: string): unknown => (Object.prototype.hasOwnProperty.call(o, k) ? (o as Record<string, unknown>)[k] : undefined);
 const KNOWN_REASONS = new Set(["retry-limit", "interrupted-no-recording-artifact", "missed-while-processing", "missed-coverage",
   "cancelled", "rescheduled", "controller-disconnected", "coverage-review", "needs-review", "invalid-time", "source-discontinuity",
   "recurring-series", "rescheduled-completed", "rejected"]);
@@ -97,10 +99,10 @@ function build(c: AttentionCase, sessionKey: string, title: unknown, startTime: 
   const t = neutralizeText(title);
   const detail = c === "action-required" && reason ? ` Reason: ${reason}.` : "";
   return {
-    key: `attn:${c}:${keyPart(sessionKey)}${c === "action-required" && reason ? `:${reason}` : ""}`,
+    key: `attn:${c}:${alertIdFor(sessionKey)}${c === "action-required" && reason ? `:${reason}` : ""}`,
     case: c, severity: spec.severity, title: `${spec.headline}: ${t}`,
     body: `${spec.what}${detail}\nEvent: ${t}\nStarts: ${renderStart(startTime, tz)}\nWhat to do: ${spec.todo}`,
-    sessionKey, ...(startTime ? { startTime } : {}), source,
+    id: alertIdFor(sessionKey), ...(startTime ? { startTime } : {}), source,
   };
 }
 
@@ -114,13 +116,18 @@ function caseForReason(reason: unknown): AttentionCase | undefined {
   }
 }
 
+/** Total: a throwing getter or Proxy anywhere in the input yields an empty, counted result. */
 export function buildAttentionAlerts(input: AttentionInput): AttentionResult {
+  try { return buildInner(input); } catch { return { alerts: [], ignored: { count: 1, reasons: { "unreadable-input": 1 } } }; }
+}
+
+function buildInner(input: AttentionInput): AttentionResult {
   const reasons: Record<string, number> = {};
   let count = 0;
   const ignore = (why: string) => { count++; reasons[why] = (reasons[why] ?? 0) + 1; };
   const alerts: AttentionAlert[] = [];
   const nowMs = Date.parse(typeof input?.now === "string" ? input.now : "");
-  const tz = typeof input?.timeZone === "string" ? input.timeZone : "UTC";
+  const tz = validZone(input?.timeZone);
   const starts = input?.startTimes && typeof input.startTimes === "object" ? input.startTimes : {};
   const startOf = (id: string): string | undefined => {
     const v = Object.prototype.hasOwnProperty.call(starts, id) ? starts[id] : undefined;
@@ -132,24 +139,32 @@ export function buildAttentionAlerts(input: AttentionInput): AttentionResult {
   const skipped = Array.isArray(input?.skipped) ? input.skipped : [];
   if (input?.skipped !== undefined && !Array.isArray(input.skipped)) ignore("malformed-skipped-list");
   for (const item of skipped) {
-    const it = item as Partial<SkippedItem> | null;
-    if (!it || typeof it !== "object" || typeof it.sessionKey !== "string" || !it.sessionKey) { ignore("malformed-skipped-item"); continue; }
-    const c = caseForReason(it.reason);
-    if (!c) { ignore(`no-alert-for-reason:${typeof it.reason === "string" ? keyPart(it.reason) : "none"}`); continue; }
-    push(build(c, it.sessionKey, it.title, startOf(it.sessionKey), tz, "skipped"));
+    try {
+      const it = item as object | null;
+      const sessionKey = it && typeof it === "object" ? own(it, "sessionKey") : undefined;
+      if (typeof sessionKey !== "string" || !sessionKey) { ignore("malformed-skipped-item"); continue; }
+      const reason = own(it as object, "reason");
+      const c = caseForReason(reason);
+      if (!c) { ignore(`no-alert-for-reason:${typeof reason === "string" ? safeReasonKey(reason) : "none"}`); continue; }
+      push(build(c, sessionKey, own(it as object, "title"), startOf(sessionKey), tz, "skipped"));
+    } catch { ignore("unreadable-skipped-item"); }
   }
 
   const jobs = input?.jobs && typeof input.jobs === "object" && !Array.isArray(input.jobs) ? input.jobs : undefined;
   if (input?.jobs !== undefined && !jobs) ignore("malformed-jobs-map");
   for (const id of Object.keys(jobs ?? {})) {
-    const row = (jobs as Record<string, unknown>)[id] as Record<string, unknown> | null;
-    if (!row || typeof row !== "object" || Array.isArray(row) || typeof row.status !== "string") { ignore("malformed-job-row"); continue; }
-    if (row.status !== "action_required") { ignore("job-not-action-required"); continue; }
-    const reason = typeof row.reason === "string" ? row.reason : undefined;
-    const mapped = caseForReason(reason);
-    const own = typeof row.startTime === "string" && Number.isFinite(Date.parse(row.startTime)) ? row.startTime : undefined;
-    const safeReason = reason && KNOWN_REASONS.has(reason) ? reason : "unspecified";
-    push(build(mapped ?? "action-required", id, row.title, startOf(id) ?? own, tz, "job", safeReason));
+    try {
+      const row = own(jobs as object, id) as object | null;
+      const status = row && typeof row === "object" && !Array.isArray(row) ? own(row, "status") : undefined;
+      if (!row || typeof status !== "string") { ignore("malformed-job-row"); continue; }
+      if (status !== "action_required") { ignore("job-not-action-required"); continue; }
+      const r = own(row, "reason"), st = own(row, "startTime");
+      const reason = typeof r === "string" ? r : undefined;
+      const mapped = caseForReason(reason);
+      const own0 = typeof st === "string" && Number.isFinite(Date.parse(st)) ? st : undefined;
+      const safeReason = reason && KNOWN_REASONS.has(reason) ? reason : "unspecified";
+      push(build(mapped ?? "action-required", id, own(row, "title"), startOf(id) ?? own0, tz, "job", safeReason));
+    } catch { ignore("unreadable-job-row"); }
   }
 
   alerts.sort((a, b) => {
