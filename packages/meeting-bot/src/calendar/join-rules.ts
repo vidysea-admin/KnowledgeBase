@@ -164,21 +164,21 @@ export function evaluateJoinRules(event: JoinRuleEvent, rawRuleSet: JoinRuleSet,
 }
 
 /** "Approve once -> trusted": returns NEW state; the input is never mutated. Throws on invalid value. */
-export function recordApproval(state: JoinRuleState, approval: { kind: "sender" | "domain"; value: string }): JoinRuleState {
+export function recordRuleApproval(state: JoinRuleState, approval: { kind: "sender" | "domain"; value: string }): JoinRuleState {
   if (approval.kind === "sender") {
     const e = normalizeEmail(approval.value);
-    if (!e) throw new Error(`recordApproval: invalid sender email ${JSON.stringify(approval.value)}`);
+    if (!e) throw new Error(`recordRuleApproval: invalid sender email ${JSON.stringify(approval.value)}`);
     return { ...state, approvedSenders: state.approvedSenders.includes(e) ? [...state.approvedSenders] : [...state.approvedSenders, e],
       approvedDomains: [...state.approvedDomains], optedOutEventIds: [...state.optedOutEventIds] };
   }
   if (approval.kind === "domain") {
     const d = normalizeDomain(approval.value);
-    if (!d) throw new Error(`recordApproval: invalid domain ${JSON.stringify(approval.value)}`);
+    if (!d) throw new Error(`recordRuleApproval: invalid domain ${JSON.stringify(approval.value)}`);
     return { ...state, approvedSenders: [...state.approvedSenders],
       approvedDomains: state.approvedDomains.includes(d) ? [...state.approvedDomains] : [...state.approvedDomains, d],
       optedOutEventIds: [...state.optedOutEventIds] };
   }
-  throw new Error(`recordApproval: unknown kind ${JSON.stringify((approval as { kind: unknown }).kind)}`);
+  throw new Error(`recordRuleApproval: unknown kind ${JSON.stringify((approval as { kind: unknown }).kind)}`);
 }
 
 /** Per-meeting opt-out; returns NEW state. */

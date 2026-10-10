@@ -19,7 +19,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync, unlinkS
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 import {
-  EMPTY_JOIN_RULE_STATE, recordApproval as applyApproval, recordOptOut as applyOptOut,
+  EMPTY_JOIN_RULE_STATE, recordRuleApproval as applyApproval, recordOptOut as applyOptOut,
   validateJoinRuleSet, validateJoinRuleState, type JoinRuleSet, type JoinRuleState,
 } from "./join-rules.js";
 
