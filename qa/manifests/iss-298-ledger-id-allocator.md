@@ -1,6 +1,6 @@
 # iss-298-ledger-id-allocator
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Feature: ledger-id-allocation
 Maker: lane/alloc (worktree KnowledgeBase-lanes/alloc), base a71685e
 Backlog: ISS-298 (qa/contracts/ledger-id-allocation.md), assigned by the orchestrator.
@@ -31,7 +31,7 @@ Choices the contract left open: whitespace-only lines are TOLERATED (as tracker-
 Exclusive lock file `qa/.issues-ledger.lock` created with `wx` (one lock for the whole union, since a main id must be unique against every shard), content `{pid, at}`, released in `finally`. Contention (EEXIST/EPERM/EBUSY/EACCES) retries with jittered sleep up to 8s then errors "still held". A lock older than 30s is a STALE LOCK: the error names it, shows its content, says "NOT stealing", leaves it in place. Write is a single `appendFileSync(..., {flag:"a"})` of the full line.
 
 ## Evidence
-`node scripts/qa/ledger-alloc.test.mjs` run as `timeout 180 node --test scripts/qa/ledger-alloc.test.mjs` (node v24.19.0):
+`timeout 180 node --test scripts/qa/ledger-alloc.test.mjs` (node v24.19.0):
 ```
 ℹ tests 16
 ℹ pass 16
@@ -60,5 +60,27 @@ That unit was a read-only duplicate refusal inside `tracker-audit.mjs` (A1-A4 ma
 - NOT wired into any hook, `append_decision.ps1`, or the maker/checker skills (enforcement paths and shared skills need the Approver): adoption is voluntary until then. Concurrent loops that keep hand-appending bypass the lock entirely; C2's re-read only protects callers that use `appendRow`.
 - C3 is narrower than the contract: only `ISSUES-WRITTEN:` lines, and only flags unresolved ids or ids whose row feature equals another existing unit's slug. Not a gate; not in tracker-audit.
 - C6 (old->new mapping in verdicts) is process, not code.
-- Unusable on the real ledger until ISS-ALLOC-001 is decided.
+- Cycle 0's "unusable on the real ledger" is resolved by Fix cycle 1. Still true: one global lock serialises all appends; no stale-lock stealing; the contract is still `proposed` and unratified; C3 `cite-check` is a triage tool, not a gate; nothing is wired into hooks or skills.
+
+## Fix cycle 1
+**What failed (verdict FAIL, cycle 0).** The mechanism passed but the READER refused the real ledger (`verify`: 4 wrong-form, exit 1), so the allocator could not run on the real repo. The cycle-0 maker invented the rule "ids in the main file must be plain `ISS-<digits>`"; it is in neither the contract nor any decision. The four ids are lawful: `ISS-360-OBSFLAKE` and `ISS-360-HEARTBEAT` were created on purpose by D-055 ruling 2, and `ISS-C-CLAIMS-TARGETING-001` and `ISS-C-TOPICREFS-ARG-001` are lane ids that arrived by merge, which D-019 forbids renumbering. **Cause: the tool's over-strict reader. No Approver decision is needed** (ISS-ALLOC-001's "Approver decision" fix_direction was wrong; its row is left in place, the checker flips status). No row was edited and there is no allowlist.
+
+**Two grammars.**
+- READING (any file, any row): `READ_ID_RE = /^ISS-[A-Z0-9]+(?:-[A-Z0-9]+)*$/` (`ISS-` then upper-case alphanumeric segments, single hyphens). Covers plain `ISS-12`, lane `ISS-U3-001`, qualified `ISS-360-OBSFLAKE`. Still refused: lower case, spaces, empty segment, trailing hyphen, missing `ISS-`, empty/non-string/missing id, a duplicate id anywhere in the union, an unparseable line, a BOM, a partial last line.
+- ALLOCATING (unchanged): main = exactly `ISS-<digits>`; shard = exactly `ISS-<LANE>-<digits>` (3 digits, LANE upper-cased).
+
+**Numbering.** Plain next = 1 + max over ids that are EXACTLY `ISS-<digits>` anywhere in the union; qualified ids neither count nor block (`ISS-360-OBSFLAKE` is not a second 360). Lane next = 1 + max over ids exactly `ISS-<LANE>-<digits>` in ANY file, so a lane whose rows were merged into the main file continues after them (`ISS-C-CLAIMS-TARGETING-001/002` in main => next `-003`/`-004`); lane `C` is a separate namespace from `C-CLAIMS-TARGETING`. The chosen id must also be unused across the union or the append is refused.
+
+**Lock.** Hard overall deadline (`waitMs`; env `LEDGER_LOCK_WAIT_MS`; default 8000 kept). `EEXIST` = "still held by someone else", retried to the deadline. Any other open error (ENOENT, EROFS, EACCES/EPERM/EBUSY with no lock file present, ...) fails immediately as "cannot create ledger lock ... <CODE>". One deliberate softening: EACCES/EPERM/EBUSY while a lock file DOES exist is treated as contention (Windows reports a mid-delete lock that way). Staleness age now comes from the `at` timestamp inside the lock when it parses, else mtime. Stale locks are still reported, never stolen. Documented in the `acquireLock` doc comment.
+
+### Real-ledger verify (read-only), `node scripts/qa/ledger-alloc-cli.mjs verify`, exit 0
+```
+rows=479 findings=0
+```
+
+### Evidence (fix cycle 1)
+`timeout 300 node --test scripts/qa/ledger-alloc.test.mjs scripts/qa/ledger-alloc-fix1.test.mjs` (node v24.19.0), run 3 times, each `tests 25 / pass 25 / fail 0` (16 existing incl. the multi-process test, 2 edited for the new grammar, plus 9 new in `ledger-alloc-fix1.test.mjs`). New tests read the real union and assert every id is accepted (0 findings); refusals; numbering cases; lock cases; an append on a temp COPY of every real ledger file.
+- `ISS-298: 5/5` (recorded reproduction replay, unchanged).
+- `ISS-ALLOC-004: 1/1`: icacls-denied qa dir, `append --main` now exits 1 in about 0.6-2 s with `cannot create ledger lock ...: EPERM`, no lock left, no spin.
+- Non-blank lines: ledger-alloc.mjs 219, ledger-alloc.test.mjs 224, ledger-alloc-fix1.test.mjs 139.
 - Windows-only run; lock contention codes for POSIX are covered but untested here.
