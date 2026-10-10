@@ -27,11 +27,24 @@ export interface SourceHydration {
 }
 export type HydrateSourcesFn = (query: string, nodes: TreeIndexNode[]) => Promise<SourceHydration>;
 export interface SourceContextDeps { hydrate: HydrateSourcesFn }
+export interface BudgetRefusalDiagnostics {
+  readonly reason: "dispatch_limit" | "job_byte_limit" | "aggregate_byte_limit" | "start_deadline" | "output_byte_limit";
+  readonly phase: "input_admission" | "output_validation";
+  readonly stage: string;
+  readonly limit: number;
+  readonly attemptedJobBytes: number;
+  readonly dispatchedCalls: number;
+  readonly acceptedInputBytes: number;
+  readonly elapsedStartMs: number;
+  readonly serializedOutputBytes?: number;
+}
 export class BoundedAskError extends Error {
   readonly code = "source_context_unavailable";
-  constructor(readonly reason: string) {
+  readonly budgetRefusal?: Readonly<BudgetRefusalDiagnostics>;
+  constructor(readonly reason: string, budgetRefusal?: BudgetRefusalDiagnostics) {
     super("Ask could not validate a bounded source context: " + reason);
     this.name = "BoundedAskError";
+    this.budgetRefusal = budgetRefusal ? Object.freeze({ ...budgetRefusal }) : undefined;
   }
 }
 export const SOURCE_LIMITS = Object.freeze({
@@ -114,15 +127,32 @@ export function completionBudget(complete: CompleteFn, now: () => number = Date.
   const bounded: CompleteFn = async (job) => {
     assertHealthy();
     const size = payloadBytes(job);
-    if (calls >= SOURCE_LIMITS.calls || size > SOURCE_LIMITS.jobBytes || bytes + size > SOURCE_LIMITS.totalJobBytes
-      || now() - started >= SOURCE_LIMITS.startDeadlineMs) {
-      failure = new BoundedAskError("completion dispatch, byte, or start-deadline budget exhausted");
+    const elapsed = now() - started;
+    const stage = ["ask", "evaluator", "ask.select_nodes", "ask.refine_batch", "ask.answer", "ask.answer_grounding"]
+      .includes(job.kind) ? job.kind : "other";
+    const cause = calls >= SOURCE_LIMITS.calls ? "dispatch_limit"
+      : size > SOURCE_LIMITS.jobBytes ? "job_byte_limit"
+        : bytes + size > SOURCE_LIMITS.totalJobBytes ? "aggregate_byte_limit"
+          : elapsed >= SOURCE_LIMITS.startDeadlineMs ? "start_deadline" : undefined;
+    if (cause) {
+      const limit = cause === "dispatch_limit" ? SOURCE_LIMITS.calls
+        : cause === "job_byte_limit" ? SOURCE_LIMITS.jobBytes
+          : cause === "aggregate_byte_limit" ? SOURCE_LIMITS.totalJobBytes : SOURCE_LIMITS.startDeadlineMs;
+      failure = new BoundedAskError("completion dispatch, byte, or start-deadline budget exhausted", {
+        reason: cause, phase: "input_admission", stage, limit, attemptedJobBytes: size,
+        dispatchedCalls: calls, acceptedInputBytes: bytes, elapsedStartMs: elapsed,
+      });
       throw failure;
     }
     calls += 1; bytes += size;
     const result = await complete(job);
-    if (payloadBytes(result) > SOURCE_LIMITS.jobBytes) {
-      failure = new BoundedAskError("completion output exceeds byte budget");
+    const outputSize = payloadBytes(result);
+    if (outputSize > SOURCE_LIMITS.jobBytes) {
+      failure = new BoundedAskError("completion output exceeds byte budget", {
+        reason: "output_byte_limit", phase: "output_validation", stage, limit: SOURCE_LIMITS.jobBytes,
+        attemptedJobBytes: size, dispatchedCalls: calls, acceptedInputBytes: bytes,
+        elapsedStartMs: now() - started, serializedOutputBytes: outputSize,
+      });
       throw failure;
     }
     return result;

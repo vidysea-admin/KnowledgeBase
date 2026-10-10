@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { TreeIndexNode } from "@lkb/core";
-import { sourceCatalog, payloadBytes, completionBudget, SOURCE_LIMITS, validateHydration } from "./source-context.js";
+import { sourceCatalog, payloadBytes, completionBudget, SOURCE_LIMITS, validateHydration, BoundedAskError } from "./source-context.js";
+import { askV2 } from "./ask-v2.js";
 import { boundedRefine, contextStrips, packContext, unpackContext } from "./bounded-refine.js";
 
 const completion = (json: unknown) => ({ text: JSON.stringify(json), json, provider: "offline", model: "fixture", costUsd: 0,
@@ -121,4 +122,92 @@ test("real-length IDs refine all 384 strips within three jobs and unchanged comp
   assert.equal(ids.size, 384);
   assert.ok(jobs.length <= 3 && jobs.every((size) => size <= 65536));
   t.diagnostic(JSON.stringify({ refineJobs: jobs.length, completeJobBytes: jobs, judgedStrips: ids.size }));
+});
+
+async function budgetFailure(attempt: Promise<unknown>): Promise<BoundedAskError> {
+  try { await attempt; assert.fail("expected budget refusal"); }
+  catch (err) {
+    assert.ok(err instanceof BoundedAskError);
+    assert.ok(err.budgetRefusal);
+    return err;
+  }
+}
+test("quota diagnostics identify exact UTF8 job bytes and omit untrusted stages and payloads", async () => {
+  let dispatched = 0;
+  const secret = "RAW_QUERY_MUST_NOT_BE_RETAINED";
+  const job = { kind: secret, messages: [{ role: "user" as const, content: secret + "字".repeat(23000) }] };
+  const budget = completionBudget(async () => { dispatched++; return completion({}); }, () => 10);
+  const failure = await budgetFailure(budget.complete(job));
+  assert.equal(failure.reason, "completion dispatch, byte, or start-deadline budget exhausted");
+  assert.deepEqual(failure.budgetRefusal, { reason: "job_byte_limit", phase: "input_admission", stage: "other",
+    limit: SOURCE_LIMITS.jobBytes, attemptedJobBytes: payloadBytes(job), dispatchedCalls: 0,
+    acceptedInputBytes: 0, elapsedStartMs: 0 });
+  assert.equal(dispatched, 0);
+  assert.ok(!JSON.stringify(failure.budgetRefusal).includes(secret));
+  assert.ok(Object.isFrozen(failure.budgetRefusal));
+  assert.throws(() => budget.assertHealthy(), (err) => err === failure);
+  const retry = await budgetFailure(budget.complete({ kind: "ask.answer", messages: [] }));
+  assert.equal(retry, failure);
+  assert.deepEqual(budget.stats(), { calls: 0, inputBytes: 0 });
+});
+test("quota diagnostics distinguish dispatch, aggregate bytes and START deadline without extra calls", async () => {
+  const small = { kind: "evaluator", messages: [] };
+  const dispatch = completionBudget(async () => completion({}), () => 0);
+  for (let i = 0; i < SOURCE_LIMITS.calls; i++) await dispatch.complete(small);
+  const limited = await budgetFailure(dispatch.complete(small));
+  assert.equal(limited.budgetRefusal!.reason, "dispatch_limit");
+  assert.equal(limited.budgetRefusal!.dispatchedCalls, 12);
+  assert.equal(limited.budgetRefusal!.acceptedInputBytes, 12 * payloadBytes(small));
+  const large = { kind: "evaluator", messages: [{ role: "user" as const, content: "x".repeat(60000) }] };
+  const total = completionBudget(async () => completion({}), () => 0);
+  for (let i = 0; i < 4; i++) await total.complete(large);
+  const pending = { kind: "ask.answer", messages: [{ role: "user" as const, content: "x".repeat(30000) }] };
+  const aggregated = await budgetFailure(total.complete(pending));
+  assert.equal(aggregated.budgetRefusal!.reason, "aggregate_byte_limit");
+  assert.equal(aggregated.budgetRefusal!.acceptedInputBytes, 4 * payloadBytes(large));
+  assert.equal(aggregated.budgetRefusal!.attemptedJobBytes, payloadBytes(pending));
+  assert.equal(aggregated.budgetRefusal!.dispatchedCalls, 4);
+  let now = 0, calls = 0;
+  const deadline = completionBudget(async () => { calls++; now = 240000; return completion({}); }, () => now);
+  await deadline.complete(small);
+  const elapsed = await budgetFailure(deadline.complete(small));
+  assert.equal(elapsed.budgetRefusal!.reason, "start_deadline");
+  assert.equal(elapsed.budgetRefusal!.elapsedStartMs, 240000);
+  assert.equal(calls, 1);
+});
+test("output diagnostics count the one completed dispatch and actual serialized result", async () => {
+  const result = completion({ text: "x".repeat(40000) });
+  const job = { kind: "ask.answer", messages: [] };
+  const budget = completionBudget(async () => result, () => 0);
+  const failure = await budgetFailure(budget.complete(job));
+  assert.equal(failure.reason, "completion output exceeds byte budget");
+  assert.equal(failure.budgetRefusal!.reason, "output_byte_limit");
+  assert.equal(failure.budgetRefusal!.phase, "output_validation");
+  assert.equal(failure.budgetRefusal!.serializedOutputBytes, payloadBytes(result));
+  assert.deepEqual(budget.stats(), { calls: 1, inputBytes: payloadBytes(job) });
+});
+test("actual bounded Ask persists safe structured refusal through its injected Job store", async () => {
+  const stored: unknown[] = [];
+  const store = { insertOne: async (entry: unknown) => { stored.push(structuredClone(entry)); } };
+  let dispatched = 0;
+  const rawMarker = "DO_NOT_PERSIST_RAW_QUERY_世界";
+  const query = rawMarker + "x".repeat(68000);
+  const tree: TreeIndexNode = { node_id: "tenant:toc", title: "TOC", level: "tenant", summary: "", children: [] };
+  const failure = await budgetFailure(askV2(query, tree, { tenantId: "toc",
+    complete: async () => { dispatched++; return completion({}); }, scoreFn: () => [1, "not reached"],
+    treeSearchFn: () => [], sourceContext: { hydrate: async () => { throw new Error("not reached"); } },
+    write: async (entry) => { await store.insertOne(entry); },
+  }));
+  assert.equal(dispatched, 0);
+  assert.equal(stored.length, 1);
+  const job = stored[0] as { tenantId: string; kind: string; status: string; error: string; createdAt: string };
+  assert.equal(job.tenantId, "toc"); assert.equal(job.kind, "ask.source_context_refused"); assert.equal(job.status, "failed");
+  assert.ok(job.createdAt);
+  const retained = JSON.parse(job.error);
+  assert.equal(retained.format, "lkb.budget_refusal.v1");
+  assert.equal(retained.message, failure.message);
+  assert.deepEqual(retained.budgetRefusal, failure.budgetRefusal);
+  assert.equal(retained.budgetRefusal.stage, "ask.select_nodes");
+  assert.equal(retained.budgetRefusal.reason, "job_byte_limit");
+  assert.ok(!job.error.includes(rawMarker));
 });

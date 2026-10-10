@@ -266,7 +266,9 @@ export async function askV2(query: string, tree: TreeIndexNode, deps: AskV2Deps)
   catch (err) {
     if (deps.sourceContext) {
       const failure = err instanceof BoundedAskError ? err : new BoundedAskError("source or completion processing failed");
-      await recordJob({ tenantId: deps.tenantId, kind: "ask.source_context_refused", status: "failed", error: failure.message }, deps.write);
+      const error = failure.budgetRefusal
+        ? JSON.stringify({ format: "lkb.budget_refusal.v1", message: failure.message, budgetRefusal: failure.budgetRefusal }) : failure.message;
+      await recordJob({ tenantId: deps.tenantId, kind: "ask.source_context_refused", status: "failed", error }, deps.write);
       throw failure;
     }
     throw err;
