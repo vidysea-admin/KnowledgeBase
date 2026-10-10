@@ -8,9 +8,9 @@
   "progress": {
     "total": 95,
     "done": 51,
-    "in_progress": 5,
+    "in_progress": 10,
     "blocked": 0,
-    "pending": 39,
+    "pending": 34,
     "current": "U2.2",
     "percent": 54
   },
@@ -269,7 +269,7 @@
     {
       "id": "T-021",
       "title": "Golden set 50-100 Qs + recall@k report (target recall@5 >= 0.85)",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "LOW",
       "deps": [
         "T-002"
@@ -482,7 +482,7 @@
     {
       "id": "U0.10",
       "title": "Honest eval baseline against a real LLM (redo T-021/T-022)",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -828,7 +828,7 @@
     {
       "id": "T-037",
       "title": "Auto-join rules (sender/domain/platform, approve-once, opt-out)",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -890,7 +890,7 @@
     {
       "id": "T-043",
       "title": "Index webinar sessions into the KB (/ask across webinars)",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -900,7 +900,7 @@
     {
       "id": "T-044",
       "title": "Transcript QA: timestamp drift clamp + hallucination spot-check",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",

@@ -124,14 +124,14 @@ Meeting-Bot pages (apps/web) are open follow-up work, not yet started.
 | T-034 | open | In-browser tab capture (extension + MediaRecorder); OBS becomes fallback | removes OBS; enables parallel meetings |
 | T-035 | open | Lean video (720p, low fps) — target <400 MB/hour | live run measured ~2.7 GB/hour |
 | T-036 | open | Discovery: Gmail + Calendar webinar-link scan incl. Zoho/OnAir/YouTube Live | extends apps/api gws-gmail.ts / gws-calendar.ts |
-| T-037 | open | Auto-join rules (sender/domain/platform, approve-once, opt-out) | Read AI pattern |
+| T-037 | in_progress | Auto-join rules (sender/domain/platform, approve-once, opt-out) | Read AI pattern. Unit t037-auto-join-rules-engine PASSed (verdict cycle 2) as a pure engine only; remaining: rule persistence, edit API/UI, scheduler switch-over (exit criterion in docs/meeting-bot-roadmap.md:60 not met) |
 | T-038 | open | Scheduler service (5-min poller → selectEventsToAutoJoin → record; overlaps) | replaces one-off Windows tasks; depends T-034, T-036, T-037 |
 | T-039 | open | "Send bot now" to a live meeting (CLI/API/web) |  |
 | T-040 | open | Post-processing: summary, facts, Q&A, action items with timestamp citations |  |
 | T-041 | open | Slide keyframes → OCR → attached to turns by time | video capture proven live 2026-09-24 |
 | T-042 | open | Speaker naming for webinar turns (Zoho tile names + intros + sync-speakers) | relates U2.4 |
-| T-043 | open | Index webinar sessions into the KB (/ask across webinars) |  |
-| T-044 | open | Transcript QA: timestamp drift clamp + hallucination spot-check | measured 223 s of turns on 186 s of audio |
+| T-043 | in_progress | Index webinar sessions into the KB (/ask across webinars) | Units t043-ask-webinar-citation-proof and t043-api-ask-tenant-scope-proof PASSed in tests only; remaining: the live `sync-session --index` + `/ask` run with a cited answer from a real session |
+| T-044 | in_progress | Transcript QA: timestamp drift clamp + hallucination spot-check | measured 223 s of turns on 186 s of audio. Unit t044-transcript-qa-clamp PASSed for the pure function; remaining: wiring into the driver, which is held by D-119 |
 | T-045 | open | More sources: OnAir on-demand, YouTube via yt-dlp, Meet/Teams/Zoom via browser bot |  |
 | T-046 | open | Retention policy for raw video (D-008) + real /meeting-bot web page |  |
 | T-047 | done | Record controller must survive console close: run hidden/detached, plus a finalize-on-restart watchdog (detect OBS still recording with no controller → finalize) | 2026-09-24: controller died 16:30:56 (console closed, Ctrl+C exit); OBS + bot kept going; recovered by hand with `lkb finalize --stop-obs` (PASS 8c1cfc1, merged 784df67) |
