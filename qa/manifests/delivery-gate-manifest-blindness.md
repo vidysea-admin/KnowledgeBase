@@ -455,7 +455,7 @@ and is a small regex change for the next unit that touches this block.
 `qa/gates/mc-hooks-manifest-blindness.md`. The commit guard cannot see a pending handshake until the
 Approver rules.
 
-**Handshake status:** paused — ISS-369: the ISS-350 backfill derived STALLED, but D-041 ruling 5 (2026-09-28) then reset this unit (legacy Status line: reset-awaiting-rebuild). That value is not in HANDSHAKE_VOCAB, so the reset is mapped to the existing `paused` (not ready-for-check, not a live STALLED); the two status lines now agree in meaning, not in spelling
+**Handshake status:** STALLED — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree
 
 ## Cycle reset — 2026-09-28 (D-041 ruling 5)
 
