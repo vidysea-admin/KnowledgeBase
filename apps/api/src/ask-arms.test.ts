@@ -161,6 +161,26 @@ test("a hit for a session NOT in this tree is dropped rather than invented", asy
   assert.deepEqual(res.arms.flat(), [], "an unmapped session must not become a fabricated node");
 });
 
+// ISS-171. The lexical arm's `seen` set is what keeps one session from casting several lexical votes
+// into rrfMerge (which counts per occurrence, no within-arm dedupe). Every earlier fixture gave a
+// session exactly one turn, so deleting the two `seen` lines left the suite green (CHECKER MUTATION M).
+// Replays the row's own case: 3 matching turns from the SAME session -> that node exactly once.
+test("ISS-171: the lexical arm yields a session ONCE even when 3 of its turns match", async () => {
+  const { db } = fakeDb({
+    turns: [
+      { _id: "t1", sessionId: "s1", text: "visas for students" },
+      { _id: "t2", sessionId: "s1", text: "more about visas" },
+      { _id: "t3", sessionId: "s1", text: "visas again" },
+      { _id: "t4", sessionId: "s2", text: "funding" },
+    ],
+  });
+  const res = await createAskArmsFor({ db })("t1")("visas?", TREE);
+  assert.equal(res.arms.length, 1, "lexical arm only (no embedder)");
+  const ids = res.arms[0]!.map((n) => n.node_id);
+  assert.deepEqual(ids, ["tenant:t1/year:2026/month:06/session:s1"],
+    `s1 must appear exactly once in the arm, got ${JSON.stringify(ids)}`);
+});
+
 test("no embedder configured = no vector arm, and that is NOT a degradation", async () => {
   const { db } = fakeDb({ turns: [{ _id: "t1", sessionId: "s1", text: "visas" }] });
   const res = await createAskArmsFor({ db })("t1")("visas?", TREE);
