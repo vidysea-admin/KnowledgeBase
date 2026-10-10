@@ -1,6 +1,7 @@
 # iss-322-333-sender-authentication
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/iss-322-333-sender-authentication.md (cycle 0, 536a56a)
 Fix cycle: 0
 Priority tier: 2 — open critical/high security issues (ISS-322 high, ISS-333 high; ISS-CAPTURE-003 medium rides along because it lies on route 3)
 Security class: auth/trust gate (what may auto-record without a click) — FULL checker ceremony, uncapped
