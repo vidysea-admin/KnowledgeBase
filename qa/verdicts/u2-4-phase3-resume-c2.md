@@ -1,5 +1,100 @@
 # Verdict - u2-4-phase3-resume-c2
 
+## Cycle 3 (current)
+
+VERDICT: FAIL
+Cycle checked: 3
+Date: 2026-10-10 · Checker (independent; did not build the unit) · Candidate: lane/ph3 d5c8912 (base 536a56a)
+Judged against: qa/contracts/speaker-resolution-llm.md (unchanged; C14 still deferred to the Approver), qa/gates/speaker-segment-identity.md phase-3 bars, D-015, security class (uncapped).
+Manifest: qa/manifests/u2-4-phase3-resume-c2.md (Fix cycle 3). The live gate was not run and was not attempted. No model, no network, no browser, no full suite.
+
+### Why FAIL (not HOLD)
+The two cycle-2 defects are fixed: every recorded reproduction is refused, no path bypasses `relationGate`, and there are 0 predicate-level lane-only acceptances. But the extended grid I built (template classes the maker's grid does not contain) finds a NEW critical defect, ISS-PH3-004, that only the lane ships when the model cites the neighbouring turn: the self-identification route ships reported speech, a question and an address form as the speaker's own name.
+Reproduction (extractSpeakers, injected complete `[{speakerRef:'spk:0',displayName:'Nikhil',turnIds:['t2']}]`, turns `[spk:0 "He said I am Nikhil.", spk:0 "I think so, yes.", spk:1 "ok"]`): BASE refuses, LANE SHIPS spk:0 -> Nikhil. Same for "She told us, I'm Nikhil.", "He said: I am Nikhil, and left.", "People go, I am Nikhil, and stall.", "I was told my name is Nikhil.", "Do you think I am Nikhil?", "I am, Nikhil, still waiting for the slides." (and, with spk:1 owning the text, citing t2: spk:1 -> Nikhil). Cited directly at t1 the base ships these too (inherited cue defect), but the lane's block-location path (cycle 1b: a cited turn only LOCATES a block) turns the base's refusal into a shipment. `relationGate` applies `isReportedAt` only to the third-party routes; self-identification gets `isQuotedAt` plus the base cue, and `hasNamingCue` strips commas and reads "do you think I am Nikhil" as "i am" + name.
+
+### Merge-safety answer
+"Is it safe to merge lane/ph3 ahead of the live run?" **NO**, by the stated definition (merging cannot add a wrong attribution): ISS-PH3-004 is an input on which the lane ships a wrong name and the base does not. Everything else I could construct is either base-equal or a correct or D-052-accepted attribution (below). The defect is small and local (see its fix_direction); once closed with the seven texts in the grid, the answer is expected to be YES with the recall cost in section 5.
+
+### 1. The 304 lane-only acceptances (OWN_BLOCK_SELF_ID)
+Reproduced: `node --test --import tsx src/pipeline/speakers-differential.test.ts` (timeout 170, 12 s, 5/5 pass) prints
+`DIFF predicate: 1280 cells, base accepts 450, lane accepts 152, lane-only 0`
+`DIFF end-to-end: 15360 cells, base ships 2700, lane ships 608, lane-only 304 (on allow-list 304 [["OWN_BLOCK_SELF_ID",304]], NOT allowed 0), base-only (recall lost) 2396`.
+I replayed the same grid (copy of its constants, scratch probe) and dumped all 304. Every one is layout `same-turn` (152) or `own-block-other-turn` (152); the label is spk:0; the label's OWN turn is a self-identification ("My name is X and I lead admissions." 50, "Hi all, X here." 50, "Good morning everyone, X speaking." 50, "I am X from the admissions team." 50, "Hello, I'm X." 50, "I'm in <place> today and my name is X." 50, "This is X speaking on the panel." 4, multi-token names only); and in all 304 the model CITED THE TRAILING spk:1 turn "ok" (t2 or t3), a turn that merely sits next to the block. The lane locates spk:0's adjacent block and ships the name from spk:0's own self-identification; the base needs the cited turn to contain the name, so it refused. Never on a label that does not own the text (0 cells, whole-grid check in section 2).
+Names: 14 persons (two multi-token) = 172 cells, genuine self-introductions of a person: correct by the contract. 11 place/org/calendar names (Paris, Mumbai, India, Delhi, London, Dubai, Google, Amazon, Vidysea, English, Diwali; 132 cells), e.g. "Hi all, Amazon here.", "Hello, I'm Google.", "I am Dubai from the admissions team.", "My name is India and I lead admissions.": explicit self-naming cues, which D-052 ruling 2 (Approved-by Umesh) deliberately keeps so a real person named Paris resolves. The base ships the same text when the model cites it directly, so this is inherited residue, not new, but I cannot call these correct.
+Sample of 40 spread over names, templates and layouts (printed by my probe): 25 genuine person self-ids (judged correct), 15 place/org-named self-ids (D-052 residue: unverifiable, plausibly wrong), 0 reported, negated or question forms. Those forms are not in the maker's grid, which is the gap (ISS-PH3-004, ISS-PH3-005).
+
+### 2. Extended grid, base vs lane through extractSpeakers (mine)
+44 names (14 persons, 30 place/org/discourse/role/closed-class) x 56 templates x 7 layouts x 2 proposed labels x every cite.
+Templates: genuine self-id; negation "I am not X", "My name is not X"; not identity "I am with X", "I am next to X", "I am X's colleague", "If I were X", "I am sure X will join"; address "I am, X, ..."; reported or quoted "He said I am X", 'He said "I am X"', "She told us, I'm X", "People go, I am X", "I was told my name is X"; question "Am I X?", "Do you think I am X?", "Is my name X?"; place or org "This is X's view", "I am in X today", "This is India speaking on the panel"; plus handover, thanks, address and quoted forms.
+Layouts: own turn; own block + other turn; own mid-block; preceding turn; following turn; both neighbours; own block + third-person mention.
+Result, 108,416 cells: lane ships 14,040, base 15,744; lane-only 8,424; base-only 10,128; ships on a label that does not own the text: base 7,872, lane 0.
+- Refused by both, as required: "I am not X", "My name is not X", "I am with X", "I am next to X", "I am X's colleague" (apostrophe is a name joiner, so no occurrence), "If I were X", "I am sure X will join", "Am I X?", "Is my name X?", 'He said "I am X"' (the lane's quote guard; the base ships it), "This is India speaking on the panel.", "This is X's view", and every word in NEVER_A_PERSON (Everyone, Team, Not, To, Welcome, Sorry, Monday, Hi).
+- Lane-only WRONG, person names: exactly seven forms, 1,212 cells (ISS-PH3-004, critical): "He said I am X." / "She told us, I'm X." / "He said: I am X, and left." / "People go, I am X, and stall." / "I was told my name is X." / "Do you think I am X?" / "I am, X, still waiting for the slides." Plus "This is Makrand Rajadhyaksha Sharma's view." for multi-token names. The same seven forms with 22 place/org names.
+- Both ship (inherited, listed so the owner sees them): the same seven forms when cited directly; role words Chair, Moderator, Host, Admin, Panel, Sir and org names under "I am X." / "Hello, I'm X.".
+- Cycle-2 grid (30 x 22 x 4): its templates are a subset of the maker's committed grid (32 names x 40 templates x 5 layouts), which I ran in full (above): predicate 0 lane-only; end to end 304 lane-only, all OWN_BLOCK_SELF_ID. The maker's numbers are true; the grid is incomplete.
+
+### 3. The gate is the only path; the differential test
+- Callers: `grep -rnE "citesNameAs|hasNamingCueAt|namingTurns|relationGate|RELATION_ROUTES|isReportedAt|isQuotedAt"` over the repo, excluding tests and the frozen copy: `speakers-llm.ts` imports only `namingTurns`; `namingTurns` calls only the three predicates, each of which is `relationGate(...)`; `hasNamingCueAt` is called only inside `relationGate`; `index.ts` exports only looksLikeAName / isDiscourseOnly / containsNameVerbatim / citesNameAsAnIntroduction (the base cue, called by no production code). No legacy path and no direct inner check. `speaker-reported-rules.ts` is used only by the gate.
+- Route switch: `routes` is a defaulted parameter of the gate and an optional parameter of the three predicates, i.e. a default, not an invariant. Only tests pass it; production cannot reach it today (not exported through index.ts, `namingTurns` passes none). `RELATION_ROUTES` is typed Readonly but not frozen. Filed low (ISS-PH3-005). Mutations: handover ON killed, thanks ON killed, gate ignores the switch killed.
+- Frozen-base fidelity: `diff <(git show 536a56a:packages/index/src/pipeline/<f>.ts) frozen-base-536a56a/<f>.mts` differs only in the 2-line "FROZEN REFERENCE" header plus: speaker-name-rules line 25 `./speaker-name-data.js` -> `./speaker-name-data.mts`; speakers-llm lines 27-28 `./speakers.js` -> `../speakers.js` and `./speaker-name-rules.js` -> `./speaker-name-rules.mts`; speaker-name-data none. Nothing else. The lane's speakers.ts and speaker-name-data.ts are unchanged versus base.
+- `.mts` outside budgets: 124 + 289 + 344 lines (10,490 + 17,257 + 18,029 bytes). `structure.config.json` counts only `.ts/.py/.mjs` for loc and `.ts` for dupes; nothing treats this directory specially, so `.mts` does keep a 344-line file out of the 300-line counter and its exports out of the dupes counter. The manifest discloses it. I judge it a legitimate test fixture (a verbatim reference never imported by production code, needed because the comparison runs the whole base `extractSpeakers`, which a golden table cannot), not a dodge; it is a budget-evading mechanism by construction and the Approver may prefer a `git show` of the base at test time.
+- Would the differential test catch a weakening? With the nine-file set: handover ON killed, route switch ignored killed, self-id skips base cue killed, quoted guard dropped killed (by another file). Differential test ALONE: handover ON killed (3 fail), self-id skips base cue killed (2), route switch ignored killed (2), but "drop the quoted-speech guard" SURVIVES it (fail 0). Its allow-list premise ("the base accepts the same turn cited directly") also licenses any lane-only shipment the base would ship when cited directly, so it cannot see ISS-PH3-004 (ISS-PH3-004/005).
+
+### 4. D-015 by issue id (mine; recorded texts verbatim, every cite t1..tn)
+Probe `d015.mts` (scratch): predicate level (looksLikeAName && !isDiscourseOnly && any of the three relation predicates) and end to end in six layouts: single turn; same turn; own block + other turn; preceding turn; following turn; preceding turn with the label = the speaker.
+- ISS-104: 20 recorded attacks: lane 0/20 shipped (20/20 refused) at predicate level and in all six layouts; base ships 1/20 (India) at predicate level and in every layout. Open: none.
+- ISS-282: `node --import tsx qa/probes/iss282-c0-replay.mts` -> `--- ISS-282 recorded wrong links refused: 8/8` (reads the recorded cycle-0 model text; offline).
+- ISS-PH3-001: 3/3 recorded texts refused (predicate level and all six layouts). ISS-PH3-002: 6/6 refused (predicate level and all six layouts).
+- ISS-093: the 20-case corpus is still asserted in speaker-name-rules.test.ts (106/106 pass; the gazetteer is empty).
+- ISS-094 / ISS-098 (the Prasanti / Doris Day / Priya address forms cycle 2 rewrote): now asserted REFUSED for the addressee at the speaking label, which is the contract's direction (an address names the person ADDRESSED, ISS-282). The genuine forms (greeting or address to the NEXT speaker) are no longer shipped at all, since the handover and thanks routes are OFF. That matches the contract; it is a recall decision (section 5).
+- ISS-255: replay `ISS255 "4/4"`, wrongPairs 0. True, but because the routes that produced the bad pairs are OFF, as the maker says; agree.
+- ISS-283 not delivered. ISS-289 relational scorer and ISS-290 as in cycle 2. ISS-PH3-003: the lock now has an automated test (`node --test qa/evidence/u2-4-phase3-precision-regate-2026-09-22/corpus-lock.test.mjs`: 4/4) and the no-op mutation is killed (2 fail); the unpinned-session and 01-block-stats parts of the row remain open.
+- Left open by name: ISS-PH3-004 (above), and the inherited D-052 residue of place/org names under explicit self-naming cues.
+
+### 5. Recall cost, measured
+Replay of the recorded c1 model text: `node --import tsx qa/evidence/u2-4-phase3-precision-regate-2026-09-22/08-replay.mts --from c1 --tag c3chk` then `05-score.mjs --tag c3chk --raw-tag c1`. I read both first: they import only node:fs / node:path, the lane's own source and corpus-lock; no fetch, no provider call, no spawn. Outputs deleted afterwards. The base row is the same script with its import pointed at the frozen base `speakers-llm.mts` (scratch copy).
+| Code | accepted | correct | wrong identities | wrong evidence pairs | additions |
+|---|---|---|---|---|---|
+| lane d5c8912 | 3 | 3 | 0 | 0 | 0 |
+| BASE 536a56a (frozen copy, same replay) | 15 | 0 | 15 | 15 | 0 |
+Counts are per session-run (3 runs). The base accepts five wrong identities in every run: Sonal (atlas-skilltech spk:0), Priyanka Roy (creative-futures spk:0), Shithij (in-focus-3 spk:1), Bhavya (uk-beyond spk:4), Jubin (leeds spk:3). The lane accepts one identity per run, Jubin Thakkar spk:0 (leeds; already covered by the deterministic floor), correct. So on the recorded corpus merging loses NO correct attribution and removes all 15 wrong ones. The cycle-2 lane's 12 correct names were never in production; they are what the OFF routes gave up. Phase-3 bar 5 (at least one correct addition) is not met even offline: additions 0.
+Synthetic base-only cells, committed grid: 2,396. My rule-based classification of all of them (crude): 2,204 wrong attributions rightly refused (750 quoted or reported, 726 place/org/closed-class names, 378 another speaker's self-id or mention credited to the label, 350 address or introduction naming someone else), 24 CORRECT attributions now lost ("This is Nikhil speaking on the panel." by the label that speaks it: 12 persons x 2 layouts; the lane needs "X speaking" to open the clause, the price of ISS-104's "This is India speaking on the panel."), 168 PLAUSIBLE but unverifiable (an address or introduction of a person in the turn before the label's block: "Good morning Nikhil, please go ahead.", "Please welcome Sonal.", "Let me introduce Sumit.", "Ruby, what do you think about this?"; correct when the next block really is that person; with no gold I do not count them). A stratified 40-cell sample (printed by my probe) gave 6 correct-lost, 6 plausible-lost, 28 rightly refused.
+Plain statement: the recall cost on the recorded corpus is zero correct names. The synthetic cost includes correct attributions in principle ("This is X speaking" and the next-speaker address class, which the base ships today), none of which occur in the recorded corpus.
+
+### 6. Tests, types, budgets, mutations
+- Each `node --test --import tsx src/pipeline/<file>.test.ts` under `timeout 170` from packages/index: speaker-relation-rules 10/10, speaker-relation-ledger 8/8, speakers-differential 5/5, speakers-llm 50/50, speaker-name-rules 106/106, speakers-windows 29/29, speakers 16/16, speaker-docs 13/13. `node --test qa/evidence/u2-4-phase3-precision-regate-2026-09-22/corpus-lock.test.mjs`: 4/4. `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` (timeout 180): exit 0, 16 s.
+- `node scripts/lint-dirsize.mjs`: OK (110 dirs). `node scripts/lint-loc.mjs`: 7 violations, all pre-existing and none in speaker files. `node scripts/lint-dupes.mjs`: 1 violation (`recordApproval` in packages/db and packages/meeting-bot), not in speaker files. speakers-llm.ts: 300 non-blank lines (limit 300).
+- Mutations (own harness: per-mutation byte backup, restore in `finally` plus a SIGINT/SIGTERM handler, `spawnSync` timeout 170 s, then `git hash-object == git rev-parse HEAD:<file>` after each; the six speaker test files together unless noted):
+
+| # | Mutation | Result |
+|---|---|---|
+| M1 | handover route ON | killed (9 fail); differential alone killed (3) |
+| M2 | thanks route ON | killed (8) |
+| M3 | thanks predicate bypasses `relationGate` | killed (7) |
+| M4 | gate drops `isQuotedAt` | killed (1); differential alone SURVIVES |
+| M5 | gate drops `isReportedAt` (third party) | killed (1) |
+| M6 | self-identification skips `hasNamingCueAt` | killed (11); differential alone killed (2) |
+| M7 | gate drops place/org refusal | killed (1) |
+| M8 | gate ignores the route switch | killed (9); differential alone killed (2) |
+| M9 | gate drops looksLikeAName / isDiscourseOnly | killed (5) |
+| M10 | possessive exemption in `readsAsAPlaceOrOrg` removed | SURVIVED: equivalent mutant (agree with the maker): `nameOccurrences` treats `'` and `’` as name joiners, so an occurrence is never followed by `'s` and the branch is unreachable |
+| M11 | corpus lock `verifyCorpus` no-op (corpus-lock.test.mjs) | killed (2) |
+
+HEAD fidelity after all runs: speaker-relation-rules.ts ae6c81171bf6a177178045ee430fbfce9344bf76, speaker-name-rules.ts bceef61e79b6120c814b5f0045192b2f7a22da78, corpus-lock.mjs 9f47f1b4b56d9b6e470c19afa99022824c0d4d43, each equal to `git rev-parse HEAD:<file>`.
+
+### Established and remaining
+Established at code level: one gate and no bypass; handover and thanks OFF and the OFF state pinned by tests; recorded ISS-104 / ISS-282 / ISS-PH3-001 / ISS-PH3-002 reproductions all refused at predicate and end-to-end level; the lane never binds a name to a label that does not speak it; replay 3/3 correct, 0 wrong, against the base's 15/15 wrong.
+Not established: the five live gate bars. Live command (repo root): Ollama qwen3:8b digest 500a1f067a9f, `node --import tsx qa/evidence/u2-4-phase3-precision-regate-2026-09-22/04-regate-eval.mts --runs 1,2,3 --tag c4` then `node --import tsx qa/evidence/u2-4-phase3-precision-regate-2026-09-22/05-score.mjs --tag c4`. Bars: (1) accepted precision 100%, (2) zero wrong label/name/citation links, (3) floor preservation, (4) stability across 3 live runs, (5) at least one correct addition (not met offline).
+Recommendation: do not merge this candidate. One more small maker cycle for ISS-PH3-004 (extend the reporting / question / address refusal to the self-identification route, add the seven texts to the grid and to the ledger test, make the allow-list premise independent of the base's own acceptances). After that, merging ahead of the live run is defensible: the recorded corpus shows 15 wrong names removed and no correct name lost, at the price of "This is X speaking" and next-speaker addresses. Re-enabling handover and thanks stays a decision for after the live run. ISS-PH3-001 and -002 stay `open` in this verdict because the rule that sets them verified applies on a HOLD; their recorded cases measure fixed (3/3, 6/6) and they can be verified on the next cycle's HOLD.
+
+ISSUES-WRITTEN: ISS-PH3-004 (critical, new), ISS-PH3-005 (low, new), both in qa/issues.ph3.jsonl. No existing row changed.
+
+EXPLANATION: The cycle-2 fix is real and the maker's numbers reproduce exactly (1280/0, 15360/304/2396, ISS-104 20/20, replay 3/3). The risk it leaves is the self-identification route, which the maker treated as the safe baseline because it sits on the base cue. The base cue is itself loose for reporting verbs, questions and comma-address, and the lane's cycle-1b block-location path means a neighbouring citation now ships what the base refused. The maker's differential grid did not contain those forms, and its allow-list is defined by what the base accepts, so it could not find them. The 304 allow-listed cells are genuine self-introductions (172 person names correct; 132 place/org names are the D-052 residue, which the base also ships).
+
+---
+
+# Cycle 2 (superseded by cycle 3; kept as recorded)
+
 VERDICT: FAIL
 Cycle checked: 2
 Date: 2026-10-10 · Checker (independent; did not build the unit) · Candidate: lane/ph3 12af112 (base 536a56a)
