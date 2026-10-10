@@ -15,23 +15,11 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.js";
 import { ask } from "../api/ask.js";
 import { ApiError } from "../api/client.js";
+import { safeHttpUrl } from "../safe-url.js";
 import type { AskResponse, AskInternalSource } from "../api/types.js";
 
-/**
- * Web sources come from an external search provider and `WebSource` is an open index-signature
- * type (`packages/ask/src/router.ts`), so `url` is attacker-influenceable text, not a checked
- * URL. Only http(s) may become an `href` — a `javascript:` or `data:` URI in a citation would
- * otherwise execute on click. Anything else renders as inert text, never as a dead or unsafe link.
- */
-function safeHttpUrl(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  try {
-    const parsed = new URL(value);
-    return parsed.protocol === "http:" || parsed.protocol === "https:" ? value : null;
-  } catch {
-    return null; // not an absolute URL at all
-  }
-}
+// Web-source `url` comes from an external search provider (open index-signature `WebSource`), so
+// it is attacker-influenceable text: only http(s) may become an `href` (see ../safe-url.ts).
 
 /** The tree stores a session id on each node's evidence; that is what makes a citation clickable. */
 function sessionRefOf(source: AskInternalSource): string | null {
