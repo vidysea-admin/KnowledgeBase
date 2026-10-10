@@ -2,7 +2,7 @@
 
 **Lane:** MEDFIX (`lane/medfix`, from 8c8429d). **Tier:** 3/4 mixed batch of audit-classed small MEDIUM issues.
 **Ceremony:** ISS-155 is tenancy-adjacent (security class, full care); the rest are light ceremony (medium, no auth/tenancy/data-write change).
-**Commits (one per issue):** ISS-171 d27f0ba | ISS-369 5e7b1c0 | ISS-155 de0154c | ISS-145+ISS-146 31a081c (same two files, one commit).
+**Commits (one per issue):** ISS-171 d27f0ba | ISS-155 de0154c | ISS-145+ISS-146 31a081c (same two files, one commit). The ISS-369 commit 5e7b1c0 was reverted in 4bd9bd8 and is not part of this unit.
 **New ledger row:** ISS-MEDFIX-001 in `qa/issues.medfix.jsonl`.
 **Toolchain:** worktree node_modules junctions created for root, apps/*, packages/* (main-tree source resolves via them). No DB, network, browser, full suite or build was run; `backfill.mjs` was only `node --check`ed, never executed.
 
@@ -31,21 +31,23 @@
 - ISS-146: injected test shows two non-speaker lanes' commits are swept with an empty pattern; real repo: all-lane sweep returns 16 rows = the 12 speaker rows + 4 other (ISS-360->ISS-360-HEARTBEAT, ISS-308->ISS-311, ISS-309->ISS-312, ISS-113 absent). D-015: ISS-146: 1/1. Those 4 rows are newly visible divergence; nothing was renumbered (D-019).
 - Tests: `node --test scripts/lib/id-divergence.test.mjs`: pass 13, fail 0. Note: the real-repo all-lane test walks ~225 commits via git and took ~86 s on this loaded machine; a candidate for a cheaper pin if it slows the suite.
 
-## ISS-369 - FIXED (documentation only)
-- Reproduced: yes (legacy `reset-awaiting-rebuild` vs canonical `STALLED` in both manifests).
-- Fix: the canonical `**Handshake status:**` line in `write-guard-enforcement-gaps.md` and `delivery-gate-manifest-blindness.md` now reads `paused` plus an explanation, replacing the false "which agree" clause. No verdict or claim changed.
-- VOCABULARY DECISION TAKEN, needs Approver ack: `reset-awaiting-rebuild` is not in HANDSHAKE_VOCAB, so it was mapped onto existing `paused` (neither readers nor qa/contracts touched). If Umesh prefers adding the value to both readers and the contracts, that is a separate change.
-- D-015: ISS-369: 4/4 reproductions (both file/line pairs now consistent; the vocab one answered by the mapping above; the git-show evidence is history, unchanged).
-- Verified: `canonicalHandshakeStatus` returns `paused` and `isReadyForCheck` false for both files.
+## ISS-369 - WITHDRAWN, still open (commit 5e7b1c0 reverted in 4bd9bd8)
+- Cycle 0 mapped the legacy status `reset-awaiting-rebuild` to `paused` in two manifests. The checker rejected that: the handshake-liveness contract (section 4.2) maps it to `building`, and `paused` would hide an owed rebuild from the backlog.
+- The commit is reverted in full; both manifests are byte-identical to their state before it. Nothing in this unit fixes ISS-369 and no D-015 count is claimed for it.
+- The correct fix needs `building` in the readers' vocabulary (a reader unit) or an Approver ruling. ISS-369 stays open in the ledger.
 
 ## Gates
 - `node scripts/lint-dirsize.mjs` before: OK (109 dir(s) within budget); after: OK (109 dir(s) within budget).
 
 **Status:** ready-for-check
-**Fix cycle:** 1
+**Fix cycle:** 2
 
 ## Fix cycle 1 (2026-10-10)
 
 Cycle 0 verdict: FAIL, on the ISS-369 commit only (5e7b1c0). The checker ruled the `paused` mapping wrong: the handshake-liveness contract (section 4.2) maps `reset-awaiting-rebuild` to `building`, and `paused` would hide an owed rebuild from the backlog. `building` is not yet in the readers' vocabulary, so the correct fix waits on the reader unit or an Approver ruling.
 
 Fix: the ISS-369 commit is reverted in full (git revert of 5e7b1c0); the two manifests it touched are back to their previous text. ISS-369 stays open and is NOT claimed by this unit any more. No other commit changed: de0154c (ISS-155), d27f0ba (ISS-171) and 31a081c (ISS-145, ISS-146) stand as checked at cycle 0. Revert applied by the orchestrator on the maker's behalf.
+
+## Fix cycle 2 (2026-10-10)
+
+Cycle 1 verdict: FAIL on the manifest text only: the body still listed ISS-369 among the commits and kept its "FIXED" section. Fixed here: the Commits line and the ISS-369 section now say withdrawn and still open. No source, test or other manifest changed since cycle 0.
