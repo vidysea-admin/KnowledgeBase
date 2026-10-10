@@ -42,4 +42,10 @@
 - `node scripts/lint-dirsize.mjs` before: OK (109 dir(s) within budget); after: OK (109 dir(s) within budget).
 
 **Status:** ready-for-check
-**Fix cycle:** 0
+**Fix cycle:** 1
+
+## Fix cycle 1 (2026-10-10)
+
+Cycle 0 verdict: FAIL, on the ISS-369 commit only (5e7b1c0). The checker ruled the `paused` mapping wrong: the handshake-liveness contract (section 4.2) maps `reset-awaiting-rebuild` to `building`, and `paused` would hide an owed rebuild from the backlog. `building` is not yet in the readers' vocabulary, so the correct fix waits on the reader unit or an Approver ruling.
+
+Fix: the ISS-369 commit is reverted in full (git revert of 5e7b1c0); the two manifests it touched are back to their previous text. ISS-369 stays open and is NOT claimed by this unit any more. No other commit changed: de0154c (ISS-155), d27f0ba (ISS-171) and 31a081c (ISS-145, ISS-146) stand as checked at cycle 0. Revert applied by the orchestrator on the maker's behalf.
