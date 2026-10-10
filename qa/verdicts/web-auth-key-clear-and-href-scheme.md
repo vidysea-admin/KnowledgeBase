@@ -137,3 +137,105 @@ fails on one listed ordering: the handler's "storage empty" clause lets a late 4
 holding a valid newer key when storage is blocked or was cleared by another tab. Cycle 1: restrict relevance to
 `detail.apiKey === apiKey` and add the two tests in ISS-WEBAUTH-002. On a later PASS the orchestrator should set
 ISS-ISS260-001 to verified in qa/issues.iss260.jsonl and ISS-WEBAUTH-001 to verified in the webauth shard.
+
+---
+
+# Cycle 1
+
+**Date:** 2026-10-10
+**Cycle checked:** 1
+**Mode:** A (event-driven unit check, no browser, no dev server; source scope)
+**Worktree:** C:\Users\product\Desktop\KnowledgeBase-lanes\webauth, HEAD cb3b299
+
+```
+VERDICT: PASS (source scope)
+SCOREBOARD: 10/10 criteria met, 2/2 invariants hold; cycle-0 properties intact
+ISSUES-WRITTEN: none
+```
+
+## 1. Scope
+`git diff 8b4c6fe cb3b299 --stat`: AuthContext.tsx (31 lines), AuthContext.ordering.test.tsx (new), AuthContext.replay.test.tsx
+(new), the manifest. safe-url.ts, AgendaView, EventDetail, AskPage, client.ts untouched.
+
+## 2. D-015 replays (counts by issue id)
+- ISS-WEBAUTH-002: recorded case (a) setItem throws + late 401 A: pass; case (b) sign out, login B, localStorage.clear(), late 401 A: pass. 2/2
+  (AuthContext.replay.test.tsx follows the ledger steps with the real LoginGate; case a uses a throwing setItem, case b a real clear()).
+- ISS-ISS260-001 (A in state, B stored, 401 A via real apiFetch, expect storage B): 1/1 (AuthContext.test.tsx), plus the
+  handler-alone variant.
+- ISS-WEBAUTH-001: hostile forms 9/9 render as text (EventDetail and AgendaView tests green in the targeted run).
+
+## 3. Ref versus state (AuthContext.tsx read in full)
+`keyRef.current` changes in the same synchronous step as state at every write site: initial `useRef(apiKey)` (the committed initial
+state, not a second storage read), `setApiKey`, `clearApiKey`, the handler's drop. No effect writes it; there is no other setter;
+storage is never adopted (reload or remount is the only adoption path, and it recomputes ref and state from one read). Requests take
+their key from React STATE via `useAuth().apiKey` (a render behind the ref) and pass it as an argument to `apiFetch`, which sends it
+and reports THAT variable in the event. So the ref can only be AHEAD of a request's key, never behind. Interleaving (i): request sent
+with old A after setApiKey B, 401 A: B stays logged in (probes X1, X1b via real apiFetch). Interleaving (ii) (ref A, request sent
+with B) cannot occur: state is only set together with or after the ref, so any key a component can read from state was written to
+the ref first; a remount creates ref and state from one read; strict mode double-invokes the initialiser with the same stored value
+and `useRef` takes the committed state (probe X4); hot reload re-runs the same code. No other module reads or writes the key.
+
+## 4. Listener lifecycle
+One `window.addEventListener(AUTH_INVALIDATED_EVENT)` in AuthProvider's effect, removed in its cleanup; the handler is
+dependency-free so it never resubscribes. One provider in App.tsx. After unmount the handler is gone: probe X5 fires a 401 with no
+provider mounted and storage is untouched; a remount reads storage fresh. The event is a same-document `CustomEvent` dispatched
+only by client.ts `invalidateAuth`; there is no `storage` listener, so it does not cross tabs. A page script could forge an event
+carrying the current key and log the user out; such a script can already read localStorage, so this is a nuisance, noted, not filed.
+
+## 5. Ordering table (each maker ordering test asserts the tab's shown key AND the stored value)
+| Ordering | Tab after | Storage after | Source |
+|---|---|---|---|
+| stored == failed A | prompt | removed | ordering test 1 |
+| tab A, stored B, 401 A (incl. two back-to-back) | prompt, B not adopted | B kept | tests 2, 8 |
+| tab A, storage empty, 401 A | prompt | empty | test 3 |
+| CONTROL tab B, storage B, late 401 A | stays B | B | test 4 |
+| case (a) tab B, setItem threw, 401 A | stays B | empty | test 5 + replay 1 |
+| case (b) tab B, other tab cleared storage, 401 A | stays B | empty | test 6 + replay 2 |
+| tab B, stale stored A, 401 A | stays B | A removed | test 7 |
+| 401 A after sign-out, B stored by other tab | prompt | B kept | test 9 |
+| detail undefined/null/{}/non-string/empty | untouched | untouched | test 10 (7 cases) |
+| setApiKey B and 401 A in one act | B | B | test 11 |
+| 403 | untouched | untouched | test 13 |
+| getItem / setItem / removeItem throwing | no crash | n/a | test 14 (3 cases) |
+
+My extra orderings (throwaway probe, 8/8 passed, deleted): X1 401 A inside the same act as setApiKey("B"): B kept, storage B.
+X1b request sent with the old-closure A through real apiFetch while setApiKey("B") runs: B kept. X2 old keys A and C both fail
+after B: B kept, storage B. X3 sign out, 401 A, log in A again, 401 A again: the second 401 logs the tab out and clears storage,
+and that is correct, because the server rejected A, so a 401 for A is valid evidence that A is bad whenever it arrives and the
+user must supply a working key; the 401 that arrived before the re-login left the new login alone (X3b). X4 strict mode: B kept,
+then a 401 for B logs out. X5 unmount then 401 with no provider: storage untouched; remount reads B fresh.
+
+## 6. Regression check (cycle-0 properties)
+Targeted run (safe-url, calendar views, AskPage, CalendarPage, client, sessions, auth): 11 files, 143 tests passed. LoginGate alone:
+4 passed (data children unmount when the key is nulled). Href scheme fix, 403 clears nothing, explicit sign-out clears storage
+unconditionally, storage throwing never crashes: all covered green. `tsc --noEmit -p tsconfig.json` in apps/web: exit 0.
+
+## 7. Mutations on the new handler (backup per mutation, subshell trap restore, `timeout 150`)
+| Mutation | Result |
+|---|---|
+| M1 restore the "storage empty" clause | killed (7 failed) |
+| M2 compare against render-closure state, deps [apiKey] | killed (11 failed) |
+| M3 ref written in an effect, not synchronously | killed (1 failed: same-tick test) |
+| M4 stored key removed unconditionally | killed (8 failed) |
+| M5 adopt the stored key when the tab key is dropped | killed (5 failed) |
+| Cycle-0 handler (8b4c6fe AuthContext.tsx) | 8 failed, 27 passed (the maker's 8) |
+
+First attempts at M3 and M5 did not apply fully (CRLF source versus my \n patterns); M3 first reported a spurious survival because
+only half the patch applied. Redone with line endings normalised: both applied and killed. HEAD fidelity after all runs:
+`git hash-object apps/web/src/auth/AuthContext.tsx` = 5c84f82f68f080a7664ffa9a657c335873c7790f = `git rev-parse
+HEAD:apps/web/src/auth/AuthContext.tsx`; `git status --short` was clean.
+
+## Owed
+This PASS certifies SOURCE SCOPE only. D-024 live-browser validation is still owed: two real tabs with keys A and B and a forced 401
+for A; a `javascript:` meeting link shown as text in the agenda and detail views; private-mode login.
+
+ISSUES-WRITTEN: none
+
+EXPLANATION: The handler now decides tab-drop and storage-clear independently on the failed key carried by the event, with the
+tab's current key read from a ref written synchronously at every write site. No ordering logs out a tab with a valid newer key,
+sends a key the user did not enter, or leaves another account's data on screen; all five handler mutations and the cycle-0 handler
+are killed. ISS-WEBAUTH-001 and ISS-WEBAUTH-002 are set to verified in qa/issues.webauth.jsonl. RECOMMENDED (not made, other shard):
+set ISS-ISS260-001 in qa/issues.iss260.jsonl to status verified, fixed_date 2026-10-10, verified_date 2026-10-10, verified_evidence
+"cycle 1 replay 1/1 plus handler-alone variant; qa/verdicts/web-auth-key-clear-and-href-scheme.md cycle 1; fix cb3b299". Low notes:
+a forged in-page event can log the user out (page scripts can already read the key); 401s arriving with no provider mounted are
+dropped by design.
