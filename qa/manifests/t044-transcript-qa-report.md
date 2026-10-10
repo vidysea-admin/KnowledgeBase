@@ -1,6 +1,7 @@
 # t044-transcript-qa-report
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t044-transcript-qa-report.md (cycle 1, d6d0813)
 Fix cycle: 1
 Priority tier: 3 — next unblocked roadmap task (T-044)
 Security class: none (reads a local turns file, writes a local report JSON; no auth/tenancy/DB writes)
@@ -64,7 +65,7 @@ Real sample (copy of `data/toc-migrated/2026-08-27-in-focus-4/turns.json` in a t
 - Runner is TypeScript run via tsx; not covered by tsc (outside `packages/ai/tsconfig` include).
 - Semantic hallucination detection remains the heuristics of the prior unit.
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 1
 
 ## Fix cycle 1
@@ -90,5 +91,5 @@ Fix cycle: 1
 **Variants (library, input byte-identical after each):** dot segment, dotdot segment, upper case, forward slashes, trailing dot, trailing space, relative path, hard link, junction (same file via a junction to its directory): all refused. Output is a directory: refused. Distinct `--out`: exit 0; existing non-input file without `--overwrite`: refused, content kept; with `--overwrite`: replaced; input never changed.
 **Skipped (stated in test diagnostics):** symlink (`symlinkSync(file)` needs privilege here: EPERM/unavailable; hard link and junction cover the same real-path/inode logic); 8.3 short name (short-name generation not available on this volume, no `~` name produced). Both are implemented via `realpathSync.native` but unverified.
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 1
