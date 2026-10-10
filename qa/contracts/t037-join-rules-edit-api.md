@@ -16,4 +16,4 @@ Only a caller holding a valid key with the required scope can read or change the
 7. Scope: server.ts change minimal; no engine, store, sender-trust, dependency-rule or budget file edited; no `packages/meeting-bot` import in apps/api code.
 8. Tests assert 1-6 such that these mutations FAIL the suite: tenant taken from a header, from a body field; a route without `requireScope`; PUT without load-first; no mutex; no validation on PUT; a queue poisoned by one failure.
 9. Manifest route table, evidence and "not delivered" match reruns.
-10. (Approver decision, not a pass condition) the scope that guards writes is distinct from the read-only `calendar` scope before production wiring.
+10. (Approved scope design, cycle 1) PUT and both POST routes require the dedicated write scope `join-rules`; GET requires `calendar`; a `join-rules`-only key is 403 on GET; a `calendar`-only key is 403 on every write with no store call. No key holds `join-rules` unless it is issued deliberately.
