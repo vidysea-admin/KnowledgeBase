@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import type { CalendarEvent } from "./calendar-model.js";
 import { formatTimeRange } from "./calendar-model.js";
 import { EVENT_COLOR } from "./EventChip.js";
+import { safeHttpUrl } from "../../safe-url.js";
 
 export interface EventDetailProps {
   event: CalendarEvent;
@@ -44,7 +45,10 @@ export function EventDetail(props: EventDetailProps): React.ReactElement {
           Open session &rarr;
         </Link>
       )}
-      {event.meetingUrl && (
+      {event.meetingUrl && !safeHttpUrl(event.meetingUrl) && (
+        <div className="row-meta" data-testid="detail-join-text" style={{ marginTop: "0.5rem" }}>{event.meetingUrl}</div>
+      )}
+      {event.meetingUrl && safeHttpUrl(event.meetingUrl) && (
         <a
           href={event.meetingUrl}
           target="_blank"
