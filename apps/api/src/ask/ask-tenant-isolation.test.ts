@@ -334,7 +334,8 @@ test("HTTP /ask with an empty or undefined resolved tenant: no tenant data, no t
   for (const bad of ["", undefined]) {
     const db = new BlindDb(corpus());
     const r = await runRoute({ db, tenantOfKey: bad });
-    assert.equal(r.status, 404, `tenant ${JSON.stringify(bad)}: ${r.text}`);
+    // auth-require-tenant-on-key: requireAuth now refuses a tenantless key with 401 before the route runs (was 404 from the route).
+    assert.equal(r.status, 401, `tenant ${JSON.stringify(bad)}: ${r.text}`);
     assert.deepEqual(leaks(r.text), []);
     assert.deepEqual(db.queries.filter((q) => q.coll !== "tree_index"), [], "no turns/chunks read");
     assert.ok(db.queries.every((q) => q.returned === 0), "no row of any tenant returned");
