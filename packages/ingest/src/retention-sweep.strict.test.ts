@@ -273,3 +273,47 @@ test("property: hostile generator, 3000 seeded cases; every purge-eligible id is
   }
   assert.ok(eligible > 100 && hostile > 1000 && total === 12000, `eligible=${eligible} hostile=${hostile} total=${total}`);
 });
+
+// ISS-T046-004: pin BOTH anchors of the ISO pattern. A valid instant with ANY extra content before or
+// after it must be refused and the media KEPT. V8's Date.parse tolerates a trailing NUL (and some other
+// bytes), so only the `^`/`$` anchors stand between such a string and a purge-eligible verdict.
+const VALID_INSTANTS = ["2020-01-01T00:00:00Z", "2020-01-01T00:00:00.123Z", OLD];
+const NUL = String.fromCharCode(0);
+const SURROUND: [string, (t: string) => string][] = [
+  ["trailing NUL", (t) => t + NUL], ["trailing space", (t) => `${t} `], ["trailing newline", (t) => `${t}\n`],
+  ["trailing CRLF", (t) => `${t}\r\n`], ["trailing tab", (t) => `${t}\t`], ["duplicate trailing Z", (t) => `${t}Z`],
+  ["trailing letters", (t) => `${t}abc`], ["trailing digit", (t) => `${t}0`], ["trailing second instant", (t) => `${t}${t}`],
+  ["trailing offset", (t) => `${t}+00:00`], ["trailing fraction", (t) => `${t}.123`],
+  ["leading space", (t) => ` ${t}`], ["leading NUL", (t) => NUL + t], ["leading newline", (t) => `\n${t}`],
+  ["leading letters", (t) => `x${t}`], ["leading digit", (t) => `0${t}`], ["leading sign", (t) => `+${t}`], ["leading extended-year sign (Date.parse accepts +00YYYY)", (t) => `+00${t}`],
+  ["both ends", (t) => ` ${t} `], ["NUL both ends", (t) => NUL + t + NUL],
+];
+
+test("ISS-T046-004: a valid instant with leading or trailing content is refused by parseIsoInstant", () => {
+  for (const t of VALID_INSTANTS) {
+    assert.notEqual(parseIsoInstant(t), null, t);
+    for (const [name, f] of SURROUND) assert.equal(parseIsoInstant(f(t)), null, `${name}: ${JSON.stringify(f(t))}`);
+  }
+});
+
+test("ISS-T046-004: processedAt with leading or trailing content is KEEP 'malformed processedAt'", () => {
+  for (const t of VALID_INSTANTS) {
+    for (const [name, f] of SURROUND) {
+      const p = run([good({ processedAt: f(t) })]);
+      assert.deepEqual(p.purgeEligibleIds, [], `${name}: ${JSON.stringify(f(t))}`);
+      assert.equal(p.items[0]!.decision, "keep");
+      assert.equal(p.items[0]!.reason, "malformed processedAt", name);
+    }
+  }
+});
+
+test("ISS-T046-004: purgedAt with leading or trailing content is KEEP (malformed), never purge-eligible", () => {
+  for (const t of VALID_INSTANTS) {
+    for (const [name, f] of SURROUND) {
+      const p = run([good({ retention: { purgeAfterVerified: true, purgedAt: f(t) } })]);
+      assert.deepEqual(p.purgeEligibleIds, [], `${name}: ${JSON.stringify(f(t))}`);
+      assert.equal(p.items[0]!.decision, "keep");
+      assert.match(p.items[0]!.reason, /malformed record/, name);
+    }
+  }
+});
