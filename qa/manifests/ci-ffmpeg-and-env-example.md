@@ -197,5 +197,6 @@ echo "ffmpeg, ffprobe, libvpx and libopus all present."
 
 YAML: `python -I -c "import yaml..."` parses; 15 steps, `timeout-minutes` = 45. The workflow change remains UNVERIFIED until it runs on GitHub (fake ffmpeg only; real `ffmpeg -encoders` column layout assumed: flags, name, description).
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/ci-ffmpeg-and-env-example.md (cycle 1, a7210e6) - workflow change unverified until it runs on GitHub
 Fix cycle: 1
