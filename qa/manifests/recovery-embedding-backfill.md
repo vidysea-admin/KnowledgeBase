@@ -2,29 +2,40 @@
 
 Status: checked-PASS
 Handshake status: checked-PASS
+Fix cycle: 2
 
-Cycle: Fixcycle1
+Cycle2 is only the root-authorized grouping of the owned recovery embedding helper and its test under scripts/lib/toc. No embedding, source data, model configuration, stored vector, runtime launcher, or API change is authorized by this cycle.
 
-Fix log: Cycle0 checker found fetch redirect-follow could escape the approved loopback endpoint. Fixcycle1 forces redirect:error after caller options and adds a no-network transport regression. Bulk remains held.
+Exact current paths: scripts/backfill.mjs; scripts/lib/toc/toc-embedding-backfill.mjs; scripts/lib/toc/toc-embedding-backfill.test.mjs; this manifest. Original helper paths have moved. The helper changes only seven relative import targets; the CLI changes only its helper import. The colocated test requires no import or byte change.
 
-Root and checker approved these ten literal paths: packages/index/src/chunk/source-spans.ts; source-spans.test.ts; packages/index/src/index.ts; apps/api/src/indexing/session.ts; scripts/backfill.mjs; scripts/lib/toc-embedding-backfill.mjs; toc-embedding-backfill.test.mjs; this manifest; packages/ai/src/providers/ollama.ts; ollama-boundary.test.ts.
+The actual structure counter is scripts/lint-dirsize.mjs check using scripts/lib/walk.mjs looseFiles: direct isFile entries excluding .git; exact-directory override else structure.config.json dirsize.maxFiles. scripts/lib was32/30 and is expected30/30 after these two moves. Ask route test remains at its pinned location; routes32/30 is independently HOLD. No global structural/release PASS is claimed.
 
-Only reviewed packet 477255b83bb0f001a7fce53d48af7631bdc8a92c2e24e85b3108a3c9ece749ef, 29 sessions and 3424 valid original turns. Exact loopback Mongo27019 / lkb_work_20261009_01a11f9c / tenant toc. Administrative total chunks count is explicitly authorized only to detect foreign presence; no foreign contents or counts disclosed. No source, page, claim, tree, semantic status replacements.
+All44 current Ask/source/runtime pins matched before the moves; neither moved path belongs to that inventory. Services and private critical workflows remain untouched.
 
-Exact contiguous source spans retain original turn identities and half-open UTF16/UTF8 offsets, full-turn and slice SHA256; no invented times. At most1024 raw UTF8 bytes per slice. Nomic model sha256:0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f / 768 finite nonzero values, task11435 only, num_thread1 and truncate:false. Document search_document: and query search_query: prefixes match; raw and exact prefixed input hashes bind receipt. Public1024-byte positive and over2048-token refusal proof retained in task work/nomic-context-boundary-proof.json.
+Historical Cycle1 manifest physical SHA25623bde7648df6ca852d4be37b0838bd9010c2df11cc5ee8fbc102d5ad759abea9 and verdict SHA256be330f64a5103d54bdc3e6025ecef6b4f8cb67a988a7b7dd8f49dd62350899d6 were copied byte-for-byte before this update to task work/grouping-history-cycle1/manifest-cycle1.md and verdict-cycle1.md. The canonical verdict remains the historical Cycle1 verdict until the checker writes Cycle2. Legacy source identities are preserved in task work/grouping-preflight.json; they are historical, not claims that old source paths remain current.
 
-Insert-only sequential batches8; bounded60s local HTTP; disk reserve50MiB. Exclusive durable receipt and immutable batch spools precede insertion. Approved exact receipt SHA required for resume; source/model/plan/vector hashes revalidate before reuse. Unknown/mixed/foreign rows refuse. Partial insertion is read back and recorded; failure remains visible, no strict index, semantic or live Ask acceptance implied.
+Historical completed job2905/2905,29sessions/3424turns/5436spans remains separately evidenced by unchanged work/toc-embedding-run-v1.json SHA25613943d346154a643c61adcad934c86c79f4ed95c94b19fae12615f9b2d445d31 and independent work/toc-embedding-checker-reconciliation-proof.json SHA256fbb383663b8fb09461d4f08f80569d86914e28a27e8d18d50c449e6d5ab5ef49. No rerun, resume, new receipt or database/model operation occurs for grouping.
 
-Bulk held until focused tests, source freeze and independent checker gate plus explicit root job authorization. Existing API remains read-only and stale until coordinated accepted-source restart. Real retrieval ranking proof is a subsequent bounded local step, never a fake vector success or cloud call.
+Verification pending:19 focused source-span/Ollama/backfill checks; syntax and side-effect-free export/import check; actual unchanged node scripts/backfill.mjs recovery-chunks CLI refusal wiring; all44 pins and post-move direct counts. Exact commands/results and current source hashes will be written before requesting Cycle2 checker review.
 
-Maker verification: focused17/17 PASS (3121.6952ms), immediate downstream64/64 PASS (6820.9731ms); index/API noEmit typechecks PASS. Actual trusted packet offline dry-run:2905 slices,1895878 raw bytes,1945263 prefixed bytes, planSHA f68943ccf969bfbeb580c178812932dd45780e779d33f8cd3615eb3576a71695. No model/DB calls in dry-run and no bulk embeddings. Fixtures use injected vectors exclusively for refusal/resume/write invariants; real cosine/corpus behavior remains unproved until root-authorized live followup.
+Full Ask/hydration, semantic human-gold, web/global acceptance and separate route grouping remain HOLD. Only the matching Cycle2 scoped layout verdict can close this cycle.
 
+## Cycle2 verification on current relocated bytes
 
-Fixcycle1 affected helper tests8/8 PASS,1410.9366ms, zero skips. Native fetch test runs disposable localhost listeners:307 refusal and zero requests at redirected sink. Both fixtures closed; real11435 untouched. TypeScript files unchanged since passing scoped types.
+Actual command: node --test --test-concurrency=1 --import tsx packages/index/src/chunk/source-spans.test.ts packages/ai/src/providers/ollama-boundary.test.ts scripts/lib/toc/toc-embedding-backfill.test.mjs. Exit0;19/19 passed, zero failed/skipped/cancelled; Node936.21ms, tool wall1.3492709s. Fake vectors and temporary receipt/redirect fixtures only; existing services untouched.
 
+Actual work/grouping-validation.mjs exit0:8/8 syntax/import/export/relative-target and real node scripts/backfill.mjs recovery-chunks invalid-input checks. Missing packet value, nonexistent packet path, and missing resume digest each exit1 with expected explicit refusal. Injected guard counts databaseConnectAttempts0/fetchAttempts0 for every CLI child; no receipt or lock created. Proof SHA25626393cbd33b6bf14f5534828df27aec82d46982c40bedb026435f4ce2ce98923.
 
-## Matching Cycle1 scoped close-out
+Current scripts/backfill.mjs SHA256 7f743c7deae4b417ddd5edfcc54453de92f05137e7f4924eb379d2607cc90ab5.
 
-All ten pre-closeout identities match independent Cycle1 sourceHashes in qa/evidence/recovery-embedding-backfill-checker-2026-10-09.json. Matching qa/verdicts/recovery-embedding-backfill.md SHA256 be330f64a5103d54bdc3e6025ecef6b4f8cb67a988a7b7dd8f49dd62350899d6 is scoped PASS:19/19 focused, redirect refusal, durable partial resume, full exact source coverage. Only this manifest closes; the earlier bulk-hold text records the historical pre-execution gate.
+Current scripts/lib/toc/toc-embedding-backfill.mjs SHA256 c1049ffa9a1a061312ae1afa53a44356eb3534f9e053548c8952157d1cce45c1.
 
-Subsequent separately root-authorized actual local job completed2905/2905. Immutable terminal work/toc-embedding-run-v1.json SHA25613943d346154a643c61adcad934c86c79f4ed95c94b19fae12615f9b2d445d31 and independent read-only work/toc-embedding-checker-reconciliation-proof.json SHA256fbb383663b8fb09461d4f08f80569d86914e28a27e8d18d50c449e6d5ab5ef49 attest29sessions/3424turns/5436spans, pinned same-model768 finite nonzero vectors, exact source/prefix/spool bindings and seven knowledgecollections preserved. They do not retroactively expand the source verdict or clear semantic/human-gold, full Ask, global/release acceptance HOLD. No new model/DB/test/runtime/Git/source action was performed for this close-out.
+Current scripts/lib/toc/toc-embedding-backfill.test.mjs SHA256 28a71e59fac87a4b51958f5a1c0ad65913aff977808f020068f73cffe6d19856.
+
+Post counters use the actual looseFiles definition: scripts/lib30/30; scripts/lib/toc2/30; routes32/30 separately HOLD. All44 pre/post runtime pins identical; Ask route test did not move. Reverse literal import substitutions reproduce each original source byte hash, and the relocated test is byte-identical.
+
+Maker request: checker independently verify Cycle2 narrow grouping and current export/CLI wiring; preserve the archived Cycle1 verdict/history. No full Ask, route-directory, global structure or release acceptance is requested.
+
+## Matching Cycle2 scoped close-out
+
+Cycle checked: 2. Matching qa/verdicts/recovery-embedding-backfill.md SHA256 7840bce16ef90fc04328d0301f7aff228002dc37caa904032a87b5642473f0fd is PASS only for the owned helper grouping. Independent work/embedding-grouping-cycle2-checker-proof.json SHA256 cbf2b1d52b9e3752df599c1f063d56f8ad6ece42a0e30bdf39d87b4afa0f4374 verifies the current relocated source hashes,19/19 focused checks and44 unchanged serving pins. The historical Cycle1 archives and completed2905-vector receipt remain separate immutable evidence. This flip closes only this layout handshake; routes32/30, full Ask/hydration/web/human-gold/global release remain HOLD. No new source, Git, model, database, query, service or paused-job action occurs during close-out.

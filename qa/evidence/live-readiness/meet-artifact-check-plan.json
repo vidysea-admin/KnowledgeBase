@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "preparedAtUtc": "2026-10-09T13:51:53.892041+00:00",
+  "status": "PREPARATION_ONLY_AWAITING_OWNED_LIVE_ARTIFACTS",
+  "scope": "Read-only postcapture acceptance preparation. No capture, browser, provider, database, process control or release acceptance performed. Original Meet owner alone owns private-window execution and cleanup.",
+  "account": "umeshsugara@vidysea.com",
+  "sources": [
+    {
+      "path": "qa/contracts/upload-transcribe-worker.md",
+      "sha256": "484d59803641e42e7340efb8d7e4b0e9ec0b505a00028d567d7e0e9c3150196d"
+    },
+    {
+      "path": "qa/contracts/webinar-portable-release.md",
+      "sha256": "bc7f061db345acbf934f1219eb75e1884304a320336788239e2a300d398967ce"
+    },
+    {
+      "path": "qa/manifests/umesh-calendar-attendance.md",
+      "sha256": "63790e9eccf83f00414b5b09d797dde0125baf5210840727534b4042cac10b95"
+    },
+    {
+      "path": "qa/manifests/u4.1-recording-upload-worker.md",
+      "sha256": "a9a7414436be092270a2a25732eb88b163f76523b418062fdcfa30ee0d31eed9"
+    },
+    {
+      "path": "qa/packets/u4.1-recording-upload-worker.cycle3.md",
+      "sha256": "8d139fcdfdb63aac0bd60afb38222b4dfc516aa8c26c1ffefc8105cc5e80ff1e"
+    },
+    {
+      "path": ".cache/webinar/self-test-meeting-20261009.json",
+      "sha256": "e7d12353327be6fbc64b793adf267c3fd86e6565829c9c5039861ffd15a5c088"
+    },
+    {
+      "path": ".cache/webinar/managed-login-manual-20261009/runtime.json",
+      "sha256": "d60f445c3870c7576d918a2879a9e7060e9aa1ef103fdbb6898d9472e4022c48"
+    },
+    {
+      "path": ".cache/webinar/account-diagnostic-20261009/result.json",
+      "sha256": "b1e0dabea03be5f5b647df1736762d4e4bd969ae2331223d3e66fe8c18e5c15d"
+    },
+    {
+      "path": ".cache/webinar/meet-prejoin-diagnostic-20261009/result.json",
+      "sha256": "d412223b0d152453f88947a92e21801924acc2a900a7144609c4da1689265190"
+    },
+    {
+      "path": ".cache/webinar/test-media-2d7bc870-6b08-42f7-b3ce-76db943d6bfe/evidence.json",
+      "sha256": "f5d9394637ca3f60510bea93c9c0846d8bafeaf19946e0082d8e3df932ea2c3c"
+    },
+    {
+      "path": ".cache/webinar/downstream-test-744a8c79-c671-4915-bc1c-804a2b079b99/result.json",
+      "sha256": "ba9553fe6f8c397bf317229bf1311cb9bec456d66c796360abeb1b2daeb023e8"
+    },
+    {
+      "path": ".cache/webinar/downstream-test-744a8c79-c671-4915-bc1c-804a2b079b99/replay-result.json",
+      "sha256": "ea41464e2197c6cf12b8c696c5c892a55e67c3f7bd6a704ccb820dc73e664c8b"
+    }
+  ],
+  "observations": [
+    "Private self-only event metadata reports authenticated actor and organizer account, confirmed private Meet conference, zero attendees; this proves creation/readback only.",
+    "Managed-login runtime reports driver-ready and authenticationVerified=false. Account diagnostic reports login_redirect; prejoin diagnostic reports sign_in_visible_no_account_control. Neither establishes a signed-in Meet receiver.",
+    "Generated local audio/video and controlled-av provider/replay evidence are GENERATEDTESTINPUT, not receiver-side Meet capture. Prior 12.650958-second audio/approximately 15-second AV, 172-byte response, [0,30] rejection and no publication remain explicit.",
+    "Cycle3 bounded duration repair has scoped checker acceptance attributed in its packet; whole U4.1 and actual Meet-to-Ask remain HOLD. No live raw receiver artifact reference was supplied in the bounded qa/.cache/webinar inventory."
+  ],
+  "awaitedOutputs": [
+    {
+      "id": "binding",
+      "required": "Original owner supplies run UUID, current exact-account visible authenticated observation at receiver join, event/readback reference and hashes, join occurrence/time, receiver/presenter roles, owned profile and controller/browser PID+creation time+executable fingerprints, recorder fake-device absence and mic/camera off. Login logs or provider event ownership alone insufficient.",
+      "status": "awaited"
+    },
+    {
+      "id": "reception",
+      "required": "Receiver-side admitted Meet observation plus time-bound actual reception of generated phrase and changing frame-counter video from the separate presenter. Distinguish emitted local fixture from network-received content. Preserve sanitized progress events, timestamps, capture backend and exact run linkage.",
+      "status": "awaited"
+    },
+    {
+      "id": "media",
+      "required": "Original raw receiver capture absolute path, exact-byte SHA256, size, UTC interval, independently probed duration and audiovisual streams; derivative paths/hashes and conversion/time-origin lineage. Inspect actual playback for audible recognizable phrase and changing frames; silence, frozen image, stream metadata or nonempty bytes alone insufficient.",
+      "status": "awaited"
+    },
+    {
+      "id": "process",
+      "required": "Exact candidate source inventory hash, commands, exit status and stdout for actual file submission/Python queue operations/model+available usage; raw provider response reference/hash; recording adapter consumption, schema and finite in-range turn timings; published source/session/turn artifacts bound to actual receiver media and preserved labels/text/provenance. Include successful below-30-second actual provider sample on current bytes without substituting old generated fixture for Meet proof.",
+      "status": "awaited"
+    },
+    {
+      "id": "index_ask",
+      "required": "Owner exports isolated-work-DB tenant/session/source readback, current-generation input-media/hash proof and every required indexing outcome. Cited Ask request/response exports must resolve exact same tenant/session/turn IDs, contain literal supporting transcript spans and bounded timestamps; demonstrate immediate downstream consumption and media-supported content. No checker DB/provider call in this preparation.",
+      "status": "awaited"
+    },
+    {
+      "id": "cleanup",
+      "required": "Original owner supplies sanitized terminal logs and fresh exact PID+creation+executable/profile ownership proof of owned receiver/presenter/controller closure, locks/extensions/control state cleanup, preservation of raw artifacts; shared Chrome worker unaffected. Live process list alone without known fingerprints insufficient; no broad kill or private-window control by checker.",
+      "status": "awaited"
+    }
+  ],
+  "acceptanceRules": [
+    "No PASS until all applicable awaited outputs exist and independently verify; distinguish bounded U4.1 C10 subset from Meet reception and portable-release L1 real-webinar/sustained/restart/Ubuntu obligations.",
+    "Synthetic generated fixture is acceptable as labeled private-test input; evidence must show it crossed the actual Meet presenter-to-receiver route. This test does not establish an unattended real webinar or continuous operation.",
+    "Bind all evidence to one owned run, media bytes, account, tenant, session, generation and candidate source inventory; refuse cross-run/stale proof.",
+    "Actual playback and changing frame content are mandatory for live-media acceptance; numeric activity is supporting evidence only.",
+    "Schema/timing failures, missing citations, failed required stage or missing ownership cleanup preserve HOLD. Human identity/external truth and release acceptance remain separate."
+  ],
+  "minimalIndependentReadOnlyCommands": [
+    {
+      "purpose": "Exact raw and downstream byte identity after absolute owned paths arrive",
+      "command": "$ownedArtifacts | ForEach-Object { Get-Item -LiteralPath $_ | Select-Object FullName,Length; Get-FileHash -LiteralPath $_ -Algorithm SHA256 }",
+      "prerequisite": "Owner supplies explicit existing capture/derivative/provider/turn/index/Ask/evidence paths; do not enumerate unrelated media."
+    },
+    {
+      "purpose": "Duration and real audiovisual stream metadata",
+      "command": "& $approvedFfprobe -v error -show_entries format=duration,size:stream=index,codec_type,codec_name,duration,width,height,sample_rate,channels -of json $ownedCapture",
+      "prerequisite": "Pinned approved ffprobe binary and raw receiver file; read-only bounded invocation after owner capture, not run during this PREP."
+    },
+    {
+      "purpose": "Bounded decode and changing video support",
+      "command": "& $approvedFfmpeg -v error -i $ownedCapture -t 20 -vf fps=1 -an -f framemd5 -",
+      "prerequisite": "Pinned approved ffmpeg; sampled actual receiver file. Differing hashes alone do not prove presenter content; inspect sampled content/playback."
+    },
+    {
+      "purpose": "Inspect supplied downstream/readback binding without DB access",
+      "command": "Get-Content -LiteralPath $ownedTurnArtifact,$ownedIndexProof,$ownedAskResponse,$ownedCleanupProof -Raw",
+      "prerequisite": "Owner supplies bounded sanitized exports; independently compare session/tenant/generation/media hashes, turn times and cited text. No auth key/profile cookies in exports."
+    }
+  ],
+  "independentChecksPerformed": {
+    "artifactCaptureHash": false,
+    "rawReceiverPlayback": false,
+    "processing": false,
+    "indexAsk": false,
+    "ownershipCleanup": false
+  },
+  "humanAdjudication": null,
+  "verdict": null
+}

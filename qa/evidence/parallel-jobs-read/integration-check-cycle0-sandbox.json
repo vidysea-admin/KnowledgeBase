@@ -1,0 +1,230 @@
+{
+  "checkedDate": "2026-10-09",
+  "scope": "independent jobs integration; local fake database only",
+  "before": {
+    "packages/db/src/index.ts": {
+      "sha256": "f5797ab0860b99de1364c5e68de002b406d19133f07a0104469fbceb2803687b",
+      "nonblankLines": 26
+    },
+    "packages/db/src/collections/jobs.ts": {
+      "sha256": "bd5c7e1bc5528022074a6c30b7111f21ffea1e086ebdb2de9718da6d97f880a2",
+      "nonblankLines": 58
+    },
+    "apps/api/src/jobs/router.ts": {
+      "sha256": "6c337958b7700638403e77d7006d4fd24d0b3393d9b81276cd58049d7d638131",
+      "nonblankLines": 65
+    },
+    "apps/api/src/jobs/store.ts": {
+      "sha256": "d28f40b17eddf581af62e7c973d91417571dc5b28ceb429dfc1e5658021fe03a",
+      "nonblankLines": 24
+    },
+    "apps/api/src/jobs/fixture-store.ts": {
+      "sha256": "6296490e14cd956ecf1779285046ef42d3d80ff77035848973917023119e129c",
+      "nonblankLines": 5
+    },
+    "apps/api/src/jobs/fixture-store.test.ts": {
+      "sha256": "72259ead01eb6676458792708d5e485011ad11c88a0d5e007c59a5fb4c18120e",
+      "nonblankLines": 74
+    },
+    "apps/api/src/server.ts": {
+      "sha256": "fa4129a968966c6cceb1c9adc6443f42bc9f584ac7cb2feb698c07da2218bef5",
+      "nonblankLines": 100
+    },
+    "apps/api/src/production.ts": {
+      "sha256": "ff65725758a0ed858dda585f8ef469ffb32bf2a7afea375d0e650396b448ac1e",
+      "nonblankLines": 236
+    },
+    "apps/api/src/fixtures.ts": {
+      "sha256": "a99dd8a2c9abf1864d9af6f26741e1d890da46fb9a4a1c0dbb2e0d762781639f",
+      "nonblankLines": 300
+    },
+    "apps/web/src/App.tsx": {
+      "sha256": "1aabc8ec568eb83972ac995aafd2cecc56de2ec0b2bff7cb18e7d7467636eefd",
+      "nonblankLines": 45
+    },
+    "apps/web/src/layout/NavSidebar.tsx": {
+      "sha256": "8adce878ee3d1998df8cc9e530af2363519781b708b1d5391c408eef563349b6",
+      "nonblankLines": 45
+    },
+    "apps/web/src/pages/SettingsPage.tsx": {
+      "sha256": "7ae43f545697316d1f50ef16aad5f04a39b4c9a7a3ec1835381805fe059b290b",
+      "nonblankLines": 99
+    },
+    "apps/web/src/pages/SettingsPage.test.tsx": {
+      "sha256": "b3864075f01f3a1d1da68057330bee20c4600e49ad29316a6bbe9be4ed293c16",
+      "nonblankLines": 91
+    },
+    "apps/web/src/api/jobs.ts": {
+      "sha256": "5565e99ec7da536249509e28053e8fb5c2bdf32a70be37b0a36eda707a93ab2b",
+      "nonblankLines": 42
+    },
+    "apps/web/src/pages/jobs/JobsPage.tsx": {
+      "sha256": "ed15ee937652e376fb76a7c2e157e84a49e6ec57ea76afe2734bcdde155247e1",
+      "nonblankLines": 65
+    }
+  },
+  "runs": [
+    {
+      "label": "API integration",
+      "command": [
+        "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=45000",
+        "--experimental-test-isolation=none",
+        "--import",
+        "tsx",
+        "apps/api/src/jobs/fixture-store.test.ts"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "timeout": 60000,
+      "status": null,
+      "signal": null,
+      "error": "spawnSync C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe EPERM"
+    },
+    {
+      "label": "Settings/App downstream",
+      "command": [
+        "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/pages/SettingsPage.test.tsx",
+        "--maxWorkers=1",
+        "--minWorkers=1",
+        "--pool=threads"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+      "timeout": 60000,
+      "status": null,
+      "signal": null,
+      "error": "spawnSync C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe EPERM"
+    },
+    {
+      "label": "API typecheck",
+      "command": [
+        "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "apps/api/tsconfig.json"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "timeout": 60000,
+      "status": null,
+      "signal": null,
+      "error": "spawnSync C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe EPERM"
+    },
+    {
+      "label": "DB typecheck",
+      "command": [
+        "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "packages/db/tsconfig.json"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "timeout": 60000,
+      "status": null,
+      "signal": null,
+      "error": "spawnSync C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe EPERM"
+    },
+    {
+      "label": "Web typecheck",
+      "command": [
+        "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "apps/web/tsconfig.json"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "timeout": 60000,
+      "status": null,
+      "signal": null,
+      "error": "spawnSync C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe EPERM"
+    }
+  ],
+  "preservation": {
+    "server": {
+      "expectedPreimage": "2a77e71ec04e6b6c68c3b0b082e27ba19111a8a9d4827c7cd4d6e9d4a035211e",
+      "reconstructedPreimage": "2a77e71ec04e6b6c68c3b0b082e27ba19111a8a9d4827c7cd4d6e9d4a035211e",
+      "pass": true,
+      "removedLines": 4
+    },
+    "production": {
+      "expectedPreimage": "7e155585e7096eec5973027af1a15b61265fee9a88a57d9255f4b215863cc365",
+      "reconstructedPreimage": "96d8e11dec8dd08383cb9e55e04db3d7c40047d568115f508f5c248f73a3cc6c",
+      "pass": false,
+      "removedLines": 2
+    },
+    "fixtures": {
+      "expected": "a99dd8a2c9abf1864d9af6f26741e1d890da46fb9a4a1c0dbb2e0d762781639f",
+      "actual": "a99dd8a2c9abf1864d9af6f26741e1d890da46fb9a4a1c0dbb2e0d762781639f",
+      "nonblankLines": 300
+    }
+  },
+  "after": {
+    "packages/db/src/index.ts": {
+      "sha256": "f5797ab0860b99de1364c5e68de002b406d19133f07a0104469fbceb2803687b",
+      "nonblankLines": 26
+    },
+    "packages/db/src/collections/jobs.ts": {
+      "sha256": "bd5c7e1bc5528022074a6c30b7111f21ffea1e086ebdb2de9718da6d97f880a2",
+      "nonblankLines": 58
+    },
+    "apps/api/src/jobs/router.ts": {
+      "sha256": "6c337958b7700638403e77d7006d4fd24d0b3393d9b81276cd58049d7d638131",
+      "nonblankLines": 65
+    },
+    "apps/api/src/jobs/store.ts": {
+      "sha256": "d28f40b17eddf581af62e7c973d91417571dc5b28ceb429dfc1e5658021fe03a",
+      "nonblankLines": 24
+    },
+    "apps/api/src/jobs/fixture-store.ts": {
+      "sha256": "6296490e14cd956ecf1779285046ef42d3d80ff77035848973917023119e129c",
+      "nonblankLines": 5
+    },
+    "apps/api/src/jobs/fixture-store.test.ts": {
+      "sha256": "72259ead01eb6676458792708d5e485011ad11c88a0d5e007c59a5fb4c18120e",
+      "nonblankLines": 74
+    },
+    "apps/api/src/server.ts": {
+      "sha256": "fa4129a968966c6cceb1c9adc6443f42bc9f584ac7cb2feb698c07da2218bef5",
+      "nonblankLines": 100
+    },
+    "apps/api/src/production.ts": {
+      "sha256": "ff65725758a0ed858dda585f8ef469ffb32bf2a7afea375d0e650396b448ac1e",
+      "nonblankLines": 236
+    },
+    "apps/api/src/fixtures.ts": {
+      "sha256": "a99dd8a2c9abf1864d9af6f26741e1d890da46fb9a4a1c0dbb2e0d762781639f",
+      "nonblankLines": 300
+    },
+    "apps/web/src/App.tsx": {
+      "sha256": "1aabc8ec568eb83972ac995aafd2cecc56de2ec0b2bff7cb18e7d7467636eefd",
+      "nonblankLines": 45
+    },
+    "apps/web/src/layout/NavSidebar.tsx": {
+      "sha256": "8adce878ee3d1998df8cc9e530af2363519781b708b1d5391c408eef563349b6",
+      "nonblankLines": 45
+    },
+    "apps/web/src/pages/SettingsPage.tsx": {
+      "sha256": "7ae43f545697316d1f50ef16aad5f04a39b4c9a7a3ec1835381805fe059b290b",
+      "nonblankLines": 99
+    },
+    "apps/web/src/pages/SettingsPage.test.tsx": {
+      "sha256": "b3864075f01f3a1d1da68057330bee20c4600e49ad29316a6bbe9be4ed293c16",
+      "nonblankLines": 91
+    },
+    "apps/web/src/api/jobs.ts": {
+      "sha256": "5565e99ec7da536249509e28053e8fb5c2bdf32a70be37b0a36eda707a93ab2b",
+      "nonblankLines": 42
+    },
+    "apps/web/src/pages/jobs/JobsPage.tsx": {
+      "sha256": "ed15ee937652e376fb76a7c2e157e84a49e6ec57ea76afe2734bcdde155247e1",
+      "nonblankLines": 65
+    }
+  },
+  "hashesStable": true
+}

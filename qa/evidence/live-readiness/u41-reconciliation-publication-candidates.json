@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "createdAt": "2026-10-09T15:37:47.245373+00:00",
+  "baseHEAD": "f42b605711fe485c026cc3293fc9b9d8e2313c9d",
+  "branch": "codex/machine-migration-2026-10-09",
+  "unit": "u4.1-recording-upload-worker",
+  "fixCycle": 3,
+  "effectiveScope": "Standalone U4.1 C1-C10 scoped PASS/CLOSED on unchanged18-file cycle3 candidate",
+  "exactAllowlist": [
+    {
+      "path": "qa/manifests/u4.1-recording-upload-worker.md",
+      "sha256": "29dd8dbdb6ee7010b204aaf04ff2e8b075a48e5d4e4c09bd6fc8d27f39eb3266",
+      "HEADExists": false,
+      "HEADSHA256": null,
+      "changeKind": "new canonical scoped QA companion",
+      "scope": "Standalone U4.1 scoped cycle3 C1-C10 PASS only; no global/live release upgrade"
+    },
+    {
+      "path": "qa/verdicts/u4.1-recording-upload-worker.md",
+      "sha256": "6d614d1bdd59e7fbb9319d3f1d2bdc814eac4e36081cf95c5eb4c30307429503",
+      "HEADExists": false,
+      "HEADSHA256": null,
+      "changeKind": "new canonical scoped QA companion",
+      "scope": "Standalone U4.1 scoped cycle3 C1-C10 PASS only; no global/live release upgrade"
+    },
+    {
+      "path": "qa/contracts/upload-transcribe-worker.md",
+      "sha256": "484d59803641e42e7340efb8d7e4b0e9ec0b505a00028d567d7e0e9c3150196d",
+      "HEADExists": false,
+      "HEADSHA256": null,
+      "changeKind": "new canonical scoped QA companion",
+      "scope": "Standalone U4.1 scoped cycle3 C1-C10 PASS only; no global/live release upgrade"
+    },
+    {
+      "path": "qa/contracts/gemini-audio-transcription.md",
+      "sha256": "13f94c9a28e2a19dd30c00a8d6199becd67ba994ac0f780dc765a2cc3b71fa94",
+      "HEADExists": true,
+      "HEADSHA256": "c4bb3b60256b84d0c1f72fa63d0a554172285d9b5c5eea335d9f0b0ca538f6c2",
+      "changeKind": "D-119 additive12-line duration clarification; no removed criteria",
+      "scope": "Standalone U4.1 scoped cycle3 C1-C10 PASS only; no global/live release upgrade"
+    }
+  ],
+  "candidatePaths": 4,
+  "sourceFilesToPublish": 0,
+  "cycleConsistency": {
+    "manifest": "checked-PASS Fixcycle3",
+    "verdict": "leading PASS Cycle checked3, exposes already effective supplement",
+    "manifestVerdictHashMatches": true,
+    "manifestInventoryHashMatches": true,
+    "sourcePinMatches": 18,
+    "HEADSourceMatches": 18,
+    "oldHOLDVerdictArchiveSHA256": "2210cd3a92c50ed5c4b85e231f40ec364d12865992acf59c695c7ee1f99cc5d4",
+    "oldHOLDHistoryRetainedByteIdentically": true,
+    "contractExceptionAuthorization": "D119 Approved-by Umesh;12 additions0deletions"
+  },
+  "sourceInventory": {
+    "path": "qa/packets/u4.1-recording-upload-worker.cycle3.sources.json",
+    "sha256": "4d82f35ac8e90b854f499e97061e1fb6c332ac79f55312d6d8430ee3956676b8",
+    "sourcePins": [
+      {
+        "path": "scripts/upload/security.mjs",
+        "sha256": "0980cafb333d7025703330619e4bd0041728751877898de829ce8d302e0030fc",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "scripts/upload/queue.mjs",
+        "sha256": "267de11f43bfdb0b6294dd37699e7a60a08c504dfc49adc5fbac608a0d56f3d7",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "scripts/upload/submit.mjs",
+        "sha256": "be7e7cad736a9faba4361811d886a3f4b17148e3e864c824150941122f69b611",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "scripts/upload/real-proof.mjs",
+        "sha256": "e92bdea500c16d0203495faf1cdb3e4d819c7d5d50daae955ca6b2e15db5f221",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "scripts/upload/queue.test.mjs",
+        "sha256": "d8d6dc281561cf0f81ad6f372dd40f00af54654b88337c48bc4096fe3152a4ff",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "workers/transcribe/src/google_transport.py",
+        "sha256": "d3cb7906deeeb50069a986131d15351b8bbbaf23b2ab77ec5168d4dd7243a54d",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "workers/transcribe/src/job_queue.py",
+        "sha256": "5fe8a65123a65198f4a2ba05fe09ee7cce1d4499b56647d51ca5cf5932c65f91",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "workers/transcribe/src/schema_check.py",
+        "sha256": "a90f42a4bca1016935f6512907b2615db38f44f069fb09410a87449f28cf0e34",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "workers/transcribe/src/worker.py",
+        "sha256": "d90037d38f9b8434f634de7721861cc4103edc5f998892a040c6b6eeaeb92f1c",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "workers/transcribe/src/test_worker.py",
+        "sha256": "013c82f8d2af7b9aaf79dba940c141231c7d29ff91677f1ef8589c04252e77f2",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "workers/transcribe/src/index.ts",
+        "sha256": "69a8aa46f47edda7c998e89af0237d985b34a857d34de7a2cc6ddc63f2636584",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "workers/transcribe/package.json",
+        "sha256": "ee84905a0c5f3665184f2886f59ed88ef381b7687e0b7081fa71c36c9b3dfc9c",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "workers/transcribe/requirements.txt",
+        "sha256": "82a952467cd4672ecf83402d10928d8064cf9dc7580db92acc6e942cb2fae4f9",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "workers/transcribe/README.md",
+        "sha256": "d82e65bba9c05eace9472d690859f7a54dbccd4265ab7cb1e6357dea52bd402f",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "packages/ai/src/stt/gemini-file-upload.ts",
+        "sha256": "00eb58ec23a0caf4401526622b4ce67cb037d64eeec1bf5e470c87132eadabf8",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "packages/ai/src/stt/gemini-file-upload.test.ts",
+        "sha256": "9beaddeea40a80c55ed300470b4e7ca5d4f7f2a0ad2dd2572355cafe79e5606d",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "scripts/transcribe-long-session.mjs",
+        "sha256": "58ebc6438bab1a28a733b4e4c61348c08ae962d98d5649bb4cb820870a070d94",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      },
+      {
+        "path": "scripts/lib/transcript-provenance.test.mjs",
+        "sha256": "b1744d9e091ff4f07e0cd4ca180a9d305fbb666554008efcd65499d30dbbc663",
+        "liveMatchesCycle3Pin": true,
+        "HEADMatchesExactOrNormalizedLF": true
+      }
+    ]
+  },
+  "privacyReview": [
+    {
+      "path": "qa/manifests/u4.1-recording-upload-worker.md",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "email": 0,
+        "credentialedURL": 0,
+        "rawCookie": 0,
+        "privateQuote": 0,
+        "inviteSecret": 0
+      },
+      "privateEvidenceBodiesIncluded": false
+    },
+    {
+      "path": "qa/verdicts/u4.1-recording-upload-worker.md",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "email": 0,
+        "credentialedURL": 0,
+        "rawCookie": 0,
+        "privateQuote": 0,
+        "inviteSecret": 0
+      },
+      "privateEvidenceBodiesIncluded": false
+    },
+    {
+      "path": "qa/contracts/upload-transcribe-worker.md",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "email": 0,
+        "credentialedURL": 0,
+        "rawCookie": 0,
+        "privateQuote": 0,
+        "inviteSecret": 0
+      },
+      "privateEvidenceBodiesIncluded": false
+    },
+    {
+      "path": "qa/contracts/gemini-audio-transcription.md",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "email": 0,
+        "credentialedURL": 0,
+        "rawCookie": 0,
+        "privateQuote": 0,
+        "inviteSecret": 0
+      },
+      "privateEvidenceBodiesIncluded": false
+    }
+  ],
+  "privacyBlockers": [],
+  "publicationScope": "QA-only WIP documentation reconciliation. Raw/private proof media/transcripts/account/credentials are never included. C9 quotation is public contract language, not transcript content; cache references are metadata only.",
+  "preservedHolds": [
+    "Main Ask remains BUILDING/HOLD; experimental ranking excluded.",
+    "Actual Meet received private AV, account authentication, attendance activation, T051/T052/Meet/full portable release remain unverified.",
+    "Existing baseline and new LOC/global directory-budget failures remain; no broad acceptance."
+  ],
+  "excluded": [
+    "all source changes",
+    "docs/DECISIONS.md",
+    "qa/issues.jsonl",
+    "data/QA review packets",
+    "qa/packets bodies",
+    "cache/source/media/account/cookie/proof bodies"
+  ],
+  "actionsPerformed": [
+    "read exact canonical QA and available source pin inventory",
+    "verify18 source hashes and committed HEAD correspondence",
+    "confirm cycle/hash/history and D119 additive exception",
+    "narrow privacy scan",
+    "write this candidate report only"
+  ],
+  "stagingCommitPushPerformed": false
+}

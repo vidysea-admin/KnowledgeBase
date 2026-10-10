@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "unit": "parallel-jobs-api",
+  "cycle": 1,
+  "reviewType": "independent-checker",
+  "humanAdjudication": null,
+  "sourceFrozen": true,
+  "sourceHashes": [
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\jobs\\router.ts",
+      "Hash": "6C337958B7700638403E77D7006D4FD24D0B3393D9B81276CD58049D7D638131"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\jobs\\router.test.ts",
+      "Hash": "7CAA17695E232D7EE34D47FBA8ED9CFAE441439B1516C6F07EE18E4176115874"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\jobs\\store.ts",
+      "Hash": "D28F40B17EDDF581AF62E7C973D91417571DC5B28CEB429DFC1E5658021FE03A"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\jobs\\store.test.ts",
+      "Hash": "A1A4856C176AC672B21DF925506C7806875CC7A34BC682E06AC8EDF801F57B14"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\db\\src\\collections\\jobs.ts",
+      "Hash": "BD5C7E1BC5528022074A6C30B7111F21FFEA1E086EBDB2DE9718DA6D97F880A2"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\parallel-jobs-read\\api-independent-boundary.mjs",
+      "Hash": "B8DCC611B197FEB9EACAFFF24600EB565F090E790CC5E657685564504CA18B51"
+    }
+  ],
+  "sourceHashesUnchangedAfterChecks": true,
+  "tests": {
+    "command": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe --test --test-concurrency=1 --test-timeout=20000 --experimental-test-isolation=none --import tsx apps/api/src/jobs/router.test.ts apps/api/src/jobs/store.test.ts",
+    "chunk_id": "fbcdc1",
+    "wall_time_seconds": 4.1817789,
+    "exit_code": 0,
+    "original_token_count": 254,
+    "output": "✔ jobs auth and dedicated scope refuse before reads with owner-positive path (227.9734ms)\n✔ jobs strict query accepts decimal boundaries and rejects selectors and malformed limits before store (272.6805ms)\n✔ jobs refuses nonempty GET JSON bodies before reading any tenant (57.537ms)\n✔ jobs projects poisoned HTTP extras and refuses malformed summaries/envelopes with sanitized503 (145.9391ms)\n✔ jobs actual accessor to adapter to HTTP keeps tenants separate with foreign row sorted first (83.979ms)\n✔ jobs store requests only bounded sorted metadata and projects poisoned fields (0.9107ms)\n✔ jobs store empty/below/exact/extra pages and cap100 have truthful truncation (7.4635ms)\n✔ jobs store refuses invalid limits/tenants before accessor and rejects malformed fetched rows (2.6077ms)\n✔ real jobs accessor binds tenant filter before sorting and projection at DB boundary (1.6654ms)\nℹ tests 9\nℹ suites 0\nℹ pass 9\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 2944.3619\n"
+  },
+  "typecheck": {
+    "command": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe node_modules/typescript/bin/tsc --noEmit -p apps/api/tsconfig.json",
+    "chunk_id": "791744",
+    "wall_time_seconds": 7.0400215,
+    "exit_code": 0,
+    "original_token_count": 0,
+    "output": ""
+  },
+  "independentBoundary": {
+    "command": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe --import tsx qa/evidence/parallel-jobs-read/api-independent-boundary.mjs",
+    "chunk_id": "c8ce78",
+    "wall_time_seconds": 3.1062715,
+    "exit_code": 0,
+    "original_token_count": 63,
+    "output": "Independent auth/query/whitelist/private-cache boundary assertions passed.\nIndependent actual DB metadata -> API lowercase date-time preservation passed.\nIndependent actual accessor -> adapter -> HTTP lowercase createdAt/updatedAt preservation passed.\n"
+  },
+  "frozenContractVerification": {
+    "command": "python contracts/verify_contracts.py",
+    "output": "verify_contracts: no frozen contracts yet (research phase) -- PASS by vacuity",
+    "exit_code": 0,
+    "limitation": "Vacuous verifier success is not product acceptance."
+  },
+  "limitations": [
+    "Production/server mounting and real client/UI downstream are later integration requirements.",
+    "No live DB/provider/browser/full-suite/runtime mutations.",
+    "Cycle0 FAIL retained; cycle1 scoped PASS only."
+  ]
+}

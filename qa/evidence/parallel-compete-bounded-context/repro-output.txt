@@ -1,0 +1,19 @@
+Command: & 'C:/Program Files/WindowsApps/OpenAI.Codex_26.1002.7124.0_x64__2p2nqsd0c76g0/app/resources/cua_node/bin/node.exe' --test --test-isolation=none --test-timeout=20000 --import tsx 'qa/evidence/parallel-compete-bounded-context/repro.ts'
+Mode: local esbuild subprocess authorized after default-sandbox spawn EPERM; no sockets, DB or provider calls.
+Exit code: 0
+{"kind":"binding","routePath":"apps/api/src/routes/compete.ts","sha256":"723197f27a38b099300535b0e7efa829ea67429a8dea1752dfd69916179e7423","mode":"mounted-handler offline; not HTTP runtime proof"}
+{"name":"sync-refusing-factory-bypassed","authenticatedTenant":"tenant-a","treeTenants":["tenant-a"],"factoryCalls":0,"hydrationCalls":0,"legacyArms":0,"completionKinds":["ask.select_nodes","ask.answer"],"status":200,"evalWrites":1,"evalTenant":"tenant-a","credibility":"internal","answer":"The grant is guaranteed.","jobsTenants":["tenant-a"],"refusedAudit":false}
+{"name":"async-factory-bypassed-outside-current-type","authenticatedTenant":"tenant-a","treeTenants":["tenant-a"],"factoryCalls":0,"hydrationCalls":0,"legacyArms":0,"completionKinds":["ask.select_nodes","ask.answer"],"status":200,"evalWrites":1,"evalTenant":"tenant-a","credibility":"internal","answer":"The grant is guaranteed.","jobsTenants":["tenant-a"],"refusedAudit":false}
+{"name":"legacy-no-factory-preserved","authenticatedTenant":"tenant-a","treeTenants":["tenant-a"],"factoryCalls":0,"hydrationCalls":0,"legacyArms":0,"completionKinds":["ask.select_nodes","ask.answer"],"status":200,"evalWrites":1,"evalTenant":"tenant-a","credibility":"internal","answer":"The grant is guaranteed.","jobsTenants":["tenant-a"],"refusedAudit":false}
+{"name":"direct-bounded-refusal-no-eval-write","authenticatedTenant":"tenant-a","treeTenants":["tenant-a"],"factoryCalls":0,"hydrationCalls":1,"legacyArms":0,"completionKinds":["ask.select_nodes"],"status":"handler-rejected-no-route-response","rejection":{"name":"BoundedAskError","message":"Ask could not validate a bounded source context: literal cited turn absent"},"evalWrites":0,"evalTenant":null,"credibility":null,"answer":null,"jobsTenants":["tenant-a"],"refusedAudit":true}
+{"name":"missing-compete-scope","authenticatedTenant":"tenant-a","treeTenants":[],"factoryCalls":0,"hydrationCalls":0,"legacyArms":0,"completionKinds":[],"status":403,"evalWrites":0,"evalTenant":null,"credibility":null,"answer":null,"jobsTenants":[],"refusedAudit":false}
+CONFIRMED 5/5 offline mounted-handler probes; no implementation edits, provider calls, DB or sockets.
+✔ qa\evidence\parallel-compete-bounded-context\repro.ts (4.3116ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1303.1781

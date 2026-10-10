@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "createdAt": "2026-10-09T15:10:30.428879+00:00",
+  "inventoryPath": "qa/evidence/live-readiness/profile-publication-candidates.json",
+  "inventorySHA256": "5588218eb2245ef984f566495450a6bc9ad48207670ba2219480ec0c78c7524c",
+  "HEAD": "5453ef67c9b42db1900fb2fbad1e3bd5a9c398bf",
+  "branch": "codex/machine-migration-2026-10-09",
+  "indexTree": "fb7fd36dd8c912d44ade7ea97764ed5d2bbb7fc5",
+  "selectedPaths": 11,
+  "stagedChangedPaths": 11,
+  "unrelatedStagedPaths": [],
+  "pinMismatches": [],
+  "stagedBlobContentMismatches": [],
+  "normalizedLFBlobCount": 7,
+  "stagedDiffCheckExit": 0,
+  "blobs": [
+    {
+      "path": "packages/meeting-bot/py/sb_join.py",
+      "mode": "100644",
+      "gitBlobOid": "366b7fb1ab44755c6e5c1d252adc731e0b712265",
+      "approvedWorkingBytesSHA256": "ff4457d77605545b9c2c6c54dd19e0a86eade0396eba4a7796d2bf5663c3ba7e",
+      "stagedBlobSHA256": "eda7f92b90f4c60e215baa5d6c32f99f46620bf661e83feb2c9fe32b807f02a5",
+      "stagedBlobBytes": 69843,
+      "byteRelation": "Git CRLF-to-LF normalization only"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-commands.ts",
+      "mode": "100644",
+      "gitBlobOid": "eb010f2412fef873a6bc5cc9b1326285b40394e5",
+      "approvedWorkingBytesSHA256": "ae0ea018a7d7e0bb2ef9e1a2f39cdc9b4436d6f101e632716abad668959375a5",
+      "stagedBlobSHA256": "d540b7d626ee7cba04e03563843aeff936e91d5935314ae685318854efeba123",
+      "stagedBlobBytes": 17334,
+      "byteRelation": "Git CRLF-to-LF normalization only"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+      "mode": "100644",
+      "gitBlobOid": "f61fc8de3d9292f0f761d4aad199a44406b03b7c",
+      "approvedWorkingBytesSHA256": "9e9e087d8cee9e58c8037524b5fb4003e1425109e2cdaeb58dbf8c45f5f9fbef",
+      "stagedBlobSHA256": "fccc47d88ec6a37bc3507cbcb29df4cca62a526f6d3253552bae23264cd6d501",
+      "stagedBlobBytes": 16871,
+      "byteRelation": "Git CRLF-to-LF normalization only"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/obs-windows.ts",
+      "mode": "100644",
+      "gitBlobOid": "43bde56072713f961b76a5a66b93e93d52e711f7",
+      "approvedWorkingBytesSHA256": "c3298bf8a42bf4b2bd88a1ea69021ca7a1adb173c119a530f11ecc1df5532db0",
+      "stagedBlobSHA256": "1f9888e2e9368ce24ee0d60dfb259bd229baefe2badbed3291a8c18f61380b56",
+      "stagedBlobBytes": 18869,
+      "byteRelation": "Git CRLF-to-LF normalization only"
+    },
+    {
+      "path": "docs/webinar-release.md",
+      "mode": "100644",
+      "gitBlobOid": "991e35801eacff56ba0a36775c0f1a8bc2bb1747",
+      "approvedWorkingBytesSHA256": "584af1fe633f5d0993967fc41b6860fbb59ffbfbfcef48ac99103df39dcd8056",
+      "stagedBlobSHA256": "9eeadcebe5685326e853ca1abbe5faa84975165f5f15c4ea71eecad3ac68035e",
+      "stagedBlobBytes": 29341,
+      "byteRelation": "Git CRLF-to-LF normalization only"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/browser-profile.ts",
+      "mode": "100644",
+      "gitBlobOid": "eebc0a6eb899eca28dd0562231505b578fa19543",
+      "approvedWorkingBytesSHA256": "bbd224f8551ef196b042cdb2b51eab5da2bd051005c442849b7bc9dfef08a733",
+      "stagedBlobSHA256": "bbd224f8551ef196b042cdb2b51eab5da2bd051005c442849b7bc9dfef08a733",
+      "stagedBlobBytes": 1840,
+      "byteRelation": "exact"
+    },
+    {
+      "path": "packages/meeting-bot/py/test_sb_join_profile.py",
+      "mode": "100644",
+      "gitBlobOid": "414810cf8d5eff6cdc38920bd9026d9e4c78cc8f",
+      "approvedWorkingBytesSHA256": "ca906c698a8bfd07b1e1ad0d084c57d1be12296d46ddfd8a06fd82abeb99376f",
+      "stagedBlobSHA256": "ca906c698a8bfd07b1e1ad0d084c57d1be12296d46ddfd8a06fd82abeb99376f",
+      "stagedBlobBytes": 9750,
+      "byteRelation": "exact"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/browser-profile.test.ts",
+      "mode": "100644",
+      "gitBlobOid": "8e31190896dc1e21991bc00f5b7e38747a58073b",
+      "approvedWorkingBytesSHA256": "242ed3e3a28ad24a85e5279f0eb0b34fe99c37d914dcd659c27375348a03a455",
+      "stagedBlobSHA256": "242ed3e3a28ad24a85e5279f0eb0b34fe99c37d914dcd659c27375348a03a455",
+      "stagedBlobBytes": 5259,
+      "byteRelation": "exact"
+    },
+    {
+      "path": "qa/manifests/meeting-bot-existing-subprofile.md",
+      "mode": "100644",
+      "gitBlobOid": "94295d88b5b1c0bd2b87247a9c3f2ddeddf130b1",
+      "approvedWorkingBytesSHA256": "63ed700dce1545ec8774faa07eadac170ec10efbf1eac67182cfe77b71b61036",
+      "stagedBlobSHA256": "3c523d75850143b79c175230dfaba022953b7b24f0571dd996ab91b2b102970b",
+      "stagedBlobBytes": 2991,
+      "byteRelation": "Git CRLF-to-LF normalization only"
+    },
+    {
+      "path": "qa/verdicts/meeting-bot-existing-subprofile.md",
+      "mode": "100644",
+      "gitBlobOid": "345a9383f1599c72ab9fda58bb92f765ab6bbf0a",
+      "approvedWorkingBytesSHA256": "e61db1d181cee6897bdb6a26da7d0c536d1627a1d634f6dd897b70a34f875414",
+      "stagedBlobSHA256": "3327277a23b4000ec5c5b00c6d3233d28593cd3808d4fc7c0037407bf9ab6320",
+      "stagedBlobBytes": 5748,
+      "byteRelation": "Git CRLF-to-LF normalization only"
+    },
+    {
+      "path": "qa/contracts/meeting-bot-existing-subprofile.md",
+      "mode": "100644",
+      "gitBlobOid": "e17a4b3364b857a44d87d7c167089d19e7d07b79",
+      "approvedWorkingBytesSHA256": "cc4e0bc36fa82078484cef9aff16de706d49506537c54480fbc788a0bb09c776",
+      "stagedBlobSHA256": "cc4e0bc36fa82078484cef9aff16de706d49506537c54480fbc788a0bb09c776",
+      "stagedBlobBytes": 3203,
+      "byteRelation": "exact"
+    }
+  ],
+  "frozenForIndependentAudit": true,
+  "acceptanceScope": "Profile-selection SOURCE WIP only, canonical cycle2 PASS/CLOSED. Actual Google/Meet account, selected live browser, capture, attendance activation and full portable release UNVERIFIED; no runtime/deploy/activation acceptance.",
+  "structureLimitations": [
+    "record-commands.ts304/300 new LOC overage.",
+    "sb_join.py1142/300 and obs-windows.ts365/300 baseline LOC failures remain.",
+    "Known global directory budget failures remain; no global structure PASS."
+  ],
+  "excluded": [
+    "governance/ledger/Gemini contract changes",
+    "cache/media/cookies/profile/private evidence bodies",
+    "all other unstaged work"
+  ],
+  "commitOrPushPerformed": false
+}

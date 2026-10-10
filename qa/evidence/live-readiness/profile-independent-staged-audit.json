@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "review": "independent-profile-SOURCE-WIP-staged-publication-audit",
+  "head": "5453ef67c9b42db1900fb2fbad1e3bd5a9c398bf",
+  "inventorySHA256": "5588218eb2245ef984f566495450a6bc9ad48207670ba2219480ec0c78c7524c",
+  "stagerReportSHA256": "7e91531a07405064c69238e5dcee57d1654a2e8c8126c25d37ef98c695401d40",
+  "indexTree": "fb7fd36dd8c912d44ade7ea97764ed5d2bbb7fc5",
+  "indexStageListingSHA256": "f159ff6e8ac499e9357cf2d0cbf8cb4d08a4df42f119b6c1a117cd24a0a83198",
+  "selected": 11,
+  "staged": 11,
+  "sourceTestDocs": 8,
+  "QA": 3,
+  "allowlistExact": true,
+  "indexMatchesFrozenTree": true,
+  "workingAndStagedPinErrors": [],
+  "byteRelations": {
+    "exact": 4,
+    "CRLFtoLFOnly": 7
+  },
+  "forbiddenStagedPaths": [],
+  "credentialPatternCandidates": [],
+  "pythonSyntax": [
+    {
+      "path": "packages/meeting-bot/py/sb_join.py",
+      "status": "PASS"
+    },
+    {
+      "path": "packages/meeting-bot/py/test_sb_join_profile.py",
+      "status": "PASS"
+    }
+  ],
+  "cycle2ScopedPASSCloseout": true,
+  "historicalCycle1FAILPreserved": true,
+  "immutableContractSHA256": "cc4e0bc36fa82078484cef9aff16de706d49506537c54480fbc788a0bb09c776",
+  "staticClosure": {
+    "method": "HEAD+frozen index source blobs; TS AST imports/literal dynamic imports, Python local imports, source-relative helper path inspection",
+    "visitedModules": 19,
+    "localEdges": 39,
+    "missing": [],
+    "unacceptedDirtyDependencies": [],
+    "syntaxDiagnostics": [],
+    "relativeHelpers": [
+      {
+        "path": "packages/meeting-bot/py/sb_join.py",
+        "indexPresent": true,
+        "binding": "literal source-relative JOIN_SCRIPT"
+      },
+      {
+        "path": "scripts/webinar/process-video.mjs",
+        "indexPresent": true,
+        "binding": "literal REPO_ROOT process helper"
+      },
+      {
+        "path": "scripts/webinar/sync-session.mjs",
+        "indexPresent": true,
+        "binding": "literal REPO_ROOT process helper"
+      }
+    ],
+    "status": "PASS",
+    "typescriptModules": 17,
+    "typescriptEdges": 38,
+    "pythonModules": 2,
+    "pythonLocalImportEdges": 1
+  },
+  "structuralLimitations": [
+    {
+      "path": "packages/meeting-bot/py/sb_join.py",
+      "currentNonblankLines": 1142,
+      "HEADNonblankLines": 1067,
+      "limit": 300,
+      "classification": "baseline-overage",
+      "independentStagedNonblankLines": 1142,
+      "independentHEADNonblankLines": 1067
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-commands.ts",
+      "currentNonblankLines": 304,
+      "HEADNonblankLines": 297,
+      "limit": 300,
+      "classification": "new-overage",
+      "independentStagedNonblankLines": 304,
+      "independentHEADNonblankLines": 297
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+      "currentNonblankLines": 258,
+      "HEADNonblankLines": 254,
+      "limit": 300,
+      "classification": "within-budget",
+      "independentStagedNonblankLines": 258,
+      "independentHEADNonblankLines": 254
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/obs-windows.ts",
+      "currentNonblankLines": 365,
+      "HEADNonblankLines": 359,
+      "limit": 300,
+      "classification": "baseline-overage",
+      "independentStagedNonblankLines": 365,
+      "independentHEADNonblankLines": 359
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/browser-profile.ts",
+      "currentNonblankLines": 26,
+      "HEADNonblankLines": null,
+      "limit": 300,
+      "classification": "within-budget",
+      "independentStagedNonblankLines": 26,
+      "independentHEADNonblankLines": null
+    },
+    {
+      "path": "packages/meeting-bot/py/test_sb_join_profile.py",
+      "currentNonblankLines": 165,
+      "HEADNonblankLines": null,
+      "limit": 400,
+      "classification": "within-budget",
+      "independentStagedNonblankLines": 165,
+      "independentHEADNonblankLines": null
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/browser-profile.test.ts",
+      "currentNonblankLines": 84,
+      "HEADNonblankLines": null,
+      "limit": 400,
+      "classification": "within-budget",
+      "independentStagedNonblankLines": 84,
+      "independentHEADNonblankLines": null
+    }
+  ],
+  "acceptanceLimits": "Independently PASS/CLOSED cycle2 source profile-selection unit only. Actual Google/Meet identity, real selected browser/account/capture, received AV, finalization/transcription/index/Ask and portable release remain unverified; no activation/deploy claim.",
+  "blockers": [],
+  "actions": [
+    "Read Git index/blobs and acceptance metadata; no tests, browser, provider, DB, source/index edits, staging, commit or push."
+  ],
+  "acceptedCycle2SourceTestDocsPinsMatched": 8,
+  "acceptedCycle2PinErrors": [],
+  "indexStillFrozen": true,
+  "stagedDiffCheckExit": 0,
+  "verdict": "PASS-SOURCE-WIP-PUBLICATION-SAFETY",
+  "structuralReleaseAcceptance": false,
+  "historicalFAILArchiveHashVerified": true,
+  "historicalFAILArchiveNotStaged": true,
+  "newDocEmailCount": 0,
+  "privacyApprovalBoundByExact11Pins": true,
+  "limits": [
+    "record-commands.ts304/300 is a new overage; sb_join.py1142/300 and obs-windows.ts365/300 remain baseline-overage classes. Global directory/structure gates are not accepted.",
+    "Source cycle2 C1-C6 only. Actual Google/Meet account/authentication, real browser/profile selection/capture/AV, processing/index/Ask and activation/release remain unverified.",
+    "Static HEAD+index helper presence/syntax is not installed SeleniumBase/UC/driver/profile/account/runtime validity. No tests or browser were launched."
+  ],
+  "auditCompletion": "Independent exact11 source-WIP staged safety review complete; no commit/push authorized by this audit itself."
+}

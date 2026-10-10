@@ -1,0 +1,10 @@
+# Parallel claim evidence review — independent acceptance
+
+Scope: preliminary AI evidence packet completeness and integrity only. Human semantic gold, factual truth, binding thresholds, original citation acceptance and full U2.2 remain unapproved.
+
+1. The index and exactly 65 uniquely identified primary tasks must exhaust the unchanged source packet rows whose replacementReviewStatus is unreviewed, in deterministic lexical claimId order. Existing seven reviewed replacement rows remain excluded. Independently recompute packet, task and source/claim hashes; verify complete literal task row/session records against the source packet and original source bindings.
+2. Each primary result belongs to its exact assigned task, claim and source binding. Every quoted or proposed passage must match a complete bound literal record, with historical versus current provenance explicit. Missing source, ambiguity and unknown states remain explicit rather than inferred as absence of a problem.
+3. All results remain AI-preliminary. Every human adjudication field is null, and no claim label, proposal, model opinion, factual-truth assessment or threshold becomes human-approved gold or authority for source/database/backfill changes.
+4. Exactly 13 independent audit results cover five distinct primary tasks each: 65 unique coverage identities, without omissions or duplicate substitution. Independently check audit task/claim/result hashes and literal/source bindings. Preserve each disagreement and its reason; reconciliation must not erase the original primary or audit opinion.
+5. Independently recompute aggregate label counts, missing fields, primary/audit completeness, provenance distinctions and disagreement lists from individual result files. The aggregate must describe the submitted evidence accurately and retain unknown/unreviewed status throughout.
+6. Perform the joint check only after the root signals ready and the unit manifest is ready-for-check with an explicit Fix cycle. Record actual bounded command/output and input/output hashes. A scoped PASS certifies this preparation packet only and cannot close full U2.2 or semantic-gold gates.

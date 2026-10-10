@@ -1,0 +1,263 @@
+{
+  "version": 1,
+  "createdAt": "2026-10-09T15:07:18.636802+00:00",
+  "baseHEAD": "5453ef67c9b42db1900fb2fbad1e3bd5a9c398bf",
+  "branch": "codex/machine-migration-2026-10-09",
+  "unit": "meeting-bot-existing-subprofile",
+  "cycle": 2,
+  "manifestStatus": "checked-PASS",
+  "canonicalVerdict": "PASS source C1-C6 only",
+  "ownerInventorySHA256": "a263a3d7f420c04cf0e23f82596f07e4dbe2d0bb6f9788a4e9d8d0f00d3152bd",
+  "exactAllowlist": [
+    {
+      "path": "packages/meeting-bot/py/sb_join.py",
+      "sha256": "ff4457d77605545b9c2c6c54dd19e0a86eade0396eba4a7796d2bf5663c3ba7e",
+      "scope": "cycle2 independently checked source/test/docs checkpoint",
+      "changedFromCycle1": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-commands.ts",
+      "sha256": "ae0ea018a7d7e0bb2ef9e1a2f39cdc9b4436d6f101e632716abad668959375a5",
+      "scope": "cycle2 independently checked source/test/docs checkpoint",
+      "changedFromCycle1": false
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+      "sha256": "9e9e087d8cee9e58c8037524b5fb4003e1425109e2cdaeb58dbf8c45f5f9fbef",
+      "scope": "cycle2 independently checked source/test/docs checkpoint",
+      "changedFromCycle1": false
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/obs-windows.ts",
+      "sha256": "c3298bf8a42bf4b2bd88a1ea69021ca7a1adb173c119a530f11ecc1df5532db0",
+      "scope": "cycle2 independently checked source/test/docs checkpoint",
+      "changedFromCycle1": false
+    },
+    {
+      "path": "docs/webinar-release.md",
+      "sha256": "584af1fe633f5d0993967fc41b6860fbb59ffbfbfcef48ac99103df39dcd8056",
+      "scope": "cycle2 independently checked source/test/docs checkpoint",
+      "changedFromCycle1": false
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/browser-profile.ts",
+      "sha256": "bbd224f8551ef196b042cdb2b51eab5da2bd051005c442849b7bc9dfef08a733",
+      "scope": "cycle2 independently checked source/test/docs checkpoint",
+      "changedFromCycle1": false
+    },
+    {
+      "path": "packages/meeting-bot/py/test_sb_join_profile.py",
+      "sha256": "ca906c698a8bfd07b1e1ad0d084c57d1be12296d46ddfd8a06fd82abeb99376f",
+      "scope": "cycle2 independently checked source/test/docs checkpoint",
+      "changedFromCycle1": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/browser-profile.test.ts",
+      "sha256": "242ed3e3a28ad24a85e5279f0eb0b34fe99c37d914dcd659c27375348a03a455",
+      "scope": "cycle2 independently checked source/test/docs checkpoint",
+      "changedFromCycle1": false
+    },
+    {
+      "path": "qa/manifests/meeting-bot-existing-subprofile.md",
+      "sha256": "63ed700dce1545ec8774faa07eadac170ec10efbf1eac67182cfe77b71b61036",
+      "scope": "necessary canonical cycle2 handshake companion"
+    },
+    {
+      "path": "qa/verdicts/meeting-bot-existing-subprofile.md",
+      "sha256": "e61db1d181cee6897bdb6a26da7d0c536d1627a1d634f6dd897b70a34f875414",
+      "scope": "necessary canonical cycle2 handshake companion"
+    },
+    {
+      "path": "qa/contracts/meeting-bot-existing-subprofile.md",
+      "sha256": "cc4e0bc36fa82078484cef9aff16de706d49506537c54480fbc788a0bb09c776",
+      "scope": "necessary canonical cycle2 handshake companion"
+    }
+  ],
+  "sourceTestDocsFiles": 8,
+  "necessaryQACompanions": 3,
+  "totalSelectedFiles": 11,
+  "pinMismatches": [],
+  "cycle2ChangedFiles": 2,
+  "sixOtherFilesStable": true,
+  "dependencyClosure": {
+    "base": "HEAD5453ef6 plus exact eight prospective overrides",
+    "staticLocalModules": 17,
+    "staticEdges": 38,
+    "missingImports": [],
+    "pythonASTFiles": 2,
+    "externalRuntimeBoundary": "SeleniumBase is existing environment dependency; checker exercised pinned installed UC constructor/argv without launching browser. External installation/profile/account validity not certified here."
+  },
+  "privacyScan": [
+    {
+      "path": "packages/meeting-bot/py/sb_join.py",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "credentialedURL": 0,
+        "inviteSecret": 0,
+        "privateQuoteBody": 0
+      }
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-commands.ts",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "credentialedURL": 0,
+        "inviteSecret": 0,
+        "privateQuoteBody": 0
+      }
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "credentialedURL": 0,
+        "inviteSecret": 0,
+        "privateQuoteBody": 0
+      }
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/obs-windows.ts",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "credentialedURL": 0,
+        "inviteSecret": 0,
+        "privateQuoteBody": 0
+      }
+    },
+    {
+      "path": "docs/webinar-release.md",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "credentialedURL": 0,
+        "inviteSecret": 0,
+        "privateQuoteBody": 0
+      }
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/browser-profile.ts",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "credentialedURL": 0,
+        "inviteSecret": 0,
+        "privateQuoteBody": 0
+      }
+    },
+    {
+      "path": "packages/meeting-bot/py/test_sb_join_profile.py",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "credentialedURL": 0,
+        "inviteSecret": 0,
+        "privateQuoteBody": 0
+      }
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/browser-profile.test.ts",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "credentialedURL": 0,
+        "inviteSecret": 0,
+        "privateQuoteBody": 0
+      }
+    },
+    {
+      "path": "qa/manifests/meeting-bot-existing-subprofile.md",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "credentialedURL": 0,
+        "inviteSecret": 0,
+        "privateQuoteBody": 0
+      }
+    },
+    {
+      "path": "qa/verdicts/meeting-bot-existing-subprofile.md",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "credentialedURL": 0,
+        "inviteSecret": 0,
+        "privateQuoteBody": 0
+      }
+    },
+    {
+      "path": "qa/contracts/meeting-bot-existing-subprofile.md",
+      "scanCounts": {
+        "credentialFormat": 0,
+        "credentialedURL": 0,
+        "inviteSecret": 0,
+        "privateQuoteBody": 0
+      }
+    }
+  ],
+  "privacyBlockers": [],
+  "docsEmailReview": "Two occurrences of one email are already in published HEAD; zero newly introduced emails. No email values copied into this report.",
+  "structuralLimitations": [
+    {
+      "path": "packages/meeting-bot/py/sb_join.py",
+      "currentNonblankLines": 1142,
+      "HEADNonblankLines": 1067,
+      "limit": 300,
+      "classification": "baseline-overage"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-commands.ts",
+      "currentNonblankLines": 304,
+      "HEADNonblankLines": 297,
+      "limit": 300,
+      "classification": "new-overage"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+      "currentNonblankLines": 258,
+      "HEADNonblankLines": 254,
+      "limit": 300,
+      "classification": "within-budget"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/obs-windows.ts",
+      "currentNonblankLines": 365,
+      "HEADNonblankLines": 359,
+      "limit": 300,
+      "classification": "baseline-overage"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/browser-profile.ts",
+      "currentNonblankLines": 26,
+      "HEADNonblankLines": null,
+      "limit": 300,
+      "classification": "within-budget"
+    },
+    {
+      "path": "packages/meeting-bot/py/test_sb_join_profile.py",
+      "currentNonblankLines": 165,
+      "HEADNonblankLines": null,
+      "limit": 400,
+      "classification": "within-budget"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/browser-profile.test.ts",
+      "currentNonblankLines": 84,
+      "HEADNonblankLines": null,
+      "limit": 400,
+      "classification": "within-budget"
+    }
+  ],
+  "acceptanceScope": "Independently PASS/CLOSED cycle2 source profile-selection unit only. Actual Google/Meet identity, real selected browser/account/capture, received AV, finalization/transcription/index/Ask and portable release remain unverified; no activation/deploy claim.",
+  "excluded": [
+    ".cache coordination/proof/media/profile/cookie bodies",
+    "qa/packets candidate/proof contents",
+    "raw evidence/source/private account data",
+    "docs/DECISIONS.md",
+    "qa/issues.jsonl",
+    "qa/contracts/gemini-audio-transcription.md",
+    "unrelated current work"
+  ],
+  "actionsPerformed": [
+    "read canonical inventory/manifest/verdict/contract",
+    "verify eight source pins and baseline LF relation",
+    "bounded static HEAD dependency and Python AST review",
+    "privacy scan necessary code/docs/QA only",
+    "write this review only"
+  ],
+  "stagingPerformed": false,
+  "commitOrPushPerformed": false
+}

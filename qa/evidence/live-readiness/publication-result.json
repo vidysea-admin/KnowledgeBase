@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "completedAt": "2026-10-09T14:43:32.444681+00:00",
+  "branch": "codex/machine-migration-2026-10-09",
+  "commitSHA": "5453ef67c9b42db1900fb2fbad1e3bd5a9c398bf",
+  "remoteSHA": "5453ef67c9b42db1900fb2fbad1e3bd5a9c398bf",
+  "remoteReadbackVerified": true,
+  "remote": "https://github.com/vidysea-admin/KnowledgeBase.git",
+  "remoteVisibility": "PUBLIC",
+  "commitURL": "https://github.com/vidysea-admin/KnowledgeBase/commit/5453ef67c9b42db1900fb2fbad1e3bd5a9c398bf",
+  "parentSHA": "87858c734f4928df7a141e8f17691f170719c76b",
+  "treeSHA": "8f9dfe5b05437c79e1ee2d5c8e6953679b650a34",
+  "changedPaths": 96,
+  "commitExit": 0,
+  "pushExit": 0,
+  "forceUsed": false,
+  "restagingPerformed": false,
+  "identityVerification": {
+    "ghAndGitPushCredentialAccountMatch": true,
+    "publicLogin": "umeshsugara-ai",
+    "publicId": 227983940,
+    "publicName": "Umesh Sugara",
+    "identityMethod": "per-command user.name and valid id+login GitHub noreply user.email; no global/repo config change"
+  },
+  "safetyAudit": {
+    "path": "qa/evidence/live-readiness/independent-staged-audit.json",
+    "sha256": "ed1929557234505bd1c81052aa06a789114cc3c8ec592928a6ffc4ff404569f1",
+    "result": "PASS-WIP-PUBLICATION-SAFETY",
+    "staticModules": 253,
+    "staticEdges": 693
+  },
+  "remainingUnstagedTracked": [
+    "docs/DECISIONS.md",
+    "docs/webinar-release.md",
+    "packages/meeting-bot/py/sb_join.py",
+    "packages/meeting-bot/src/capture/obs-windows.ts",
+    "packages/meeting-bot/src/capture/record-commands.ts",
+    "packages/meeting-bot/src/capture/tab-browser.ts",
+    "qa/contracts/gemini-audio-transcription.md",
+    "qa/issues.jsonl"
+  ],
+  "remainingUntrackedFilesBeforeThisReport": 228,
+  "remainingStagedPaths": [],
+  "acceptanceScope": "D117 WIP checkpoint only. Main Ask BUILDING/HOLD and ranking excluded; actual Meet capture/attendance activation/full portable release pending; global structure baseline/new directory failures remain.",
+  "noDeploymentRuntimeBrowserDBProviderActions": true,
+  "statusInventoryLimitation": "Git status reported permission denied on two pytest-cache-files directories; listed228 untracked files is not a complete cache inventory. Those cache directories were not staged or read."
+}
