@@ -71,7 +71,7 @@ test("actual HTTP composition gives request factory sole ownership of arms and s
       if (job.kind === "ask.select_nodes") return complete({ node_ids: [] });
       if (job.kind === "evaluator") return complete({ score: 0.9, reason: "source answers" });
       if (job.kind === "ask.answer_grounding") return complete({ decisions: [{ id: "sentence-0", supported: true, answersQuery: true }] });
-      const context = JSON.parse(JSON.parse(job.messages[1]!.content).context);
+      const context = JSON.parse(job.messages[1]!.content).context.sources;
       return complete({ sentences: [{ text: "The source says forms open in October.", sourceIds: [context[0].sourceId] }] });
     },
   });

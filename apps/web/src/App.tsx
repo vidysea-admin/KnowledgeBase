@@ -18,6 +18,7 @@ import { JobsPage } from "./pages/jobs/JobsPage.js";
 import { KnowledgeExplorerPage } from "./pages/explorer/KnowledgeExplorerPage.js";
 import { ConfidenceGraphPage } from "./pages/graph-confidence/ConfidenceGraphPage.js";
 import { KnowledgeGapsPage } from "./pages/gaps/KnowledgeGapsPage.js";
+import { ActivityHealthPage } from "./pages/activity-health/ActivityHealthPage.js";
 
 export function App(): React.ReactElement {
   return (
@@ -34,6 +35,7 @@ export function App(): React.ReactElement {
               <Route path="/explorer" element={<KnowledgeExplorerPage />} />
               <Route path="/graph-confidence" element={<ConfidenceGraphPage />} />
               <Route path="/gaps" element={<KnowledgeGapsPage />} />
+              <Route path="/activity-health" element={<ActivityHealthPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/watch" element={<WatchPage />} />
               <Route path="/sources" element={<SourcesPage />} />

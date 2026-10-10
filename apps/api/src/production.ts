@@ -27,6 +27,7 @@ import { createAskArmsFor } from "./ask-arms.js";
 import { createSourceRequestDepsFor } from "./ask/source-context.js";
 import { withSessionArtifacts } from "./routes/brain.js";
 import { createMongoJobsReadDeps } from "./jobs/store.js";
+import { createConfiguredActivityHealthDeps } from "./activity-health/queue-reader.js";
 
 const ROUTING_CONFIG_PATH = fileURLToPath(new URL("../../../config/ai-routing.yaml", import.meta.url));
 
@@ -193,6 +194,7 @@ export function buildProductionDeps(): ServerDeps {
     keys: createMongoKeysDeps(),
     ingest: createMongoIngestDeps(boundIndexer),
     jobs: createMongoJobsReadDeps(),
+    activityHealth: createConfiguredActivityHealthDeps(),
     // CORS_ORIGINS is a comma-separated allowlist (e.g. "http://localhost:5173" in dev, the real
     // apps/web deployment origin in prod) — no default beyond "" -> empty list, matching
     // server.ts's safe-by-default stance.

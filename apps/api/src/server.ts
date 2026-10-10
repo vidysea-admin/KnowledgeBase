@@ -28,6 +28,8 @@ import { createRateLimiter, type RateLimitOptions } from "./rate-limit.js";
 import { createCors } from "./cors.js";
 import { createJobsRouter, type JobsReadDeps } from "./jobs/router.js";
 import { unavailableJobsReadDeps } from "./jobs/fixture-store.js";
+import { createActivityHealthRouter, unavailableActivityHealthDeps } from "./activity-health/router.js";
+import type { ActivityHealthDeps } from "./activity-health/types.js";
 
 export interface ServerDeps {
   keyStore: ApiKeyStore;
@@ -45,6 +47,7 @@ export interface ServerDeps {
   keys: KeysDeps;
   ingest: IngestDeps;
   jobs?: JobsReadDeps;
+  activityHealth?: ActivityHealthDeps;
   rateLimit?: RateLimitOptions;
   /** apps/web's real origin(s) in dev/prod (e.g. "http://localhost:5173") — no default, an
    * empty list means no cross-origin browser call succeeds, which is the safe default until a
@@ -73,6 +76,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createCompeteRouter({ ...deps.ask, evalRuns: deps.evalRuns }));
   app.use(createBrainRouter(deps.brain));
   app.use(createJobsRouter(deps.jobs ?? unavailableJobsReadDeps));
+  app.use(createActivityHealthRouter(deps.activityHealth ?? unavailableActivityHealthDeps));
   app.use(createWatchedSourcesRouter(deps.watchedSources));
   app.use(createCitationsRouter(deps.citations));
   app.use(createSearchRouter(deps.search));
@@ -99,5 +103,7 @@ export function createServer(deps: ServerDeps): Express {
  * the first time anyone opened a browser, which is the whole argument for D-024's rule.
  */
 export function startServer(deps: ServerDeps, port: number = Number(process.env.PORT ?? 3300)): Server {
-  return createServer(deps).listen(port);
+  const server = createServer(deps).listen(port);
+  server.once("close", () => { void deps.activityHealth?.close?.().catch(() => undefined); });
+  return server;
 }
