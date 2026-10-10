@@ -8,8 +8,10 @@
  * Reader decisions, stated so a checker can disagree with them:
  *  - A whitespace-only line is TOLERATED (the existing readers, tracker-audit readLedgerRows, skip
  *    them; qa/issues.104cc.jsonl has one). Any other unparseable line is a refusal.
- *  - Main file ids must be plain `ISS-<digits>`; a shard `qa/issues.<lane>.jsonl` ids must be
- *    `ISS-<LANE>-<digits>` with LANE = the file's lane, upper-cased. Anything else is "wrong form".
+ *  - TWO GRAMMARS (fix cycle 1). READING accepts READ_ID_RE in any file: `ISS-` then upper-case alphanumeric
+ *    segments joined by single hyphens (plain ISS-12, lane ISS-U3-001, qualified ISS-360-OBSFLAKE, lane ids that
+ *    were merged into the main file: D-019 forbids renumbering them, D-055 ruling 2 made the qualified ones).
+ *    ALLOCATING stays strict: main = exactly `ISS-<digits>`, a lane = exactly `ISS-<LANE>-<digits>`.
  *  - The union (I2) is qa/issues.jsonl then every qa/issues.*.jsonl, sorted. Always all of it.
  */
 import {
@@ -20,6 +22,8 @@ import { join } from "node:path";
 export const LOCK_NAME = ".issues-ledger.lock";
 export const SEVERITIES = ["critical", "high", "medium", "low"];
 const RESERVED = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
+/** Reading grammar, derived from the ids in the real union; checked against every one of them by the tests. */
+export const READ_ID_RE = /^ISS-[A-Z0-9]+(?:-[A-Z0-9]+)*$/;
 const LANE_RE = /^[A-Za-z0-9][A-Za-z0-9-]{0,39}$/;
 
 export class LedgerError extends Error {
@@ -61,9 +65,8 @@ export function readUnion(root) {
       if (row === null || typeof row !== "object" || Array.isArray(row) || typeof row.id !== "string" || !row.id.trim()) {
         findings.push({ kind: "no-id", loc, detail: "row has no non-empty string id" }); return;
       }
-      const wanted = file.lane === null ? /^ISS-\d+$/ : new RegExp(`^ISS-${escapeRe(file.lane.toUpperCase())}-\\d+$`);
-      if (!wanted.test(row.id)) {
-        findings.push({ kind: "wrong-form", loc, id: row.id, detail: file.lane === null ? "main ledger id must be ISS-<digits>" : `shard ${file.name} id must be ISS-${file.lane.toUpperCase()}-<digits>` });
+      if (!READ_ID_RE.test(row.id)) {
+        findings.push({ kind: "wrong-form", loc, id: row.id, detail: `id ${JSON.stringify(row.id)} does not match ${READ_ID_RE}` });
       }
       if (first.has(row.id)) {
         findings.push({ kind: "duplicate", loc, id: row.id, other: first.get(row.id), detail: `id ${row.id} at ${first.get(row.id)} and ${loc}` });
@@ -84,7 +87,11 @@ export function refuseIfUnclean({ findings }) {
 
 const pad = (n) => String(n).padStart(3, "0");
 
-/** Next id for the lane (or the main tree) from an already-read, clean union. Also proves it is unused union-wide. */
+/**
+ * Next id for the lane (or the main tree) from an already-read, clean union. Also proves it is unused union-wide.
+ * Only ids EXACTLY `ISS-<digits>` (main) or `ISS-<LANE>-<digits>` (lane) move the counter, wherever the row lives:
+ * a lane's rows merged into the main file still count for that lane, and `ISS-360-OBSFLAKE` is not a plain 360.
+ */
 export function nextIdFrom(union, lane = null) {
   const re = lane === null ? /^ISS-(\d+)$/ : new RegExp(`^ISS-${escapeRe(validateLane(lane).toUpperCase())}-(\\d+)$`);
   let max = 0;
@@ -107,30 +114,43 @@ export function nextId(root, lane = null) {
 }
 
 const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
-const CONTENTION = new Set(["EEXIST", "EPERM", "EBUSY", "EACCES"]);
+export const DEFAULT_LOCK_WAIT_MS = 8000;
+const lockWaitMs = () => { const n = Number(process.env.LEDGER_LOCK_WAIT_MS); return Number.isFinite(n) && n > 0 ? n : DEFAULT_LOCK_WAIT_MS; };
 
-/** Exclusive lock via `wx`. A stale lock is REPORTED, never stolen. */
-export function acquireLock(root, { waitMs = 8000, staleMs = 30000 } = {}) {
+/**
+ * Exclusive lock via `wx`. Hard overall deadline `waitMs` (option, else env LEDGER_LOCK_WAIT_MS, else 8000).
+ * EEXIST = held by someone else: retry until the deadline. EACCES/EPERM/EBUSY with the lock file present is the
+ * same thing seen mid-delete on Windows, so it retries too; with NO lock file it means "cannot create it" and, like
+ * ENOENT/EROFS/anything else, fails immediately with the code. A stale lock is REPORTED, never stolen; its age is
+ * taken from the `at` timestamp inside it when that parses, else from the file's mtime.
+ */
+export function acquireLock(root, { waitMs = lockWaitMs(), staleMs = 30000 } = {}) {
   const path = join(qaDir(root), LOCK_NAME), start = Date.now();
   for (;;) {
+    let code = null, openErr = null;
     try {
       const fd = openSync(path, "wx");
       try { writeSync(fd, JSON.stringify({ pid: process.pid, at: new Date().toISOString() })); }
       finally { closeSync(fd); }
       return path;
-    } catch (err) {
-      if (!CONTENTION.has(err?.code)) throw err;
+    } catch (err) { openErr = err; code = err?.code ?? "UNKNOWN"; if (code !== "EEXIST" && !["EACCES", "EPERM", "EBUSY"].includes(code)) throw lockFail(path, err, code); }
+    let mtime, held = "";
+    try { mtime = statSync(path).mtimeMs; } catch (err) {
+      if (code === "EEXIST" && Date.now() - start < waitMs) continue; // released between open and stat: retry, bounded
+      if (code === "EEXIST") throw new LedgerError(`ledger lock ${path} still contended after ${waitMs}ms; retry later`);
+      throw lockFail(path, openErr, code);
     }
-    let age;
-    try { age = Date.now() - statSync(path).mtimeMs; } catch (err) { if (err?.code === "ENOENT") continue; throw err; }
-    if (age > staleMs) {
-      let held = "";
-      try { held = readFileSync(path, "utf8"); } catch { /* unreadable: report without content */ }
-      throw new LedgerError(`stale ledger lock ${path} (age ${Math.round(age / 1000)}s > ${staleMs / 1000}s, content ${held || "unreadable"}). NOT stealing it: confirm the holder is dead, delete the file by hand, then retry.`);
-    }
-    if (Date.now() - start > waitMs) throw new LedgerError(`ledger lock ${path} still held after ${waitMs}ms (age ${Math.round(age / 1000)}s); retry later`);
+    try { held = readFileSync(path, "utf8"); } catch { /* unreadable: report without content */ }
+    let at = NaN; try { at = Date.parse(JSON.parse(held).at); } catch { /* fall back to mtime */ }
+    const age = Date.now() - (Number.isFinite(at) ? at : mtime);
+    if (age > staleMs) throw new LedgerError(`stale ledger lock ${path} (age ${Math.round(age / 1000)}s > ${staleMs / 1000}s, content ${held || "unreadable"}). NOT stealing it: confirm the holder is dead, delete the file by hand, then retry.`);
+    if (Date.now() - start >= waitMs) throw new LedgerError(`ledger lock ${path} still held by someone else after ${waitMs}ms (age ${Math.round(age / 1000)}s, content ${held || "unreadable"}); retry later or raise LEDGER_LOCK_WAIT_MS`);
     sleep(10 + Math.floor(Math.random() * 25));
   }
+}
+
+function lockFail(path, err, code) {
+  return new LedgerError(`cannot create ledger lock ${path}: ${code} (${err?.message ?? err}). This is not contention; fix the directory permissions or path. Nothing was changed.`);
 }
 
 export function releaseLock(path) { try { unlinkSync(path); } catch (err) { if (err?.code !== "ENOENT") throw err; } }

@@ -74,10 +74,9 @@ test("EOL: LF stays LF, CRLF stays CRLF, file lacking a final newline does not j
   } finally { done(lf); done(noNl); done(crlf); }
 });
 
-test("C1 union: the next main id is not one already present in a shard (candidate unused union-wide)", () => {
-  // a plain id inside a shard is also 'wrong form', so it refuses; the point is no silent reuse either way
+test("C1 union: a plain id living in a shard still counts for the main counter (never reused)", () => {
   const root = fixture({ "issues.jsonl": [mk("ISS-5")], "issues.x.jsonl": [mk("ISS-6")] });
-  try { assert.throws(() => nextId(root), /wrong-form|not clean/); } finally { done(root); }
+  try { assert.equal(nextId(root), "ISS-7"); } finally { done(root); }
 });
 
 test("refusals: bad JSON, missing id, duplicate (both locations named), wrong form each refuse and change nothing", () => {
@@ -85,7 +84,7 @@ test("refusals: bad JSON, missing id, duplicate (both locations named), wrong fo
     "bad-json": { "issues.jsonl": [mk("ISS-1"), "{not json"] },
     "no-id": { "issues.jsonl": [mk("ISS-1"), JSON.stringify({ title: "x" })] },
     "duplicate": { "issues.jsonl": [mk("ISS-1"), mk("ISS-2")], "issues.q.jsonl": [mk("ISS-Q-1"), mk("ISS-Q-1")] },
-    "wrong-form": { "issues.jsonl": [mk("ISS-1"), mk("ISS-Q-2")] },
+    "wrong-form": { "issues.jsonl": [mk("ISS-1"), mk("iss-3")] },
   };
   for (const [kind, files] of Object.entries(cases)) {
     const root = fixture(files);
@@ -108,7 +107,6 @@ test("C5 duplicate across main and shard names both rows with file:line; shard w
     const u = readUnion(root);
     const dup = u.findings.find((f) => f.kind === "duplicate");
     assert.equal(dup.other, "issues.jsonl:2"); assert.equal(dup.loc, "issues.k.jsonl:2");
-    assert.ok(u.findings.some((f) => f.kind === "wrong-form" && f.loc === "issues.k.jsonl:2"));
     const v = cli(root, "verify");
     assert.equal(v.status, 1); assert.match(v.stdout, /issues\.jsonl:2 and issues\.k\.jsonl:2/);
   } finally { done(root); }
@@ -207,7 +205,7 @@ test("lock: a fresh lock held by someone else times out with a clear message and
   const root = fixture({ "issues.jsonl": [mk("ISS-1")] });
   try {
     const held = acquireLock(root);
-    assert.throws(() => acquireLock(root, { waitMs: 150 }), /still held after 150ms/);
+    assert.throws(() => acquireLock(root, { waitMs: 150 }), /still held by someone else after 150ms/);
     assert.ok(existsSync(held));
   } finally { done(root); }
 });
