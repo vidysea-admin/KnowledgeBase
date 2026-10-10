@@ -1,6 +1,7 @@
 # t037-join-rules-persistence
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t037-join-rules-persistence.md (cycle 0, a8a698d)
 Fix cycle: 0
 Priority tier: 3 - next unblocked roadmap task (T-037)
 Security class: data writes + auto-join trust data (decides a no-click join) - FULL checker ceremony

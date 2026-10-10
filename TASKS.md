@@ -124,7 +124,7 @@ Meeting-Bot pages (apps/web) are open follow-up work, not yet started.
 | T-034 | open | In-browser tab capture (extension + MediaRecorder); OBS becomes fallback | removes OBS; enables parallel meetings |
 | T-035 | open | Lean video (720p, low fps) — target <400 MB/hour | live run measured ~2.7 GB/hour |
 | T-036 | open | Discovery: Gmail + Calendar webinar-link scan incl. Zoho/OnAir/YouTube Live | extends apps/api gws-gmail.ts / gws-calendar.ts |
-| T-037 | in_progress | Auto-join rules (sender/domain/platform, approve-once, opt-out) | Read AI pattern. Unit t037-auto-join-rules-engine PASSed (verdict cycle 2) as a pure engine only; remaining: rule persistence, edit API/UI, scheduler switch-over (exit criterion in docs/meeting-bot-roadmap.md:60 not met) |
+| T-037 | in_progress | Auto-join rules (sender/domain/platform, approve-once, opt-out) | Read AI pattern. Unit t037-auto-join-rules-engine PASSed (verdict cycle 2) as a pure engine only; unit t037-join-rules-persistence PASSed (verdict cycle 0) as a tenant-scoped file store, not yet called by anything; remaining: edit API/UI (must load before save so approvals and opt-outs are kept), scheduler switch-over with a single writer or a lock (exit criterion in docs/meeting-bot-roadmap.md:60 not met) |
 | T-038 | open | Scheduler service (5-min poller → selectEventsToAutoJoin → record; overlaps) | replaces one-off Windows tasks; depends T-034, T-036, T-037 |
 | T-039 | open | "Send bot now" to a live meeting (CLI/API/web) |  |
 | T-040 | open | Post-processing: summary, facts, Q&A, action items with timestamp citations |  |
