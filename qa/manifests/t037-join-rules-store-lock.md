@@ -1,6 +1,7 @@
 # t037-join-rules-store-lock
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t037-join-rules-store-lock.md (cycle 0, b9f88ab)
 Fix cycle: 0
 Priority tier: 2/3 - follow-up to verdict note of `t037-join-rules-persistence` (lost opt-out = unwanted unattended join)
 Security class: data writes + auto-join trust data - FULL checker ceremony (security class is never round-capped)
