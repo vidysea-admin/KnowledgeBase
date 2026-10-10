@@ -36,6 +36,15 @@ export function entityId(tenantId: string, slug: string): string {
   return `${tenantId}:${slug}`;
 }
 
+/**
+ * ISS-155. One dry-run preview line for a promoted topic. `backfill.mjs entities --dry-run` is the
+ * only path C8 allows, so it must print the id the live path (promoteAndPersistEntities) would
+ * WRITE -- the namespaced one -- not the bare slug `promoteTreeEntities` returns.
+ */
+export function topicPreviewLine(tenantId: string, t: Pick<PromotedTopic, "_id" | "sessionRefs">): string {
+  return `topic ${entityId(tenantId, t._id)} <- ${t.sessionRefs.length} session(s)`;
+}
+
 export interface PromotionResult {
   topics: number;
   orgs: number;

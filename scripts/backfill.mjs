@@ -85,7 +85,7 @@ try {
   // a per-session fact.
   if (SUBCOMMAND === "entities") {
     const { promoteTreeEntities } = await import("../packages/index/src/index.ts");
-    const { promoteAndPersistEntities } = await import("../apps/api/src/indexing/promote-entities.ts");
+    const { promoteAndPersistEntities, topicPreviewLine } = await import("../apps/api/src/indexing/promote-entities.ts");
     const { treeIndexRootFilter } = await import("../packages/index/src/index.ts");
 
     const root = await db.collection("tree_index").findOne(treeIndexRootFilter(TENANT));
@@ -102,7 +102,7 @@ try {
     console.log(`tenant=${TENANT} topics_before=${tBefore} orgs_before=${oBefore}${DRY_RUN ? "  [DRY RUN — no writes]" : ""}`);
     console.log(`  would write: ${planned.topics.length} topic(s), ${planned.orgs.length} org(s)`);
     if (DRY_RUN) {
-      for (const t of planned.topics.slice(0, 10)) console.log(`    topic ${t._id} <- ${t.sessionRefs.length} session(s)`);
+      for (const t of planned.topics.slice(0, 10)) console.log(`    ${topicPreviewLine(TENANT, t)}`); // ISS-155: the namespaced id the live path writes
       console.log(`
 DRY RUN: nothing written.`);
       await close();
