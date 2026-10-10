@@ -39,7 +39,8 @@
 ## Gates
 - `node scripts/lint-dirsize.mjs` before: OK (109 dir(s) within budget); after: OK (109 dir(s) within budget).
 
-**Status:** ready-for-check
+**Status:** checked-PASS
+Checked: qa/verdicts/medium-fix-batch-2026-10-10.md (cycle 2, cc5ac4b)
 **Fix cycle:** 2
 
 ## Fix cycle 1 (2026-10-10)
