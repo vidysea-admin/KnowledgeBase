@@ -34,5 +34,6 @@
 - HEAD-fidelity after all mutation runs: `packages/ingest/src/strict-record.ts` hash-object == HEAD blob `015d105e5af2e09257592c71bf5ff2e5473932f6`; `apps/api/src/auth.ts` hash-object == HEAD blob `2f9ce54f8a7b38954a45fa24529058b787c94b5a`.
 - `git diff 6c5d800 --stat`: only the two test files, qa/issues.testgaps.jsonl and this manifest.
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/test-gaps-t046-004-t037api-003.md (cycle 0, 2fc7743)
 Fix cycle: 0
