@@ -75,5 +75,6 @@ A person must open `/join-rules` in a real browser, with a real key, and look at
 4. The 503 state (the deployed API today): only the "not available on this server yet" message, no empty-looking rule list.
 Also unverified: behaviour against a real wired store (the API answers 503 until production wiring exists) and the stale check under a real concurrent writer.
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t037-join-rules-editor-page.md (cycle 0, d1bfd43) - SOURCE SCOPE ONLY; live-browser validation under D-024 still owed
 Fix cycle: 0
