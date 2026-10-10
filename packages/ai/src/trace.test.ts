@@ -142,3 +142,36 @@ test("concurrent calls keep their own correlation and tenant ids", async () => {
   assert.deepEqual([by.fast!.correlationId, by.fast!.tenantId], ["B", null]);
   assert.deepEqual([by.none!.correlationId, by.none!.tenantId], [null, null]);
 });
+
+test("unknown methods run with this bound to the ORIGINAL provider (#private fields keep working)", async () => {
+  class Priv implements Provider {
+    readonly name = "priv";
+    #secret = "s3";
+    async complete(_j?: Job): Promise<CompleteResult> { return result({ text: this.peek() }); }
+    async listModels() { return [{ id: this.#secret, label: "L" }]; }
+    peek(): string { return this.#secret; }
+    extra(): string { return this.#secret + "!"; }
+  }
+  const p = traceProvider(new Priv(), { sink: memorySink(), env: ON }) as Priv;
+  assert.equal(p.extra(), "s3!");
+  assert.equal(p.peek(), "s3");
+  assert.equal(p.name, "priv");
+  assert.deepEqual(await p.listModels(), [{ id: "s3", label: "L" }]);
+  assert.equal((await p.complete(job())).text, "s3");
+});
+
+test("missing or non-finite usage/cost numbers are recorded as null, never undefined or NaN", async () => {
+  const sink = memorySink();
+  const bad = [{}, { inputTokens: NaN, outputTokens: Infinity }, undefined];
+  for (const usage of bad) {
+    const p = traceProvider(fake(async () => result({ usage: usage as never, costUsd: NaN })), { sink, env: ON });
+    await p.complete(job());
+  }
+  assert.equal(sink.records.length, 3);
+  for (const r of sink.records) {
+    assert.equal(r.inputTokens, null);
+    assert.equal(r.outputTokens, null);
+    assert.equal(r.costUsd, null);
+    assert.equal(r.outputChars, 5);
+  }
+});
