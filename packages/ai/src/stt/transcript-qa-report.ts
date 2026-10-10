@@ -6,7 +6,8 @@
  * never modifies it, and refuses to overwrite an existing report unless `overwrite` is set.
  * NOT wired into the transcription driver (reserved by D-119).
  */
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, realpathSync, statSync } from "node:fs";
+import { resolve, dirname, basename, join } from "node:path";
 import { clampAndValidateTurns, type TranscriptQaReport } from "./transcript-qa.js";
 import type { Turn } from "./transcribe.js";
 
@@ -89,10 +90,39 @@ export function defaultReportPath(inputPath: string): string {
   return inputPath.replace(/\.json$/i, "") + ".qa-report.json";
 }
 
-/** Reads the turns file (read-only), writes the report. Throws if the report exists and !overwrite. */
+/** Real path of an existing path, or realpath(parent) + normalised final name when it does not exist yet. */
+function canonicalPath(p: string): string {
+  try { return realpathSync.native(p); } catch { /* not existing: fall through */ }
+  const abs = resolve(p);
+  let parent = dirname(abs);
+  try { parent = realpathSync.native(parent); } catch { /* parent missing too: keep lexical */ }
+  // Windows strips trailing dots/spaces from the last component and compares names case-insensitively.
+  const name = process.platform === "win32" ? basename(abs).replace(/[. ]+$/, "").toLowerCase() : basename(abs);
+  return join(parent, name);
+}
+
+/**
+ * True when `a` and `b` are the same file by identity, not spelling: equal real paths (resolves `./`, `..`,
+ * case, slashes, trailing dot/space, 8.3 names, symlinks, junctions) or equal device+inode (hard links).
+ */
+export function isSameFile(a: string, b: string): boolean {
+  const norm = (p: string) => (process.platform === "win32" ? p.toLowerCase() : p);
+  if (norm(canonicalPath(a)) === norm(canonicalPath(b))) return true;
+  try {
+    const sa = statSync(a, { bigint: true });
+    const sb = statSync(b, { bigint: true });
+    return sa.ino !== 0n && sa.ino === sb.ino && sa.dev === sb.dev;
+  } catch { return false; }
+}
+
+/**
+ * Reads the turns file (read-only), writes the report. Throws, before any byte is written, if the output is the
+ * input by identity, is a directory, or exists and !overwrite. An existing non-input file is replaced only with `overwrite`.
+ */
 export function writeTranscriptQaReport(opts: WriteReportOptions): { outPath: string; report: TranscriptQaFullReport } {
   const outPath = opts.outPath ?? defaultReportPath(opts.inputPath);
-  if (outPath === opts.inputPath) throw new Error("refusing to write the report over the input file");
+  if (isSameFile(outPath, opts.inputPath)) throw new Error("refusing to write the report over the input file");
+  if (existsSync(outPath) && statSync(outPath).isDirectory()) throw new Error(`output path is a directory: ${outPath}`);
   if (existsSync(outPath) && !opts.overwrite) throw new Error(`report exists, not overwriting without overwrite flag: ${outPath}`);
   const knownDur = typeof opts.durationSec === "number" ? opts.durationSec : null;
   let report: TranscriptQaFullReport;

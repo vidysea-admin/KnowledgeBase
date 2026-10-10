@@ -1,7 +1,7 @@
 # t044-transcript-qa-report
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Priority tier: 3 — next unblocked roadmap task (T-044)
 Security class: none (reads a local turns file, writes a local report JSON; no auth/tenancy/DB writes)
 Lane: T044W (no issues filed; `qa/issues.t044w.jsonl` not created)
@@ -65,4 +65,30 @@ Real sample (copy of `data/toc-migrated/2026-08-27-in-focus-4/turns.json` in a t
 - Semantic hallucination detection remains the heuristics of the prior unit.
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
+
+## Fix cycle 1
+
+**What failed (verdict FAIL, cycle 0):** ISS-T044W-001 (medium, data write). The "never write over the input" guard compared path strings, so `--out <S>/./alias.json --overwrite` replaced the turns file with the report.
+
+**Root cause:** same-file was decided by text. Any other spelling of the same file defeated it.
+
+**Fix** (`packages/ai/src/stt/transcript-qa-report.ts`, library, so the runner inherits it; the runner already maps a thrown error to exit 2, unchanged):
+- New exported `isSameFile(a, b)`: true if the canonical paths are equal or device+inode (bigint stat) are equal. Canonical path = `realpathSync.native` (resolves `./`, `..`, relative/absolute, case, slashes, trailing dot/space, 8.3 names, symlinks, junctions); for a not-yet-existing path = real path of the parent + final name with trailing dots/spaces stripped and lower-cased on win32. Device+inode catches hard links.
+- `writeTranscriptQaReport` checks, before any byte is written and before reading: same file => throw "refusing to write the report over the input file"; output is a directory => throw "output path is a directory"; existing file that is not the input => refused without `--overwrite`, replaced with it (allowed).
+- Exit code: 2 (the runner's existing refused-overwrite code).
+
+**`buildTranscriptQaReport` guard test:** not added. Its `remainingViolations` / duration checks run on the real clamp's output and the function has no injection point for a clamp result; adding one would change its structure/signature. Left as is (defence-in-depth, noted by the checker as not a defect).
+
+**Evidence** (node from the codex runtime; cwd `packages/ai`):
+- `node --test --test-reporter=spec --import tsx src/stt/transcript-qa-report.test.ts` -> `tests 15, pass 15, fail 0`.
+- `node --test --import tsx src/stt/transcript-qa.test.ts` -> `tests 16, pass 16, fail 0`.
+- `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` -> no output, exit 0.
+
+**D-015 count:** `ISS-T044W-001: 1/1 refused` against its own recorded reproduction (`alias.json`, `--out <S>/./alias.json --overwrite`, spawned through the runner verbatim): exit 2, stderr `refusing to write the report over the input file`, input bytes identical. The ledger row records exactly one attack (plus the already-refused identical-string form); the other spellings the row names are covered below.
+
+**Variants (library, input byte-identical after each):** dot segment, dotdot segment, upper case, forward slashes, trailing dot, trailing space, relative path, hard link, junction (same file via a junction to its directory): all refused. Output is a directory: refused. Distinct `--out`: exit 0; existing non-input file without `--overwrite`: refused, content kept; with `--overwrite`: replaced; input never changed.
+**Skipped (stated in test diagnostics):** symlink (`symlinkSync(file)` needs privilege here: EPERM/unavailable; hard link and junction cover the same real-path/inode logic); 8.3 short name (short-name generation not available on this volume, no `~` name produced). Both are implemented via `realpathSync.native` but unverified.
+
+Status: ready-for-check
+Fix cycle: 1

@@ -3,9 +3,9 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync } from "node:fs";
+import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync, mkdirSync, linkSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, sep, relative } from "node:path";
 import { spawnSync } from "node:child_process";
 
 import { buildTranscriptQaReport, writeTranscriptQaReport } from "./transcript-qa-report.js";
@@ -126,5 +126,102 @@ test("runner CLI: exit codes 0 / 1 / 2 and no overwrite without --overwrite", ()
     assert.equal(run(input, "abc", "--overwrite").status, 1, "NaN duration => FAIL verdict");
     assert.equal(run(input).status, 2, "usage");
     assert.ok(existsSync(join(dir, "turns.qa-report.json")));
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+// ---- ISS-T044W-001: the output must be refused when it IS the input by identity, not only by spelling ----
+const runner = () => join(process.cwd(), "..", "..", "scripts", "qa", "transcript-qa-report.ts");
+const runCli = (...a: string[]) => spawnSync(process.execPath, ["--import", "tsx", runner(), ...a], { encoding: "utf8", timeout: 60000 });
+const EXACT = JSON.stringify([t(0, 10), t(10, 20)]);
+
+test("ISS-T044W-001 recorded reproduction verbatim: --out <S>/./alias.json --overwrite is refused, exit 2, input unchanged", () => {
+  const dir = tmp();
+  try {
+    const alias = join(dir, "alias.json");
+    writeFileSync(alias, EXACT);
+    const before = readFileSync(alias);
+    const r = runCli(alias, "20", "--out", `${dir}${sep}.${sep}alias.json`, "--overwrite");
+    assert.equal(r.status, 2, r.stdout + r.stderr);
+    assert.match(r.stderr, /over the input/);
+    assert.ok(before.equals(readFileSync(alias)), "input byte-identical");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("ISS-T044W-001 alias variants through the library: all refused before any write, input byte-identical", (tc) => {
+  const dir = tmp();
+  try {
+    const name = "longaliasname.json";
+    const input = join(dir, name);
+    writeFileSync(input, EXACT);
+    const before = readFileSync(input);
+    const variants: Array<[string, string | null]> = [
+      ["dot segment", `${dir}${sep}.${sep}${name}`],
+      ["dotdot segment", join(dir, "sub", "..", name)],
+      ["upper case", join(dir, name.toUpperCase())],
+      ["forward slashes", input.split("\\").join("/")],
+      ["trailing dot", input + "."],
+      ["trailing space", input + " "],
+      ["relative", relative(process.cwd(), input)],
+    ];
+    // 8.3 short name (needs short-name generation enabled on the volume)
+    let short: string | null = null;
+    if (process.platform === "win32") {
+      const s = spawnSync("cmd", ["/c", `for %I in ("${input}") do @echo %~sI`], { encoding: "utf8" }).stdout.trim();
+      if (s && s.includes("~")) short = s;
+    }
+    variants.push(["8.3 short name", short]);
+    // hard link
+    const hard = join(dir, "hard.json");
+    try { linkSync(input, hard); variants.push(["hard link", hard]); } catch { variants.push(["hard link", null]); }
+    // symlink (may need privilege)
+    const sym = join(dir, "sym.json");
+    try { symlinkSync(input, sym, "file"); variants.push(["symlink", sym]); } catch { variants.push(["symlink", null]); }
+    // junction to the directory, then the same name through it
+    const real = join(dir, "real"); const junc = join(dir, "junc");
+    try { mkdirSync(real); writeFileSync(join(real, name), EXACT); symlinkSync(real, junc, "junction"); } catch { /* skip below */ }
+    const viaJunction = existsSync(junc) ? join(junc, name) : null;
+
+    for (const [label, out] of variants) {
+      if (out === null) { tc.diagnostic(`SKIPPED ${label}: not creatable here`); continue; }
+      assert.throws(() => writeTranscriptQaReport({ inputPath: input, durationSec: 20, outPath: out, overwrite: true }), /over the input/, label);
+      assert.ok(before.equals(readFileSync(input)), `${label}: input unchanged`);
+    }
+    if (viaJunction) {
+      const jb = readFileSync(join(real, name));
+      assert.throws(() => writeTranscriptQaReport({ inputPath: join(real, name), durationSec: 20, outPath: viaJunction, overwrite: true }), /over the input/, "junction");
+      assert.ok(jb.equals(readFileSync(join(real, name))));
+    } else tc.diagnostic("SKIPPED junction: not creatable here");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("ISS-T044W-001: output that is a directory is refused; unrelated existing file needs --overwrite and is then replaced", () => {
+  const dir = tmp();
+  try {
+    const input = join(dir, "turns.json");
+    writeFileSync(input, EXACT);
+    const before = readFileSync(input);
+    const d = join(dir, "outdir"); mkdirSync(d);
+    assert.throws(() => writeTranscriptQaReport({ inputPath: input, durationSec: 20, outPath: d, overwrite: true }), /directory/);
+    const other = join(dir, "other.json");
+    writeFileSync(other, "OLD");
+    assert.throws(() => writeTranscriptQaReport({ inputPath: input, durationSec: 20, outPath: other }), /not overwriting/);
+    assert.equal(readFileSync(other, "utf8"), "OLD");
+    writeTranscriptQaReport({ inputPath: input, durationSec: 20, outPath: other, overwrite: true });
+    assert.equal(JSON.parse(readFileSync(other, "utf8")).verdict, "PASS");
+    assert.ok(before.equals(readFileSync(input)));
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("ISS-T044W-001: legitimate runs still work (distinct --out, --overwrite of an old report, same-file different dir)", () => {
+  const dir = tmp();
+  try {
+    const input = join(dir, "turns.json");
+    writeFileSync(input, EXACT);
+    const out = join(dir, "custom-report.json");
+    assert.equal(runCli(input, "20", "--out", out).status, 0);
+    assert.equal(runCli(input, "20", "--out", out).status, 2, "existing without --overwrite");
+    assert.equal(runCli(input, "20", "--out", out, "--overwrite").status, 0);
+    mkdirSync(join(dir, "b")); writeFileSync(join(dir, "b", "turns.json"), "x");
+    assert.equal(writeTranscriptQaReport({ inputPath: input, durationSec: 20, outPath: join(dir, "b", "turns.json"), overwrite: true }).report.verdict, "PASS");
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
