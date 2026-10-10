@@ -30,6 +30,7 @@ a client of that API — with the long-range goal of beating top human counsello
   - `docs/adr/`
   - `docs/archive/`
   - `docs/features/`
+  - `docs/whatsapp/`
 - `migrations/`
 - `packages/` — Application logic, one exported symbol per concept
   - `packages/ai/`
@@ -42,11 +43,13 @@ a client of that API — with the long-range goal of beating top human counsello
 - `qa/`
   - `qa/audits/`
   - `qa/briefs/`
+  - `qa/checkpoints/`
   - `qa/contracts/`
   - `qa/debug/`
   - `qa/evidence/`
   - `qa/gates/`
   - `qa/manifests/`
+  - `qa/packets/`
   - `qa/probes/`
   - `qa/tests/`
   - `qa/verdicts/`
@@ -56,13 +59,19 @@ a client of that API — with the long-range goal of beating top human counsello
 - `schema/` — JSON Schemas + fixtures + Python validator
   - `schema/fixtures/`
 - `scripts/`
+  - `scripts/demo/`
   - `scripts/lib/`
+  - `scripts/qa/`
+  - `scripts/upload/`
   - `scripts/watch/`
   - `scripts/webinar/`
+- `skills/`
+  - `skills/checker/`
+  - `skills/maker/`
 - `sources/` — Data and source repos
   - `sources/whatsapp_msg/`
 - `workers/`
-  - `workers/transcribe/` — Python ML worker (Whisper/diarization) — talks to the TS packages via the job queue only. No TS code; package.json exists so pnpm sees the workspace member.
+  - `workers/transcribe/` — Isolated Python Gemini transcription transport worker — communicates through tenant-scoped jobs only; see README.md for worker and file-submission commands.
 
 ## Schema summary
 
