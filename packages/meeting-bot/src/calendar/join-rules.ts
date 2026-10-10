@@ -17,6 +17,14 @@
  *   7. approve-once sender (exact email) or approved domain (exact)    -> join
  *   8. nothing matched (DEFAULT-DENY)                                  -> needs-approval
  *
+ * FAIL CLOSED ON INVALID DATA (C10): before any matching, the evaluator runs the SAME validators that
+ * guard persistence (`validateJoinRuleSet` for the rule set, `validateJoinRuleState` for the state) and
+ * matches against their normalised output. If either throws (wrong type, unknown field/kind/enum value,
+ * bad domain/email, non-boolean flag, duplicate id, non-array list, null/undefined set...) the whole set
+ * is invalid: the decision is `needs-approval` / `invalid-rule-set` and NEVER `join`; one bad rule
+ * invalidates all rules (a broken deny rule cannot let a later allow win). The only thing honoured on
+ * invalid data is a per-meeting opt-out (-> skip), because skip can never widen access.
+ *
  * Matching: emails/domains are trimmed and lower-cased (one trailing dot on a domain is dropped).
  * A domain rule matches the exact domain or a TRUE subdomain (label boundary) only; set
  * `subdomains: false` on the rule for exact-only. Approved-once domains are exact-only.
@@ -71,12 +79,12 @@ export interface JoinRuleEvent {
 
 export type JoinReason =
   | "meeting-opt-out" | "deny-rule" | "cancelled" | "no-meeting-url" | "sender-unverifiable"
-  | "allow-rule" | "approved-sender" | "approved-domain" | "no-matching-rule";
+  | "allow-rule" | "approved-sender" | "approved-domain" | "no-matching-rule" | "invalid-rule-set";
 
 export interface JoinDecision {
   action: "join" | "skip" | "needs-approval";
   reason: JoinReason;
-  /** Rule id, or a synthetic id: `opt-out:<eventId>`, `approval:sender:<e>`, `approval:domain:<d>`, `precondition`, `default-deny`. */
+  /** Rule id, or a synthetic id: `opt-out:<eventId>`, `approval:sender:<e>`, `approval:domain:<d>`, `precondition`, `default-deny`, `invalid-rule-set`. */
   ruleId: string;
 }
 
@@ -129,10 +137,22 @@ function norm(list: readonly string[], f: (v: unknown) => string | undefined): s
   return list.map(f).filter((v): v is string => v !== undefined);
 }
 
-export function evaluateJoinRules(event: JoinRuleEvent, ruleSet: JoinRuleSet,
-  state: JoinRuleState = EMPTY_JOIN_RULE_STATE): JoinDecision {
+export function evaluateJoinRules(event: JoinRuleEvent, rawRuleSet: JoinRuleSet,
+  rawState: JoinRuleState = EMPTY_JOIN_RULE_STATE): JoinDecision {
   const skip = (reason: JoinReason, ruleId: string): JoinDecision => ({ action: "skip", reason, ruleId });
-  if (state.optedOutEventIds.includes(event.id)) return skip("meeting-opt-out", `opt-out:${event.id}`);
+  // Opt-out can only narrow access, so it is honoured even when the rest of the input is invalid.
+  const rawOptOuts: unknown = isObj(rawState) ? rawState.optedOutEventIds : undefined;
+  if (Array.isArray(rawOptOuts) && typeof event.id === "string" && rawOptOuts.includes(event.id)) {
+    return skip("meeting-opt-out", `opt-out:${event.id}`);
+  }
+  let ruleSet: JoinRuleSet;
+  let state: JoinRuleState;
+  try {
+    ruleSet = validateJoinRuleSet(rawRuleSet);
+    state = validateJoinRuleState(rawState);
+  } catch {
+    return { action: "needs-approval", reason: "invalid-rule-set", ruleId: "invalid-rule-set" };
+  }
 
   const email = normalizeEmail(event.senderEmail ?? event.organizer);
   const sender = email ? { email, domain: email.slice(email.indexOf("@") + 1) } : undefined;
@@ -194,9 +214,13 @@ export interface TrustedSenderConfigLike { emails: readonly string[]; domains: r
  * Intentionally stricter than `isTrustedSender` on malformed senders (see tests).
  */
 export function ruleSetFromTrustedSenderConfig(cfg: TrustedSenderConfigLike, ownDomains: readonly string[] = []): JoinRuleSet {
+  // De-duplicate on the normalised value and drop entries the engine cannot represent (as the engine
+  // always did), so the output stays valid: the evaluator now treats any invalid set as "never join".
+  const emails = [...new Set(cfg.emails.map(normalizeEmail).filter((v): v is string => v !== undefined))];
+  const domains = [...new Set(cfg.domains.map(normalizeDomain).filter((v): v is string => v !== undefined))];
   const rules: JoinRule[] = [
-    ...cfg.emails.map((e): JoinRule => ({ id: `trusted-email:${e}`, effect: "allow", match: { email: e } })),
-    ...cfg.domains.map((d): JoinRule => ({ id: `trusted-domain:${d}`, effect: "allow", match: { domain: d, subdomains: false } })),
+    ...emails.map((e): JoinRule => ({ id: `trusted-email:${e}`, effect: "allow", match: { email: e } })),
+    ...domains.map((d): JoinRule => ({ id: `trusted-domain:${d}`, effect: "allow", match: { domain: d, subdomains: false } })),
   ];
   return { version: 1, ownDomains: [...ownDomains], rules };
 }
@@ -212,6 +236,32 @@ const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object
 
 function rejectUnknownKeys(obj: Record<string, unknown>, allowed: readonly string[], path: string): void {
   for (const k of Object.keys(obj)) if (!allowed.includes(k)) throw new JoinRuleSetValidationError(path, `unknown field "${k}"`);
+}
+
+/** Validates persisted/untrusted state and returns a normalised copy. Throws `JoinRuleSetValidationError`. */
+export function validateJoinRuleState(input: unknown): JoinRuleState {
+  if (!isObj(input)) throw new JoinRuleSetValidationError("$state", "must be an object");
+  rejectUnknownKeys(input, ["approvedSenders", "approvedDomains", "optedOutEventIds"], "$state");
+  const list = (key: string): unknown[] => {
+    const v = input[key];
+    if (!Array.isArray(v)) throw new JoinRuleSetValidationError(`$state.${key}`, "must be an array");
+    return v;
+  };
+  const approvedSenders = list("approvedSenders").map((v, i) => {
+    const n = normalizeEmail(v);
+    if (!n) throw new JoinRuleSetValidationError(`$state.approvedSenders[${i}]`, "not a valid email");
+    return n;
+  });
+  const approvedDomains = list("approvedDomains").map((v, i) => {
+    const n = normalizeDomain(v);
+    if (!n) throw new JoinRuleSetValidationError(`$state.approvedDomains[${i}]`, "not a valid domain");
+    return n;
+  });
+  const optedOutEventIds = list("optedOutEventIds").map((v, i) => {
+    if (typeof v !== "string" || v === "") throw new JoinRuleSetValidationError(`$state.optedOutEventIds[${i}]`, "must be a non-empty string");
+    return v;
+  });
+  return { approvedSenders, approvedDomains, optedOutEventIds };
 }
 
 /** Validates JSON-parsed input and returns a normalised copy. Throws `JoinRuleSetValidationError`. */

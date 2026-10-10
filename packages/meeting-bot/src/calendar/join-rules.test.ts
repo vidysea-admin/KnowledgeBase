@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   evaluateJoinRules, recordApproval, recordOptOut, ruleSetFromTrustedSenderConfig, validateJoinRuleSet,
-  JoinRuleSetValidationError, EMPTY_JOIN_RULE_STATE, normalizeDomain, normalizeEmail,
+  JoinRuleSetValidationError, validateJoinRuleState, EMPTY_JOIN_RULE_STATE, normalizeDomain, normalizeEmail,
   type JoinRuleSet, type JoinRuleState, type JoinRuleEvent, type JoinRule,
 } from "./join-rules.js";
 import { isTrustedSender, loadTrustedSenderConfig } from "./auto-record-policy.js";
@@ -268,4 +268,104 @@ test("adapter: documented deliberate divergence from isTrustedSender on malforme
   // legacy does not trim; the engine does
   assert.equal(isTrustedSender("a@ashoka.edu.in ", undefined, cfg), false);
   assert.equal(evaluateJoinRules(ev("a@ashoka.edu.in "), rs).action, "join");
+});
+
+// ---- Fix cycle 2: C10 / ISS-CAPTURE-002 — the evaluator itself fails closed on invalid data ----
+const bypass = (rs: unknown, sender: string, st?: unknown, over: Partial<JoinRuleEvent> = {}) =>
+  evaluateJoinRules(ev(sender, over), rs as JoinRuleSet, st as JoinRuleState | undefined);
+const INVALID = { action: "needs-approval", reason: "invalid-rule-set", ruleId: "invalid-rule-set" };
+
+test("ISS-CAPTURE-002 recorded reproductions (verbatim): none joins, all report invalid-rule-set", () => {
+  let refused = 0; let total = 0;
+  const check = (d: { action: string; reason: string }, label: string) => {
+    total++;
+    assert.notEqual(d.action, "join", label);
+    assert.deepEqual(d, INVALID, label);
+    refused++;
+  };
+  // 1-7: ownDomains ['corp.com'], single allow {scope:S}, external sender a@other.com, empty state
+  for (const S of ["Internal", "INTERNAL", "both", "", null, 1, true]) {
+    const rs = { version: 1, ownDomains: ["corp.com"], rules: [{ id: "a", effect: "allow", match: { scope: S } }] };
+    check(bypass(rs, "a@other.com", EMPTY_JOIN_RULE_STATE), `scope=${JSON.stringify(S)} external`);
+  }
+  // 8-14: same S with the matching INTERNAL sender (recorded as needs-approval; must still never join)
+  for (const S of ["Internal", "INTERNAL", "both", "", null, 1, true]) {
+    const rs = { version: 1, ownDomains: ["corp.com"], rules: [{ id: "a", effect: "allow", match: { scope: S } }] };
+    check(bypass(rs, "a@corp.com", EMPTY_JOIN_RULE_STATE), `scope=${JSON.stringify(S)} internal`);
+  }
+  // 15: subdomains given as a string
+  check(bypass({ version: 1, ownDomains: [], rules: [{ id: "r", effect: "allow", match: { domain: "x.com", subdomains: "false" } }] },
+    "a@sub.x.com", EMPTY_JOIN_RULE_STATE), "subdomains string");
+  // 16: invalid deny must not let a later allow win
+  check(bypass({ version: 1, ownDomains: [], rules: [{ id: "d", effect: "deny", match: { domain: "*.evil.com" } },
+    { id: "a", effect: "allow", match: { domain: "evil.com" } }] }, "a@evil.com", EMPTY_JOIN_RULE_STATE), "invalid deny *.evil.com");
+  // 17: invalid deny scope "Internal" followed by an allow
+  check(bypass({ version: 1, ownDomains: ["corp.com"], rules: [{ id: "d", effect: "deny", match: { scope: "Internal" } },
+    { id: "a", effect: "allow", match: { domain: "other.com" } }] }, "a@other.com", EMPTY_JOIN_RULE_STATE), "invalid deny scope Internal");
+  assert.equal(`ISS-CAPTURE-002: ${refused}/${total} refused`, "ISS-CAPTURE-002: 17/17 refused");
+});
+
+test("fail closed: other invalid rule-set shapes never join", () => {
+  const good = { id: "g", effect: "allow", match: { domain: "x.com" } };
+  const mk = (over: Record<string, unknown>) => ({ version: 1, ownDomains: [], rules: [good], ...over });
+  const bad: [string, unknown][] = [
+    ["null set", null], ["undefined set", undefined], ["array set", []], ["string set", "x"],
+    ["bad version", mk({ version: 2 })], ["unknown top field", mk({ extra: 1 })],
+    ["rules not array", mk({ rules: { 0: good, length: 1 } })], ["ownDomains not array", mk({ ownDomains: "x.com" })],
+    ["bad ownDomain", mk({ ownDomains: ["nodot"] })],
+    ["duplicate id", mk({ rules: [good, { ...good }] })],
+    ["unknown effect", mk({ rules: [{ ...good, effect: "ALLOW" }] })],
+    ["unknown matcher kind", mk({ rules: [{ ...good, match: { domain: "x.com", organizerName: "z" } }] })],
+    ["unknown rule field", mk({ rules: [{ ...good, priority: 1 }] })],
+    ["missing match", mk({ rules: [{ id: "g", effect: "allow" }] })],
+    ["empty matcher", mk({ rules: [{ ...good, match: {} }] })],
+    ["bad platform case", mk({ rules: [{ ...good, match: { platform: "Zoom" } }] })],
+    ["non-string platform", mk({ rules: [{ ...good, match: { platform: 1 } }] })],
+    ["bad email", mk({ rules: [{ ...good, match: { email: "x.com" } }] })],
+    ["non-string domain", mk({ rules: [{ ...good, match: { domain: 5 } }] })],
+    ["subdomains true without domain", mk({ rules: [{ ...good, match: { email: "a@x.com", subdomains: true } }] })],
+    ["numeric subdomains", mk({ rules: [{ ...good, match: { domain: "x.com", subdomains: 0 } }] })],
+    ["valid rule plus one broken rule", mk({ rules: [good, { id: "z", effect: "allow", match: { scope: "bad" } }] })],
+  ];
+  for (const [name, rs] of bad) assert.deepEqual(bypass(rs, "a@x.com", EMPTY_JOIN_RULE_STATE), INVALID, name);
+  // the internal-sender inversion case: an intended "internal" rule typo'd must not join either population
+  const typo = mk({ ownDomains: ["corp.com"], rules: [{ id: "a", effect: "allow", match: { scope: "Internal" } }] });
+  for (const s of ["a@corp.com", "a@other.com", "a@eng.corp.com"]) assert.equal(bypass(typo, s).action, "needs-approval", s);
+});
+
+test("fail closed: malformed state never joins; valid opt-out still skips", () => {
+  const rs = set([allow("a", { domain: "x.com" })]);
+  const okState = { approvedSenders: [], approvedDomains: [], optedOutEventIds: [] };
+  const bad: [string, unknown][] = [
+    ["null state", null], ["array state", []], ["string state", "x"],
+    ["missing approvedDomains", { approvedSenders: [], optedOutEventIds: [] }],
+    ["senders not array", { ...okState, approvedSenders: "a@x.com" }],
+    ["bad approved sender", { ...okState, approvedSenders: ["nope"] }],
+    ["non-string approved sender", { ...okState, approvedSenders: [5] }],
+    ["bad approved domain", { ...okState, approvedDomains: ["*.x.com"] }],
+    ["opt-outs not array", { ...okState, optedOutEventIds: "e2" }],
+    ["empty opt-out id", { ...okState, optedOutEventIds: [""] }],
+    ["non-string opt-out id", { ...okState, optedOutEventIds: [1] }],
+    ["unknown state field", { ...okState, extra: [] }],
+  ];
+  for (const [name, st] of bad) assert.deepEqual(bypass(rs, "a@x.com", st), INVALID, name);
+  assert.equal(bypass(rs, "a@x.com", { ...okState, approvedSenders: ["nope"], optedOutEventIds: ["e1"] }).reason, "meeting-opt-out");
+  // opt-out is honoured even when the rule set is invalid
+  assert.deepEqual(bypass(null, "a@x.com", { ...okState, optedOutEventIds: ["e1"] }),
+    { action: "skip", reason: "meeting-opt-out", ruleId: "opt-out:e1" });
+  // validateJoinRuleState is the shared validator and accepts normal states
+  assert.deepEqual(validateJoinRuleState({ approvedSenders: [" A@X.com "], approvedDomains: ["X.com"], optedOutEventIds: ["e"] }),
+    { approvedSenders: ["a@x.com"], approvedDomains: ["x.com"], optedOutEventIds: ["e"] });
+  assert.throws(() => validateJoinRuleState(null), JoinRuleSetValidationError);
+});
+
+test("adapter: duplicate and unrepresentable config entries stay valid and keep behaviour", () => {
+  const cfg = { emails: ["a@x.com", "A@X.com", " a@x.com", "nope"], domains: ["q.org", "Q.org", "localhost", "com"] };
+  const rs = ruleSetFromTrustedSenderConfig(cfg);
+  assert.doesNotThrow(() => validateJoinRuleSet(JSON.parse(JSON.stringify(rs))));
+  assert.deepEqual(rs.rules.map((r) => r.id), ["trusted-email:a@x.com", "trusted-domain:q.org"]);
+  assert.equal(evaluateJoinRules(ev("A@x.com"), rs).action, "join");
+  assert.equal(evaluateJoinRules(ev("z@q.org"), rs).action, "join");
+  assert.equal(evaluateJoinRules(ev("z@sub.q.org"), rs).action, "needs-approval");
+  assert.equal(evaluateJoinRules(ev("z@other.org"), rs).action, "needs-approval");
 });
