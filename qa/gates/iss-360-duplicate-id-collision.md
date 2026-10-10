@@ -1,7 +1,7 @@
 # HUMAN_GATE — `ISS-360` is two different issues in one file, with opposite statuses
 
 **Raised:** 2026-09-28 · by the maker, during the `iss-104-place-vs-person-signal` close-out
-**Status:** OPEN — needs the Approver (Umesh). No code change is proposed here.
+**Status:** ANSWERED — 2026-09-28, ruling 2 of D-055 (Approved-by: Umesh); see "Answered" at the end of this file.
 **Found by:** a post-merge ledger integrity check, not by a sweep.
 
 ## The finding
@@ -69,3 +69,9 @@ D-019 fixed shard-vs-shard id allocation and said nothing about two writers to `
 - Neither row's content is disputed; both are real findings.
 - The `iss-104-place-vs-person-signal` unit is unaffected and PASSed on its own evidence.
 - No renumbering, merging or deletion has been done. The file is byte-unchanged by this gate.
+
+## Answered
+
+**Answered:** 2026-09-28 - D-055 ruling 2 (Approved-by: Umesh): the duplicate `ISS-360` is resolved by promoting each row's existing `canonical_id` to a real, distinct id - `ISS-360-OBSFLAKE` (open) and `ISS-360-HEARTBEAT` (fixed). Recorded by the /checker ledger-bookkeeping pass on 2026-10-10 from docs/DECISIONS.md; the ledger now carries no bare `ISS-360` row.
+
+**Gate status:** ANSWERED - recorded inline: 2026-09-28 - D-055 ruling 2 - Umesh (Approver)
