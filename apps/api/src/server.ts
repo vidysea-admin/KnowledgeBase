@@ -18,6 +18,8 @@ import { createHealthRouter, type HealthDeps } from "./routes/health.js";
 import { createSearchRouter, type SearchDeps } from "./routes/search.js";
 import { createGraphRouter, type GraphReadDeps } from "./routes/graph.js";
 import { createCalendarRouter, type CalendarReadDeps } from "./routes/calendar.js";
+import { createJoinRulesRouter, unavailableJoinRulesRouter } from "./join-rules/router.js";
+import type { JoinRulesDeps } from "./join-rules/deps.js";
 import { createMeetingCandidatesRouter, type MeetingCandidatesDeps } from "./routes/meeting-candidates.js";
 import { createWhatsAppRouter, type WhatsAppRouteDeps } from "./routes/whatsapp.js";
 import { createKeysRouter, type KeysDeps } from "./routes/keys.js";
@@ -43,6 +45,8 @@ export interface ServerDeps {
   graph: GraphReadDeps;
   calendar: CalendarReadDeps;
   meetingCandidates: MeetingCandidatesDeps;
+  /** T-037 join-rules edit API. Optional: absent -> the routes answer 503 (fail closed). Production wiring pending. */
+  joinRules?: JoinRulesDeps;
   whatsapp: WhatsAppRouteDeps;
   keys: KeysDeps;
   ingest: IngestDeps;
@@ -82,6 +86,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createSearchRouter(deps.search));
   app.use(createGraphRouter(deps.graph));
   app.use(createCalendarRouter(deps.calendar));
+  app.use(deps.joinRules ? createJoinRulesRouter(deps.joinRules) : unavailableJoinRulesRouter());
   app.use(createMeetingCandidatesRouter(deps.meetingCandidates));
   app.use(createWhatsAppRouter(deps.whatsapp));
   app.use(createKeysRouter(deps.keys));
