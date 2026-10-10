@@ -1,6 +1,7 @@
 # t044-transcript-qa-clamp
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t044-transcript-qa-clamp.md (cycle 1, e86f80e)
 Fix cycle: 1
 Priority tier: 3 — next unblocked roadmap task (T-044)
 Security class: none (pure function, no I/O, no auth/tenancy/writes)
