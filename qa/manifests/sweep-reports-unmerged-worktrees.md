@@ -1,6 +1,7 @@
 # sweep-reports-unmerged-worktrees
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/sweep-reports-unmerged-worktrees.md (cycle 0, 9d960bf)
 Fix cycle: 0
 Priority tier: 1 (QUEUE.md TODO row; the row itself is rated tier 4 medium)
 Security class: none (read-only git queries; no auth, tenancy or data writes)

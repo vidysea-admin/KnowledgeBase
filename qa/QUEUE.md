@@ -59,11 +59,11 @@ unit adds cases to that file, so `speaker-rules-test-file-split` is a hard prere
 nice-to-have. Do the split first or the gate reds.
 
 ---
-## TODO — report unmerged-worktree commits in the sweep
+## DONE — report unmerged-worktree commits in the sweep (checked-PASS cycle 0, qa/verdicts/sweep-reports-unmerged-worktrees.md)
 
 | unit | tier | why | files | schema | surface | consumes | runtime |
 |---|---|---|---|---|---|---|---|
-| `sweep-reports-unmerged-worktrees` | 4 (medium) | 23 commits across 5 worktrees are invisible to every gate, count and sweep, because all of them read master. `wave/u2-4-phase3-fix` alone is 13 commits behind a **critical open** row (ISS-282). Make the number appear every tick instead of being discovered during unrelated hygiene. | the sweep / session-start reader in `scripts/` | no | sweep report contract | `git worktree list`, `git log master..<branch>` | none |
+| `sweep-reports-unmerged-worktrees` (DONE) | 4 (medium) | 23 commits across 5 worktrees are invisible to every gate, count and sweep, because all of them read master. `wave/u2-4-phase3-fix` alone is 13 commits behind a **critical open** row (ISS-282). Make the number appear every tick instead of being discovered during unrelated hygiene. | the sweep / session-start reader in `scripts/` | no | sweep report contract | `git worktree list`, `git log master..<branch>` | none |
 
 **Reporting is separable from deciding.** `qa/gates/unmerged-worktree-inventory.md` holds the
 per-branch merge/retire decision for the Approver. This unit only makes the debt visible and must
