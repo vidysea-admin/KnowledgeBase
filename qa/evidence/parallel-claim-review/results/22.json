@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "index": 22,
+  "originalIndex": 24,
+  "claimId": "2026-05-29-decoding-ever-expanding-cast-c03",
+  "inputHash": "7b00f8a33fcf7e10c177478f6a34adf999a5fc79eef45aa04e331a6a84d5f200",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The original cited turn explicitly proposes respecting hand-offs, staying in one's lane, and sticking to the expertise for which the case was referred.",
+    "missingReferences": [],
+    "caveats": [
+      "Stored speakerRef is unknown; the embedded Bhakti label does not establish a person identity.",
+      "This supports a proposed professional rule in the transcript, not independently verified external truth.",
+      "Only supplied context was reviewed; raw artifact hashes and normalized-LF hashes remain distinct and unverified on disk."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "turnId": "2026-05-29-decoding-ever-expanding-cast-t190",
+        "contextVersion": "originalMigration",
+        "quote": "Respect the handoff, okay? I think like don't reach past the introduction, right? Like, you know, if if you have been sort of put in touch with a student, right, respect and be in your lane",
+        "textSha256": "20150db26d666e3695d7a69a69068e157f3c37d3a33ac17a0965b4634dc67d75",
+        "contextSha256": "fb97ca7e96c75bbe4b43c76e28a73091e470cb2fff8d522db8c1748f2c602fce",
+        "artifactSha256": "f71d34bcd4de42e8dee814bff2a5761ced144a7ce92ad25d294078970a85e974",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 4759,
+        "tEnd": 4792,
+        "supports": "Supports the proposed professional hand-off and own-lane rule."
+      },
+      {
+        "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "turnId": "2026-05-29-decoding-ever-expanding-cast-t190",
+        "contextVersion": "originalMigration",
+        "quote": "there's a specific expertise that has been, you know, that has the case has come to you for, stick to that, you know.",
+        "textSha256": "20150db26d666e3695d7a69a69068e157f3c37d3a33ac17a0965b4634dc67d75",
+        "contextSha256": "fb97ca7e96c75bbe4b43c76e28a73091e470cb2fff8d522db8c1748f2c602fce",
+        "artifactSha256": "f71d34bcd4de42e8dee814bff2a5761ced144a7ce92ad25d294078970a85e974",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 4759,
+        "tEnd": 4792,
+        "supports": "Supports staying within the specific expertise for which the case was referred."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unresolvable",
+    "reason": "The unchanged literal citation t190 is absent from the supplied current artifact context; no current text can support any component.",
+    "missingReferences": [
+      {
+        "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "turnId": "2026-05-29-decoding-ever-expanding-cast-t190",
+        "reason": "turn-absent; no supplied current matches"
+      }
+    ],
+    "caveats": [
+      "Original evidence cannot substitute for the missing current citation.",
+      "No changed timing or same-ID changed-content comparison is possible with the current turn absent."
+    ],
+    "citations": []
+  },
+  "sameIdContentChanged": false,
+  "shortReason": "Original t190 supports all components of the proposed rule; current t190 is missing. No same-ID changed-content flag is supplied, and external truth and human approval remain open."
+}

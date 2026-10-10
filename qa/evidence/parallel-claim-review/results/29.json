@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "index": 29,
+  "originalIndex": 31,
+  "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c04",
+  "inputHash": "f29f69ae34fede95e512194844bb34ac36ecb22ed1b7e6818909e0a8295c4b82",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The context states a 30-mark/about-14,500-rank relation, but does not establish the claimed government-to-private/AYUSH transition for that difference: student B remains state-dependent for a government seat, while private/AYUSH is attached to student C at 580 versus student A at 650. NEET is not explicitly named in the cited record.",
+    "missingReferences": [],
+    "caveats": [
+      "One cited reference has exactly one original match; no duplicate match is supplied.",
+      "The examples are hypothetical and government-seat access is qualified as most likely or state-dependent.",
+      "The statement about 30 marks between categories is numerically inconsistent with the stated 650 and 580 scores; the cited context does not resolve this.",
+      "speakerRef is unknown; the embedded name does not establish identity.",
+      "No exam year is established by the cited text; session metadata does not establish temporal truth.",
+      "Only supplied contexts reviewed; historical artifact SHA256 is supplied, not verified against historical bytes."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t059",
+        "contextVersion": "originalMigration",
+        "quote": "So 30-mark difference between all of these categories can lead to about 14,500 rank difference.",
+        "textSha256": "b4bbea5a0b86d84c1f44ac1ce3a39a9ec01e5847575208f12e56ff618ccd76ba",
+        "contextSha256": "79ab649be8e20ff4693a2f4f6c3c40608d6b4b43affeb30f00916bce1c3535bd",
+        "artifactSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2056,
+        "tEnd": 2095,
+        "supports": "Supports the stated approximate mark/rank relation, subject to the example inconsistency."
+      },
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t059",
+        "contextVersion": "originalMigration",
+        "quote": "Versus a student C with a 580 score and 97.5 percentile will have to consider a private or an AYUSH.",
+        "textSha256": "b4bbea5a0b86d84c1f44ac1ce3a39a9ec01e5847575208f12e56ff618ccd76ba",
+        "contextSha256": "79ab649be8e20ff4693a2f4f6c3c40608d6b4b43affeb30f00916bce1c3535bd",
+        "artifactSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2056,
+        "tEnd": 2095,
+        "supports": "Supports private/AYUSH consideration at 580, but does not support a 30-mark jump from the 650 government-seat example."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unresolvable",
+    "reason": "The sole literal reference t059 is absent from the supplied current artifact; no current cited text is available to assess any component.",
+    "missingReferences": [
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t059",
+        "reason": "turn-absent"
+      }
+    ],
+    "caveats": [
+      "No current match is supplied; original evidence cannot substitute for the missing current reference.",
+      "Current raw artifact SHA256 and normalized-LF SHA256 are distinct supplied values; neither artifact byte verification nor normalization verification was performed."
+    ],
+    "citations": []
+  },
+  "sameIdContentChanged": false,
+  "shortReason": "Original context partially supports the approximate mark/rank relation but not the full claimed transition; current t059 is missing. No same-ID changed-content flag is supplied. AI preliminary only; external truth and human approval remain open."
+}

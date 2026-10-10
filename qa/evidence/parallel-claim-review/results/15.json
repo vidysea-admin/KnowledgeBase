@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "index": 15,
+  "originalIndex": 17,
+  "claimId": "2026-05-23-uniaccess-atlas-skilltech-c02",
+  "inputHash": "1ca8f277cf530e23645b8eb301105f9f967144d39ad8a5d2355f3d7a636440b3",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The cited speaker describes a Management and Entrepreneurship school as belonging to a Babson group of about 30 schools worldwide, but the literal cited record does not name ISME or establish that this school belongs to ATLAS SkillTech. Those identity components of the compound claim are unsupported by the supplied citation alone.",
+    "missingReferences": [],
+    "caveats": [
+      "speakerRef is unknown; Farheen appears in transcript text but stored metadata does not establish person identity.",
+      "The source uses we without identifying ISME or ATLAS SkillTech in this record.",
+      "Original timing 167–195 seconds differs from current timing 703–713 seconds for the same turn ID.",
+      "Transcript support for the group and approximate count does not establish external factual truth.",
+      "Historical artifact bytes were not read or verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "turnId": "2026-05-23-uniaccess-atlas-skilltech-t007",
+        "contextVersion": "originalMigration",
+        "quote": "For Management and Entrepreneurship school, we are a group of Babson group of schools, which are about 30 schools across the globe.",
+        "textSha256": "884a0d9a4cdbb859db08674a7aeb9b6b7dfad8e0488b0277a0c92ea51a5d077f",
+        "contextSha256": "07ae13f8a580670a451e72b53e6cc49a8772a62c97de63f7d8c37893729bb9af",
+        "artifactSha256": "01ac7389a1fbc6c276e46349306dc3a86f40ae5c4c658e87177ecff7bd30d545",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 167,
+        "tEnd": 195,
+        "supports": "Supports a speaker-referenced Management and Entrepreneurship school belonging to a Babson group of about 30 schools worldwide; does not establish ISME or ATLAS SkillTech identity."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The same cited turn ID now contains closing thanks and an invitation to contact the speaker. It supplies no support for ISME, ATLAS SkillTech management-school affiliation, Babson membership, or the approximate worldwide count.",
+    "missingReferences": [],
+    "caveats": [
+      "Same turn ID has changed text and timing relative to originalMigration.",
+      "speakerRef spk:0 is an anonymous diarization label and does not establish identity.",
+      "This unrelated quotation does not contradict the claim or establish that it is false.",
+      "Artifact raw-byte SHA256 and normalized-LF SHA256 differ; no on-disk verification was performed."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "turnId": "2026-05-23-uniaccess-atlas-skilltech-t007",
+        "contextVersion": "current",
+        "quote": "If you have any questions in the future, please feel free to reach out to me.",
+        "textSha256": "4c1b0affff5928210aa2e2dc84514d031bac66f3007a7f1288ba3378484a91c4",
+        "contextSha256": "191f1eb98a5694304023cb04603ceba039dabf2e0731c8c00c1d71e8c547888c",
+        "artifactSha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+        "revision": null,
+        "speakerRef": "spk:0",
+        "tStart": 703,
+        "tEnd": 713,
+        "supports": "Unrelated closing invitation; supports none of the asserted institutional identity, group membership, or worldwide school-count components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original evidence partially supports Babson group membership and approximately 30 schools but lacks the asserted named-school identity; current same-ID evidence is unrelated. Neither supports the full compound claim from literal citations alone; human factual adjudication remains open."
+}

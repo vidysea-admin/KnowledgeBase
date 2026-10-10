@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "index": 31,
+  "originalIndex": 33,
+  "claimId": "2026-06-25-in-focus-2-c02",
+  "inputHash": "ea6402fd8911b6249826c86a521f241d29e4e2048af504577aa3efd0386489f7",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The original cited turn supports Foundations of Data Science teaching Tableau and a little Python within data-science instruction, but does not identify the course as Futurowise's; the ownership component lacks support.",
+    "missingReferences": [],
+    "caveats": [
+      "The one citation reference resolves once, with no missing or duplicate matches.",
+      "Stored speakerRef is unknown; the embedded speaker name does not establish identity or organizational affiliation.",
+      "The original turn spans 365-599 seconds; the same current turn ID spans 1122-1139 seconds with different content and speakerRef.",
+      "The stated current cohort and upcoming end-of-August cohort are relative transcript statements; session metadata does not establish their dates or external factual truth.",
+      "Artifact SHA256 values are provided byte hashes, not verified here; current normalizedLfSha256 is a distinct supplied value."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-25-in-focus-2",
+        "turnId": "2026-06-25-in-focus-2-t011",
+        "contextVersion": "originalMigration",
+        "quote": "And in Foundations of Data Science, students are learning Tableau, which is a data visualization tool. They are learning a little bit of Python",
+        "textSha256": "6d307113fc9a86ca50f8e613be355319736a5cd9a2de7175f8470f9963c76a1b",
+        "contextSha256": "b70db889014944ef9317649befd540bc266451e745b55942297b2082a1ca5df6",
+        "artifactSha256": "fcbd3a1364cf2f44969fcd223fef7433a8c4fb7043b1bd4e9a79449e398f8afb",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 365,
+        "tEnd": 599,
+        "supports": "Supports the course title, Tableau teaching, and introductory Python; does not support Futurowise ownership."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn contains thanks and a general personal-learning remark; it supports neither Futurowise ownership nor the course title, Tableau, Python basics, or data-science curriculum.",
+    "missingReferences": [],
+    "caveats": [
+      "The one citation reference resolves once, with no missing or duplicate matches.",
+      "Same-ID content changed from a course description to an unrelated thank-you; original support cannot be substituted for current evidence.",
+      "Stored speakerRef is Himanshu, without independent identity verification; timing changed from 365-599 to 1122-1139 seconds.",
+      "Transcript evidence does not establish external truth; raw artifact byte hashes and normalized-LF hashes remain distinct and unverified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-25-in-focus-2",
+        "turnId": "2026-06-25-in-focus-2-t011",
+        "contextVersion": "current",
+        "quote": "Thank you so much, Amrita. Thanks, Bhakti. Thanks, Vijaya, for this opportunity.",
+        "textSha256": "43ad9e2b354f9c498c61ccd41f801658401146cea6c0927be7dec5313ce41e8a",
+        "contextSha256": "f1c526eacf91592551060ce946d613877bbb8900998b51781b2f4db5b780ed74",
+        "artifactSha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+        "revision": null,
+        "speakerRef": "Himanshu",
+        "tStart": 1122,
+        "tEnd": 1139,
+        "supports": "Unrelated thanks; provides no support for any course or curriculum component."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original evidence supports the named curriculum content but omits Futurowise ownership; current same-ID evidence is unrelated, with changed text, timing, and speakerRef. Both are unsupported, not established false."
+}

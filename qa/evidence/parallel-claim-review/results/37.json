@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "index": 37,
+  "originalIndex": 39,
+  "claimId": "2026-07-03-inside-the-uc-session-c03",
+  "inputHash": "4c66a265f0aa6feb7d9498b061a78c2b3dcfd94af38e215067fb59cc94772ed9",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The original cited turn explicitly calls UC test-blind and test-free, excludes ACT/SAT review for admission, and extends the statement to all UC campuses.",
+    "missingReferences": [],
+    "caveats": [
+      "Stored speakerRef is unknown; a name in transcript text does not independently establish identity.",
+      "The transcript describes policy at the session; calendar metadata does not independently establish the policy date or present validity.",
+      "The English-proficiency use of SAT/ACT mentioned earlier is separate from admission decisions.",
+      "No missing or duplicate cited references are supplied.",
+      "Same turn ID now contains different text and timing: original 2124-2533, current 336-352.",
+      "Artifact byte hashes are supplied only; raw and normalized-LF hashes are distinct and neither was verified on disk."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-03-inside-the-uc-session",
+        "turnId": "2026-07-03-inside-the-uc-session-t019",
+        "contextVersion": "originalMigration",
+        "quote": "We are test-blind and test-free UC system. None of us are going to review your ACT or SAT scores, not for your admission purpose, not for your scholarship purpose.",
+        "textSha256": "5b72e552dcc31b7dc41680e91b325f72add0be6ff0c828e09c98654dcae484a3",
+        "contextSha256": "1246b1b490d42572398ff74a84d9e984839c37395ce82168ca8e077513fecf34",
+        "artifactSha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2124,
+        "tEnd": 2533,
+        "supports": "Directly supports test-blind/test-free UC system and exclusion of ACT/SAT scores from admission decisions."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn is a speaker introduction and provides no support for UC test-blind/test-free status or SAT/ACT exclusion from admission decisions.",
+    "missingReferences": [],
+    "caveats": [
+      "Stored speakerRef is Vaishnavi; this introduction does not independently establish identity.",
+      "No missing or duplicate cited references are supplied.",
+      "Same turn ID changed from policy discussion at 2124-2533 to introduction at 336-352; original support cannot be substituted for current evidence.",
+      "Artifact byte hashes are supplied only; raw and normalized-LF hashes are distinct and neither was verified on disk."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-03-inside-the-uc-session",
+        "turnId": "2026-07-03-inside-the-uc-session-t019",
+        "contextVersion": "current",
+        "quote": "My name is Vaishnavi Kotiyal. I am based out of Delhi, and I'm an in-country representative for University of California, Merced.",
+        "textSha256": "b66572529d34567acf2e14bf42643a06dc211a7b295ffea5cae87ece5977c53a",
+        "contextSha256": "95b3279bd1337124f6544202bfad4acdcd824c3b446250c32cb070c5d5fd8b86",
+        "artifactSha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+        "revision": null,
+        "speakerRef": "Vaishnavi",
+        "tStart": 336,
+        "tEnd": 352,
+        "supports": "Unrelated introduction; does not support either admissions-policy component."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original policy discussion entails both claim components; current same-ID introduction supports neither. Text, speakerRef and timings changed. Transcript support does not establish external policy truth."
+}

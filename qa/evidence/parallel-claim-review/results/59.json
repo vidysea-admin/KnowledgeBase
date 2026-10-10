@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "index": 59,
+  "originalIndex": 66,
+  "claimId": "2026-08-24-uniaccess-leeds-arts-university-c01",
+  "inputHash": "cd76de926e755c7869bb12e597d3b53d1fd5a5db450ea6235e51e0b2b1af8f1a",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "Foundation minimum 55% and Undergraduate 65% are directly stated, but PG is described as nearly 55% in any graduation with IELTS, not a minimum of 55%; most of you all dealing with the PG does not establish most Postgraduate courses.",
+    "missingReferences": [],
+    "caveats": [
+      "One supplied match; no missing or duplicate reference.",
+      "SpeakerRef is unknown; a name embedded in transcript text does not establish identity.",
+      "Original t040 spans 3208-3508; calendar/session metadata does not establish factual truth.",
+      "Transcript describes approximate PG percentage and an IELTS condition, which the claim omits.",
+      "Artifact raw-byte hash is supplied only; historical source bytes were not verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-24-uniaccess-leeds-arts-university",
+        "turnId": "2026-08-24-uniaccess-leeds-arts-university-t040",
+        "contextVersion": "originalMigration",
+        "quote": "For a foundation students, it's minimum of 55%. For an undergraduate course is 65%. For most of you all dealing with the PG, it's nearly 55% in any graduation with the IELTS.",
+        "textSha256": "2ba4f18ed48fefa83cf40973e3e20bfd1de9b3add8fba1a85572f64a5627158b",
+        "contextSha256": "3ad87f8999517542efb35cf69f775ca74969d0cb924fc79197ca0d0f2ea26cfc",
+        "artifactSha256": "fd835b78b01a869731e56e8de8775f0104f505f5f82e2272be9e8499917d60b8",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 3208,
+        "tEnd": 3508,
+        "supports": "Supports Foundation minimum 55% and Undergraduate 65%; only approximate PG 55% with IELTS, without support for most courses or a PG minimum."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited t040 discusses product and fashion and asks which industry has grown through creativity; it supplies no Foundation, Undergraduate or Postgraduate entry percentages.",
+    "missingReferences": [],
+    "caveats": [
+      "One supplied match; no missing or duplicate reference.",
+      "SpeakerRef spk:0 is a stored label, not a verified person identity.",
+      "The same t040 ID now has different text, speakerRef and timings (2511-2525 versus original 3208-3508).",
+      "Raw artifact SHA256 and normalizedLfSha256 are distinct supplied values; neither was checked against on-disk bytes.",
+      "Transcript support would not establish external factual truth."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-24-uniaccess-leeds-arts-university",
+        "turnId": "2026-08-24-uniaccess-leeds-arts-university-t040",
+        "contextVersion": "current",
+        "quote": "I wanted to understand which industry have you seen a rapid growth where creativity has played a vital role?",
+        "textSha256": "a94e33648ab6bce0b5d9b4064783e7bb370fb41692dca1d716cce3978a8bddec",
+        "contextSha256": "b2063c34d99e1e4aca08f9f455d2c6a7c4edb38ddd6993034bd1b2895f742bad",
+        "artifactSha256": "69e1be5a61cecd344422d130c12ed259c96112ffd9c553745a4de0d376ceb98c",
+        "revision": null,
+        "speakerRef": "spk:0",
+        "tStart": 2511,
+        "tEnd": 2525,
+        "supports": "Unrelated industry-growth question; supports none of the entry-requirement percentages."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original partially supports Foundation and Undergraduate figures but does not entail the exact PG minimum or most-courses qualifier. Current same-ID citation is unrelated after text, speaker and timing changes. AI preliminary only; human approval and external truth remain open."
+}

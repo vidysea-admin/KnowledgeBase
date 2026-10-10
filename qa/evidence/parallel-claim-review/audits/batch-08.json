@@ -1,0 +1,384 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "AI-preliminary-independent-audit",
+  "humanAdjudication": null,
+  "batch": 8,
+  "entries": [
+    {
+      "index": 40,
+      "claimId": "2026-07-08-beyond-black-robes-law-careers-c02",
+      "inputHash": "ad82078a2167a21e820f0ed84c1afbbcb1cca0e5b158049b297f3861e0d8ebb1",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original t115 expressly names Harvey AI adoption in late September 2025 and subsequent firms using alternatives. Current t115 discusses organizational legal teams and IPO advising, supplying none of the AI adoption components. Same ID has changed content/timing; original speakerRef is unknown. Session date alone does not validate chronology or external factual truth. All provided references resolve uniquely in both versions; no missing or duplicate supplied references. Raw artifact hashes remain distinct from normalized-LF hashes; artifact bytes were not inspected.",
+      "evidenceHashes": {
+        "taskBytesSha256": "ad82078a2167a21e820f0ed84c1afbbcb1cca0e5b158049b297f3861e0d8ebb1",
+        "expectedInputHash": "ad82078a2167a21e820f0ed84c1afbbcb1cca0e5b158049b297f3861e0d8ebb1",
+        "claimRecordSha256": "7e7ca03ef9e9b841082c847399a9688eb85efa7a173677ffd0bae7560c483c43",
+        "claimTextSha256": "2bf08252d38852779ddd780945e2831b342a606d81250b59dbafb310eda547a5",
+        "sourceBindingSha256": "24e56f8e12b9d2aa9d492448f91033467d0bc4826699a53ff01f506930b49abf",
+        "reviewerResultBytesSha256": "0a87d748b89acd570f7721a92f097f0e5aa52edd067aa970975eb18372972ab6",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-07-08-beyond-black-robes-law-careers-t115",
+            "contextSha256": "9c7ed763b3921286af98f3d143a354292ba2a55effc7f3c1959c952507cb133a",
+            "textSha256": "86685998d3f1eee11db38145e16620ca4beacb2fa6c0fbf287fd7127b22f12d5",
+            "providedTextSha256": "86685998d3f1eee11db38145e16620ca4beacb2fa6c0fbf287fd7127b22f12d5",
+            "artifactSha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 3643,
+            "tEnd": 3700,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-07-08-beyond-black-robes-law-careers-t115",
+            "contextSha256": "bd5a494e7858c40178e75487bf852886e20616429c761a0d2af8fda84772ec7a",
+            "textSha256": "fad4f0293a4ce74beb5176a0cbc77b09781730a2777d2dd31499808653789eb7",
+            "providedTextSha256": "fad4f0293a4ce74beb5176a0cbc77b09781730a2777d2dd31499808653789eb7",
+            "artifactSha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+            "normalizedLfSha256": "75d65d97c41f237fe7b75a440fa932ce2001c2e0f1a8acb3e8ea2365c78975b8",
+            "revision": null,
+            "speakerRef": "Harshwardhan Tiwari",
+            "tStart": 3852,
+            "tEnd": 3869,
+            "sameIdContentChanged": true
+          }
+        ],
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationBindings": true
+        },
+        "failures": []
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 41,
+      "claimId": "2026-07-08-beyond-black-robes-law-careers-c03",
+      "inputHash": "f7cfa7c2df51892776dfd33990214ad580beead704306ec9ba3c789b1f944406",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original t115 supports law firms adopting Harvey and Claude for Legal by Anthropic and places AI in the case-summary discussion. Original t119 lists Manupatra/LexisNexis with Claude/Harvey in a law-school discussion, but does not directly establish law firms using those traditional platforms alongside AI. Full compound claim therefore exceeds literal cited support. Current t115 discusses legal teams; t119 says a question was answered. Both IDs changed content/timing; original speakerRef is unknown. All provided references resolve uniquely in both versions; no missing or duplicate supplied references. Raw artifact hashes remain distinct from normalized-LF hashes; artifact bytes were not inspected.",
+      "evidenceHashes": {
+        "taskBytesSha256": "f7cfa7c2df51892776dfd33990214ad580beead704306ec9ba3c789b1f944406",
+        "expectedInputHash": "f7cfa7c2df51892776dfd33990214ad580beead704306ec9ba3c789b1f944406",
+        "claimRecordSha256": "5464fba92635d8db37350e84f8ba9d43ad123dc52e7201500c42c095defe8d4a",
+        "claimTextSha256": "9849d0c1f8ee569d85e5ed23ade8df01cdb0580c0d65cd5b857ca8bce4a18f43",
+        "sourceBindingSha256": "24e56f8e12b9d2aa9d492448f91033467d0bc4826699a53ff01f506930b49abf",
+        "reviewerResultBytesSha256": "e3409799ca84c5f3a0375e80300479606e956671e277c37c887aceb7fdd956fe",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-07-08-beyond-black-robes-law-careers-t115",
+            "contextSha256": "9c7ed763b3921286af98f3d143a354292ba2a55effc7f3c1959c952507cb133a",
+            "textSha256": "86685998d3f1eee11db38145e16620ca4beacb2fa6c0fbf287fd7127b22f12d5",
+            "providedTextSha256": "86685998d3f1eee11db38145e16620ca4beacb2fa6c0fbf287fd7127b22f12d5",
+            "artifactSha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 3643,
+            "tEnd": 3700,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-07-08-beyond-black-robes-law-careers-t115",
+            "contextSha256": "bd5a494e7858c40178e75487bf852886e20616429c761a0d2af8fda84772ec7a",
+            "textSha256": "fad4f0293a4ce74beb5176a0cbc77b09781730a2777d2dd31499808653789eb7",
+            "providedTextSha256": "fad4f0293a4ce74beb5176a0cbc77b09781730a2777d2dd31499808653789eb7",
+            "artifactSha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+            "normalizedLfSha256": "75d65d97c41f237fe7b75a440fa932ce2001c2e0f1a8acb3e8ea2365c78975b8",
+            "revision": null,
+            "speakerRef": "Harshwardhan Tiwari",
+            "tStart": 3852,
+            "tEnd": 3869,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-07-08-beyond-black-robes-law-careers-t119",
+            "contextSha256": "327042a471ae383766cf38db24b38c01dac916199cc8210cf29739fae3c7ce39",
+            "textSha256": "5e29522c93272ae1bc80d4e4ff8417317b538718b684ae4a43ad8ab0b260b8e8",
+            "providedTextSha256": "5e29522c93272ae1bc80d4e4ff8417317b538718b684ae4a43ad8ab0b260b8e8",
+            "artifactSha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 3750,
+            "tEnd": 3799,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-07-08-beyond-black-robes-law-careers-t119",
+            "contextSha256": "4a0a8fc8291a2cb7b17a3ebd133ebd8ca09f63cbb07a208d8a76a4998a8d0f18",
+            "textSha256": "d52006d72e450ea46cc38d3358b02ed9514bd04b839e3e001d373e950ba65e2a",
+            "providedTextSha256": "d52006d72e450ea46cc38d3358b02ed9514bd04b839e3e001d373e950ba65e2a",
+            "artifactSha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+            "normalizedLfSha256": "75d65d97c41f237fe7b75a440fa932ce2001c2e0f1a8acb3e8ea2365c78975b8",
+            "revision": null,
+            "speakerRef": "Bhakti",
+            "tStart": 4130,
+            "tEnd": 4147,
+            "sameIdContentChanged": true
+          }
+        ],
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationBindings": true
+        },
+        "failures": []
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 42,
+      "claimId": "2026-07-15-creative-futures-c02",
+      "inputHash": "8cfcc191b4ea3676fd8bd4b22038630d6d47dabe1759d9398eba9f183a8f9f45",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original t019 states about 63% of total SCAD degree programs are STEM and connects STEM study with three-year OPT after graduation. It does not state the international-graduate population, and the claim omits the percentage approximation. Establishing that population would require outside knowledge. Current t019 concerns AI summits and teaching creatives to master AI, with neither percentage nor OPT support. Same ID changed content/timing; original speakerRef is unknown. All provided references resolve uniquely in both versions; no missing or duplicate supplied references. Raw artifact hashes remain distinct from normalized-LF hashes; artifact bytes were not inspected.",
+      "evidenceHashes": {
+        "taskBytesSha256": "8cfcc191b4ea3676fd8bd4b22038630d6d47dabe1759d9398eba9f183a8f9f45",
+        "expectedInputHash": "8cfcc191b4ea3676fd8bd4b22038630d6d47dabe1759d9398eba9f183a8f9f45",
+        "claimRecordSha256": "67d76a6ae35e9bef93d7832ede7c236cf2aa2bf64153f276a39635c1c5b68ec8",
+        "claimTextSha256": "8da7dda96a3583ae6442b197a61559b84f50b3f087393a1064ad4a703ccc7381",
+        "sourceBindingSha256": "bf999944a72661be786d0c6d5ddca6fc86caaeb531b29191fc63560f37761218",
+        "reviewerResultBytesSha256": "3a99bde2ca3a719c8db7fcae476fb3c60792f22a4f9cc6439fa02a4ab763682e",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-07-15-creative-futures-t019",
+            "contextSha256": "9299d71eb9ffe7288deca1fda37be16aef68340fbd93ac1a3fd8a27dbe22778e",
+            "textSha256": "3c8d5a68b8de2a361b865e4f5c18efbc369aa2caefdfa80bfa79a61f8b0075bd",
+            "providedTextSha256": "3c8d5a68b8de2a361b865e4f5c18efbc369aa2caefdfa80bfa79a61f8b0075bd",
+            "artifactSha256": "53ff3b19e362cce7e8caa46e68495236da55ca289067028700649d68939554ea",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 649,
+            "tEnd": 688,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-07-15-creative-futures-t019",
+            "contextSha256": "2680b857dcf29775afbb98b163187e0123b01a00d248645e8c619a147619433b",
+            "textSha256": "50d278db088a7a5858ffd0903cff2e021104a5df787cfcc206c64ef148aaddcc",
+            "providedTextSha256": "50d278db088a7a5858ffd0903cff2e021104a5df787cfcc206c64ef148aaddcc",
+            "artifactSha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+            "normalizedLfSha256": "e0802d0f7934e41f9982924fcf813e57d5a67a205ebff85c4d9a36785e6e1288",
+            "revision": null,
+            "speakerRef": "Emily Lee",
+            "tStart": 805,
+            "tEnd": 831,
+            "sameIdContentChanged": true
+          }
+        ],
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationBindings": true
+        },
+        "failures": []
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 43,
+      "claimId": "2026-07-22-uniaccess-cept-university-c02",
+      "inputHash": "ba7a88b8a81f1e1709eaba45bd354fcd8cd976dd41777ace41391b58282501df",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original t006 directly says 70% of academic credit is a studio and explains studio pedagogy. Original t005's 70% describes practitioners among faculty, a different denominator, and is unnecessary to support this claim. Current t005/t006 contain thanks and requests for questions, no credit share. Both IDs changed content/timing; original speakerRef unknown and current t006 spk:2 does not identify a person. All provided references resolve uniquely in both versions; no missing or duplicate supplied references. Raw artifact hashes remain distinct from normalized-LF hashes; artifact bytes were not inspected.",
+      "evidenceHashes": {
+        "taskBytesSha256": "ba7a88b8a81f1e1709eaba45bd354fcd8cd976dd41777ace41391b58282501df",
+        "expectedInputHash": "ba7a88b8a81f1e1709eaba45bd354fcd8cd976dd41777ace41391b58282501df",
+        "claimRecordSha256": "4a33441f8e7b99b49923091c2bf918cb46472aec9dab0db0f7ee36f0dcf2ab9d",
+        "claimTextSha256": "29fa292aeede3d046f9338c2eea672916a97cf967887a1781b315bb6e5e57334",
+        "sourceBindingSha256": "bdbc646fff76ad6468ecd263b89659c0a3b01c30c20f685fc28deaee767ab14a",
+        "reviewerResultBytesSha256": "6a287752d05373852253a180e54bc2329e8100ad0cb8b7743606404d278543a4",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-07-22-uniaccess-cept-university-t005",
+            "contextSha256": "9dcc0553c17ca1216899614c991a06cd43026f4395ad8686f0bf06189de3156e",
+            "textSha256": "2afb88424414f2bef1b1e0811538382d1e15bb54a732b795618df68faadb84cd",
+            "providedTextSha256": "2afb88424414f2bef1b1e0811538382d1e15bb54a732b795618df68faadb84cd",
+            "artifactSha256": "f41764fd45c53cabc8c4bd9ca04c16091da302e66ecd5eea253a9fd50f736d05",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 189,
+            "tEnd": 236,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-07-22-uniaccess-cept-university-t005",
+            "contextSha256": "137d985e1a589dd7f50630f4182fa10ff0d3a7dfada50161d6527e4b270a69a1",
+            "textSha256": "090912fcf6fa8cca23d36331e3e140f7279501ee51c8279a67e8f103d95964de",
+            "providedTextSha256": "090912fcf6fa8cca23d36331e3e140f7279501ee51c8279a67e8f103d95964de",
+            "artifactSha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+            "normalizedLfSha256": "27a260ca24052977071f2b4ccf4fbb25a844d316ccc0cfd92d53243cf94bb773",
+            "revision": null,
+            "speakerRef": "Pooja",
+            "tStart": 682,
+            "tEnd": 717,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-07-22-uniaccess-cept-university-t006",
+            "contextSha256": "56c6cdd34855aea6a2c5ac8e824e47308467bee6a4fef718bc70c5a494089e14",
+            "textSha256": "9b72b7d947c0e278b4c0010c265fea09f8fdfdf6d62723cae320c2eba763da74",
+            "providedTextSha256": "9b72b7d947c0e278b4c0010c265fea09f8fdfdf6d62723cae320c2eba763da74",
+            "artifactSha256": "f41764fd45c53cabc8c4bd9ca04c16091da302e66ecd5eea253a9fd50f736d05",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 236,
+            "tEnd": 307,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-07-22-uniaccess-cept-university-t006",
+            "contextSha256": "7a3e9cb7c85e85b0efc2b3e6a930c9d6f5675fd66cbad564b822ac2d01ccf7bc",
+            "textSha256": "fe6d3d5fc7f16ecc3d9a186e63212cb8c4cc9475551616a97ce74641f375729a",
+            "providedTextSha256": "fe6d3d5fc7f16ecc3d9a186e63212cb8c4cc9475551616a97ce74641f375729a",
+            "artifactSha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+            "normalizedLfSha256": "27a260ca24052977071f2b4ccf4fbb25a844d316ccc0cfd92d53243cf94bb773",
+            "revision": null,
+            "speakerRef": "spk:2",
+            "tStart": 717,
+            "tEnd": 724,
+            "sameIdContentChanged": true
+          }
+        ],
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationBindings": true
+        },
+        "failures": []
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 44,
+      "claimId": "2026-07-22-uniaccess-cept-university-c03",
+      "inputHash": "74b1c6f02d0f85ba8d4f7f56ae017c46dc319d159b843f7b138ca807f653e274",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original t033 repeatedly states CEPT admissions require no portfolio, specifically for design programs, supporting the B.Des admission requirement claim. Current t033 concerns applicants seeing merit ranks on dashboards and supplies no portfolio requirement support. Same ID changed content/timing; original speakerRef unknown. Transcript support is preliminary and does not establish current external admissions policy. All provided references resolve uniquely in both versions; no missing or duplicate supplied references. Raw artifact hashes remain distinct from normalized-LF hashes; artifact bytes were not inspected.",
+      "evidenceHashes": {
+        "taskBytesSha256": "74b1c6f02d0f85ba8d4f7f56ae017c46dc319d159b843f7b138ca807f653e274",
+        "expectedInputHash": "74b1c6f02d0f85ba8d4f7f56ae017c46dc319d159b843f7b138ca807f653e274",
+        "claimRecordSha256": "c1e3222f6c3a4bc1ba70643d7f2eb499e448643fbddc6a6acb30e2af7de98809",
+        "claimTextSha256": "4b0159c95fcf7a2953462db3c786f16c1b25cacd2289e2a94189dc9beba36464",
+        "sourceBindingSha256": "bdbc646fff76ad6468ecd263b89659c0a3b01c30c20f685fc28deaee767ab14a",
+        "reviewerResultBytesSha256": "6336db597b0c109bf7216a75b1d0fbdb853a3d24c30133b4516e65ce6c0eca96",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-07-22-uniaccess-cept-university-t033",
+            "contextSha256": "781f6c4088dbf77658d4699b35e03f907daa50726c67e0ab11223cf853fa79fe",
+            "textSha256": "3da001f07ecc162ca303701a7bada6b74e99c21b261b9fcd22c2d53b4da72114",
+            "providedTextSha256": "3da001f07ecc162ca303701a7bada6b74e99c21b261b9fcd22c2d53b4da72114",
+            "artifactSha256": "f41764fd45c53cabc8c4bd9ca04c16091da302e66ecd5eea253a9fd50f736d05",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 1079,
+            "tEnd": 1129,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-07-22-uniaccess-cept-university-t033",
+            "contextSha256": "5ed5203a480915664aebe3cdd2f714795d244e9f891b448c3005bd1cd5c2c8d6",
+            "textSha256": "461124b6b8a0cb1d852cc9817426960baf97f9524aa1ccdc6b898c917dd90c7c",
+            "providedTextSha256": "461124b6b8a0cb1d852cc9817426960baf97f9524aa1ccdc6b898c917dd90c7c",
+            "artifactSha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+            "normalizedLfSha256": "27a260ca24052977071f2b4ccf4fbb25a844d316ccc0cfd92d53243cf94bb773",
+            "revision": null,
+            "speakerRef": "Nilesh",
+            "tStart": 1370,
+            "tEnd": 1378,
+            "sameIdContentChanged": true
+          }
+        ],
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationBindings": true
+        },
+        "failures": []
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    }
+  ]
+}

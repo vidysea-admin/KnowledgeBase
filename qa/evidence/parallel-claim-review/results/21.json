@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "index": 21,
+  "originalIndex": 23,
+  "claimId": "2026-05-29-decoding-ever-expanding-cast-c02",
+  "inputHash": "d4fd5a6b3f10bd5e41a988b9fd00cf27ed6bb5200733ab27fc9edb19805bf558",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The turn reports currently 75% of you and the largest enrollment-goals versus family-cost option. It does not establish all workshop participants as denominator, specify enrollment-yield goals, or identify an ecosystem-wide sharpest tension.",
+    "missingReferences": [],
+    "caveats": [
+      "Currently describes a provisional poll state; final result and response denominator are unavailable.",
+      "speakerRef is unknown; names embedded in the transcript do not establish speaker identity.",
+      "One historical match is supplied, with no duplicate reference; current t161 is absent.",
+      "Provided current artifact raw-byte SHA256 differs from normalized-LF SHA256; historical raw-byte SHA256 is a separate pin, not a verified disk hash.",
+      "Transcript wording provides reported evidence only, not external factual truth."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "turnId": "2026-05-29-decoding-ever-expanding-cast-t161",
+        "contextVersion": "originalMigration",
+        "quote": "So we're looking at currently 75% of you, and the largest is universities' enrollment goals versus families' cost reality.",
+        "textSha256": "625c55181dbde80d31091d5eb162dcd445859feb00c0ca1b1d065b0e3a0679c7",
+        "contextSha256": "b57d5896d8b222614b775033464d870c65a79317be7ed993cff31bf9fe9abc1d",
+        "artifactSha256": "f71d34bcd4de42e8dee814bff2a5761ced144a7ce92ad25d294078970a85e974",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 3861,
+        "tEnd": 3890,
+        "supports": "Supports a currently reported 75% and leading universities enrollment-goals versus families cost-reality option; does not establish the full workshop denominator, enrollment-yield qualifier, or ecosystem-wide sharpest tension."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unresolvable",
+    "reason": "The sole cited current turn t161 is absent, leaving no supplied current evidence for the percentage, denominator, goal-versus-cost comparison, or sharpest-tension conclusion.",
+    "missingReferences": [
+      {
+        "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "turnId": "2026-05-29-decoding-ever-expanding-cast-t161",
+        "reason": "turn-absent: no supplied current match"
+      }
+    ],
+    "caveats": [
+      "Historical support cannot substitute for the missing current citation.",
+      "No same-ID changed-content comparison is possible because the current record is absent."
+    ],
+    "citations": []
+  },
+  "sameIdContentChanged": false,
+  "shortReason": "Original citation partially supports a provisional poll statement but not all claim qualifiers; current citation is missing. No supplied same-ID changed-content flag. Human factual and semantic approval remain open."
+}

@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "index": 19,
+  "originalIndex": 21,
+  "claimId": "2026-05-28-in-focus-1-c03",
+  "inputHash": "b9e1cf134abd35adaca68f556910cb0463c99442f7292030c8c5acff20f12098",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The cited original text directly supports students creating 12 to 15 final works for international-college requirements. It does not identify those students as Artiste 360 students, explicitly call the works portfolio works, or establish that this is its flagship program; the full compound claim therefore lacks complete literal support.",
+    "missingReferences": [],
+    "caveats": [
+      "Only the supplied literal citation was assessed; no missing or duplicate match was supplied for this reference.",
+      "Stored speakerRef is unknown; the embedded Yavya Jain label does not independently establish person identity.",
+      "The same turn ID has changed text, speakerRef and timing: original 1546-1589 versus current 2968-2969.",
+      "Transcript support does not establish external factual truth or the calendar date of this activity.",
+      "Provided artifact hashes were not checked against artifact bytes; raw and normalized-LF hashes remain distinct."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-28-in-focus-1",
+        "turnId": "2026-05-28-in-focus-1-t056",
+        "contextVersion": "originalMigration",
+        "quote": "So students create 12 to 15 final works based on the requirements of international colleges, like the ones in the UK, US, Singapore, Australia, and beyond.",
+        "textSha256": "d0bba2f78ef493f0a942a5436a0ede735eede7829e20c20596b6fd266ee46b6a",
+        "contextSha256": "49d2382509ac3ae33397a73fdc17f16855c55aadbe844321d7414f9cce732165",
+        "artifactSha256": "0ac457de7615bc242980485dca851754c20b6f0181bbe354f743489ed085062a",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1546,
+        "tEnd": 1589,
+        "supports": "Supports the number of final works and international-college purpose, but does not establish Artiste 360 identity, portfolio terminology or flagship-program status."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The exact current cited text is only a thank-you. It supports none of the Artiste 360 attribution, 12-15 works, portfolio description or flagship-program components. This absence of support does not establish that the claim is false.",
+    "missingReferences": [],
+    "caveats": [
+      "No missing or duplicate match was supplied for this reference.",
+      "Same-ID content changed; original support cannot be substituted for the current citation.",
+      "Stored speakerRef Makrand is not independent verification of person identity.",
+      "Current timing is 2968-2969, rather than the original 1546-1589.",
+      "Provided raw and normalized-LF artifact hashes were not independently checked against artifact bytes."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-28-in-focus-1",
+        "turnId": "2026-05-28-in-focus-1-t056",
+        "contextVersion": "current",
+        "quote": "Thank you very much.",
+        "textSha256": "9e41164cb68b90cf8133a32422dceef505ce83d054281d47edff7b018531e88c",
+        "contextSha256": "31460c533cadbc11186b65a3ae761ee1653419559656ea8e2125e2b074b00409",
+        "artifactSha256": "3f7229899fd1a4a6d190e3c9d402b12dcae2ceb9dc66cbf697d18e698d9e6581",
+        "revision": null,
+        "speakerRef": "Makrand",
+        "tStart": 2968,
+        "tEnd": 2969,
+        "supports": "Unrelated to all factual components of the persisted claim."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original citation partially supports 12-15 final works but not the complete organizational/program claim; current same-ID citation is unrelated. All supplied-context hashes and identity bindings match. Human adjudication and external truth remain open."
+}

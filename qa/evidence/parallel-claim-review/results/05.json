@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "index": 5,
+  "originalIndex": 6,
+  "claimId": "2026-05-08-funding-dreams-loans-forex-c01",
+  "inputHash": "d420035764d74e7bc7ce8e720a953e045dcded40ddd50ea42a97cc0185d40cdb",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The approximate 1% versus Flywire and a bank at 2%-2.5% markup comparison is supported, but the quoted speaker calls it our markup without identifying FRR Forex. The entire named-company attribution therefore is not directly supported by this literal citation alone.",
+    "missingReferences": [],
+    "caveats": [
+      "Partial numerical support is not support for the complete claim; FRR Forex attribution would require unavailable context and no company identity is assumed.",
+      "Stored speakerRef is unknown; the embedded Dev Mehta label does not independently establish identity or affiliation.",
+      "This is an approximate speaker-reported comparison at the original turn time 1448-1486; external truth and current pricing are not adjudicated.",
+      "The same turn ID now has different content, speakerRef and timing; original support cannot be substituted into the current citation.",
+      "Artifact SHA256 and normalized-LF SHA256 are distinct provided pins; no artifact bytes were read."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "turnId": "2026-05-08-funding-dreams-loans-forex-t037",
+        "contextVersion": "originalMigration",
+        "quote": "So our markup would be about 1%. Flywire is about 2% to 2.5%, and so is a bank.",
+        "textSha256": "6671c1f668f493a03bdc16b5523885d6c44f4f8d65447577325477cdfdcb1eb9",
+        "contextSha256": "94039ccafcd9d0ebc966ce224e1eb90fa3b6a7a6d9e2e487c0238a2a93b64984",
+        "artifactSha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1448,
+        "tEnd": 1486,
+        "supports": "Supports only the approximate our-markup 1% versus Flywire and a bank 2%-2.5% comparison, without establishing that our refers to FRR Forex."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The currently cited turn discusses counselors and making a conversation interactive. It supplies no currency-conversion markup, percentage, FRR Forex, Flywire or bank comparison.",
+    "missingReferences": [],
+    "caveats": [
+      "No explicit incompatible pricing statement appears; unsupported does not mean false.",
+      "The same turn ID is a different text at 1902-1905 with stored speakerRef Nikhil; that stored label is not independent identity verification.",
+      "The original numeric comparison cannot establish support in this changed current citation.",
+      "Artifact SHA256 and normalized-LF SHA256 are distinct provided pins; no artifact bytes were read."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "turnId": "2026-05-08-funding-dreams-loans-forex-t037",
+        "contextVersion": "current",
+        "quote": "So, why don't we keep it more interactive, you know, talk about.",
+        "textSha256": "b2a37ba69ce2ea3411c7f9e9e6c61188bf09856914526908ff1981b039d616c5",
+        "contextSha256": "ba16d705da07d9b1c9fc495f8e5e94c6de078bcd98d0bfcd246286f70b50049d",
+        "artifactSha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+        "revision": null,
+        "speakerRef": "Nikhil",
+        "tStart": 1902,
+        "tEnd": 1905,
+        "supports": "Merely unrelated discussion of an interactive conversation; supports none of the claim pricing components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original context supports the numerical comparison only, with FRR Forex affiliation unestablished; current same-ID context is unrelated. Both whole-claim assessments are provisionally unsupported, with all supplied hash/binding checks passing and human adjudication null."
+}

@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "index": 48,
+  "originalIndex": 53,
+  "claimId": "2026-07-30-in-focus-3-c01",
+  "inputHash": "319d38216bf755c31dd95f3951a4c910d1f35a68815ded025be43662803374e5",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The original context names StarterSky and directly states both group and individual prices plus tax, but does not identify the priced offering as an entrepreneurship accelerator; that component requires unavailable context.",
+    "missingReferences": [],
+    "caveats": [
+      "The stored speakerRef is unknown; the transcript name prefix does not establish a verified person identity.",
+      "The same turn ID now contains different text and timings: original 838-904 versus current 2240-2254.",
+      "The rupee symbol supports the INR reading in this context; transcript support does not establish current pricing or external factual truth.",
+      "Provided artifact byte hashes have not been checked on disk; raw and normalized-LF hashes are distinct."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-30-in-focus-3",
+        "turnId": "2026-07-30-in-focus-3-t030",
+        "contextVersion": "originalMigration",
+        "quote": "The cost is ₹75,000 plus tax if you do it in a group, and ₹90,000 plus tax if you do it individually.",
+        "textSha256": "c4f27252257d93fdfeba44429e272b8f4517e34a671538de14924bd5d34fd2e5",
+        "contextSha256": "8a850c2bd26133a1c0085dc1f8f22f4b9d1c91ed3f82db54cebb5eb0512e9712",
+        "artifactSha256": "e6c6449ba49f9ca5c2bd212667b7ce01a6339e744877c89f07e01333204a7da7",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 838,
+        "tEnd": 904,
+        "supports": "Directly supports the group and individual amounts and plus-tax qualifiers; the surrounding context names StarterSky but does not explicitly call the offering an entrepreneurship accelerator."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn contains thanks and an invitation for questions, with no StarterSky offering, accelerator description, group/individual format or price information.",
+    "missingReferences": [],
+    "caveats": [
+      "The current stored speakerRef spk:1 is a label, not a verified person identity.",
+      "Same-ID changed content and timings prevent using original pricing support as current citation support.",
+      "Provided artifact byte hashes have not been checked on disk; raw and normalized-LF hashes are distinct."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-30-in-focus-3",
+        "turnId": "2026-07-30-in-focus-3-t030",
+        "contextVersion": "current",
+        "quote": "Thank you, Shithij. It was perfectly timed. Uh, thanks everyone for joining in. Yes, people. Questions?",
+        "textSha256": "8f26653b74a11e6482a4d4c8506e309915533830295617994c8bde9d5687e384",
+        "contextSha256": "c6af663874935f24b7b43b63fd405e6cc1515ca20b85c18a5c6ce50ccad333e4",
+        "artifactSha256": "ba7eb5554cd2fd310b840c73fa43b590028e5fe9d043556bea284e9b3f064ef6",
+        "revision": null,
+        "speakerRef": "spk:1",
+        "tStart": 2240,
+        "tEnd": 2254,
+        "supports": "Unrelated to the claimed offering and prices; supports only thanks and an invitation for questions."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original context supports the two price amounts, formats and tax qualifier but not the accelerator characterization. Current context is unrelated. Same turn ID has changed content, speaker label and timings. Human adjudication remains open."
+}

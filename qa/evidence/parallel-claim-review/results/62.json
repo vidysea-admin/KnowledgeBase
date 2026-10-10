@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "index": 62,
+  "originalIndex": 69,
+  "claimId": "2026-08-27-in-focus-4-c01",
+  "inputHash": "8a37a8ede0c45ab340c2b62d1eaf61049879d66471435e7276d43ac7b9de5db5",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The cited turn describes a mithai ka dabba flashcard box and about 1,500-plus words, but does not identify the provider as Education & You; the entire ownership-qualified claim is therefore only partially supported.",
+    "missingReferences": [],
+    "caveats": [
+      "Stored speakerRef is unknown; the name prefixed in transcript text does not establish identity or organizational affiliation.",
+      "The count is qualified as about 1,500-plus; a strict externally verified minimum is not established.",
+      "One reference resolves to one original match; no duplicate or missing references.",
+      "Original timing is 657-732; current timing is 1773-1796 for the same turn ID.",
+      "Artifact byte hashes have not been verified; current raw and normalized-LF hashes are distinct and have not been substituted."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-27-in-focus-4",
+        "turnId": "2026-08-27-in-focus-4-t020",
+        "contextVersion": "originalMigration",
+        "quote": "a mithai ka dabba, which is basically a flashcard box of words.",
+        "textSha256": "78dc169ecd3027404a89b695582a3fa7b5cb89caba32be415ad061b8c0e31a9a",
+        "contextSha256": "d259b4588f8ff81c930a36cc6d23a75ccc536fc6f22530934e3534e0493fbbbd",
+        "artifactSha256": "4ad967ba1a61b723719068868214ee5a18671bbc279beb29e43a6aea2579765f",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 657,
+        "tEnd": 732,
+        "supports": "Supports the flashcard-box description and nickname; does not establish Education & You ownership."
+      },
+      {
+        "sessionId": "2026-08-27-in-focus-4",
+        "turnId": "2026-08-27-in-focus-4-t020",
+        "contextVersion": "originalMigration",
+        "quote": "So this flashcard box comes with about 1,500-plus words.",
+        "textSha256": "78dc169ecd3027404a89b695582a3fa7b5cb89caba32be415ad061b8c0e31a9a",
+        "contextSha256": "d259b4588f8ff81c930a36cc6d23a75ccc536fc6f22530934e3534e0493fbbbd",
+        "artifactSha256": "4ad967ba1a61b723719068868214ee5a18671bbc279beb29e43a6aea2579765f",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 657,
+        "tEnd": 732,
+        "supports": "Supports an approximate 1,500-plus vocabulary size, retaining the source qualifier about."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The same cited turn ID now contains a request to read comparative-literature and economics passages, with no flashcard box, Education & You attribution, mithai nickname or 1,500-word count.",
+    "missingReferences": [],
+    "caveats": [
+      "Stored speakerRef is Parthosh; this is a source label, not independently verified identity.",
+      "One reference resolves to one current match; no duplicate or missing references.",
+      "Same-ID text, speakerRef and timing differ from the originalMigration context; original support cannot substitute for current evidence.",
+      "Transcript support would not establish external factual truth; human adjudication remains open."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-27-in-focus-4",
+        "turnId": "2026-08-27-in-focus-4-t020",
+        "contextVersion": "current",
+        "quote": "I'm going to move to another passage as well. This one is from comparative literature, right? And this one is from economics",
+        "textSha256": "1949191be8ed6806df27de1735a6d74374e6a1fe0e6090c55c1904475b63128a",
+        "contextSha256": "c7bd424b601181bf7340a59e07024db590132a1af622838b3fdf58f18c34bd7d",
+        "artifactSha256": "e831dc37eb547a4afcfec47287331d7785713f3116db6d8cda1486bcf04f243e",
+        "revision": null,
+        "speakerRef": "Parthosh",
+        "tStart": 1773,
+        "tEnd": 1796,
+        "supports": "Unrelated reading-passage discussion; supports none of the flashcard ownership, nickname or word-count components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original evidence partially supports the box and approximate word count but omits the named provider; the changed current evidence is unrelated. Both assessments are AI preliminary."
+}

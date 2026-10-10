@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "index": 13,
+  "originalIndex": 15,
+  "claimId": "2026-05-22-uniaccess-xavier-university-c03",
+  "inputHash": "498eecbff5cf476b23ccbcc89206162959ab5f1ac25e3f5058443f4084e309b9",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The original cited turn directly supports annual merit awards of $23,000-$36,000 and the possibility of tuition falling to $11,500 with aid. It does not explicitly identify those awards as international merit scholarships; the full compound claim therefore exceeds the supplied literal context.",
+    "missingReferences": [],
+    "caveats": [
+      "One literal reference has one supplied original match; no missing or duplicate citation references.",
+      "Stored speakerRef is unknown; the textual speaker prefix does not independently establish identity.",
+      "Tuition is qualified as sometimes, for many students, and happened this year; the supplied excerpt does not establish a continuing offer or specific calendar year.",
+      "Dollar amounts and Xavier US education are stated; external factual truth, eligibility details and a separately verified currency denomination are not established.",
+      "Artifact exact-byte and normalized-LF hashes are distinct provided metadata; neither artifact bytes nor historical revision bytes were independently verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-22-uniaccess-xavier-university",
+        "turnId": "2026-05-22-uniaccess-xavier-university-t050",
+        "contextVersion": "originalMigration",
+        "quote": "merit scholarships ranging from $23,000 to $36,000 annually, along with additional grants and financial aid options",
+        "textSha256": "cd80f6ddabce830b2692e14825f40f22ecfb84980d9c58ce88a84e8739b287d9",
+        "contextSha256": "2ddcfd6cc3d992ec707c0aeaa33432cb2f4290f0272d78af13e586b53240fb2d",
+        "artifactSha256": "77d983a227996034e40dc522a5608a73f00760a7953351e2ab9398747fa39968",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1597,
+        "tEnd": 1636,
+        "supports": "Supports annual merit scholarship dollar range and additional aid, but does not explicitly specify international scholarship eligibility."
+      },
+      {
+        "sessionId": "2026-05-22-uniaccess-xavier-university",
+        "turnId": "2026-05-22-uniaccess-xavier-university-t050",
+        "contextVersion": "originalMigration",
+        "quote": "In fact, for many students, the annual tuition cost can sometimes even come down to as low as $11,500. This happened this year.",
+        "textSha256": "cd80f6ddabce830b2692e14825f40f22ecfb84980d9c58ce88a84e8739b287d9",
+        "contextSha256": "2ddcfd6cc3d992ec707c0aeaa33432cb2f4290f0272d78af13e586b53240fb2d",
+        "artifactSha256": "77d983a227996034e40dc522a5608a73f00760a7953351e2ab9398747fa39968",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1597,
+        "tEnd": 1636,
+        "supports": "Supports qualified possibility of annual tuition as low as $11,500, with the stated temporal limitation."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current record at the identical cited turn ID only thanks the audience; it supports neither international scholarship amounts nor annual tuition after aid. Original support cannot substitute for this changed current citation.",
+    "missingReferences": [],
+    "caveats": [
+      "One literal reference has one supplied current match; no missing or duplicate citation references.",
+      "Same ID now has different text, speakerRef and timing: original unknown at 1597-1636 seconds; current Sandeep at 1733-1737 seconds. Stored labels do not independently prove person identity.",
+      "Artifact byte verification was not performed; assessment is confined to supplied literal context."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-22-uniaccess-xavier-university",
+        "turnId": "2026-05-22-uniaccess-xavier-university-t050",
+        "contextVersion": "current",
+        "quote": "So, I'm guessing this was it. Thank you so much.",
+        "textSha256": "aba8c1abd2905d5f252e85d4cce44287411dd0db44095b7bcd4f61729a2284b8",
+        "contextSha256": "27fef6296df1afce6a9a91d4666e03e2f48baa8aa2ad96d96bddcd7f7c80d79b",
+        "artifactSha256": "9540ce875b248339533cec077615dbb111a2f5562c1b795f5627c1b32b9d17ab",
+        "revision": null,
+        "speakerRef": "Sandeep",
+        "tStart": 1733,
+        "tEnd": 1737,
+        "supports": "Unrelated closing thanks; no support for either financial component."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original text supports the financial figures with qualifications but does not explicitly establish the international scholarship qualifier; current same-ID text is unrelated. Both provisional full-claim assessments are unsupported, not a finding of falsity or human adjudication."
+}

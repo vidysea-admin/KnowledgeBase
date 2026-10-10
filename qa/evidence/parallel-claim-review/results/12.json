@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "index": 12,
+  "originalIndex": 14,
+  "claimId": "2026-05-22-uniaccess-xavier-university-c02",
+  "inputHash": "1a57dc7641c5c33be7220217552a9e5ce4d9ccf024584bd1c5585a917aa4114e",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The literal original turn states Xavier was awarded $2.8 million from NIH and was one of only six institutions selected in the inaugural cohort. Grant is a funding paraphrase; no additional conditions or currency designation are independently established.",
+    "missingReferences": [],
+    "caveats": [
+      "Transcript support only; external factual truth and the award date are unverified.",
+      "$ is preserved as supplied; the transcript does not independently specify a currency code.",
+      "Stored speakerRef is unknown; the textual Sandeep Bhalla prefix does not verify person identity.",
+      "The same turn ID now has different content and timing: original 1097-1150 seconds versus current 738-760 seconds.",
+      "Historical artifact bytes were not independently read or verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-22-uniaccess-xavier-university",
+        "turnId": "2026-05-22-uniaccess-xavier-university-t038",
+        "contextVersion": "originalMigration",
+        "quote": "Xavier was really awarded $2.8 million from NIH, and notably it was one of the only six institutions selected in the inaugural cohort.",
+        "textSha256": "bb6d759bf82df27077ad27e9c9a9dfee289ad56d32c0586f8ac6b9ad49a331f5",
+        "contextSha256": "b7b9ecff46fa325f128917eed8cdd417e2003de92f1c5bcd1e3b41de3c353252",
+        "artifactSha256": "77d983a227996034e40dc522a5608a73f00760a7953351e2ab9398747fa39968",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1097,
+        "tEnd": 1150,
+        "supports": "Supports Xavier receiving $2.8 million from NIH and its selection as one of only six institutions in the inaugural cohort; award is described as funding but the word grant is not literal."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The sole current cited turn discusses Xavier student relationships and experience, with no NIH award, $2.8 million amount, six-institution cohort or inaugural selection. Original support cannot substitute for the current citation.",
+    "missingReferences": [],
+    "caveats": [
+      "Same-ID content changed; no missing or duplicate matches are supplied.",
+      "Stored speakerRef Sandeep is a supplied label, not independently established identity.",
+      "Current timing is 738-760 seconds; session date does not date the alleged award.",
+      "Current artifact raw SHA256 and normalized-LF SHA256 are distinct; neither byte hash was independently verified.",
+      "Unsupported does not mean factually false."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-22-uniaccess-xavier-university",
+        "turnId": "2026-05-22-uniaccess-xavier-university-t038",
+        "contextVersion": "current",
+        "quote": "the experience they remember is more often than not shaped by relationships they build there.",
+        "textSha256": "5d193f8336294a1191133fe854efdce8e80b49619cf6cd6eedaf81b5c9eed3bf",
+        "contextSha256": "658bd93c2ac446054ad3e7649ce12a22f58cfca2956172dd6452b04c937f1c66",
+        "artifactSha256": "9540ce875b248339533cec077615dbb111a2f5562c1b795f5627c1b32b9d17ab",
+        "revision": null,
+        "speakerRef": "Sandeep",
+        "tStart": 738,
+        "tEnd": 760,
+        "supports": "Unrelated student-experience discussion; supports none of the NIH award, amount, cohort size or inaugural selection components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original quoted evidence supports the NIH funding/cohort statement; the same current citation ID resolves to unrelated relationships discussion with changed timing and speaker label. Human review and external factual verification remain open."
+}

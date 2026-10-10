@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "index": 11,
+  "originalIndex": 12,
+  "claimId": "2026-05-20-telling-your-brand-story-better-c02",
+  "inputHash": "4df2f68e78f3926ca7210504fc89f22ddf16c3a66dda148d735f8d94eda63fc7",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The cited historical record names emotional doors, identifies joy, and describes these doors as building communication/storytelling, including belonging and connecting through nostalgia. All claim components are supported as the presented framework.",
+    "missingReferences": [],
+    "caveats": [
+      "SpeakerRef is unknown; an embedded speaker name does not independently establish identity.",
+      "Historical timing 1308-1419 differs from current same-ID timing 3056-3058.",
+      "This assesses transcript support only, not external factual truth or human approval."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-20-telling-your-brand-story-better",
+        "turnId": "2026-05-20-telling-your-brand-story-better-t030",
+        "contextVersion": "originalMigration",
+        "quote": "These are the basic seven things that we can talk about. I call them emotional doors. Like emotional doors, how do you tap into a communication platform? So, you know, joy is one of them.",
+        "textSha256": "fe9b68b95b38b12706dff6e3efc3e3d5191f6fdca373616dd4396eed25c499eb",
+        "contextSha256": "8cac691b56ea0984b51c480a343226e77ce1b6c1897153d10251f76ef4618556",
+        "artifactSha256": "58612ed394808cf3c2a3367da17b183531bdccf27d5971fc85eadd31dcd481f2",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1308,
+        "tEnd": 1419,
+        "supports": "Supports emotional-door framework, communication and joy example."
+      },
+      {
+        "sessionId": "2026-05-20-telling-your-brand-story-better",
+        "turnId": "2026-05-20-telling-your-brand-story-better-t030",
+        "contextVersion": "originalMigration",
+        "quote": "Belonging, students love belonging, okay? They they they everyone's trying to find that tribe, right?",
+        "textSha256": "fe9b68b95b38b12706dff6e3efc3e3d5191f6fdca373616dd4396eed25c499eb",
+        "contextSha256": "8cac691b56ea0984b51c480a343226e77ce1b6c1897153d10251f76ef4618556",
+        "artifactSha256": "58612ed394808cf3c2a3367da17b183531bdccf27d5971fc85eadd31dcd481f2",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1308,
+        "tEnd": 1419,
+        "supports": "Supports audience connection through emotional belonging."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The entire supplied current citation says only Yes. It identifies neither a framework nor emotional doors, joy, communication or audience connection; the proposition being affirmed is absent.",
+    "missingReferences": [],
+    "caveats": [
+      "Same turn ID now has different content and timings; original support cannot be transferred to current evidence.",
+      "SpeakerRef spk:0 is a diarization label, not a verified person identity.",
+      "Necessary antecedent for Yes is unavailable in the supplied literal citation; unsupported does not mean false."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-20-telling-your-brand-story-better",
+        "turnId": "2026-05-20-telling-your-brand-story-better-t030",
+        "contextVersion": "current",
+        "quote": "Yes.",
+        "textSha256": "5f9a2b795615ba6a3d5455fd5624d773fbca5bcd16249c421fd37411dc9837da",
+        "contextSha256": "2af989c4f5f8e491480b97d0d81d6ccc3891bbe13b1ae0146b18c8001b2c56a5",
+        "artifactSha256": "2ae41f67947436cb5ee92c993bbd8cf4ae82670c2e95b6210eac4fca73f4f78a",
+        "revision": null,
+        "speakerRef": "spk:0",
+        "tStart": 3056,
+        "tEnd": 3058,
+        "supports": "Unrelated affirmation without the proposition needed to support any claim component."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original emotional-door explanation supports the claim; current same-ID Yes does not. Text and timing changed; supplied hashes pass, while artifact bytes and external truth remain unverified."
+}

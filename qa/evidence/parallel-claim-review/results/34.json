@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "index": 34,
+  "originalIndex": 36,
+  "claimId": "2026-06-30-exploring-identity-success-counseling-c02",
+  "inputHash": "6bfe1a90965721ef6eda29d50309bc6f315234edbe3ae17ee897987c1b18c14b",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The cited passage supports a four-legged success table including financial stability, but its unnamed he/his author is not identified as Andrew Hallam in the supplied context. That attribution is unsupported.",
+    "missingReferences": [],
+    "caveats": [
+      "Stored speakerRef is unknown; the embedded Luke Devlin label does not establish speaker identity.",
+      "The author attribution would require context outside the supplied cited record; book titles alone do not supply it.",
+      "Transcript support does not establish external factual truth.",
+      "Original timing is 3181-3238; no current matching record exists for comparison.",
+      "Provided current artifact raw SHA256 and normalized-LF SHA256 differ; neither artifact bytes nor historical bytes were verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-30-exploring-identity-success-counseling",
+        "turnId": "2026-06-30-exploring-identity-success-counseling-t073",
+        "contextVersion": "originalMigration",
+        "quote": "his definition of success is, is a four-legged table uh with with wealth or or financial um stability and, and strength, uh but health, purpose, and relationships.",
+        "textSha256": "2b63021210d5175b606725e86817fe8c9253d876549eefa7523f9d6b37da2def",
+        "contextSha256": "7a94b144f0698fe17b5db12aa3851cfbb09a41daccbf4ef60f9bc2581a74b088",
+        "artifactSha256": "f128e50c567ed7b450e437e9ff5e4fa5ce96e141da9fe624608495a8ed38f93c",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 3181,
+        "tEnd": 3238,
+        "supports": "Supports the four-legged success table and financial stability component; does not directly identify Andrew Hallam as the referenced author."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unresolvable",
+    "reason": "The sole cited turn is absent from the supplied current context; no current evidence can resolve any component of the claim.",
+    "missingReferences": [
+      {
+        "sessionId": "2026-06-30-exploring-identity-success-counseling",
+        "turnId": "2026-06-30-exploring-identity-success-counseling-t073",
+        "reason": "turn-absent"
+      }
+    ],
+    "caveats": [
+      "Original support was not substituted for the missing current citation.",
+      "No current timing or speaker record is available."
+    ],
+    "citations": []
+  },
+  "sameIdContentChanged": false,
+  "shortReason": "Original text supports the table and financial stability but not the Andrew Hallam attribution; current cited turn is absent. No duplicate reference or supplied same-ID changed-content flag. Human adjudication remains open."
+}

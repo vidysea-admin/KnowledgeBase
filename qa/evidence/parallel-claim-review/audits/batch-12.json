@@ -1,0 +1,297 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "AI-preliminary-independent-audit",
+  "humanAdjudication": null,
+  "batch": 12,
+  "entries": [
+    {
+      "index": 60,
+      "claimId": "2026-08-24-uniaccess-leeds-arts-university-c02",
+      "inputHash": "044acefdd4c445bf895449062077d842af2bc906a711cb8c5e76240275e969a6",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original states a minimum £2,000 scholarship in a range specifically for Indian students, with larger awards depending on availability and portfolio quality; eligibility remains unspecified. Current t040 asks about creative industry growth and supplies no scholarship evidence. Same ID has changed content, timings and speakerRef. Context-only transcript assessment; external truth and person identities remain unadjudicated.",
+      "evidenceHashes": {
+        "inputHash": "044acefdd4c445bf895449062077d842af2bc906a711cb8c5e76240275e969a6",
+        "claimRecordSha256": "58bed36e9266701164ee9e23ffd76fa1591aa4253f71007b910d991673806d35",
+        "claimTextSha256": "09042b7f3f0302aba09d6574ee049189595eee995af0b0ae8ae650ad1fb5d4dc",
+        "sourceBindingSha256": "73e4fd249c6ce1b20b0cd116da0dc2737ac4b24b66578afb1d059995b657ec68",
+        "contexts": [
+          {
+            "version": "originalMigration",
+            "turnId": "2026-08-24-uniaccess-leeds-arts-university-t040",
+            "textSha256": "2ba4f18ed48fefa83cf40973e3e20bfd1de9b3add8fba1a85572f64a5627158b",
+            "providedTextSha256": "2ba4f18ed48fefa83cf40973e3e20bfd1de9b3add8fba1a85572f64a5627158b",
+            "contextSha256": "3ad87f8999517542efb35cf69f775ca74969d0cb924fc79197ca0d0f2ea26cfc",
+            "artifactSha256": "fd835b78b01a869731e56e8de8775f0104f505f5f82e2272be9e8499917d60b8",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 3208,
+            "tEnd": 3508
+          },
+          {
+            "version": "current",
+            "turnId": "2026-08-24-uniaccess-leeds-arts-university-t040",
+            "textSha256": "a94e33648ab6bce0b5d9b4064783e7bb370fb41692dca1d716cce3978a8bddec",
+            "providedTextSha256": "a94e33648ab6bce0b5d9b4064783e7bb370fb41692dca1d716cce3978a8bddec",
+            "contextSha256": "b2063c34d99e1e4aca08f9f455d2c6a7c4edb38ddd6993034bd1b2895f742bad",
+            "artifactSha256": "69e1be5a61cecd344422d130c12ed259c96112ffd9c553745a4de0d376ceb98c",
+            "normalizedLfSha256": "a195884b2c4f5131663d2d4c5df4d30b0b602c41bbd0dd4a0ed22caf2597a7ea",
+            "revision": null,
+            "speakerRef": "spk:0",
+            "tStart": 2511,
+            "tEnd": 2525
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true
+        }
+      },
+      "reviewerLabels": {
+        "originalLabel": "entailed",
+        "currentLabel": "unsupported",
+        "inputHash": "044acefdd4c445bf895449062077d842af2bc906a711cb8c5e76240275e969a6",
+        "resultSha256": "306f4d754ee274273e82b258682b27360d0f8bbc08a405ea87076760c34188e9"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 61,
+      "claimId": "2026-08-24-uniaccess-leeds-arts-university-c03",
+      "inputHash": "ea824c0fe97542a67283c1d4e36fe5086379c790e72111e44d41f539baae7d48",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original states the Leeds Government School moved to Vernon Street in 1903 but does not identify it as the foundation-student campus; that component prevents full entailment. Current t036 discusses Leeds facilities, careers and scholarships, without Vernon Street or the move. Same ID has changed content, timings and speakerRef. Context-only transcript assessment; external truth and person identities remain unadjudicated.",
+      "evidenceHashes": {
+        "inputHash": "ea824c0fe97542a67283c1d4e36fe5086379c790e72111e44d41f539baae7d48",
+        "claimRecordSha256": "8c63a7364531a2d7d2d642f23a405a26381883cda7994dc152237f6c0cccf988",
+        "claimTextSha256": "4fb03f45d3dc0612f76855607587a5c18a28a276708d3af4f17312af2ceb5b1e",
+        "sourceBindingSha256": "73e4fd249c6ce1b20b0cd116da0dc2737ac4b24b66578afb1d059995b657ec68",
+        "contexts": [
+          {
+            "version": "originalMigration",
+            "turnId": "2026-08-24-uniaccess-leeds-arts-university-t036",
+            "textSha256": "8f0b2b7623a92dea3b83ef2080a89c1a0d0247239cf5edd959e563743b6997cf",
+            "providedTextSha256": "8f0b2b7623a92dea3b83ef2080a89c1a0d0247239cf5edd959e563743b6997cf",
+            "contextSha256": "7fda4f5c401b6c75879a94cefeba4f9f74443e3f8a1433dfab49c51d17c5c69a",
+            "artifactSha256": "fd835b78b01a869731e56e8de8775f0104f505f5f82e2272be9e8499917d60b8",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 2904,
+            "tEnd": 3039
+          },
+          {
+            "version": "current",
+            "turnId": "2026-08-24-uniaccess-leeds-arts-university-t036",
+            "textSha256": "38d9ddaf403a28feecd62128cd310dbb8ad6000dbb3e8e70abd1c863ba559035",
+            "providedTextSha256": "38d9ddaf403a28feecd62128cd310dbb8ad6000dbb3e8e70abd1c863ba559035",
+            "contextSha256": "491b31718dec9aa68127a8b4f9ad9a55f81ff47dc4de06106f763d6ad9307677",
+            "artifactSha256": "69e1be5a61cecd344422d130c12ed259c96112ffd9c553745a4de0d376ceb98c",
+            "normalizedLfSha256": "a195884b2c4f5131663d2d4c5df4d30b0b602c41bbd0dd4a0ed22caf2597a7ea",
+            "revision": null,
+            "speakerRef": "spk:0",
+            "tStart": 2008,
+            "tEnd": 2487
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true
+        }
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unsupported",
+        "inputHash": "ea824c0fe97542a67283c1d4e36fe5086379c790e72111e44d41f539baae7d48",
+        "resultSha256": "7a280e02d3a23631db497d3c71c3173d1dc92fb0eb4214870c52f392d2133f51"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 62,
+      "claimId": "2026-08-27-in-focus-4-c01",
+      "inputHash": "8a37a8ede0c45ab340c2b62d1eaf61049879d66471435e7276d43ac7b9de5db5",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original describes a physical mithai ka dabba flashcard box with about 1,500-plus words, but the literal record does not identify the provider as Education & You and retains the approximate qualifier. Current t020 concerns reading passages, without the box or word count. Same ID has changed content, timings and speakerRef. Context-only transcript assessment; external truth and person identities remain unadjudicated.",
+      "evidenceHashes": {
+        "inputHash": "8a37a8ede0c45ab340c2b62d1eaf61049879d66471435e7276d43ac7b9de5db5",
+        "claimRecordSha256": "c17c10cd28f2138434439a34dc00db2b50d5536785a634d738e06f9a1bc6618c",
+        "claimTextSha256": "7c54c56052f0f21346b0e7421a4796a4fd325a4c39d73c8b9261e96592bb9308",
+        "sourceBindingSha256": "718ed04509468bb519435187d9de4d2cdf8d5a86b519f0142fec5009e53060f1",
+        "contexts": [
+          {
+            "version": "originalMigration",
+            "turnId": "2026-08-27-in-focus-4-t020",
+            "textSha256": "78dc169ecd3027404a89b695582a3fa7b5cb89caba32be415ad061b8c0e31a9a",
+            "providedTextSha256": "78dc169ecd3027404a89b695582a3fa7b5cb89caba32be415ad061b8c0e31a9a",
+            "contextSha256": "d259b4588f8ff81c930a36cc6d23a75ccc536fc6f22530934e3534e0493fbbbd",
+            "artifactSha256": "4ad967ba1a61b723719068868214ee5a18671bbc279beb29e43a6aea2579765f",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 657,
+            "tEnd": 732
+          },
+          {
+            "version": "current",
+            "turnId": "2026-08-27-in-focus-4-t020",
+            "textSha256": "1949191be8ed6806df27de1735a6d74374e6a1fe0e6090c55c1904475b63128a",
+            "providedTextSha256": "1949191be8ed6806df27de1735a6d74374e6a1fe0e6090c55c1904475b63128a",
+            "contextSha256": "c7bd424b601181bf7340a59e07024db590132a1af622838b3fdf58f18c34bd7d",
+            "artifactSha256": "e831dc37eb547a4afcfec47287331d7785713f3116db6d8cda1486bcf04f243e",
+            "normalizedLfSha256": "1ade9c5ebf5792d320286d82ceba6b2785e3bba3c96490cdeb1e99f9b6d3c044",
+            "revision": null,
+            "speakerRef": "Parthosh",
+            "tStart": 1773,
+            "tEnd": 1796
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true
+        }
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unsupported",
+        "inputHash": "8a37a8ede0c45ab340c2b62d1eaf61049879d66471435e7276d43ac7b9de5db5",
+        "resultSha256": "515097efb9ee57683732944b83e5511db88e02556f6295b25ffdef774869673e"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 63,
+      "claimId": "2026-08-27-in-focus-4-c02",
+      "inputHash": "3cd408ffec294a0c6c62c4bd14d0b8b7e05a0b19af185894f26e4882dde584b0",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original says they try to run a diagnostic test across exams before a personalized plan, which does not establish every student is tested; the literal record also does not identify Education & You. Current t014 discusses college access and success, without this testing process. Same ID has changed content, timings and speakerRef. Context-only transcript assessment; external truth and person identities remain unadjudicated.",
+      "evidenceHashes": {
+        "inputHash": "3cd408ffec294a0c6c62c4bd14d0b8b7e05a0b19af185894f26e4882dde584b0",
+        "claimRecordSha256": "162065200bf00164cc45ea130b3c1f0598caf890e8377ee2a49dc4f58ad29e4e",
+        "claimTextSha256": "5d22952c2c0a4ff848b1fae27fc2b69a61a1733b2035014863d6a4916c55526a",
+        "sourceBindingSha256": "718ed04509468bb519435187d9de4d2cdf8d5a86b519f0142fec5009e53060f1",
+        "contexts": [
+          {
+            "version": "originalMigration",
+            "turnId": "2026-08-27-in-focus-4-t014",
+            "textSha256": "c8094703f7288857ebe432771e5f252159f03e100cf479db93d55eeb02381465",
+            "providedTextSha256": "c8094703f7288857ebe432771e5f252159f03e100cf479db93d55eeb02381465",
+            "contextSha256": "b120f916e98ef2c9c158ee7d92e655f0de274b9537d39bb9d3e6c08820ab55c6",
+            "artifactSha256": "4ad967ba1a61b723719068868214ee5a18671bbc279beb29e43a6aea2579765f",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 357,
+            "tEnd": 416
+          },
+          {
+            "version": "current",
+            "turnId": "2026-08-27-in-focus-4-t014",
+            "textSha256": "63173db1f3a1512fcdcfb33b692d1c94cb234d446d12535ac44ae80d0ae84dc8",
+            "providedTextSha256": "63173db1f3a1512fcdcfb33b692d1c94cb234d446d12535ac44ae80d0ae84dc8",
+            "contextSha256": "95d16f40c7015bb57b5ebc20890dcee134a859f9c1e529a431f7267b65f790f0",
+            "artifactSha256": "e831dc37eb547a4afcfec47287331d7785713f3116db6d8cda1486bcf04f243e",
+            "normalizedLfSha256": "1ade9c5ebf5792d320286d82ceba6b2785e3bba3c96490cdeb1e99f9b6d3c044",
+            "revision": null,
+            "speakerRef": "Parthosh",
+            "tStart": 1594,
+            "tEnd": 1722
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true
+        }
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unsupported",
+        "inputHash": "3cd408ffec294a0c6c62c4bd14d0b8b7e05a0b19af185894f26e4882dde584b0",
+        "resultSha256": "aa982583a362ccf6b1d6a0401ccb6aba8e0b5abee775e559df07e5d123c4acb3"
+      },
+      "agreement": true,
+      "disagreements": [
+        {
+          "type": "preparation-state",
+          "reason": "Matching results/63.json was missing at first comparison. Independent classification completed; reviewer comparison pending. No polling performed.",
+          "resolved": true,
+          "resolution": "Parent confirmed readiness; one resumed comparison read completed. Reviewer unsupported/unsupported agrees with previously frozen independent labels."
+        }
+      ]
+    },
+    {
+      "index": 64,
+      "claimId": "2026-08-27-in-focus-4-c03",
+      "inputHash": "7fe74f8eb0ce6920bc258a3fe20929e5c14321ae6ef63697c2ec9a26fe696a56",
+      "originalLabel": "unsupported",
+      "currentLabel": "unresolvable",
+      "reason": "Original identifies NotebookLM as Google's reading tool in a question-and-answer exchange, describing explanations and podcast discussion, but does not state dense readings are summarized. Current t102 is absent, so current support is unresolvable. Historical speakerRef is unknown; absent current evidence cannot be replaced by original support. Context-only transcript assessment; external truth and person identities remain unadjudicated.",
+      "evidenceHashes": {
+        "inputHash": "7fe74f8eb0ce6920bc258a3fe20929e5c14321ae6ef63697c2ec9a26fe696a56",
+        "claimRecordSha256": "96a45970c927ad0e45ce27d4657e75c31c274d07e3cc7daaa453eae79bb73a19",
+        "claimTextSha256": "0eba46c193eecb3e292b8e638cbfdce0f221ad1ad1f123fce555b1a48d18cc00",
+        "sourceBindingSha256": "718ed04509468bb519435187d9de4d2cdf8d5a86b519f0142fec5009e53060f1",
+        "contexts": [
+          {
+            "version": "originalMigration",
+            "turnId": "2026-08-27-in-focus-4-t102",
+            "textSha256": "6cec7524caa0af3633ba8011a12ea33bf704defed88a13cdd69480a6e81a71ab",
+            "providedTextSha256": "6cec7524caa0af3633ba8011a12ea33bf704defed88a13cdd69480a6e81a71ab",
+            "contextSha256": "500d904d2fc03568d33fe2059a9e7fdbf8ec275d3546385608a375304f5680f0",
+            "artifactSha256": "4ad967ba1a61b723719068868214ee5a18671bbc279beb29e43a6aea2579765f",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 2959,
+            "tEnd": 2998
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true
+        }
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unresolvable",
+        "inputHash": "7fe74f8eb0ce6920bc258a3fe20929e5c14321ae6ef63697c2ec9a26fe696a56",
+        "resultSha256": "af05ca6e4ff3dbf05f72127fd22b653cb662df0be817bad6f0c42691c425ce3f"
+      },
+      "agreement": true,
+      "disagreements": []
+    }
+  ]
+}

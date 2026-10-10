@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "index": 40,
+  "originalIndex": 42,
+  "claimId": "2026-07-08-beyond-black-robes-law-careers-c02",
+  "inputHash": "ad82078a2167a21e820f0ed84c1afbbcb1cca0e5b158049b297f3861e0d8ebb1",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The original cited text explicitly states the named firm employed Harvey AI in late September 2025, followed by other law firms adopting named AI tools. Both factual components are supported as transcript statements.",
+    "missingReferences": [],
+    "caveats": [
+      "Transcript support does not establish external factual truth, adoption dates, or tool identities.",
+      "speakerRef is unknown; the name embedded in transcript text does not independently establish speaker identity.",
+      "Session calendar metadata does not independently verify the claimed adoption timing.",
+      "The same turn ID has changed content, speakerRef and timings in the current context."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "turnId": "2026-07-08-beyond-black-robes-law-careers-t115",
+        "contextVersion": "originalMigration",
+        "quote": "Shardul Amarchand Mangaldas employed Harvey AI in late September 2025, followed by other law firms which also went on with Lucidity / Lucio AI for that matter, or Claude for Legal by Anthropic,",
+        "textSha256": "86685998d3f1eee11db38145e16620ca4beacb2fa6c0fbf287fd7127b22f12d5",
+        "contextSha256": "9c7ed763b3921286af98f3d143a354292ba2a55effc7f3c1959c952507cb133a",
+        "artifactSha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 3643,
+        "tEnd": 3700,
+        "supports": "Supports the named firm, Harvey AI, late September 2025 timing, and subsequent adoption of similar AI tools by other law firms."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited text discusses legal teams in universities and consulting firms. It supports neither the named firm adopting Harvey AI, the September 2025 date, nor later adoption of similar tools by other law firms.",
+    "missingReferences": [],
+    "caveats": [
+      "Same ID changed from AI adoption at 3643–3700 seconds to legal teams at 3852–3869 seconds; original support cannot substitute for current evidence.",
+      "The stored speakerRef Harshwardhan Tiwari is not independently identity-verified.",
+      "Unsupported means these cited words do not establish the claim; it does not establish that the claim is false."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "turnId": "2026-07-08-beyond-black-robes-law-careers-t115",
+        "contextVersion": "current",
+        "quote": "Even that had a legal team. In fact, the one where I am working right now, has a legal team.",
+        "textSha256": "fad4f0293a4ce74beb5176a0cbc77b09781730a2777d2dd31499808653789eb7",
+        "contextSha256": "bd5a494e7858c40178e75487bf852886e20616429c761a0d2af8fda84772ec7a",
+        "artifactSha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+        "revision": null,
+        "speakerRef": "Harshwardhan Tiwari",
+        "tStart": 3852,
+        "tEnd": 3869,
+        "supports": "Unrelated discussion of legal teams; supports none of the AI-adoption claim components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original context supports both adoption components; the same-ID current context is unrelated. All supplied canonical/text hashes and row-session bindings verify; artifact byte hashes were not independently verified."
+}

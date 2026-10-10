@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "index": 52,
+  "originalIndex": 57,
+  "claimId": "2026-08-03-uk-beyond-offer-letters-c02",
+  "inputHash": "695810f1f6877592198816d65e4a93eba1c36d7ff319806e34e60b45d225f29a",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The original citation supports Exeter onboarding Enroly CAS Shield and using it for CAS/visa processing, but does not identify the additional checks as financial or credibility checks or specify pre-CAS timing.",
+    "missingReferences": [],
+    "caveats": [
+      "speakerRef is unknown; the name in transcript text does not establish verified person identity.",
+      "No missing or duplicate original reference; one supplied match.",
+      "Relative now does not establish a calendar date or external factual truth.",
+      "Historical artifact hash denotes supplied raw bytes; on-disk/historical bytes were not verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-t061",
+        "contextVersion": "originalMigration",
+        "quote": "So we have onboarded the Enroly CAS Shield platform, so we're using CAS Shield now to work through our CASes and our visa process.",
+        "textSha256": "40659e544b2819e5775e65820d46e3d82e8facfdb496325a8aea6ad0014ed772",
+        "contextSha256": "4007a55463ede7f1cd034c006b9ffec497dbdff42518ad213dbac7c340931570",
+        "artifactSha256": "5bb9aca4b53d64656b2b0515d9485424d042a099ce5fad916b8b6a69fa4d1d14",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1602,
+        "tEnd": 1621,
+        "supports": "Supports Exeter onboarding Enroly CAS Shield for CAS and visa processing; generic additional admissions/enrollment checks do not establish pre-CAS financial or credibility checks."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unresolvable",
+    "reason": "The sole cited turn t061 is absent from the supplied current context, so no current evidence supports any component.",
+    "missingReferences": [
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-t061",
+        "reason": "turn-absent; no current match supplied"
+      }
+    ],
+    "caveats": [
+      "Original support cannot substitute for missing current evidence.",
+      "No duplicate current match; the sole reference is missing.",
+      "Current raw artifact SHA256 differs from normalizedLfSha256; neither artifact was read or byte-verified."
+    ],
+    "citations": []
+  },
+  "sameIdContentChanged": false,
+  "shortReason": "Original support is partial: onboarding is explicit, but financial/credibility purpose and pre-CAS timing are unspecified. Current reference is missing; supplied same-ID changed-content flag is false. Human adjudication remains open."
+}

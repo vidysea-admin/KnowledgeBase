@@ -1,0 +1,406 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "AI-preliminary-independent-audit",
+  "humanAdjudication": null,
+  "batch": 1,
+  "entries": [
+    {
+      "index": 5,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c01",
+      "inputHash": "d420035764d74e7bc7ce8e720a953e045dcded40ddd50ea42a97cc0185d40cdb",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original numerically supports approximately 1% own markup versus Flywire/bank 2%-2.5%, but 'our markup' does not establish FRR Forex attribution. Current interactive-conversation text supports none of the financial components. All provided input, canonical claim/source-binding and context-text hashes pass; references resolve uniquely. Same IDs changed text, speakerRef and timing in all supplied contexts. Stored historical speakerRef is unknown; identities and external truth remain unadjudicated. Raw artifact and normalized-LF pins are distinct; artifact byte verification was not performed.",
+      "evidenceHashes": {
+        "checks": {
+          "inputHash": {
+            "actual": "d420035764d74e7bc7ce8e720a953e045dcded40ddd50ea42a97cc0185d40cdb",
+            "expected": "d420035764d74e7bc7ce8e720a953e045dcded40ddd50ea42a97cc0185d40cdb",
+            "verified": true
+          },
+          "claimRecordHash": {
+            "actual": "44c3ae292498e65142a8a278a8729f0a367675648a7ca47445aaf10e60dfd71f",
+            "expected": "44c3ae292498e65142a8a278a8729f0a367675648a7ca47445aaf10e60dfd71f",
+            "verified": true
+          },
+          "claimTextHash": {
+            "actual": "69741c2542fac6bee2a6d7473455217a60f1ff142dabc6b7187d0026f354d0d2",
+            "expected": "69741c2542fac6bee2a6d7473455217a60f1ff142dabc6b7187d0026f354d0d2",
+            "verified": true
+          },
+          "sourceBindingHash": {
+            "actual": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+            "expected": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+            "verified": true
+          }
+        },
+        "identityBinding": true,
+        "contextTextHashes": true,
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t037",
+            "textSha256": "6671c1f668f493a03bdc16b5523885d6c44f4f8d65447577325477cdfdcb1eb9",
+            "providedTextSha256": "6671c1f668f493a03bdc16b5523885d6c44f4f8d65447577325477cdfdcb1eb9",
+            "textHashVerified": true,
+            "contextSha256": "94039ccafcd9d0ebc966ce224e1eb90fa3b6a7a6d9e2e487c0238a2a93b64984",
+            "artifactSha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 1448,
+            "tEnd": 1486
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t037",
+            "textSha256": "b2a37ba69ce2ea3411c7f9e9e6c61188bf09856914526908ff1981b039d616c5",
+            "providedTextSha256": "b2a37ba69ce2ea3411c7f9e9e6c61188bf09856914526908ff1981b039d616c5",
+            "textHashVerified": true,
+            "contextSha256": "ba16d705da07d9b1c9fc495f8e5e94c6de078bcd98d0bfcd246286f70b50049d",
+            "artifactSha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+            "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+            "revision": null,
+            "speakerRef": "Nikhil",
+            "tStart": 1902,
+            "tEnd": 1905
+          }
+        ],
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "reviewerResultSha256": "54feb0c9a6835915e198c04b741f1165e57002836b02f5cfc57b91ce9a268f08",
+        "reviewerCitationValidation": true
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 6,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c02",
+      "inputHash": "c7a34c8cee46fb8927442a719177cbb0e3867246d59ce7b6db502274b35b7666",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original directly gives the exclusive mother/father/sibling/spouse list and FEMA attribution in an outward-remittance/student-family context; education purpose is contextual. Current screen-share request supplies no family restriction or FEMA support. All provided input, canonical claim/source-binding and context-text hashes pass; references resolve uniquely. Same IDs changed text, speakerRef and timing in all supplied contexts. Stored historical speakerRef is unknown; identities and external truth remain unadjudicated. Raw artifact and normalized-LF pins are distinct; artifact byte verification was not performed.",
+      "evidenceHashes": {
+        "checks": {
+          "inputHash": {
+            "actual": "c7a34c8cee46fb8927442a719177cbb0e3867246d59ce7b6db502274b35b7666",
+            "expected": "c7a34c8cee46fb8927442a719177cbb0e3867246d59ce7b6db502274b35b7666",
+            "verified": true
+          },
+          "claimRecordHash": {
+            "actual": "07cd7091f499781de065709fcf599a4da309cc14f3b20c45fcbe66756694ff52",
+            "expected": "07cd7091f499781de065709fcf599a4da309cc14f3b20c45fcbe66756694ff52",
+            "verified": true
+          },
+          "claimTextHash": {
+            "actual": "92e3fd4ceeef9859da990122accb42dcb62a16c597bb26514f437cdd9d14f4f3",
+            "expected": "92e3fd4ceeef9859da990122accb42dcb62a16c597bb26514f437cdd9d14f4f3",
+            "verified": true
+          },
+          "sourceBindingHash": {
+            "actual": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+            "expected": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+            "verified": true
+          }
+        },
+        "identityBinding": true,
+        "contextTextHashes": true,
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t029",
+            "textSha256": "4324ed5508a330c545f12ce5a93e8e69e9df984271fb456991f84378bb936675",
+            "providedTextSha256": "4324ed5508a330c545f12ce5a93e8e69e9df984271fb456991f84378bb936675",
+            "textHashVerified": true,
+            "contextSha256": "382d6b510f3a7e7168be0ccbb01b58c1e5e1c1ad81b3f61f7223a49d2d604934",
+            "artifactSha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 1173,
+            "tEnd": 1226
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t029",
+            "textSha256": "70b6142c9faf6f96daf8e63ab17f6b34b07167f57528cc09bf655757654f2ed8",
+            "providedTextSha256": "70b6142c9faf6f96daf8e63ab17f6b34b07167f57528cc09bf655757654f2ed8",
+            "textHashVerified": true,
+            "contextSha256": "afd5320f2f3c4bfa55e0c77728514c5f7c468b3ca654bde44d5cfaf6172ff232",
+            "artifactSha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+            "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+            "revision": null,
+            "speakerRef": "Nikhil",
+            "tStart": 1798,
+            "tEnd": 1805
+          }
+        ],
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "reviewerResultSha256": "3df0f6505b345ae2bbee030f373ebfd22c5b3867e2532ddd8271068f8770d457",
+        "reviewerCitationValidation": true
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 7,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c03",
+      "inputHash": "5e998afbd962e3c2e72b8934a720078702febd16443fe327d0b444035711d7cc",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original education-loan discussion states 'It ensures all interest benefit under Section 80E.', supporting the modest tax-benefit claim without asserting universal eligibility. Current education-completion/EMI question leaves 'these' unresolved and supplies no Section 80E assertion. All provided input, canonical claim/source-binding and context-text hashes pass; references resolve uniquely. Same IDs changed text, speakerRef and timing in all supplied contexts. Stored historical speakerRef is unknown; identities and external truth remain unadjudicated. Raw artifact and normalized-LF pins are distinct; artifact byte verification was not performed.",
+      "evidenceHashes": {
+        "checks": {
+          "inputHash": {
+            "actual": "5e998afbd962e3c2e72b8934a720078702febd16443fe327d0b444035711d7cc",
+            "expected": "5e998afbd962e3c2e72b8934a720078702febd16443fe327d0b444035711d7cc",
+            "verified": true
+          },
+          "claimRecordHash": {
+            "actual": "5ad86aa5a26cfc0d294c50df0cfd396dd4aee99dd0961d8bbc67aec2e6f4b706",
+            "expected": "5ad86aa5a26cfc0d294c50df0cfd396dd4aee99dd0961d8bbc67aec2e6f4b706",
+            "verified": true
+          },
+          "claimTextHash": {
+            "actual": "600ffe44370efd9dbdbf424881d127bcc0b105e7cced0341ba02cdd837a62125",
+            "expected": "600ffe44370efd9dbdbf424881d127bcc0b105e7cced0341ba02cdd837a62125",
+            "verified": true
+          },
+          "sourceBindingHash": {
+            "actual": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+            "expected": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+            "verified": true
+          }
+        },
+        "identityBinding": true,
+        "contextTextHashes": true,
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t074",
+            "textSha256": "ccfa8f05b9cd03447dc52bedc2ce62dbec21f2a65b2959b58088079b1701ddf9",
+            "providedTextSha256": "ccfa8f05b9cd03447dc52bedc2ce62dbec21f2a65b2959b58088079b1701ddf9",
+            "textHashVerified": true,
+            "contextSha256": "fa8f045a49f7f8263bbd65a36d320e516f8353ad657316e91d3ccd0b5ea39b54",
+            "artifactSha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 2118,
+            "tEnd": 2167
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t074",
+            "textSha256": "67bffca0176040a2694d9a0626a0da255ab418266fe1515d55993212ea79c7e4",
+            "providedTextSha256": "67bffca0176040a2694d9a0626a0da255ab418266fe1515d55993212ea79c7e4",
+            "textHashVerified": true,
+            "contextSha256": "bae2aaedb7907fbfd4a428b6b21a5c547d2854ddb43f5c245ebc59ea708a5c63",
+            "artifactSha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+            "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+            "revision": null,
+            "speakerRef": "Kanchan",
+            "tStart": 3783,
+            "tEnd": 3792
+          }
+        ],
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "reviewerResultSha256": "13b7288b98adb5d2568af29438d21271298afef5a45a3eece1970b65b27670cb",
+        "reviewerCitationValidation": true
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 8,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c04",
+      "inputHash": "37f16421722de283ee6470e0a90a0df16d9f16a7828bf87cbe0840c879a3f749",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original states an offered 20-year undergraduate tenure and INR1.5 crore unsecured amount. It does not identify HDFC Credila, state maximum/up-to limits, or establish general education-loan scope. Current closing/networking text supplies none of those product terms. All provided input, canonical claim/source-binding and context-text hashes pass; references resolve uniquely. Same IDs changed text, speakerRef and timing in all supplied contexts. Stored historical speakerRef is unknown; identities and external truth remain unadjudicated. Raw artifact and normalized-LF pins are distinct; artifact byte verification was not performed.",
+      "evidenceHashes": {
+        "checks": {
+          "inputHash": {
+            "actual": "37f16421722de283ee6470e0a90a0df16d9f16a7828bf87cbe0840c879a3f749",
+            "expected": "37f16421722de283ee6470e0a90a0df16d9f16a7828bf87cbe0840c879a3f749",
+            "verified": true
+          },
+          "claimRecordHash": {
+            "actual": "2c37963c4c9ef68d0322d4f1fe4a98360eb64f4f8639abdbeef9c071c27b0eba",
+            "expected": "2c37963c4c9ef68d0322d4f1fe4a98360eb64f4f8639abdbeef9c071c27b0eba",
+            "verified": true
+          },
+          "claimTextHash": {
+            "actual": "4893ee7c4a7f0d95226950799ded79e8faf977974314b2887b3503d0b1ac4b98",
+            "expected": "4893ee7c4a7f0d95226950799ded79e8faf977974314b2887b3503d0b1ac4b98",
+            "verified": true
+          },
+          "sourceBindingHash": {
+            "actual": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+            "expected": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+            "verified": true
+          }
+        },
+        "identityBinding": true,
+        "contextTextHashes": true,
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t080",
+            "textSha256": "f813cf2ac00a4274ca5a663c2972623c5733fffd8659850cd078dda9d7485775",
+            "providedTextSha256": "f813cf2ac00a4274ca5a663c2972623c5733fffd8659850cd078dda9d7485775",
+            "textHashVerified": true,
+            "contextSha256": "d65e727fc7cca26d594dc7fbbe5eaef7c2c81b9d7d16fa35d9d0e57a3c6f398c",
+            "artifactSha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 2370,
+            "tEnd": 2418
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t080",
+            "textSha256": "eb69be51ec21d575487aaf14b81640a85d5a585d71ddb23af0783a4c0445d5fd",
+            "providedTextSha256": "eb69be51ec21d575487aaf14b81640a85d5a585d71ddb23af0783a4c0445d5fd",
+            "textHashVerified": true,
+            "contextSha256": "eb1dce91695909de25a97179784cc17145a55e6d62e32af2f75b2dcbe6ede9cf",
+            "artifactSha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+            "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+            "revision": null,
+            "speakerRef": "Nikhil",
+            "tStart": 3845,
+            "tEnd": 3940
+          }
+        ],
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "reviewerResultSha256": "f5af9048cfecb0135d7ddfa028f4fdedaa115000d14766bee581ce3dee038db7",
+        "reviewerCitationValidation": true
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 9,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c05",
+      "inputHash": "02c877390ca5f7bba11ba44cef4fc1e8a08f3fd01f9ea00b87bab1e7d2d59a1c",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original supports parent anxiety about LRS/FEMA/TCS and confusion around education TCS, but not counselors or the entire population/frequency generalization. Both current texts concern screen sharing or an unspecified desire and do not support the financial-rule claim. All provided input, canonical claim/source-binding and context-text hashes pass; references resolve uniquely. Same IDs changed text, speakerRef and timing in all supplied contexts. Stored historical speakerRef is unknown; identities and external truth remain unadjudicated. Raw artifact and normalized-LF pins are distinct; artifact byte verification was not performed.",
+      "evidenceHashes": {
+        "checks": {
+          "inputHash": {
+            "actual": "02c877390ca5f7bba11ba44cef4fc1e8a08f3fd01f9ea00b87bab1e7d2d59a1c",
+            "expected": "02c877390ca5f7bba11ba44cef4fc1e8a08f3fd01f9ea00b87bab1e7d2d59a1c",
+            "verified": true
+          },
+          "claimRecordHash": {
+            "actual": "085e98bb4d793899f03188177db01a8beffbf26d048fdb964b238ca0267fd151",
+            "expected": "085e98bb4d793899f03188177db01a8beffbf26d048fdb964b238ca0267fd151",
+            "verified": true
+          },
+          "claimTextHash": {
+            "actual": "c2abfb6caada21943a30f11acfdddcd1e999db926f2e05a77761152afd1bf935",
+            "expected": "c2abfb6caada21943a30f11acfdddcd1e999db926f2e05a77761152afd1bf935",
+            "verified": true
+          },
+          "sourceBindingHash": {
+            "actual": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+            "expected": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+            "verified": true
+          }
+        },
+        "identityBinding": true,
+        "contextTextHashes": true,
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t018",
+            "textSha256": "4fdedb7771aa9a61dbee3fd24eaff7d5e8b55fc771d5c2fde0086a8a3959af2f",
+            "providedTextSha256": "4fdedb7771aa9a61dbee3fd24eaff7d5e8b55fc771d5c2fde0086a8a3959af2f",
+            "textHashVerified": true,
+            "contextSha256": "187f1f5ab0e6e1f6d7f1e6ea2a2eb7a97fb26f4bf2e6ff63385bc8f85f688ac9",
+            "artifactSha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 729,
+            "tEnd": 756
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t018",
+            "textSha256": "4d8e4e09bdbf6dc6884d0bae5e20b77945f46ee2ce041918f35a20e73735f144",
+            "providedTextSha256": "4d8e4e09bdbf6dc6884d0bae5e20b77945f46ee2ce041918f35a20e73735f144",
+            "textHashVerified": true,
+            "contextSha256": "cfa1c7475666e6d2a2e8b191c63db9c38fef1b9f27e4d7dab020e2553ead6590",
+            "artifactSha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+            "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+            "revision": null,
+            "speakerRef": "Shweta",
+            "tStart": 1726,
+            "tEnd": 1741
+          },
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t030",
+            "textSha256": "dbcef9ced723a21d9c83b69b4132ccdd957f4db8ae9ccd8236cc9429ebe547eb",
+            "providedTextSha256": "dbcef9ced723a21d9c83b69b4132ccdd957f4db8ae9ccd8236cc9429ebe547eb",
+            "textHashVerified": true,
+            "contextSha256": "9691d2d90522b979265d263121f383831ec2618d88512cb4ea4b7cb916fad031",
+            "artifactSha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 1226,
+            "tEnd": 1268
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t030",
+            "textSha256": "9a5fcdf1fee07d60c004b54291bc33946fe03453808b1d66e2e27a6b8a609b63",
+            "providedTextSha256": "9a5fcdf1fee07d60c004b54291bc33946fe03453808b1d66e2e27a6b8a609b63",
+            "textHashVerified": true,
+            "contextSha256": "eb8225336a1346a7cff9e0c1dc11362fb12a8793974986846157f1f12622816a",
+            "artifactSha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+            "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+            "revision": null,
+            "speakerRef": "Shweta",
+            "tStart": 1805,
+            "tEnd": 1810
+          }
+        ],
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "reviewerResultSha256": "91025ca64fb280265a024c7a4273cbc08b5cd74e0c113dd93645bd1be9fe841c",
+        "reviewerCitationValidation": true
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    }
+  ]
+}

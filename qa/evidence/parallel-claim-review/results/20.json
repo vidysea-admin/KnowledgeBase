@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "index": 20,
+  "originalIndex": 22,
+  "claimId": "2026-05-29-decoding-ever-expanding-cast-c01",
+  "inputHash": "9255cc06d7e74cbd7c5d45b9842f0c51e613568affd3e5d9125fd7387e6ff716",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The original citation directly supports mapping a provisional count of 24 broad role categories across a lifecycle. This supplied context does not explicitly bind that lifecycle to a student educational journey or establish that all categories are distinct professional roles; those claim components require additional context.",
+    "missingReferences": [],
+    "caveats": [
+      "The count is provisional: categories may be missing, totals could exceed 50, and umbrella categories may contain subcategories.",
+      "Stored speakerRef is unknown; the text prefix Bhakti does not establish verified person identity.",
+      "Original timing is 253-303; the same turn ID now refers to different text at 389-446.",
+      "Only supplied contexts reviewed; historical artifact bytes and external factual truth remain unverified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "turnId": "2026-05-29-decoding-ever-expanding-cast-t012",
+        "contextVersion": "originalMigration",
+        "quote": "At this point according at at our count, it's 24, but Devesh, you could well be right, it could be over 50. These are umbrellas, right? Like these are umbrella categories.",
+        "textSha256": "0c860e216eb6e89fa34fbac3c93e40374adb37babe3e346d36f1779324913a9f",
+        "contextSha256": "e6d2f8a659046490aa28dc8df897103f5f1e55200e0e88c580be4772a5789e65",
+        "artifactSha256": "f71d34bcd4de42e8dee814bff2a5761ced144a7ce92ad25d294078970a85e974",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 253,
+        "tEnd": 303,
+        "supports": "Supports provisional count 24 and broad mapped role categories; full record mentions a lifecycle, but does not explicitly establish student education or professional status of all roles."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current citation concerns parents, family and the student at the center of a surrounding ecosystem; it supplies no count of 24 and no completed mapping of distinct professional roles across an educational journey.",
+    "missingReferences": [],
+    "caveats": [
+      "Same cited turn ID contains different text, speakerRef and timing from the originalMigration context; original support cannot substitute for current support.",
+      "Bhakti is the stored speakerRef, not an independently verified identity.",
+      "Provided current raw-byte sha256 differs from normalizedLfSha256; neither artifact byte hash was verified on disk.",
+      "Transcript support would not establish external factual truth or human approval."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "turnId": "2026-05-29-decoding-ever-expanding-cast-t012",
+        "contextVersion": "current",
+        "quote": "The family is in the center and, uh, that's not a professional. That's not an organization, right, that's external. Exactly, Jay, parents are internal, families are internal.",
+        "textSha256": "8e9b2b2d1efbab1858ad43e53fc1cc85374493a7ff5509454c65b59529b7f602",
+        "contextSha256": "b15b738cf338332a6e9e99c0da7786cc085203900a61bff2f683ae27cd7a83ea",
+        "artifactSha256": "bec016384879e3e2eef64f3b5826e43fb9d0160807e42d31b87c853e11f7511b",
+        "revision": null,
+        "speakerRef": "Bhakti",
+        "tStart": 389,
+        "tEnd": 446,
+        "supports": "Related family/professional ecosystem distinction only; does not support 24 mapped professional roles."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original supplies 24 provisional broad role categories and a lifecycle but lacks explicit educational/professional binding; current same-ID context lacks the count and mapping. Both are unsupported as complete claims, not proven false. No missing or duplicate references; all supplied hash/binding checks pass."
+}

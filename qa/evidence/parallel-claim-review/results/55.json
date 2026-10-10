@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "index": 55,
+  "originalIndex": 60,
+  "claimId": "2026-08-10-ucas-what-changed-what-matters-c01",
+  "inputHash": "b2e79bc97cb7dbfe975bf9097a6ce130d6d024cb264dfb8faeb7eb563a0c4de6",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The original cited turn explicitly describes introduction of a structured three-question personal statement, replacing one box with 4,000 characters that the student filled in. This supports every component of the persisted claim.",
+    "missingReferences": [],
+    "caveats": [
+      "Support is transcript entailment only; external UCAS policy truth and effective date are not verified.",
+      "Stored speakerRef is unknown; a speaker name in transcript text does not independently establish identity.",
+      "The same turn ID now contains different content with different timing: original 352–595, current 594–798.",
+      "No missing or duplicate citation references or duplicate matching records are supplied."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+        "turnId": "2026-08-10-ucas-what-changed-what-matters-t005",
+        "contextVersion": "originalMigration",
+        "quote": "one, the introduction of a structured three-question personal statement. Earlier, there used to be just one box with 4,000 characters and you had to fill in,",
+        "textSha256": "b8fc05c0a305c692949e8e54df834860dc4e8e5d28bcf44eafa88cf5e4c31767",
+        "contextSha256": "536eaed3d570fc50ca364d1a2f23c0dcef30dfe1bce6743b895668253934bba2",
+        "artifactSha256": "8aa7123b2862c2896763b7f675a477cece264fcb5441b675c519bdf28025fae8",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 352,
+        "tEnd": 595,
+        "supports": "Supports the transition from one 4,000-character input box to a structured personal statement."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn describes a structured three-section Letter of Reference and its 4000-character limit. It does not describe a personal-statement transition from one free-text box; LOR evidence cannot support those components.",
+    "missingReferences": [],
+    "caveats": [
+      "The same turn ID has changed content and timing, and its stored speakerRef changed from unknown to Mishi Sardana.",
+      "Stored speakerRef is provided metadata, not independently verified identity.",
+      "No missing or duplicate citation references or duplicate matching records are supplied.",
+      "The unrelated LOR discussion neither supports nor explicitly contradicts the personal-statement claim."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+        "turnId": "2026-08-10-ucas-what-changed-what-matters-t005",
+        "contextVersion": "current",
+        "quote": "So when it comes to the letter of reference, as Sapna mentioned, it has the new format allows us to divide it into the three sections.",
+        "textSha256": "3f31b2b4a393d4245ef4115aa82afe89b9a5d3e820ac342a3f94b1b536bf573a",
+        "contextSha256": "b2ca4cb55d73109aa226241757548ab12af1abedec2771e60b523ee312554eb0",
+        "artifactSha256": "d2078954432f8d780c84bdbf62fa5dab4454b07b173fa375a78fd940278cd416",
+        "revision": null,
+        "speakerRef": "Mishi Sardana",
+        "tStart": 594,
+        "tEnd": 798,
+        "supports": "Describes structure of the Letter of Reference, unrelated to the claimed personal-statement transition."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original context supports the whole claim; current context under the same turn ID discusses the Letter of Reference instead. Supplied canonical hashes and identity bindings are checked; artifact bytes and external truth remain unverified."
+}

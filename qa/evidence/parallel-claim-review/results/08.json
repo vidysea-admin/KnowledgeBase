@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "index": 8,
+  "originalIndex": 9,
+  "claimId": "2026-05-08-funding-dreams-loans-forex-c04",
+  "inputHash": "37f16421722de283ee6470e0a90a0df16d9f16a7828bf87cbe0840c879a3f749",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The quoted original context directly describes INR1.5 crore unsecured loans and an offered20-year undergraduate-loan tenure. It does not explicitly establish the HDFC Credila lender identity, that20 years is a maximum, or unrestricted applicability to education loans beyond undergraduate loans; the entire claim therefore exceeds the supplied citation.",
+    "missingReferences": [],
+    "caveats": [
+      "Original turn speakerRef is unknown despite an inline Shweta Jain label; neither establishes a verified person identity.",
+      "The20-year tenure statement is expressly introduced for undergraduate loans; preserve that population qualifier.",
+      "Product amounts and offered tenure are transcript claims at the recorded historical context, not externally verified current financial terms.",
+      "Same turn ID now contains different content and timing: original2370–2418 versus current3845–3940 seconds.",
+      "Provided raw/normalized artifact hashes are distinct; source bytes and historical revision were not independently read."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "turnId": "2026-05-08-funding-dreams-loans-forex-t080",
+        "contextVersion": "originalMigration",
+        "quote": "that we offer 20-year tenure, right? As the market is at 15-year, we offer 20 years.",
+        "textSha256": "f813cf2ac00a4274ca5a663c2972623c5733fffd8659850cd078dda9d7485775",
+        "contextSha256": "d65e727fc7cca26d594dc7fbbe5eaef7c2c81b9d7d16fa35d9d0e57a3c6f398c",
+        "artifactSha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2370,
+        "tEnd": 2418,
+        "supports": "Supports an offered20-year tenure; does not explicitly state a maximum."
+      },
+      {
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "turnId": "2026-05-08-funding-dreams-loans-forex-t080",
+        "contextVersion": "originalMigration",
+        "quote": "The market offers maybe ₹75 lakhs to ₹1 Crore of unsecured loans; we offer ₹1.5 Crores of unsecured loans.",
+        "textSha256": "f813cf2ac00a4274ca5a663c2972623c5733fffd8659850cd078dda9d7485775",
+        "contextSha256": "d65e727fc7cca26d594dc7fbbe5eaef7c2c81b9d7d16fa35d9d0e57a3c6f398c",
+        "artifactSha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2370,
+        "tEnd": 2418,
+        "supports": "Supports the INR1.5 crore unsecured-loan amount in the quoted speaker presentation."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn concerns reconnecting, Credila networking and a TOC meeting, then closing thanks. It supplies no unsecured-loan amount,20-year tenure, maximum-tenure condition or underwriting population. Those product claims cannot be supported by this current citation.",
+    "missingReferences": [],
+    "caveats": [
+      "Current stored speakerRef is Nikhil; attribution is supplied metadata, not verified identity.",
+      "Mention of Credila and financing does not establish product terms or the HDFC name.",
+      "Current event statements mentioning August and last-year attendance provide no verification of the claim product terms.",
+      "Same-ID changed content and later timing make original support non-transferable to this current reference.",
+      "Artifact byte verification not performed; evidence limited to supplied contexts."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "turnId": "2026-05-08-funding-dreams-loans-forex-t080",
+        "contextVersion": "current",
+        "quote": "Unfortunately, lot of people know Credila that way, but, yes, we are having, I think, Bombay meet-up, right, in August,",
+        "textSha256": "eb69be51ec21d575487aaf14b81640a85d5a585d71ddb23af0783a4c0445d5fd",
+        "contextSha256": "eb1dce91695909de25a97179784cc17145a55e6d62e32af2f75b2dcbe6ede9cf",
+        "artifactSha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+        "revision": null,
+        "speakerRef": "Nikhil",
+        "tStart": 3845,
+        "tEnd": 3940,
+        "supports": "Related lender-name mention in networking discussion; unrelated to unsecured-loan amount or tenure."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original supplied citation partially supports amount and offered undergraduate tenure, with unsupported scope/maximum/name components. Current same-ID citation is unrelated. This is AI preliminary entailment review; human approval and external financial truth remain unknown."
+}

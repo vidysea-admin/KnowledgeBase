@@ -1,0 +1,333 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "AI-preliminary-independent-audit",
+  "humanAdjudication": null,
+  "batch": 3,
+  "entries": [
+    {
+      "index": 15,
+      "claimId": "2026-05-23-uniaccess-atlas-skilltech-c02",
+      "inputHash": "1ca8f277cf530e23645b8eb301105f9f967144d39ad8a5d2355f3d7a636440b3",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original partially supports a management school in a Babson group of about 30 schools globally, but neither ISME nor ATLAS affiliation is identified in the cited record. Current is an unrelated closing invitation. Both labels concern literal citation support only; unsupported does not imply false. All same-ID records changed text and timing. Stored speaker labels do not establish identities. No supplied reference is missing or duplicated. Human adjudication and external truth remain open.",
+      "evidenceHashes": {
+        "claimRecordSha256": "b103c417dbad7b6e22f1a6a14b655ca4269e26adf65dcce826ad9feb8ae2ead8",
+        "claimTextSha256": "368525171b28ddfeb419bdc1602985ae5bf656332af7f04799461b5516f402ab",
+        "sourceBindingSha256": "1fbf8b430dd7c589e960441ad83ab1678820ca0bb1601db879ab84c14baf8250",
+        "reviewerResultSha256": "3b2165059cc65f98b86b6485536ce36a4517776c88f0532adbddc7a893d6ba3a",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "resultInputHash": true,
+          "contextTextHashes": true,
+          "reviewerCitationHashes": true
+        },
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t007",
+            "textSha256": "884a0d9a4cdbb859db08674a7aeb9b6b7dfad8e0488b0277a0c92ea51a5d077f",
+            "contextSha256": "07ae13f8a580670a451e72b53e6cc49a8772a62c97de63f7d8c37893729bb9af",
+            "textHashMatches": true,
+            "reviewerCitationHashesMatch": true,
+            "artifactSha256": "01ac7389a1fbc6c276e46349306dc3a86f40ae5c4c658e87177ecff7bd30d545",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 167,
+            "tEnd": 195,
+            "quote": "about 30 schools across the globe.",
+            "quoteOffset": 106
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t007",
+            "textSha256": "4c1b0affff5928210aa2e2dc84514d031bac66f3007a7f1288ba3378484a91c4",
+            "contextSha256": "191f1eb98a5694304023cb04603ceba039dabf2e0731c8c00c1d71e8c547888c",
+            "textHashMatches": true,
+            "reviewerCitationHashesMatch": true,
+            "artifactSha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+            "normalizedLfSha256": "edd79a5447c222145df9738c30009c5ece51825958e2ea78266e35b252043043",
+            "revision": null,
+            "speakerRef": "spk:0",
+            "tStart": 703,
+            "tEnd": 713,
+            "quote": "please feel free to reach out to me.",
+            "quoteOffset": 126
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 16,
+      "claimId": "2026-05-23-uniaccess-atlas-skilltech-c03",
+      "inputHash": "78baeabd85e6c877a50c3323cacbf62422b4f028430246dccea030ede82fda75",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original supports student accolades at NASA and Google, but does not directly identify those accolades as NASA/Google competitions or establish the ATLAS attribution. Current is an unrelated farewell. Both labels concern literal citation support only; unsupported does not imply false. All same-ID records changed text and timing. Stored speaker labels do not establish identities. No supplied reference is missing or duplicated. Human adjudication and external truth remain open.",
+      "evidenceHashes": {
+        "claimRecordSha256": "0c5255c3a08f2ac979ecafe6aa5e99a23eeabacc5b779b40052f177eaa1c8ab7",
+        "claimTextSha256": "91aab85c29c9592c913543a77ae44b6db9ffb3c132750e6245ec3b7dfd0fa0c3",
+        "sourceBindingSha256": "1fbf8b430dd7c589e960441ad83ab1678820ca0bb1601db879ab84c14baf8250",
+        "reviewerResultSha256": "235c506972278315f0dd5f28b9970bd189d5028385d249faf78e3cfd9b3bcd3f",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "resultInputHash": true,
+          "contextTextHashes": true,
+          "reviewerCitationHashes": true
+        },
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t008",
+            "textSha256": "2345e38afad485375d096de0a76651935fd9e9b4b065e5abc3cd730bf3f437e1",
+            "contextSha256": "01161b361406e68ffa4352727f99d85651ec72f734e909cac3c266ac19e4e6b5",
+            "textHashMatches": true,
+            "reviewerCitationHashesMatch": true,
+            "artifactSha256": "01ac7389a1fbc6c276e46349306dc3a86f40ae5c4c658e87177ecff7bd30d545",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 195,
+            "tEnd": 237,
+            "quote": "students have achieved and won several accolades at NASA, at Google.",
+            "quoteOffset": 231
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t008",
+            "textSha256": "924f0963dec369020fade5243e6c2d105555e3d7d673f8a938cfb1e27101f19d",
+            "contextSha256": "93f9dcb425a80d677065cbea3060d372969e3a111e04714f35652020aec23283",
+            "textHashMatches": true,
+            "reviewerCitationHashesMatch": true,
+            "artifactSha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+            "normalizedLfSha256": "edd79a5447c222145df9738c30009c5ece51825958e2ea78266e35b252043043",
+            "revision": null,
+            "speakerRef": "spk:0",
+            "tStart": 713,
+            "tEnd": 743,
+            "quote": "Thank you. Bye-bye.",
+            "quoteOffset": 0
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 17,
+      "claimId": "2026-05-28-in-focus-1-c01",
+      "inputHash": "aa279817f81751e8c0aa8634228a5e0ec9f6dfe348824f69624cbb1cfcd91cb8",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original supports a stated 48-hour counselor-solution promise, but neither Innovique attribution nor project-matching specificity is supplied. Current asks about mentorship. Both labels concern literal citation support only; unsupported does not imply false. All same-ID records changed text and timing. Stored speaker labels do not establish identities. No supplied reference is missing or duplicated. Human adjudication and external truth remain open.",
+      "evidenceHashes": {
+        "claimRecordSha256": "c5b603b9adf8fbfc873a165fb611411bb2af68cc2b90a82ad8fb4711d3a1f06e",
+        "claimTextSha256": "ac9e0ef0270ac8557fc784f42ecba683d3c907c049095ba134b5fde5a0f9d739",
+        "sourceBindingSha256": "3f651d130d02b2ca4452f3a2aec8cfdccacbab8e711c21aadc8a5869c1cb9556",
+        "reviewerResultSha256": "6303e22ada4c44430fcce73005ac843afe5658b90ce1528404ed292d7f8f53a0",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "resultInputHash": true,
+          "contextTextHashes": true,
+          "reviewerCitationHashes": true
+        },
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-28-in-focus-1-t035",
+            "textSha256": "e1ea1a9b4eb74aa359de879048720a010654414be823751c2177a4c25b2c1a17",
+            "contextSha256": "f91f2924d79f62c11962d3be6713a4d99059465cf77fb657e3ec223706a3633a",
+            "textHashMatches": true,
+            "reviewerCitationHashesMatch": true,
+            "artifactSha256": "0ac457de7615bc242980485dca851754c20b6f0181bbe354f743489ed085062a",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 940,
+            "tEnd": 965,
+            "quote": "we require just 48 hours to provide a solution to any education counselor",
+            "quoteOffset": 127
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-28-in-focus-1-t035",
+            "textSha256": "e2b510e75e5c6af062dc43f0882561e9d4c31f8cbf0e1c6e8c51ae06930de3c4",
+            "contextSha256": "43958597c0d9ab6a2b1ff4f9350c14513e90271af01ea2089c3e2db9b8947a87",
+            "textHashMatches": true,
+            "reviewerCitationHashesMatch": true,
+            "artifactSha256": "3f7229899fd1a4a6d190e3c9d402b12dcae2ceb9dc66cbf697d18e698d9e6581",
+            "normalizedLfSha256": "155e69c048c3c12f2dafddf32db6db0d1ed88f5dd38769276c668e03ae74fc7c",
+            "revision": null,
+            "speakerRef": "Yavya",
+            "tStart": 2284,
+            "tEnd": 2291,
+            "quote": "the mentorship you received",
+            "quoteOffset": 52
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 18,
+      "claimId": "2026-05-28-in-focus-1-c02",
+      "inputHash": "c56fbb2415b7b60990af02973d32e001681d416190bf28a0c825e04aabe2dbf4",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original supports a stated Government of India copyright certificate for student/MSME passion projects, but neither Innovique attribution nor invention characterization is explicit. Current is a handover. Both labels concern literal citation support only; unsupported does not imply false. All same-ID records changed text and timing. Stored speaker labels do not establish identities. No supplied reference is missing or duplicated. Human adjudication and external truth remain open.",
+      "evidenceHashes": {
+        "claimRecordSha256": "83105f0b1271296f6d3f2f0b6817336c39d225b8487f9d0cc25465cadbf9a615",
+        "claimTextSha256": "edd45aba9657200a85911e69ede02825c8e5761cc9d30427f7076f33cd65fcec",
+        "sourceBindingSha256": "3f651d130d02b2ca4452f3a2aec8cfdccacbab8e711c21aadc8a5869c1cb9556",
+        "reviewerResultSha256": "7557be9d6871774ac7abfe139238a9a86af42ab7a43d89ba389e9755e2b1ac9f",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "resultInputHash": true,
+          "contextTextHashes": true,
+          "reviewerCitationHashes": true
+        },
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-28-in-focus-1-t041",
+            "textSha256": "5a4f84219273491d4044acbea4cf02edd20ded4d522d409e233529751bde9eb3",
+            "contextSha256": "bd929c93c48531ec851f2f93e570f5bf3d10ed4027175b83e100661172c4e167",
+            "textHashMatches": true,
+            "reviewerCitationHashesMatch": true,
+            "artifactSha256": "0ac457de7615bc242980485dca851754c20b6f0181bbe354f743489ed085062a",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 1095,
+            "tEnd": 1128,
+            "quote": "secure a copyright certificate from the Government of India",
+            "quoteOffset": 343
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-28-in-focus-1-t041",
+            "textSha256": "a93d7b0050ad39afcfae1e72bb10b64507bd4ca986943cfe48b0bc5aa84f8563",
+            "contextSha256": "19e3a132e0d4b46a42405d4a77b52fe98ff4dfabadad4fad0b4e0454ba70788c",
+            "textHashMatches": true,
+            "reviewerCitationHashesMatch": true,
+            "artifactSha256": "3f7229899fd1a4a6d190e3c9d402b12dcae2ceb9dc66cbf697d18e698d9e6581",
+            "normalizedLfSha256": "155e69c048c3c12f2dafddf32db6db0d1ed88f5dd38769276c668e03ae74fc7c",
+            "revision": null,
+            "speakerRef": "Makrand",
+            "tStart": 2476,
+            "tEnd": 2478,
+            "quote": "I will hand over to Pranav Patel.",
+            "quoteOffset": 0
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 19,
+      "claimId": "2026-05-28-in-focus-1-c03",
+      "inputHash": "b9e1cf134abd35adaca68f556910cb0463c99442f7292030c8c5acff20f12098",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original supports students creating 12 to 15 final works for international-college requirements, but Artiste 360 identity, portfolio terminology and flagship-program status are not established. Current is a thank-you. Both labels concern literal citation support only; unsupported does not imply false. All same-ID records changed text and timing. Stored speaker labels do not establish identities. No supplied reference is missing or duplicated. Human adjudication and external truth remain open.",
+      "evidenceHashes": {
+        "claimRecordSha256": "5f71f93859f59ca0b5e97a5623ff53c60b6eaf6ea85387b5c5bae4d49048d221",
+        "claimTextSha256": "0e087df91e2e09c29ea5be361c4e6be306b2cd39aed9decbdb7f7a0d132b040c",
+        "sourceBindingSha256": "3f651d130d02b2ca4452f3a2aec8cfdccacbab8e711c21aadc8a5869c1cb9556",
+        "reviewerResultSha256": "1d650fb9435f18796896e76dd03f09a751631872b78fbfec9c2101f733ba2fa5",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "resultInputHash": true,
+          "contextTextHashes": true,
+          "reviewerCitationHashes": true
+        },
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-28-in-focus-1-t056",
+            "textSha256": "d0bba2f78ef493f0a942a5436a0ede735eede7829e20c20596b6fd266ee46b6a",
+            "contextSha256": "49d2382509ac3ae33397a73fdc17f16855c55aadbe844321d7414f9cce732165",
+            "textHashMatches": true,
+            "reviewerCitationHashesMatch": true,
+            "artifactSha256": "0ac457de7615bc242980485dca851754c20b6f0181bbe354f743489ed085062a",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 1546,
+            "tEnd": 1589,
+            "quote": "students create 12 to 15 final works",
+            "quoteOffset": 15
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-28-in-focus-1-t056",
+            "textSha256": "9e41164cb68b90cf8133a32422dceef505ce83d054281d47edff7b018531e88c",
+            "contextSha256": "31460c533cadbc11186b65a3ae761ee1653419559656ea8e2125e2b074b00409",
+            "textHashMatches": true,
+            "reviewerCitationHashesMatch": true,
+            "artifactSha256": "3f7229899fd1a4a6d190e3c9d402b12dcae2ceb9dc66cbf697d18e698d9e6581",
+            "normalizedLfSha256": "155e69c048c3c12f2dafddf32db6db0d1ed88f5dd38769276c668e03ae74fc7c",
+            "revision": null,
+            "speakerRef": "Makrand",
+            "tStart": 2968,
+            "tEnd": 2969,
+            "quote": "Thank you very much.",
+            "quoteOffset": 0
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    }
+  ]
+}

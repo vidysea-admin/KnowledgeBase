@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "index": 53,
+  "originalIndex": 58,
+  "claimId": "2026-08-03-uk-beyond-offer-letters-reupload-c01",
+  "inputHash": "31fd5c015ef1fd9ccdfb88fcec482f8fe026fa242b485345a77d57adaedafe75",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The cited record directly states 131,000 Indian students left India to study abroad in 2005, attributes that to the Ministry of External Affairs in India, and reports the same ministry raising that number to 1.3 million over 20 years, explicitly referring to 2025.",
+    "missingReferences": [],
+    "caveats": [
+      "The passage describes students leaving India or going abroad; it does not establish a separately measured stock of students currently studying abroad.",
+      "The speaker expressly selects 2025 and says 2026 statistics are unavailable; the session calendar date cannot independently establish the reference year or factual accuracy.",
+      "Support is for the figures and attribution as stated in the recording; no Ministry figures or external factual truth were independently verified.",
+      "The same turn ID has changed text and start time: original 204 seconds, current 202 seconds; both end at 606 seconds.",
+      "Artifact hashes are provided context metadata only; raw-byte and normalized-LF hashes are distinct and no artifact bytes were verified.",
+      "Original speakerRef is 'unknown'; the textual name prefix does not independently establish identity."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t002",
+        "contextVersion": "originalMigration",
+        "quote": "the Ministry of External Affairs in India tells us that 131,000 Indian students left India to study abroad in that year.",
+        "textSha256": "674430662ebdbffcb3f5c16a6d00018ff7b5ec3cc2bbdeb80f07a5d735b3d4a2",
+        "contextSha256": "bfc8d911003b637a425b7afe394092cfae673819c77b2ec82a8f01a9585e408e",
+        "artifactSha256": "e308ee4a56c1724b6844dbb407cef4ad6e9b1c22834992b2a5a12f1f00e147d6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 204,
+        "tEnd": 606,
+        "supports": "Supports the cited Indian student departure count of 131,000, with 2005 specified earlier in this record, and attribution to the Ministry of External Affairs in India."
+      },
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t002",
+        "contextVersion": "originalMigration",
+        "quote": "they told us that that number from 131,000 has gone up to 1.3 million in 20 years' time.",
+        "textSha256": "674430662ebdbffcb3f5c16a6d00018ff7b5ec3cc2bbdeb80f07a5d735b3d4a2",
+        "contextSha256": "bfc8d911003b637a425b7afe394092cfae673819c77b2ec82a8f01a9585e408e",
+        "artifactSha256": "e308ee4a56c1724b6844dbb407cef4ad6e9b1c22834992b2a5a12f1f00e147d6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 204,
+        "tEnd": 606,
+        "supports": "Supports an increase above one million over two decades, attributed to the same ministry; the nearby text explicitly selects 2025."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "entailed",
+    "reason": "The cited record directly states 131,000 Indian students left India to study abroad in 2005, attributes that to the Ministry of External Affairs in India, and reports the same ministry raising that number to 1.3 million over 20 years, explicitly referring to 2025.",
+    "missingReferences": [],
+    "caveats": [
+      "The passage describes students leaving India or going abroad; it does not establish a separately measured stock of students currently studying abroad.",
+      "The speaker expressly selects 2025 and says 2026 statistics are unavailable; the session calendar date cannot independently establish the reference year or factual accuracy.",
+      "Support is for the figures and attribution as stated in the recording; no Ministry figures or external factual truth were independently verified.",
+      "The same turn ID has changed text and start time: original 204 seconds, current 202 seconds; both end at 606 seconds.",
+      "Artifact hashes are provided context metadata only; raw-byte and normalized-LF hashes are distinct and no artifact bytes were verified.",
+      "Current speakerRef is stored as 'Jasminder Khanna'; it does not independently establish identity."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t002",
+        "contextVersion": "current",
+        "quote": "the Ministry of External Affairs in India tells us that 131,000 Indian students left India to study abroad in that year.",
+        "textSha256": "cd6d27685f8c9b11eb7e428490a766f32c68771a3df8b712aae004fc29916876",
+        "contextSha256": "af55f17c66127efcd6c028df22f74f3b4cd5f7c23dc36935f1cdae0fc79b7d99",
+        "artifactSha256": "20edaf5a5efed3a6a1d24da6e55861ae0c51a6f5740db1cdcb2059a6541078e2",
+        "revision": null,
+        "speakerRef": "Jasminder Khanna",
+        "tStart": 202,
+        "tEnd": 606,
+        "supports": "Supports the cited Indian student departure count of 131,000, with 2005 specified earlier in this record, and attribution to the Ministry of External Affairs in India."
+      },
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t002",
+        "contextVersion": "current",
+        "quote": "they told us that that number from 131,000 has gone up to 1.3 million in 20 years' time.",
+        "textSha256": "cd6d27685f8c9b11eb7e428490a766f32c68771a3df8b712aae004fc29916876",
+        "contextSha256": "af55f17c66127efcd6c028df22f74f3b4cd5f7c23dc36935f1cdae0fc79b7d99",
+        "artifactSha256": "20edaf5a5efed3a6a1d24da6e55861ae0c51a6f5740db1cdcb2059a6541078e2",
+        "revision": null,
+        "speakerRef": "Jasminder Khanna",
+        "tStart": 202,
+        "tEnd": 606,
+        "supports": "Supports an increase above one million over two decades, attributed to the same ministry; the nearby text explicitly selects 2025."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Both supplied versions support the quoted growth figures and ministry attribution. The same turn ID has different text, speaker metadata and start timing, but the relevant numbers remain unchanged. Transcript entailment does not establish external truth or speaker identity."
+}

@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "index": 2,
+  "originalIndex": 3,
+  "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c04",
+  "inputHash": "2c6cd2b9f39ae1a18e397c89de1b97625c787f69b051030de7f5975b9aac8f58",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The university-study passage explicitly names Italy and says more than 700+ courses are entirely taught in English; it supports the course-count/language assertion in that academic context.",
+    "missingReferences": [],
+    "caveats": [
+      "Source says courses in a university-study context; it does not separately enumerate degree levels or establish a current external course catalogue.",
+      "Stored historical speakerRef is unknown; the name in transcript text does not verify speaker identity.",
+      "Historical interval is 3458-3520 seconds; session date does not establish present-day accuracy.",
+      "Artifact raw versus normalized hashes are supplied metadata; source bytes were not verified in this one-claim review."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t064",
+        "contextVersion": "originalMigration",
+        "quote": "One big misconception about Italy is you need to know Italian before going to Italy for your studies.",
+        "textSha256": "4c420892a94051ae0a945e478d6a0cd27002433d3ad046a6998bef2dc5c628b5",
+        "contextSha256": "1c71328df2ff682a4db3ed1175ccb864f3882c9253f5b589727ffaca16e37792",
+        "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 3458,
+        "tEnd": 3520,
+        "supports": "Identifies Italy as the country under discussion."
+      },
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t064",
+        "contextVersion": "originalMigration",
+        "quote": "we are one country in Europe which offers more than 700+ courses entirely taught in the English language, as it's already mentioned.",
+        "textSha256": "4c420892a94051ae0a945e478d6a0cd27002433d3ad046a6998bef2dc5c628b5",
+        "contextSha256": "1c71328df2ff682a4db3ed1175ccb864f3882c9253f5b589727ffaca16e37792",
+        "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 3458,
+        "tEnd": 3520,
+        "supports": "Supports more than 700 courses taught entirely in English in the supplied university-study context."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current record with the same turn ID describes companies and employment demand in New Zealand. It contains no Italy, more-than-700 course count, degree-course inventory or English-only teaching assertion.",
+    "missingReferences": [],
+    "caveats": [
+      "Unsupported means absent support in these citations, not proof the Italian course assertion is false.",
+      "Same positional turn ID now resolves to different content, speakerRef Kshitij and interval777-794; historical support cannot substitute for the current evidence.",
+      "No missing or duplicate supplied reference was observed; this is a changed-content citation defect.",
+      "External truth and speaker identity remain unverified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t064",
+        "contextVersion": "current",
+        "quote": "We have got companies like TCS, Infosys, Tech Mahindra who have set up bases in New Zealand.",
+        "textSha256": "d764c3e77915120c77d3cda2d552df2873eac2f5e6e986d5479baab5cc423213",
+        "contextSha256": "58b5d43140db7a0e903e924e46ffff5fefcff8986fd864ecd4c116cd66d848c3",
+        "artifactSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+        "revision": null,
+        "speakerRef": "Kshitij",
+        "tStart": 777,
+        "tEnd": 794,
+        "supports": "Unrelated New Zealand employment context; provides no Italian course count or language-of-instruction support."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original academic passage supports the Italian English-taught-course assertion; current reused ID points to unrelated New Zealand employment. Provisional AI review only; no human approval or source repair."
+}

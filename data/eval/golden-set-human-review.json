@@ -1,0 +1,800 @@
+{
+  "version": 1,
+  "status": "HUMAN_REVIEW_REQUIRED",
+  "purpose": "Bounded review packet for exactly six recorded vector retrieval misses; no golden-set changes or accepted semantic labels.",
+  "createdAt": "2026-10-09T12:45:12.346Z",
+  "scopeNote": "Candidate literal current-source excerpts selected by the builder. Not exhaustive transcript review, automatic adjudication, production/backfill authorization, or retrieval acceptance. Read complete hashed source files before ruling out answers. Human fields remain null/unreviewed. Historical embedding evidence is separate from current transcript evidence.",
+  "sourceBindings": [
+    {
+      "path": "data/eval/golden-set.json",
+      "sha256": "07e507d5b1b297c97242d3d4f727f66227267378a4a8806006e533aac78e94be",
+      "bytes": 23581
+    },
+    {
+      "path": "data/eval/recall-report-vector.json",
+      "sha256": "d028b0967792f46ccb835b25f621d6f47f92381456267b9af0b37ebdfa9d7280",
+      "bytes": 5541
+    },
+    {
+      "path": "data/eval/golden-set-sibling-semantic.json",
+      "sha256": "ad4179f1d2c2b6a97de0a2adccd01b5887525ad03f180104be4b05b8c5fd63d3",
+      "bytes": 69561
+    }
+  ],
+  "recordedBaseline": {
+    "generatedAt": "2026-09-21T09:41:08.835Z",
+    "total": 92,
+    "hits": 86,
+    "k": 5,
+    "recallAtK": 0.9347826086956522,
+    "questionBlindControl": 0.21739130434782608,
+    "missCount": 6
+  },
+  "evidenceEncoding": {
+    "fileSha256": "SHA-256 of exact source bytes",
+    "turnSha256": "SHA-256 of UTF-8 JSON.stringify(parsed turn), preserving source key order",
+    "characterOffsets": "Zero-based JavaScript UTF-16 code-unit offsets into parsed turn.text; lengths use the same units"
+  },
+  "humanGate": {
+    "status": "unreviewed",
+    "approver": null,
+    "approvedAt": null,
+    "gateClosure": null,
+    "repointU14U15": null,
+    "thresholdDecision": null
+  },
+  "cases": [
+    {
+      "id": "2026-05-23-uniaccess-atlas-skilltech-gq01",
+      "question": "What kind of support is available for students looking for internships?",
+      "expectedSessionId": "2026-05-23-uniaccess-atlas-skilltech",
+      "recordedTopK": [
+        "2026-07-22-uniaccess-cept-university",
+        "2026-05-28-in-focus-1",
+        "2026-07-08-beyond-black-robes-law-careers",
+        "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "2026-07-15-creative-futures"
+      ],
+      "recordedMiss": true,
+      "historicalSemanticEvidence": {
+        "measuredAt": "2026-09-21T09:44:02.478Z",
+        "expectedScore": 0.6703,
+        "bestRival": "2026-07-22-uniaccess-cept-university",
+        "bestRivalScore": 0.7158,
+        "topSession": "2026-07-22-uniaccess-cept-university",
+        "topScore": 0.7158,
+        "margin": -0.0456,
+        "ambiguousRivals_0p03": [
+          "2026-07-22-uniaccess-cept-university",
+          "2026-05-28-in-focus-1",
+          "2026-07-08-beyond-black-robes-law-careers",
+          "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "2026-07-15-creative-futures",
+          "2026-05-22-uniaccess-xavier-university",
+          "2026-07-30-in-focus-3",
+          "2026-06-25-in-focus-2",
+          "2026-08-03-uk-beyond-offer-letters-reupload",
+          "2026-08-03-uk-beyond-offer-letters",
+          "2026-07-03-inside-the-uc-session",
+          "428d130a-f41e-40c9-b52e-14664e307301",
+          "2026-06-03-dual-enrollment-pathway",
+          "2026-08-12-uniaccess-ashoka-university",
+          "2026-08-24-uniaccess-leeds-arts-university",
+          "2026-08-27-in-focus-4",
+          "2026-05-29-decoding-ever-expanding-cast"
+        ],
+        "scope": "Historical scores copied verbatim; not recomputed against current transcript hashes. Similarity is not proof of answerability."
+      },
+      "expected": {
+        "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "source": {
+          "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+          "sha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+          "bytes": 10389,
+          "turnCount": 8
+        },
+        "selectionStatus": "candidate-evidence-unreviewed",
+        "evidence": [
+          {
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t002",
+            "tenantId": "toc",
+            "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+            "speakerRef": "spk:0",
+            "tStart": 16,
+            "tEnd": 435,
+            "turnSha256": "867dbada29c7fb95ec4aa7271dc72341bae1f2d1c32097bc9b079d799e50d767",
+            "anchor": "career development cell",
+            "characterOffset": 5691,
+            "characterLength": 605,
+            "text": "internship, and they have to submit documents for that obviously which are mandatory. And we help students find internships, we don't just say go and find an internship. We have a career development cell, and that helps students with finding the right kind of fit of an opportunity for them, be it in the social circles or be in social service or in finance, or any other areas that the students might be interested in. So, that is something that we provide as a benefit, and that same is followed obviously for their placements after they graduate as well. If are there any questions or should I move on?",
+            "truncated": true
+          }
+        ],
+        "humanAnswerable": null
+      },
+      "rival": {
+        "sessionId": "2026-07-22-uniaccess-cept-university",
+        "source": {
+          "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+          "sha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+          "bytes": 44699,
+          "turnCount": 56
+        },
+        "selectionStatus": "candidate-evidence-unreviewed",
+        "evidence": [
+          {
+            "turnId": "2026-07-22-uniaccess-cept-university-t037",
+            "tenantId": "toc",
+            "sessionId": "2026-07-22-uniaccess-cept-university",
+            "speakerRef": "Nilesh",
+            "tStart": 1409,
+            "tEnd": 1440,
+            "turnSha256": "6989c7bc511f961301a1092a836000c4d75e836c31d08d58f115b93ac9600e53",
+            "anchor": "career cell",
+            "characterOffset": 0,
+            "characterLength": 424,
+            "text": "Yes, we do have a career cell and we help them in their placements. Internships are not mandatory. A student can choose to do a academic internship, can choose to do a studio internship, like practitioner, or they can also do the DRP. So, it's not compulsory, but yes, we help all the students and we have a good alum base who can take them as an internship. And we have a very good companies coming for the placements, too.",
+            "truncated": false
+          },
+          {
+            "turnId": "2026-07-22-uniaccess-cept-university-t036",
+            "tenantId": "toc",
+            "sessionId": "2026-07-22-uniaccess-cept-university",
+            "speakerRef": "Pooja",
+            "tStart": 1394,
+            "tEnd": 1409,
+            "turnSha256": "964f0b43d11456e3b41a9c333c2a9086bdd281c6303b490377daaead62067661",
+            "anchor": "internship mandatory",
+            "characterOffset": 0,
+            "characterLength": 219,
+            "text": "Okay. Um, just, uh, tackling the slightly technical questions first. Sandhya asks, is there an internship mandatory during the undergrad program? Uh, does CEPT help students in placements once their degree is completed?",
+            "truncated": false
+          }
+        ],
+        "humanAnswerable": null
+      },
+      "humanAdjudication": {
+        "status": "unreviewed",
+        "reviewer": null,
+        "reviewedAt": null,
+        "questionHasUniqueAnswer": null,
+        "acceptedSessionIds": null,
+        "disposition": null,
+        "rationale": null,
+        "approvedForGoldenSet": null
+      }
+    },
+    {
+      "id": "2026-05-23-uniaccess-atlas-skilltech-gq03",
+      "question": "Does the teaching style follow an international model or is it more traditional for the region?",
+      "expectedSessionId": "2026-05-23-uniaccess-atlas-skilltech",
+      "recordedTopK": [
+        "2026-06-25-in-focus-2",
+        "2026-05-22-uniaccess-xavier-university",
+        "2026-08-27-in-focus-4",
+        "2026-07-30-in-focus-3",
+        "2026-07-15-creative-futures"
+      ],
+      "recordedMiss": true,
+      "historicalSemanticEvidence": {
+        "measuredAt": "2026-09-21T09:44:02.478Z",
+        "expectedScore": 0.6508,
+        "bestRival": "2026-06-25-in-focus-2",
+        "bestRivalScore": 0.6963,
+        "topSession": "2026-06-25-in-focus-2",
+        "topScore": 0.6963,
+        "margin": -0.0455,
+        "ambiguousRivals_0p03": [
+          "2026-06-25-in-focus-2",
+          "2026-05-22-uniaccess-xavier-university",
+          "2026-08-27-in-focus-4",
+          "2026-07-30-in-focus-3",
+          "2026-07-15-creative-futures",
+          "2026-07-22-uniaccess-cept-university",
+          "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "2026-06-19-entrance-exams-pathways-india-part1",
+          "2026-06-03-dual-enrollment-pathway",
+          "428d130a-f41e-40c9-b52e-14664e307301",
+          "2026-08-10-ucas-what-changed-what-matters",
+          "2026-05-28-in-focus-1",
+          "2026-08-24-uniaccess-leeds-arts-university",
+          "2026-08-12-uniaccess-ashoka-university",
+          "2026-07-08-beyond-black-robes-law-careers",
+          "2026-07-03-inside-the-uc-session",
+          "2026-05-29-decoding-ever-expanding-cast",
+          "2026-08-03-uk-beyond-offer-letters",
+          "2026-05-20-telling-your-brand-story-better",
+          "2026-05-08-funding-dreams-loans-forex",
+          "2026-07-28-metrics-and-mingling",
+          "2026-08-03-uk-beyond-offer-letters-reupload"
+        ],
+        "scope": "Historical scores copied verbatim; not recomputed against current transcript hashes. Similarity is not proof of answerability."
+      },
+      "expected": {
+        "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "source": {
+          "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+          "sha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+          "bytes": 10389,
+          "turnCount": 8
+        },
+        "selectionStatus": "candidate-evidence-unreviewed",
+        "evidence": [
+          {
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t002",
+            "tenantId": "toc",
+            "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+            "speakerRef": "spk:0",
+            "tStart": 16,
+            "tEnd": 435,
+            "turnSha256": "867dbada29c7fb95ec4aa7271dc72341bae1f2d1c32097bc9b079d799e50d767",
+            "anchor": "learning pattern",
+            "characterOffset": 2279,
+            "characterLength": 2000,
+            "text": ". There also there is definitely a lot of conversation and dialogue about what is beneficial for a student, and that's why our majority of our courses come with the influence of a learning pattern which is more US centric, rather than the rote learning which is which was seen earlier in India. Other than that, our UGDX school is one is very prominent. It's three years old at this time. However, we have had some fantastic establishments and achievements through our experienced faculty members and our students obviously. So, students have achieved and won several accolades at NASA, at Google. We also have students who have participated in several other competitions and have won challenges in the Indian ecosystem as well. So, our students are developing, developing a car structure or a drone structured car, basically, for the Indian Army also. I posted about that a couple of days back on our LinkedIn. So, our LinkedIn and Instagram are places where you can definitely follow us to see all the recent updates of our students' placements, of everything that's happening on our campus first-hand. And then, there's School of Law, which is a Bar Council approved law school program. This is very new, it was it just started last year, and we are entering the second year at this time. So, these are the courses in our individual schools, if I may quickly take you through. So, our fashion communication and styling is the most popular course. Our product design is the most popular course, and our fashion design and strategic design and management are some of the popular courses in the School of Design. In Management, obviously, our BBAs come with specializations, which are very popular. We also have a BBA in Psychology. We also have an International Accounting and Finance, which gives the benefit to a student of waiving nine papers of 12 papers. And then, we also have AI and emerging technologies BBA for a student at ISME. So, all futuristic programs, no program that you will see is",
+            "truncated": true
+          }
+        ],
+        "humanAnswerable": null
+      },
+      "rival": {
+        "sessionId": "2026-06-25-in-focus-2",
+        "source": {
+          "path": "data/toc-migrated/2026-06-25-in-focus-2/turns.json",
+          "sha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+          "bytes": 59932,
+          "turnCount": 69
+        },
+        "selectionStatus": "candidate-evidence-unreviewed",
+        "evidence": [
+          {
+            "turnId": "2026-06-25-in-focus-2-t014",
+            "tenantId": "toc",
+            "sessionId": "2026-06-25-in-focus-2",
+            "speakerRef": "Himanshu",
+            "tStart": 1353,
+            "tEnd": 1964,
+            "turnSha256": "965f60f2c054af01b617e22e9850b5d2d5920d6bf864c5e263bb69b0ce1505ba",
+            "anchor": "international curriculum",
+            "characterOffset": 0,
+            "characterLength": 1916,
+            "text": "Yeah, thank you. So, Student Skoope has primarily been a premium academic execution partner for international curriculum students. We have 9-plus years of academic execution experience, mentored about 1,000-plus students across programs in three of our Mumbai centers, as well as with online academic support. Our curriculum focus includes IBDP, IGCSE, MYP, Cambridge, as well as A levels. Our subject support includes physics, chemistry, biology, mathematics, and economics. But what makes us different is not just the subject teaching, it's the academic system behind the teaching. We start right at the diagnostic stage, do a topic tracking, categorize the homework, have a structured feedback loop in process, continuing with parent reporting, as well as admissions alignment. To our credibility, we have worked with various international schools in Mumbai, in India, as well as across few countries as well. So, we do have a good understanding of various international school ecosystems. So, student from an IB school or a Cambridge or an international ecosystem may need very, very different academic handling, and our strength lies in handling those set of students. So, we follow a very, very simple academic readiness engine, that is the operating system behind which and how we support students. We follow a 5-stage roadmap, uh where in the first stage, we end up diagnosing the student, identifying topic gaps, concept gaps, and exams skill gaps. In the second, we try mapping and creating a roadmap based on the subject, board, school timeline, as well as the admissions goal. Third, we teach, that is the curriculum subject concept mastery. And the fourth, we help students get the right practice through structured homework tires, exam-style questions, timed assessment. And the fifth is involving our process of reporting, where parents primarily receive clarity and where relevant, counselors also re",
+            "truncated": true
+          },
+          {
+            "turnId": "2026-06-25-in-focus-2-t012",
+            "tenantId": "toc",
+            "sessionId": "2026-06-25-in-focus-2",
+            "speakerRef": "Himanshu",
+            "tStart": 1139,
+            "tEnd": 1348,
+            "turnSha256": "5413cc6ef690bce86a1e0acb177e0dfb7c58fa364b4ee4bfc74783cd32144fce",
+            "anchor": "academic execution",
+            "characterOffset": 429,
+            "characterLength": 2000,
+            "text": "ng about a very specific gap that primarily affects counselor, school leaders, university partners, parents, and students. So, the gap that I'm going to be addressing today is the academic execution. So, our focus is very, very simple. How do we primarily help international curriculum students become academically stronger, more confident, and better prepared for global university pathways? So, let's focus on the core gap. As counselors, I'm sure we all have been doing a powerful job of giving students some direction. You guys have been helping with university strategy, core selection, application narratives, essays, and profile positioning. Schools have been doing the job of delivering the curriculum, classroom learning, grade progression. But between the counseling direction and the school curriculum, there has often been a gap, and that gap has been academic execution, and that is where the Student Skoope primarily operates. So, we work with students on diagnostic, concept mastery, exam practice, internal assessment, extended essay supports, parent reporting, as well as academic evidence. So, our belief is very, very simple, that counseling outcomes will become stronger only when the academic execution is visible, measurable, as well as aligned. So, what- what we see that as counselors or any other TOC members have already experienced, I'm sure many of you must have seen this pattern, that a student generally looks very ambitious on paper. They wanted to do medicine, they wanted to do engineering, economics, computer science, or selective global universities, but the academic risk is often hidden until it's quite late. So, sometimes the risk is the subject selection, a student ends up choosing higher levels or standard levels or A level subjects without having enough evidence of the readiness for that subject. Sometimes it's also the parent anxiety. Parents want clarity but receive reassurance instead of measurable progress. And sometimes the profile story is very",
+            "truncated": true
+          }
+        ],
+        "humanAnswerable": null
+      },
+      "humanAdjudication": {
+        "status": "unreviewed",
+        "reviewer": null,
+        "reviewedAt": null,
+        "questionHasUniqueAnswer": null,
+        "acceptedSessionIds": null,
+        "disposition": null,
+        "rationale": null,
+        "approvedForGoldenSet": null
+      }
+    },
+    {
+      "id": "2026-05-28-in-focus-1-gq03",
+      "question": "My family lives in a smaller town, not a major city. Are there options for students to participate remotely or is everything on-site?",
+      "expectedSessionId": "2026-05-28-in-focus-1",
+      "recordedTopK": [
+        "2026-07-15-creative-futures",
+        "2026-06-03-dual-enrollment-pathway",
+        "2026-08-27-in-focus-4",
+        "2026-08-10-ucas-what-changed-what-matters",
+        "2026-06-25-in-focus-2"
+      ],
+      "recordedMiss": true,
+      "historicalSemanticEvidence": {
+        "measuredAt": "2026-09-21T09:44:02.478Z",
+        "expectedScore": 0.6571,
+        "bestRival": "2026-07-15-creative-futures",
+        "bestRivalScore": 0.6984,
+        "topSession": "2026-07-15-creative-futures",
+        "topScore": 0.6984,
+        "margin": -0.0414,
+        "ambiguousRivals_0p03": [
+          "2026-07-15-creative-futures",
+          "2026-06-03-dual-enrollment-pathway",
+          "2026-08-27-in-focus-4",
+          "2026-08-10-ucas-what-changed-what-matters",
+          "2026-06-25-in-focus-2",
+          "2026-07-22-uniaccess-cept-university",
+          "2026-05-22-uniaccess-xavier-university",
+          "2026-06-19-entrance-exams-pathways-india-part1",
+          "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "2026-05-23-uniaccess-atlas-skilltech",
+          "2026-07-28-metrics-and-mingling",
+          "2026-07-03-inside-the-uc-session",
+          "2026-05-29-decoding-ever-expanding-cast",
+          "2026-07-08-beyond-black-robes-law-careers",
+          "2026-07-30-in-focus-3",
+          "2026-08-24-uniaccess-leeds-arts-university",
+          "2026-05-08-funding-dreams-loans-forex",
+          "2026-08-03-uk-beyond-offer-letters-reupload",
+          "2026-08-03-uk-beyond-offer-letters",
+          "2026-06-30-exploring-identity-success-counseling",
+          "428d130a-f41e-40c9-b52e-14664e307301"
+        ],
+        "scope": "Historical scores copied verbatim; not recomputed against current transcript hashes. Similarity is not proof of answerability."
+      },
+      "expected": {
+        "sessionId": "2026-05-28-in-focus-1",
+        "source": {
+          "path": "data/toc-migrated/2026-05-28-in-focus-1/turns.json",
+          "sha256": "3f7229899fd1a4a6d190e3c9d402b12dcae2ceb9dc66cbf697d18e698d9e6581",
+          "bytes": 52264,
+          "turnCount": 59
+        },
+        "selectionStatus": "candidate-evidence-unreviewed",
+        "evidence": [
+          {
+            "turnId": "2026-05-28-in-focus-1-t021",
+            "tenantId": "toc",
+            "sessionId": "2026-05-28-in-focus-1",
+            "speakerRef": "Yavya",
+            "tStart": 1233,
+            "tEnd": 2190,
+            "turnSha256": "39cee2f70f2d3e42a86a52cb4fe78deb050e73c66a6054754d2f00fbfa3f18fb",
+            "anchor": "available online",
+            "characterOffset": 2917,
+            "characterLength": 2000,
+            "text": "rong work, we'll build them up from wherever they are. So, we have three core offerings. Um, first is our short courses, so each ranging from just 4 hours to 40 hours. And they're available online, offline, or in a hybrid model. These introduce students to specific mediums as well as build foundational skills. The second is our mentorship program, which is designed um, for students needing help with their IGCSE, IBDP, or A Level curriculums. Um, this program can also be personalized to help students build a portfolio remotely, as well as a supplemental portfolio, or when they want to work on independent creative projects. Um, and our third, which is our flagship program, is our portfolio development program, which I'll be going into detail shortly. But it's basically a full year-long hybrid journey for students applying um, to art and designs, art and design programs um, at an undergrad or at a post-grad level. So, our short courses fall under three categories. The first is specialized design courses. So, here we have offerings such as interior design, architecture, UI/UX, and digital illustration. Um, the next is foundational skill building. So, these are the core technical skills that every student basically needs. And the next is exploratory mediums. So, this includes photography, sculpture, printmaking, and more. So, these are ideal for students who want to discover what they enjoy and understand different creative expressions and ways of making. So, this is what we specialize in, it is the portfolio development program, which is a one-year-long journey where students create a standout portfolio um, ready for submission to the world's top art and design programs. This is a hybrid program, and students of grade 10 and above are eligible to join this program. So, students create 12 to 15 final works um, based on the requirements of international colleges um, like the ones in the UK, US, Singapore, Australia, and beyond. They work one-on-one with our team of specia",
+            "truncated": true
+          },
+          {
+            "turnId": "2026-05-28-in-focus-1-t047",
+            "tenantId": "toc",
+            "sessionId": "2026-05-28-in-focus-1",
+            "speakerRef": "Makrand",
+            "tStart": 2664,
+            "tEnd": 2749,
+            "turnSha256": "8cafc15498e8130134bfe82499f20ecf0f1950a19823e5e740c443f825ca919a",
+            "anchor": "internship online",
+            "characterOffset": 804,
+            "characterLength": 374,
+            "text": "kids that from the trade exhibitions that they have, you know, prototypes, if you will. So, they would like to take all these kids to go to Chandigarh for two days. We will do the internship online, but we'll also give the, you know, the students a very hands-on experience. So, that's the kind of, you know, responsiveness that we get from these MSME partners. Yep. Thanks.",
+            "truncated": true
+          }
+        ],
+        "humanAnswerable": null
+      },
+      "rival": {
+        "sessionId": "2026-07-15-creative-futures",
+        "source": {
+          "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+          "sha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+          "bytes": 160163,
+          "turnCount": 269
+        },
+        "selectionStatus": "candidate-evidence-unreviewed",
+        "evidence": [
+          {
+            "turnId": "2026-07-15-creative-futures-t078",
+            "tenantId": "toc",
+            "sessionId": "2026-07-15-creative-futures",
+            "speakerRef": "Emily Lee",
+            "tStart": 2371,
+            "tEnd": 2399,
+            "turnSha256": "047f8eb394f03f950ff63ac9ff46ceefc4a4df9523e694a8003a7796baceba58",
+            "anchor": "campus online",
+            "characterOffset": 66,
+            "characterLength": 459,
+            "text": " not just one or two SCADpro each quarter each academic setting, it's multiple. We have tons, sometimes 10s or 20s happening at the same time at each campus, and we have all three campus online SCAD now, um, with Atlanta and Savannah, all three campus have different opportunities as well. So really, as long I would say, if the student is interested, with the mindset of coming to SCAD, they want to be part of the SCADpro, they want to take that experience,",
+            "truncated": true
+          },
+          {
+            "turnId": "2026-07-15-creative-futures-t131",
+            "tenantId": "toc",
+            "sessionId": "2026-07-15-creative-futures",
+            "speakerRef": "Sumit Saurabh",
+            "tStart": 3400,
+            "tEnd": 3421,
+            "turnSha256": "1fb73ed244d8504c9c9eea72a765c5cdd4e1d976b63cc53c24b72ce5ee9b3976",
+            "anchor": "take it online",
+            "characterOffset": 125,
+            "characterLength": 305,
+            "text": " to live the life your students are sho- showing in their portfolio. But now, the crowd has gone multiple folds. Earlier, there were not so many applic- applications. So now, they take it online, but still, their requirement and their expectation remains same. That, from where you have done the research,",
+            "truncated": true
+          }
+        ],
+        "humanAnswerable": null
+      },
+      "humanAdjudication": {
+        "status": "unreviewed",
+        "reviewer": null,
+        "reviewedAt": null,
+        "questionHasUniqueAnswer": null,
+        "acceptedSessionIds": null,
+        "disposition": null,
+        "rationale": null,
+        "approvedForGoldenSet": null
+      }
+    },
+    {
+      "id": "2026-06-19-entrance-exams-pathways-india-part1-gq01",
+      "question": "Is it better to pick a top-ranked college even if it's for a less popular course, or should I prioritize the course I want at a lower-ranked institution?",
+      "expectedSessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "recordedTopK": [
+        "2026-08-24-uniaccess-leeds-arts-university",
+        "2026-05-08-funding-dreams-loans-forex",
+        "2026-08-03-uk-beyond-offer-letters-reupload",
+        "2026-08-03-uk-beyond-offer-letters",
+        "2026-07-03-inside-the-uc-session"
+      ],
+      "recordedMiss": true,
+      "historicalSemanticEvidence": {
+        "measuredAt": "2026-09-21T09:44:02.478Z",
+        "expectedScore": 0.6645,
+        "bestRival": "2026-08-24-uniaccess-leeds-arts-university",
+        "bestRivalScore": 0.7494,
+        "topSession": "2026-08-24-uniaccess-leeds-arts-university",
+        "topScore": 0.7494,
+        "margin": -0.0849,
+        "ambiguousRivals_0p03": [
+          "2026-08-24-uniaccess-leeds-arts-university",
+          "2026-05-08-funding-dreams-loans-forex",
+          "2026-08-03-uk-beyond-offer-letters-reupload",
+          "2026-08-03-uk-beyond-offer-letters",
+          "2026-07-03-inside-the-uc-session",
+          "2026-08-12-uniaccess-ashoka-university",
+          "2026-07-15-creative-futures",
+          "2026-05-22-uniaccess-xavier-university",
+          "2026-07-22-uniaccess-cept-university",
+          "2026-08-10-ucas-what-changed-what-matters",
+          "2026-06-03-dual-enrollment-pathway",
+          "2026-07-30-in-focus-3",
+          "2026-07-08-beyond-black-robes-law-careers",
+          "2026-08-27-in-focus-4",
+          "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "2026-06-25-in-focus-2",
+          "2026-05-23-uniaccess-atlas-skilltech"
+        ],
+        "scope": "Historical scores copied verbatim; not recomputed against current transcript hashes. Similarity is not proof of answerability."
+      },
+      "expected": {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "source": {
+          "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+          "sha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+          "bytes": 71001,
+          "turnCount": 38
+        },
+        "selectionStatus": "candidate-evidence-unreviewed",
+        "evidence": [
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t007",
+            "tenantId": "toc",
+            "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+            "speakerRef": "Anurag",
+            "tStart": 409,
+            "tEnd": 1412,
+            "turnSha256": "13de1c269e391c6da49356865f7686d0f86d1c0d5dc5bfc5d56049a215b05bd1",
+            "anchor": "brand of the college",
+            "characterOffset": 14825,
+            "characterLength": 557,
+            "text": "s the student set on the core engineering career or open to switching tracks? If they are open to switching tracks into consulting, MBA or in any other domain, then definitely the brand of the college does help, no matter what sort of, you know, the course you are studying there, what sort of branch you are studying there. But, if you are actually wanting to get into the core tech, go ahead and, you know, look for the branch, no matter which college you are studying in, right? So, it is largely depending upon the sort of career student is looking for.",
+            "truncated": true
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t009",
+            "tenantId": "toc",
+            "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+            "speakerRef": "Anurag",
+            "tStart": 1415,
+            "tEnd": 1660,
+            "turnSha256": "a857f4338130d3fd6a455af9214fe3313e7fcaecb248dd8cf3203bfbd4f33a6d",
+            "anchor": "Branch versus college",
+            "characterOffset": 2661,
+            "characterLength": 1016,
+            "text": "nts should be encouraged to go for parallel application to BITSAT, state CETs and other exams so that they have really good option available with them. Not just a fallback option. Branch versus college, it should definitely depend upon 10-year goal what they are looking for. Not just depending upon what is going in and around on day one, right? In JoSAA, when once they are opting for a counseling thing, they should recommend students go for float, not for freeze, so that the option of upgrading the the choice remain available with them. And matching the branch would be absolutely the choice what students are, you know, going to make for themselves, 10 years down the line. If they are going into the the pivot roles, they can go for different things and if they are looking for, you know, the the great foundation in AI/ML, they should definitely go for CSE along with the AI/ML electives. So, this is what it is from my end, and Ambika, over to you if there are any questions, I would really love to answer.",
+            "truncated": true
+          }
+        ],
+        "humanAnswerable": null
+      },
+      "rival": {
+        "sessionId": "2026-08-24-uniaccess-leeds-arts-university",
+        "source": {
+          "path": "data/toc-migrated/2026-08-24-uniaccess-leeds-arts-university/turns.json",
+          "sha256": "69e1be5a61cecd344422d130c12ed259c96112ffd9c553745a4de0d376ceb98c",
+          "bytes": 76396,
+          "turnCount": 102
+        },
+        "selectionStatus": "candidate-evidence-unreviewed",
+        "evidence": [
+          {
+            "turnId": "2026-08-24-uniaccess-leeds-arts-university-t034",
+            "tenantId": "toc",
+            "sessionId": "2026-08-24-uniaccess-leeds-arts-university",
+            "speakerRef": "spk:0",
+            "tStart": 1915,
+            "tEnd": 1945,
+            "turnSha256": "4231a8328c7d94ee2523789f4d774b7187842f90bb1e829c767ec0ae6bada3c2",
+            "anchor": "not about the brands",
+            "characterOffset": 128,
+            "characterLength": 441,
+            "text": "t. And that brings me to very interesting conversation with Shweta. Miss Shweta, if you there, um, you know, I remember ages ago I had a very beautiful conversation that it's just not about the brands, it's just not about the top four or the top five that comes to your mind. Um what additionally do you do, Miss Shweta, just to make sure that the student reaches to the right place, if- if I may ask you, just in general in your counseling?",
+            "truncated": true
+          }
+        ],
+        "humanAnswerable": null
+      },
+      "humanAdjudication": {
+        "status": "unreviewed",
+        "reviewer": null,
+        "reviewedAt": null,
+        "questionHasUniqueAnswer": null,
+        "acceptedSessionIds": null,
+        "disposition": null,
+        "rationale": null,
+        "approvedForGoldenSet": null
+      }
+    },
+    {
+      "id": "2026-07-22-uniaccess-cept-university-gq01",
+      "question": "What's the relative importance of high school grades compared to standardized test scores when you calculate a final merit score for admission?",
+      "expectedSessionId": "2026-07-22-uniaccess-cept-university",
+      "recordedTopK": [
+        "2026-06-03-dual-enrollment-pathway",
+        "2026-07-03-inside-the-uc-session",
+        "2026-08-10-ucas-what-changed-what-matters",
+        "2026-08-12-uniaccess-ashoka-university",
+        "2026-07-15-creative-futures"
+      ],
+      "recordedMiss": true,
+      "historicalSemanticEvidence": {
+        "measuredAt": "2026-09-21T09:44:02.478Z",
+        "expectedScore": 0.6552,
+        "bestRival": "2026-06-03-dual-enrollment-pathway",
+        "bestRivalScore": 0.7103,
+        "topSession": "2026-06-03-dual-enrollment-pathway",
+        "topScore": 0.7103,
+        "margin": -0.0551,
+        "ambiguousRivals_0p03": [
+          "2026-06-03-dual-enrollment-pathway",
+          "2026-07-03-inside-the-uc-session",
+          "2026-08-10-ucas-what-changed-what-matters",
+          "2026-08-12-uniaccess-ashoka-university",
+          "2026-07-15-creative-futures",
+          "2026-08-27-in-focus-4",
+          "2026-07-30-in-focus-3",
+          "2026-05-08-funding-dreams-loans-forex",
+          "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "2026-06-25-in-focus-2",
+          "2026-05-22-uniaccess-xavier-university",
+          "2026-06-19-entrance-exams-pathways-india-part1",
+          "2026-08-03-uk-beyond-offer-letters",
+          "2026-08-03-uk-beyond-offer-letters-reupload"
+        ],
+        "scope": "Historical scores copied verbatim; not recomputed against current transcript hashes. Similarity is not proof of answerability."
+      },
+      "expected": {
+        "sessionId": "2026-07-22-uniaccess-cept-university",
+        "source": {
+          "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+          "sha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+          "bytes": 44699,
+          "turnCount": 56
+        },
+        "selectionStatus": "candidate-evidence-unreviewed",
+        "evidence": [
+          {
+            "turnId": "2026-07-22-uniaccess-cept-university-t004",
+            "tenantId": "toc",
+            "sessionId": "2026-07-22-uniaccess-cept-university",
+            "speakerRef": "Nilesh",
+            "tStart": 145,
+            "tEnd": 682,
+            "turnSha256": "718c6e33977f710bdcd2a9ded069b6274b4f6ba1ac727c62e4bbe88a1311f5ef",
+            "anchor": "50-50 weightage",
+            "characterOffset": 5949,
+            "characterLength": 1798,
+            "text": "tecture, we accept NATA score. For urban design, we accept NATA or JEE Paper 2 score. Lot of people confused about how the merits are calculated. So, B.Arch and B.U.D. merit has a 50-50 weightage of NATA and board score. So, if a student has scored 90% in board, 120 in NATA because NATA is out of 200, so student merit score will be 75. So, this is the score which is a good score to get into the CEPT. The student can stay positive if his score, merit score of 75, and this is how calculated by 50%. So, this is the only entrance exam which also takes board into account. And we run bachelors in design program. We have communications design, product design, and multidisciplinary design. So, student can decide to remain in multidisciplinary rather than selecting his major. There, the admissions are only through UCEED. We also run a civil engineering program since 1982, so it's one of the oldest civil engineering program at in India. And we have only a small cohort of 40 students there. And there also, we follow the similar studio-based pedagogy. And yes, we are open for counselors. You can schedule a visit at CEPT, a group or an individual visit. We also arrange a lot of workshops in your cities or at the CEPT campus. And if you want to organize a specific workshop, like we have done this with one of our community members in past, we can do that. We have a program ambassadors, so if you are, counseling students and who want more information about CEPT, they can get in touch with the program ambassadors. Link to their names are already there on the website. We organize a lot of public events and webinars. There are open houses, which I usually share on the group. And yes, we maintain this relationship. So, yes, this this is what all about CEPT. Now, if you have any question.",
+            "truncated": true
+          },
+          {
+            "turnId": "2026-07-22-uniaccess-cept-university-t027",
+            "tenantId": "toc",
+            "sessionId": "2026-07-22-uniaccess-cept-university",
+            "speakerRef": "Nilesh",
+            "tStart": 1246,
+            "tEnd": 1285,
+            "turnSha256": "9a21336218f7e7e599167df16447adf35b66f561cafac3d608ea7ae6b3386a0e",
+            "anchor": "board score",
+            "characterOffset": 0,
+            "characterLength": 622,
+            "text": "So, what happens now, like, our application typically starts when the UCEED scores are released. After that, we ask students to upload their 12th board score once it is released. But, most of the time, that is getting missed. Lot of times, the NATA scores are not properly captured in their application. We don't require any questionnaire. We don't required any statement of purpose. It's only the score and application. So, yes, if you have, like, it's a very simple, very straightforward application. You just have to put your board score and NATA score or a board score and your UCEED score and you are done. That's it.",
+            "truncated": false
+          }
+        ],
+        "humanAnswerable": null
+      },
+      "rival": {
+        "sessionId": "2026-06-03-dual-enrollment-pathway",
+        "source": {
+          "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/turns.json",
+          "sha256": "7b3ac6ef7c6b7bec82bbb2a78e04e05f96de20f4302513b8dc25d35b0c9df78e",
+          "bytes": 88408,
+          "turnCount": 90
+        },
+        "selectionStatus": "candidate-evidence-unreviewed",
+        "evidence": [
+          {
+            "turnId": "2026-06-03-dual-enrollment-pathway-t016",
+            "tenantId": "toc",
+            "sessionId": "2026-06-03-dual-enrollment-pathway",
+            "speakerRef": "Stephen Fu",
+            "tStart": 1054,
+            "tEnd": 1135,
+            "turnSha256": "5707b7cc5feffd45d6648ddf368b81057bb4b96a5a7738a3e4d2b6879182eb2b",
+            "anchor": "holistic grade",
+            "characterOffset": 38,
+            "characterLength": 1188,
+            "text": " could benefit from the dual enrollment classes because they are, you know, in a high school setting, but actual college classes, right? And when you think about it, um, it is the holistic grade that gets evaluated by colleges. So when we evaluate those um dual enrollment classes, our transfer credit team will look at the final transcript from whatever wherever they received credits from, and they send the transcripts over. So unlike AP or IB, you know, with a final grade that might depend on one exam, this grade that we receive and this grade that we evaluate is a holistic grade where, you know, a student might do bad on one of the exams but can come back, um, with a grade. So a lot of students that claim themselves as bad test takers could really benefit from the dual enrollment programs as well because they use the holistic um grade to evaluate. But I think it's, you know, a lot of students can benefit from dual enrollment just to widen their horizon as well, and there are a lot more classes that high schools don't teach um on the regular curriculum that they can benefit from taking dual enrollment classes and to get a taste of what college classes are like early on.",
+            "truncated": true
+          },
+          {
+            "turnId": "2026-06-03-dual-enrollment-pathway-t073",
+            "tenantId": "toc",
+            "sessionId": "2026-06-03-dual-enrollment-pathway",
+            "speakerRef": "Niharika Sondi",
+            "tStart": 3119,
+            "tEnd": 3161,
+            "turnSha256": "075f4615e68eedd947fe198207ad3890cbe540a12b9bda150c2ce66dc2ebf459",
+            "anchor": "both the transcripts",
+            "characterOffset": 583,
+            "characterLength": 241,
+            "text": "f physics scores were lesser, and the grades have been improved in the college transcript, then it really adds value. Is so the idea is that evaluation of an admission is based on both the transcripts and not only the high school transcript.",
+            "truncated": true
+          }
+        ],
+        "humanAnswerable": null
+      },
+      "humanAdjudication": {
+        "status": "unreviewed",
+        "reviewer": null,
+        "reviewedAt": null,
+        "questionHasUniqueAnswer": null,
+        "acceptedSessionIds": null,
+        "disposition": null,
+        "rationale": null,
+        "approvedForGoldenSet": null
+      }
+    },
+    {
+      "id": "2026-08-12-uniaccess-ashoka-university-gq04",
+      "question": "If there's an aptitude test as part of the process, what kind of skills does it measure?",
+      "expectedSessionId": "2026-08-12-uniaccess-ashoka-university",
+      "recordedTopK": [
+        "2026-07-22-uniaccess-cept-university",
+        "2026-05-28-in-focus-1",
+        "2026-08-10-ucas-what-changed-what-matters",
+        "2026-07-15-creative-futures",
+        "2026-08-27-in-focus-4"
+      ],
+      "recordedMiss": true,
+      "historicalSemanticEvidence": {
+        "measuredAt": "2026-09-21T09:44:02.478Z",
+        "expectedScore": 0.6535,
+        "bestRival": "2026-07-22-uniaccess-cept-university",
+        "bestRivalScore": 0.692,
+        "topSession": "2026-07-22-uniaccess-cept-university",
+        "topScore": 0.692,
+        "margin": -0.0386,
+        "ambiguousRivals_0p03": [
+          "2026-07-22-uniaccess-cept-university",
+          "2026-05-28-in-focus-1",
+          "2026-08-10-ucas-what-changed-what-matters",
+          "2026-07-15-creative-futures",
+          "2026-08-27-in-focus-4",
+          "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "2026-07-03-inside-the-uc-session",
+          "2026-07-30-in-focus-3",
+          "2026-07-08-beyond-black-robes-law-careers",
+          "2026-05-08-funding-dreams-loans-forex",
+          "2026-06-25-in-focus-2",
+          "2026-08-24-uniaccess-leeds-arts-university",
+          "2026-06-03-dual-enrollment-pathway",
+          "2026-05-23-uniaccess-atlas-skilltech",
+          "2026-05-29-decoding-ever-expanding-cast"
+        ],
+        "scope": "Historical scores copied verbatim; not recomputed against current transcript hashes. Similarity is not proof of answerability."
+      },
+      "expected": {
+        "sessionId": "2026-08-12-uniaccess-ashoka-university",
+        "source": {
+          "path": "data/toc-migrated/2026-08-12-uniaccess-ashoka-university/turns.json",
+          "sha256": "fcc2b56c91966ac80c75719e135dd238d62e6a092b8227b71978de7cdb58f306",
+          "bytes": 68881,
+          "turnCount": 26
+        },
+        "selectionStatus": "candidate-evidence-unreviewed",
+        "evidence": [
+          {
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t011",
+            "tenantId": "toc",
+            "sessionId": "2026-08-12-uniaccess-ashoka-university",
+            "speakerRef": "Anju",
+            "tStart": 1341,
+            "tEnd": 2467,
+            "turnSha256": "890d4520295cbd4824123ef59a23b008df557ff7477ffe7ef67d9ac5641ba635",
+            "anchor": "logical reasoning",
+            "characterOffset": 10112,
+            "characterLength": 2000,
+            "text": "e the Ashoka Aptitude Assessment or they want to take the Ashoka Mathematics Challenge. Now, there is a difference between the two. The Ashoka Aptitude Assessment, um, is based on logical reasoning, verbal reasoning, there is visual reasoning, there is—it's—it's a lot more reasoning-driven, uh, test. When you look at the Ashoka Mathematics Challenge, it is a test which is more focused on mathematical abilities and their quantitative aptitude more than the other part. There is reasoning within that also, there is reasoning within the particular questions in AMC as well. Having said that, the focus is a—little more still tilted towards the mathematical aspect. Now, why did we feel the need for this? Um, we've had the sciences at Ashoka from the beginning, it's not that we are having them right now. But we also realize that as we are growing and as, you know, more and more students pick up these STEM majors, there is a certain level of mathematics that the students should have at the time of entry. Uh, so, we've picked up, there are also kids who are extremely confident that they can perform really well in a much more mathematical test than a much more reasoning-based test. So, if the reasoning component is limited, uh, they—they shine better. And their, if—if, if the reasoning component is not that great, or rather they are more reasoning and less mathematical, they can pick up the other. So, essentially, the choice is with the student. If the student feels that yes, \"I want to take the AMC and I want to showcase that this is my quantitative ability, and I am focused on a STEM major. This is how it can help me really well. My chances of also scoring very high on an AMC is much better than, let's say, the aptitude assessment.\" You can, they can go ahead and choose the AMC. If they think, \"Ki boss, ye mere samajh mein nahi aane wala hai. This is not something that I'm going to understand. Mathematical abilities is there, it's good enough for reasoning, it is not great e",
+            "truncated": true
+          },
+          {
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t017",
+            "tenantId": "toc",
+            "sessionId": "2026-08-12-uniaccess-ashoka-university",
+            "speakerRef": "Anju",
+            "tStart": 3012,
+            "tEnd": 3393,
+            "turnSha256": "5fcd1bf41726014188398d13fa1226eab42073b2fd102ce67b2405917950cd52",
+            "anchor": "reasoning test",
+            "characterOffset": 1634,
+            "characterLength": 2000,
+            "text": "tude test that you're preparing for, whether it's the SAT, whether it's CLAT, whether it's CUET, whatever aptitude test that you pick up, it's an aptitude test, it's essentially a reasoning test. We're only looking at that. So, as long as your basics are strong, and you can practice, you know, number of those questions, bunch of different spaces, that's good enough for you, you can prepare that really well. Uh, and then go about with it. Um, okay. Aparna, turn around time, so there are timelines that we give in for each and every, uh, round. So, for example, if we have the application deadline, let's say, for the first round by November end, then you can expect for the offers to come out by January end. Similarly, if it's Jan end for round two, then somewhere in say, March is when we release offers. So, we take in that timeline to read through applications and then within that timeline is when your interviews also happen and so forth. That's there. Acceptance rate, it depends from year to year. Uh, I can't give you the rate, it's there's no trade secret but then it's not something that's very specific or sustained each and every year. Uh, but yes, we are very selective and our benchmarks are really, really high. And I'm not saying this only from a perspective of what is the grade that you get on your academic transcript. The benchmark is high in terms of the quality of student that's coming into Ashoka, and the contribution that the student is going to put in to Ashoka when they are going through the process. So, I think that's very contextual. And yeah, you—you just need to keep this in mind that the competition is extremely wide. I'll give you an example. Uh, and I think Jay had asked a question saying, \"Cutoff for 26?\" We don't have a cutoff for we don't have a cutoff cutoff per se. Uh, if you mean the academic cutoff, there's no academic cutoff there. Um, the past two years, last year we onboarded about eight, 820 kids last year. This year, I have my new coming,",
+            "truncated": true
+          }
+        ],
+        "humanAnswerable": null
+      },
+      "rival": {
+        "sessionId": "2026-07-22-uniaccess-cept-university",
+        "source": {
+          "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+          "sha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+          "bytes": 44699,
+          "turnCount": 56
+        },
+        "selectionStatus": "candidate-evidence-unreviewed",
+        "evidence": [
+          {
+            "turnId": "2026-07-22-uniaccess-cept-university-t021",
+            "tenantId": "toc",
+            "sessionId": "2026-07-22-uniaccess-cept-university",
+            "speakerRef": "Nilesh",
+            "tStart": 1080,
+            "tEnd": 1129,
+            "turnSha256": "cd7b90689983e916e089b707e965de11687c881edca9510ff991331836ddd629",
+            "anchor": "aptitude and design thinking",
+            "characterOffset": 0,
+            "characterLength": 625,
+            "text": "We don't require any portfolio. So, NATA and UCEED both have a component one and component two. Component one is typically their aptitude and design thinking skill, and part two analyze the design thinking. Right? So, there is no portfolio student has to submit for the CEPT admissions. And there, after, their portfolio will automatically get developed. So, as I show you that studio, the student work from last 10 years is on display there every semester wise. So, yes, CEPT admission doesn't require portfolio. For design programs, NID requires portfolio, I believe, and other institutes, but not CEPT. CEPT is only UCEED.",
+            "truncated": false
+          }
+        ],
+        "humanAnswerable": null
+      },
+      "humanAdjudication": {
+        "status": "unreviewed",
+        "reviewer": null,
+        "reviewedAt": null,
+        "questionHasUniqueAnswer": null,
+        "acceptedSessionIds": null,
+        "disposition": null,
+        "rationale": null,
+        "approvedForGoldenSet": null
+      }
+    }
+  ]
+}

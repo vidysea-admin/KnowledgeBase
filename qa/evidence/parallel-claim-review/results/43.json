@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "index": 43,
+  "originalIndex": 48,
+  "claimId": "2026-07-22-uniaccess-cept-university-c02",
+  "inputHash": "ba7a88b8a81f1e1709eaba45bd354fcd8cd976dd41777ace41391b58282501df",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "Original t006 explicitly states that 70% of student credit is a studio within CEPT studio-based pedagogy. Original t005's separate 70% faculty statistic does not establish the academic-credit percentage.",
+    "missingReferences": [],
+    "caveats": [
+      "Both cited references have exactly one supplied match; no missing or duplicate references.",
+      "Both original speakerRef values are unknown; an embedded speaker name does not establish person identity.",
+      "Transcript support does not establish external factual truth, applicability at a later date, or human approval.",
+      "Original timings are t005 189-236 and t006 236-307; current same-ID timings and content differ."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-22-uniaccess-cept-university",
+        "turnId": "2026-07-22-uniaccess-cept-university-t005",
+        "contextVersion": "originalMigration",
+        "quote": "70% of our faculties are practitioners, so they practice apart from teaching at the CEPT.",
+        "textSha256": "2afb88424414f2bef1b1e0811538382d1e15bb54a732b795618df68faadb84cd",
+        "contextSha256": "9dcc0553c17ca1216899614c991a06cd43026f4395ad8686f0bf06189de3156e",
+        "artifactSha256": "f41764fd45c53cabc8c4bd9ca04c16091da302e66ecd5eea253a9fd50f736d05",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 189,
+        "tEnd": 236,
+        "supports": "Unrelated 70% statistic refers to practitioner faculty, not student academic credits."
+      },
+      {
+        "sessionId": "2026-07-22-uniaccess-cept-university",
+        "turnId": "2026-07-22-uniaccess-cept-university-t006",
+        "contextVersion": "originalMigration",
+        "quote": "So 70% of your credit is a single studio",
+        "textSha256": "9b72b7d947c0e278b4c0010c265fea09f8fdfdf6d62723cae320c2eba763da74",
+        "contextSha256": "56c6cdd34855aea6a2c5ac8e824e47308467bee6a4fef718bc70c5a494089e14",
+        "artifactSha256": "f41764fd45c53cabc8c4bd9ca04c16091da302e66ecd5eea253a9fd50f736d05",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 236,
+        "tEnd": 307,
+        "supports": "Directly supports 70% of a CEPT student's credit coming from studio-based coursework."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "Current t005 invites questions and current t006 thanks the presenter for understandable visuals. Neither states CEPT's studio-credit proportion or the 70% academic-credit denominator.",
+    "missingReferences": [],
+    "caveats": [
+      "Both cited references have exactly one supplied match; no missing or duplicate references.",
+      "Same IDs now have changed text, speakerRef values, and timings: t005 682-717, t006 717-724.",
+      "The stored Pooja and spk:2 speakerRef values do not independently verify person identities.",
+      "Provided current artifact raw-byte SHA256 and normalizedLfSha256 are distinct; neither artifact byte hash was independently verified.",
+      "Unsupported citation support does not establish that the claim is false."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-22-uniaccess-cept-university",
+        "turnId": "2026-07-22-uniaccess-cept-university-t005",
+        "contextVersion": "current",
+        "quote": "And I think it's, it's a great idea to open the floor, because a lot of folks probably have questions.",
+        "textSha256": "090912fcf6fa8cca23d36331e3e140f7279501ee51c8279a67e8f103d95964de",
+        "contextSha256": "137d985e1a589dd7f50630f4182fa10ff0d3a7dfada50161d6527e4b270a69a1",
+        "artifactSha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+        "revision": null,
+        "speakerRef": "Pooja",
+        "tStart": 682,
+        "tEnd": 717,
+        "supports": "Invitation to ask questions; supports no component of the 70% studio-credit claim."
+      },
+      {
+        "sessionId": "2026-07-22-uniaccess-cept-university",
+        "turnId": "2026-07-22-uniaccess-cept-university-t006",
+        "contextVersion": "current",
+        "quote": "Yeah, I think it was quite self-explanatory. I mean, the visuals were also understandable, so thank you, Nilesh, for that.",
+        "textSha256": "fe6d3d5fc7f16ecc3d9a186e63212cb8c4cc9475551616a97ce74641f375729a",
+        "contextSha256": "7a3e9cb7c85e85b0efc2b3e6a930c9d6f5675fd66cbad564b822ac2d01ccf7bc",
+        "artifactSha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+        "revision": null,
+        "speakerRef": "spk:2",
+        "tStart": 717,
+        "tEnd": 724,
+        "supports": "Thanks for understandable visuals; supports no component of the 70% studio-credit claim."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original t006 directly supports 70% studio credit; both current same-ID records are unrelated. Content and timing drift prevents substituting historical support for current support. AI preliminary only; external truth and human adjudication remain open."
+}

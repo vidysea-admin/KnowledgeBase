@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "index": 32,
+  "originalIndex": 34,
+  "claimId": "2026-06-25-in-focus-2-c03",
+  "inputHash": "e681394bd201afc33ca3fa8cb57a487e4e41a85954bc87cf44271c5295879c4b",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The original context supports seven-day teacher training before classes for most mentors, but the claim removes the qualifier most and names The Student Scoop, which this cited record does not identify. The entire claim is therefore not directly supported.",
+    "missingReferences": [],
+    "caveats": [
+      "No missing or duplicate references: one supplied match for the sole citation.",
+      "Stored speakerRef is unknown; the embedded speaker name does not establish personal or organizational identity.",
+      "The speaker says currently; session calendar metadata does not establish the applicability period or external truth.",
+      "The same turn ID now contains different text and timings: original 2063-2106, current 2932-2933.",
+      "Provided current artifact raw SHA256 and normalized-LF SHA256 differ; neither on-disk artifact nor historical bytes were verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-25-in-focus-2",
+        "turnId": "2026-06-25-in-focus-2-t063",
+        "contextVersion": "originalMigration",
+        "quote": "Most of our mentors have to undergo a very rigorous 7-day teachers training program, before which we do not let them take up any classes.",
+        "textSha256": "abd08fef88802a2d1c0ad1aa85071e7ffc1d25b2d4a376d52162c612fb5a1ce9",
+        "contextSha256": "8478f20a4c59d314e2112f45fc01ba6ad69f4576a0d97f28cf603cb3a6e23e30",
+        "artifactSha256": "fcbd3a1364cf2f44969fcd223fef7433a8c4fb7043b1bd4e9a79449e398f8afb",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2063,
+        "tEnd": 2106,
+        "supports": "Supports seven-day teacher training as a prerequisite for most mentors; does not establish universal coverage or The Student Scoop attribution."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited record is only a farewell and provides no support for The Student Scoop, mentor training, its duration, mandatory coverage, or the prerequisite to teaching.",
+    "missingReferences": [],
+    "caveats": [
+      "No missing or duplicate references: one supplied match for the sole citation.",
+      "Stored speakerRef Himanshu is a source label, not independently verified identity.",
+      "Same-ID content changed from the original training passage to a farewell, with timings changing from 2063-2106 to 2932-2933.",
+      "Provided raw artifact SHA256 differs from normalized-LF SHA256; byte verification was not performed."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-25-in-focus-2",
+        "turnId": "2026-06-25-in-focus-2-t063",
+        "contextVersion": "current",
+        "quote": "Bye everyone.",
+        "textSha256": "d50129c1901cfd1477b9fd3208129cb7561c75d606dfbc4fe1ac4fd95dbbad25",
+        "contextSha256": "9940d5a7675b5c0d09cfca5c9b38ba88c8e2b8261cf8c29284dc8aa423973183",
+        "artifactSha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+        "revision": null,
+        "speakerRef": "Himanshu",
+        "tStart": 2932,
+        "tEnd": 2933,
+        "supports": "Unrelated farewell; supports none of the training claim components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original evidence partially supports training for most mentors but lacks organizational identification and universal coverage; current same-ID evidence is unrelated. AI preliminary only; human adjudication and external truth remain open."
+}

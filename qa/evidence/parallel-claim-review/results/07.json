@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "index": 7,
+  "originalIndex": 8,
+  "claimId": "2026-05-08-funding-dreams-loans-forex-c03",
+  "inputHash": "5e998afbd962e3c2e72b8934a720078702febd16443fe327d0b444035711d7cc",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The quoted education-loan discussion explicitly describes all interest benefit under Section 80E, supporting the claim as a summary of the speaker's tax-benefit assertion. It supplies no eligibility conditions or independent legal verification.",
+    "missingReferences": [],
+    "caveats": [
+      "Speaker asserts this benefit in a Credila education-loan example; the quotation does not establish all lenders, borrowers or eligibility conditions.",
+      "Stored speakerRef is unknown; the transcript name prefix is not verified identity.",
+      "Original cited interval is 2118–2167 seconds; the current same-ID record is 3783–3792 seconds with different text and speakerRef.",
+      "Provided raw artifact hash is distinct from current raw and normalized-LF hashes; artifact bytes were not independently read.",
+      "Transcript support does not verify legal accuracy, applicability date, country, or external factual truth."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "turnId": "2026-05-08-funding-dreams-loans-forex-t074",
+        "contextVersion": "originalMigration",
+        "quote": "Education loan from lenders like Credila—and we are an NBFC, we are a non-banking financial company, but given we are the pioneers and the leaders in education loan—a loan from Credila ensures 0% TCS, right?",
+        "textSha256": "ccfa8f05b9cd03447dc52bedc2ce62dbec21f2a65b2959b58088079b1701ddf9",
+        "contextSha256": "fa8f045a49f7f8263bbd65a36d320e516f8353ad657316e91d3ccd0b5ea39b54",
+        "artifactSha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2118,
+        "tEnd": 2167,
+        "supports": "Establishes the education-loan and Credila scope of the surrounding tax discussion."
+      },
+      {
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "turnId": "2026-05-08-funding-dreams-loans-forex-t074",
+        "contextVersion": "originalMigration",
+        "quote": "It ensures all interest benefit under Section 80E.",
+        "textSha256": "ccfa8f05b9cd03447dc52bedc2ce62dbec21f2a65b2959b58088079b1701ddf9",
+        "contextSha256": "fa8f045a49f7f8263bbd65a36d320e516f8353ad657316e91d3ccd0b5ea39b54",
+        "artifactSha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2118,
+        "tEnd": 2167,
+        "supports": "Supports the asserted Section 80E interest benefit in that education-loan example."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn only asks whether unspecified actions can be done after education completion and EMI repayment starts; it never identifies Section 80E, interest deductions or a tax benefit. The necessary antecedent is absent.",
+    "missingReferences": [],
+    "caveats": [
+      "The single cited turn exists once in each supplied version; there are no missing or duplicate matches.",
+      "The unresolved antecedent these does not justify substituting the original text.",
+      "Stored speakerRef Kanchan is supplied metadata, not independently verified person identity.",
+      "Same turn ID now binds to changed text, timing and speakerRef; current support must be assessed separately.",
+      "Artifact bytes were not independently read or hash-verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "turnId": "2026-05-08-funding-dreams-loans-forex-t074",
+        "contextVersion": "current",
+        "quote": "And, these can be done even after the the student has completed their education and started paying EMI, again, that will also be done?",
+        "textSha256": "67bffca0176040a2694d9a0626a0da255ab418266fe1515d55993212ea79c7e4",
+        "contextSha256": "bae2aaedb7907fbfd4a428b6b21a5c547d2854ddb43f5c245ebc59ea708a5c63",
+        "artifactSha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+        "revision": null,
+        "speakerRef": "Kanchan",
+        "tStart": 3783,
+        "tEnd": 3792,
+        "supports": "Mentions education completion and EMI as a question; does not support the claimed Section 80E tax benefit."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original quoted evidence supports the speaker's education-loan Section 80E interest-benefit assertion; the current same-ID question provides no such support. No legal truth, human gold or artifact-byte verification is established."
+}

@@ -1,0 +1,305 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "AI-preliminary-independent-audit",
+  "humanAdjudication": null,
+  "batch": 2,
+  "entries": [
+    {
+      "index": 10,
+      "claimId": "2026-05-20-telling-your-brand-story-better-c01",
+      "inputHash": "8fd2500e8745337373d5667fb2d9c8134eed409c77b05a21b098c4ef0afb4e69",
+      "originalLabel": "unsupported",
+      "currentLabel": "unresolvable",
+      "reason": "Original t049 supports EDUCATE's E as Examine and examining the world around the brand, with an inline Mitul Shah attribution; it does not state the claimed before-crafting-a-story sequence. Current t049 is absent, so current support is unresolvable. Original stored speakerRef values are unknown; inline names do not establish person identity. Current speaker labels do not establish identity. No duplicate literal references or duplicate matches are supplied. Current t049 is missing; no same-ID content replacement is supplied. Transcript support is preliminary only; no artifact byte verification, external truth, human adjudication, or semantic gold.",
+      "evidenceHashes": {
+        "claimRecordSha256": "ec358f17eb0811d32646e13b6fcc5fb432b7750f3adb8eac085985678a93045e",
+        "claimTextSha256": "1483d4d9b82c3b063bab8e991d0a0677e70a6e8f8cf451d6281c420c23d99bac",
+        "sourceBindingSha256": "fdd472ab17f4547f636c7fe79000dcdc0c0c4fd9e6ca908e3edb2fe727291468",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationBindings": true
+        },
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "turnId": "2026-05-20-telling-your-brand-story-better-t049",
+            "contextVersion": "originalMigration",
+            "textSha256": "b5f34530ed642448c139bee315fdbf8646666396b77311bc105b207b6b5330c3",
+            "contextSha256": "e4165fd9b66efc34c0b49d9e4179ca4ac5ec325016e88bfd1ac84ba9c643f198",
+            "providedArtifactSha256": "58612ed394808cf3c2a3367da17b183531bdccf27d5971fc85eadd31dcd481f2",
+            "providedNormalizedLfSha256": null,
+            "providedRevision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 2531,
+            "tEnd": 2585
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unresolvable"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 11,
+      "claimId": "2026-05-20-telling-your-brand-story-better-c02",
+      "inputHash": "4df2f68e78f3926ca7210504fc89f22ddf16c3a66dda148d735f8d94eda63fc7",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original t030 explicitly calls these emotional doors, names joy, and describes doors into communication and storytelling with examples of audience feelings. Current same-ID text is only 'Yes.' and lacks the claim's components. Original stored speakerRef values are unknown; inline names do not establish person identity. Current speaker labels do not establish identity. No duplicate literal references or duplicate matches are supplied. Same-ID content and timing changed across versions. Transcript support is preliminary only; no artifact byte verification, external truth, human adjudication, or semantic gold.",
+      "evidenceHashes": {
+        "claimRecordSha256": "3639af46e14812122d5b7fbab37e5d3f3ada62e49fcd909fb14fe8ac88d577a9",
+        "claimTextSha256": "9801b12d9872ddc6d7b4b02dbbfbd779b9432e605ff58c55d66fe095d60df2ef",
+        "sourceBindingSha256": "fdd472ab17f4547f636c7fe79000dcdc0c0c4fd9e6ca908e3edb2fe727291468",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationBindings": true
+        },
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "turnId": "2026-05-20-telling-your-brand-story-better-t030",
+            "contextVersion": "current",
+            "textSha256": "5f9a2b795615ba6a3d5455fd5624d773fbca5bcd16249c421fd37411dc9837da",
+            "contextSha256": "2af989c4f5f8e491480b97d0d81d6ccc3891bbe13b1ae0146b18c8001b2c56a5",
+            "providedArtifactSha256": "2ae41f67947436cb5ee92c993bbd8cf4ae82670c2e95b6210eac4fca73f4f78a",
+            "providedNormalizedLfSha256": "5c982fe673d5bdda527d6576cba6113327ab5e8284bc06be1837513ef0266b9e",
+            "providedRevision": null,
+            "speakerRef": "spk:0",
+            "tStart": 3056,
+            "tEnd": 3058
+          },
+          {
+            "turnId": "2026-05-20-telling-your-brand-story-better-t030",
+            "contextVersion": "originalMigration",
+            "textSha256": "fe9b68b95b38b12706dff6e3efc3e3d5191f6fdca373616dd4396eed25c499eb",
+            "contextSha256": "8cac691b56ea0984b51c480a343226e77ce1b6c1897153d10251f76ef4618556",
+            "providedArtifactSha256": "58612ed394808cf3c2a3367da17b183531bdccf27d5971fc85eadd31dcd481f2",
+            "providedNormalizedLfSha256": null,
+            "providedRevision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 1308,
+            "tEnd": 1419
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 12,
+      "claimId": "2026-05-22-uniaccess-xavier-university-c02",
+      "inputHash": "1a57dc7641c5c33be7220217552a9e5ce4d9ccf024584bd1c5585a917aa4114e",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original t038 explicitly states Xavier received $2.8 million from NIH and was one of only six institutions in the inaugural cohort. Current same-ID text concerns relationships and university experience, with no grant, amount, funder, or cohort support. Original stored speakerRef values are unknown; inline names do not establish person identity. Current speaker labels do not establish identity. No duplicate literal references or duplicate matches are supplied. Same-ID content and timing changed across versions. Transcript support is preliminary only; no artifact byte verification, external truth, human adjudication, or semantic gold.",
+      "evidenceHashes": {
+        "claimRecordSha256": "5fa4a514f24cb8f7d876c125a2137c64ac43ba6d330642e84d8eeafae47a57ab",
+        "claimTextSha256": "9cf9904d4f5ebbe009a01ec2ba699402be442a02363ce9bb02cd8d1d9aad7a18",
+        "sourceBindingSha256": "91751c854720b10f5cf56b810852ac40e52eb4520214f48659cd67059216ce1e",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationBindings": true
+        },
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "turnId": "2026-05-22-uniaccess-xavier-university-t038",
+            "contextVersion": "current",
+            "textSha256": "5d193f8336294a1191133fe854efdce8e80b49619cf6cd6eedaf81b5c9eed3bf",
+            "contextSha256": "658bd93c2ac446054ad3e7649ce12a22f58cfca2956172dd6452b04c937f1c66",
+            "providedArtifactSha256": "9540ce875b248339533cec077615dbb111a2f5562c1b795f5627c1b32b9d17ab",
+            "providedNormalizedLfSha256": "8809e80ce6af8c0f72ead587c3b40245726258659217015aa13474858dd7ccbb",
+            "providedRevision": null,
+            "speakerRef": "Sandeep",
+            "tStart": 738,
+            "tEnd": 760
+          },
+          {
+            "turnId": "2026-05-22-uniaccess-xavier-university-t038",
+            "contextVersion": "originalMigration",
+            "textSha256": "bb6d759bf82df27077ad27e9c9a9dfee289ad56d32c0586f8ac6b9ad49a331f5",
+            "contextSha256": "b7b9ecff46fa325f128917eed8cdd417e2003de92f1c5bcd1e3b41de3c353252",
+            "providedArtifactSha256": "77d983a227996034e40dc522a5608a73f00760a7953351e2ab9398747fa39968",
+            "providedNormalizedLfSha256": null,
+            "providedRevision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 1097,
+            "tEnd": 1150
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 13,
+      "claimId": "2026-05-22-uniaccess-xavier-university-c03",
+      "inputHash": "498eecbff5cf476b23ccbcc89206162959ab5f1ac25e3f5058443f4084e309b9",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original t050 supports merit scholarships of $23,000-$36,000 annually and tuition sometimes as low as $11,500 with additional grants/aid, but does not establish the claim's international-student scope. Current same-ID text is a closing thanks and supports none of the financial components. Original stored speakerRef values are unknown; inline names do not establish person identity. Current speaker labels do not establish identity. No duplicate literal references or duplicate matches are supplied. Same-ID content and timing changed across versions. Transcript support is preliminary only; no artifact byte verification, external truth, human adjudication, or semantic gold.",
+      "evidenceHashes": {
+        "claimRecordSha256": "268cd63419359055a5fa6572296d2cf377d1af4e76ed771ac6cefa90950b756b",
+        "claimTextSha256": "de0aa5201e9d4bb3791c1fb2c81fb1feb45a54db59ba8949dfddf726b9d194fa",
+        "sourceBindingSha256": "91751c854720b10f5cf56b810852ac40e52eb4520214f48659cd67059216ce1e",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationBindings": true
+        },
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "turnId": "2026-05-22-uniaccess-xavier-university-t050",
+            "contextVersion": "current",
+            "textSha256": "aba8c1abd2905d5f252e85d4cce44287411dd0db44095b7bcd4f61729a2284b8",
+            "contextSha256": "27fef6296df1afce6a9a91d4666e03e2f48baa8aa2ad96d96bddcd7f7c80d79b",
+            "providedArtifactSha256": "9540ce875b248339533cec077615dbb111a2f5562c1b795f5627c1b32b9d17ab",
+            "providedNormalizedLfSha256": "8809e80ce6af8c0f72ead587c3b40245726258659217015aa13474858dd7ccbb",
+            "providedRevision": null,
+            "speakerRef": "Sandeep",
+            "tStart": 1733,
+            "tEnd": 1737
+          },
+          {
+            "turnId": "2026-05-22-uniaccess-xavier-university-t050",
+            "contextVersion": "originalMigration",
+            "textSha256": "cd80f6ddabce830b2692e14825f40f22ecfb84980d9c58ce88a84e8739b287d9",
+            "contextSha256": "2ddcfd6cc3d992ec707c0aeaa33432cb2f4290f0272d78af13e586b53240fb2d",
+            "providedArtifactSha256": "77d983a227996034e40dc522a5608a73f00760a7953351e2ab9398747fa39968",
+            "providedNormalizedLfSha256": null,
+            "providedRevision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 1597,
+            "tEnd": 1636
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 14,
+      "claimId": "2026-05-23-uniaccess-atlas-skilltech-c01",
+      "inputHash": "83380f5dfd0bab9605def24fdc8e7d1f23ab52e3587a276953b46d68651bf245",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original t005/t006 support ISDI's membership in ATLAS SkillTech and long-standing collaboration with Parsons School; they do not explicitly identify ISDI as ATLAS's design school or expand Parsons School to Parsons School of Design. Current same-ID records discuss whether Sonal has questions and provide no collaboration support. Original stored speakerRef values are unknown; inline names do not establish person identity. Current speaker labels do not establish identity. No duplicate literal references or duplicate matches are supplied. Same-ID content and timing changed across versions. Transcript support is preliminary only; no artifact byte verification, external truth, human adjudication, or semantic gold.",
+      "evidenceHashes": {
+        "claimRecordSha256": "5df514eef88c2a868a04b0424143fb44f93263ad98ff1be778de07a7d987d328",
+        "claimTextSha256": "8c932f2285fa20e069c120bf7587f98ac7ff57bd377fe44f7a2caef89c18a092",
+        "sourceBindingSha256": "1fbf8b430dd7c589e960441ad83ab1678820ca0bb1601db879ab84c14baf8250",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationBindings": true
+        },
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t005",
+            "contextVersion": "current",
+            "textSha256": "a0c42a14a1bebf9c0069a37c9d1aa288ccda71c5df50ba1b0a944d75830bb724",
+            "contextSha256": "d7fd8b9d51a7293dcd07ec6806c7a7d0edeca2b829fa8c0e96a37db90af8f3df",
+            "providedArtifactSha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+            "providedNormalizedLfSha256": "edd79a5447c222145df9738c30009c5ece51825958e2ea78266e35b252043043",
+            "providedRevision": null,
+            "speakerRef": "spk:0",
+            "tStart": 617,
+            "tEnd": 697
+          },
+          {
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t005",
+            "contextVersion": "originalMigration",
+            "textSha256": "4aef625eccdfdf3ec83e5b0209dacd1f376d3327d5db9d00e185348ae1d52658",
+            "contextSha256": "f5375ed80e5db167795910e7de35aead5a9f2eab81e83f602836bef6b957dee9",
+            "providedArtifactSha256": "01ac7389a1fbc6c276e46349306dc3a86f40ae5c4c658e87177ecff7bd30d545",
+            "providedNormalizedLfSha256": null,
+            "providedRevision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 120,
+            "tEnd": 145
+          },
+          {
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t006",
+            "contextVersion": "current",
+            "textSha256": "7bade8d494d181e074b0bd33353ae3e27d71c7fccb724c35802fda960d29b9a0",
+            "contextSha256": "d7acd157fe00bdce237932076713563e2ada3b1730092fdc741c3a3421bbfa91",
+            "providedArtifactSha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+            "providedNormalizedLfSha256": "edd79a5447c222145df9738c30009c5ece51825958e2ea78266e35b252043043",
+            "providedRevision": null,
+            "speakerRef": "spk:1",
+            "tStart": 697,
+            "tEnd": 703
+          },
+          {
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t006",
+            "contextVersion": "originalMigration",
+            "textSha256": "8a60921933c39e5143b8dda26e5906143f9b5691582c2088377a3c1b16276f84",
+            "contextSha256": "df77d9bcb1735d037ce86f147a375b30be7980bec633ea00ef7fba158ba78fac",
+            "providedArtifactSha256": "01ac7389a1fbc6c276e46349306dc3a86f40ae5c4c658e87177ecff7bd30d545",
+            "providedNormalizedLfSha256": null,
+            "providedRevision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 145,
+            "tEnd": 167
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    }
+  ]
+}

@@ -1,0 +1,533 @@
+{
+  "version": 1,
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "packetPath": "data/eval/extraction-adjudication-packet.json",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "filter": "replacementReviewStatus === 'unreviewed'",
+  "order": "claimId ascending simple lexical, zero-based indices",
+  "taskCount": 65,
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "tasks": [
+    {
+      "index": 0,
+      "originalIndex": 0,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/00.json",
+      "inputHash": "54ca1c5f2eca687ba59374307696a74379493036807ac4da5dc85b8eba9b5730",
+      "resultPath": "qa/evidence/parallel-claim-review/results/00.json"
+    },
+    {
+      "index": 1,
+      "originalIndex": 2,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/01.json",
+      "inputHash": "a9b65fd0a4bb0194e5fdffb75c3bcd2cdc6834299311c4f7908de262955f8fc5",
+      "resultPath": "qa/evidence/parallel-claim-review/results/01.json"
+    },
+    {
+      "index": 2,
+      "originalIndex": 3,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c04",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/02.json",
+      "inputHash": "2c6cd2b9f39ae1a18e397c89de1b97625c787f69b051030de7f5975b9aac8f58",
+      "resultPath": "qa/evidence/parallel-claim-review/results/02.json"
+    },
+    {
+      "index": 3,
+      "originalIndex": 4,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c05",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/03.json",
+      "inputHash": "46b6cf920958c63707a8b9527fa397d52a34d72f4e040f453975238086c7c83b",
+      "resultPath": "qa/evidence/parallel-claim-review/results/03.json"
+    },
+    {
+      "index": 4,
+      "originalIndex": 5,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c06",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/04.json",
+      "inputHash": "4ecaa1800af3f88167c2e7fe9a41f9c72ae25240c1a20cc8fa7f9ad1996784e7",
+      "resultPath": "qa/evidence/parallel-claim-review/results/04.json"
+    },
+    {
+      "index": 5,
+      "originalIndex": 6,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/05.json",
+      "inputHash": "d420035764d74e7bc7ce8e720a953e045dcded40ddd50ea42a97cc0185d40cdb",
+      "resultPath": "qa/evidence/parallel-claim-review/results/05.json"
+    },
+    {
+      "index": 6,
+      "originalIndex": 7,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/06.json",
+      "inputHash": "c7a34c8cee46fb8927442a719177cbb0e3867246d59ce7b6db502274b35b7666",
+      "resultPath": "qa/evidence/parallel-claim-review/results/06.json"
+    },
+    {
+      "index": 7,
+      "originalIndex": 8,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/07.json",
+      "inputHash": "5e998afbd962e3c2e72b8934a720078702febd16443fe327d0b444035711d7cc",
+      "resultPath": "qa/evidence/parallel-claim-review/results/07.json"
+    },
+    {
+      "index": 8,
+      "originalIndex": 9,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c04",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/08.json",
+      "inputHash": "37f16421722de283ee6470e0a90a0df16d9f16a7828bf87cbe0840c879a3f749",
+      "resultPath": "qa/evidence/parallel-claim-review/results/08.json"
+    },
+    {
+      "index": 9,
+      "originalIndex": 10,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c05",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/09.json",
+      "inputHash": "02c877390ca5f7bba11ba44cef4fc1e8a08f3fd01f9ea00b87bab1e7d2d59a1c",
+      "resultPath": "qa/evidence/parallel-claim-review/results/09.json"
+    },
+    {
+      "index": 10,
+      "originalIndex": 11,
+      "claimId": "2026-05-20-telling-your-brand-story-better-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/10.json",
+      "inputHash": "8fd2500e8745337373d5667fb2d9c8134eed409c77b05a21b098c4ef0afb4e69",
+      "resultPath": "qa/evidence/parallel-claim-review/results/10.json"
+    },
+    {
+      "index": 11,
+      "originalIndex": 12,
+      "claimId": "2026-05-20-telling-your-brand-story-better-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/11.json",
+      "inputHash": "4df2f68e78f3926ca7210504fc89f22ddf16c3a66dda148d735f8d94eda63fc7",
+      "resultPath": "qa/evidence/parallel-claim-review/results/11.json"
+    },
+    {
+      "index": 12,
+      "originalIndex": 14,
+      "claimId": "2026-05-22-uniaccess-xavier-university-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/12.json",
+      "inputHash": "1a57dc7641c5c33be7220217552a9e5ce4d9ccf024584bd1c5585a917aa4114e",
+      "resultPath": "qa/evidence/parallel-claim-review/results/12.json"
+    },
+    {
+      "index": 13,
+      "originalIndex": 15,
+      "claimId": "2026-05-22-uniaccess-xavier-university-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/13.json",
+      "inputHash": "498eecbff5cf476b23ccbcc89206162959ab5f1ac25e3f5058443f4084e309b9",
+      "resultPath": "qa/evidence/parallel-claim-review/results/13.json"
+    },
+    {
+      "index": 14,
+      "originalIndex": 16,
+      "claimId": "2026-05-23-uniaccess-atlas-skilltech-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/14.json",
+      "inputHash": "83380f5dfd0bab9605def24fdc8e7d1f23ab52e3587a276953b46d68651bf245",
+      "resultPath": "qa/evidence/parallel-claim-review/results/14.json"
+    },
+    {
+      "index": 15,
+      "originalIndex": 17,
+      "claimId": "2026-05-23-uniaccess-atlas-skilltech-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/15.json",
+      "inputHash": "1ca8f277cf530e23645b8eb301105f9f967144d39ad8a5d2355f3d7a636440b3",
+      "resultPath": "qa/evidence/parallel-claim-review/results/15.json"
+    },
+    {
+      "index": 16,
+      "originalIndex": 18,
+      "claimId": "2026-05-23-uniaccess-atlas-skilltech-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/16.json",
+      "inputHash": "78baeabd85e6c877a50c3323cacbf62422b4f028430246dccea030ede82fda75",
+      "resultPath": "qa/evidence/parallel-claim-review/results/16.json"
+    },
+    {
+      "index": 17,
+      "originalIndex": 19,
+      "claimId": "2026-05-28-in-focus-1-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/17.json",
+      "inputHash": "aa279817f81751e8c0aa8634228a5e0ec9f6dfe348824f69624cbb1cfcd91cb8",
+      "resultPath": "qa/evidence/parallel-claim-review/results/17.json"
+    },
+    {
+      "index": 18,
+      "originalIndex": 20,
+      "claimId": "2026-05-28-in-focus-1-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/18.json",
+      "inputHash": "c56fbb2415b7b60990af02973d32e001681d416190bf28a0c825e04aabe2dbf4",
+      "resultPath": "qa/evidence/parallel-claim-review/results/18.json"
+    },
+    {
+      "index": 19,
+      "originalIndex": 21,
+      "claimId": "2026-05-28-in-focus-1-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/19.json",
+      "inputHash": "b9e1cf134abd35adaca68f556910cb0463c99442f7292030c8c5acff20f12098",
+      "resultPath": "qa/evidence/parallel-claim-review/results/19.json"
+    },
+    {
+      "index": 20,
+      "originalIndex": 22,
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/20.json",
+      "inputHash": "9255cc06d7e74cbd7c5d45b9842f0c51e613568affd3e5d9125fd7387e6ff716",
+      "resultPath": "qa/evidence/parallel-claim-review/results/20.json"
+    },
+    {
+      "index": 21,
+      "originalIndex": 23,
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/21.json",
+      "inputHash": "d4fd5a6b3f10bd5e41a988b9fd00cf27ed6bb5200733ab27fc9edb19805bf558",
+      "resultPath": "qa/evidence/parallel-claim-review/results/21.json"
+    },
+    {
+      "index": 22,
+      "originalIndex": 24,
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/22.json",
+      "inputHash": "7b00f8a33fcf7e10c177478f6a34adf999a5fc79eef45aa04e331a6a84d5f200",
+      "resultPath": "qa/evidence/parallel-claim-review/results/22.json"
+    },
+    {
+      "index": 23,
+      "originalIndex": 25,
+      "claimId": "2026-06-03-dual-enrollment-pathway-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/23.json",
+      "inputHash": "a3b6d17fcc096bd8f6b52e58eb97e8488366552f52027ddf9943ded05af4ae3c",
+      "resultPath": "qa/evidence/parallel-claim-review/results/23.json"
+    },
+    {
+      "index": 24,
+      "originalIndex": 26,
+      "claimId": "2026-06-03-dual-enrollment-pathway-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/24.json",
+      "inputHash": "70fd28e8465370a9f07170b17a4fa77164758547589780cc09c1276c4112da5b",
+      "resultPath": "qa/evidence/parallel-claim-review/results/24.json"
+    },
+    {
+      "index": 25,
+      "originalIndex": 27,
+      "claimId": "2026-06-03-dual-enrollment-pathway-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/25.json",
+      "inputHash": "064971b65cc8c720d9053c7e81c7a1fed688a6f67803f807bcb98028b1a1ad2d",
+      "resultPath": "qa/evidence/parallel-claim-review/results/25.json"
+    },
+    {
+      "index": 26,
+      "originalIndex": 28,
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/26.json",
+      "inputHash": "eafb6424774958e09202c44b3e5ebe316033ecc51c7cb2232eb936acd148e09d",
+      "resultPath": "qa/evidence/parallel-claim-review/results/26.json"
+    },
+    {
+      "index": 27,
+      "originalIndex": 29,
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/27.json",
+      "inputHash": "47295b5229b8d8020ff21a639473bc81fa380f097fbd487dc67a6e606c6760cb",
+      "resultPath": "qa/evidence/parallel-claim-review/results/27.json"
+    },
+    {
+      "index": 28,
+      "originalIndex": 30,
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/28.json",
+      "inputHash": "36c42422a7cea4cc4fdf95f666e147f3b22d3683668d4acb3c543a88cbd0bde0",
+      "resultPath": "qa/evidence/parallel-claim-review/results/28.json"
+    },
+    {
+      "index": 29,
+      "originalIndex": 31,
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c04",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/29.json",
+      "inputHash": "f29f69ae34fede95e512194844bb34ac36ecb22ed1b7e6818909e0a8295c4b82",
+      "resultPath": "qa/evidence/parallel-claim-review/results/29.json"
+    },
+    {
+      "index": 30,
+      "originalIndex": 32,
+      "claimId": "2026-06-25-in-focus-2-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/30.json",
+      "inputHash": "8c59c8f9a4b605788edc71ff448dea07a872a67609f391dbdc96c2b222f97373",
+      "resultPath": "qa/evidence/parallel-claim-review/results/30.json"
+    },
+    {
+      "index": 31,
+      "originalIndex": 33,
+      "claimId": "2026-06-25-in-focus-2-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/31.json",
+      "inputHash": "ea6402fd8911b6249826c86a521f241d29e4e2048af504577aa3efd0386489f7",
+      "resultPath": "qa/evidence/parallel-claim-review/results/31.json"
+    },
+    {
+      "index": 32,
+      "originalIndex": 34,
+      "claimId": "2026-06-25-in-focus-2-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/32.json",
+      "inputHash": "e681394bd201afc33ca3fa8cb57a487e4e41a85954bc87cf44271c5295879c4b",
+      "resultPath": "qa/evidence/parallel-claim-review/results/32.json"
+    },
+    {
+      "index": 33,
+      "originalIndex": 35,
+      "claimId": "2026-06-30-exploring-identity-success-counseling-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/33.json",
+      "inputHash": "16e09e2e96f6cc26293ec074c079187872595de1d24c4402a29221dc34cd2f75",
+      "resultPath": "qa/evidence/parallel-claim-review/results/33.json"
+    },
+    {
+      "index": 34,
+      "originalIndex": 36,
+      "claimId": "2026-06-30-exploring-identity-success-counseling-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/34.json",
+      "inputHash": "6bfe1a90965721ef6eda29d50309bc6f315234edbe3ae17ee897987c1b18c14b",
+      "resultPath": "qa/evidence/parallel-claim-review/results/34.json"
+    },
+    {
+      "index": 35,
+      "originalIndex": 37,
+      "claimId": "2026-07-03-inside-the-uc-session-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/35.json",
+      "inputHash": "b55e3d84d91303b0a7eb242f04985d0cd8c9d20a1313eb7af2641a0c001d335c",
+      "resultPath": "qa/evidence/parallel-claim-review/results/35.json"
+    },
+    {
+      "index": 36,
+      "originalIndex": 38,
+      "claimId": "2026-07-03-inside-the-uc-session-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/36.json",
+      "inputHash": "f6cd006f9bb02609dde201431eb7e748eb2f418db3f05d973944494b2578f96c",
+      "resultPath": "qa/evidence/parallel-claim-review/results/36.json"
+    },
+    {
+      "index": 37,
+      "originalIndex": 39,
+      "claimId": "2026-07-03-inside-the-uc-session-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/37.json",
+      "inputHash": "4c66a265f0aa6feb7d9498b061a78c2b3dcfd94af38e215067fb59cc94772ed9",
+      "resultPath": "qa/evidence/parallel-claim-review/results/37.json"
+    },
+    {
+      "index": 38,
+      "originalIndex": 40,
+      "claimId": "2026-07-03-inside-the-uc-session-c04",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/38.json",
+      "inputHash": "74e703bc740ca39ede6a5667093fc16f8611d0025c9d4244cd5238db24b35ac1",
+      "resultPath": "qa/evidence/parallel-claim-review/results/38.json"
+    },
+    {
+      "index": 39,
+      "originalIndex": 41,
+      "claimId": "2026-07-08-beyond-black-robes-law-careers-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/39.json",
+      "inputHash": "ae7305211511a115718ac592b563fc5063e81e40a91969c5b6b434dfba768434",
+      "resultPath": "qa/evidence/parallel-claim-review/results/39.json"
+    },
+    {
+      "index": 40,
+      "originalIndex": 42,
+      "claimId": "2026-07-08-beyond-black-robes-law-careers-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/40.json",
+      "inputHash": "ad82078a2167a21e820f0ed84c1afbbcb1cca0e5b158049b297f3861e0d8ebb1",
+      "resultPath": "qa/evidence/parallel-claim-review/results/40.json"
+    },
+    {
+      "index": 41,
+      "originalIndex": 43,
+      "claimId": "2026-07-08-beyond-black-robes-law-careers-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/41.json",
+      "inputHash": "f7cfa7c2df51892776dfd33990214ad580beead704306ec9ba3c789b1f944406",
+      "resultPath": "qa/evidence/parallel-claim-review/results/41.json"
+    },
+    {
+      "index": 42,
+      "originalIndex": 45,
+      "claimId": "2026-07-15-creative-futures-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/42.json",
+      "inputHash": "8cfcc191b4ea3676fd8bd4b22038630d6d47dabe1759d9398eba9f183a8f9f45",
+      "resultPath": "qa/evidence/parallel-claim-review/results/42.json"
+    },
+    {
+      "index": 43,
+      "originalIndex": 48,
+      "claimId": "2026-07-22-uniaccess-cept-university-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/43.json",
+      "inputHash": "ba7a88b8a81f1e1709eaba45bd354fcd8cd976dd41777ace41391b58282501df",
+      "resultPath": "qa/evidence/parallel-claim-review/results/43.json"
+    },
+    {
+      "index": 44,
+      "originalIndex": 49,
+      "claimId": "2026-07-22-uniaccess-cept-university-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/44.json",
+      "inputHash": "74b1c6f02d0f85ba8d4f7f56ae017c46dc319d159b843f7b138ca807f653e274",
+      "resultPath": "qa/evidence/parallel-claim-review/results/44.json"
+    },
+    {
+      "index": 45,
+      "originalIndex": 50,
+      "claimId": "2026-07-28-metrics-and-mingling-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/45.json",
+      "inputHash": "cef337e84aaf7dbb6506262149786afff7053938e51175c9183786cdfd049110",
+      "resultPath": "qa/evidence/parallel-claim-review/results/45.json"
+    },
+    {
+      "index": 46,
+      "originalIndex": 51,
+      "claimId": "2026-07-28-metrics-and-mingling-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/46.json",
+      "inputHash": "0166b62e44d453873f93620bda2cdab9ffc39dd6574786b31465c6bdc695b096",
+      "resultPath": "qa/evidence/parallel-claim-review/results/46.json"
+    },
+    {
+      "index": 47,
+      "originalIndex": 52,
+      "claimId": "2026-07-28-metrics-and-mingling-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/47.json",
+      "inputHash": "0503b6da4700075ca707d10835a7cd224e29dfb6f3bca4940b009c094e44a504",
+      "resultPath": "qa/evidence/parallel-claim-review/results/47.json"
+    },
+    {
+      "index": 48,
+      "originalIndex": 53,
+      "claimId": "2026-07-30-in-focus-3-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/48.json",
+      "inputHash": "319d38216bf755c31dd95f3951a4c910d1f35a68815ded025be43662803374e5",
+      "resultPath": "qa/evidence/parallel-claim-review/results/48.json"
+    },
+    {
+      "index": 49,
+      "originalIndex": 54,
+      "claimId": "2026-07-30-in-focus-3-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/49.json",
+      "inputHash": "f4e4779a6316a61637c7be22993f352e85e3f19a20d5d1432c6423b7d1b20aaf",
+      "resultPath": "qa/evidence/parallel-claim-review/results/49.json"
+    },
+    {
+      "index": 50,
+      "originalIndex": 55,
+      "claimId": "2026-07-30-in-focus-3-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/50.json",
+      "inputHash": "ad3ae59c157bd06448602b634500e84cf84502312b2c933598901f123c059055",
+      "resultPath": "qa/evidence/parallel-claim-review/results/50.json"
+    },
+    {
+      "index": 51,
+      "originalIndex": 56,
+      "claimId": "2026-08-03-uk-beyond-offer-letters-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/51.json",
+      "inputHash": "64a43d8c6104947a8e4457e5c2ee9520ced06f6f4119f81c21372b99701b64df",
+      "resultPath": "qa/evidence/parallel-claim-review/results/51.json"
+    },
+    {
+      "index": 52,
+      "originalIndex": 57,
+      "claimId": "2026-08-03-uk-beyond-offer-letters-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/52.json",
+      "inputHash": "695810f1f6877592198816d65e4a93eba1c36d7ff319806e34e60b45d225f29a",
+      "resultPath": "qa/evidence/parallel-claim-review/results/52.json"
+    },
+    {
+      "index": 53,
+      "originalIndex": 58,
+      "claimId": "2026-08-03-uk-beyond-offer-letters-reupload-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/53.json",
+      "inputHash": "31fd5c015ef1fd9ccdfb88fcec482f8fe026fa242b485345a77d57adaedafe75",
+      "resultPath": "qa/evidence/parallel-claim-review/results/53.json"
+    },
+    {
+      "index": 54,
+      "originalIndex": 59,
+      "claimId": "2026-08-03-uk-beyond-offer-letters-reupload-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/54.json",
+      "inputHash": "22fcc06d3a65d15418a02290bff9ff814c70c0932ca67972c0d4d76124a3a268",
+      "resultPath": "qa/evidence/parallel-claim-review/results/54.json"
+    },
+    {
+      "index": 55,
+      "originalIndex": 60,
+      "claimId": "2026-08-10-ucas-what-changed-what-matters-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/55.json",
+      "inputHash": "b2e79bc97cb7dbfe975bf9097a6ce130d6d024cb264dfb8faeb7eb563a0c4de6",
+      "resultPath": "qa/evidence/parallel-claim-review/results/55.json"
+    },
+    {
+      "index": 56,
+      "originalIndex": 62,
+      "claimId": "2026-08-10-ucas-what-changed-what-matters-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/56.json",
+      "inputHash": "34ef3bd88dbe5babb5931b74a138495394c6309d8be75254e5db50c2885957fe",
+      "resultPath": "qa/evidence/parallel-claim-review/results/56.json"
+    },
+    {
+      "index": 57,
+      "originalIndex": 64,
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/57.json",
+      "inputHash": "08426e2d46c26c8f97974845f53ab53ada0ccb83e01595b7b9b197747c64dd86",
+      "resultPath": "qa/evidence/parallel-claim-review/results/57.json"
+    },
+    {
+      "index": 58,
+      "originalIndex": 65,
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/58.json",
+      "inputHash": "7dd6b494c2bc84e080f0d79fac3ab8da23d875ad0f0e087306a715286cb55212",
+      "resultPath": "qa/evidence/parallel-claim-review/results/58.json"
+    },
+    {
+      "index": 59,
+      "originalIndex": 66,
+      "claimId": "2026-08-24-uniaccess-leeds-arts-university-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/59.json",
+      "inputHash": "cd76de926e755c7869bb12e597d3b53d1fd5a5db450ea6235e51e0b2b1af8f1a",
+      "resultPath": "qa/evidence/parallel-claim-review/results/59.json"
+    },
+    {
+      "index": 60,
+      "originalIndex": 67,
+      "claimId": "2026-08-24-uniaccess-leeds-arts-university-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/60.json",
+      "inputHash": "044acefdd4c445bf895449062077d842af2bc906a711cb8c5e76240275e969a6",
+      "resultPath": "qa/evidence/parallel-claim-review/results/60.json"
+    },
+    {
+      "index": 61,
+      "originalIndex": 68,
+      "claimId": "2026-08-24-uniaccess-leeds-arts-university-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/61.json",
+      "inputHash": "ea824c0fe97542a67283c1d4e36fe5086379c790e72111e44d41f539baae7d48",
+      "resultPath": "qa/evidence/parallel-claim-review/results/61.json"
+    },
+    {
+      "index": 62,
+      "originalIndex": 69,
+      "claimId": "2026-08-27-in-focus-4-c01",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/62.json",
+      "inputHash": "8a37a8ede0c45ab340c2b62d1eaf61049879d66471435e7276d43ac7b9de5db5",
+      "resultPath": "qa/evidence/parallel-claim-review/results/62.json"
+    },
+    {
+      "index": 63,
+      "originalIndex": 70,
+      "claimId": "2026-08-27-in-focus-4-c02",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/63.json",
+      "inputHash": "3cd408ffec294a0c6c62c4bd14d0b8b7e05a0b19af185894f26e4882dde584b0",
+      "resultPath": "qa/evidence/parallel-claim-review/results/63.json"
+    },
+    {
+      "index": 64,
+      "originalIndex": 71,
+      "claimId": "2026-08-27-in-focus-4-c03",
+      "taskPath": "qa/evidence/parallel-claim-review/tasks/64.json",
+      "inputHash": "7fe74f8eb0ce6920bc258a3fe20929e5c14321ae6ef63697c2ec9a26fe696a56",
+      "resultPath": "qa/evidence/parallel-claim-review/results/64.json"
+    }
+  ]
+}

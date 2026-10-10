@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "index": 38,
+  "originalIndex": 40,
+  "claimId": "2026-07-03-inside-the-uc-session-c04",
+  "inputHash": "74e703bc740ca39ede6a5667093fc16f8611d0025c9d4244cd5238db24b35ac1",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "Supports Riverside Academic Merit Scholarship up to $89,100 over four years. International/out-of-state eligibility is stated for UC scholarships generally, but not explicitly tied to this particular scholarship; its non-resident qualification is not established.",
+    "missingReferences": [],
+    "caveats": [
+      "One available match; no missing or duplicate reference.",
+      "Stored speakerRef is unknown; a name embedded in transcript text does not establish speaker identity.",
+      "The same turn ID now has different content and timing (original 353-893; current 262-297).",
+      "Amount and duration are transcript assertions; no award year, external factual verification or currency expansion beyond the dollar symbol is established."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-03-inside-the-uc-session",
+        "turnId": "2026-07-03-inside-the-uc-session-t016",
+        "contextVersion": "originalMigration",
+        "quote": "And with regards to scholarship, we do cover more than one year's tuition, living expenses, personal expenses with the Academic Merit Scholarship that students can, you know, get as well.",
+        "textSha256": "4da089f68573b982ffd1d89c280eea6d6930ac49f442659ffb031791f7d9def1",
+        "contextSha256": "9aa57e7060b6774d8f039de74d92c26d43cb464fdb36224d87e8259b2dd5d238",
+        "artifactSha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 353,
+        "tEnd": 893,
+        "supports": "Supports Academic Merit Scholarship in the Riverside introduction."
+      },
+      {
+        "sessionId": "2026-07-03-inside-the-uc-session",
+        "turnId": "2026-07-03-inside-the-uc-session-t016",
+        "contextVersion": "originalMigration",
+        "quote": "So this scholarship is based off of the GPA that students essentially have, and this scholarship goes up to $89,100, and that is spread across your 4 years.",
+        "textSha256": "4da089f68573b982ffd1d89c280eea6d6930ac49f442659ffb031791f7d9def1",
+        "contextSha256": "9aa57e7060b6774d8f039de74d92c26d43cb464fdb36224d87e8259b2dd5d238",
+        "artifactSha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 353,
+        "tEnd": 893,
+        "supports": "Supports GPA-based merit, maximum dollar amount and four-year distribution."
+      },
+      {
+        "sessionId": "2026-07-03-inside-the-uc-session",
+        "turnId": "2026-07-03-inside-the-uc-session-t016",
+        "contextVersion": "originalMigration",
+        "quote": "the UC system does offer scholarships for international students, out-of-state students as well",
+        "textSha256": "4da089f68573b982ffd1d89c280eea6d6930ac49f442659ffb031791f7d9def1",
+        "contextSha256": "9aa57e7060b6774d8f039de74d92c26d43cb464fdb36224d87e8259b2dd5d238",
+        "artifactSha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 353,
+        "tEnd": 893,
+        "supports": "Supports general UC scholarship availability, without specifying eligibility for the Riverside scholarship."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "Current t016 describes the session agenda and handoff. It supplies none of the Riverside scholarship, eligibility, amount or four-year distribution components.",
+    "missingReferences": [],
+    "caveats": [
+      "One available match; no missing or duplicate reference.",
+      "Stored speakerRef is Amrita; identity is not independently verified.",
+      "Same-ID content and timing changed from originalMigration; original evidence cannot substitute for the current citation."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-03-inside-the-uc-session",
+        "turnId": "2026-07-03-inside-the-uc-session-t016",
+        "contextVersion": "current",
+        "quote": "to start the session with the overview of the UC system, and then we move into the application, and then particularly the PIQs",
+        "textSha256": "1159fc6a68bf0cf19fb3e5969867f4ad88d3c8d06bd9606f1ee148ec47cd0259",
+        "contextSha256": "a9ddf0b42f812163ac7e3df8a6c2554dc85cf438d858bcaab8783342f547203b",
+        "artifactSha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+        "revision": null,
+        "speakerRef": "Amrita",
+        "tStart": 262,
+        "tEnd": 297,
+        "supports": "Unrelated agenda text; does not support the scholarship claim."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original partially supports the merit award amount and duration but leaves specific non-resident/international eligibility unbound; current same-ID text is unrelated. Supplied hashes pass; artifact bytes were not verified."
+}

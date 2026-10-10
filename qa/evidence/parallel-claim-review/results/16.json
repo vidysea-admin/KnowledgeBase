@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "index": 16,
+  "originalIndex": 18,
+  "claimId": "2026-05-23-uniaccess-atlas-skilltech-c03",
+  "inputHash": "78baeabd85e6c877a50c3323cacbf62422b4f028430246dccea030ede82fda75",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "Students winning accolades at NASA and Google is supported; the exact assertion that those accolades were at NASA and Google competitions is not directly specified. The following sentence mentions other competitions without identifying NASA or Google events.",
+    "missingReferences": [],
+    "caveats": [
+      "The supplied turn says our uGDX school and our students; attribution to ATLAS SkillTech relies on session binding, not an explicit institution name in this cited text.",
+      "speakerRef is unknown; the literal text label Farheen does not independently establish identity.",
+      "Original t008 spans 195-237 seconds; current t008 spans 713-743 seconds and contains different content.",
+      "Transcript support does not establish external factual truth or a calendar date."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "turnId": "2026-05-23-uniaccess-atlas-skilltech-t008",
+        "contextVersion": "originalMigration",
+        "quote": "So students have achieved and won several accolades at NASA, at Google. We also have students who have participated in several other competitions and have won challenges in the Indian ecosystem as well.",
+        "textSha256": "2345e38afad485375d096de0a76651935fd9e9b4b065e5abc3cd730bf3f437e1",
+        "contextSha256": "01161b361406e68ffa4352727f99d85651ec72f734e909cac3c266ac19e4e6b5",
+        "artifactSha256": "01ac7389a1fbc6c276e46349306dc3a86f40ae5c4c658e87177ecff7bd30d545",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 195,
+        "tEnd": 237,
+        "supports": "Supports student accolades at NASA and Google, but does not explicitly identify NASA or Google competitions."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn contains only a farewell and supports none of the student-recognition, institution, NASA, Google, or competition components.",
+    "missingReferences": [],
+    "caveats": [
+      "Same turn ID now points to changed content and changed timings; original evidence cannot be substituted for current evidence.",
+      "speakerRef spk:0 is a stored label, not an established person identity.",
+      "No duplicate or missing reference is present in the supplied contexts.",
+      "Artifact exact-byte hashes and normalized-LF hashes are distinct; no on-disk artifact byte verification was performed."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "turnId": "2026-05-23-uniaccess-atlas-skilltech-t008",
+        "contextVersion": "current",
+        "quote": "Thank you. Bye-bye.",
+        "textSha256": "924f0963dec369020fade5243e6c2d105555e3d7d673f8a938cfb1e27101f19d",
+        "contextSha256": "93f9dcb425a80d677065cbea3060d372969e3a111e04714f35652020aec23283",
+        "artifactSha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+        "revision": null,
+        "speakerRef": "spk:0",
+        "tStart": 713,
+        "tEnd": 743,
+        "supports": "Unrelated farewell; no support for the persisted recognition claim."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original context supports accolades at NASA and Google but leaves the competitions qualifier unstated; current same-ID context is an unrelated farewell. This is preliminary citation-support review, not human approval or external fact verification."
+}

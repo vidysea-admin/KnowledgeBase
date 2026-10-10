@@ -1,0 +1,360 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "AI-preliminary-independent-audit",
+  "humanAdjudication": null,
+  "batch": 4,
+  "entries": [
+    {
+      "index": 20,
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c01",
+      "inputHash": "9255cc06d7e74cbd7c5d45b9842f0c51e613568affd3e5d9125fd7387e6ff716",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Independent initial reading accepted the provisional 24 roles mapped across a lifecycle as educational-role mapping. Current t012 concerns family/student centrality and supplies no count; same ID changed from 253-303/unknown to 389-446/Bhakti. Post-comparison assessment is unsupported for original too: the literal historical context does not establish student education or professional status of every mapped umbrella category. Initial disagreement remains explicit. Stored speaker labels are unverified; transcript support is not external truth. No duplicate supplied reference.",
+      "evidenceHashes": {
+        "claimRecordSha256": "ab263e74574f25c3a6efea970c92a910150eec33de52077700813db1d7194ea9",
+        "claimTextSha256": "42ad248c03c6fe59952307a5bb8cd67c2a71076613f9237a25d15916ef431572",
+        "sourceBindingSha256": "dbef499161c63e775b7131f4f89e681a9325c634a8c0e1f5fd71fce7c642d0aa",
+        "reviewerResultSha256": "3d620af232d976b14a893a7596ec99cbc72575beb80374e72e04ebff324c9a3d",
+        "checks": {
+          "taskBytesMatchIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "reviewerInputHash": true,
+          "contextTextHashes": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t012",
+            "available": true,
+            "missingReason": null,
+            "providedArtifactSha256": "f71d34bcd4de42e8dee814bff2a5761ced144a7ce92ad25d294078970a85e974",
+            "providedNormalizedLfSha256": null,
+            "providedRevision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "matches": [
+              {
+                "textSha256": "0c860e216eb6e89fa34fbac3c93e40374adb37babe3e346d36f1779324913a9f",
+                "textHashVerified": true,
+                "contextSha256": "e6d2f8a659046490aa28dc8df897103f5f1e55200e0e88c580be4772a5789e65",
+                "quote": "they are 24 at this point",
+                "quoteStart": 93,
+                "quoteEnd": 118,
+                "speakerRef": "unknown",
+                "tStart": 253,
+                "tEnd": 303
+              }
+            ]
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t012",
+            "available": true,
+            "missingReason": null,
+            "providedArtifactSha256": "bec016384879e3e2eef64f3b5826e43fb9d0160807e42d31b87c853e11f7511b",
+            "providedNormalizedLfSha256": "f93002ba741a978cd1e8fce7a9954896a14ae1e657a7d57eec41815ccf98db72",
+            "providedRevision": null,
+            "matches": [
+              {
+                "textSha256": "8e9b2b2d1efbab1858ad43e53fc1cc85374493a7ff5509454c65b59529b7f602",
+                "textHashVerified": true,
+                "contextSha256": "b15b738cf338332a6e9e99c0da7786cc085203900a61bff2f683ae27cd7a83ea",
+                "quote": "The family is in the center",
+                "quoteStart": 356,
+                "quoteEnd": 383,
+                "speakerRef": "Bhakti",
+                "tStart": 389,
+                "tEnd": 446
+              }
+            ]
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only"
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unsupported"
+      },
+      "agreement": false,
+      "disagreements": [
+        {
+          "dimension": "originalLabel",
+          "independentInitialLabel": "entailed",
+          "reviewerLabel": "unsupported",
+          "postComparisonAssessment": "unsupported",
+          "reason": "Initial reading imported educational/professional meaning into lifecycle and roles. Reviewer correctly requires explicit full-component support in the supplied original context; retain the initial blinded disagreement, with unsupported as the corrected post-comparison assessment."
+        }
+      ]
+    },
+    {
+      "index": 21,
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c02",
+      "inputHash": "d4fd5a6b3f10bd5e41a988b9fd00cf27ed6bb5200733ab27fc9edb19805bf558",
+      "originalLabel": "unsupported",
+      "currentLabel": "unresolvable",
+      "reason": "Original t161 supports a provisional currently 75% of you and the leading universities enrollment goals versus families cost reality option, but not the enrollment-yield qualifier or a fixed all-participants denominator. Current t161 is turn-absent, hence unresolvable; historical evidence cannot fill it. Stored speaker labels are unverified; transcript support is not external truth. No duplicate supplied reference.",
+      "evidenceHashes": {
+        "claimRecordSha256": "f47e4ec5fde87e4fad4d537270d3b56e466e82b9aba27726dd8cfa326a0de122",
+        "claimTextSha256": "6dc40bff9e7e9fd55d84fae9bd56d7c1626bbb4af38ffbbf1d18e7d8d6bebe3c",
+        "sourceBindingSha256": "dbef499161c63e775b7131f4f89e681a9325c634a8c0e1f5fd71fce7c642d0aa",
+        "reviewerResultSha256": "c1700738864f662d86f6ac44de5cf9fc63cc098f08bf387511d990825ece4f5f",
+        "checks": {
+          "taskBytesMatchIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "reviewerInputHash": true,
+          "contextTextHashes": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t161",
+            "available": true,
+            "missingReason": null,
+            "providedArtifactSha256": "f71d34bcd4de42e8dee814bff2a5761ced144a7ce92ad25d294078970a85e974",
+            "providedNormalizedLfSha256": null,
+            "providedRevision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "matches": [
+              {
+                "textSha256": "625c55181dbde80d31091d5eb162dcd445859feb00c0ca1b1d065b0e3a0679c7",
+                "textHashVerified": true,
+                "contextSha256": "b57d5896d8b222614b775033464d870c65a79317be7ed993cff31bf9fe9abc1d",
+                "quote": "currently 75% of you",
+                "quoteStart": 78,
+                "quoteEnd": 98,
+                "speakerRef": "unknown",
+                "tStart": 3861,
+                "tEnd": 3890
+              }
+            ]
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t161",
+            "available": false,
+            "missingReason": "turn-absent",
+            "providedArtifactSha256": "bec016384879e3e2eef64f3b5826e43fb9d0160807e42d31b87c853e11f7511b",
+            "providedNormalizedLfSha256": "f93002ba741a978cd1e8fce7a9954896a14ae1e657a7d57eec41815ccf98db72",
+            "providedRevision": null,
+            "matches": []
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only"
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unresolvable"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 22,
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c03",
+      "inputHash": "7b00f8a33fcf7e10c177478f6a34adf999a5fc79eef45aa04e331a6a84d5f200",
+      "originalLabel": "entailed",
+      "currentLabel": "unresolvable",
+      "reason": "Original t190 directly proposes respecting handoff, remaining in lane, and sticking to referred expertise. Current t190 is turn-absent, hence unresolvable; no changed-content comparison can be made. Stored speaker labels are unverified; transcript support is not external truth. No duplicate supplied reference.",
+      "evidenceHashes": {
+        "claimRecordSha256": "6cc988461d01c9222236a99eed6bb2325ef5b8c8e9fac92fb7486d5935d5551e",
+        "claimTextSha256": "7d04fda79eea34dd86e4a650d54b1389ce27eb505f34efbc5ccede32fbfa5c03",
+        "sourceBindingSha256": "dbef499161c63e775b7131f4f89e681a9325c634a8c0e1f5fd71fce7c642d0aa",
+        "reviewerResultSha256": "f0e2e176b2f347e43b71ac298525d681651d2e06a57d0a103d6df117eb233f3b",
+        "checks": {
+          "taskBytesMatchIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "reviewerInputHash": true,
+          "contextTextHashes": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t190",
+            "available": true,
+            "missingReason": null,
+            "providedArtifactSha256": "f71d34bcd4de42e8dee814bff2a5761ced144a7ce92ad25d294078970a85e974",
+            "providedNormalizedLfSha256": null,
+            "providedRevision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "matches": [
+              {
+                "textSha256": "20150db26d666e3695d7a69a69068e157f3c37d3a33ac17a0965b4634dc67d75",
+                "textHashVerified": true,
+                "contextSha256": "fb97ca7e96c75bbe4b43c76e28a73091e470cb2fff8d522db8c1748f2c602fce",
+                "quote": "Respect the handoff",
+                "quoteStart": 8,
+                "quoteEnd": 27,
+                "speakerRef": "unknown",
+                "tStart": 4759,
+                "tEnd": 4792
+              }
+            ]
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t190",
+            "available": false,
+            "missingReason": "turn-absent",
+            "providedArtifactSha256": "bec016384879e3e2eef64f3b5826e43fb9d0160807e42d31b87c853e11f7511b",
+            "providedNormalizedLfSha256": "f93002ba741a978cd1e8fce7a9954896a14ae1e657a7d57eec41815ccf98db72",
+            "providedRevision": null,
+            "matches": []
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only"
+      },
+      "reviewerLabels": {
+        "originalLabel": "entailed",
+        "currentLabel": "unresolvable"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 23,
+      "claimId": "2026-06-03-dual-enrollment-pathway-c01",
+      "inputHash": "a3b6d17fcc096bd8f6b52e58eb97e8488366552f52027ddf9943ded05af4ae3c",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original t015 says about 80% of US students have access, without specifying high school as denominator; full claim unsupported. Current t015 only asks who benefits, with no statistic or US/high school scope. Same-ID text/speaker/timing changed (336-355/unknown to 1029-1054/Niharika Sondi). Stored speaker labels are unverified; transcript support is not external truth. No duplicate supplied reference.",
+      "evidenceHashes": {
+        "claimRecordSha256": "500b4cc44d51876fa2adf4fe7d58d29a23f4329dd084130f503db7e0f416f799",
+        "claimTextSha256": "b6b994fc144e496e08fb4c03e7808b7c79086c8bef18da37caba0093fdd0a203",
+        "sourceBindingSha256": "896494e6abeac3201f833684c75c1ebd6c0faf50ed7d1847f4cdec8d605a80ca",
+        "reviewerResultSha256": "c4c7468ab185289a0e82c4c0afcf4b635a399a4ea9a60e509fd0b6975a913710",
+        "checks": {
+          "taskBytesMatchIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "reviewerInputHash": true,
+          "contextTextHashes": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-06-03-dual-enrollment-pathway-t015",
+            "available": true,
+            "missingReason": null,
+            "providedArtifactSha256": "4bda921455d67089aaf4f242d2178f6ea6d1eb9280d10581ecede23369f23089",
+            "providedNormalizedLfSha256": null,
+            "providedRevision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "matches": [
+              {
+                "textSha256": "cfa61dca091fa0140214637c7915d1557b313317b66d33c19135290c78f609b1",
+                "textHashVerified": true,
+                "contextSha256": "3cb9f53e8f44258868710fd79f9f9b08a8dc38bd3e8457fb18a1628bad78e8c3",
+                "quote": "about 80% of US students now have access",
+                "quoteStart": 171,
+                "quoteEnd": 211,
+                "speakerRef": "unknown",
+                "tStart": 336,
+                "tEnd": 355
+              }
+            ]
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-06-03-dual-enrollment-pathway-t015",
+            "available": true,
+            "missingReason": null,
+            "providedArtifactSha256": "7b3ac6ef7c6b7bec82bbb2a78e04e05f96de20f4302513b8dc25d35b0c9df78e",
+            "providedNormalizedLfSha256": "0117d6be63f6d788167cd742299d69e694a61ee440e937128af89fbc2aef27d3",
+            "providedRevision": null,
+            "matches": [
+              {
+                "textSha256": "83ec426023ecc373725bfe5a1b1bf639ab420e95835ae9746236b9a45e3fe63a",
+                "textHashVerified": true,
+                "contextSha256": "aa6a26e53e1a12c2b35ccbee83c0109f61a300e813cefa614c2de0b629dfef62",
+                "quote": "What kind of students actually benefit",
+                "quoteStart": 48,
+                "quoteEnd": 86,
+                "speakerRef": "Niharika Sondi",
+                "tStart": 1029,
+                "tEnd": 1054
+              }
+            ]
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only"
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 24,
+      "claimId": "2026-06-03-dual-enrollment-pathway-c02",
+      "inputHash": "70fd28e8465370a9f07170b17a4fa77164758547589780cc09c1276c4112da5b",
+      "originalLabel": "unsupported",
+      "currentLabel": "unresolvable",
+      "reason": "Original t092 supports only approximately 30 credits as a year; transferable credits and typical university treatment are not established. Current t092 is turn-absent, hence unresolvable. Stored speaker labels are unverified; transcript support is not external truth. No duplicate supplied reference.",
+      "evidenceHashes": {
+        "claimRecordSha256": "ff4fddbb96eb8026ce1d4b3098ce0eabab40d0ccc84c0524149d0e71dd314168",
+        "claimTextSha256": "68dfdf2ff88d01ff1db51c9fe19acd73196c201ff06558e7799590fa43dcd09d",
+        "sourceBindingSha256": "896494e6abeac3201f833684c75c1ebd6c0faf50ed7d1847f4cdec8d605a80ca",
+        "reviewerResultSha256": "11ebb257cbbc8fe83f64a2ae9447bde46222bfa1c6b915b6f9835fb8305af432",
+        "checks": {
+          "taskBytesMatchIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "reviewerInputHash": true,
+          "contextTextHashes": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-06-03-dual-enrollment-pathway-t092",
+            "available": true,
+            "missingReason": null,
+            "providedArtifactSha256": "4bda921455d67089aaf4f242d2178f6ea6d1eb9280d10581ecede23369f23089",
+            "providedNormalizedLfSha256": null,
+            "providedRevision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "matches": [
+              {
+                "textSha256": "30889ddee8b0f3251de920c13f86de0d92d9709c94854da20a789a58f9f670ce",
+                "textHashVerified": true,
+                "contextSha256": "f6901fb5b4c9c530a423143a6ec1966714e9f7b4d9db8b331f6560c0cd3ba2d4",
+                "quote": "So 30 credits would be almost like a year.",
+                "quoteStart": 17,
+                "quoteEnd": 59,
+                "speakerRef": "unknown",
+                "tStart": 2352,
+                "tEnd": 2355
+              }
+            ]
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-06-03-dual-enrollment-pathway-t092",
+            "available": false,
+            "missingReason": "turn-absent",
+            "providedArtifactSha256": "7b3ac6ef7c6b7bec82bbb2a78e04e05f96de20f4302513b8dc25d35b0c9df78e",
+            "providedNormalizedLfSha256": "0117d6be63f6d788167cd742299d69e694a61ee440e937128af89fbc2aef27d3",
+            "providedRevision": null,
+            "matches": []
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only"
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unresolvable"
+      },
+      "agreement": true,
+      "disagreements": []
+    }
+  ]
+}

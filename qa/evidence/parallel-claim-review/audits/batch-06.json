@@ -1,0 +1,439 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "AI-preliminary-independent-audit",
+  "humanAdjudication": null,
+  "batch": 6,
+  "entries": [
+    {
+      "index": 30,
+      "claimId": "2026-06-25-in-focus-2-c01",
+      "inputHash": "8c59c8f9a4b605788edc71ff448dea07a872a67609f391dbdc96c2b222f97373",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original t007 identifies Futurowise, expert/professor-led 2-4 week programs, published project and certificate; t008 confirms duration and instructor alternatives. Current t007 acknowledges future work and t008 praises projects/masterclasses, without the duration, instruction, publication or certification components. Both IDs changed content, speaker labels and timings (202-241 to 1062-1066; 241-282 to 1066-1073). No missing or duplicate references. Original speakerRef unknown and current source labels do not establish person identity. Transcript support is not external factual truth.",
+      "evidenceHashes": {
+        "claimRecordSha256": "6c2751cc9e219060ae941fff9f8d51eee0d1f4b866bfaa86cd7d30c2ca7890e3",
+        "claimTextSha256": "d893ca0ea7e71b867cc338e2a6175111478e226c432dba0b2c42ed560a1ecbe8",
+        "sourceBindingSha256": "f917bcfc96ba5f957fd7ef999674a7549806c2c11b5586a9b36498a4bd09f291",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "checks": {
+          "inputHashMatchesIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "contextIdentityBindings": true,
+          "reviewerInputHash": true,
+          "reviewerClaimId": true,
+          "reviewerCitationsValid": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-06-25-in-focus-2",
+            "turnId": "2026-06-25-in-focus-2-t007",
+            "available": true,
+            "reason": null,
+            "artifactSha256": "fcbd3a1364cf2f44969fcd223fef7433a8c4fb7043b1bd4e9a79449e398f8afb",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "sameIdContentChanged": true,
+            "matches": [
+              {
+                "textSha256": "a20cc10c1632b893367a4a2e8502b337747c7909a280f3c8fefc7fb9ce3bd1e5",
+                "contextSha256": "290a74ffdaaa85163cf2f127ae3f42ec644e707045be96ca8af290b4da5bb5b3",
+                "speakerRef": "unknown",
+                "tStart": 202,
+                "tEnd": 241,
+                "quote": "Every program that we run is led by industry experts and professors",
+                "quoteStart": 284,
+                "quoteEnd": 351
+              }
+            ]
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-06-25-in-focus-2",
+            "turnId": "2026-06-25-in-focus-2-t007",
+            "available": true,
+            "reason": null,
+            "artifactSha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+            "normalizedLfSha256": "13751a71cff2b4d3e3253b20bb0a4e5e7625d4cb847d1d50d4f47572a00ff65d",
+            "revision": null,
+            "sameIdContentChanged": true,
+            "matches": [
+              {
+                "textSha256": "8fc6b7064fcf660694fb88f078976aa10ca8f07c7acda67cb126b1f5065b0601",
+                "contextSha256": "3b38622ca80e2ea1ec3e408835d85b1c7237f50a75bc5730976cc2e95a884dd0",
+                "speakerRef": "Devesh",
+                "tStart": 1062,
+                "tEnd": 1066,
+                "quote": "I look forward to working on those.",
+                "quoteStart": 28,
+                "quoteEnd": 63
+              }
+            ]
+          },
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-06-25-in-focus-2",
+            "turnId": "2026-06-25-in-focus-2-t008",
+            "available": true,
+            "reason": null,
+            "artifactSha256": "fcbd3a1364cf2f44969fcd223fef7433a8c4fb7043b1bd4e9a79449e398f8afb",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "sameIdContentChanged": true,
+            "matches": [
+              {
+                "textSha256": "07b38ef5cc8a11b44f695931a7c3ddce4cd09051db4e3fda9d065c8681c965f7",
+                "contextSha256": "fbdc3bca2b3bf190bf2167262cde1b92c040c457a81acbde9b0fc505a838b79a",
+                "speakerRef": "unknown",
+                "tStart": 241,
+                "tEnd": 282,
+                "quote": "2- to 4-week-long courses",
+                "quoteStart": 109,
+                "quoteEnd": 134
+              }
+            ]
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-06-25-in-focus-2",
+            "turnId": "2026-06-25-in-focus-2-t008",
+            "available": true,
+            "reason": null,
+            "artifactSha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+            "normalizedLfSha256": "13751a71cff2b4d3e3253b20bb0a4e5e7625d4cb847d1d50d4f47572a00ff65d",
+            "revision": null,
+            "sameIdContentChanged": true,
+            "matches": [
+              {
+                "textSha256": "416b8e532e28674dbad594ffd470445d33a14005760bd5e585897d47e73c67ae",
+                "contextSha256": "2f3a8616178c125b48532d4ade13cd0a041f1065462e7b575d389a695dc54aaa",
+                "speakerRef": "Abha",
+                "tStart": 1066,
+                "tEnd": 1073,
+                "quote": "your projects have been fantastic",
+                "quoteStart": 5,
+                "quoteEnd": 38
+              }
+            ]
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "originalLabel": "entailed",
+        "currentLabel": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 31,
+      "claimId": "2026-06-25-in-focus-2-c02",
+      "inputHash": "ea6402fd8911b6249826c86a521f241d29e4e2048af504577aa3efd0386489f7",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original t011 directly supports Foundations of Data Science, Tableau and a little Python, but never identifies Futurowise as the provider; that attribution is unsupported by the sole literal citation. Current t011 only thanks participants and mentions personal learning. Same ID changed content, speaker label and timings (365-599 to 1122-1139). No missing or duplicate references. Original speakerRef unknown and current source labels do not establish person identity. Transcript support is not external factual truth.",
+      "evidenceHashes": {
+        "claimRecordSha256": "b306e88cab37cc1f68145fe0dde8ce6b5f28166f9612786f8e4b612ad32665f4",
+        "claimTextSha256": "b84a34e3567b51788ba462597eb8ca30419aa4123740ab841293a4130dfb4a23",
+        "sourceBindingSha256": "f917bcfc96ba5f957fd7ef999674a7549806c2c11b5586a9b36498a4bd09f291",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "checks": {
+          "inputHashMatchesIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "contextIdentityBindings": true,
+          "reviewerInputHash": true,
+          "reviewerClaimId": true,
+          "reviewerCitationsValid": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-06-25-in-focus-2",
+            "turnId": "2026-06-25-in-focus-2-t011",
+            "available": true,
+            "reason": null,
+            "artifactSha256": "fcbd3a1364cf2f44969fcd223fef7433a8c4fb7043b1bd4e9a79449e398f8afb",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "sameIdContentChanged": true,
+            "matches": [
+              {
+                "textSha256": "6d307113fc9a86ca50f8e613be355319736a5cd9a2de7175f8470f9963c76a1b",
+                "contextSha256": "b70db889014944ef9317649befd540bc266451e745b55942297b2082a1ca5df6",
+                "speakerRef": "unknown",
+                "tStart": 365,
+                "tEnd": 599,
+                "quote": "They are learning a little bit of Python",
+                "quoteStart": 813,
+                "quoteEnd": 853
+              }
+            ]
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-06-25-in-focus-2",
+            "turnId": "2026-06-25-in-focus-2-t011",
+            "available": true,
+            "reason": null,
+            "artifactSha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+            "normalizedLfSha256": "13751a71cff2b4d3e3253b20bb0a4e5e7625d4cb847d1d50d4f47572a00ff65d",
+            "revision": null,
+            "sameIdContentChanged": true,
+            "matches": [
+              {
+                "textSha256": "43ad9e2b354f9c498c61ccd41f801658401146cea6c0927be7dec5313ce41e8a",
+                "contextSha256": "f1c526eacf91592551060ce946d613877bbb8900998b51781b2f4db5b780ed74",
+                "speakerRef": "Himanshu",
+                "tStart": 1122,
+                "tEnd": 1139,
+                "quote": "Thank you so much, Amrita.",
+                "quoteStart": 0,
+                "quoteEnd": 26
+              }
+            ]
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 32,
+      "claimId": "2026-06-25-in-focus-2-c03",
+      "inputHash": "e681394bd201afc33ca3fa8cb57a487e4e41a85954bc87cf44271c5295879c4b",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original t063 describes 7-day training before classes for most mentors, not the claim's unqualified mentor population; it also never identifies The Student Scoop. Current t063 is a farewell. Same ID changed content, speaker label and timings (2063-2106 to 2932-2933). No missing or duplicate references. Original speakerRef unknown and current source labels do not establish person identity. Transcript support is not external factual truth.",
+      "evidenceHashes": {
+        "claimRecordSha256": "c2fd21d7d87f1b65cb80e2d91ce58a1214c60119197bc062238ce7f042bd5fc3",
+        "claimTextSha256": "e17657cbdee35771dbf550f639e07006b46b58b84aa672e2265e5748b70c450a",
+        "sourceBindingSha256": "f917bcfc96ba5f957fd7ef999674a7549806c2c11b5586a9b36498a4bd09f291",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "checks": {
+          "inputHashMatchesIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "contextIdentityBindings": true,
+          "reviewerInputHash": true,
+          "reviewerClaimId": true,
+          "reviewerCitationsValid": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-06-25-in-focus-2",
+            "turnId": "2026-06-25-in-focus-2-t063",
+            "available": true,
+            "reason": null,
+            "artifactSha256": "fcbd3a1364cf2f44969fcd223fef7433a8c4fb7043b1bd4e9a79449e398f8afb",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "sameIdContentChanged": true,
+            "matches": [
+              {
+                "textSha256": "abd08fef88802a2d1c0ad1aa85071e7ffc1d25b2d4a376d52162c612fb5a1ce9",
+                "contextSha256": "8478f20a4c59d314e2112f45fc01ba6ad69f4576a0d97f28cf603cb3a6e23e30",
+                "speakerRef": "unknown",
+                "tStart": 2063,
+                "tEnd": 2106,
+                "quote": "Most of our mentors",
+                "quoteStart": 496,
+                "quoteEnd": 515
+              }
+            ]
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-06-25-in-focus-2",
+            "turnId": "2026-06-25-in-focus-2-t063",
+            "available": true,
+            "reason": null,
+            "artifactSha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+            "normalizedLfSha256": "13751a71cff2b4d3e3253b20bb0a4e5e7625d4cb847d1d50d4f47572a00ff65d",
+            "revision": null,
+            "sameIdContentChanged": true,
+            "matches": [
+              {
+                "textSha256": "d50129c1901cfd1477b9fd3208129cb7561c75d606dfbc4fe1ac4fd95dbbad25",
+                "contextSha256": "9940d5a7675b5c0d09cfca5c9b38ba88c8e2b8261cf8c29284dc8aa423973183",
+                "speakerRef": "Himanshu",
+                "tStart": 2932,
+                "tEnd": 2933,
+                "quote": "Bye everyone.",
+                "quoteStart": 0,
+                "quoteEnd": 13
+              }
+            ]
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 33,
+      "claimId": "2026-06-30-exploring-identity-success-counseling-c01",
+      "inputHash": "16e09e2e96f6cc26293ec074c079187872595de1d24c4402a29221dc34cd2f75",
+      "originalLabel": "entailed",
+      "currentLabel": "unresolvable",
+      "reason": "Original t085 explicitly associates the Career Construction Inventory with Control, Concern, Curiosity and Confidence. Current t085 is absent, leaving the claim unresolvable there. No duplicate references. Absence is not same-ID changed-content evidence. Original speakerRef unknown and current source labels do not establish person identity. Transcript support is not external factual truth.",
+      "evidenceHashes": {
+        "claimRecordSha256": "abf6fe599df8b6502e7d5562fd15270c615643e077c3cd68d53c4dccafc8bfc0",
+        "claimTextSha256": "5b24d0623d0cb8d0c94167ebb761fb6a90c0dcd48ce246b5f7af2baef4f631c0",
+        "sourceBindingSha256": "a9ce6cd70c31ea7399b7ec99d79da4508007439a56103a1ba40fe1176ceef0d4",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "checks": {
+          "inputHashMatchesIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "contextIdentityBindings": true,
+          "reviewerInputHash": true,
+          "reviewerClaimId": true,
+          "reviewerCitationsValid": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-06-30-exploring-identity-success-counseling",
+            "turnId": "2026-06-30-exploring-identity-success-counseling-t085",
+            "available": true,
+            "reason": null,
+            "artifactSha256": "f128e50c567ed7b450e437e9ff5e4fa5ce96e141da9fe624608495a8ed38f93c",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "sameIdContentChanged": false,
+            "matches": [
+              {
+                "textSha256": "e1d909055853eb2dad645182f36de4b8633b14c397312c87ca6f71a6cf6e1819",
+                "contextSha256": "0c302d7287cfe44d1a85dbf0c2bddc142c210bfd2c711afecc0ecbff0cc6c37a",
+                "speakerRef": "unknown",
+                "tStart": 3762,
+                "tEnd": 3797,
+                "quote": "Control, Concern, Curiosity, and Confidence.",
+                "quoteStart": 381,
+                "quoteEnd": 425
+              }
+            ]
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-06-30-exploring-identity-success-counseling",
+            "turnId": "2026-06-30-exploring-identity-success-counseling-t085",
+            "available": false,
+            "reason": "turn-absent",
+            "artifactSha256": "3610ddfd8a9fc8d68bbeb04dd73ae508fe042c9e127d0a039315ffa4dd2c9dd0",
+            "normalizedLfSha256": "d3169ba6536072aa7e40872839c503bdcca9304c6167a55c67a7658a48d01c78",
+            "revision": null,
+            "sameIdContentChanged": false,
+            "matches": []
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "originalLabel": "entailed",
+        "currentLabel": "unresolvable"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 34,
+      "claimId": "2026-06-30-exploring-identity-success-counseling-c02",
+      "inputHash": "6bfe1a90965721ef6eda29d50309bc6f315234edbe3ae17ee897987c1b18c14b",
+      "originalLabel": "unresolvable",
+      "currentLabel": "unresolvable",
+      "reason": "Original t073 supports a four-legged success table including financial stability, but only uses an unnamed he/his; Andrew Hallam attribution cannot be resolved within the supplied citation. Book titles do not supply an explicit identity binding. Current t073 is absent. No duplicate references. The original unresolvable label records ambiguous attribution requiring unavailable antecedent context; reviewer instead uses unsupported for the same attribution gap. Original speakerRef unknown and current source labels do not establish person identity. Transcript support is not external factual truth.",
+      "evidenceHashes": {
+        "claimRecordSha256": "6d55e67173116a1c05c68dfec96df1079b8210515b36a3f71f681e5c2f80dd86",
+        "claimTextSha256": "18088304656f1f146aaf2b9c074544d0da186cd143bcd103b3b42442f395ed67",
+        "sourceBindingSha256": "a9ce6cd70c31ea7399b7ec99d79da4508007439a56103a1ba40fe1176ceef0d4",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "checks": {
+          "inputHashMatchesIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "contextIdentityBindings": true,
+          "reviewerInputHash": true,
+          "reviewerClaimId": true,
+          "reviewerCitationsValid": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-06-30-exploring-identity-success-counseling",
+            "turnId": "2026-06-30-exploring-identity-success-counseling-t073",
+            "available": true,
+            "reason": null,
+            "artifactSha256": "f128e50c567ed7b450e437e9ff5e4fa5ce96e141da9fe624608495a8ed38f93c",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "sameIdContentChanged": false,
+            "matches": [
+              {
+                "textSha256": "2b63021210d5175b606725e86817fe8c9253d876549eefa7523f9d6b37da2def",
+                "contextSha256": "7a94b144f0698fe17b5db12aa3851cfbb09a41daccbf4ef60f9bc2581a74b088",
+                "speakerRef": "unknown",
+                "tStart": 3181,
+                "tEnd": 3238,
+                "quote": "his definition of success is, is a four-legged table",
+                "quoteStart": 623,
+                "quoteEnd": 675
+              }
+            ]
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-06-30-exploring-identity-success-counseling",
+            "turnId": "2026-06-30-exploring-identity-success-counseling-t073",
+            "available": false,
+            "reason": "turn-absent",
+            "artifactSha256": "3610ddfd8a9fc8d68bbeb04dd73ae508fe042c9e127d0a039315ffa4dd2c9dd0",
+            "normalizedLfSha256": "d3169ba6536072aa7e40872839c503bdcca9304c6167a55c67a7658a48d01c78",
+            "revision": null,
+            "sameIdContentChanged": false,
+            "matches": []
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "originalLabel": "unsupported",
+        "currentLabel": "unresolvable"
+      },
+      "agreement": false,
+      "disagreements": [
+        {
+          "contextVersion": "original",
+          "auditorLabel": "unresolvable",
+          "reviewerLabel": "unsupported",
+          "reason": "Ambiguous unnamed he/his requires missing antecedent context under the unresolvable definition; reviewer classifies the attribution gap as unsupported. Both refuse whole-claim entailment."
+        }
+      ]
+    }
+  ]
+}

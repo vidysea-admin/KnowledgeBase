@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "index": 14,
+  "originalIndex": 16,
+  "claimId": "2026-05-23-uniaccess-atlas-skilltech-c01",
+  "inputHash": "83380f5dfd0bab9605def24fdc8e7d1f23ab52e3587a276953b46d68651bf245",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "Original t005 connects former ISDI/ISME diploma institutions to ATLAS SkillTech; t006 explicitly states the long-standing ISDI-Parsons collaboration and curriculum/faculty influence. These citations do not explicitly designate ISDI as ATLAS's design school or give Parsons's full School of Design name, leaving those factual components unsupported.",
+    "missingReferences": [],
+    "caveats": [
+      "Both referenced IDs occur once in each supplied context; no missing or duplicate references.",
+      "Original speakerRef is unknown; prose attribution does not verify a person identity.",
+      "Original timings t005 120-145 and t006 145-167 differ from current 617-697 and 697-703.",
+      "Session date does not establish present operational status; source statements do not establish external factual truth.",
+      "Artifact hashes are supplied metadata; raw and normalized-LF hashes are distinct and artifact bytes were not read."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "turnId": "2026-05-23-uniaccess-atlas-skilltech-t005",
+        "contextVersion": "originalMigration",
+        "quote": "They were diploma-granting earlier, and then when NEP came into effect, obviously then they were formed into a university, which is ATLAS SkillTech, and then the other majors were added.",
+        "textSha256": "4aef625eccdfdf3ec83e5b0209dacd1f376d3327d5db9d00e185348ae1d52658",
+        "contextSha256": "f5375ed80e5db167795910e7de35aead5a9f2eab81e83f602836bef6b957dee9",
+        "artifactSha256": "01ac7389a1fbc6c276e46349306dc3a86f40ae5c4c658e87177ecff7bd30d545",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 120,
+        "tEnd": 145,
+        "supports": "Supports institutional transition/ATLAS affiliation, without explicit design-school designation."
+      },
+      {
+        "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "turnId": "2026-05-23-uniaccess-atlas-skilltech-t006",
+        "contextVersion": "originalMigration",
+        "quote": "So ISDI and Parsons are a long-standing collaboration, and the collaboration is to the extent that Parsons obviously influences the curriculum development, the faculty trainings for our faculty members as well.",
+        "textSha256": "8a60921933c39e5143b8dda26e5906143f9b5691582c2088377a3c1b16276f84",
+        "contextSha256": "df77d9bcb1735d037ce86f147a375b30be7980bec633ea00ef7fba158ba78fac",
+        "artifactSha256": "01ac7389a1fbc6c276e46349306dc3a86f40ae5c4c658e87177ecff7bd30d545",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 145,
+        "tEnd": 167,
+        "supports": "Directly supports long-standing collaboration and educational influence; does not supply the full Parsons School of Design name."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "Current t005 asks Sonal about questions and t006 says Sonal has no questions and sent a message. Neither supports ISDI identity, ATLAS affiliation, a design school, Parsons, or a long-standing collaboration; neither explicitly contradicts the claim.",
+    "missingReferences": [],
+    "caveats": [
+      "Both literal IDs now bind to unrelated text; original evidence cannot substitute for the current citations.",
+      "Current speakerRef values spk:0 and spk:1 do not identify named people.",
+      "Both IDs have changed content and timings compared with originalMigration.",
+      "Artifact bytes and external factual truth remain unverified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "turnId": "2026-05-23-uniaccess-atlas-skilltech-t005",
+        "contextVersion": "current",
+        "quote": "Sonal, do you have any questions?",
+        "textSha256": "a0c42a14a1bebf9c0069a37c9d1aa288ccda71c5df50ba1b0a944d75830bb724",
+        "contextSha256": "d7fd8b9d51a7293dcd07ec6806c7a7d0edeca2b829fa8c0e96a37db90af8f3df",
+        "artifactSha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+        "revision": null,
+        "speakerRef": "spk:0",
+        "tStart": 617,
+        "tEnd": 697,
+        "supports": "Unrelated question prompt; supports none of the claim components."
+      },
+      {
+        "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "turnId": "2026-05-23-uniaccess-atlas-skilltech-t006",
+        "contextVersion": "current",
+        "quote": "Uh, but I think Sonal is not having any questions, she's dropped a text. Yeah, messages.",
+        "textSha256": "7bade8d494d181e074b0bd33353ae3e27d71c7fccb724c35802fda960d29b9a0",
+        "contextSha256": "d7acd157fe00bdce237932076713563e2ada3b1730092fdc741c3a3421bbfa91",
+        "artifactSha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+        "revision": null,
+        "speakerRef": "spk:1",
+        "tStart": 697,
+        "tEnd": 703,
+        "supports": "Unrelated remark about questions/messages; supports none of the claim components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original quotes support ISDI-ATLAS affiliation and long-standing Parsons collaboration, but omit design-school designation/full Parsons name. Current identical turn IDs carry unrelated question discussion. Both provisional assessments are unsupported, not false; human adjudication and external truth remain open."
+}

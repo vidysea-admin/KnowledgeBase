@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "index": 60,
+  "originalIndex": 67,
+  "claimId": "2026-08-24-uniaccess-leeds-arts-university-c02",
+  "inputHash": "044acefdd4c445bf895449062077d842af2bc906a711cb8c5e76240275e969a6",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The original cited context identifies Leeds Arts University and explicitly offers a minimum GBP 2,000 scholarship, with Indian-student scope and portfolio/availability qualifications. Eligibility criteria are not exhaustively specified.",
+    "missingReferences": [],
+    "caveats": [
+      "The scholarships are described specifically for Indian students; eligible students must be read within this stated scope.",
+      "Amounts above GBP 2,000 depend on availability and portfolio quality; this describes an offer, not a scholarship award to an individual.",
+      "Stored speakerRef is unknown; a name appearing in transcript text does not establish verified identity.",
+      "Original turn timing is 3208–3508; session metadata dates do not establish when the offer applied or its external truth.",
+      "There is one available match and no missing or duplicate reference."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-24-uniaccess-leeds-arts-university",
+        "turnId": "2026-08-24-uniaccess-leeds-arts-university-t040",
+        "contextVersion": "originalMigration",
+        "quote": "And also we offer a minimum of £2,000 scholarship. It could go more depending on the availability and the quality of the portfolio.",
+        "textSha256": "2ba4f18ed48fefa83cf40973e3e20bfd1de9b3add8fba1a85572f64a5627158b",
+        "contextSha256": "3ad87f8999517542efb35cf69f775ca74969d0cb924fc79197ca0d0f2ea26cfc",
+        "artifactSha256": "fd835b78b01a869731e56e8de8775f0104f505f5f82e2272be9e8499917d60b8",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 3208,
+        "tEnd": 3508,
+        "supports": "Supports the offered minimum GBP 2,000 scholarship and qualifications on higher amounts."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current same-ID turn asks about industry growth and creativity. It supplies no evidence of Leeds Arts University offering scholarships, their minimum GBP 2,000 amount, or student eligibility.",
+    "missingReferences": [],
+    "caveats": [
+      "The cited ID now has changed text and timing, 2511–2525 instead of 3208–3508; original scholarship evidence cannot substitute for current evidence.",
+      "Stored speakerRef is spk:0; the addressed name in the text does not establish speaker identity.",
+      "The single current match is available and unrelated, with no missing or duplicate reference.",
+      "Unsupported does not mean the scholarship claim is false."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-24-uniaccess-leeds-arts-university",
+        "turnId": "2026-08-24-uniaccess-leeds-arts-university-t040",
+        "contextVersion": "current",
+        "quote": "I wanted to understand which industry have you seen a rapid growth where creativity has played a vital role?",
+        "textSha256": "a94e33648ab6bce0b5d9b4064783e7bb370fb41692dca1d716cce3978a8bddec",
+        "contextSha256": "b2063c34d99e1e4aca08f9f455d2c6a7c4edb38ddd6993034bd1b2895f742bad",
+        "artifactSha256": "69e1be5a61cecd344422d130c12ed259c96112ffd9c553745a4de0d376ceb98c",
+        "revision": null,
+        "speakerRef": "spk:0",
+        "tStart": 2511,
+        "tEnd": 2525,
+        "supports": "Unrelated question about industry growth; supports none of the scholarship claim components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original evidence supports the minimum GBP 2,000 offer within its Indian-student scope; the current same-ID turn instead asks about creative-industry growth. Artifact bytes were not verified and external truth remains unadjudicated."
+}
