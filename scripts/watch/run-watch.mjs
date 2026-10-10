@@ -494,7 +494,7 @@ async function runReingest(gdrive, driveFileId, calendarEvents, now) {
       `--reingest: "${correctSessionId}" has ${turnCount} turns but 0 chunks under its own correct id — ` +
         `repairing by re-indexing only (no re-download/re-transcribe/re-seed).`,
     );
-    const { buildIndexer } = await import("../../apps/api/src/production.ts");
+    const { buildIndexer } = await import("../../apps/api/src/composition/production.ts");
     const indexResult = await buildIndexer()(TENANT, correctSessionId);
     assertIndexed(correctSessionId, turnCount, indexResult.chunks);
     await markDriveState(driveFileId, "ingested", { sessionId: correctSessionId, repairedFrom: oldSessionId });

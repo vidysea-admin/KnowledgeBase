@@ -285,7 +285,7 @@ test("every scripts/*.mjs resolves its imports — scripts are outside typecheck
  * emit the checklist).
  */
 test("ISS-245: opener success, failures and timeout preserve exact URLs and continuation", async () => {
-  const { openPages } = await import("./demo-live.mjs");
+  const { openPages } = await import("./demo/demo-live.mjs");
   const pages = [["/first", "one"], ["/second", "two"]];
   for (const mode of ["success", "first-error", "second-error", "timeout", "throw"]) {
     const attempted = [];
@@ -310,7 +310,7 @@ test("ISS-245: opener success, failures and timeout preserve exact URLs and cont
 test("ISS-245: the checklist prints only after every opener succeeded (wiring is fail-gated)", async () => {
   // Static wiring assertion: the CLI branch's printChecklist call must be reachable only after
   // the failures check exited. This guards against regressing to the old fire-and-forget shape.
-  const src = readFileSync(join(SCRIPTS, "demo-live.mjs"), "utf8");
+  const src = readFileSync(join(SCRIPTS, "demo", "demo-live.mjs"), "utf8");
   const guardIdx = src.indexOf("if (RUNNING_AS_CLI) {");
   const cliBody = src.slice(guardIdx);
   const failCheckIdx = cliBody.indexOf("if (failures.length > 0) {");

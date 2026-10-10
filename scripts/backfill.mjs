@@ -58,14 +58,14 @@ const LIMIT = Number(val("--limit", "0")) || 0;
 const unregister = register();
 try {
   if (SUBCOMMAND === "recovery-chunks") {
-    const {runRecoveryEmbeddingBackfill} = await import("./lib/toc-embedding-backfill.mjs");
+    const {runRecoveryEmbeddingBackfill} = await import("./lib/toc/toc-embedding-backfill.mjs");
     await runRecoveryEmbeddingBackfill(args.slice(1), {root: fileURLToPath(new URL("../", import.meta.url))});
   } else {
   const { getDb, connect, close, scopedCollection } = await import("../packages/db/src/index.ts");
   const { buildChunks } = await import("../packages/index/src/index.ts");
   const { writeSessionChunks } = await import("../apps/api/src/indexing/session.ts");
   const { embed: routeEmbed } = await import("../packages/ai/src/index.ts");
-  const { buildRouting } = await import("../apps/api/src/production.ts");
+  const { buildRouting } = await import("../apps/api/src/composition/production.ts");
 
   // Same env vars as migrate-mongo-config.cjs and seed-toc.mjs — one convention, not a third.
   await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", process.env.MONGODB_DB || "lkb");

@@ -2,8 +2,8 @@
 import {createHash, randomUUID} from "node:crypto";
 import {readFileSync, writeFileSync, renameSync, rmSync, mkdirSync, existsSync, statfsSync} from "node:fs";
 import {resolve, join, dirname, basename} from "node:path";
-import {assertRecoveryPacketVerified, readRecoveryInputs, readRecoveryPacket} from "./toc-recovery.mjs";
-import {requireRecoveryDatabase, RECOVERY_COLLECTIONS} from "./toc-recovery-import.mjs";
+import {assertRecoveryPacketVerified, readRecoveryInputs, readRecoveryPacket} from "../toc-recovery.mjs";
+import {requireRecoveryDatabase, RECOVERY_COLLECTIONS} from "../toc-recovery-import.mjs";
 export const PACKET_ID = "477255b83bb0f001a7fce53d48af7631bdc8a92c2e24e85b3108a3c9ece749ef";
 export const MODEL_DIGEST = "sha256:0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f";
 export const WORK_DB = "lkb_work_20261009_01a11f9c";
@@ -213,17 +213,17 @@ export async function runRecoveryEmbeddingBackfill(args, {root}) {
   const option = name => {const i = args.indexOf(name); if (i < 0) return undefined; requireTrue(args[i + 1] && !args[i + 1].startsWith("--"), "missing recovery embedding option"); return args[i + 1];};
   requireTrue(args.includes("--dry-run") !== args.includes("--apply"), "choose one dry-run or apply mode");
   const packetPath = option("--packet"); requireTrue(packetPath, "verified recovery packet required");
-  const {buildTree, buildSourceSlices} = await import("../../packages/index/src/index.ts");
-  const {ollamaEmbeddingInputs} = await import("../../packages/ai/src/providers/ollama.ts");
+  const {buildTree, buildSourceSlices} = await import("../../../packages/index/src/index.ts");
+  const {ollamaEmbeddingInputs} = await import("../../../packages/ai/src/providers/ollama.ts");
   const snapshot = readRecoveryInputs(join(root, "data/toc-migrated"), join(root, "data/eval/extraction-reconciliation-reviewed.json"), join(root, "data/eval/extraction-corpus.json"));
   const packet = readRecoveryPacket(resolve(packetPath), snapshot, buildTree);
   const plan = makeEmbeddingPlan(packet, {buildSourceSlices, embeddingInputs: ollamaEmbeddingInputs});
   if (args.includes("--dry-run")) {console.log(JSON.stringify({status: "dry-run-no-database-or-model", slices: plan.rows.length, rawBytes: plan.binding.rawInputBytes,
     inputBytes: plan.binding.embeddingInputBytes, planSha256: plan.binding.planSha256, semanticAcceptance: false})); return;}
   const target = requireEmbeddingTarget(process.env), receiptPath = option("--receipt"); requireTrue(receiptPath, "durable receipt required");
-  const {connect, close, scopedCollection} = await import("../../packages/db/src/index.ts");
-  const {prepareChunkDocuments} = await import("../../apps/api/src/indexing/session.ts");
-  const {buildRouting} = await import("../../apps/api/src/production.ts");
+  const {connect, close, scopedCollection} = await import("../../../packages/db/src/index.ts");
+  const {prepareChunkDocuments} = await import("../../../apps/api/src/indexing/session.ts");
+  const {buildRouting} = await import("../../../apps/api/src/composition/production.ts");
   const journal = openReceipt(receiptPath, plan, option("--resume-receipt-sha256"));
   try {
     const db = await connect(target.url, target.dbName), provider = buildRouting().providers.ollama;

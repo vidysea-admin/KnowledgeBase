@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * scripts/demo-live.mjs — the HUMAN half of the plan §9 Phase-0 validation protocol.
+ * scripts/demo/demo-live.mjs — the HUMAN half of the plan §9 Phase-0 validation protocol.
  *
  * `live-verify.mjs` proves the bytes; this proves them to a person. It opens the operator's OWN
  * installed browser (not an automation-controlled one) on every page of the running app and
@@ -23,7 +23,7 @@
  *
  * Usage: pnpm demo:up      -> start both servers (foreground; Ctrl-C stops both)
  *        pnpm demo:live    -> open the operator's own browser on every page
- *        (or: node scripts/demo-live.mjs [--up] [--web http://localhost:5173])
+ *        (or: node scripts/demo/demo-live.mjs [--up] [--web http://localhost:5173])
  */
 import { execFile } from "node:child_process";
 import { platform } from "node:process";
@@ -53,7 +53,7 @@ if (process.argv.includes("--up")) {
   const { spawn } = await import("node:child_process");
   const { dirname, join, resolve } = await import("node:path");
   const { fileURLToPath } = await import("node:url");
-  const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+  const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
   const apiPort = new URL(API).port || "3300";
   const webPort = new URL(WEB).port || "5173";
   const workDb = process.env.MONGO_WORK_DB?.trim();

@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
- * scripts/seed-demo-server.mjs — one-off setup for actually running apps/api against the real
+ * scripts/demo/seed-demo-server.mjs — one-off setup for actually running apps/api against the real
  * seeded TOC data: (1) builds the tenant "toc" tree index from the real sessions/session_pages
  * already in Mongo and upserts it into tree_index (nobody had ever populated this collection),
  * (2) mints one real API key with every scope the routes check, prints the raw key ONCE (it is
  * never stored, only its sha256). Idempotent: re-running regenerates the tree and reuses/rotates
  * the demo key rather than accumulating duplicates.
  *
- * Usage: node scripts/seed-demo-server.mjs
+ * Usage: node scripts/demo/seed-demo-server.mjs
  */
 import { randomUUID, randomBytes, createHash } from "node:crypto";
 import "dotenv/config";
@@ -16,8 +16,8 @@ import { register } from "tsx/esm/api";
 register();
 
 async function main() {
-  const { connect, getDb, sessions, sessionPages } = await import("../packages/db/src/index.ts");
-  const { buildTree } = await import("../packages/index/src/tree/build.ts");
+  const { connect, getDb, sessions, sessionPages } = await import("../../packages/db/src/index.ts");
+  const { buildTree } = await import("../../packages/index/src/tree/build.ts");
 
   const url = process.env.MONGODB_URL;
   const dbName = process.env.MONGODB_DB ?? "lkb";

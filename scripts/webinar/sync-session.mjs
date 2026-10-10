@@ -212,7 +212,7 @@ try {
   console.log(`written (${gen}): turns ${tw.upserted} upserted/${tw.removedStale} stale removed, ` +
     `graph_edges ${ew.upserted} upserted/${ew.removedStale} stale removed`);
   if (INDEX) {
-    const { buildIndexer } = await import("../../apps/api/src/production.ts");
+    const { buildIndexer } = await import("../../apps/api/src/composition/production.ts");
     const res = await buildIndexer(undefined, { strictWebinar: true })(tenantId, sessionId);
     if (!res.completion?.strict || !res.completion.complete || res.summary?.degraded || res.claims?.degraded || res.chunks.skipped || !res.completion.treeWritten) {
       throw new Error("required webinar indexing incomplete; no completion proof emitted");

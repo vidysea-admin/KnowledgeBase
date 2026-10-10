@@ -233,7 +233,7 @@ export async function ingestOneDriveFile(gdrive, gwsRun, file, monthName, deps) 
 
   execFileSync("node", [join(ROOT, "scripts", "seed-toc.mjs"), "--sessions", sessionId], { timeout: 5 * 60 * 1000, stdio: "inherit" });
 
-  const { buildIndexer } = await import("../../../apps/api/src/production.ts");
+  const { buildIndexer } = await import("../../../apps/api/src/composition/production.ts");
   const indexResult = await buildIndexer()(TENANT, sessionId);
   // ISS-305: refuse to report success on a session that indexed with zero searchable chunks.
   assertIndexed(sessionId, turns.length, indexResult.chunks);
