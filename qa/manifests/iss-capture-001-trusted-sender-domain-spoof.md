@@ -1,6 +1,7 @@
 # iss-capture-001-trusted-sender-domain-spoof
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/iss-capture-001-trusted-sender-domain-spoof.md (cycle 1, 4a981ea)
 Fix cycle: 1
 Priority tier: 2 — open security-class issue (ISS-CAPTURE-001; the checker's t037 cycle-1 review recommends high severity, ledger row still says medium and is not edited here)
 Security class: auth/trust gate (what may auto-record without a click) — FULL checker ceremony, uncapped
@@ -49,3 +50,5 @@ Supplied-domain/email mismatch in both directions (incl. trusted email + wrong d
 4. Behaviour change for edge senders: non-ASCII (internationalised) local parts, padded or trailing-dot addresses, and an explicit empty-string `senderDomain` now refuse. Judged acceptable fail-closed; none appear in the tests or config defaults.
 5. A supplied domain that is padded (e.g. " ashoka.edu.in") is normalised before comparison; it can only match the email's own domain, so it cannot grant trust.
 6. `parseStrictEmail` is a trust-gate parser, not RFC 5322; quoted local parts are intentionally refused.
+7. (added after check) The spoofed senderDomain from apps/api/src/gws-gmail.ts:259 also feeds the DB auto-approve path at apps/api/src/store.ts:172 and :193, so the multi-@ spoof can still reach auto-record through that path (ISS-CAPTURE-003, with ISS-333); the checker rates this high.
+8. (added after check) No Gmail authentication result (SPF/DKIM/DMARC/Authentication-Results) is consulted anywhere on this path; a forged From at a trusted domain is still trusted (ISS-322).
