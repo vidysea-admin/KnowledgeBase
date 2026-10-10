@@ -28,6 +28,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/activity-health", label: "Activity & Health", icon: <DocsIcon /> },
   { to: "/analytics", label: "Analytics", icon: <DashboardIcon /> },
   { to: "/calendar", label: "Calendar", icon: <CalendarIcon /> },
+  { to: "/join-rules", label: "Join rules", icon: <MeetingBotIcon /> },
   { to: "/watch", label: "Watch", icon: <GapIcon /> },
   { to: "/sources", label: "Sources", icon: <SourcesIcon /> },
   { to: "/ingest", label: "Ingest", icon: <IngestIcon /> },
