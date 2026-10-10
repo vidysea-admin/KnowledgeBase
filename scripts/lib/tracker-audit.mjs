@@ -189,8 +189,9 @@ export function audit(root = ROOT, { exec = execFileSync } = {}) {
  *
  * `qa/verdicts/` is checker-owned; a maker editing a verdict is the self-certification this pair
  * exists to prevent. So the debt is FROZEN and named here rather than silently tolerated: these
- * files keep their existing ambiguous references, any NEW one anywhere fails the gate, and the
- * list can only shrink. A checker that rewrites its own verdict deletes its line from this table.
+ * files keep their existing ambiguous references. The skip is per FILE, not per ref, so a NEW one
+ * added inside these four is also unreported (ISS-162); anywhere else it fails. A checker that
+ * qualifies its own verdict deletes its line from this table.
  */
 export const G4_FROZEN = new Set([
   "qa/verdicts/guarded-fetcher.md",

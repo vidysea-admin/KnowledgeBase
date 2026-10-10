@@ -60,8 +60,7 @@ it — and makes a careless blanket qualification visibly wrong instead of silen
 **Verdicts are checker-owned and I did not touch them.** 66 of the 96 refs live in
 `qa/verdicts/`; a maker rewriting a verdict is the self-certification this pair exists to prevent.
 Those four files are named in `G4_FROZEN` — the debt is *frozen and visible* rather than tolerated:
-any **new** ambiguous ref anywhere fails, and the list can only shrink. A checker that rewrites its
-own verdict deletes its own line.
+any **new** ambiguous ref in any *other* file fails. (Corrected per ISS-162: the skip is per file, not per ref, so a new ambiguous ref added inside one of the four frozen verdicts is also unreported; the original sentence here and in the `G4_FROZEN` comment claimed "anywhere".) A checker that qualifies its own verdict deletes its own line.
 
 **G4 gates commits, G2/G3 still do not.** G1's stated criterion for gating is that it is fully in
 the author's control and clearable in the same commit. G4 meets it exactly. G2 and G3 depend on
