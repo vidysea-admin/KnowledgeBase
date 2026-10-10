@@ -379,3 +379,16 @@ committed by a checker ten minutes earlier, and the gate really was exit 0 at `3
 `qa/contracts/` the checker cleared it itself, so master is green again.
 
 **Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree
+
+## Addendum (ISS-163, medfix2 batch 2026-10-10) — the standing test was narrowed, disclosed here late
+
+At ccd81d4 the standing assertion `G4: master's manifests and verdicts are clean under this gate`
+(`scripts/lib/ledger-union.test.mjs`) was **narrowed**: `assert.deepEqual(auditIssueRefs(...), [])`
+became a filter to `/qa/(manifests|verdicts)//`, which **excludes `qa/contracts/`** from the assertion
+while the gate itself still judges it. The reason is in the test's code comment (a concurrent lane
+adds contracts continuously and `qa/contracts/entity-promotion.md` reddened it mid-check); the
+narrowing was not stated in this manifest. Consequence: that test can be green while
+`pnpm lint:structure` is red on a contract. Since ISS-164 (commit 9b98ee7) the gate itself treats
+verdict and contract findings as advisory and gates only on `qa/manifests/`, so the restoration
+ISS-163 asks for is to widen this assertion back to the *gating* set once the lane manifests that
+are currently flagged are qualified; that is left open, not done here.
