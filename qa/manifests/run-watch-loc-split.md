@@ -3,7 +3,8 @@
 Lane: WATCHSPLIT (branch lane/watchsplit, base 6c5d800)
 Tier: 3 (roadmap/structure; ISS-367 high). ISS-367 STAYS OPEN (other stages still red, below).
 Round cap: the run-watch seam has >=3 PASSed units; this is NOT a finding on the seam but a verbatim restructuring to clear the `loc` gate. No behaviour change; no defects fixed (none filed either; lane ledger untouched).
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/run-watch-loc-split.md (cycle 0, 25616f1) - the watch service itself was not run after the split; watch its first real run
 Fix cycle: 0
 
 ## Purpose
@@ -89,5 +90,5 @@ The transcript-provenance change (1 fail -> 0) is not explained by this unit (it
 - Still red in `lint:structure` `loc`: packages/index/src/pipeline/speakers-llm.ts:313 (another lane) and packages/meeting-bot/py/sb_join.py:1142 (needs a browser). Other `lint:structure` stages were not run here. ISS-367 remains open.
 - `register()` now runs after the config consts (see initialisation analysis): argued unobservable, not tested.
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
