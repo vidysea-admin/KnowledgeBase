@@ -1,5 +1,6 @@
 # iss-298-ledger-id-allocator
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/iss-298-ledger-id-allocator.md (cycle 1, d94f4ce) - tool only; ISS-298 stays open until wired and the contract is ratified
 Fix cycle: 1
 Feature: ledger-id-allocation
 Maker: lane/alloc (worktree KnowledgeBase-lanes/alloc), base a71685e
