@@ -4,9 +4,8 @@ import type { AutoRecordItem, SelectAutoRecordItemsResult, SkippedItem } from "@
 import { applyJoinRules, type JoinRuleEvaluator } from "./join-rules-select.js";
 import { EMPTY_JOIN_RULE_STATE, type JoinRule, type JoinRuleSet, type JoinRuleState } from "./join-rules.js";
 
-const MEET = "https://meet.google.com/abc-defg-hij";
 const item = (n: number, sender?: string): AutoRecordItem => ({ sessionKey: `cal:e${n}`, source: "calendar", sourceId: `e${n}`,
-  title: `Webinar ${n}`, startTime: "2026-10-10T10:00:00Z", endTime: "2026-10-10T11:00:00Z", meetingUrl: MEET, sender });
+  title: `Webinar ${n}`, startTime: "2026-10-10T10:00:00Z", endTime: "2026-10-10T11:00:00Z", meetingUrl: `https://meet.google.com/abc-defg-hi${String.fromCharCode(97 + n)}`, sender });
 const sk = (n: number): SkippedItem => ({ sessionKey: `cal:s${n}`, source: "calendar", sourceId: `s${n}`, title: `S${n}`, reason: "past" });
 const sel = (toSchedule: AutoRecordItem[], skipped: SkippedItem[] = []): SelectAutoRecordItemsResult => ({ toSchedule, skipped });
 const rs = (rules: JoinRule[] = []): JoinRuleSet => ({ version: 1, ownDomains: [], rules });
@@ -29,7 +28,7 @@ test("deny rule removes exactly the matching item, original order kept", () => {
   assert.equal(r.skipped.length, 2);
   assert.deepEqual(r.skipped[0], sk(1));
   assert.equal(r.skipped[1]!.sessionKey, "cal:e2");
-  assert.equal(r.skipped[1]!.reason, "untrusted-sender");
+  assert.equal(r.skipped[1]!.reason, "rule-denied");
   assert.match(r.skipped[1]!.detail!, /deny-rule \(rule d1\)/);
   assert.ok(!r.skipped[1]!.detail!.includes("meet.google.com"));
 });
@@ -88,10 +87,10 @@ test("engine decision table through a fake evaluator", () => {
   const mk = (action: "join" | "skip" | "needs-approval", reason: string): JoinRuleEvaluator =>
     () => ({ action, reason: reason as never, ruleId: "r" });
   const cases: Array<[string, string, boolean, string?]> = [
-    ["skip", "deny-rule", false, "untrusted-sender"], ["skip", "meeting-opt-out", false, "untrusted-sender"],
+    ["skip", "deny-rule", false, "rule-denied"], ["skip", "meeting-opt-out", false, "opted-out"],
     ["skip", "cancelled", false, "cancelled"], ["skip", "no-meeting-url", false, "no-join-link"],
     ["needs-approval", "no-matching-rule", true], ["needs-approval", "sender-unverifiable", true],
-    ["needs-approval", "invalid-rule-set", false, "untrusted-sender"],
+    ["needs-approval", "invalid-rule-set", false, "rules-unevaluable"],
     ["join", "allow-rule", true], ["join", "approved-sender", true], ["join", "approved-domain", true],
   ];
   for (const [action, reason, stays, skipReason] of cases) {
