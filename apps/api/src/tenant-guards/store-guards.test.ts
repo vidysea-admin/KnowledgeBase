@@ -174,6 +174,8 @@ test("whatsapp ingestGroup positive control: every write filter and stored row c
 });
 
 // ---------------------------------------------------------------- indexSession (tree_index findOne + replaceOne with hand-built filters)
+// NOT given its own guard: the first statement after the db handle is `turnsColl(tenantId).find`, whose accessor already throws, so the hand-built
+// tree_index read/upsert below it are unreachable for an invalid tenant. These tests PIN that ordering: any raw query placed before the accessor fails them.
 for (const [name, bad] of HOSTILE) {
   test(`indexSession: tenant ${name} throws the guard error before ANY read, delete or upsert`, async () => {
     const { db, calls } = fakeDb();
