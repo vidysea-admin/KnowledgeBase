@@ -20,3 +20,12 @@ Ground truth for the WIRING unit that will connect `attention-alerts.ts` to a se
 ## Acceptance for the checker of the wiring
 - The ISS-R1ALERTS-001 evidence corpus re-run verbatim against the wired output: 0 leaks.
 - One sent message per situation across ticks and across the generic plus new path.
+
+## Cycle 1 additions (checker, 2026-10-11): pipeline rules and wiring requirements
+Pipeline rules (alert-text.ts, allowlist): titles are NFKC-normalised, percent-decoded, look-alike slashes, colons and dots folded, whitespace to space, all Cc/Cf/Cs/Co/Cn and invisible marks stripped; URLs, bare domains with a path, emails (incl. `(at)`, `[dot]`, `at ... dot`), mixed-script tokens, key shapes, digit runs of 3+ (or groups reaching 6 digits, any Nd script), mixed letter+digit runs of 8+ and the secret-keyword value are masked; only letters (any script), marks, Nd digits, space and `. , : ; ' " ! ? ( ) / & + - %` survive; repeated to a fixed point (cap 5, else `(hidden)`); 80 code points. A secret keyword's value must be masked for the WHOLE clause, in English and Hindi spellings (open: ISS-R1ALERTS-006). A single-pass sanitiser must fail a test (ISS-R1ALERTS-007).
+Wiring requirements:
+1. `AttentionAlert.id` (hashed) replaces `sessionKey`; the consumer keeps its OWN id-to-sessionKey map (never put in the alert or in dedupe state) to act on an alert.
+2. Supply `startTimes` for every skipped item and a validated sender-domain field for `untrusted-sender` (hostname shape, never title or address text). `startTime` must be ISO (ISS-R1ALERTS-008).
+3. Suppress the existing generic `notifyOperation` line for every case this module handles (needs-registration, overlap-lost, unsafe-join-link, no-join-link, untrusted-sender, action_required rows): one message per situation across both paths.
+4. Per-tick send cap (<= 20, remainder in one summary line); log `ignored` counts; persist the `keys` from `selectNewAlerts` and keep `maxKeys` above the live situation count.
+5. Plain-text send only (no parse_mode); the ISS-R1ALERTS-001 and -006 corpora replayed verbatim against the wired output: 0 leaks.
