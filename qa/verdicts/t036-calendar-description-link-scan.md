@@ -42,3 +42,64 @@ ISSUES-WRITTEN: ISS-T036CAL-001 (high), ISS-T036CAL-002, -003, -004, -005 (mediu
 2. ISS-T036CAL-002: embedded-redirect refusal in the copy with the 38-URL corpus; fix the manifest sentence.
 3. ISS-T036CAL-004: differential test over a shared corpus (copy-join implies canonical-join, same identity) plus webex/zoom suffix cases; this kills M10a and M15.
 4. ISS-T036CAL-003 and -005 (passcode-preferring dedupe; refuse /s/ and zak=) with tests; may be verified inside the same cycle.
+
+
+---
+
+# Cycle 1
+
+VERDICT: FAIL
+Cycle checked: 1
+Commit checked: 5fe97b9 (branch lane/t036cal, base 8520fa8)
+Scope: fixtures only; not validated against live Google Calendar; field presence (`description`/`location` in the default event resource) and real invite HTML unverified. No Google call, browser, database or build; local loopback test server only. `@lkb/core` junctions verified first (both point at C:\Users\product\Desktop\KnowledgeBase\packages\core, untouched); type-check and runtime used a temporary `paths` tsconfig onto this lane's core, deleted afterwards.
+
+## EXPLANATION
+
+Why FAIL: the HIGH attack of cycle 0 is closed, and I could not get a free-text link scheduled by any route. But the fix introduces one new HIGH regression in the persisted-state path (ISS-T036CAL-006) and leaves existing tests red (ISS-T036CAL-007). Both are narrow; the next cycle is small.
+
+### 1. The attack is closed, end to end (own probe through the real functions)
+API mapper (`listUpcomingGwsMeetings` with a fake `gws` run) -> real Express route over loopback -> real `createHttpCalendarLoader` -> `selectAutoRecordItems`. Outsider event "Free Webinar: Win a prize", organizer attacker@evil.com, six carriers: description plain, location plain, description anchor, location anchor, Google redirect wrapper (text and anchor). Also the same six with a trusted organizer.
+- everyWebinar true/false x organizer trusted/untrusted: 12 free-text events x 4 modes: never scheduled; every one skipped `unverified-link-source` (48/48 asserted). Conference twins (hangoutLink, conferenceData entry point): scheduled as before (every-webinar; trusted non-every-webinar; untrusted non-every-webinar stays untrusted-sender, unchanged).
+- Conference plus free text in one event: the returned URL is the conference one and the source says conference (4/4).
+- Paths tried to schedule a free-text link anyway: (a) missing source: our mapper sets the source whenever a url exists (asserted over 20 rows); legacy/missing is read as conference by design; a stripped source in a hand-edited persisted state file schedules (needs local file access; noted). (b) allow-list: 29 bad values (`"Description"`, `"desc"`, `1`, `null`, `["description"]`, `""`, padded or cased `conference`, 32-char, zero-width, NUL, newline, objects, booleans) through both the direct loader path and `reconcileWebinarSources`: non-strings, control characters and >32 chars are REJECTED closed (whole reconciliation throws); every other string is kept as-is and skipped. None dropped, none scheduled, 0/58 runs. (c) Gmail-linked copy: a Gmail row linked to a free-text calendar event inherits that URL AND its source and is skipped (approved authenticated row and pending row alike); a Gmail row with a different meeting of its own is scheduled on its own trust and the calendar item is skipped; a Gmail row cannot carry a source (allow-list rejects the key), so no relabelling. Note (usability, safe direction): an approved Gmail webinar whose calendar twin has the link only in the description is now skipped. (d) persistence: source survives JSON round trip and a later tick where the event is absent (still `description`, still skipped). (e) other feeders: Gmail candidates carry no source and keep their own trust rules (unchanged, ISS-376 open); the attendance selector in run-pipeline (`selectVerifiedCalendarMeetings`) does not read the source but a free-text event is skipped `needs-review` there because its fingerprint (raw observation has conference data only) never matches; `selectEventsToAutoJoin` has no production caller. Both noted as ISS-T036CAL-009 (low).
+
+### 2. Operator-visible behaviour
+Skipped item text is truthful and URL-free ("link found in the invite text, not verified, so the bot will not join it automatically; if you trust the invite, send the bot to it manually (send-now)"); sentinels (text, e-mail, passcode, zak) absent from rows, errors, enum fields and tick logs; an invalid source string is not echoed. brain.ts, telegram `NOTIFIABLE_REASONS` and run-pipeline `OPERATION_REASONS` all derive from or list the 15th reason and compile. The attention-alert formatter has no case for it: it is ignored as `no-alert-for-reason:unverified-link-source` (no alert, no title shown). run-pipeline turns only five reasons into operations, so no operation/Telegram alert either: an attacker spamming invites produces log lines only (note, no alert noise). Web shows "unverified link source" neutrally.
+
+### 3. Recogniser parity
+Differential test 3/3. My own fresh corpus (different seed and construction): 15,182 URLs including a regenerated embedded-redirect family of 7,904 (19 key names x 13 value forms x all platforms; the cycle-0 verdict did NOT record its 38 URLs and its harness is gone, so they cannot be run verbatim: the recorded 6 plus this family were run instead), host tricks (userinfo, ports, IDN and fullwidth dots, trailing dot, encoded dots, `@`, backslash), path tricks, schemes: both accept 560 with equal identity and URL; canonical-only 118 (copy stricter); copy-only 0. Through the resolver (description/location, anchors, markdown, angle, Google wrapper; 5,372 returned links): all canonical-accepted, none with zak. The two cycle-0 survivors (extra host zoomgov; webex endsWith) are killed by the differential. The differential imports packages/meeting-bot by relative path, i.e. this worktree's files; `git diff 8520fa8 5fe97b9` on platform.ts and send-now.ts is empty.
+
+### 4. D-015 counts
+001: 12 events x 4 modes = 48/48 not scheduled (plus 4/4 of the row's own probe shape in the maker's test). 002: 6/6 recorded URLs refused (recognise, description, location, anchor); the 38 are unrecoverable (see above), family run instead. 003: plain-then-pwd and pwd-then-plain both return the pwd URL; pwd=A vs pwd=B ambiguous in both orders (3/3). 004: 4/4 refused (zoomgov, evilwebex x2, us02web.zoomgov). 005: 11/12 shapes never returned; the 12th, `?zak` with no `=` and no value, is returned but carries no token (the claim "no URL containing zak is ever returned" is slightly broader than the rule; harmless). Host plus join of one meeting returns the join link without the token; host alone gives `host-start-link`.
+
+### 5. The four changed assertions
+Extractor "first URL kept" now uses one passcode in both URLs: legitimate (two different passcodes are now ambiguous, pinned by a new test). Leakage regex `"(description|location)"` -> `"(description|location)":`: not weakened in effect (it was a key check; the new enum VALUES legitimately match; the sentinel assertions on the free text remain and my own sentinel run is clean). Parity test gains `meetingUrlSource: "conference"`: correct for the shape, but it hides ISS-T036CAL-006 (the persisted comparison). SKIP_REASONS 14 -> 15: correct; but two more hard-coded 14s exist (ISS-T036CAL-007).
+
+### 6. Default parity
+Old `auto-join.ts` from 8520fa8 loaded in a temp module vs new: 864 full selections (288 times x everyWebinar true/false/undefined; 500 seeded events, 150 candidates, mixed sources, trusted/untrusted, duplicates, cancelled, bad URLs) byte-identical; 864 items scheduled in total, no `unverified-link-source`. Selection parity holds; persisted-state parity does NOT (ISS-T036CAL-006).
+
+### 7. Type safety
+tsc exit 0 for packages/core, packages/meeting-bot and apps/api against this lane's core via a temporary paths tsconfig (total `Record<SkipReason,...>` in brain.ts and skip-describe.ts compile). Negative control: apps/api against MAIN's core fails only at brain.ts:31 (unknown key), as expected before the merge. On the trial-merged tree the same three type-checks are clean.
+
+### 8. Merge readiness
+`git merge-tree` with codex/machine-migration-2026-10-09 (a3ad969): clean, tree 4352065. Trial merge (`--no-commit --no-ff`, aborted, worktree clean): SKIP_REASONS has 15 values; brain.ts and skip-describe.ts totals include the new one; dirsize OK; apps/api/src/join-rules 12 files (limit 30); packages/meeting-bot/src/calendar unchanged by this lane (26 entries as at base; 27 on the merged tree from main). But the merged tree has 4 red tests: alert-who-production.test.ts (2, main-only file) and skip-reason-vocabulary.test.mjs (2): ISS-T036CAL-007.
+
+### 9. Gates
+Extractor 17/17, differential 3/3, calendar 15/15, gws-gmail 25/25; meeting-bot auto-join 39/39, schedule-tick 14/14, webinar-policy 19/19, schedule-state 18/18, join-rules-optout-identity 22/22, join-rules-select 11/11, alert-title-policy 12/12 and telegram-channel 6/6 (against the lane's core), api brain 11/11; scripts/webinar/skip-reason-vocabulary 1 of 3 pass (2 FAIL). `lint-dirsize` and `lint-loc` fail only on packages/index/src/pipeline and sb_join.py (unrelated).
+
+### 10. Mutations (own harness, per-mutation byte backup, finally-restore, 240 s kill, hash equals HEAD blob after every run, harness deleted)
+17 run, 17 killed. M1 non-conference scheduled in every-webinar mode; M2 invalid source dropped by the allow-list; M3 location source lost in mapper; M4 source lost in Gmail-linked copy; M5 conference+free text returns free text; M6 embedded-redirect check removed; M7 webex endsWith; M8 passcode-less duplicate kept; M9 zak accepted; M10 reason mapped to no-join-link; M11 normalizeCandidate drops source; M12 normalizeCalendarEvent drops source; M13 `/s/` accepted again; M14 mapper hard-codes conference; M15 null treated as missing; M16 case-insensitive compare; M17 extra host zoomgov. Note: M2 (the dangerous seam) is killed only by my probe, not by the lane's suite (ISS-T036CAL-008).
+
+### 11. The new HIGH finding (ISS-T036CAL-006)
+Through `prepareWebinarSourceState` (the production webinar-release path): a persisted state written by the pre-unit mapper shape, then the same event (same `updated`) from the cycle-1 mapper (now carrying `meetingUrlSource: conference`) -> `contradictory-revision`, event absent from `calendarEvents`, transition `unresolved`, and it stays dropped on later ticks until the event is edited. With legacy scope all new starts are blocked. Fail-closed, so no wrong join, but after deploy every already-known upcoming webinar would stop being auto-recorded. Whether production has such a persisted state is not verified here.
+
+ISSUES-WRITTEN: ISS-T036CAL-006 (high), -007 (medium), -008 (medium), -009 (low); ISS-T036CAL-001..005 marked `verified-cycle1` in qa/issues.t036cal.jsonl.
+
+## Merge conditions (cycle 2)
+1. ISS-T036CAL-006: persisted comparison unchanged for existing rows (prefer: mapper emits `meetingUrlSource` only for location/description, missing = conference), with a prepareWebinarSourceState test (old state + same-revision event still scheduled, no unresolved/transition); update the contract item 1 accordingly.
+2. ISS-T036CAL-007: fix the two literals in scripts/webinar/skip-reason-vocabulary.test.mjs; rebase onto main and add the unverified-link-source fixture and EXPECTED row in alert-who-production.test.ts; paste the green runs.
+3. ISS-T036CAL-008: add the allow-list variants test (never dropped, never scheduled).
+4. Keep: provenance field, skip in any mode, differential test, recogniser parity, passcode and host-start rules (all verified).
+
+## Standing statement for the owner
+Free-text calendar links are found but never auto-joined. Whether they may ever be auto-joined, and how a calendar event is approved (no approval path exists for calendar events), is the Approver's decision (Umesh); nothing in this unit decides it, and ISS-376 (record-every-webinar skips the sender-trust check for Gmail candidates) remains open and separate.
