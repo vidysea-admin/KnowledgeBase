@@ -1,6 +1,6 @@
 # Manifest — t035-lean-video-settings-builder
 
-**Lane:** T035LEAN (branch lane/t035lean, base c08a431, code commit caa18d8). **Status:** ready-for-check. **Fix cycle:** 0
+**Lane:** T035LEAN (branch lane/t035lean, base c08a431, code commit caa18d8). **Status:** checked-PASS. **Checked:** qa/verdicts/t035-lean-video-settings-builder.md (cycle 0, 100db03). **Fix cycle:** 0
 **Backlog tier:** 3 (roadmap). **Task:** T-035 "Lean video (720p, low fps), under 400 MB/hour" — stays open/in_progress; this is slice 1 only. **Issues addressed:** none.
 **D-119 reserved files:** none touched (D-119 Changes-authorized names only ai/stt, scripts/upload, u4.1 qa files).
 
