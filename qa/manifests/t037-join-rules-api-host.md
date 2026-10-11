@@ -1,6 +1,7 @@
 # t037-join-rules-api-host
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t037-join-rules-api-host.md (cycle 1, 176797d) - merged after the store lock, as the verdict requires; never launched against a real database
 Fix cycle: 1
 Priority tier: 3 - next unblocked roadmap task (T-037)
 Security class: auth + tenancy + data writes (makes the API a writer of the files that decide a no-click join) - FULL checker ceremony
