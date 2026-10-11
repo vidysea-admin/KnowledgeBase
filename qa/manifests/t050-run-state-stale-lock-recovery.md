@@ -1,6 +1,6 @@
 # t050-run-state-stale-lock-recovery
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t050-run-state-stale-lock-recovery.md, cycle 0, 9307ae8; unwired; single machine; ISS-RUNLOCK-003 open as before-wiring condition)
 Fix cycle: 0
 Tier: 2 (open ledger issue, high, data-write class: ISS-RUNSTORE-001, with ISS-RUNSTORE-002 and -003 folded in). T-050 stays open.
 Lane: lane/runlock (from f2a44c4). Full ceremony. Ledger shard: qa/issues.runlock.jsonl (ISS-RUNLOCK-NNN).
