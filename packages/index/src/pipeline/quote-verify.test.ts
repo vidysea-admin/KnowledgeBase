@@ -54,6 +54,8 @@ test("minimum length and token count; mid-word and mid-cluster matches are refus
   refused(verifyQuote(T, "is not"), "too-short");
   refused(verifyQuote(T, "admissionfee"), "too-short");
   refused(verifyQuote(T, "ission fee is not ref"), "partial-word");
+  refused(verifyQuote(T, "ission fee is not refundable"), "partial-word");
+  refused(verifyQuote(T, "admission fee is not refund"), "partial-word");
   refused(verifyQuote(T, "प्रवेश प्रक्रिय"), "partial-word");
   ok(verifyQuote(T, "प्रवेश प्रक्रिया के बारे"));
 });
