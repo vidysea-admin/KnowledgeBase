@@ -388,24 +388,26 @@ const FAKE_RC = [
 async function driveRecord(scenario: string, untilMs: number) {
   const dir = mkdtempSync(join(tmpdir(), "lkb-rc-")), script = join(dir, "fake-extension.mjs"), recordDir = join(dir, "record");
   writeFileSync(script, FAKE_RC); process.env.FAKE_RC = scenario;
-  const finalizeCalls: unknown[][] = []; let startedAt = 0;
+  const finalizeCalls: unknown[][] = []; let polls = 0, pollsAtEvent: number | undefined, pollsAtStop: number | undefined;
   try {
     const t0 = Date.now(); let error: unknown;
     await runRecord(["https://meet.google.com/abc-defg-hij", "--until", new Date(t0 + untilMs).toISOString(), "--backend", "tab",
       "--session-id", "t034-rc", "--tenant", "fixture", "--title", "fixture"], {
-      recordDir, pollMs: 20, finalize: async (...args) => { finalizeCalls.push(args); },
-      tab: (onEvent) => createTabBrowserDeps({python: process.execPath, joinScript: script, profileDir: join(dir, "profile"), recordDir,
+      recordDir, wait: async () => { polls++; await new Promise((r) => setTimeout(r, 20)); }, finalize: async (...args) => { finalizeCalls.push(args); },
+      tab: (onEvent) => { const t = createTabBrowserDeps({python: process.execPath, joinScript: script, profileDir: join(dir, "profile"), recordDir,
         extensionDir: join(REPO_ROOT, "packages/meeting-bot/py/tab-capture"), sessionId: "t034-rc", tenantId: "fixture", startupTimeoutMs: 15000, log: () => {},
-        onEvent: (h, e) => { if (e.event === "capture-started") startedAt = Date.now(); onEvent(h, e); }}),
+        onEvent: (h, e) => { if (e.event === "capture-error" || (e.event === "capture-stopped" && e.failed !== false)) pollsAtEvent ??= polls; onEvent(h, e); }});
+        const stop = t.deps.stop!; t.deps.stop = async (h) => { pollsAtStop ??= polls; return stop(h); }; return t; },
     }).catch((e) => { error = e; });
-    const elapsedAfterStart = Date.now() - startedAt;
     const webm = existsSync(recordDir) ? readdirSync(recordDir).filter((n) => n.endsWith(".webm")) : [];
     const status = webm.length ? JSON.parse(readFileSync(join(recordDir, webm[0]! + ".status.json"), "utf8")) : undefined;
     const media = webm.length ? readFileSync(join(recordDir, webm[0]!), "utf8") : undefined;
-    return {error, finalizeCalls, elapsedAfterStart, status, media};
+    return {error, finalizeCalls, pollsAtEvent, pollsAtStop, status, media};
   } finally { delete process.env.FAKE_RC; rmSync(dir, {recursive: true, force: true}); }
 }
 const T4 = {timeout: 60000};
+// Deterministic, no clock: the loop must make ZERO further waits between the failure event and the stop call.
+const assertLoopExitedAtOnce = (r: Awaited<ReturnType<typeof driveRecord>>) => { assert.notEqual(r.pollsAtEvent, undefined); assert.equal(r.pollsAtStop, r.pollsAtEvent, "loop waited again after the failure event"); };
 const expectFailed = (r: Awaited<ReturnType<typeof driveRecord>>, reason: RegExp) => {
   assert.ok(r.error instanceof Error, "runRecord must reject (non-zero exit)"); assert.match((r.error as Error).message, reason);
   assert.equal(r.finalizeCalls.length, 0, "finalize/promote must never be called"); assert.equal(r.media, "partial-media", "partial file left in place");
@@ -416,11 +418,11 @@ test("ISS-T034FIX-004: tab stop rejects (failed stop at end of recording) -> run
 });
 test("ISS-T034FIX-004: a capture-error ends the record loop promptly and the capture fails (no finalize)", T4, async () => {
   const r = await driveRecord("early-error", 120000); expectFailed(r, /lost audio/);
-  assert.ok(r.elapsedAfterStart < 3000, `loop must end promptly, took ${r.elapsedAfterStart} ms`);
+  assertLoopExitedAtOnce(r);
 });
 test("ISS-T034FIX-004: an early capture-stopped failed:true ends the record loop promptly and the capture fails (no finalize)", T4, async () => {
   const r = await driveRecord("early-failed-stop", 120000); expectFailed(r, /failed stop; media is incomplete/);
-  assert.ok(r.elapsedAfterStart < 3000, `loop must end promptly, took ${r.elapsedAfterStart} ms`);
+  assertLoopExitedAtOnce(r);
 });
 test("ISS-T034FIX-004 parity: a clean tab stop is not a capture failure (status stopped; proceeds past stop into normalize/finalize)", T4, async () => {
   const r = await driveRecord("clean", 3000);

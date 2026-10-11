@@ -71,7 +71,7 @@ export function recordingBackend(rest: string[], env: NodeJS.ProcessEnv = proces
 /** Test seam: inject the tab backend, finalize, record dir and loop poll interval (defaults are production). */
 export interface RecordInject {
   tab?: (onEvent: (handle: string, event: any) => void) => ReturnType<typeof createTabBrowserDeps>;
-  finalize?: typeof finalizeRecording; recordDir?: string; pollMs?: number;
+  finalize?: typeof finalizeRecording; recordDir?: string; wait?: (ms: number) => Promise<void>;
 }
 export async function runRecord(rest: string[], inject: RecordInject = {}): Promise<void> {
   const recordDir = inject.recordDir ?? RECORD_DIR;
@@ -175,7 +175,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
         if (endedAt !== undefined && now >= endNotBefore.getTime() && now - endedAt > 60_000) {
           console.log("[bot] webinar reported ended"); break;
         }
-        await new Promise((r) => setTimeout(r, inject.pollMs ?? 5000));
+        await (inject.wait ?? ((ms) => new Promise<void>((r) => setTimeout(r, ms))))(5000);
       }
     } finally {
       audioWatchdog.stop(); // T-031: before joiner.stop — recording is ending, no more reconnects

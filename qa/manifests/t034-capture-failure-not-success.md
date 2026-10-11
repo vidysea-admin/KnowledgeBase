@@ -1,7 +1,7 @@
 # Manifest — t034-capture-failure-not-success
 
 Status: ready-for-check
-Fix cycle: 1
+Fix cycle: 2
 
 **Goal task:** T-034 (in-browser tab capture). T-034 stays OPEN (no real-browser run yet).
 **Lane:** T034FIX, branch `lane/t034fix` from d27cf71. New issues: `qa/issues.t034fix.jsonl` (ISS-T034FIX-001, -002).
@@ -78,3 +78,9 @@ Mutants (per-mutation byte backup, restore in finally, hash equals pre-mutation 
 **3. ISS-T034FIX-005 (alert/operation row): LEFT OPEN.** `record-commands.ts` has no operation/job-outcome recording for failures of any kind (grep for operation/job: none); its only failure outputs are the thrown error (non-zero exit), stderr and the status file. There is no existing path to reuse with one call, and alerting was out of scope.
 
 **Evidence (cycle 1).** tab-browser tests: 13 tests, 12 pass, 1 fail = the pre-existing symlink EPERM test (environmental, unchanged). record-commands tests: 23 tests, 22 pass, 0 fail (one earlier run under load showed 2 timing failures, a rerun was green). Extension tests: 44 tests, 43 pass, 1 todo (-004 of the T034EXT set). `tsc --noEmit -p tsconfig.json`: 0 errors. `lint-dirsize`: OK. Non-blank sizes: tab-browser.ts 268 (limit 300), record-commands.ts 278, record-commands.test.ts 397 (limit 400), tab-browser.test.ts 141. background.js and manifest.json untouched (blobs 37ec1ae..., 3c49a48...).
+
+## Fix cycle 2 (cycle 1 FAIL: wall-clock flakiness, ISS-T034FIX-006)
+All `elapsedAfterStart < 3000` assertions are removed. The record loop's sleep is now an injectable waiter: `RecordInject.wait?: (ms) => Promise<void>` replaces `pollMs`; the default is the identical 5000 ms `setTimeout` and nothing is reachable from CLI or env.
+Deterministic observation: the test's waiter counts loop waits (`polls`). The fake tab records `pollsAtEvent` (waits so far when the capture-error / failed capture-stopped reaches the controller) and `pollsAtStop` (waits so far when `deps.stop` is called). `assertLoopExitedAtOnce` asserts `pollsAtStop === pollsAtEvent`: after the failure event the loop must make ZERO further waits. No clock comparison anywhere in the assertions (the fake extension's 6 s self-exit and the 60 s test timeout are only safety nets that make a surviving mutant terminate; they never decide a kill).
+Killers (per-mutation byte backup, restore in finally, hash equals pre-mutation blob): C1 rethrow removed: killed by "tab stop rejects (failed stop at end of recording)" and the early-failed-stop test; C2 loop throw removed: killed by "a capture-error ends the record loop promptly" and the early-failed-stop test (loop made further waits); C3 early-exit failed-stop line removed: killed by "an early capture-stopped failed:true ends the record loop promptly" (further waits). ISS-T034FIX-004: 3/3 mutants killed, none by elapsed time.
+Ten consecutive runs of record-commands.test.ts (foreground, 250 s cap each): every run `tests 23 / pass 22 / fail 0 / skipped 1`. record-commands.test.ts is 399 of 400 non-blank lines; no file added to src/capture. `tsc --noEmit -p tsconfig.json`: 0 errors.
