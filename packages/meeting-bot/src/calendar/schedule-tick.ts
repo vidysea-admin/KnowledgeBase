@@ -9,7 +9,8 @@ import {
   type AutoRecordCandidateInput, type AutoRecordItem,
 } from "./auto-join.js";
 import { describeSkip } from "./skip-describe.js";
-import { enforceJoinRules, type JoinRulesEnforceIo } from "./join-rules-enforce.js";
+import { createKeyTenantLoader } from "./join-rules-wiring/key-tenant.js";
+import { enforceJoinRules, parseJoinRulesEnforce, type JoinRulesEnforceIo } from "./join-rules-enforce.js";
 import { readScheduledKeys, recordScheduled, writeScheduledJob, validateWebinarCalendarAcquisition, type WebinarCalendarAcquisition } from "./schedule-state.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
 
@@ -51,8 +52,10 @@ export interface ScheduleTickDeps {
   joinRulesEnforce?: unknown;
   /** This tick's own tenant (LKB_TENANT_ID); join rules are loaded for this tenant only. */
   joinRulesTenantId?: string;
-  /** The API key's tenant when known (none of the tick's responses carries it today; production leaves this unset). */
+  /** The API key's tenant when already known (test seam); `null` = could not be verified. */
   joinRulesKeyTenantId?: unknown;
+  /** Production: verifies the key's tenant (one `GET /webinar-operations`, header `X-LKB-Tenant`); called ONLY when enforcement is enabled. */
+  loadKeyTenant?: () => Promise<string | null>;
   joinRulesIo?: JoinRulesEnforceIo;
 }
 
@@ -211,6 +214,7 @@ export function buildRealScheduleTickDeps(): ScheduleTickDeps {
     everyWebinar: true,
     joinRulesEnforce: process.env.LKB_JOIN_RULES_ENFORCE,
     joinRulesTenantId: process.env.LKB_TENANT_ID,
+    loadKeyTenant: createKeyTenantLoader(apiUrl, process.env.LKB_API_KEY, log),
     now: () => new Date().toISOString(),
     stateDir: DEFAULT_STATE_DIR,
     scheduler: createWindowsTaskScheduler(),
@@ -243,8 +247,11 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
     everyWebinar: deps.everyWebinar,
   });
   // Veto-only join rules (T-037); `off` (the default) returns `selected` itself without opening the store.
+  // Key tenant (ISS-T037WIRE-001): fetched per tick, only when enforcing; a throwing loader means "unverified" (null).
+  const keyTenantId = deps.joinRulesKeyTenantId === undefined && deps.loadKeyTenant && parseJoinRulesEnforce(deps.joinRulesEnforce) !== "off"
+    ? await deps.loadKeyTenant().catch(() => null) : deps.joinRulesKeyTenantId;
   const result = await enforceJoinRules(selected, {
-    mode: deps.joinRulesEnforce, tenantId: deps.joinRulesTenantId, keyTenantId: deps.joinRulesKeyTenantId, stateDir: deps.stateDir, log: deps.log, io: deps.joinRulesIo,
+    mode: deps.joinRulesEnforce, tenantId: deps.joinRulesTenantId, keyTenantId, stateDir: deps.stateDir, log: deps.log, io: deps.joinRulesIo,
   });
 
   deps.log(`schedule-tick: ${result.toSchedule.length} to schedule, ${result.skipped.length} skipped ` +

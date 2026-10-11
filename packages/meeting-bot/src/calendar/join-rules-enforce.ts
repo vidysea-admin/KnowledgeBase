@@ -53,8 +53,9 @@ export interface JoinRulesEnforceIo {
 }
 export interface JoinRulesEnforceConfig {
   mode: unknown; tenantId?: string; stateDir: string; log: (msg: string) => void; io?: JoinRulesEnforceIo;
-  /** The tenant of the API key whose candidates are filtered, WHEN KNOWN. Production passes none today: no response the tick already
-   * receives carries it and there is no whoami route (ISS-T037WIRE-001 stays open). If given and different from `tenantId` => `tenant-mismatch`. */
+  /** The tenant of the API key whose candidates are filtered. A string different from `tenantId` => `tenant-mismatch`; `null` = the key's
+   * tenant could not be verified => `tenant-unverified` (same handling per policy); `undefined` = not supplied (test seam). Production
+   * supplies it every enforcing tick from the `X-LKB-Tenant` header (join-rules-wiring/key-tenant.ts). */
   keyTenantId?: unknown;
 }
 
@@ -62,6 +63,7 @@ const RETRY_WAITS_MS = [150, 300];
 const TRANSIENT_CODES = new Set(["locked", "lock-failed", "EBUSY", "EPERM", "EACCES"]);
 const REASON_TENANT_UNSET = "tenant-unset: LKB_TENANT_ID is absent or not a valid tenant id (no default tenant); join rules not evaluated";
 const REASON_TENANT_MISMATCH = "tenant-mismatch: the API key's tenant differs from LKB_TENANT_ID; join rules not applied";
+const REASON_TENANT_UNVERIFIED = "tenant-unverified: the API key's tenant could not be verified against LKB_TENANT_ID; join rules not applied";
 const DETAIL_FAIL_CLOSED = "join rules could not be read or evaluated; failing closed (see the JOIN RULES log line)";
 
 /** Message safe for a log: control characters removed, path-like text redacted, bounded. */
@@ -110,6 +112,7 @@ export async function enforceJoinRules(selection: SelectAutoRecordItemsResult, c
   const skipped = Array.isArray(selection?.skipped) ? selection.skipped : [];
 
   const read = typeof c.tenantId !== "string" || c.tenantId === "" ? { error: REASON_TENANT_UNSET }
+    : c.keyTenantId === null ? { error: REASON_TENANT_UNVERIFIED }
     : c.keyTenantId !== undefined && c.keyTenantId !== c.tenantId ? { error: REASON_TENANT_MISMATCH }
     : await readRules(c);
   if ("error" in read) {
