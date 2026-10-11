@@ -1,7 +1,7 @@
 /**
  * T-036 fix cycle 1 (ISS-T036CAL-002, -004): DIFFERENTIAL test between the API-side recogniser copy
  * (calendar-link-extract.ts `recognise`) and the canonical recognisers (packages/meeting-bot send-now.ts `planSendNow` +
- * `meetingIdentity`, platform.ts `detectPlatform`). Tests may cross packages; production code may not (dep-cruiser).
+ * `meetingIdentity`, platform.ts `detectPlatform`). Lives in scripts/qa (outside the dep-cruiser roots) because it must import both apps/api and packages/meeting-bot, an edge no layer may hold.
  *
  * Property 1 (safety): the copy NEVER returns a join link the canonical planner refuses.
  * Property 2 (identity): where both accept, the meeting identity and the normalised URL are identical.
@@ -12,8 +12,8 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { recognise, resolveEventMeetingLink } from "./calendar-link-extract.js";
-import { planSendNow } from "../../../../packages/meeting-bot/src/send-now.js";
+import { recognise, resolveEventMeetingLink } from "../../apps/api/src/join-rules/calendar-link-extract.js";
+import { planSendNow } from "../../packages/meeting-bot/src/send-now.js";
 
 const NOW = "2026-10-11T12:00:00Z";
 const canon = (u: string) => { const p = planSendNow(u, NOW); return p.ok ? { key: p.request.meetingKey, url: p.request.meetingUrl } : undefined; };
