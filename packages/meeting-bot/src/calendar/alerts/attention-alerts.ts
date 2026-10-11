@@ -10,6 +10,7 @@
 import { createHash } from "node:crypto";
 import { SKIP_REASONS, type SkippedItem } from "@lkb/core";
 import { neutralizeText } from "./alert-text.js";
+import { allowlistTitle } from "./title-allowlist.js";
 
 /**
  * How the event title may appear in an alert. `omit` (the DEFAULT, and the value for anything absent,
@@ -123,7 +124,7 @@ function build(c: AttentionCase, sessionKey: string, title: unknown, startTime: 
   const detail = c === "action-required" && reason ? ` Reason: ${reason}.` : "";
   // omit: the title argument is never read. Headline, formatted start and the hashed id identify the alert.
   const masked = policy === "masked";
-  const t = masked ? neutralizeText(title) : "";
+  const t = masked ? allowlistTitle(title) : "";
   return {
     key: `attn:${c}:${id}${c === "action-required" && reason ? `:${reason}` : ""}`,
     case: c, severity: spec.severity, title: masked ? `${spec.headline}: ${t}` : `${spec.headline}: ${starts} [${id}]`,
