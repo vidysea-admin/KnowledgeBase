@@ -1,6 +1,6 @@
 # iss-jobqueue-002-lost-update
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2 (open ledger issue ISS-JOBQUEUE-002, status `open-before-wiring`, class data write: full ceremony). Fixes the condition that blocked wiring the T-050 job queue to any runner; does NOT wire it.
 Lane: lane/jobqlost. Ledger for this lane: qa/issues.jobqlost.jsonl, ids ISS-JOBQLOST-NNN (2 filed, both open). Existing ledger rows untouched (the checker changes ISS-JOBQUEUE-002's status).
