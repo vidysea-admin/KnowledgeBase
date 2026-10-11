@@ -1,6 +1,6 @@
 # Manifest — auth-require-tenant-on-key
 **Lane:** lane/authtenant (base 6677e1b) · **Ledger shard:** qa/issues.authtenant.jsonl (ISS-AUTHTENANT-NNN; none filed)
-**Issue addressed:** ISS-AUTHSCOPE-001 (high; security class: authentication and tenancy, full ceremony) · **Fix cycle:** 0
+**Issue addressed:** ISS-AUTHSCOPE-001 (high; security class: authentication and tenancy, full ceremony) · **Fix cycle:** 1
 
 ## What changed
 - `apps/api/src/auth.ts` (67 non-blank lines, limit 300): new exported `isValidTenantId`; `requireAuth` refuses with the unknown-key 401 (same status, same body `{error:"unauthorized",message:"invalid or revoked API key"}`) when the verified record is not an object or its tenantId is invalid. The check sits AFTER the store lookup (no distinguishable early return); nothing is logged; no throw. `requireScope` untouched.
@@ -37,7 +37,39 @@ Per-mutation runner (git show HEAD: content written over the source, test run un
    `db.api_keys.find({ $or: [ { tenantId: { $exists: false } }, { tenantId: { $not: { $type: "string" } } }, { tenantId: "" }, { tenantId: { $regex: /^\s|\s$|[\x00-\x1f\x7f]/ } } ] }, { keyHash: 0 })`
 2. Still open: a holder of the `keys` scope can mint a key with ANY scope (routes/keys.ts only checks strings), i.e. escalate to every scope of the tenant. Not changed here.
 3. `store.ts:47` still returns `doc.tenantId` unvalidated; `requireAuth` is the choke point so left as is.
-4. `ask-tenant-isolation.test.ts` no longer exercises the route-level 404 for an empty tenant over HTTP (auth refuses first).
+4. `ask-tenant-isolation.test.ts` no longer exercises the route-level 404 for an empty tenant over HTTP (auth refuses first). (Repaired in fix cycle 1 below.)
+
+## Fix cycle 1 (test-only; answers VERDICT FAIL cycle 0, ISS-AUTHTENANT-001)
+**What failed.** Cycle 0 edited one assertion in `ask-tenant-isolation.test.ts` ("empty or undefined resolved tenant") from 404 to 401. True at the auth level, but the route never ran any more, so "no turns/chunks query", "zero rows returned" and "no model call" held vacuously. With auth bypassed, tenants `""`, `undefined`, `{$ne:null}` reach `tree.load` raw; nothing asserted that the tree store then returns nothing. That is how ISS-078 survived: a green suite with the protection silently regressed. The security fix (requireAuth 401 + throwing accessor) is unchanged; no production file is touched this cycle.
+
+**Auth-free route access, no production switch.** New `apps/api/src/ask/ask-tenant-hostile.test.ts` (222 non-blank lines, budget 400; beside `ask-tenant-isolation.test.ts`, no new entry in apps/api/src) builds an `express()` app with `express.json()`, a test-local middleware `req.auth = { tenantId: <hostile>, scopes: ["ask"] }`, then the REAL `createAskRouter` (real `requireScope`, real handler, real `createSourceRequestDepsFor` hydrator/arms) over a tenant-blind fake DB with Mongo operator semantics ($ne, $gt, $in, $regex, $exists, array equality). `requireAuth` is deliberately not mounted. The existing 401 assertion stays.
+
+**Hostile table** (one table, 11 values, run at 5 levels). Fixture: real tenants tA (sentinel `SENT-A-ALPHA-7f3`) and tB (`SENT-B-BRAVO-9c1`), plus valid-but-empty `tNone`. Positive controls: A gets 200 with only A's sentinel, B 200 with only B's; every A query carries `tenantId: tA`.
+| value | tree store / route (store honest) | arms, hydrator (old guard, this lane) | accessor in THIS lane (relative import) |
+|---|---|---|---|
+| `""`, undefined, null | 0 rows; route 404, load got exact value | old guard throws; arms degrade, hydrator refuses; 0 rows | throws |
+| `"   "`, 5, `tNone` | 0 rows; route 404 | query runs, 0 rows | throws (tNone passes) |
+| `{$ne:null}`, `{$gt:''}`, `{$in:[A,B]}`, `{$regex:'.*'}`, `[A]` | 0 rows (node_id `tenant:<value>` matches no root); route 404 | SKIPPED: old guard would pass an operator object to the driver; 5 values x arms/hydrator/bypassed-tree = 15 skips | throws |
+
+Route checks per value: status 404, neither sentinel nor any `tenant:tB`/`b-turn-`/`b-chunk-` in the body, no stack/path in the body, `tree.load` received exactly the hostile value, no turns/chunks query, every query returned 0 rows, zero model calls. Level 2b ("tree store itself bypassed", returns A's tree for any tenant): no sentinel, no stack; observed under the old guard: `""`/undefined/null give a clean 503, whitespace/5/tNone give 200 with empty `sources.internal`. Under the new guard the operator values must give the same clean refusal (same code path as `""` today).
+
+**Mutations** (per-mutation in-memory byte backup, 150 s `spawnSync` timeout, restore in `finally`, sha1 of the file equal before/after: true for both). The real store's `getDb()` cannot be injected hermetically and packages/index resolves to the main tree, so the mutated deep layer is the test-file replica `treeStore.load` (same call shape as `store.ts`: `findOne(treeIndexRootFilter(tenantId))`).
+- (a) load ignores the tenant (always tA's root): `pass 20 fail 23`; killed, including positive control B, all 11 tree-store tests and all 11 route tests.
+- (b) load drops `node_id` and passes `{level:"tenant", tenantId}`, so the operator object reaches the fake collection and matches all roots: `pass 35 fail 8`; killed: tree-store and route tests for `{$ne:null}`, `{$gt:''}`, `{$in:[A,B]}`, `{$regex:'.*'}`.
+
+**Integration gap.** apps/api's `@lkb/db` resolves to the MAIN tree (old `!tenantId` guard). The tests hold under both guards; a probe (`guardRefusesObjects`, logged as `# @lkb/db guard refuses operator objects: false` here) skips the 15 cases that need the new guard to refuse an operator object. One test imports THIS lane's `tenantScope.ts` by relative path and asserts all 10 invalid values throw and valid ids pass. AFTER MERGE the 15 skipped cases run for the first time against the new guard and MUST be re-run: `cd apps/api && node --test --import tsx src/ask/ask-tenant-hostile.test.ts` (expect `skipped 0`, `fail 0`); then the whole apps/api suite (ISS-AUTHTENANT-003).
+
+**D-015.** ISS-AUTHTENANT-001 recorded reproduction (stub auth; `""`, undefined, `{$ne:null}`; POST /ask): 3/3 now refused at the route with 404, load receives the raw value, no data. ISS-AUTHSCOPE-001: 4/4 (missing, null, "", 5) still refused 401; `require-scope.test.ts` 21/21.
+
+**Evidence** (node 24.19.0 via codex runtime PATH; each command under `timeout`):
+- `cd apps/api && node --test --import tsx src/ask/ask-tenant-hostile.test.ts` -> `tests 58 / pass 43 / fail 0 / skipped 15`
+- same plus `src/ask/ask-tenant-isolation.test.ts` -> `tests 74 / pass 59 / fail 0 / skipped 15`
+- `src/ask/*.test.ts src/ask-arms.test.ts src/routes/ask/ask.test.ts src/server.test.ts` -> `tests 121 / pass 106 / fail 0 / skipped 15`
+- require-scope + join-rules + routes/keys + routes/calendar tests -> `tests 67 / pass 67 / fail 0`; `require-scope.test.ts` alone `tests 21 / pass 21 / fail 0`
+- `cd packages/db && node --test --import tsx` over `*.test.ts` -> `tests 29 / pass 29 / fail 0`
+- `tsc --noEmit -p tsconfig.json` in apps/api and packages/db -> exit 0 both; `node scripts/lint-dirsize.mjs` -> `lint-dirsize: OK (112 dir(s) within budget)`
+
+**Follow-ups (not this cycle).** ISS-AUTHTENANT-002 (unguarded tenant filters outside packages/db: api_keys in store.ts, tree_index via treeIndexRootFilter, whatsapp/store.ts, activity-health queue reader, mint-key) stays open, file-don't-fix. ISS-AUTHTENANT-003: run the apps/api suite once after merge. Production defect exposed by the new tests: none.
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
