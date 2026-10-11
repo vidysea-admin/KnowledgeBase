@@ -137,7 +137,7 @@ test("corrupt and oversized per-session state is reported as kept, never eligibl
   assert.equal(r.code, 0);
   assert.match(r.out, /RECORDING bad-src => KEEP[\s\S]*unreadable state, kept: source\.json: not valid JSON/);
   assert.match(r.out, /RECORDING bad-ses => KEEP[\s\S]*session\.json: not an object/);
-  assert.match(r.out, /RECORDING good-src => ELIGIBLE/);
+  assert.match(r.out, /RECORDING good-src => KEEP[\s\S]*guard: scope-incomplete/); // cycle 3: an unreadable record in scope refuses every ELIGIBLE
   // corrupt claims.json could hide a citation: every recording is kept
   writeSession(root, media, { name: "bad-claims", ...old, raw: { "claims.json": "{{" } });
   const blocked = runCmd(baseArgs(root, media));

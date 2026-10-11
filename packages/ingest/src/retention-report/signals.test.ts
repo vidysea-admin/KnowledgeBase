@@ -6,7 +6,6 @@ import { join } from "node:path";
 import test from "node:test";
 import { REAL_IO, type MediaIo } from "../retention-report-media.js";
 import { DAY, NOW, baseArgs, iso, runCmd, snapshot, tempRoot, writeSession } from "../retention-report.fixtures.js";
-import { OPS_UNKNOWN_WINDOW_MS } from "./ops.js";
 import { block, guardOf, line, runIo, verdict } from "./helpers.js";
 
 function withRoots(fn: (root: string, media: string, scratch: string) => void): void {
@@ -94,21 +93,25 @@ test("pipeline operation rows: every non-terminal or unknown status keeps; only 
   assert.equal(guardOf(r2.out, "by-art"), "operation-in-progress");
 }));
 
-test("operations state missing, unreadable or malformed: header warning; media changed within 30 days is kept, older is not", () => withRoots((root, media, scratch) => {
+test("operations state is REQUIRED; missing, unreadable or malformed means nothing is ELIGIBLE at any age (ISS-T046DRY-008)", () => withRoots((root, media, scratch) => {
   const day = (d: number) => NOW - d * DAY;
   writeSession(root, media, { name: "m29", processedAt: iso(29 * DAY), mediaMtimeMs: day(29) });
   writeSession(root, media, { name: "m30", ...old, mediaMtimeMs: day(30) });
   writeSession(root, media, { name: "m31", processedAt: iso(31 * DAY), mediaMtimeMs: day(31) });
-  assert.equal(OPS_UNKNOWN_WINDOW_MS, 30 * DAY);
   mkdirSync(join(scratch, "adir"));
   writeFileSync(join(scratch, "bad.json"), "{nope"); writeFileSync(join(scratch, "noops.json"), "{\"version\":1}");
-  for (const ops of [null, join(scratch, "does-not-exist.json"), join(scratch, "adir"), join(scratch, "bad.json"), join(scratch, "noops.json")]) {
+  const omitted = runCmd(args(root, media, null));
+  assert.equal(omitted.code, 2);
+  assert.equal(omitted.out, "");
+  assert.match(omitted.err, /--operations-state is required/);
+  for (const ops of [join(scratch, "does-not-exist.json"), join(scratch, "adir"), join(scratch, "bad.json"), join(scratch, "noops.json")]) {
     const r = runCmd(args(root, media, ops));
     assert.equal(r.code, 0, r.err);
     assert.match(r.out, /^!! PIPELINE STATE UNAVAILABLE \(/m, String(ops));
     assert.deepEqual([verdict(r.out, "m29"), guardOf(r.out, "m29")], ["KEEP", "operation-state-unavailable"]);
     assert.deepEqual([verdict(r.out, "m30"), guardOf(r.out, "m30")], ["KEEP", "operation-state-unavailable"]);
-    assert.equal(verdict(r.out, "m31"), "ELIGIBLE");
+    assert.deepEqual([verdict(r.out, "m31"), guardOf(r.out, "m31")], ["KEEP", "operation-state-unavailable"]);
+    assert.doesNotMatch(r.out, /=> ELIGIBLE/);
     assert.match(block(r.out, "m29"), /operation-state-unavailable \(not assessable\)/);
   }
   const ok = runCmd(args(root, media, opsFile(scratch, {})));

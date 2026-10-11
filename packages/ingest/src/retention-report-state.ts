@@ -51,6 +51,8 @@ export interface Gathered {
   mediaInfo: number[];
   nonRecording: number;
   notes: string[];
+  /** every directory entry the scan saw but could not turn into a parsed record (path relative to the data root, and why) */
+  notUnderstood: Array<{ path: string; why: string }>;
 }
 
 export type GatherResult = { ok: true; value: Gathered } | { ok: false; message: string };
@@ -85,15 +87,21 @@ function describe(r: Read): string {
 export function gatherState(opts: ReportOptions, io: MediaIo = REAL_IO): GatherResult {
   const tenantDir = join(opts.dataRoot, tenantSegment(opts.tenant));
   let names: string[];
+  const skipped: Array<{ path: string; why: string }> = [];
   try {
     if (!lstatSync(opts.dataRoot).isDirectory() || !lstatSync(tenantDir).isDirectory()) throw new Error("not a directory");
-    names = readdirSync(tenantDir, { withFileTypes: true }).filter((d) => d.isDirectory() && SESSION_NAME.test(d.name)).map((d) => d.name).sort();
+    const entries = readdirSync(tenantDir, { withFileTypes: true });
+    names = entries.filter((d) => d.isDirectory() && SESSION_NAME.test(d.name)).map((d) => d.name).sort();
+    for (const d of entries) {
+      if (d.isDirectory() && SESSION_NAME.test(d.name)) continue;
+      skipped.push({ path: `${tenantSegment(opts.tenant)}/${d.name}`, why: d.isDirectory() ? "directory name not accepted as a session" : "not a plain session directory (file, link or junction)" });
+    }
   } catch {
     return { ok: false, message: "cannot read this tenant's state: the data root must contain a directory named by the sha-256 of the tenant id" };
   }
   if (names.length > CAPS.maxSessions) return { ok: false, message: `too many session directories (${names.length} > ${CAPS.maxSessions}); refusing to guess` };
 
-  const g: Gathered = { tenantId: opts.tenant, media: [], claims: [], turns: [], infos: [], mediaInfo: [], nonRecording: 0, notes: [] };
+  const g: Gathered = { tenantId: opts.tenant, media: [], claims: [], turns: [], infos: [], mediaInfo: [], nonRecording: 0, notes: [], notUnderstood: skipped };
   const budget = { used: 0 };
   for (const name of names) {
     const dir = join(tenantDir, name);
@@ -148,5 +156,6 @@ export function gatherState(opts: ReportOptions, io: MediaIo = REAL_IO): GatherR
     g.mediaInfo.push(g.infos.length);
     g.infos.push(info);
   }
+  for (const i of g.infos) if (i.unreadable) g.notUnderstood.push({ path: `${tenantSegment(opts.tenant)}/${i.dir}`, why: `unreadable record (${i.unreadable})` });
   return { ok: true, value: g };
 }

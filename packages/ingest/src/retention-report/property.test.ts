@@ -22,7 +22,7 @@ const POOL = 260;
 const spellings = (k: number): string[] => [`m/f${k}.webm`, `m/./f${k}.webm`, `M/F${k}.WEBM`, `m//f${k}.webm`];
 
 /** One batch of 400 sessions over a shared pool of media files (so many files are referenced by several records). */
-function batch(seed: number): { sessions: SessionSpec[]; linked: Array<[string, string]>; opsRows: Record<string, unknown> } {
+function batch(seed: number, corruptRate: number): { sessions: SessionSpec[]; linked: Array<[string, string]>; opsRows: Record<string, unknown> } {
   const r = rng(seed);
   const sessions: SessionSpec[] = [];
   const linked: Array<[string, string]> = [];
@@ -39,6 +39,7 @@ function batch(seed: number): { sessions: SessionSpec[]; linked: Array<[string, 
       mediaMtimeMs: NOW - ([5000, 3 * DAY, 20 * DAY, 60 * DAY, -9 * DAY][Math.floor(r() * 5)] as number),
       ...(r() < 0.12 ? { claims: [{ _id: "c", tenantId: "toc", text: "x", status: "needs-review", evidence: [{ turnId: `${name}-t1`, sessionId: name }] }] } : {}),
       ...(r() < 0.06 ? { status: { transcribe: "pending", index: "done" } } : {}),
+      ...(r() < corruptRate ? { raw: { "source.json": '{"_id":"x","tenantId":"toc","kind":"rec' } } : {}),
     });
     if (r() < 0.05) opsRows[`${name}-src`] = { status: ["recording", "processing", "failed", "mystery"][Math.floor(r() * 4)] };
     else if (r() < 0.1) opsRows[name] = { status: "ready" };
@@ -46,12 +47,14 @@ function batch(seed: number): { sessions: SessionSpec[]; linked: Array<[string, 
   return { sessions, linked, opsRows };
 }
 
-test("downgrade-only at FILE level: 2,000 seeded sessions (5 x 400) incl. shared files, hardlinks, case and ./ spellings and pipeline rows", (t) => {
-  let eligibleFiles = 0, vetoed = 0, mixedFiles = 0, inProgress = 0;
+test("downgrade-only at FILE level: 2,000 seeded sessions (2 batches carry unreadable records) (5 x 400) incl. shared files, hardlinks, case and ./ spellings and pipeline rows", (t) => {
+  let dirtyChecked = 0, eligibleFiles = 0, vetoed = 0, mixedFiles = 0, inProgress = 0;
   for (const seed of [11, 22, 33, 44, 55]) {
     const root = tempRoot(), media = tempRoot(), scratch = mkdtempSync(join(tmpdir(), "t046dry-prop-"));
     try {
-      const { sessions, linked, opsRows } = batch(seed);
+      const dirty = seed === 22 || seed === 44; // these two batches carry truncated (unreadable) records at about 1%
+      const { sessions, linked, opsRows } = batch(seed, dirty ? 0.01 : 0);
+      assert.ok(!dirty || sessions.some((s) => s.raw), "a dirty batch has at least one unreadable record");
       for (const s of sessions) writeSession(root, media, s);
       for (const [link, target] of linked) {
         if (!existsSync(join(media, target))) {
@@ -77,7 +80,13 @@ test("downgrade-only at FILE level: 2,000 seeded sessions (5 x 400) incl. shared
       }
       const reported = new Map<string, boolean>();
       for (const m of res.out.matchAll(/^RECORDING (\S+) => (ELIGIBLE|KEEP)$/gm)) reported.set(m[1] as string, m[2] === "ELIGIBLE");
-      const g = gatherState({ tenant: "toc", dataRoot: root, mediaRoot: media, minAgeDays: 7, clipPaddingSeconds: 15 });
+      if (dirty) {
+        assert.equal([...reported.values()].filter(Boolean).length, 0, "an unreadable record is in scope: the eligible set must be EMPTY");
+        assert.match(res.out, /^!! SCOPE INCOMPLETE/m);
+        dirtyChecked++;
+        continue;
+      }
+      const g = gatherState({ tenant: "toc", dataRoot: root, mediaRoot: media, minAgeDays: 7, clipPaddingSeconds: 15, operationsState: "x" });
       assert.ok(g.ok);
       if (!g.ok) return;
       const planned = planRetentionSweep({ tenantId: "toc", media: g.value.media, claims: g.value.claims, turns: g.value.turns, now: NOW, params: { minAgeAfterProcessedMs: 7 * DAY, clipPaddingSeconds: 15 } });
@@ -101,6 +110,6 @@ test("downgrade-only at FILE level: 2,000 seeded sessions (5 x 400) incl. shared
       assert.deepEqual([Number(tot?.[1]), Number(tot?.[2])], [files, bytes], "eligible totals count each physical file once");
     } finally { for (const d of [root, media, scratch]) rmSync(d, { recursive: true, force: true }); }
   }
-  t.diagnostic(`eligible files ${eligibleFiles}, shared-media vetoes ${vetoed}, multi-record files with none eligible ${mixedFiles}, operation-in-progress ${inProgress}`);
+  t.diagnostic(`dirty batches with an empty eligible set ${dirtyChecked}; eligible files ${eligibleFiles}, shared-media vetoes ${vetoed}, multi-record files with none eligible ${mixedFiles}, operation-in-progress ${inProgress}`);
   assert.ok(eligibleFiles > 20 && vetoed > 20 && mixedFiles > 20 && inProgress > 5, `not vacuous: eligible files ${eligibleFiles}, vetoed ${vetoed}, mixed files ${mixedFiles}, in-progress ${inProgress}`);
 });

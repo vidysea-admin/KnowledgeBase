@@ -68,7 +68,7 @@ test("downgrade-only through the command: 150 random sessions, reported-eligible
     const out = runCmd(args);
     assert.equal(out.code, 0, out.err);
     const reported = new Set([...out.out.matchAll(/^RECORDING (\S+) => ELIGIBLE$/gm)].map((m) => m[1]));
-    const opts = { tenant: "toc", dataRoot: root, mediaRoot: media, minAgeDays: 7, clipPaddingSeconds: 15 };
+    const opts = { tenant: "toc", dataRoot: root, mediaRoot: media, minAgeDays: 7, clipPaddingSeconds: 15, operationsState: "x" };
     const g = gatherState(opts);
     assert.ok(g.ok);
     if (!g.ok) return;

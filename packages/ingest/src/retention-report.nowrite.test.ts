@@ -7,7 +7,7 @@ import { importGraph, scanSource, strip } from "./retention-report.scan.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ENTRY = ["retention-report.ts", "retention-report-args.ts", "retention-report-state.ts", "retention-report-text.ts", "retention-report-cli.ts", "retention-report-media.ts", "retention-report-guards.ts",
-  "retention-report/assess.ts", "retention-report/ops.ts", "retention-report/clock.ts"];
+  "retention-report/assess.ts", "retention-report/ops.ts", "retention-report/clock.ts", "retention-report/crosstenant.ts"];
 // The @lkb/core barrel also re-exports an https alert sink; the report only uses these pure names, so the scan pins
 // the names imported from the barrel and follows the one file that defines them.
 const CORE_PURGE_POLICY = resolve(HERE, "..", "..", "core", "src", "domain", "purge-policy.ts");

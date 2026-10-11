@@ -11,11 +11,10 @@
  * `action_required` row can be reconsidered. Every other string, including an unknown one or a
  * missing/mistyped status, means in progress: unknown means keep.
  *
- * If the file is not given, missing, unreadable, oversized or malformed, in-progress state is UNKNOWN.
- * The conservative choice: recordings whose media was modified within OPS_UNKNOWN_WINDOW_MS are KEPT
- * (`operation-state-unavailable`, not assessable) and the report header warns loudly. Older media
- * is not blocked: the poller retry limit and the 24 h quiet period make a stalled row on a file
- * untouched for a month implausible, and blocking everything forever would make the report useless.
+ * --operations-state is REQUIRED (usage error without it). If the file is missing, unreadable,
+ * oversized or malformed, in-progress state is UNKNOWN and NOTHING is ELIGIBLE: every otherwise
+ * eligible recording is KEEP `operation-state-unavailable` (not assessable), whatever its age, and the
+ * header says why. A stuck row on very old media is exactly what the command could not see.
  */
 import { lstatSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -24,7 +23,6 @@ import type { GuardHit } from "../retention-report-guards.js";
 import { fileKeys, REAL_IO, type MediaIo } from "../retention-report-media.js";
 import { cleanText } from "../retention-report-text.js";
 
-export const OPS_UNKNOWN_WINDOW_MS = 30 * 86_400_000;
 export const TERMINAL_STATUSES: ReadonlySet<string> = new Set(["ready", "cancelled"]);
 const MAX_BYTES = 5 * 1024 * 1024;
 const MAX_ROWS = 20_000;
@@ -61,15 +59,11 @@ export function loadOps(file: string | undefined, io: MediaIo = REAL_IO): OpsSta
   return { kind: "available", rows, file: "operations-state" };
 }
 
-export interface OpsSubject { names: string[]; keys: string[]; mtimeMs: number }
+export interface OpsSubject { names: string[]; keys: string[] }
 
 /** Null = no objection. Downgrade-only: callers only consult it for a row that is otherwise eligible. */
-export function opsGuard(ops: OpsState, s: OpsSubject, now: number): GuardHit | null {
-  if (ops.kind === "unavailable") {
-    return now - s.mtimeMs <= OPS_UNKNOWN_WINDOW_MS
-      ? { code: "operation-state-unavailable", detail: `pipeline operations state unavailable (${ops.why}) and the media was modified ${((now - s.mtimeMs) / 86_400_000).toFixed(1)} d ago (within ${OPS_UNKNOWN_WINDOW_MS / 86_400_000} d)` }
-      : null;
-  }
+export function opsGuard(ops: OpsState, s: OpsSubject): GuardHit | null {
+  if (ops.kind === "unavailable") return { code: "operation-state-unavailable", detail: `pipeline operations state unavailable (${ops.why}); in-progress recordings cannot be ruled out` };
   const names = new Set(s.names.map((n) => n.toLowerCase()));
   for (const row of ops.rows) {
     if (typeof row.status === "string" && TERMINAL_STATUSES.has(row.status)) continue;

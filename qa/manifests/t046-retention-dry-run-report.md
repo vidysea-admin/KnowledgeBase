@@ -1,7 +1,7 @@
 # Manifest - t046-retention-dry-run-report (T-046, retention half, operator report)
 
 Status: ready-for-check
-Fix cycle: 2
+Fix cycle: 3
 Lane: t046dry (branch `lane/t046dry`, base 8520fa8). Code commit a0d18a8.
 Tier: 3 (next roadmap task, T-046); a new feature slice, not a ledger finding.
 Round cap: PASSed verdicts naming the retention seam: `t046-retention-sweep-planner` (cycle 1 PASS), `test-gaps-t046-004-t037api-003` (PASS), and the T-026 `purge-retention-policy` verdict (no `VERDICT:` line in the usual form; counted as a third). The class-based cap (D-014) limits non-security FINDINGS on a seam to 2 PASSes; it does not bar a new roadmap feature (tier 3 "is not optional"). A new operator command with new code, new tests and no change to the planner or policy is a different unit; the seam of THIS unit is "gather local state and print" and has 0 PASSes. This is also destructive-adjacent (security class), which is never capped. Classification: new feature slice of T-046, proceeding. No issue filed (`qa/issues.t046dry.jsonl` not created: nothing found).
@@ -232,3 +232,63 @@ Hand-built harness, untracked in the worktree and deleted before commit; per-mut
 - File symlinks: no symlink privilege on this machine (directory junctions only, as in cycle 1).
 - The command has not been run against real data directories; dependency-cruiser was not re-run for the new subdirectory (imports are relative into `../`).
 - Unreadable session records (no parseable source.json) could reference any file; they are counted in the header, not used as vetoes.
+
+## Fix cycle 3
+
+Cycle-2 verdict FAIL: ISS-T046DRY-006 (HIGH: an unreadable or skipped record did not veto a readable sibling that shares its file; a bad-named directory was dropped with no count), ISS-T046DRY-008 (medium: omitted/unreadable pipeline state still allowed ELIGIBLE for media older than 30 days), ISS-T046DRY-007 (medium: another tenant's reference to the same file was invisible), plus the surviving cycle-2 mutant (future-evidence filter untested). Planner and policy files remain byte-identical to base 8520fa8. All three rulings are "doubt means no ELIGIBLE".
+
+### 1. ISS-T046DRY-006: scope-incomplete (implemented)
+The scan now accounts for every entry in the tenant directory: it is a parsed record, or it is counted and listed as NOT UNDERSTOOD. Not understood = a directory whose name fails the session pattern, a file/link/junction where a session directory is expected, or a session whose source.json/session.json is unreadable, unparseable or of the wrong shape. If the list is non-empty, or the cross-tenant pass (3) could not complete, then NOTHING is ELIGIBLE: every recording that would have been eligible is KEEP `scope-incomplete` (not assessable). The header shows `!! SCOPE INCOMPLETE: N entr(y|ies) ...` and up to 20 lines `not understood: <path relative to the data root> - <why>` (sanitised, then "... and K more"); the recordings line carries `entries not understood: N`. Strict on purpose: a stray file such as `desktop.ini` in a tenant directory also refuses the report until the operator removes it or investigates; that is the price of "no silent skips".
+
+### 2. ISS-T046DRY-008: `--operations-state` is now REQUIRED (option a)
+Omitting it is a usage error (exit 2, empty stdout). A missing, unreadable, oversized or malformed file leaves nothing ELIGIBLE at any age (`operation-state-unavailable` for every otherwise-eligible row) with `!! PIPELINE STATE UNAVAILABLE (<why>)` in the header. The 30-day fallback is deleted. No opt-out flag was added: nothing in the code or docs shows a deployment without the poller's operations.json that also runs retention (the poller is the only capture path found; `scripts/webinar/run-pipeline.mjs` always writes it).
+
+### 3. ISS-T046DRY-007: cross-tenant key-only veto (implemented)
+`retention-report/crosstenant.ts` scans the SIBLING tenant directories (64-hex segments under `--data-root`, excluding this tenant's), reads from each `source.json` ONLY the media path field, resolves it through the same probe to physical-file identity keys, and keeps the keys in a set; nothing else of those records (ids, tenant, title, claims, turns) is parsed or retained. A file in this tenant's eligible set whose key is in the set becomes KEEP `shared-across-tenants` with the detail text exactly `shared` (no tenant id, path, title or count; the test asserts none of the other tenant's title, id or segment appears anywhere in the output). If a sibling tenant or record cannot be read (unparseable source.json, unreadable referenced file, too many tenants or sessions) the scan is incomplete and nothing is ELIGIBLE (`scope-incomplete`, header line "a sibling tenant directory could not be scanned"). Why a boolean is acceptable: this is an operator command run on the operator's machine over the whole data root; `--data-root` and `--tenant` are free arguments, the CLI has no per-tenant access control (no auth, no tenant-scoped user; the tenant is just a string hashed into a directory name), and the operator can already list the root. If the command is ever exposed to a tenant-scoped user, the cross-tenant pass must become a header caveat only. Not scanned: directories under the data root that are not 64-hex tenant segments (legacy flat dirs such as `data/toc-migrated`); the header says so.
+
+### 4. Future-evidence filter test
+`scope.test.ts` "future-evidence filter": a record whose media mtime is 2099 must not hide a clock 5 years ahead (`CLOCK UNCONFIRMED` still printed, nothing ELIGIBLE). Removing the filter now fails it (mutation 7).
+
+### 5. Limit added (low note)
+If files are written while the system clock is wrong (the live worker keeps writing), the newest evidence sits near the wrong `now`, so a far-future clock looks fine and `--as-of` is not demanded. The clock rule cannot see this; the as-of line printed at the top of every report is the only defence. No code change.
+
+### Sample reports (temp fixture, excerpt)
+Incomplete scope (good + a truncated sibling sharing its file):
+```
+!! SCOPE INCOMPLETE: 1 entry in this tenant's directory could not be read or understood. No recording is reported ELIGIBLE (scope-incomplete).
+  not understood: 4ebde790877e2f92305cfb30ed1c0e2943dc00dfc24b49e3dc2a47889ca44151/trunc - unreadable record (source.json: not valid JSON; session.jso...
+RECORDING good-src => KEEP
+  guard: scope-incomplete (not assessable) - some record or directory in scope could not be read or understood, so no file can be proven unreferenced ...
+TOTALS eligible: 0 recording(s) = 0 file(s), 0 B (each physical file's bytes counted once)
+```
+Clean scope (same fixture without the broken sibling, operations state present):
+```
+RECORDING good-src => ELIGIBLE
+TOTALS eligible: 1 recording(s) = 1 file(s), 100 B (each physical file's bytes counted once)
+```
+
+### D-015 against the ledger's recorded reproductions (verbatim; tests named in `retention-report/scope.test.ts`, `shared.test.ts`, `signals.test.ts`, the cycle-1 guards test)
+ISS-T046DRY-001: 2/2. -002: 4/4. -003: 2/2. -004: 2/2. -005: 2/2. -006: 2/2 (truncated source.json beside a sharing sibling; sibling directory named "bad name"). -007: 1/1. -008: 3/3 (option omitted -> exit 2; missing file; malformed JSON; plus the stuck row supplied -> KEEP operation-in-progress). Additional corpus (not a substitute): stray file, dot-directory and bidi-named directory listed and sanitised; real icacls deny on a session's source.json (restored in a finally) -> nothing ELIGIBLE; sibling tenant with an unreadable record; different-file other tenant does not veto.
+
+### Positive control
+A clean scope with the operations state present and everything terminal (three sessions over two files, plus a sibling tenant with its own file) gives ELIGIBLE x3 = 2 files, 300 B; no incomplete/unavailable/clock banner; the temp tree is byte-identical after the run. The cycle-2 fixtures (15-recording hand totals, shared groups, hardlinks) pass unchanged.
+
+### Downgrade-only property re-run
+`retention-report/property.test.ts`: 2,000 seeded sessions (5 x 400 plus hardlink helper sessions); batches 22 and 44 carry truncated source.json records at about 1%: in both, the eligible set is EMPTY and the SCOPE INCOMPLETE banner is present (2/2 dirty batches); the three clean batches again show 0 record-level and 0 file-level violations and totals equal to the inode oracle. Diagnostic: eligible files 50, shared-media vetoes 117, multi-record files with none eligible 349, operation-in-progress 6.
+
+### Mutations: 14/14 killed (hand-built harness untracked in the worktree, deleted before commit; per-mutation byte backup, restore in finally, hash before == after, all restores matched)
+unreadable record only warned (cycle-2 behaviour); bad-name directory skipped silently; scope-incomplete only for files sharing media with the unreadable record; operations state optional again; 30-day fallback restored (emulated by name for the 29/30/31-day and stuck fixtures; an earlier equivalent variant was discarded); missing state treated as nothing in progress; cross-tenant veto leaking detail; future-evidence filter removed (the cycle-2 survivor); header list omitted; over-refusal on a clean scope (positive control); cross-tenant keys ignored; unreadable sibling tenant ignored; stray files skipped silently; own tenant not excluded from the cross-tenant pass.
+
+### Evidence (from `packages/ingest`)
+- `node --test --import tsx src/retention-report.test.ts src/retention-report.guards.test.ts src/retention-report.property.test.ts src/retention-report.safety.test.ts src/retention-report.nowrite.test.ts src/retention-report/*.test.ts` -> `tests 54 / pass 54 / fail 0`.
+- Planner `src/retention-sweep.test.ts src/retention-sweep.strict.test.ts` -> 31/31; core `src/domain/purge-policy.test.ts` -> 7/7.
+- `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` -> exit 0.
+- `git diff 8520fa8 -- packages/ingest/src/retention-sweep.ts packages/core/src/domain/purge-policy.ts` -> empty.
+- No-write scanner (in `retention-report.nowrite.test.ts`, graph now includes `crosstenant.ts`): passes; the only open in the graph is still the media probe's literal `"r"`; crosstenant.ts uses only lstatSync/readFileSync/readdirSync.
+- Budgets (non-blank lines): sources max 148-ish, tests max 175. `node scripts/lint-dirsize.mjs`: only the known `packages/index/src/pipeline: 34 files (budget 30)`; `packages/ingest/src/retention-report/` now holds 9 files.
+- Existing tests changed: `baseArgs` was already passing an operations file; the unreadable-records test now expects `scope-incomplete` for the readable sibling; the 30-day-window test was rewritten to the new rule; the safety test's explicit run now passes `--operations-state`; the old property test passes `operationsState` to `gatherState`.
+
+### Unverified
+- Real Windows sharing violation (seam only); file symlinks (no privilege); never run on real data directories; dependency-cruiser not re-run for the new module (relative imports only).
+- A pipeline row not yet written for a recording that is being captured; a stale row never updated keeps (safe direction).
+- The cross-tenant pass does not see legacy flat directories or other deployments' data roots, and does not see a sibling tenant's record whose media path is not under the same `--media-root`.

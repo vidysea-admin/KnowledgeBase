@@ -20,9 +20,10 @@ import { parseArgs, USAGE, type ReportOptions } from "./retention-report-args.js
 import { gatherState, tenantSegment, type Gathered, type SessionInfo } from "./retention-report-state.js";
 import { cleanText } from "./retention-report-text.js";
 import { NOT_ASSESSABLE, QUIET_PERIOD_MS } from "./retention-report-guards.js";
-import { assess, type Row, type Verdict } from "./retention-report/assess.js";
+import { assess, type Row, type Scope, type Verdict } from "./retention-report/assess.js";
+import { scanOtherTenants } from "./retention-report/crosstenant.js";
 import { checkClock, CLOCK_HORIZON_MS } from "./retention-report/clock.js";
-import { OPS_UNKNOWN_WINDOW_MS, TERMINAL_STATUSES, loadOps, type OpsState } from "./retention-report/ops.js";
+import { TERMINAL_STATUSES, loadOps, type OpsState } from "./retention-report/ops.js";
 import { REAL_IO, mediaRootUsable, type MediaIo } from "./retention-report-media.js";
 
 export interface RunDeps {
@@ -61,7 +62,7 @@ function preconditions(info: SessionInfo, g: Gathered, minAgeMs: number, now: nu
   return parts.join(" ");
 }
 
-function section(g: Gathered, plan: RetentionPlan | null, opts: ReportOptions, minAgeMs: number, now: number, clock: ClockCheck, ops: OpsState) {
+function section(g: Gathered, plan: RetentionPlan | null, opts: ReportOptions, minAgeMs: number, now: number, clock: ClockCheck, ops: OpsState, scope: Scope) {
   const lines: string[] = [];
   // Planner items follow media order; an index:N id names the media array slot. Own-tenant copies only.
   const byId = new Map<string, SessionInfo[]>();
@@ -77,7 +78,7 @@ function section(g: Gathered, plan: RetentionPlan | null, opts: ReportOptions, m
     rows.push({ info, item });
   }
   const printed = new Set(rows.map((r) => r.info));
-  const a = assess(rows, g.infos.filter((i) => !printed.has(i)), now, clock, ops);
+  const a = assess(rows, g.infos.filter((i) => !printed.has(i)), now, clock, ops, scope);
   for (const row of rows) {
     const { info, item } = row;
     const v = a.verdicts.get(row) as Verdict;
@@ -122,22 +123,28 @@ export function runRetentionReport(argv: readonly string[], deps: RunDeps): numb
   }
   const ops = loadOps(opts.operationsState, io);
   const clock = checkClock(now, g.infos.flatMap((i) => [parseIsoInstant(i.processedAt), i.media.mtimeMs]), opts.asOf);
-  const { lines, a } = section(g, planned.plan, opts, minAgeMs, now, clock, ops);
+  const foreign = scanOtherTenants(opts.dataRoot, tenantSegment(opts.tenant), opts.mediaRoot, io);
+  const incomplete = g.notUnderstood.length > 0 || foreign.incomplete;
+  const { lines, a } = section(g, planned.plan, opts, minAgeMs, now, clock, ops, { incomplete, foreignKeys: foreign.keys });
   const t = a.totals;
   const tot = (label: string, b: { records: number; files: number; bytes: number }): string => `TOTALS ${label}: ${b.records} recording(s) = ${b.files} file(s), ${b.bytes} B`;
   const out = [
     "RETENTION DRY RUN - report only. Nothing is deleted, moved or written; this command cannot delete.",
     clock.asOfLine,
     ...clock.banner,
-    ...(ops.kind === "unavailable" ? [`!! PIPELINE STATE UNAVAILABLE (${cleanText(ops.why, 60)}): in-progress recordings cannot be seen. Recordings whose media changed within ${OPS_UNKNOWN_WINDOW_MS / 86_400_000} d are kept (operation-state-unavailable). Pass --operations-state <data/webinar-release/operations.json>.`] : []),
+    ...(ops.kind === "unavailable" ? [`!! PIPELINE STATE UNAVAILABLE (${cleanText(ops.why, 60)}): in-progress recordings cannot be seen. No recording is reported ELIGIBLE (operation-state-unavailable).`] : []),
+    ...(incomplete ? [`!! SCOPE INCOMPLETE: ${g.notUnderstood.length} entr${g.notUnderstood.length === 1 ? "y" : "ies"} in this tenant's directory could not be read or understood${foreign.incomplete ? "; a sibling tenant directory could not be scanned" : ""}. No recording is reported ELIGIBLE (scope-incomplete).`,
+      ...g.notUnderstood.slice(0, 20).map((n) => `  not understood: ${cleanText(n.path, 120)} - ${cleanText(n.why, 120)}`),
+      ...(g.notUnderstood.length > 20 ? [`  ... and ${g.notUnderstood.length - 20} more`] : [])] : []),
     `tenant: ${cleanText(opts.tenant, 80)}  state: <data-root>/${tenantSegment(opts.tenant)}/ (tenant-segmented by sha-256 of the tenant id; each file also carries its own tenantId)`,
     `thresholds used (owner decision, ARCHITECTURE Q6, no default): min-age-days=${opts.minAgeDays} (${minAgeMs} ms)  clip-padding-seconds=${opts.clipPaddingSeconds}`,
-    "tenant scoping: only this tenant's directory is read; legacy flat dirs (e.g. data/toc-migrated) are not tenant-scoped by directory and are never read.",
+    "tenant scoping: records are read only from this tenant's directory (sibling tenants: see below); legacy flat dirs (e.g. data/toc-migrated) are not tenant-scoped by directory and are never read.",
     `media guards (downgrade-only, planner untouched): media file found inside --media-root, opened read-only and read; quiet period ${QUIET_PERIOD_MS / 3_600_000} h (modified strictly longer ago than this); pipeline status must be terminal (${[...TERMINAL_STATUSES].join("/")}), unknown or non-terminal status keeps; clock check horizon ${CLOCK_HORIZON_MS / 86_400_000} d`,
-    "ELIGIBLE means only: the existing planner said purge-eligible for these thresholds, AND every guard above passed, AND every session record that references the same physical file is also ELIGIBLE.",
+    "ELIGIBLE means only: the existing planner said purge-eligible for these thresholds, AND every guard above passed, AND every session record that references the same physical file is also ELIGIBLE, AND nothing in scope was unreadable or skipped.",
     "ELIGIBLE does not mean: safe to delete. No shipped writer records processedAt or sizeBytes, a writer holding a file open can be invisible to the OS, and no executor exists. It is a shortlist for human review.",
     "note: no shipped writer records processedAt, so real state reports recordings as not processed unless session.json carries processedAt.",
-    `recordings: ${g.infos.length}  non-recording sessions skipped: ${g.nonRecording}  other-tenant records excluded: ${planned.plan.tenancyViolations.length}  unreadable session records: ${g.infos.filter((i) => i.unreadable).length} (their media paths are unknown and could reference any file)`,
+    `recordings: ${g.infos.length}  non-recording sessions skipped: ${g.nonRecording}  other-tenant records excluded: ${planned.plan.tenancyViolations.length}  entries not understood: ${g.notUnderstood.length}`,
+    "other tenants: sibling tenant directories under the data root are scanned for media file identity ONLY (nothing else of those records is read or printed); a file used by another tenant is KEEP shared-across-tenants. Directories that are not 64-hex tenant segments (legacy flat dirs) are not scanned.",
     "",
     ...lines,
     "",

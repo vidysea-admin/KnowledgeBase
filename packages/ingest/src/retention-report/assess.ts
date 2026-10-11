@@ -18,6 +18,9 @@ import type { SessionInfo } from "../retention-report-state.js";
 import type { ClockCheck } from "./clock.js";
 import { opsGuard, type OpsState } from "./ops.js";
 
+/** What the scan could not see: any unreadable/skipped entry makes the whole report refuse; foreign keys are other tenants' file identities (nothing else of theirs is held). */
+export interface Scope { incomplete: boolean; foreignKeys: ReadonlySet<string> }
+
 export interface Row { info: SessionInfo | undefined; item: PlanItem | undefined }
 export interface Verdict { eligible: boolean; hit: GuardHit | null; shared: number }
 export type Bucket = "eligible" | "policy" | "guard" | "notAssessable";
@@ -30,7 +33,7 @@ export function bucketOf(v: Verdict): Bucket {
   return NOT_ASSESSABLE.has(v.hit.code) ? "notAssessable" : "guard";
 }
 
-function perRow(r: Row, now: number, clock: ClockCheck, ops: OpsState): Verdict {
+function perRow(r: Row, now: number, clock: ClockCheck, ops: OpsState, scope: Scope): Verdict {
   const planned = r.item?.decision ?? "keep";
   const { info } = r;
   if (info === undefined) {
@@ -39,12 +42,14 @@ function perRow(r: Row, now: number, clock: ClockCheck, ops: OpsState): Verdict 
   const fin = finalEligible(planned, { media: info.media, recordedBytes: info.recordedBytes, processedAtMs: parseIsoInstant(info.processedAt) }, now);
   if (!fin.eligible) return { eligible: false, hit: fin.hit, shared: 1 };
   if (clock.refused) return { eligible: false, shared: 1, hit: { code: "clock-unconfirmed", detail: "the as-of clock is not confirmed (see the banner at the top of this report)" } };
-  const o = opsGuard(ops, { names: [info.dir, info.mediaId ?? ""].filter(Boolean), keys: info.media.keys ?? [], mtimeMs: info.media.mtimeMs ?? now }, now);
+  if (scope.incomplete) return { eligible: false, shared: 1, hit: { code: "scope-incomplete", detail: "some record or directory in scope could not be read or understood, so no file can be proven unreferenced (see the list at the top of this report)" } };
+  if ((info.media.keys ?? []).some((k) => scope.foreignKeys.has(k))) return { eligible: false, shared: 1, hit: { code: "shared-across-tenants", detail: "shared" } };
+  const o = opsGuard(ops, { names: [info.dir, info.mediaId ?? ""].filter(Boolean), keys: info.media.keys ?? [] });
   return { eligible: o === null, hit: o, shared: 1 };
 }
 
-export function assess(rows: Row[], unmatched: SessionInfo[], now: number, clock: ClockCheck, ops: OpsState): Assessment {
-  const verdicts = new Map<Row, Verdict>(rows.map((r) => [r, perRow(r, now, clock, ops)]));
+export function assess(rows: Row[], unmatched: SessionInfo[], now: number, clock: ClockCheck, ops: OpsState, scope: Scope): Assessment {
+  const verdicts = new Map<Row, Verdict>(rows.map((r) => [r, perRow(r, now, clock, ops, scope)]));
   // union-find over identity keys; members = printed rows plus unmatched session records (never eligible)
   const members = [...rows.map((r) => ({ info: r.info, row: r as Row | null })), ...unmatched.map((info) => ({ info: info as SessionInfo | undefined, row: null as Row | null }))];
   const parent = new Map<string, string>();

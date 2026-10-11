@@ -23,12 +23,13 @@ export const SIZE_TOLERANCE = 0.01;
 export type GuardCode =
   | "media-root-not-given" | "media-not-found" | "media-path-outside-root" | "media-unreadable"
   | "recently-modified" | "clock-skew" | "media-modified-after-processed" | "size-mismatch"
-  | "clock-unconfirmed" | "operation-in-progress" | "operation-state-unavailable" | "shared-media-not-all-eligible";
+  | "clock-unconfirmed" | "operation-in-progress" | "operation-state-unavailable" | "shared-media-not-all-eligible"
+  | "scope-incomplete" | "shared-across-tenants";
 
 /** Codes meaning "the report could not see or trust the media": counted as NOT ASSESSABLE. */
 export const NOT_ASSESSABLE: ReadonlySet<GuardCode> = new Set<GuardCode>([
   "media-root-not-given", "media-not-found", "media-path-outside-root", "media-unreadable", "clock-skew", "size-mismatch",
-  "clock-unconfirmed", "operation-state-unavailable",
+  "clock-unconfirmed", "operation-state-unavailable", "scope-incomplete",
 ]);
 
 export interface GuardInput {

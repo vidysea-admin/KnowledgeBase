@@ -3,7 +3,7 @@ import { rmSync } from "node:fs";
 import test from "node:test";
 import { join } from "node:path";
 import { cleanText } from "./retention-report-text.js";
-import { DAY, baseArgs, freezeTree, iso, runCmd, snapshot, tempRoot, writeSession } from "./retention-report.fixtures.js";
+import { DAY, baseArgs, emptyOps, freezeTree, iso, runCmd, snapshot, tempRoot, writeSession } from "./retention-report.fixtures.js";
 
 function richFixture(): { root: string; media: string } {
   const root = tempRoot();
@@ -31,7 +31,7 @@ test("the temp tree is byte-identical, mtimes included, after every kind of run"
       baseArgs(root, media, ["--apply"]),
       ["--tenant", "toc", "--data-root", root],
       baseArgs(root, media, ["--min-age-days", "1"]),
-      ["--tenant", "toc", "--data-root", join(root, "nope"), "--media-root", media, "--min-age-days", "1", "--clip-padding-seconds", "1"],
+      ["--tenant", "toc", "--data-root", join(root, "nope"), "--media-root", media, "--min-age-days", "1", "--clip-padding-seconds", "1", "--operations-state", emptyOps()],
     ];
     const codes = runs.map((a) => runCmd(a).code);
     assert.deepEqual(codes, [0, 0, 3, 2, 2, 2, 3]);
