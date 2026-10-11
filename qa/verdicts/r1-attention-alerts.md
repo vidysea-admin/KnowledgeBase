@@ -170,3 +170,58 @@ Final `git hash-object` of alert-text.ts = `git rev-parse HEAD:` = 74d2064094d48
 ISSUES-WRITTEN: ISS-R1ALERTS-006 (high), ISS-R1ALERTS-007 (medium), ISS-R1ALERTS-008 (medium)
 
 EXPLANATION: The allowlist rebuild genuinely closes the cycle-0 corpus and is fast and linear. It still fails on two points the brief named as in scope. Non-ASCII digits are fine (Nd is masked as digits). But the secret-keyword mask reaches one token, so "passcode: tiger seven blue" prints "seven blue" and "pin 4 2 1 7" prints "2 1 7"; the keyword list also lacks pw, pass, psw, access code and every Hindi spelling. For an Indian-English and Hindi corpus, पासकोड, पिन or कोड followed by a value is realistic. Fix direction: mask the rest of the clause after a keyword, widen the keyword list, store startTime as ISO. Low notes: pure-letter tokens under 24 characters and spaced 5-digit groups without a keyword pass; a keyword spelled with interior punctuation (`p-a-s-s-c-o-d-e`) is not caught (the maker listed this). Re-submit with 006 fixed and its row replayed verbatim.
+
+# Cycle 2
+
+VERDICT: PASS (at the stated scope below; ISS-R1ALERTS-009 stays OPEN and gates wiring)
+Cycle checked: 2
+Unit commit: 89d7a61 (lane/r1alerts, base 3803812). Tested bytes: alert-text.ts and attention-alerts.ts equal `git rev-parse HEAD:` after every mutation. node v24.19.0 per toolchain note.
+
+Scope of the PASS: the unit as a PURE, UNWIRED formatter that redacts by deny-list. It does not claim "no secret ever reaches an alert", and its manifest says so. A grep for `buildAttentionAlerts` / `attention-alerts` outside `packages/meeting-bot/src/calendar/` finds nothing, so nothing can send these alerts today. Commit scope is clean: 4 files under `packages/meeting-bot/src/calendar/`, the manifest and the lane ledger.
+
+## Commands
+- `timeout 170 node --test --import tsx src/calendar/alert-text.corpus.test.ts src/calendar/alert-text.test.ts src/calendar/attention-alerts.test.ts` -> tests 33 / pass 33 / fail 0 (7 s).
+- `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` (180 s timeout) -> exit 0, no output. `node scripts/lint-dirsize.mjs` -> OK (111 dirs). Non-blank lines: alert-text.ts 142, attention-alerts.ts 187 (limit 300); tests 205 / 217 / 129 (limit 400). `calendar/` has 23 files (27 after merge, limit 30).
+
+## D-015, my own run
+I extracted every quoted string of rows 001 and 006 from `qa/issues.r1alerts.jsonl` and ran each through `sanitize` (all hidden or reduced to harmless text), re-typed the 002/003/004/005/007/008 reproductions and ran them through BOTH routes (skipped and job), searching the whole serialised alert with the 20-hex id/key removed. Then I ran the maker's corpus test. Counts agree with the manifest: 001 21/21, 002 1/1, 003 4/4, 004 2/2, 005 4/4, 006 37/37, 007 3/3, 008 2/2. The 002 difference: the cycle-1 verdict counted 2/2 because the row records ONE string (the sessionKey) and says "same for a job-map key", so it counted one string on two routes; the maker counts table entries (1) and runs both routes inside each. Same coverage, different unit. ISS-R1ALERTS-001..008: verified CLOSED by my run.
+Defect in the ledger itself: row 006 contained an invalid JSON escape (backslash-S in "area"), so `JSON.parse` failed on the file for any reader of the lane shard; repaired in this commit (escape only, no content change).
+
+## Failure modes of the new shape (78 titles, both routes, whole alert searched)
+Held: spaced/joined/suffixed forms (passcodes, passwords:, pwd=, pass-code, passcode=tiger, code#), line break or tab inside the keyword, zero-width, bidi override, variation selector, fullwidth, combining marks, Cyrillic a inside a Latin keyword, Devanagari पासवर्ड / पास कोड / पासकोड / कोड / ओटीपी, Hinglish `paasvard`, `passwrd`, Arabic-Indic and Devanagari digits, a single 4-digit run (`Webinar 4217`), `4217 is the passcode`, `pin4217`.
+Leaks found (sanitiser output, title field):
+| Title | Output | Class | Realism |
+|---|---|---|---|
+| `Webinar pasword tiger`, `paswrd`, `paswerd`, `pasvard`, `paasward`, `Pasccode`, `p/w` | unchanged | misspelling of a listed word | medium: pasword/paswrd are very common |
+| `Webinar pincode tiger` | unchanged | joined form | medium (Indian usage) |
+| `Webinar पासवर्ड़ tiger` (nukta), `पासवड`, `पासवरड` | unchanged | Devanagari variants | low-medium |
+| `tiger seven blue is the passcode`, `Webinar - tiger is the password`, `Topic (banana = password)`, `12 34 - pin` | secret kept, keyword hidden | secret LEFT of keyword | low-medium |
+| `Webinar access: tiger`, `mdp:`, `пароль:`, `암호`, `パスワード`, `código`, `p4ss`, all-Cyrillic `раѕѕсоде`, `Webinar 42 17`, `4 2 1`, `one two three four`, `Webinar tiger` | unchanged | unlisted keyword / no pattern | the ISS-009 class |
+Filed: ISS-R1ALERTS-010 (misspellings and joined forms, medium) and ISS-R1ALERTS-011 (secret left of keyword, medium). Not filed: deep percent-encoding (`pass%252525252563ode` is hidden anyway); obfuscation by the secret's own author is not a realistic threat for these alerts.
+
+## Other input fields (both routes)
+Canary `ZQCANARY` planted in sessionKey, job-map key, reason (known, unknown, `__proto__`, 44-char), status, startTimes values (garbage, suffixed, array, object with toString), job `startTime`, `now`, `timeZone` (five hostile shapes), and in `detail`, `meetingUrl`, `registrationUrl`, `sender`, `organiser`, `organizer`, `platform`, `eventId`, `description`, `location`, `attendees`, `name`, `note`; objects with `toString`/`toJSON` as title and key. 0 occurrences anywhere in the serialised result. `ignored.reasons` held only constants (`no-alert-for-reason:other`).
+
+## Fixed-point cap and timing
+No input needing more than 4 rounds in my 150,000-string fuzz (max 4: `pinPasspass{}word=1.`); the cap of 5 has slack, and fail-closed at k-1 passes is asserted for the 3-pass shapes. Timing: 29 adversarial shapes at 4,000 chars through `neutralizeText`: worst 2.6 ms. At 1 MB through unsliced `sanitize`: worst 673 ms (`a б ` repeated), then 507 ms (`पास ` repeated), 451 ms (`p i ` repeated); linear scaling, nothing super-linear.
+
+## Residual and the contract (ruling)
+Options: (i) FAIL until titles are not echoed, (ii) PASS with ISS-009 open and a wiring precondition, (iii) amend the contract. I chose (ii) plus (iii). The module's honest claim (deny-list, best effort) is kept by the code and measured; the claim it cannot keep ("no secret ever") is removed from what the contract promises, in the contract's Cycle 2 amendment, which names what is and is not guaranteed. Failing the unit again would only buy one more synonym round (I found misspellings in minutes; the next checker finds the next), which the ledger already calls unclosable. The danger lives at the wiring, not here, and the module is verifiably unwired. The contract now carries W8 (blocking gate: no sender until the Approver rules on ISS-009 in DECISIONS: accept for a named operator channel, or drop titles), W9 and W10. ISS-009 re-rated MEDIUM -> HIGH: the leaked item is a meeting passcode delivered to a chat that retains it, the same class as the high-rated 001 and 006; medium would let it sit under the severity gate. It is not a cycle-3 fix item: Umesh decides.
+
+## Readability (40 titles of mine: English, Hinglish, Hindi, real webinar shapes)
+28 unchanged, 3 partly kept, 9 fully hidden. Of the 9, 1 contained a real passcode (`Passcode: 8841 - IELTS webinar`); 8 are false positives: `Key takeaways from Canada's new study permit cap`, `Pin code areas near campus`, `Code of conduct for international students`, `Token economy and student motivation`, `Pass the GRE: strategy session`, `Login help for the new student portal`, `OTP and fraud awareness for students`, `Secret scholarships you never heard of`. Unaffected: Passport, Compass, Secretary, Keynote, Authority, Pinterest, Tokenization, Codecs, Monkey, Decode. A fully hidden alert keeps its headline, `Starts:` line and a 20-hex id; two different fully hidden meetings at the same start time differ only by that opaque id (verified: 773ccc... and be13cc...). That is thin for a human, hence W9.
+
+## ignored.reasons
+Confirmed from the diff: cycle 1 echoed any `[a-z0-9-]{1,40}` string; cycle 2 echoes only the 11 values in `SKIP_REASONS`, else `other` (canary test and my run). Merge note (correctness, not a leak): the branch `codex/machine-migration-2026-10-09` has 14 SkipReason values; `opted-out`, `rule-denied`, `rules-unevaluable` are absent from this lane's set, so after merge they are reported as `no-alert-for-reason:other`. Recorded as contract W10.
+
+## Cycle 0/1 properties
+Hold (tests pass): 4-line bodies, 80-code-point cap not splitting a combining sequence, ordering, retention oldest-first, totality on throwing getters and Proxies, purity, deterministic ids (digest pinned), zone handling, the 4,000-unit cut before sanitising (see survivor d: unobservable except for speed).
+
+## Mutations (my own; per-mutation byte backup, restore in `finally`, 150 s timeout; `git hash-object` == `git rev-parse HEAD:` after each and at the end)
+22 run, 18 killed, 4 survived.
+Killed: tail not cut after keyword (ledger corpus, 006 shape, keyword recognition); EDGE without trailing boundary (006 shape, masks); EDGE without leading boundary (006 shape); two-part digit-group threshold 9 (ledger corpus); canonicalStart without the strict shape (startTime test); echo any skip reason (echo audit); mixed-script never matches (006 shape); no Latin diacritic fold (ledger corpus, keyword recognition); non-convergence echoes text (fixed point); separators inside keyword only space (ledger corpus, generator); no camelCase keyword (keyword recognition, property); SEGMENT mask off and KEY_SHAPES off (masks, property); Devanagari keywords off (ledger corpus, generator); allowlist keeps `=` and `@` (output charset); STRONG keywords case-sensitive (006 shape, generator); `pin` removed (ledger corpus, generator); keyword never hides (006 shape).
+Survived (all low; notes, not filed): (a) default fixed-point cap 5 -> 2: tests pass an explicit `rounds`, so the default used by `neutralizeText` is unpinned (fails closed, safe); (b) REPEAT collapse of `(hidden) (hidden)` removed: cosmetic; (c) URL carry (`carry = false`): the keyword rule covers `pwd=`, but `see https://a.example/r?x= TIGER` depends on it and no test says so; (d) `raw.slice(0, 4000)` removed: only speed changes, the 80-char output cap hides the difference.
+
+ISSUES-WRITTEN: ISS-R1ALERTS-010 (medium), ISS-R1ALERTS-011 (medium). Re-rated ISS-R1ALERTS-009 medium -> high (in place, with a `rerated_by` note). Verified CLOSED by my run: ISS-R1ALERTS-001, 002, 003, 004, 005, 006, 007, 008.
+
+EXPLANATION: The cycle-1 failure (one-token reach, missing keywords, no fixed-point test, raw startTime) is fixed, and every recorded reproduction is refused on both routes in my own replay as well as the maker's. The new shape works as designed to the right of a recognised keyword; it cannot see a secret that has no recognised keyword or that stands before one, which is the class the maker filed as 009 and I raised to high. I did not pass a guarantee the code cannot keep: the contract now states the achievable one and blocks wiring until Umesh rules on 009. Merge conditions: none for the code; at merge or wiring add the three new SkipReason values (W10); never wire before W8 is satisfied. Unverified: behaviour on real Gmail/Calendar titles (none used) and the wired path (does not exist).
