@@ -103,3 +103,57 @@ ISSUES-WRITTEN: ISS-T036CAL-006 (high), -007 (medium), -008 (medium), -009 (low)
 
 ## Standing statement for the owner
 Free-text calendar links are found but never auto-joined. Whether they may ever be auto-joined, and how a calendar event is approved (no approval path exists for calendar events), is the Approver's decision (Umesh); nothing in this unit decides it, and ISS-376 (record-every-webinar skips the sender-trust check for Gmail candidates) remains open and separate.
+
+
+---
+
+# Cycle 2
+
+VERDICT: FAIL
+Cycle checked: 2
+Commit checked: fbb4cfc (branch lane/t036cal, on top of checker commit fadfd19)
+Scope: fixtures only; not validated against live Google Calendar; real invite HTML and the default event resource fields unverified. Loopback test server only; no Google call, browser or database. `@lkb/core` junctions re-verified (both point at C:\Users\product\Desktop\KnowledgeBase\packages\core, untouched); type-check and runtime used temporary `paths` tsconfigs inside the worktree, deleted afterwards.
+
+## EXPLANATION
+
+The cycle-2 changes are correct and safe: 006 to 009 are verified and no path schedules a free-text link. The verdict is FAIL for one HIGH finding that cycles 0 to 2 all left in place and that I should have found in cycle 0: an outsider can block a legitimate conference meeting (ISS-T036CAL-010).
+
+### 1. The new reconciliation rule (provenance ignored in identity; fresh snapshot stored)
+Through `prepareWebinarSourceState` (production path) then `selectAutoRecordItems`: full table {absent, conference, location, description, garbage} persisted x fresh x {same url, different url} x {same revision, newer revision} = 100 cells: scheduled url always the fresh one; a free-text effective source is never scheduled (0 violations); same revision with a different url stays `contradictory-revision` (dropped, not scheduled); stored source always equals the fresh source except the guard (fresh copy with no source never relaxes a stored free-text source for the same url, confirmed for two consecutive ticks). Specific cases: persisted conference U1, fresh description U2 (same or newer revision): not scheduled, stored description. Persisted description, fresh conference same url: scheduled (Google vouches). Same-revision duplicates in one fetch (meetings plus sourceEvents), 5 orders: the less trusted source wins every time, nothing scheduled. Gmail-linked downgrade: a Gmail row (pending, unauthenticated, free-text link) with the same meeting does NOT touch the calendar event (separate occurrence): legit conference event still scheduled, Gmail row skipped `duplicate-session`; Gmail row for another meeting at the same time loses `overlap-lost`. Newer-revision, different url, fresh source absent is scheduled: only an old API build or a hand-made row can produce an absent source; noted, not outsider-reachable.
+
+### 2. Persisted state and real contradictions
+006 reproduction verbatim, 3 further ticks: event stays, no unresolved inventory reason, no transitions. 50 legacy events: 50 events after the new tick, deep-equal apart from the added field. Real contradiction detection intact: same revision with a different title or a different start time is still `contradictory-revision`; a newer-revision title change is accepted; a cancellation yields a `cancelled` transition. Mutations on the dispute set and on the title in the comparison are killed.
+
+### 3. Attack and parity
+Cycle-1 48-case probe re-run (6 carriers x 2 organizers x every-webinar true/false x trusted/untrusted): 48/48 not scheduled, all `unverified-link-source`; the conference twin scheduled. Default parity against the 8520fa8 selection: 864 full selections identical, 856 items scheduled.
+
+### 4. ISS-007 and the alert ruling
+Vocabulary test 3/3 on the lane. Alert decision: a free-text skip raises no alert and no Telegram operation (formatter ignores it by name; run-pipeline creates operations for five reasons only). Ruling: acceptable and correct against invite spam; the cost, for the owner: a legitimate meeting whose organiser put the link only in the description is neither recorded nor alerted, and is visible only in the operator's skipped list and the tick log (the skip line says to use send-now). Merge edit validated by simulation on a trial merge with main 3c7a8e8 (merge-tree clean, tree 421bfa2): the UNEDITED `packages/meeting-bot/src/alert-who-production.test.ts` fails exactly 2 of 4; with the three edits below it passes 4/4. Note the file is `packages/meeting-bot/src/alert-who-production.test.ts` (not under calendar/alerts). No other test on main breaks at 15: every other hit for `rules-unevaluable` or SKIP_REASONS (brain.test.ts list, join-rules-enforce*, optout-identity, telegram, alert-title-policy, vocabulary) is non-exhaustive or derives from the core list, and ran green on the trial merge.
+
+### 5. ISS-008, ISS-009, ISS-005
+Allow-list tests (4) and reconcile tests (7) green; mutation "invalid value dropped by the allow-list" is killed by the named lane test `ISS-T036CAL-008: an invalid STRING is kept as-is...`. `selectEventsToAutoJoin` guard and attendance guard present and tested (mutations killed). Bare `?zak` and `?zak&...` refused; 005 14/14 (12 recorded plus 2 bare forms); `pwd=abcZAKdef` and `zakx=1` still returned.
+
+### 6. D-015 by my own run
+001 48/48; 002 6/6 (the 38 remain unrecoverable; family covered in cycle 1); 003 3/3; 004 4/4; 005 14/14; 006 reproduction 3 ticks plus 50 legacy; 007 vocabulary 3/3; 008 allow-list 4 tests plus 29-variant probe earlier; 009 selectEventsToAutoJoin trusted 2/2, untrusted 6/6 not selected, attendance guard test green.
+
+### 7. Mutations (own harness, per-mutation byte backup, finally-restore, hash equals HEAD blob each run, harness deleted)
+12 run, 11 killed. Killed: source back in identity (006 regression); fresh-absent relaxes stored free-text; more trusted wins; dispute set disabled; title ignored in the comparison; invalid source dropped; alert raised; attendance guard removed; bare zak accepted; selectEventsToAutoJoin guard removed; free-text source upgraded to conference. SURVIVED: keepSource ignoring url equality (M10): the mutant is stricter (keeps the free-text source for a newer, different url), so it denies rather than admits; not a safety gap.
+
+### 8. Gates and merge
+Extractor 17, differential 3, calendar 15, gws-gmail 25; auto-join 39, schedule-tick 14, webinar-policy 19, schedule-state 18, link-source 4 and 7, attention-alerts 11, alert-title-policy 12, telegram 6, optout-identity 22, attendance 33, vocabulary 3. tsc exit 0 for core, meeting-bot, api on the lane and on the trial-merged tree. dirsize/loc fail only on unrelated packages/index/src/pipeline (lane) and sb_join.py. Calendar dir 25 files plus two subdirs (new tests are in link-source/); merged tree 29 (limit 30); apps/api/src unchanged (31/31); join-rules 12. Trial merge (no-trace, aborted, worktree clean): SKIP_REASONS 15 values, brain.ts and skip-describe.ts totals include the new reason.
+
+### 9. The HIGH finding (ISS-T036CAL-010)
+Legit conference event plus an outsider event with the same start whose description repeats the meeting link: both become `ambiguous-identity`, `calendarEvents` empty, transitions `unresolved`, nothing scheduled (production path; legacy scope blocks all starts). Reachable by any outsider who knows a public webinar link and its start and whose invite reaches the calendar.
+
+ISSUES-WRITTEN: ISS-T036CAL-010 (high). ISS-T036CAL-006..009 marked `verified-cycle2`.
+
+## Merge conditions (cycle 3 and merge close-out)
+1. ISS-T036CAL-010: rows with a present non-conference `meetingUrlSource` contribute no aliases; test legit + outsider same-meeting/same-start in both orders and both scopes (legit scheduled, no unresolved, no transition).
+2. Merge close-out edit, to apply on the merged tree in `packages/meeting-bot/src/alert-who-production.test.ts`:
+   - after the line `  ev("evP8", "Webinar Past", { meetingUrl: "https://zoom.us/j/44444444444", startTime: "2026-10-10T08:00:00.000Z", endTime: "2026-10-10T09:00:00.000Z" }),` add `  ev("evF10", "Webinar FreeText", { meetingUrl: "https://zoom.us/j/88888888888", meetingUrlSource: "description" }),`
+   - after `  "rules-unevaluable": [false, false, ""],` add `  "unverified-link-source": [false, false, ""],`
+   - title `covers all 14 skip reasons from core` -> `covers all 15 skip reasons from core`.
+   Result on the trial merge: 4/4 (unedited: 2 fail).
+
+## Standing statement for the owner
+Free-text calendar links are found but never auto-joined and raise no alert. Whether they may ever be auto-joined, and how a calendar event is approved (no approval path exists), is the Approver's decision (Umesh). ISS-376 (record-every-webinar skips the sender-trust check for Gmail candidates) remains open and separate.
