@@ -132,9 +132,12 @@ function build(c: AttentionCase, sessionKey: string, title: unknown, startTime: 
   };
 }
 
-/** Total: a throwing getter on the input cannot make the policy anything but "omit". */
+/** An option counts only if it is an OWN property of the input: nothing inherited (class prototype, Object.create, a polluted Object.prototype) is ever read. */
+const opt = (input: unknown, k: keyof AttentionInput): unknown => (input !== null && typeof input === "object" ? own(input, k) : undefined);
+
+/** Total: a throwing getter on the input cannot make the policy anything but "omit". Read once, own property only. */
 function readPolicy(input: unknown): TitlePolicy {
-  try { return resolveTitlePolicy((input as AttentionInput | undefined)?.titlePolicy); } catch { return DEFAULT_TITLE_POLICY; }
+  try { return resolveTitlePolicy(opt(input, "titlePolicy")); } catch { return DEFAULT_TITLE_POLICY; }
 }
 
 function caseForReason(reason: unknown): AttentionCase | undefined {
@@ -157,10 +160,11 @@ function buildInner(input: AttentionInput): AttentionResult {
   let count = 0;
   const ignore = (why: string) => { count++; reasons[why] = (reasons[why] ?? 0) + 1; };
   const alerts: AttentionAlert[] = [];
-  const nowMs = Date.parse(typeof input?.now === "string" ? input.now : "");
-  const tz = validZone(input?.timeZone);
+  const nowRaw = opt(input, "now"), startsRaw = opt(input, "startTimes"), skippedRaw = opt(input, "skipped"), jobsRaw = opt(input, "jobs");
+  const nowMs = Date.parse(typeof nowRaw === "string" ? nowRaw : "");
+  const tz = validZone(opt(input, "timeZone"));
   const policy = readPolicy(input);
-  const starts = input?.startTimes && typeof input.startTimes === "object" ? input.startTimes : {};
+  const starts = startsRaw && typeof startsRaw === "object" ? (startsRaw as Record<string, string>) : {};
   const startOf = (id: string): string | undefined => {
     const v = Object.prototype.hasOwnProperty.call(starts, id) ? starts[id] : undefined;
     return canonicalStart(v);
@@ -168,8 +172,8 @@ function buildInner(input: AttentionInput): AttentionResult {
   const stale = (s: string | undefined) => s !== undefined && Number.isFinite(nowMs) && Date.parse(s) < nowMs;
   const push = (a: AttentionAlert) => { if (stale(a.startTime)) ignore("already-started"); else alerts.push(a); };
 
-  const skipped = Array.isArray(input?.skipped) ? input.skipped : [];
-  if (input?.skipped !== undefined && !Array.isArray(input.skipped)) ignore("malformed-skipped-list");
+  const skipped: readonly unknown[] = Array.isArray(skippedRaw) ? skippedRaw : [];
+  if (skippedRaw !== undefined && !Array.isArray(skippedRaw)) ignore("malformed-skipped-list");
   for (const item of skipped) {
     try {
       const it = item as object | null;
@@ -182,8 +186,8 @@ function buildInner(input: AttentionInput): AttentionResult {
     } catch { ignore("unreadable-skipped-item"); }
   }
 
-  const jobs = input?.jobs && typeof input.jobs === "object" && !Array.isArray(input.jobs) ? input.jobs : undefined;
-  if (input?.jobs !== undefined && !jobs) ignore("malformed-jobs-map");
+  const jobs = jobsRaw && typeof jobsRaw === "object" && !Array.isArray(jobsRaw) ? jobsRaw : undefined;
+  if (jobsRaw !== undefined && !jobs) ignore("malformed-jobs-map");
   for (const id of Object.keys(jobs ?? {})) {
     try {
       const row = own(jobs as object, id) as object | null;

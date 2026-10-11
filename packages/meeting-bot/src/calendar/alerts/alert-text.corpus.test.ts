@@ -148,18 +148,20 @@ test("startTime is parsed and FORMATTED from the instant; a caller string is nev
   }
 });
 
-test("echo audit: no caller-controlled string reaches ANY field of the result (key, id, title, body, startTime, ignored)", () => {
+test("echo audit: no caller-controlled string reaches ANY field of the result (key, id, title, body, startTime, ignored), under BOTH title policies", () => {
   const M = "ZMARK";
-  const res = buildAttentionAlerts({
-    timeZone: `Asia/Kolkata ${M}z`, now: NOW,
-    skipped: [{ sessionKey: `cal:${M}a`, title: `Talk passcode ${M}t`, reason: "overlap-lost", detail: M, meetingUrl: `https://zoom.us/j/1?pwd=${M}`, sender: `${M}@x.example` },
-      { sessionKey: `cal:${M}b`, title: "Talk x", reason: `pwd-${M.toLowerCase()}r` }, { sessionKey: `cal:c`, title: "t", reason: `${M.toLowerCase()}`.repeat(3) }],
-    jobs: { [`job-${M}`]: { status: "action_required", reason: `pwd-${M.toLowerCase()}j`, title: `Job key ${M}`, startTime: `Mon Oct 12 2026 (${M}) 10:00` } },
-    startTimes: { [`cal:${M}a`]: `Mon Oct 12 2026 (${M}) 10:00` },
-  } as never);
-  assert.equal(res.alerts.length, 2);
-  assert.ok(!/zmark/i.test(JSON.stringify(res)), JSON.stringify(res));
-  assert.deepEqual(Object.keys(res.ignored.reasons).sort(), ["no-alert-for-reason:other"]);
+  for (const titlePolicy of ["omit", "masked"] as const) {
+    const res = buildAttentionAlerts({
+      titlePolicy, timeZone: `Asia/Kolkata ${M}z`, now: NOW,
+      skipped: [{ sessionKey: `cal:${M}a`, title: `Talk passcode ${M}t`, reason: "overlap-lost", detail: M, meetingUrl: `https://zoom.us/j/1?pwd=${M}`, sender: `${M}@x.example` },
+        { sessionKey: `cal:${M}b`, title: "Talk x", reason: `pwd-${M.toLowerCase()}r` }, { sessionKey: `cal:c`, title: "t", reason: `${M.toLowerCase()}`.repeat(3) }],
+      jobs: { [`job-${M}`]: { status: "action_required", reason: `pwd-${M.toLowerCase()}j`, title: `Job key ${M}`, startTime: `Mon Oct 12 2026 (${M}) 10:00` } },
+      startTimes: { [`cal:${M}a`]: `Mon Oct 12 2026 (${M}) 10:00` },
+    } as never);
+    assert.equal(res.alerts.length, 2, titlePolicy);
+    assert.ok(!/zmark/i.test(JSON.stringify(res)), `${titlePolicy}: ${JSON.stringify(res)}`);
+    assert.deepEqual(Object.keys(res.ignored.reasons).sort(), ["no-alert-for-reason:other"], titlePolicy);
+  }
 });
 
 // ---- seeded generator ----

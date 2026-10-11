@@ -169,3 +169,75 @@ test("W10 / ISS-T037W1-003: every core SKIP_REASONS value is a known reason; an 
   for (const v of ["opted-out", "rule-denied", "rules-unevaluable"]) assert.ok(KNOWN_SKIP_REASONS.has(v), v);
   console.log(`ISS-T037W1-003 attention-alerts: ${passed}/${SKIP_REASONS.length} core reasons pass through, unknown -> other`);
 });
+
+// ---- ISS-ALERTFIX-002: only an OWN "masked" selects masked; nothing inherited is read ----
+const LANE = readFileSync(new URL("../../../../../qa/issues.alertfix.jsonl", import.meta.url), "utf8").trim().split("\n").map((l) => JSON.parse(l) as Record<string, string>);
+const base = { timeZone: "UTC", now: NOW };
+/** Every way of presenting the options so the policy can only arrive by inheritance, on each route. */
+const inheritedShapes: [string, (extra: Record<string, unknown>) => unknown][] = [
+  ["Object.create({titlePolicy:masked})", (e) => Object.assign(Object.create({ titlePolicy: "masked" }), base, e)],
+  ["class instance, policy on its prototype", (e) => { class Opts { constructor() { Object.assign(this, base, e); } } (Opts.prototype as Record<string, unknown>).titlePolicy = "masked"; return new Opts(); }],
+  ["row recorded in ledger (verbatim)", (e) => Object.assign(Object.create({ titlePolicy: "masked" }), { timeZone: "UTC", now: "2026-10-10T00:00:00Z" }, e)],
+];
+const withTitle = (route: "skipped" | "job", extra?: Record<string, unknown>): Record<string, unknown> =>
+  route === "skipped" ? { skipped: [{ sessionKey: "cal:k", title: "Weekly tiger", reason: "overlap-lost" }], ...extra }
+    : { jobs: { "job-k": { status: "action_required", reason: "retry-limit", title: "Weekly tiger" } }, ...extra };
+
+test("ISS-ALERTFIX-002: an INHERITED titlePolicy is ignored on both routes; the recorded reproduction, Object.create and a class prototype all give omit", () => {
+  const row = LANE.find((x) => x.id === "ISS-ALERTFIX-002")!;
+  assert.ok(row.evidence!.includes('Object.assign(Object.create({titlePolicy:"masked"}),{timeZone:"UTC",now:"2026-10-10T00:00:00Z",skipped:[{sessionKey:"cal:k",title:"Weekly tiger",reason:"overlap-lost"}]})'));
+  let ok = 0, total = 0;
+  for (const route of ["skipped", "job"] as const) {
+    const omitted = buildAttentionAlerts({ ...base, ...withTitle(route), titlePolicy: "omit" } as never);
+    for (const [name, make] of inheritedShapes) {
+      total++;
+      const res = buildAttentionAlerts(make(withTitle(route)) as never);
+      assert.equal(res.alerts.length, 1, `${route} ${name}`);
+      assert.ok(!blob(res).includes("tiger") && !blob(res).includes("Weekly"), `${route} ${name} leaked the title`);
+      assert.deepEqual(res, omitted, `${route} ${name}`);
+      ok++;
+    }
+  }
+  console.log(`ISS-ALERTFIX-002: ${ok}/${total} inherited-policy cases refused`);
+  assert.equal(ok, total);
+});
+
+test("ISS-ALERTFIX-002: a polluted Object.prototype.titlePolicy changes nothing (set and restored inside the test)", () => {
+  const proto = Object.prototype as Record<string, unknown>;
+  assert.equal(Object.prototype.hasOwnProperty.call(proto, "titlePolicy"), false, "precondition: clean prototype");
+  let ok = 0;
+  try {
+    proto.titlePolicy = "masked";
+    for (const route of ["skipped", "job"] as const) {
+      const res = buildAttentionAlerts({ ...base, ...withTitle(route) } as never); // states no policy at all
+      assert.ok(!blob(res).includes("tiger"), `${route} polluted prototype leaked`);
+      assert.equal(blob(res), blob(buildAttentionAlerts({ ...base, ...withTitle(route), titlePolicy: "omit" } as never)));
+      const cls = buildAttentionAlerts({ ...base, ...withTitle(route), titlePolicy: undefined } as never); // own undefined must not fall through to the prototype
+      assert.ok(!blob(cls).includes("tiger"), `${route} own-undefined fell through`);
+      ok++;
+    }
+  } finally { delete proto.titlePolicy; }
+  assert.equal(ok, 2);
+  assert.equal("titlePolicy" in {}, false, "Object.prototype restored");
+  console.log("ISS-ALERTFIX-002: polluted Object.prototype 2/2 routes refused, prototype restored");
+});
+
+test("ISS-ALERTFIX-002: an OWN \"masked\" still opts in (the opt-in keeps working), also when the prototype says otherwise", () => {
+  for (const route of ["skipped", "job"] as const) {
+    assert.ok(blob(buildAttentionAlerts({ ...base, ...withTitle(route), titlePolicy: "masked" } as never)).includes("Weekly tiger"), route);
+    const inheritsOmit = Object.assign(Object.create({ titlePolicy: "omit" }), base, withTitle(route), { titlePolicy: "masked" });
+    assert.ok(blob(buildAttentionAlerts(inheritsOmit)).includes("Weekly tiger"), `${route} own beats prototype`);
+  }
+});
+
+test("ISS-ALERTFIX-002 option audit: every other caller option is read from OWN properties only (inherited timeZone, now, startTimes, skipped, jobs are ignored)", () => {
+  const proto = { timeZone: "Asia/Kolkata", now: "2030-01-01T00:00:00Z", startTimes: { "cal:k": "2026-10-12T10:00:00Z" }, skipped: withTitle("skipped").skipped, jobs: withTitle("job").jobs };
+  const none = buildAttentionAlerts(Object.create(proto));
+  assert.deepEqual(none, { alerts: [], ignored: { count: 0, reasons: {} } }, "inherited lists are not read");
+  const own = Object.assign(Object.create(proto), withTitle("skipped"));
+  const res = buildAttentionAlerts(own);
+  assert.equal(res.alerts.length, 1);
+  assert.match(res.alerts[0]!.body, /Starts: start time unknown/, "inherited startTimes ignored");
+  assert.ok(!res.alerts[0]!.body.includes("Kolkata"), "inherited timeZone ignored");
+  assert.equal(res.ignored.count, 0, "inherited now (2030) did not mark the alert as already started");
+});
