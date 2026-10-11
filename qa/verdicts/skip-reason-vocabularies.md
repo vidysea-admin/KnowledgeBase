@@ -1,0 +1,17 @@
+# Verdict: skip-reason-vocabularies
+
+VERDICT: PASS
+Cycle checked: 0
+Commit checked: 2d4f440 (lane/skipvocab, base 1414d79)
+
+EXPLANATION:
+- Union: SkipReason spellings in 1414d79 and in SKIP_REASONS are identical (diff empty, 14 each). tsc --noEmit exit 0 in packages/core, packages/meeting-bot, apps/api, both as the lane resolves today and with a temporary tsconfig mapping @lkb/core to THIS lane's core (temp files deleted). Nothing imports SKIP_REASONS at runtime anywhere (only the core definition and tests that read it as text), so nothing is undefined before or after merge. SKIP_REASON_MEANING lives in packages/meeting-bot/src/calendar/skip-describe.ts (same package as telegram: allowed). brain.ts (apps/api) may not import meeting-bot under .dependency-cruiser.cjs, so it keeps its own total Record<SkipReason,true>: correct, no exception added. scripts/ is outside the cruiser rules.
+- Behaviour: old lists extracted from git and compared with the new ones. All three new reasons now pass in all three consumers, wording is the bare code (SKIP_REASON_MEANING is not shown). Old entries are all retained. NOT strictly byte-identical for the 11 old reasons: previously-unlisted ones now show their code instead of the neutral label: brain and run-pipeline `past, untrusted-sender, duplicate-session, not-webinar`; telegram also `no-join-link`. The manifest discloses that the lists differed. Operator-visible only as a code, none is persisted as an operation row today: note, not an issue.
+- Unknown value: brain -> processing-failed, telegram -> pipeline-failed, run-pipeline -> details-private; the raw string is never echoed (probe + mutations M4/M5).
+- run-pipeline.mjs ~226: opted-out, rule-denied, rules-unevaluable fall through with no operation row, no retry, no failure, no log line, same as not-webinar/duplicate-session. Not mishandled. Whether rules-unevaluable (fail closed) should raise action_required is a wiring decision already recorded in ISS-T037W1-003 fix_direction; nothing filed.
+- D-015: ISS-T037W1-003 names brain, telegram, run-pipeline: 3/3 by my run (each accepts all 14 plus neutral unknown). The row also names attention-alerts (unmerged), so I have NOT marked it verified: that must wait for merge plus the follow-up below.
+- Mutations (timeout 170, per-mutation backup, hash-object == HEAD blob checked each time): M1 drop rules-unevaluable from brain Record: killed by brain.test (and tsc). M2 telegram filter out rules-unevaluable: killed by telegram-channel.test. M3 run-pipeline filter out opted-out: killed by skip-reason-vocabulary.test (2 fail). M4 telegram unknown echoes raw: killed by telegram-channel.test. M5 brain unknown echoes raw: killed by brain.test. 5/5 killed.
+- Tests: telegram+skip-describe 6/6; vocabulary+run-pipeline 25/25; brain 11/11. lint-dirsize OK. Commit touches only its unit (8 files). Files 131-291 lines.
+- Merge note: attention-alerts commits add only new files (attention-alerts*.ts, alert-text*.ts, qa files); none overlap this lane's 8 files, so no textual conflict expected. Follow-up in packages/meeting-bot/src/calendar/attention-alerts.ts line 76: replace the local 11-value `SKIP_REASONS` Set with `new Set<string>(SKIP_REASONS)` and change line 11 to a value import `import { SKIP_REASONS, type SkippedItem } from "@lkb/core"` (drop the local name clash). Effect: opted-out/rule-denied/rules-unevaluable stop bucketing as `no-alert-for-reason:other`. KNOWN_REASONS (job reasons, line 85) is a different list and is not a SkipReason copy.
+
+ISSUES-WRITTEN: none

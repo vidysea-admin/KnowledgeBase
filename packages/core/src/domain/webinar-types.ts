@@ -79,22 +79,26 @@ export interface AutoRecordItem {
   sender?: string;
 }
 
-export type SkipReason =
-  | "no-join-link"
-  | "past"
-  | "untrusted-sender"
-  | "needs-registration"
-  | "duplicate-session"
-  | "overlap-lost"
-  | "not-webinar"
-  | "needs-review"
-  | "cancelled"
-  | "invalid-time"
-  | "unsafe-join-link"
+/** Runtime list of every SkipReason; the type is derived from it so hand-kept copies can be tested against it. */
+export const SKIP_REASONS = [
+  "no-join-link",
+  "past",
+  "untrusted-sender",
+  "needs-registration",
+  "duplicate-session",
+  "overlap-lost",
+  "not-webinar",
+  "needs-review",
+  "cancelled",
+  "invalid-time",
+  "unsafe-join-link",
   // T-037 join-rules veto layer (join-rules-select.ts): removals the rules engine makes after selection.
-  | "opted-out"
-  | "rule-denied"
-  | "rules-unevaluable";
+  "opted-out",
+  "rule-denied",
+  "rules-unevaluable",
+] as const;
+
+export type SkipReason = (typeof SKIP_REASONS)[number];
 
 export interface SkippedItem {
   sessionKey: string;

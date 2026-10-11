@@ -13,6 +13,12 @@ const {loadTrustedSenderConfig, activeWebinarStopReason, runWebinarRegistrations
 const {createOperationNotifications} = await import('../../packages/meeting-bot/src/capture/telegram-channel.ts');
 const {readWebinarOperationState, writeWebinarOperationState, prepareWebinarSourceState, webinarCompletionState, validateWebinarRegistration, confirmWebinarRegistration} = await import('../../packages/meeting-bot/src/calendar/schedule-state.ts');
 const {createPipelineDeps, safeText} = await import('./run-pipeline-deps.mjs');
+const {SKIP_REASON_MEANING} = await import('../../packages/meeting-bot/src/calendar/skip-describe.ts');
+// Operation reasons that are not skip reasons; every skip reason is derived from the total SKIP_REASON_MEANING record, so a new one is covered automatically.
+const OPERATION_ONLY_REASONS = ['retry-limit', 'interrupted-no-recording-artifact', 'missed-while-processing', 'missed-coverage', 'controller-disconnected',
+  'coverage-review', 'source-discontinuity', 'unproven-calendar-history', 'rejected', 'rescheduled', 'rescheduled-completed', 'recurring-series',
+  'unknown-tombstone', 'ambiguous-provider', 'contradictory-revision', 'missing-revision', 'ambiguous-identity'];
+export const OPERATION_REASONS = [...OPERATION_ONLY_REASONS, ...Object.keys(SKIP_REASON_MEANING)];
 export {createPipelineDeps};
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const ID = /^[a-z0-9][a-z0-9-]{0,63}$/;
@@ -237,11 +243,7 @@ export async function runPipelineWatch({run = false, watch = false} = {}, deps =
   const tick = deps.tick ?? (() => runPipelineTick(createPipelineDeps(), run)), wait = deps.wait ?? sleep, log = deps.log ?? console.log;
   const statuses = ['queued', 'recording', 'processing', 'failed', 'ready', 'action_required'];
   const phases = ['submitting', 'awaiting-confirmation', 'uncertain', 'action_required', 'confirmed'];
-  const reasons = ['retry-limit', 'interrupted-no-recording-artifact', 'missed-while-processing', 'missed-coverage', 'cancelled',
-    'controller-disconnected', 'coverage-review', 'overlap-lost', 'needs-registration', 'needs-review', 'invalid-time',
-    'unsafe-join-link', 'no-join-link', 'source-discontinuity', 'unproven-calendar-history', 'rejected', 'rescheduled',
-    'rescheduled-completed', 'recurring-series', 'unknown-tombstone', 'ambiguous-provider', 'contradictory-revision',
-    'missing-revision', 'ambiguous-identity'];
+  const reasons = OPERATION_REASONS;
   const timestamp = value => typeof value === 'string' && Number.isFinite(Date.parse(value)) &&
     new Date(value).toISOString() === value ? safeText(value) : undefined;
   do {
