@@ -1,6 +1,6 @@
 # t037-scheduler-wiring-behind-flag
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t037-scheduler-wiring-behind-flag.md, cycle 0, 6f068c0; wiring present, DISABLED by default; enabling is the Approver decision)
 Fix cycle: 0
 Priority tier: 3 (roadmap T-037: wiring precondition set W1-W7 of `qa/contracts/t037-join-rules-veto-select.md`); it also removes a false-assurance blocker (the web copy tells users an opt-out stops the bot while no scheduler applies join rules).
 Security class: decides which meetings the bot records (data-write / recording decision) - FULL ceremony, never round-capped.
