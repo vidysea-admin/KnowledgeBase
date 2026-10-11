@@ -1,6 +1,7 @@
 # u2-4-phase3-resume-c2
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/u2-4-phase3-resume-c2.md (cycle 6, 50871fa; OFFLINE scope only: live gate not run)
 Fix cycle: 6
 Priority tier: 2 - open critical ISS-282 / ISS-104 and high ISS-283 / ISS-289 (also medium ISS-284, ISS-290). Authorized by D-122 (Approver ruling 2026-10-10: `origin/wave/u2-4-phase3-fix` is RESUMED through the maker-checker pair).
 Security class: data-write precondition (U2.4 phase-4 persists identities) - full ceremony, uncapped.
