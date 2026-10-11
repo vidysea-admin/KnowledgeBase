@@ -28,6 +28,7 @@ import { createAskArmsFor } from "../ask-arms.js";
 import { createSourceRequestDepsFor } from "../ask/source-context.js";
 import { withSessionArtifacts } from "../routes/brain.js";
 import { createMongoJobsReadDeps } from "../jobs/store.js";
+import { createMongoClaimsListDeps } from "../claims/store.js";
 import { createConfiguredActivityHealthDeps } from "../activity-health/queue-reader.js";
 
 const ROUTING_CONFIG_PATH = fileURLToPath(new URL("../../../../config/ai-routing.yaml", import.meta.url));
@@ -182,6 +183,7 @@ export function buildProductionDeps(): ServerDeps {
     evalRuns: createMongoEvalRunStore(),
     brain: withSessionArtifacts(createMongoBrainReadDeps(), fileURLToPath(new URL("../../../../", import.meta.url))),
     citations: createMongoCitationsDeps(),
+    claims: createMongoClaimsListDeps(),
     // U4b/R2: the same Mongo health deps as before, plus the injected watcher-silence detector.
     health: { ...createMongoHealthDeps(), watchSilence: createMongoWatchSilenceDeps() },
     // U4d: the same A13 watched-sources deps as before, plus the watch_state/watch_heartbeat read

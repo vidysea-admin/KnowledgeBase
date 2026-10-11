@@ -14,6 +14,7 @@ import { createCompetePageRouter } from "./routes/compete-page.js";
 import { createBrainRouter, type BrainReadDeps } from "./routes/brain.js";
 import { createWatchedSourcesRouter, type WatchedSourceDeps } from "./routes/watched-sources.js";
 import { createCitationsRouter, type CitationsDeps } from "./routes/citations.js";
+import { createClaimsListRouter, unavailableClaimsListDeps, type ClaimsListDeps } from "./claims/router.js";
 import { createHealthRouter, type HealthDeps } from "./routes/health.js";
 import { createSearchRouter, type SearchDeps } from "./routes/search.js";
 import { createGraphRouter, type GraphReadDeps } from "./routes/graph.js";
@@ -40,6 +41,8 @@ export interface ServerDeps {
   brain: BrainReadDeps;
   watchedSources: WatchedSourceDeps;
   citations: CitationsDeps;
+  /** T-007 read-only claims list. Optional: absent -> GET /claims answers 503 (fail closed). */
+  claims?: ClaimsListDeps;
   health: HealthDeps;
   search: SearchDeps;
   graph: GraphReadDeps;
@@ -83,6 +86,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createActivityHealthRouter(deps.activityHealth ?? unavailableActivityHealthDeps));
   app.use(createWatchedSourcesRouter(deps.watchedSources));
   app.use(createCitationsRouter(deps.citations));
+  app.use(createClaimsListRouter(deps.claims ?? unavailableClaimsListDeps));
   app.use(createSearchRouter(deps.search));
   app.use(createGraphRouter(deps.graph));
   app.use(createCalendarRouter(deps.calendar));

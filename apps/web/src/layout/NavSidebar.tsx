@@ -36,6 +36,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/whatsapp", label: "WhatsApp", icon: <WhatsAppIcon /> },
   { to: "/settings", label: "Settings", icon: <SettingsIcon /> },
   { to: "/jobs", label: "Provider jobs", icon: <DocsIcon /> },
+  { to: "/claims", label: "Claims", icon: <DocsIcon /> },
   { to: "/status", label: "System status", icon: <SettingsIcon /> },
 ];
 
