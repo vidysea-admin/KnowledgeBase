@@ -1,6 +1,6 @@
 # Manifest — r1-alert-title-policy-and-reasons
 
-**Status:** ready-for-check
+**Status:** checked-PASS (Checked: qa/verdicts/r1-alert-title-policy-and-reasons.md, cycle 1, b9990d0)
 **Fix cycle:** 1
 **Lane:** ALERTFIX (branch lane/alertfix, base 9dae5d3). **Security class:** credential handling (meeting passcodes in operator alerts). Full ceremony.
 **Backlog tier:** 2 (open high security issue ISS-R1ALERTS-009; also -010, -011 medium and ISS-T037W1-003 / contract W10).
