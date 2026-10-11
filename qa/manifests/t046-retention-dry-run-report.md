@@ -1,6 +1,6 @@
 # Manifest - t046-retention-dry-run-report (T-046, retention half, operator report)
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t046-retention-dry-run-report.md, cycle 3, 5eb9d8f; report-only; thresholds undecided; no executor exists; not run on real data)
 Fix cycle: 3
 Lane: t046dry (branch `lane/t046dry`, base 8520fa8). Code commit a0d18a8.
 Tier: 3 (next roadmap task, T-046); a new feature slice, not a ledger finding.
