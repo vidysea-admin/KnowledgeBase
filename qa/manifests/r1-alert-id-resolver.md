@@ -1,7 +1,7 @@
 # Manifest - r1-alert-id-resolver
 
 **Status:** ready-for-check
-**Fix cycle:** 0
+**Fix cycle:** 1
 **Lane:** ALERTID (branch lane/alertid, base 33baf6f). **Security class:** credential handling (meeting passcodes must not reach operator alerts). Full ceremony.
 **Backlog tier:** 2 (closes wiring precondition W9 behind open high ISS-R1ALERTS-009: the safe `omit` default is only usable if an operator can find the meeting). Round cap: security class, never capped.
 
@@ -54,3 +54,82 @@ Not mutated: "env var the user did not set" has no code path (tenant only via `c
 
 ## Issues filed (qa/issues.alertid.jsonl)
 ISS-ALERTID-001 (medium, skipped sessions unresolvable), ISS-ALERTID-002 (medium, unsalted hash brute-forceable for webinar keys; HMAC recommended).
+
+---
+
+# Fix cycle 1 (answers verdict qa/verdicts/r1-alert-id-resolver.md, FAIL cycle 0)
+Supersedes where it differs: the cycle-0 statements above on tenant tagging ("tenant separation there rests on the state dir"), on skipped sessions ("never persisted"), the miss message, and the `72/72` D-015 claim. Code commit ef8d1f8 (this section and two ledger rows are the follow-up commit).
+
+## What failed
+ISS-ALERTID-003 (high): `alert-who <B's job id> --tenant A` printed tenant B's title and the miss said "for tenant A". ISS-ALERTID-004 (medium): the 72/72 put the formatter's own keys in the candidate list. ISS-ALERTID-001 (high): two skipped kinds did not resolve. ISS-ALERTID-005 (low): junction followed; job size cap unpinned.
+
+## What is true about tenant tagging, per source (read from the writers)
+- `schedule-state.json`: written by `recordScheduled` (schedule-state.ts:247-251), record `{sessionKey,title,scheduledAt}`. NO tenant field. One path for the whole machine (`DEFAULT_STATE_DIR = <repo>/raw/webinars`, schedule-tick.ts:17).
+- `scheduled/*.json`: written by `writeScheduledJob` (schedule-state.ts:273-283), record `{url,until,title,sessionId}`. NO tenant field, same shared dir.
+- `operations.json`: carries `tenantId` on the file and every row; `readWebinarOperationState` refuses another tenant's file. The only tagged source.
+So option (a) (filter by a field in each record) is impossible: there is no field. Option (b) applied. Root cause filed, not fixed: ISS-ALERTID-006.
+
+## What the tool does now
+- Default (any tenant, including the default one): only tenant-tagged `operations.json` is searched. The two untagged sources are read only to be COUNTED; the run prints `notice: N candidate(s) in schedule-state.json and scheduled/ were NOT searched: those files are shared by every tenant on this machine and carry no tenant tag ... Add --include-untagged ...`. Nothing from them is ever printed.
+- `--include-untagged` (explicit opt-in): searches them; every match prints `source:   tenant unknown (shared schedule file): <source>`. A key that also has a tenant-tagged hit prints once, unlabelled.
+- Every "for tenant X" phrasing is gone; the miss reads `no record in operations.json matches alert id <id>` (literally true) plus a limits line.
+- Applied always, not conditional on how many tenants are configured (that cannot be detected from disk reliably).
+
+## ISS-ALERTID-003 reproduction, verbatim (test `ISS-ALERTID-003 recorded reproduction, verbatim`)
+scheduled/b.json `{sessionId:'cal:tenantB',title:'TENANT-B Board Review'}`, operations.json tagged B, `alert-who <alertIdFor('cal:tenantB')> --tenant A`: exit 1; output contains neither `TENANT-B` nor `Board Review` nor `for tenant`; it contains the NOT searched notice and `no record in operations.json matches alert id`. With `--include-untagged` the same id prints the title, labelled `tenant unknown (shared schedule file)`.
+
+## Per-kind resolution table, from production-shaped state (replaces the 72/72 claim)
+Built by: real `runScheduleTickOnce` (everyWebinar:true, injected clock, fake loaders/scheduler, no network) writing schedule-state.json and scheduled/*.json to a temp root; real `prepareWebinarSourceState` (reconcile + projectWebinarInventory) writing operations.json for the same inputs; real `buildAttentionAlerts` over the tick's skipped list and the operations rows; the resolver reads ONLY the temp root. The fixture covers all 14 values of core `SKIP_REASONS` (asserted equal to the list; the 3 veto reasons opted-out/rule-denied/rules-unevaluable come from join-rules-select, so they are fed as SkippedItems, and emit no alert). Test: `alert-who-production.test.ts`, expectations pinned.
+
+| skip reason / kind | session key | alert emitted? | resolves | source |
+|---|---|---|---|---|
+| overlap-lost | webinar-<hash> | yes | yes | operations (row) |
+| untrusted-sender | webinar-<hash> | yes | yes | operations (row) |
+| no-join-link | cal:<id> | yes | yes (was NO) | operations source inventory |
+| unsafe-join-link | cal:<id> | yes | yes (was NO) | operations source inventory |
+| needs-registration | gmail:<id> | yes | yes (was NO) | operations source inventory |
+| past, duplicate-session, not-webinar, needs-review, cancelled, invalid-time, opted-out, rule-denied, rules-unevaluable | - | NO alert | n/a | n/a |
+| job alerts (operations rows at action_required; 7 in the fixture) | review keys | yes | 7/7 | operations (row) |
+
+Default and `--include-untagged` give the same result for every skipped kind (none is resolved from an untagged file).
+
+## cal:/gmail: kinds: what exists on disk
+The tick itself persists nothing for skipped items (schedule-tick.ts:236-239 only logs `result.skipped`). But `operations.json` already carries the poller's source inventory (`source.reconciliation.occurrences[*]` = `{source:"calendar"|"gmail", snapshot:{id,title,startTime,...}}`, written by `prepareWebinarSourceState`, tenant-tagged, validated on read). Skipped sessions are keyed `cal:<event id>` / `gmail:<candidate id>`, so a READ of that existing block resolves them with no new write path. Added in `loadCandidates`. Limit, stated in the miss message: the inventory is filled by a different loader than the tick's, so an item the inventory has not seen misses; NOT verified end to end against the real poller. Filed as ISS-ALERTID-007 (the write-path follow-up that would make W9 unconditional: one record per skipped alertable item `{sessionKey,startTime,source,tenantId}`, never the join URL, written by `runScheduleTickOnce`).
+
+## W9 and W11
+W9: PARTLY met. On production-shaped state all 5 alert-emitting skip kinds and 7/7 job alerts resolve, from the tenant-tagged operations.json only. Still open: (1) the cal:/gmail: kinds (no-join-link, unsafe-join-link, needs-registration) depend on operations.json's source inventory having synced the same item (ISS-ALERTID-007; not verified against the real poller); (2) the untagged files stay off by default until the scheduler tags them (ISS-ALERTID-006). ISS-ALERTFIX-001 is not marked verified by this unit.
+W11 (ISS-ALERTID-002: `alertIdFor` is an unsalted SHA-256 prefix) is a SENDER gate for the Approver and is NOT addressed here: `alertIdFor` unchanged, nothing wired to a sender.
+
+## D-015 measurement
+- ISS-ALERTID-003: 1/1 recorded reproduction refused (plus the two-tenant matrix: tenants A and B each see 0 of the other's untagged titles, 2/2 runs).
+- ISS-ALERTID-004: per-kind table measured on real state (above); the old 72/72 test is renamed `hash agreement only (NOT W9 evidence ...)`.
+- ISS-ALERTID-001: 5 of 5 alert-emitting skip kinds resolve on production-shaped state (was 2 of 5), 7 of 7 job alerts; open = the two W9 conditions above, with the three cal:/gmail: kinds named as the ones that depend on the inventory.
+- ISS-ALERTID-005: a junction at scheduled/ and a junction in front of operations.json are both refused (`resolves outside the data root (link not followed; skipped)`); job cap pinned (70 KiB valid job refused, 60 KiB valid job accepted).
+
+## Mutations
+Harness `.alertid-mut.cjs`: untracked in the worktree, deleted; absolute paths inside this worktree; byte backup PER mutation; restore in `finally`; 200 s kill; `git hash-object` equals `git rev-parse HEAD:<file>` after each (`restored: true` x11). 11 run, 11 KILLED, 0 survived.
+
+| Mutation | Killed by (named tests) |
+|---|---|
+| M1 untagged records added to the tagged bucket | ISS-ALERTID-003 recorded reproduction; two tenants' operations plus shared files; untagged opt-in labelled; scheduled webinar not searched by default; +3 |
+| M2 untagged searched by default | ISS-ALERTID-003 recorded reproduction; two tenants' operations plus shared files |
+| M3 "tenant unknown" label removed | untagged sources are opt-in and labelled; resolves from three sources |
+| M4 "for tenant" restored on a miss | a miss never claims a tenant scope; ISS-ALERTID-003 reproduction; no-match test |
+| M5 source-inventory path removed | per-kind table |
+| M6 operations-row path removed | per-kind table; job alerts end to end; two tenants; +4 |
+| M7a/b/c realpath check removed (all; scheduled/ only; operations.json only) | ISS-ALERTID-005 junction test (each) |
+| M8 job size cap removed | ISS-ALERTID-005 size-cap test |
+| M9 NOT searched notice removed | ISS-ALERTID-003 reproduction; two tenants' operations plus shared files |
+
+## Evidence
+Toolchain: node from the codex runtime; `node --test --import tsx` in packages/meeting-bot.
+- Unit tests (`alert-who-production.test.ts`, `alert-who-command.test.ts`, `alert-resolve.test.ts`): `tests 29 / pass 29 / fail 0` (4 + 18 + 7).
+- Four existing alert files unchanged: alert-text.corpus 9/9, alert-text 15/15, alert-title-policy 12/12, attention-alerts 10/10.
+- `tsc --noEmit -p tsconfig.json` (packages/meeting-bot): exit 0, no output.
+- `node scripts/lint-dirsize.mjs`: `lint-dirsize: OK (115 dir(s) within budget)`. Non-blank lines: alert-who-command.ts 200, alert-who-command.test.ts 301, alert-who-production.test.ts 137 (budgets 300 / 400 / 400).
+- The tests print `PER-KIND TABLE` and `JOB ALERTS: 7/7 resolve (operations)`.
+- Kept: terminal safety (8 hostile payloads, 6 lines), host-only join URL, read-only snapshot test, imported hash, collisions, malformed ids. No `qa/contracts/`, verdicts, enforcement paths or ledger statuses edited; `alertIdFor` untouched.
+- Unverified: not run end to end against the real poller or a real operations.json; the test's `resolveTenant` honours `--tenant` as the existing harness does (the real `captureTenant` is covered by tsc only).
+
+## Issues filed this cycle
+ISS-ALERTID-006 (high: scheduler state files carry no tenant tag; writers schedule-state.ts:251 and :283; multi-tenant task), ISS-ALERTID-007 (medium: persist skipped alertable items; writer runScheduleTickOnce).
