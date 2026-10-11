@@ -22,6 +22,7 @@ import { KnowledgeGapsPage } from "./pages/gaps/KnowledgeGapsPage.js";
 import { ActivityHealthPage } from "./pages/activity-health/ActivityHealthPage.js";
 import { AnalyticsPage } from "./pages/analytics/AnalyticsPage.js";
 import { JoinRulesPage } from "./pages/join-rules/JoinRulesPage.js";
+import { SystemStatusPage } from "./pages/system-status/SystemStatusPage.js";
 
 export function App(): React.ReactElement {
   return (
@@ -47,6 +48,7 @@ export function App(): React.ReactElement {
               <Route path="/sources" element={<SourcesPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/jobs" element={<JobsPage />} />
+              <Route path="/status" element={<SystemStatusPage />} />
               <Route path="/ingest" element={<IngestPage />} />
               <Route path="/meeting-bot" element={<MeetingBotPage />} />
               <Route path="/whatsapp" element={<WhatsAppPage />} />
