@@ -1,6 +1,6 @@
 # Manifest — t034-capture-failure-not-success
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t034-capture-failure-not-success.md, cycle 2, c2f9ee0; logic verified with fakes; NOT run in a real browser)
 Fix cycle: 2
 
 **Goal task:** T-034 (in-browser tab capture). T-034 stays OPEN (no real-browser run yet).
