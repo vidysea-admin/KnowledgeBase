@@ -17,6 +17,7 @@ import { buildTestDeps, fakeKeyStore } from "../../apps/api/src/fixtures.js";
 import type { JoinRulesDeps } from "../../apps/api/src/join-rules/deps.js";
 import { loadJoinRules, saveJoinRules, recordTenantApproval, recordTenantOptOut, joinRulesFilePath } from "../../packages/meeting-bot/src/calendar/join-rules-store.js";
 import { validateJoinRuleSet } from "../../packages/meeting-bot/src/calendar/join-rules.js";
+import { createJoinRulesDeps } from "../webinar/join-rules-host.js";
 
 const KEYS: Record<string, { tenantId: string; scopes: string[] }> = {
   "a-key": { tenantId: "tenant-a", scopes: ["calendar", "join-rules"] },
@@ -33,6 +34,7 @@ async function harness(fn: (dir: string, call: (method: string, p: string, key: 
     validateRuleSet: validateJoinRuleSet,
     recordApproval: (t, a) => recordTenantApproval(dir, t, a),
     recordOptOut: (t, id) => recordTenantOptOut(dir, t, id),
+    removeOptOut: createJoinRulesDeps({ stateDir: dir }).removeOptOut,
   };
   // The real createServer (auth + rate limit + router), not a hand-built app.
   const server = await startTestServer(buildTestDeps({ keyStore: fakeKeyStore(KEYS), joinRules: deps }));

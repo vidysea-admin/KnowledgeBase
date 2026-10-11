@@ -26,13 +26,14 @@ function thrower(code: string, where: "load" | "write"): JoinRulesDeps {
   const boom = async (): Promise<never> => { throw new StoreError(code); };
   return {
     load: where === "load" ? boom : async () => empty(),
-    save: boom, recordApproval: boom, recordOptOut: boom,
+    save: boom, recordApproval: boom, recordOptOut: boom, removeOptOut: boom,
     validateRuleSet: i => i as ReturnType<JoinRulesDeps["validateRuleSet"]>,
   };
 }
 const ROUTES: [string, string, string, unknown][] = [
   ["GET", "GET", URL_PATH, undefined], ["PUT", "PUT", URL_PATH, RULES],
   ["approvals", "POST", `${URL_PATH}/approvals`, { kind: "sender", value: "x@y.example" }], ["opt-outs", "POST", `${URL_PATH}/opt-outs`, { eventId: "e1" }],
+  ["opt-outs/remove", "POST", `${URL_PATH}/opt-outs/remove`, { eventId: "e1" }],
 ];
 async function hit(deps: JoinRulesDeps | undefined, method: string, path: string, body: unknown) {
   const server = await startTestServer(buildTestDeps({ keyStore: fakeKeyStore(KEYS), ...(deps ? { joinRules: deps } : {}) }));

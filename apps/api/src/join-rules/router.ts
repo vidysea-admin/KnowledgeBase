@@ -6,11 +6,14 @@
  *   PUT  /calendar/join-rules              body = a rule set; replaces rules ONLY, stored state is kept
  *   POST /calendar/join-rules/approvals    body { kind: "sender"|"domain", value }
  *   POST /calendar/join-rules/opt-outs     body { eventId, meetingUrl?, sessionKey? } (the optional hints store the MEETING
- *                                          identity with the opt-out; there is NO un-opt operation, for ids or identities)
+ *                                          identity with the opt-out)
+ *   POST /calendar/join-rules/opt-outs/remove  UN-OPT (t037-join-rules-un-opt); same body: removes that exact id and the identities the
+ *                                          hints derive -> { state, removed: { eventId, meetings } }; absent = 200 no-op. POST, not DELETE:
+ *                                          every mutation here is a JSON-body POST (DELETE bodies are fragile in proxies and clients).
  *
  * The tenant is ALWAYS `req.auth!.tenantId` (as routes/calendar.ts does); URL, query, headers and body
  * never name it, and a body field `tenantId` is rejected (400). Scopes: GET needs "calendar" (read); PUT and
- * both POSTs need the dedicated WRITE scope "join-rules" (a "calendar" read key must not gain write power).
+ * every POST need the dedicated WRITE scope "join-rules" (a "calendar" read key must not gain write power).
  * Writes for one tenant are serialised in-process by a promise-chain mutex; across processes the store
  * takes a per-tenant lock file (t037-join-rules-store-lock). Contention surfaces as 503 `join_rules_busy`
  * + Retry-After (STORE_FAILURE below); GET never takes that lock (the store's load is lock-free).
@@ -70,6 +73,22 @@ function bodyOf(req: Request, allowed: readonly string[]): Record<string, unknow
     if (!allowed.includes(key)) throw new BadRequest(`unknown field "${key.slice(0, 40)}"`);
   }
   return body;
+}
+
+/** Body of opt-out and un-opt. Optional hints (ISS-T037W1-001) are bounded strings; an empty / blank one is "not given". */
+function optOutBody(req: Request): { eventId: string; hint: { meetingUrl?: string; sessionKey?: string } } {
+  const body = bodyOf(req, ["eventId", "meetingUrl", "sessionKey"]);
+  if (typeof body.eventId !== "string" || body.eventId === "" || body.eventId.length > 1024) {
+    throw new BadRequest("body must be { eventId: <non-empty string>, meetingUrl?: string, sessionKey?: string }");
+  }
+  const hint: { meetingUrl?: string; sessionKey?: string } = {};
+  for (const [key, max] of [["meetingUrl", 2048], ["sessionKey", 256]] as const) {
+    const v = body[key];
+    if (v === undefined) continue;
+    if (typeof v !== "string" || v.length > max) throw new BadRequest(`${key} must be a string of at most ${max} characters`);
+    if (v.trim() !== "") hint[key] = v;
+  }
+  return { eventId: body.eventId, hint };
 }
 
 export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
@@ -136,24 +155,21 @@ export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
 
   router.post("/calendar/join-rules/opt-outs", requireScope(WRITE_SCOPE), (req: Request, res: Response) =>
     guarded(req, res, async tenantId => {
-      const body = bodyOf(req, ["eventId", "meetingUrl", "sessionKey"]);
-      if (typeof body.eventId !== "string" || body.eventId === "" || body.eventId.length > 1024) {
-        throw new BadRequest("body must be { eventId: <non-empty string>, meetingUrl?: string, sessionKey?: string }");
-      }
-      // Optional hints so the opt-out follows the MEETING (ISS-T037W1-001). Strings only, bounded; an empty string is "not given".
-      const hint: { meetingUrl?: string; sessionKey?: string } = {};
-      for (const [key, max] of [["meetingUrl", 2048], ["sessionKey", 256]] as const) {
-        const v = body[key];
-        if (v === undefined) continue;
-        if (typeof v !== "string" || v.length > max) throw new BadRequest(`${key} must be a string of at most ${max} characters`);
-        if (v.trim() !== "") hint[key] = v;
-      }
+      const { eventId, hint } = optOutBody(req);
       await deps.load(tenantId);
-      try { return { state: await (hint.meetingUrl || hint.sessionKey ? deps.recordOptOut(tenantId, body.eventId, hint) : deps.recordOptOut(tenantId, body.eventId)) }; }
+      try { return { state: await (hint.meetingUrl || hint.sessionKey ? deps.recordOptOut(tenantId, eventId, hint) : deps.recordOptOut(tenantId, eventId)) }; }
       catch (e) {
         if (storeCode(e) === "invalid") throw new BadRequest("eventId is not valid");
         throw e;
       }
+    }));
+
+  // Un-opt: same write scope, same tenant-from-auth, same body allow-list and bounds as POST /opt-outs (one parser).
+  router.post("/calendar/join-rules/opt-outs/remove", requireScope(WRITE_SCOPE), (req: Request, res: Response) =>
+    guarded(req, res, async tenantId => {
+      const { eventId, hint } = optOutBody(req);
+      await deps.load(tenantId); // a bad stored file is a 5xx before anything else
+      return await (hint.meetingUrl || hint.sessionKey ? deps.removeOptOut(tenantId, eventId, hint) : deps.removeOptOut(tenantId, eventId));
     }));
 
   return router;

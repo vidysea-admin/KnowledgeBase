@@ -13,7 +13,7 @@
  * It runs on the RAW state, before validation, exactly like the id opt-out: skip never widens access.
  *
  * KNOWN LIMIT: a recurring personal-room URL (one Zoom/Meet room reused by different meetings) has ONE identity, so opting
- * out of one occurrence blocks every later meeting on that URL until the entry is removed (no un-opt operation exists yet).
+ * out of one occurrence blocks every later meeting on that URL until the entry is removed (`removeOptOutEntries`; the caller names the id AND the hints).
  */
 import { meetingIdentity } from "../send-now.js";
 
@@ -81,4 +81,26 @@ export function optedOutMeetingMatch(rawEntries: unknown, eventId: unknown, meet
   if (!Array.isArray(rawEntries) || rawEntries.length === 0) return undefined;
   const wanted = [urlEntry(meetingUrl), keyEntry(eventId)];
   return wanted.find((w): w is string => w !== undefined && rawEntries.includes(w));
+}
+
+/** The part of a join-rule state an un-opt touches; structural so this file needs no import from join-rules.ts. */
+export interface OptOutHolder { optedOutEventIds: readonly string[]; optedOutMeetings?: readonly string[] }
+export interface OptOutRemoval<S extends OptOutHolder> { state: S; removedEventId: boolean; removedMeetings: string[] }
+
+/**
+ * Un-opt (t037-join-rules-un-opt). Removes the EXACT id `eventId` from `optedOutEventIds` and, when hints are given, exactly the
+ * entries `urlEntry`/`keyEntry` derive from them (the same derivation `addMeetingEntries` uses). Nothing else is touched: no prefix
+ * or case-insensitive match, no guessing which stored identities belonged to the id, no other rule/approval/id. Absent -> no-op:
+ * the SAME state reference is returned and both report fields are empty. `optedOutMeetings` is never added to a state without it;
+ * a list emptied by removal stays present as `[]`. Veto-only: this can only leave fewer vetoes.
+ */
+export function removeOptOutEntries<S extends OptOutHolder>(state: S, eventId: string, meeting?: OptOutMeeting): OptOutRemoval<S> {
+  const hints = meeting !== null && typeof meeting === "object" ? meeting : {};
+  const wanted = [urlEntry(hints.meetingUrl), keyEntry(hints.sessionKey)].filter((e): e is string => e !== undefined);
+  const removedMeetings = (state.optedOutMeetings ?? []).filter((e) => wanted.includes(e));
+  const removedEventId = state.optedOutEventIds.includes(eventId);
+  if (!removedEventId && removedMeetings.length === 0) return { state, removedEventId: false, removedMeetings: [] };
+  const next = { ...state, optedOutEventIds: state.optedOutEventIds.filter((i) => i !== eventId) };
+  if (state.optedOutMeetings !== undefined) next.optedOutMeetings = state.optedOutMeetings.filter((e) => !wanted.includes(e));
+  return { state: next, removedEventId, removedMeetings };
 }

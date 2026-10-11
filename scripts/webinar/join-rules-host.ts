@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 import type { JoinRulesDeps } from "../../apps/api/src/join-rules/deps.js";
 import { loadJoinRules, saveJoinRules, recordTenantApproval, recordTenantOptOut } from "../../packages/meeting-bot/src/calendar/join-rules-store.js";
 import { validateJoinRuleSet } from "../../packages/meeting-bot/src/calendar/join-rules.js";
+import { removeOptOutEntries } from "../../packages/meeting-bot/src/calendar/join-rules-optout.js";
 
 export const HOST_PID_FILE = "join-rules-host.pid";
 
@@ -24,6 +25,14 @@ export function createJoinRulesDeps({ stateDir }: { stateDir: string }): JoinRul
     validateRuleSet: validateJoinRuleSet,
     recordApproval: (t, a) => recordTenantApproval(stateDir, t, a),
     recordOptOut: (t, id, meeting) => recordTenantOptOut(stateDir, t, id, {}, meeting),
+    // Un-opt: pure removal (join-rules-optout.ts) then the store's LOCKED save. load->save is not one critical section across processes
+    // (same as PUT; this host is the only writer, and the router serialises per tenant). A no-op writes nothing.
+    removeOptOut: (t, id, meeting) => {
+      const cur = loadJoinRules(stateDir, t);
+      const r = removeOptOutEntries(cur.state, id, meeting);
+      if (r.state !== cur.state) saveJoinRules(stateDir, t, { ruleSet: cur.ruleSet, state: r.state });
+      return { state: r.state, removed: { eventId: r.removedEventId, meetings: r.removedMeetings } };
+    },
   };
 }
 

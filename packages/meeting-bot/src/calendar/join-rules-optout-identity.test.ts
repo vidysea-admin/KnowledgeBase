@@ -299,12 +299,12 @@ test("cap: at the limit further entries are not stored but the id opt-out still 
   assert.doesNotThrow(() => validateJoinRuleState(s));
 });
 
-test("un-opt: the API has no un-opt operation, so identities share the id's lifecycle; replacing rules keeps both", () => withDir((dir) => {
+test("un-opt: only the POST /opt-outs/remove route removes entries (no delete/patch); replacing rules keeps both ids and identities", () => withDir((dir) => {
   const state = recordTenantOptOut(dir, "acme", "calX", {}, { meetingUrl: ZOOM(123456789) });
   saveJoinRules(dir, "acme", { ruleSet: { version: 1, ownDomains: ["x.com"], rules: [] }, state: loadJoinRules(dir, "acme").state });
   assert.deepEqual(loadJoinRules(dir, "acme").state, state);
   const router = readFileSync(new URL("../../../../apps/api/src/join-rules/router.ts", import.meta.url), "utf8");
-  assert.ok(!/router\.(delete|patch)\(/.test(router), "no delete/patch route exists; if one is added it must remove the identity too");
+  assert.ok(!/router\.(delete|patch)\(/.test(router), "no delete/patch route exists; removal is the one POST route (t037-join-rules-un-opt)");
   assert.equal(recordRuleApproval(state, { kind: "domain", value: "x.com" }).optedOutMeetings?.[0], "url:zoom:123456789", "other state changes keep identities");
 }));
 

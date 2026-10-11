@@ -21,6 +21,7 @@ const KEYS = {
 const RULES = { version: 1, ownDomains: [], rules: [{ id: "a", effect: "allow", match: { platform: "meet" } }] };
 const WRITES: [string, string, unknown][] = [
   ["PUT", P, RULES], ["POST", `${P}/approvals`, { kind: "domain", value: "gmail.com" }], ["POST", `${P}/approvals`, { kind: "domain", value: "co.uk" }], ["POST", `${P}/opt-outs`, { eventId: "e1" }],
+  ["POST", `${P}/opt-outs/remove`, { eventId: "e1" }],
 ];
 const ALL: [string, string, unknown][] = [["GET", P, undefined], ...WRITES];
 
