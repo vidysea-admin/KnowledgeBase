@@ -65,5 +65,6 @@ Cross-package note: `SkipReason` lives in packages/core, outside the briefed fol
 - ISS-T037W1-003: other skip-reason vocabularies and the attention-alerts lane must adopt the three values at wiring/merge.
 - T-037 stays in progress.
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t037-veto-skip-reasons-and-optout-identity.md (cycle 0, 1689ee5)
 Fix cycle: 0
