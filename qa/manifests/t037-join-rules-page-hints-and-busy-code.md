@@ -1,6 +1,6 @@
 # t037-join-rules-page-hints-and-busy-code
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t037-join-rules-page-hints-and-busy-code.md, cycle 0, d1f5da1; source scope only)
 Fix cycle: 0
 Priority tier: 3 (roadmap follow-up; ISS-T037OPT-002 and ISS-JRLOCK-002, both medium, both touch a data-write path's client)
 Security class: client of data-write routes (opt-outs, PUT) - no auth/tenancy change
