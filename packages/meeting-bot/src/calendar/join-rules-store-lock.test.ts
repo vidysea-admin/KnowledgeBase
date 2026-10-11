@@ -2,13 +2,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, readdirSync, existsSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, readdirSync, existsSync, utimesSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import {
   loadJoinRules, saveJoinRules, recordTenantApproval, recordTenantOptOut, joinRulesFilePath, JoinRulesStoreError, type StoredJoinRules,
 } from "./join-rules-store.js";
+import { acquireLock, releaseLock, lockStillOwned, defaultIsAlive, LockFailure, type LockOptions } from "./join-rules-store-lock.js";
 
 const STORE_URL = pathToFileURL(path.join(path.dirname(fileURLToPath(import.meta.url)), "join-rules-store.ts")).href;
 function withDir(fn: (dir: string) => void | Promise<void>): Promise<void> {
@@ -170,3 +171,126 @@ test("save refuses an unreadable / corrupt / wrong-tenant / invalid file by defa
   rmSync(joinRulesFilePath(dir, "acme")); mkdirSync(joinRulesFilePath(dir, "acme"));
   assert.throws(() => saveJoinRules(dir, "acme", empty, { overwriteInvalid: true }), code("not-a-file"));
 }));
+
+// ---- unit `t037-join-rules-stale-lock-takeover`: injected host / liveness / clock, real files in a temp dir ----
+const HOST = "h1", DEAD = 424242;
+const staleBody = (o: Record<string, unknown> = {}) => JSON.stringify({ token: "dead-token", pid: DEAD, host: HOST, at: new Date(Date.now() - 600000).toISOString(), ...o });
+type Alive = (pid: number) => "alive" | "dead" | "unknown";
+const deadOnly: Alive = p => (p === DEAD ? "dead" : "alive");
+const inj = (alive: Alive = deadOnly): LockOptions => ({ hostname: () => HOST, isAlive: alive, waitMs: 0 });
+const tenantLock = (dir: string, t = "acme", body = staleBody()) => { mkdirSync(path.join(dir, "join-rules"), { recursive: true }); writeFileSync(lockOf(dir, t), body); return lockOf(dir, t); };
+const storeOpts = (extra: object = {}, alive: Alive = deadOnly) => ({ lockWaitMs: 0, lockTest: { hostname: () => HOST, isAlive: alive }, ...extra });
+const HOLDER = `const [u, dir] = process.argv.slice(1); const s = await import(u);
+s.recordTenantOptOut(dir, "ta", "e1", { afterRead: () => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 60000) });`;
+
+/** ISS-T037LOCK-001 recorded reproduction: a real child holds the lock inside recordTenantOptOut, is killed (hard), the lock stays. */
+async function killedHolder(dir: string): Promise<string> {
+  const p = spawn(process.execPath, ["--import", "tsx", "--input-type=module", "-e", HOLDER, STORE_URL, dir], { stdio: "ignore" });
+  const lock = lockOf(dir, "ta"), t0 = Date.now(); let ok = false;
+  while (!ok && Date.now() - t0 < 60000) { try { ok = !!JSON.parse(readFileSync(lock, "utf8")).pid; } catch { await new Promise(r => setTimeout(r, 50)); } }
+  assert.ok(ok, "child acquired the lock");
+  const exited = new Promise(r => p.on("exit", r)); p.kill("SIGKILL"); await exited;
+  assert.ok(existsSync(lock), "precondition: the killed writer left its lock behind");
+  return lock;
+}
+for (const [name, extra] of [["ISS-T037LOCK-001 repro 1 (lockWaitMs:1000)", {}], ["ISS-T037LOCK-001 repro 2 (lockWaitMs:1000, lockStaleMs:200)", { lockStaleMs: 200 }]] as const)
+  test(`${name}: killed writer's lock is recovered with no manual action; the write succeeds`, () => withDir(async dir => {
+    const lock = await killedHolder(dir); let info: any;
+    const st = recordTenantOptOut(dir, "ta", "e2", { lockWaitMs: 1000, onLockTakeover: i => { info = i; }, ...extra });
+    assert.deepEqual(st.optedOutEventIds, ["e2"]); assert.ok(info && Number.isInteger(info.pid) && !JSON.stringify(info).includes(dir));
+    assert.deepEqual(files(dir).filter(f => f !== "ta.json"), [], "no lock, tombstone or temp left"); assert.ok(!existsSync(lock));
+  }));
+
+test("dead holder on this host: takeover, the write succeeds, takeover reported without a path", () => withDir(dir => {
+  tenantLock(dir); let info: any, n = 0;
+  const st = recordTenantOptOut(dir, "acme", "ev", storeOpts({ onLockTakeover: (i: any) => { info = i; n++; } }));
+  assert.deepEqual(st.optedOutEventIds, ["ev"]); assert.equal(n, 1); assert.equal(info.pid, DEAD); assert.ok(info.ageMs >= 590000);
+  assert.ok(!JSON.stringify(info).includes(dir)); assert.deepEqual(files(dir), ["acme.json"]);
+  recordTenantOptOut(dir, "acme", "ev2", storeOpts({ onLockTakeover: () => { n++; } })); assert.equal(n, 1, "no takeover report on a plain acquire");
+}));
+
+test("live / undeterminable holder, pid reuse, another host, legacy lock without host: `locked`, lock byte-identical, nothing written", () => withDir(dir => {
+  const legacy = JSON.stringify({ token: "dead", pid: DEAD, at: new Date(Date.now() - 600000).toISOString() });
+  const cases: [string, string, Alive][] = [
+    ["alive", staleBody(), () => "alive"], ["unknown", staleBody(), () => "unknown"], ["pid reused by a live process", staleBody(), () => "alive"],
+    ["other host (probe would say dead)", staleBody({ host: "h2" }), () => "dead"], ["legacy lock, no host", legacy, () => "dead"],
+  ];
+  for (const [why, body, alive] of cases) {
+    const lock = tenantLock(dir, "acme", body);
+    assert.throws(() => recordTenantOptOut(dir, "acme", "ev", storeOpts({}, alive)), code("locked"), why);
+    assert.equal(readFileSync(lock, "utf8"), body, why); assert.deepEqual(files(dir), ["acme.lock"], why); rmSync(lock);
+  }
+}));
+
+test("garbage lock content is never taken over, even with the probe saying dead", () => withDir(dir => {
+  const bad = ["", "{", "[]", "null", "x".repeat(5000), staleBody({ token: "../evil" }), staleBody({ token: "" }), staleBody({ pid: 0 }), staleBody({ pid: -1 }), staleBody({ pid: 1.5 }), staleBody({ pid: "1" }), staleBody({ host: "" }), staleBody({ host: 7 }), staleBody({ pid: undefined })];
+  for (const body of bad) {
+    const lock = tenantLock(dir, "acme", body);
+    assert.throws(() => acquireLock(lock, inj(() => "dead")), (e: unknown) => e instanceof LockFailure && e.code === "locked", body.slice(0, 40));
+    assert.equal(readFileSync(lock, "utf8"), body); assert.deepEqual(files(dir), ["acme.lock"]); rmSync(lock);
+  }
+}));
+
+test("clock stepped hours forward and back: a live holder is never taken over; a dead one is recovered regardless of the clock", () => withDir(dir => {
+  const lock = tenantLock(dir, "acme", staleBody({ at: new Date().toISOString() }));
+  for (const skew of [3 * 3600e3, -3 * 3600e3, 40 * 86400e3, -40 * 86400e3])
+    for (const staleMs of [1, 30000]) {
+      assert.throws(() => acquireLock(lock, { ...inj(() => "alive"), now: () => Date.now() + skew, staleMs }), (e: unknown) => e instanceof LockFailure && e.code === "locked", `skew ${skew}`);
+      assert.equal(JSON.parse(readFileSync(lock, "utf8")).token, "dead-token");
+    }
+  for (const skew of [3 * 3600e3, -3 * 3600e3]) {
+    const t = acquireLock(lock, { ...inj(), now: () => Date.now() + skew }); assert.ok(lockStillOwned(lock, t)); releaseLock(lock, t); tenantLock(dir);
+  }
+}));
+
+test("two takers racing a dead lock: every interleaving of the critical steps yields exactly one holder", () => withDir(dir => {
+  for (const at of ["judged", "linked", "verified", "renamed"]) {
+    const lock = tenantLock(dir); const out: (string | Error)[] = []; let fired = false;
+    const run = (o: LockOptions) => { try { out.push(acquireLock(lock, o)); } catch (e) { out.push(e as Error); } };
+    const seen: string[] = [];
+    run({ ...inj(), step: n => { seen.push(n); if (n === at && !fired) { fired = true; run(inj()); } } });
+    if (at === "judged") assert.deepEqual(seen, ["judged", "linked"], "the tombstone check refuses a replaced lock before anything live is renamed (no restore needed)");
+    assert.ok(fired, at); const wins = out.filter(x => typeof x === "string"), losses = out.filter(x => x instanceof LockFailure);
+    assert.equal(wins.length, 1, `${at}: exactly one winner (${out.map(String)})`); assert.equal(losses.length, 1, at);
+    assert.equal(JSON.parse(readFileSync(lock, "utf8")).token, wins[0]); assert.deepEqual(files(dir), ["acme.lock"], `${at}: no tombstones left`);
+    rmSync(lock);
+  }
+}));
+
+test("a holder wrongly judged dead wakes after the takeover: it cannot complete its write, and its release leaves the new lock alone", () => withDir(dir => {
+  saveJoinRules(dir, "acme", sample()); const before = readFileSync(joinRulesFilePath(dir, "acme"), "utf8"); let newToken = "";
+  assert.throws(() => recordTenantOptOut(dir, "acme", "ev-late", { afterRead: () => { newToken = acquireLock(lockOf(dir, "acme"), { waitMs: 0, isAlive: p => (p === process.pid ? "dead" : "alive") }); } }), code("locked"));
+  assert.equal(readFileSync(joinRulesFilePath(dir, "acme"), "utf8"), before, "the woken holder wrote nothing");
+  assert.ok(lockStillOwned(lockOf(dir, "acme"), newToken), "its release did not delete the new holder's lock");
+  assert.deepEqual(files(dir), ["acme.json", "acme.lock"]);
+  releaseLock(lockOf(dir, "acme"), "not-the-token"); assert.ok(lockStillOwned(lockOf(dir, "acme"), newToken), "release with a foreign token is a no-op");
+  releaseLock(lockOf(dir, "acme"), newToken); assert.deepEqual(files(dir), ["acme.json"]);
+}));
+
+test("tenant isolation: taking over tenant A's dead lock never touches tenant B's lock or data", () => withDir(dir => {
+  const lb = tenantLock(dir, "beta", staleBody({ token: "beta-live", pid: process.pid })); const bBody = readFileSync(lb, "utf8");
+  tenantLock(dir, "acme"); recordTenantOptOut(dir, "acme", "ev", storeOpts());
+  assert.equal(readFileSync(lb, "utf8"), bBody); assert.deepEqual(files(dir), ["acme.json", "beta.lock"]);
+  assert.throws(() => recordTenantOptOut(dir, "beta", "ev", storeOpts()), code("locked"));
+}));
+
+test("an abandoned takeover tombstone expires (eventual recovery); a fresh one keeps the lock `locked`", () => withDir(dir => {
+  const lock = tenantLock(dir); const tomb = `${lock}.stale.dead-token`; writeFileSync(tomb, staleBody());
+  assert.throws(() => acquireLock(lock, inj()), (e: unknown) => e instanceof LockFailure && e.code === "locked", "fresh tombstone = taker in progress");
+  const old = new Date(Date.now() - 3600e3); utimesSync(tomb, old, old);
+  const t = acquireLock(lock, { ...inj(), waitMs: 1000, sleep: () => {} }); assert.ok(lockStillOwned(lock, t));
+}));
+
+test("defaultIsAlive: this process alive, an exited child dead, nonsense pids never `dead`", async () => {
+  assert.equal(defaultIsAlive(process.pid), "alive");
+  for (const bad of [0, -1, 1.5, NaN, 2 ** 40]) assert.notEqual(defaultIsAlive(bad), "dead", String(bad));
+  const p = spawn(process.execPath, ["-e", "0"], { stdio: "ignore" }); const pid = p.pid!; await new Promise(r => p.on("exit", r));
+  assert.equal(defaultIsAlive(pid), "dead");
+  const real = process.kill; // only ESRCH is death: EPERM = exists, anything else = cannot tell
+  try {
+    for (const [c, want] of [["EPERM", "alive"], ["ESRCH", "dead"], ["EACCES", "unknown"], [undefined, "unknown"]] as const) {
+      (process as any).kill = () => { throw Object.assign(new Error("x"), { code: c }); };
+      assert.equal(defaultIsAlive(1234), want, String(c));
+    }
+  } finally { process.kill = real; }
+});
