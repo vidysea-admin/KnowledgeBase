@@ -1,6 +1,6 @@
 # iss-ph3-001-002-004-006-reported-speech-names
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS (Checked: qa/verdicts/iss-ph3-001-002-004-006-reported-speech-names.md, cycle 0, d055571; no source change; offline scope; ISS-104 stays open pending phase-3 live gate)
 Fix cycle: 0
 Tier: 2 (critical ledger rows still `open` in qa/issues.ph3.jsonl while qa/manifests/u2-4-phase3-resume-c2.md is checked-PASS cycle 6).
 Lane: lane/ph3close. Class: measurement unit; NO source edit, NO new test file. Ledger for this lane: qa/issues.ph3close.jsonl (none filed).
