@@ -91,5 +91,5 @@ This unit changes nothing under packages/, and the main tree's `@lkb/db` at 1414
 ## Follow-ups filed (qa/issues.tenantflt.jsonl, all low, file-don't-fix)
 ISS-TENANTFLT-001 seed-demo-server writes a tenant-less tree root; ISS-TENANTFLT-002 `treeIndexRootFilter` unvalidated at source (move validator to @lkb/core); ISS-TENANTFLT-003 literal/env tenants in watch-reingest, seed-demo-server, upload queue left unguarded.
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/tenant-filter-guards-outside-db.md, cycle 0, ad1adff)
 Fix cycle: 0
