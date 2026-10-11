@@ -19,3 +19,18 @@ ISSUES-WRITTEN: none (the routine-run gap is the cycle-0 FAIL finding, fixed in-
 
 ## Merge conditions
 Wire the moved test into a routine command and CI (item 1), paste the command and output, then recheck cycle 1.
+
+## Cycle 1
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: 28ef664
+
+- `test:lint` now runs `node --test --import tsx` and lists calendar-link-differential, join-rules-edit-api and calendar-optout-id-space. ci.yml unchanged (`git diff 816f48c 28ef664 -- .github` empty); CI runs `pnpm test:lint`.
+- Exact command run once: `ℹ tests 136 / pass 136 / fail 0 / cancelled 0 / skipped 0`; the 3 differential test names appear in the output. 124 + 12 = 136, none skipped, none loaded twice.
+- tsx is a declared root devDependency (package.json `tsx: 4.23.13`, present in pnpm-lock importers), so CI resolves it.
+- Bite through the same invocation: copy's `endsWith("webex.com")` mutation gives pass 0, fail 3; restored, hash equals HEAD blob.
+- Gates: dependency stage `no dependency violations found (799 modules, 2733 dependencies cruised)`; lint-dirsize OK (125 dirs); lint-dupes OK; `git merge-tree` against codex/machine-migration-2026-10-09 clean (tree df5ad578), no package.json conflict.
+- ISS-DEPFIX-002 row is accurate; left at fixed-pending-check (status flip is the maker's close-out).
+
+ISSUES-WRITTEN: none
+Merge conditions: none beyond close-out. Note: the two sibling tests were also unrun before; now covered.
