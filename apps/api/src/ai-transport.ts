@@ -15,6 +15,22 @@ async function httpTransport(req: TransportRequest): Promise<TransportResponse> 
 export interface CliLimits {
   timeoutMs?: number; inputBytes?: number; outputBytes?: number; outputTokens?: number;
   executable?: string; cwd?: string;
+  /** Ephemeral-directory cleanup seam. Cleanup never changes the call's outcome; `onFailure`
+   *  gets only the error code (never the path) once the bounded retries are exhausted. */
+  cleanup?: { remove?: (dir: string) => void; delayMs?: number; onFailure?: (code: string) => void };
+}
+/** Total attempts 4; waits delayMs*1..3 between them (default 50 => 300 ms worst case, only after a failure). */
+const CLEANUP_ATTEMPTS = 4;
+async function removeEphemeral(dir: string, c: CliLimits["cleanup"] = {}): Promise<void> {
+  const remove = c.remove ?? ((d: string) => rmSync(d, { recursive: true, force: true }));
+  let code = "UNKNOWN";
+  for (let attempt = 1; attempt <= CLEANUP_ATTEMPTS; attempt++) {
+    try { remove(dir); return; } catch (e) {
+      code = String((e as { code?: unknown } | null)?.code ?? "UNKNOWN");
+      if (attempt < CLEANUP_ATTEMPTS) await new Promise((r) => setTimeout(r, (c.delayMs ?? 50) * attempt));
+    }
+  }
+  try { c.onFailure?.(code); } catch { /* reporting must not alter the outcome */ }
 }
 export function resolveCliCommand(command: string): string {
   if (process.platform !== "win32") return command;
@@ -89,7 +105,7 @@ export function createCliTransport(options: CliLimits = {}): Transport {
         timer = setTimeout(() => terminate("CLI process timed out"), timeoutMs);
         child.stdin.end(req.stdin ?? "");
       });
-    } finally { if (ephemeral) rmSync(ephemeral, {recursive: true, force: true}); }
+    } finally { if (ephemeral) await removeEphemeral(ephemeral, options.cleanup); }
   };
 }
 const cliTransport = createCliTransport();
