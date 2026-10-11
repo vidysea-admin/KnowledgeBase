@@ -5,7 +5,7 @@
   "type": "module",
   "main": "./src/index.ts",
   "scripts": {
-    "test": "node --test --import tsx \"src/**/*.test.ts\"",
+    "test": "node --test --import tsx \"src/**/*.test.ts\" \"py/tab-capture/*.test.mjs\"",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "cli": "tsx src/cli.ts"
   },

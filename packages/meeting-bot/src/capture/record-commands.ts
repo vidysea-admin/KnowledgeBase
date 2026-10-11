@@ -105,6 +105,7 @@ export async function runRecord(rest: string[]): Promise<void> {
   const onEvent = (_h: string, ev: Parameters<typeof collectGapEvent>[1]) => {
     if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
     if (ev.event === "capture-error") captureFailure = String(ev.error ?? "capture failed");
+    if (ev.event === "capture-stopped" && (ev as {failed?: unknown}).failed === true) captureFailure ??= "capture stopped with failure";
     collectGapEvent(gaps, ev);
     telegram.onBotEvent(ev);
   };

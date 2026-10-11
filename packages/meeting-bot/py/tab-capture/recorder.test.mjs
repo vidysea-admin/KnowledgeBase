@@ -122,18 +122,27 @@ test("P3 MediaRecorder error: capture-error then capture-stopped failed:true", T
   assert.deepEqual(ev.at(-1), { event: "capture-stopped", failed: true });
 });
 
-test("P3 track ending stops the recorder and releases everything (reported as clean stop today)", T, async () => {
+test("P3 track ending stops the recorder and releases everything (reported as FAILED: ISS-T034EXT-002)", T, async () => {
   const w = makeRecorderWorld(); await w.begin(); w.tracks[1].end(); await flush();
   assert.equal(w.recorder().state, "inactive"); assert.equal(w.timers.live.size, 0); assert.ok(w.contexts[0].closed);
+  assert.deepEqual(w.events().at(-1), { event: "capture-stopped", failed: true });
+});
+
+test("ISS-T034EXT-002: unexpected audio track end reports capture-error and capture-stopped failed:true", T, async () => {
+  const w = makeRecorderWorld(); await w.begin(); w.tracks[0].end(); await flush();
+  const ev = w.events(); assert.ok(ev.some((e) => e.event === "capture-error" && /audio track ended unexpectedly/.test(e.error)));
+  assert.deepEqual(ev.at(-1), { event: "capture-stopped", failed: true });
+});
+
+test("ISS-T034EXT-002: a deliberate (bot-requested) stop is clean even if the tracks then report ended", T, async () => {
+  let stop = false;
+  const w = makeRecorderWorld({ handler: (c) => (c.url.endsWith("/control") ? okResponse({ stop }) : okResponse()) });
+  await w.begin(); stop = true; await w.timers.tick(); await flush(); w.tracks.forEach((t) => t.end()); await flush();
+  assert.ok(!w.events().some((e) => e.event === "capture-error"));
   assert.deepEqual(w.events().at(-1), { event: "capture-stopped", failed: false });
 });
 
-test("EXPECTED FAIL ISS-T034EXT-002: unexpected track end reports a failure state, not a clean stop", { ...T, todo: "ISS-T034EXT-002" }, async () => {
-  const w = makeRecorderWorld(); await w.begin(); w.tracks[0].end(); await flush();
-  const ev = w.events(); assert.ok(ev.some((e) => e.event === "capture-error") || ev.at(-1).failed === true);
-});
-
-test("EXPECTED FAIL ISS-T034EXT-001: after a chunk exhausts retries, chunks queued behind it are NOT sent", { ...T, todo: "ISS-T034EXT-001" }, async () => {
+test("ISS-T034EXT-001: after a chunk exhausts retries, chunks queued behind it are NOT sent", T, async () => {
   const w = makeRecorderWorld({ handler: (c) => { if (c.url.includes("/chunk") && seqOf(c) === 0) throw new Error("boom"); return okResponse({ stop: false }); } });
   await w.begin(); const r = w.recorder(); r.emit(10, "A"); r.emit(10, "B"); await flush();
   assert.deepEqual([...new Set(w.chunkCalls().map(seqOf))], [0], "seq 1 must never be sent after seq 0 was lost");
@@ -171,11 +180,11 @@ test("P4 stop during a pending send completes cleanly once the send settles", T,
 });
 
 test("P4 double start is refused; second getUserMedia never happens", T, async () => {
-  const w = makeRecorderWorld(); await w.begin(); const second = await w.send(w.startMsg).reply;
+  const w = makeRecorderWorld(); const first = w.send(w.startMsg); assert.equal(first.ret, true, "ISS-T034EXT-007: async channel kept open"); await first.reply; await flush(); const second = await w.send(w.startMsg).reply;
   assert.equal(second.ok, false); assert.match(second.error, /already active/); assert.equal(w.getUserMediaCalls, 1);
 });
 
-test("EXPECTED FAIL ISS-T034EXT-003: two start messages in the same tick open only one capture", { ...T, todo: "ISS-T034EXT-003" }, async () => {
+test("ISS-T034EXT-003: two start messages in the same tick open only one capture", T, async () => {
   const w = makeRecorderWorld(); const a = w.send(w.startMsg), b = w.send(w.startMsg); await Promise.all([a.reply, b.reply]); await flush();
   assert.equal(w.getUserMediaCalls, 1);
 });
@@ -211,13 +220,13 @@ test("P6/P7 no external surface: manifest has no externally_connectable/content_
   assert.deepEqual(m.host_permissions, ["http://127.0.0.1/*"]);
 });
 
-test("EXPECTED FAIL ISS-T034EXT-005: start message from a foreign sender (other id / web URL) is refused", { ...T, todo: "ISS-T034EXT-005" }, async () => {
+test("ISS-T034EXT-005: start message from a foreign sender (other id / web URL) is refused", T, async () => {
   const w = makeRecorderWorld();
   const reply = await w.send(w.startMsg, { id: "other-extension", url: "https://evil.example/p.html" }).reply;
   assert.equal(reply.ok, false); assert.equal(w.getUserMediaCalls, 0);
 });
 
-test("EXPECTED FAIL ISS-T034EXT-005: a start message cannot redirect chunks to a non-loopback endpoint", { ...T, todo: "ISS-T034EXT-005" }, async () => {
+test("ISS-T034EXT-005: a start message cannot redirect chunks to a non-loopback endpoint", T, async () => {
   const cfg = { endpoint: "https://evil.example", token: "stolen" }; const w = makeRecorderWorld({ config: cfg });
   const reply = await w.send({ ...w.startMsg, config: cfg }).reply; await flush();
   assert.equal(reply.ok, false); assert.ok(!w.calls.some((c) => c.url.startsWith("https://evil.example")));
@@ -227,4 +236,47 @@ test("P5 single-capture by design: second start for another stream refused (two-
   const w = makeRecorderWorld(); await w.begin();
   const r = await w.send({ ...w.startMsg, streamId: "sid-2", config: { endpoint: "http://127.0.0.1:9999", token: "t2" } }).reply;
   assert.equal(r.ok, false); assert.ok(!w.calls.some((c) => c.url.includes(":9999")));
+});
+
+const BAD_ENDPOINTS = ["https://evil.example", "http://127.0.0.1.evil.example", "http://127.0.0.1.evil.example:4321", "http://localhost@evil.example",
+  "http://127.0.0.1@evil.example:80", "http://user:pw@127.0.0.1:4321", "http://[::ffff:127.0.0.1]:4321", "http://[::1]:4321", "http://localhost:4321",
+  "http://192.168.1.20:4321", "http://127.0.0.1", "http://127.0.0.1:", "http://127.0.0.1:0", "http://127.0.0.1:65536", "http://127.0.0.1:99999999999",
+  "http://127.0.0.1:4321/", "http://127.0.0.1:4321/x", "http://127.0.0.1:4321@evil.example", "https://127.0.0.1:4321", "HTTP://127.0.0.1:4321",
+  " http://127.0.0.1:4321", "http://127.0.0.1:4321\n", "http://127.0.0.1:043x", "http://127.0.0.1:-1", "", undefined, null, 4321];
+test("ISS-T034EXT-005: endpoint table, refused forms start nothing and NO fetch is ever made", T, async () => {
+  for (const endpoint of BAD_ENDPOINTS) {
+    const cfg = { endpoint, token: "stolen" }; const w = makeRecorderWorld({ config: cfg });
+    const reply = await w.send({ ...w.startMsg, config: cfg }).reply; await flush();
+    assert.equal(reply.ok, false, String(endpoint)); assert.equal(w.getUserMediaCalls, 0, String(endpoint));
+    assert.equal(w.calls.length, 0, `no fetch for ${endpoint}`); assert.equal(w.recorders.length, 0);
+  }
+  for (const cfg of [undefined, null, { endpoint: "http://127.0.0.1:4321" }, { endpoint: "http://127.0.0.1:4321", token: "" }]) {
+    const w = makeRecorderWorld(); const reply = await w.send({ ...w.startMsg, config: cfg }).reply; await flush();
+    assert.equal(reply.ok, false); assert.equal(w.calls.length, 0);
+  }
+});
+
+test("ISS-T034EXT-005: endpoint table, accepted loopback forms (127.0.0.1 with a numeric port 1..65535)", T, async () => {
+  for (const port of ["1", "4321", "65535"]) {
+    const cfg = { endpoint: `http://127.0.0.1:${port}`, token: "t" }; const w = makeRecorderWorld({ config: cfg });
+    assert.equal((await w.begin()).ok, true, port);
+    assert.ok(w.calls.length > 0 && w.calls.every((c) => c.url.startsWith(cfg.endpoint + "/")), "all traffic goes only to the loopback endpoint");
+  }
+});
+
+test("ISS-T034EXT-005: sender table, foreign id / content-script tab / web url are ignored; own background and offscreen senders work", T, async () => {
+  const own = "chrome-extension://ext-id/";
+  for (const sender of [{ id: "other-extension" }, { id: "ext-id", tab: { id: 7 } }, { id: "ext-id", url: "https://evil.example/p.html" },
+    { id: "ext-id", url: "chrome-extension://other-id/x.html" }, { url: own + "background.js" }, {}, null]) {
+    const w = makeRecorderWorld(); const reply = await w.send(w.startMsg, sender).reply; await flush();
+    assert.equal(reply.ok, false, JSON.stringify(sender)); assert.equal(w.getUserMediaCalls, 0); assert.equal(w.calls.length, 0); assert.equal(w.recorders.length, 0);
+  }
+  for (const sender of [{ id: "ext-id", url: own + "background.js" }, { id: "ext-id" }]) {
+    const w = makeRecorderWorld(); assert.equal((await w.send(w.startMsg, sender).reply).ok, true);
+  }
+});
+
+test("ISS-T034EXT-005: a refused start does not poison the recorder: a later valid start from the real sender works", T, async () => {
+  const w = makeRecorderWorld(); await w.send(w.startMsg, { id: "other-extension" }).reply;
+  assert.equal((await w.begin()).ok, true);
 });

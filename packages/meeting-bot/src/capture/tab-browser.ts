@@ -180,6 +180,11 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
         receiver = await createTabCaptureReceiver(output, (event) => {
           if (event.event === "capture-started") { ready = true; captureStartedAt = new Date().toISOString(); status("recording"); }
           if (event.event === "capture-error") { failure = String(event.error ?? "Capture failed"); status("failed", failure); }
+          // A stop that says failed:true is a failure by itself: the capture-error POST may have been lost.
+          // The partial .webm stays on disk, status "failed" (never "stopped"); stop() throws so nothing finalizes it.
+          if (event.event === "capture-stopped" && (event as {failed?: unknown}).failed === true && !failure) {
+            failure = "Recorder reported a failed stop; media is incomplete"; status("failed", failure);
+          }
           const run = runs.get(handle);
           if (run && event.event === "capture-stopped") run.stopped = true;
           if (run && failure) run.failure = failure;
