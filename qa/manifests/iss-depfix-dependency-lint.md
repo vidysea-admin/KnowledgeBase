@@ -1,5 +1,5 @@
 # iss-depfix-dependency-lint
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/iss-depfix-dependency-lint.md, cycle 1, 75ad8be; cross-layer tests now in test:lint)
 Fix cycle: 1
 Issue: ISS-DEPFIX-001 (medium, pre-existing, introduced by 5fe97b9)
 
