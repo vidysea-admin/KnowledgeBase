@@ -1,6 +1,7 @@
 # skip-reason-vocabularies
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/skip-reason-vocabularies.md (cycle 0, 22e81d0)
 Fix cycle: 0
 Lane: `skipvocab`, branch `lane/skipvocab` (base 1414d79). Closes ISS-T037W1-003 (medium).
 Tier: backlog tier 4 (medium issue). Not auth, tenancy or data-write: the three consumers only label and filter operator-facing reason text. No selection or scheduling behaviour changed.
