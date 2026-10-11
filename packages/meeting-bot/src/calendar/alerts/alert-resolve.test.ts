@@ -18,7 +18,7 @@ test("hit: the id resolves to exactly the one candidate; miss: no matches, ok=tr
   assert.ok(none.ok); assert.equal(none.matches.length, 0);
 });
 
-test("ISS-ALERTFIX-001 verbatim: ids printed by REAL formatter calls (omit policy) resolve to the right meeting", () => {
+test("hash agreement only (NOT W9 evidence, see alert-who-production.test.ts): formatter ids and resolver ids agree for 6 keys x 4 reasons x 3 forms", () => {
   const cs = KEYS.map((k) => cand(k));
   let ok = 0, n = 0;
   const reasons = ["overlap-lost", "untrusted-sender", "no-join-link", "needs-registration"];
@@ -33,7 +33,7 @@ test("ISS-ALERTFIX-001 verbatim: ids printed by REAL formatter calls (omit polic
       if (r.ok && r.matches.length === 1 && r.matches[0]!.sessionKey === key) ok++;
     }
   }
-  console.log(`ISS-ALERTFIX-001: ${ok}/${n} resolved`);
+  console.log(`hash agreement: ${ok}/${n}`);
   assert.equal(ok, n); assert.equal(n, KEYS.length * reasons.length * 3);
 });
 
