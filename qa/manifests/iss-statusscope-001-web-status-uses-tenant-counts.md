@@ -1,6 +1,6 @@
 # iss-statusscope-001-web-status-uses-tenant-counts
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Status: ready-for-check
 Fix cycle: 0
 Tier: 2/3 (open ledger issues ISS-T057SCREEN-001 and ISS-STATUSSCOPE-001). Lane: lane/statusweb (base e3599c9). Class: security (cross-tenant read). Ledger for this lane: qa/issues.statusweb.jsonl (ISS-STATUSWEB-001 filed).
