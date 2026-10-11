@@ -3,7 +3,7 @@
 Task: T-037 (scheduler switch-over; precondition W7 of qa/contracts/t037-join-rules-veto-select.md). Lane `t037opt`, branch `lane/t037opt` from 1414d79. Class: SECURITY (join authorization) and DATA WRITE (tenant join-rules document).
 Tier: 2, open HIGH issue ISS-T037W1-001. Full ceremony.
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t037-optout-meeting-identity-store.md, cycle 1, 76ad56b)
 Fix cycle: 1
 
 ## Scope
