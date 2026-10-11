@@ -1,9 +1,15 @@
 import { render, screen, cleanup } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { afterEach, describe, test, expect, vi } from "vitest";
+import { afterEach, beforeEach, describe, test, expect, vi } from "vitest";
 import { MeetingBotPage } from "./MeetingBotPage.js";
 import * as sessions from "../api/sessions.js";
+import * as calendar from "../api/calendar.js";
 vi.mock("../auth/AuthContext.js", () => ({ useAuth: () => ({ apiKey: "test-key" }) }));
+// The page now also reads the calendar and the sessions list; these tests are about the operations feed, so those two resolve empty.
+beforeEach(() => {
+  vi.spyOn(calendar, "listUpcomingMeetings").mockResolvedValue({ meetings: [] });
+  vi.spyOn(sessions, "listSessions").mockResolvedValue({ sessions: [] });
+});
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 const display = () => render(<MemoryRouter><MeetingBotPage /></MemoryRouter>);
 describe("MeetingBotPage operational status", () => {
