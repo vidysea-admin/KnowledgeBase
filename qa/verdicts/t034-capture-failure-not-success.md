@@ -48,3 +48,28 @@ Verified by the new passing tests and mutations: -001, -002, -003, -005, -006, -
 
 ## A live session must confirm
 Normal bot-requested stop yields `stopped`; the meeting closing or navigating the tab before the bot's stop (does Chrome fire `ended`, does the stream survive navigation); a deliberately killed track yields `failed` and a kept partial; the real `sender` of the background-to-offscreen message passes the predicate; the real config.json endpoint is accepted; no redirect carries the token; a failed capture produces an operator-visible signal.
+
+---
+
+# Cycle 1 check (commit dbe3938, on df00752)
+
+VERDICT: FAIL
+Cycle checked: 1
+Commit checked: dbe3938
+Scope: logic verified with fakes; NOT run in a real browser; one live tab-capture session is required before T-034 is called done.
+
+## EXPLANATION
+The two fixes are correct; the new record-commands tests are flaky, which is a required fix on the recording path.
+- (a) ISS-T034FIX-003 VERIFIED. Own probe through the real receiver with ten values: only exactly `false` is a clean stop (state stopped). `true` -> "Recorder reported a failed stop"; "true", "false", 1, 0, null, missing, {} and [] -> "Malformed capture-stopped message ..." and state failed, partial kept. record-commands onEvent uses `!== false`. Existing clean-stop tests unchanged.
+- (b) `inject` seam: ruled acceptable. Defaults: recordDir = RECORD_DIR, tab = same createTabBrowserDeps config, finalize = finalizeRecording, pollMs 5000, so absent-inject behaviour is the same calls. The only callers are cli.ts and send-now-command.ts, neither passes it; it is a function parameter, not readable from argv or env, so it cannot be set from outside the process. It can only skip finalize or move the record dir for a caller in code. Low risk; keep.
+- (c) Mutants re-applied (per-mutation backup, 250 s timeout, finally restore, hashes equal HEAD): M5 (rethrow removed) KILLED by an assertion (message regex "failed stop; media is incomplete" in the stop-failed test). M7 (loop throw removed) and M6 (early-exit line removed) KILLED only by the `elapsedAfterStart < 3000` wall-clock assertion ("loop must end promptly, took 5800-6600 ms"), not by a behavioural assertion.
+- (d) FLAKINESS: record-commands.test.ts run five times in a row: run1 green; runs 2-5 each failed 1-2 of the "promptly" tests (took 6.6-9.7 s against a 3000 ms bound). The fake child sleeps 1000 ms, gives up at 6000 ms, and the assertions hold wall-clock margins on a saturated machine. REQUIRED FIX before merge: remove the real-time margin (assert on behaviour: loop exits before `--until` with the right reason, or inject a clock or poll step and widen the bound to a large multiple), as it would otherwise be ignored in CI. Filed ISS-T034FIX-006.
+- (e) record-commands.test.ts 397 of 400 non-blank lines; record-commands.ts 278; tab-browser.ts 268 of 300; lint-dirsize OK but the capture directory is at its file limit: the next unit needs a split of the test file first.
+- (f) Frozen files: unchanged since d27cf71. tab-browser tests 12/13 (the symlink-EPERM test, environmental); extension tests 44 / 43 pass / 1 todo; `tsc --noEmit` exit 0; `git merge-tree` against codex/machine-migration-2026-10-09 clean.
+
+## ISSUES
+ISS-T034FIX-003 verified (fixed, logic with fakes). ISS-T034FIX-004: chain now tested; M5 killed by assertion, M6/M7 only by the flaky timing assertion, so NOT yet verified. ISS-T034FIX-005 stays open. New: ISS-T034FIX-006 (medium).
+
+## Merge conditions
+1. ISS-T034FIX-006: deterministic record-commands tests (five consecutive green runs, M6/M7 killed by a non-timing assertion).
+2. ISS-T034FIX-001 / -005 decided after the live session; the live-session list in cycle 0 still applies.
