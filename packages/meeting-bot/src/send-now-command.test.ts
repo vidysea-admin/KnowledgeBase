@@ -122,7 +122,7 @@ test("readLiveJobs: missing state is no jobs; corrupt or wrong-shape state throw
     const now = new Date("2026-10-10T10:00:00.000Z");
     assert.deepEqual(readLiveJobs(src, now, readWebinarOperationState), []);                  // nothing exists: no jobs
     mkdirSync(src.scheduledDir);
-    const job = (n: string, o: object) => writeFileSync(path.join(src.scheduledDir, `${n}.json`), JSON.stringify(o));
+    const job = (n: string, o: object) => writeFileSync(path.join(src.scheduledDir, `${n}.json`), JSON.stringify({ tenantId: "t1", ...o }));
     job("a", { url: MEET, until: "2026-10-10T12:00:00.000Z", title: "t", sessionId: "s-a" });   // no row, until ahead -> queued
     job("b", { url: "https://zoom.us/j/12345678", until: "2026-10-10T09:00:00.000Z", title: "t", sessionId: "s-b" }); // past -> ready
     writeFileSync(src.operationsFile, JSON.stringify({ version: 1, tenantId: "t1", operations: { "s-b": { tenantId: "t1", status: "recording" } } }));
@@ -133,6 +133,11 @@ test("readLiveJobs: missing state is no jobs; corrupt or wrong-shape state throw
     writeFileSync(path.join(src.scheduledDir, "c.json"), "{not json");                           // corrupt
     assert.throws(() => readLiveJobs(src, now, readWebinarOperationState), /unreadable/);
     rmSync(path.join(src.scheduledDir, "c.json"));
+    writeFileSync(path.join(src.scheduledDir, "d.json"), JSON.stringify({ url: MEET, until: "2026-10-10T12:00:00.000Z", title: "t", sessionId: "s-d" })); // untagged legacy
+    assert.throws(() => readLiveJobs(src, now, readWebinarOperationState), /no tenant tag/);
+    writeFileSync(path.join(src.scheduledDir, "d.json"), JSON.stringify({ tenantId: "t2", url: MEET, until: "2026-10-10T12:00:00.000Z", title: "t", sessionId: "s-d" })); // other tenant
+    assert.throws(() => readLiveJobs(src, now, readWebinarOperationState), /different tenant/);
+    rmSync(path.join(src.scheduledDir, "d.json"));
     writeFileSync(src.operationsFile, "{corrupt");                                              // corrupt operations
     assert.throws(() => readLiveJobs(src, now, readWebinarOperationState));
     writeFileSync(src.operationsFile, JSON.stringify({ version: 1, tenantId: "other", operations: {} })); // wrong tenant

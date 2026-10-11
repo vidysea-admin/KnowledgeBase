@@ -9,6 +9,7 @@ import {
   type AutoRecordCandidateInput, type AutoRecordItem,
 } from "./auto-join.js";
 import { describeSkip } from "./skip-describe.js";
+import { requireStateTenant } from "./state-tenant-tag.js";
 import { createKeyTenantLoader } from "./join-rules-wiring/key-tenant.js";
 import { enforceJoinRules, parseJoinRulesEnforce, type JoinRulesEnforceIo } from "./join-rules-enforce.js";
 import { readScheduledKeys, recordScheduled, writeScheduledJob, validateWebinarCalendarAcquisition, type WebinarCalendarAcquisition } from "./schedule-state.js";
@@ -45,6 +46,8 @@ export interface ScheduleTickDeps {
   loadCandidates: (refresh?: boolean) => Promise<AutoRecordCandidateInput[]>;
   now: () => string;
   stateDir: string;
+  /** Tenant that owns the dedup/job state files under stateDir (LKB_TENANT_ID). Absent or invalid = the tick refuses, before anything is read or scheduled (ISS-ALERTID-006). */
+  stateTenantId?: string;
   scheduler: TaskScheduler;
   log: (msg: string) => void;
   everyWebinar?: boolean;
@@ -214,6 +217,7 @@ export function buildRealScheduleTickDeps(): ScheduleTickDeps {
     everyWebinar: true,
     joinRulesEnforce: process.env.LKB_JOIN_RULES_ENFORCE,
     joinRulesTenantId: process.env.LKB_TENANT_ID,
+    stateTenantId: process.env.LKB_TENANT_ID,
     loadKeyTenant: createKeyTenantLoader(apiUrl, process.env.LKB_API_KEY, log),
     now: () => new Date().toISOString(),
     stateDir: DEFAULT_STATE_DIR,
@@ -240,7 +244,9 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
   const [calendarEvents, candidates] = await Promise.all([deps.loadCalendarEvents(), deps.loadCandidates()]);
   const now = deps.now();
   const trustedSenders = loadTrustedSenderConfig();
-  const alreadyScheduled = readScheduledKeys(deps.stateDir);
+  // Fail closed (ISS-ALERTID-006): no valid tenant, or an untagged / other-tenant state file, stops the tick before anything is scheduled.
+  const stateTenant = requireStateTenant(deps.stateTenantId);
+  const alreadyScheduled = readScheduledKeys(deps.stateDir, stateTenant);
 
   const selected = selectAutoRecordItems({
     calendarEvents, candidates, now, leadMinutes: DEFAULT_LEAD_MINUTES, trustedSenders, alreadyScheduled,
@@ -285,7 +291,7 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
         until: item.endTime,
         title: item.title,
         sessionId: item.sessionKey,
-      });
+      }, stateTenant);
     } catch (err) {
       // ISS-321: writeScheduledJob refuses (throws) when jobKey already belongs to a different
       // session — never silently overwrite another session's scheduled recording. Skip only this
@@ -300,7 +306,7 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
       launcherPath: RECORD_LAUNCHER,
       runAtIso: item.startTime,
     });
-    recordScheduled(deps.stateDir, { sessionKey: item.sessionKey, title: item.title, scheduledAt: now });
+    recordScheduled(deps.stateDir, { sessionKey: item.sessionKey, title: item.title, scheduledAt: now }, stateTenant);
     deps.log(`  scheduled: ${item.sessionKey} via one-off Windows task (job ${jobKey})`);
   }
 
