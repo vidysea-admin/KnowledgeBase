@@ -1,5 +1,5 @@
 # Manifest — t041-keyframe-dedup
-**Status:** ready-for-check
+**Status:** checked-PASS (Checked: qa/verdicts/t041-keyframe-dedup.md, cycle 0, e315349; pure function; synthetic hashes only; unwired)
 **Fix cycle:** 0
 **Tier:** 3 (roadmap task). Second slice of T-041; T-041 stays OPEN.
 **Scope: pure function; SYNTHETIC hashes only; unwired.** No ffmpeg, no image hashing, no OCR, no storage, no wiring, no schema/contract change. Severity: no auth, tenancy or data write.
