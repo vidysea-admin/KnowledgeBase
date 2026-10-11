@@ -1,6 +1,6 @@
 # Manifest - u3-2-global-search-bar
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/u3-2-global-search-bar.md, cycle 0, 595c58d; SOURCE SCOPE ONLY per D-024)
 Fix cycle: 0
 Lane: lane/u32bar (from 2d1e738)
 Tier: 3 (roadmap). A global search bar is a named deliverable of U3.2 ("Search page / global search bar"), not polish.
