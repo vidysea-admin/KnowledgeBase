@@ -71,3 +71,38 @@ test("OBS mapping: base==output, fps num/den, bitrates as strings; uses the base
   // existing obs-windows.ts reads exactly these two fields from GetVideoSettings
   assert.ok("baseWidth" in r.videoSettings && "baseHeight" in r.videoSettings);
 });
+
+// --- ISS-T035LEAN-001: report (not clamp) when in-range overrides exceed the target ---
+import { assessLeanVideoSettings as assess, isWithinLeanTarget } from "./lean-video.js";
+const OVER_NOTE = /not under the 400 MB\/h target/;
+test("ISS-T035LEAN-001 recorded repro verbatim: 4000+192 kbps -> withinTarget false, note present, values kept", () => {
+  const a = assess({ videoBitrateKbps: 4000, audioBitrateKbps: 192 });
+  near(a.estimateMbPerHour, 1924.128); assert.equal(a.withinTarget, false); assert.equal(a.targetMbPerHour, 400);
+  assert.equal(a.settings.videoBitrateKbps, 4000); assert.equal(a.settings.audioBitrateKbps, 192); // reported, not clamped
+  assert.equal(a.settings.adjustments.length, 1); assert.match(a.settings.adjustments[0]!, OVER_NOTE);
+  assert.match(build({ videoBitrateKbps: 4000, audioBitrateKbps: 192 }).adjustments.join("|"), OVER_NOTE);
+});
+test("defaults and talking-head hint: withinTarget true, no note", () => {
+  for (const inp of [{}, { contentHint: "talking-head" as const }]) {
+    const a = assess(inp); assert.equal(a.withinTarget, true); assert.deepEqual(a.settings.adjustments, []); assert.equal(a.estimateMbPerHour, est(a.settings));
+  }
+});
+test("boundary: strictly under 400 is within; 871 kbps just under, 872 just over; exactly 400 is NOT within", () => {
+  const under = assess({ videoBitrateKbps: 807, audioBitrateKbps: 64 }); // 871 * 0.459 = 399.789
+  const over = assess({ videoBitrateKbps: 808, audioBitrateKbps: 64 });  // 872 * 0.459 = 400.248
+  assert.equal(under.withinTarget, true); assert.deepEqual(under.settings.adjustments, []);
+  assert.equal(over.withinTarget, false); assert.match(over.settings.adjustments[0]!, OVER_NOTE);
+  assert.equal(isWithinLeanTarget(399.999999), true); assert.equal(isWithinLeanTarget(400), false); assert.equal(isWithinLeanTarget(400.000001), false);
+});
+test("hostile: NaN/Infinity/non-numbers are never within; hostile overrides stay consistent with the final settings", () => {
+  for (const v of [NaN, Infinity, -Infinity, undefined as never, "1" as never, null as never]) assert.equal(isWithinLeanTarget(v), false);
+  const a = assess({ videoBitrateKbps: 1e9, audioBitrateKbps: NaN }); // clamps to 4000, NaN audio -> default 64
+  assert.equal(a.settings.videoBitrateKbps, 4000); assert.equal(a.withinTarget, false); assert.match(a.settings.adjustments.join("|"), OVER_NOTE);
+  const b = assess({ videoBitrateKbps: NaN, audioBitrateKbps: Infinity }); // both defaulted -> real default estimate
+  assert.equal(b.withinTarget, est(b.settings) < 400); assert.ok(Number.isFinite(b.estimateMbPerHour));
+  for (const bad of [null, 5, "x", [], { videoBitrateKbps: {} as never }]) assert.doesNotThrow(() => assess(bad as never));
+});
+test("estimate comes from the final clamped settings, not defaults or raw input", () => {
+  const a = assess({ videoBitrateKbps: 5000, audioBitrateKbps: 5000 }); near(a.estimateMbPerHour, est({ videoBitrateKbps: 4000, audioBitrateKbps: 192 }));
+  const lo = assess({ videoBitrateKbps: 100, audioBitrateKbps: 32 }); near(lo.estimateMbPerHour, 60.588); assert.equal(lo.withinTarget, true);
+});
