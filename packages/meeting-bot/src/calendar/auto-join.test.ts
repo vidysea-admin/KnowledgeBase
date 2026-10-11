@@ -394,7 +394,9 @@ test("T-036: the source survives reconciliation (calendar allow-list), a linked 
   assert.throws(() => reconcileWebinarSources({ ...base, calendarEvents: [], candidates: [{ ...g, meetingUrlSource: "conference" } as never] }), Error, "gmail rows cannot self-declare a source");
   const linked = reconcileWebinarSources({ ...base, calendarEvents: [cal("description")], candidates: [g] });
   const gm = linked.candidates.find((c) => c.id === "g9");
-  assert.equal(gm?.meetingUrlSource, "description", "the approved Gmail row now carries the calendar's free-text URL, so it carries its provenance");
-  const sel = selectAutoRecordItems({ calendarEvents: [], candidates: [gm!], now: P_NOW, leadMinutes: 5, trustedSenders: { emails: [], domains: [] }, alreadyScheduled: [] });
-  assert.equal(sel.toSchedule.length, 0); assert.equal(sel.skipped[0]!.reason, "unverified-link-source");
+  // cycle 3 (ISS-T036CAL-010): a free-text calendar row holds no aliases, so the Gmail row is NOT linked to it and does not inherit its provenance;
+  // the Gmail row keeps its own (authenticated, approved) trust and the free-text calendar row is skipped separately.
+  assert.equal(gm?.meetingUrlSource, undefined);
+  const sel = selectAutoRecordItems({ calendarEvents: linked.calendarEvents, candidates: [gm!], now: P_NOW, leadMinutes: 5, trustedSenders: { emails: [], domains: [] }, alreadyScheduled: [] });
+  assert.deepEqual(sel.toSchedule.map((i) => i.sourceId), ["g9"]); assert.deepEqual(sel.skipped.map((x) => `${x.sourceId}:${x.reason}`), ["c9:unverified-link-source"]);
 });

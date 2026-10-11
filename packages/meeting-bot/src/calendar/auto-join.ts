@@ -105,6 +105,12 @@ function normalizeCandidate(c: AutoRecordCandidateInput): NormalizedItem {
   };
 }
 
+/** A present source other than "conference". Such an item takes no part in the every-webinar identity logic (barriers, session-key collapse). */
+const isUntrustedSource = (item: NormalizedItem): boolean => item.meetingUrlSource !== undefined && item.meetingUrlSource !== "conference";
+/** Meeting identity used to share barriers and to collapse copies; undefined for an untrusted item (ISS-T036CAL-010). */
+const meetingIdentityOf = (item: NormalizedItem): string | undefined =>
+  item.meetingUrl && item.startTime && !isUntrustedSource(item) ? webinarIdentity(item.meetingUrl, item.startTime) : undefined;
+
 function overlaps(a: NormalizedItem, b: NormalizedItem): boolean {
   const aStart = new Date(a.startTime as string).getTime();
   const aEnd = new Date(a.endTime as string).getTime();
@@ -131,14 +137,14 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
   if (input.everyWebinar) {
     const barriers = new Map<string, { rejected: boolean; registration: boolean; cancelled: boolean }>();
     for (const item of normalized) {
-      const identity = item.meetingUrl && item.startTime ? webinarIdentity(item.meetingUrl, item.startTime) : undefined;
+      const identity = meetingIdentityOf(item);
       if (!identity) continue;
       const prior = barriers.get(identity);
       barriers.set(identity, { rejected: item.rejected || Boolean(prior?.rejected),
         registration: Boolean(item.registrationOnly || prior?.registration), cancelled: Boolean(item.cancelled || prior?.cancelled) });
     }
     for (const item of normalized) {
-      const identity = item.meetingUrl && item.startTime ? webinarIdentity(item.meetingUrl, item.startTime) : undefined;
+      const identity = meetingIdentityOf(item);
       const barrier = identity ? barriers.get(identity) : undefined;
       if (barrier) { item.rejected = barrier.rejected; item.registrationOnly = barrier.registration; item.cancelled = barrier.cancelled; }
     }
@@ -149,7 +155,7 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
   const seenWebinars = new Set<string>();
 
   for (const item of normalized) {
-    if (input.everyWebinar && item.meetingUrl && item.startTime) {
+    if (input.everyWebinar && item.meetingUrl && item.startTime && !isUntrustedSource(item)) { // a free-text row keeps its own cal: key
       const identity = webinarIdentity(item.meetingUrl, item.startTime);
       if (identity) item.sessionKey = webinarSessionKey(identity);
     }

@@ -1,7 +1,7 @@
 # t036-calendar-description-link-scan
 
 Status: ready-for-check
-Fix cycle: 2
+Fix cycle: 3
 Priority tier: 3 - next unblocked roadmap task (T-036, slice: Calendar side of "find webinar links in Gmail and Calendar")
 Security class: changes which meetings can be auto-joined (a wrong link joins the wrong meeting) - FULL ceremony
 Lane: lane/t036cal (ledger shard qa/issues.t036cal.jsonl, ids ISS-T036CAL-NNN; none filed)
@@ -172,3 +172,48 @@ Harness `.mut-t036cal-c2.cjs` untracked in the worktree, absolute paths, byte ba
 - `node <main>/node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.lane-tmp.json`: packages/core exit 0, packages/meeting-bot exit 0, apps/api exit 0.
 - `node scripts/lint-dirsize.mjs`: only packages/index/src/pipeline (34 > 30, unrelated). packages/meeting-bot/src/calendar gains NO file (new tests are in the subfolder link-source/, 2 files); apps/api/src gains none. Non-blank lines: calendar-client.ts 248, link-source-reconcile.test.ts 108, link-source-allowlist.test.ts 51.
 - `git merge-tree --write-tree HEAD codex/machine-migration-2026-10-09`: clean, tree c85dc990edb59533b026aaa64d581da255e0470a, no conflicts.
+
+
+## Fix cycle 3 (checker verdict FAIL cycle 2: ISS-T036CAL-010 high; 006..009 verified)
+
+### What failed, and why this unit introduced it
+An outsider could BLOCK a legitimate recording. Before T-036 an outsider's invite had no `meetingUrl` (the link was only in its description), so it had no identity alias and could not collide with anything. T-036 turned the description link into a `meetingUrl`, `normalizeOccurrence` gave that row the same alias as the real conference event (same url, same start), and `reconcileWebinarSources` marked BOTH `ambiguous-identity`: `calendarEvents` empty, transitions `unresolved`, nothing scheduled (legacy scope: `newStartsBlocked` for all events). Anyone who knows a public webinar link and its start time could do it. Cycles 0 to 2 made the link visible and untrusted for SELECTION but left it trusted for IDENTITY.
+
+### The rule
+A calendar row whose `meetingUrlSource` is present and not `conference` contributes NO identity aliases and takes no part in duplicate/ambiguity resolution, barriers or session-key collapse. Absent source = legacy conference row = unchanged (keeps aliases). Where:
+- `calendar-client.ts` `normalizeOccurrence`: `aliases` is `[]` for an untrusted snapshot (helper `untrustedSnapshot`). Because aliases are what link Gmail rows to calendar rows and what `aliasOwners` collide on, such a row can neither make a conference row ambiguous nor attach to a Gmail row.
+- `mergeOccurrence` end: a row that BECAME free-text (Google removed the conference data) drops the aliases it held; `aliasOwners` also skips untrusted rows (so a state persisted by an earlier build cannot collide); the Gmail `linkedCalendar` validation no longer demands an alias match when the linked calendar row has turned free-text (otherwise one source flip would make the whole reconciliation throw).
+- Output: an untrusted row's inventory entry and transition carry no `sessionKey`/`currentKey`, so it never takes the real meeting's `webinar-` key, never writes a `queued` operation over it; it appears as its own `needs-review` operation under its own review key (same class of entry an outsider's link-less webinar-titled invite already produced before this unit).
+- `auto-join.ts` (every-webinar mode): an untrusted item is excluded from the cancelled/rejected/registration barrier groups (`meetingIdentityOf`) and keeps its own `cal:<id>` session key (no collapse into the `webinar-` group of a conference or authenticated Gmail copy). It is still skipped `unverified-link-source` and listed.
+
+### (a) to (f) with tests (link-source/link-source-alias.test.ts, 9 tests)
+- (a) conference row resolved exactly as if the outsider did not exist: deep-equal events, transitions, inventory, unresolved flags, `blocked` and scheduled set vs the run on the conference row alone. 010 recorded reproduction verbatim: 4/4 (2 orders x 2 scopes), also in every-webinar and non-every modes; and through `prepareWebinarSourceState` (production path) in both orders: one queued operation, transitions empty. Invite spam: 1, 2, 50 and 400 outsider rows, both scopes: unchanged result, n outsider rows each skipped `unverified-link-source`, 400 rows reconcile in well under the 10 s bound (the time is printed in the assertion message on failure).
+- (b) the outsider row stays visible and separate: skipped `unverified-link-source` with its own `cal:` key; inventory entry without the real meeting's session key.
+- (c) two or more free-text rows for the same link (description and location): no `unresolved`, not blocked, other meetings still scheduled; both scopes.
+- (d) free-text calendar row + conference row + authenticated approved Gmail row, every-webinar: scheduled set identical to the run without the outsider, outsider keeps `cal:evil0`; free-text row + Gmail row alone: Gmail row scheduled, NOT linked to the free-text row; a cancelled outsider row cannot veto the group. Changed existing assertion: auto-join.test.ts "a linked Gmail row inherits it" now asserts the Gmail row is NOT linked and keeps its own trust (g9 scheduled, calendar row c9 skipped `unverified-link-source`): the cycle-1 inheritance only existed because free-text rows took part in identity, which is the defect.
+- (e) opt-out: `siblingIds` in join-rules-select groups only SCHEDULED items, and a free-text row is never scheduled, so it can neither be a sibling nor trigger a removal; the real rows keep their own aliases/identity, so an opt-out of the real meeting (`url:meet:abc-defg-hij` or the real event id) still vetoes every real row, and a state that opted out of a different meeting removes nothing. Excluding free-text rows from aliases cannot be used to dodge an opt-out. Tested both ways.
+- (f) source flips: free-text holds 0 aliases; becomes `conference` -> 1 alias and schedulable; back to free text -> aliases dropped and not scheduled; a legacy row with an absent source keeps its alias; a Gmail row linked to a conference event survives the calendar row later turning free-text (no throw, nothing blocked). Two conference rows for one meeting are still `ambiguous-identity` (real ambiguity detection kept).
+
+### Property (seed 20261011)
+300 random cases x 2 scopes = 600/600: trusted rows T (1 to 5, urls/starts/titles drawn from small pools so they collide with each other), plus 0 to 8 free-text rows F (sources location/description/bogus; urls, starts, titles and string ids derived from T rows), shuffled. For every row of T the view (events, transitions, inventory, unresolved flags, blocked) AND the selection fate (scheduled, or skipped with reason and session key) are identical to the run on T alone, in every-webinar and normal mode; free-text rows scheduled: 0 of 1,178 added. (Cancelled outsider tombstones with an unknown id were excluded from F: they are `unknown-tombstone` for any event regardless of source, pre-existing and not outsider-controllable through a normal invite; noted, not changed.)
+
+### Everything verified in cycle 2 still holds
+reconcile table / 50 legacy events / real contradiction detection: link-source-reconcile 7/7; allow-list 4/4; auto-join 39/39 (48-case attack coverage and default parity tests in it); extractor 17/17, differential 3/3, calendar route 15/15; schedule-tick 14/14, schedule-state 18/18, webinar-policy 19/19, join-rules-select 11/11, optout-identity 22/22, sender-authentication 5/5, attention-alerts 11/11; scripts vocabulary 3/3 and attendance 33/33.
+
+### D-015
+ISS-T036CAL-010: 4/4 verbatim (2 orders x 2 scopes) plus production-path 2/2 orders. Re-run 001: 4/4 (auto-join test); 002: 6/6; 003: 3/3; 004: 2/2 (differential 3/3); 005: 12/12 (17/17 with siblings); 006: 1/1 + 50 legacy + 50/50 table cells; 007: vocabulary 3/3, main's alert-who production test needs the edit below; 008: 48/48 + 16/16; 009: 9/9 + 7/7.
+
+### Post-merge edit for main's alert-who production test (unchanged, as the checker validated it)
+File: `packages/meeting-bot/src/alert-who-production.test.ts` (NOT under calendar/alerts). Unedited it fails 2 of 4 with 15 reasons; with these three edits it passes 4/4. (1) after the line `  ev("evP8", "Webinar Past", { meetingUrl: "https://zoom.us/j/44444444444", startTime: "2026-10-10T08:00:00.000Z", endTime: "2026-10-10T09:00:00.000Z" }),` add `  ev("evF10", "Webinar FreeText", { meetingUrl: "https://zoom.us/j/88888888888", meetingUrlSource: "description" }),`; (2) after `  "rules-unevaluable": [false, false, ""],` add `  "unverified-link-source": [false, false, ""],`; (3) title `covers all 14 skip reasons from core` -> `covers all 15 skip reasons from core`. Not re-simulated in cycle 3: this cycle changes inventory/session-key handling for untrusted rows, so the checker should re-run that test on the trial merge.
+
+### NOT DONE
+The Approver's policy on free-text links and an approval path for calendar events; ISS-376; a live Calendar run; moving recognisers to core; the alert-who edit (merge condition); unknown-tombstone behaviour for cancelled unknown ids (pre-existing, source-independent).
+
+### Mutations (11 run, 11 killed, all by link-source-alias.test.ts)
+Harness `.mut-t036cal-c3.cjs` untracked in the worktree, byte backup per mutation, restore in finally with byte compare, 240 s timeout; `git diff` hash identical before and after the run; deleted before commit. M1 free-text rows contribute aliases again (3 sites) <= 010 reproductions. M2 free-text rows dropped silently <= 010 tests. M3 exclusion only in the available scope <= 010 + (c). M4a exclusion not applied to description <= 010. M4b not applied to location <= property. M5 free-text row in the every-webinar collapse <= (d). M6 free-text row feeds the barriers (veto) <= (d). M7 outsider inventory entry takes the real session key <= production-path test. M8 absent source treated as free-text <= (d), (f). M9 free-text row consumes the identity before a trusted row (skip reason of a trusted row changes) <= 010 tests, (d). M10 Gmail link validation not relaxed <= (f) Gmail flip test.
+
+### Evidence (node from the codex runtime; no node_modules change; `TSX_TSCONFIG_PATH` -> temporary untracked tsconfig with `paths` `@lkb/core` -> this worktree's packages/core/src/index.ts; deleted before commit)
+- meeting-bot: `node --test --import tsx src/calendar/link-source/link-source-alias.test.ts` 9/9 (prints `ISS-T036CAL-010: 4/4 ...` and `property: 600/600 ...`); reconcile 7/7; allow-list 4/4; the suites listed above.
+- tsc `--noEmit -p tsconfig.lane-tmp.json`: packages/meeting-bot exit 0, apps/api exit 0; packages/core exit 0.
+- `node scripts/lint-dirsize.mjs`: only packages/index/src/pipeline (unrelated). No new file in calendar/ or apps/api/src; non-blank lines: calendar-client.ts 254, auto-join.ts 255, link-source-alias.test.ts 183.
+- `git merge-tree --write-tree HEAD codex/machine-migration-2026-10-09`: clean, tree 72ca39c1cc91d1def6e75696569c2001d41b1a2e.
