@@ -146,7 +146,7 @@ Notes: M3's first run used a pattern that did not match (PATTERN-MISSING, nothin
 ---
 
 # Fix cycle 2 (answers verdict FAIL cycle 1 at 4a1112b: ISS-T040QUOTE-002 high, ISS-T040QUOTE-003 medium)
-**Status:** ready-for-check. **Fix cycle:** 2. Code commits 8ed30c3 and ce5d96b (quote-token-rule.ts rewritten, quote-verify.ts, two new test files); the following commit adds only this manifest.
+**Status:** checked-PASS (Checked: qa/verdicts/t040-strict-quote-verifier-and-windowing.md, cycle 2, eb45cc9). **Fix cycle:** 2. Code commits 8ed30c3 and ce5d96b (quote-token-rule.ts rewritten, quote-verify.ts, two new test files); the following commit adds only this manifest.
 
 ## What failed, and why a joiner list cannot work
 Cycle 1 listed the characters that JOIN a token (`. , - / : @ _ ' %`) and treated every other symbol as a boundary, and a trailing one as sentence punctuation. So "has 10" verified against "has 10+ years" (also C of C++, R of R&D, 3 of 3x4, 2 of 2+2, 5 of 5 degrees, AT of AT&T). A deny-list is complete only if it names every character Unicode will ever assign; the next unnamed symbol reopens the hole. Separately, JavaScript's regex whitespace shorthand contains U+FEFF, so "r<U+FEFF>evenue" collapsed to "r evenue" and "the revenue is r" verified. Cycle 2 inverts the rule: it names where a quote MAY start or end, and everything else is inside a token without being named.
