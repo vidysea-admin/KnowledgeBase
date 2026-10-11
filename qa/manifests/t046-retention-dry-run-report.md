@@ -1,7 +1,7 @@
 # Manifest - t046-retention-dry-run-report (T-046, retention half, operator report)
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Lane: t046dry (branch `lane/t046dry`, base 8520fa8). Code commit a0d18a8.
 Tier: 3 (next roadmap task, T-046); a new feature slice, not a ledger finding.
 Round cap: PASSed verdicts naming the retention seam: `t046-retention-sweep-planner` (cycle 1 PASS), `test-gaps-t046-004-t037api-003` (PASS), and the T-026 `purge-retention-policy` verdict (no `VERDICT:` line in the usual form; counted as a third). The class-based cap (D-014) limits non-security FINDINGS on a seam to 2 PASSes; it does not bar a new roadmap feature (tier 3 "is not optional"). A new operator command with new code, new tests and no change to the planner or policy is a different unit; the seam of THIS unit is "gather local state and print" and has 0 PASSes. This is also destructive-adjacent (security class), which is never capped. Classification: new feature slice of T-046, proceeding. No issue filed (`qa/issues.t046dry.jsonl` not created: nothing found).
@@ -99,3 +99,72 @@ Hand-written lane-unique harness (`mut-t046dry-harness.mjs`, untracked, deleted 
 | M11 file read opened with write flag | killed (10), including the byte-identical tree test |
 
 11/11 killed, 0 survived.
+
+## Fix cycle 1
+
+What failed (verdict cycle 0, FAIL): ISS-T046DRY-001 (high) a recording whose media mtime was 5 s ago or in the future was ELIGIBLE (the command never read mtime); ISS-T046DRY-002 (medium) a recording whose media file was missing, absolute, escaping, or with no `--media-root` was ELIGIBLE and counted; note: the no-write scan's regex missed an open flag of `"r+"`.
+
+Planner and policy untouched: `git diff 8520fa8 -- packages/ingest/src/retention-sweep.ts packages/core/src/domain/purge-policy.ts` is empty. All fixes are in the command (`packages/ingest/src/` only).
+
+### Guards (`retention-report-guards.ts`, pure, `now` injected) - all DOWNGRADE-ONLY
+`guard(planned, input, now)` returns null for ANY planner verdict other than the exact string `purge-eligible`; `finalEligible` is `planned === "purge-eligible" && hit === null`. So a guard can only turn the planner's eligible into KEEP, never the reverse. Checked in this order, first hit wins:
+
+| reason code | fires when |
+|---|---|
+| `media-root-not-given` | no media root (cannot occur from the CLI now; kept for the pure function) |
+| `media-not-found` | no stored path, or the file does not exist under the root |
+| `media-path-outside-root` | stored path absolute / drive / UNC / NUL / `..` escape, or the REAL path (realpath) is outside the real root (symlink or junction out) |
+| `media-unreadable` | root or file cannot be resolved or stat'd, the target is not a regular file, or size/mtime missing |
+| `clock-skew` | media mtime more than 5 min after the injected `now` (`CLOCK_SKEW_MS`) |
+| `recently-modified` | `now - mtime` under the 24 h quiet period (includes an mtime up to 5 min ahead) |
+| `media-modified-after-processed` | mtime later than `processedAt` by more than 1 h (`AFTER_PROCESSED_MS`): the file changed after the state says it was processed (re-recorded, replaced, copied). This is the "recorded time disagrees wildly with mtime" check; the only recorded time in the state is `processedAt` |
+| `size-mismatch` | `source.json` carries `sizeBytes` and it differs from the stat'd size by more than 1% (`SIZE_TOLERANCE`); printed in the guard line, recording KEPT, stat'd size used in totals |
+
+Media evidence (`retention-report-media.ts`) uses `realpathSync`, `lstatSync`, `statSync` only (reads).
+
+Quiet period: `QUIET_PERIOD_MS` = 24 h, a constant, not an option. Justification: the pipeline's finalise -> transcribe -> process-video -> index steps (`scripts/webinar/run-pipeline.mjs` runs `finalize --transcribe --process-video --index`) can rewrite or remux the artifact and have no time bound in code, so a day (not seconds) is the conservative window. The planner's inputs have no such notion, so no option was added (a flag would let one argument lower the safety margin). Interaction: with `--min-age-days` >= 1 the `media-modified-after-processed` guard also covers recent files; the quiet period protects a short min-age or a state whose `processedAt` was written late.
+
+`--media-root` is now REQUIRED (parser: exit 2, "--media-root is required: a report that cannot see the media files cannot say anything is purgeable"); it must be an existing directory (else exit 3, no report).
+
+### Totals format
+`TOTALS eligible: E recording(s), B B | kept: K recording(s), B B | size unknown for U (not counted in bytes)` and a separate line `not assessable: N recording(s), B B known (policy says eligible, but the media file was not found, not trusted or not readable; ...)`. Not assessable = guard-downgraded for `media-root-not-given`, `media-not-found`, `media-path-outside-root`, `media-unreadable`, `clock-skew`, `size-mismatch`; they are in neither the eligible nor the kept count. `recently-modified` and `media-modified-after-processed` (media seen and judged) count under kept. A guard line names the code and states "the planner alone said purge-eligible"; the planner's own reason is then printed as `planner reason:`.
+
+### No-write scan (`retention-report.scan.ts`, tests in `retention-report.nowrite.test.ts`)
+Now reads the flags argument: `open`/`openSync`/`fs.promises.open` must pass a LITERAL `"r"` (any quote) or `O_RDONLY`; `r+`, `w`, `a`, `x`, `wx`, `a+`, numbers, variables, ternaries, concatenations, a missing flag, `flag:`/`flags:` options other than read-only, and any `createWriteStream` are violations. Whole transitive import graph as before (now including the media and guards modules; the `node:fs` allow-list adds `statSync`, `realpathSync`). The `r+` case and the non-literal case are tests of the scanner itself on small fixture sources (`scanner: only a literal read-only open flag passes ...`).
+
+### D-015 (ledger fixtures verbatim through the command)
+- ISS-T046DRY-001: 2/2 KEEP (`justwritten` mtime now-5000 ms -> `recently-modified`; `future-mtime` mtime now+9 d -> `clock-skew`). Test `ISS-T046DRY-001 recorded fixtures`. (The ledger used the real clock; the test injects `now`.)
+- ISS-T046DRY-002: 4/4 refused: `e-nomedia` -> `media-not-found`; `..\..\outside.webm` -> `media-path-outside-root`; `C:\Windows\win.ini` -> `media-path-outside-root`; no `--media-root` -> usage error exit 2, no report (so no ELIGIBLE line). Test `ISS-T046DRY-002 recorded fixtures`. None left open.
+- The two cycle-0 planner inputs (ISS-T046-001 prototype tenantId; ISS-T046-002/004, 9 processedAt values) still KEEP through the command (existing tests, now with valid media present): 1/1 and 9/9.
+- Additional (mine, not substituting): mtime exactly at the quiet period ELIGIBLE, 1 s inside KEEP, 1 s past ELIGIBLE; future +1 min and exactly 5 min `recently-modified`, +5 min 1 s and +1 y `clock-skew`; `../`, `a/../../`, `/etc/passwd`, UNC, `D:rel`, NUL, junction out of the root, a directory in place of the file, no stored path; size edge (1010 vs 1000 ok, 1011 vs 1000 KEEP); trees byte-identical (mtimes included) after guard runs. A genuinely ACL-unreadable file was not tested (a directory stands in for `media-unreadable`).
+
+### Downgrade-only property (`retention-report.property.test.ts`)
+(a) 1,000 seeded (mulberry32) random guard inputs including planner verdicts `keep`, empty, `PURGE-ELIGIBLE`, `purge-eligible `: whenever the final result is eligible the planner verdict was exactly `purge-eligible`, and for any other verdict the guard returns null; non-vacuous (>20 stayed eligible, >100 downgraded). (b) 150 random sessions through the real command: the reported-ELIGIBLE set is a subset of what `planRetentionSweep` alone says (computed from the same gathered inputs); non-vacuous. Result: holds.
+
+### Mutations
+Own harness `mut-t046dry-fix1-harness.mjs` (untracked, deleted before commit; absolute paths inside the worktree; byte backup per mutation; restore in `finally`; 240 s SIGKILL timeout; `cmp` and `git hash-object` equal to the committed blob after each: all 13 restores matched). 13/13 killed, 0 survived: M1 mtime/quiet guard removed (3 tests); M2 future mtime treated as old (2); M3 missing media treated as present (2); M4a lexical path-escape check removed (path evidence test); M4b realpath/junction containment removed (path evidence test); M5 media root optional again (2); M6 guard can upgrade keep to eligible (9, including both downgrade-only tests); M7 not-assessable merged into kept (totals test); M8 scanner accepts `r+` (scanner test); M9 scanner accepts non-literal flag (scanner test); M10 size-mismatch guard removed (2); M11 modified-after-processed removed (1); M12 quiet period lowered to 5 s (2). Run on commit 60e7ccc; the only later source change relabels the planner reason line as `planner reason:` when a guard fired.
+
+### Evidence
+PATH has the codex node dir. From `packages/ingest`:
+- `node --test --import tsx src/retention-report.test.ts src/retention-report.safety.test.ts src/retention-report.nowrite.test.ts src/retention-report.guards.test.ts src/retention-report.property.test.ts` -> `tests 30 / pass 30 / fail 0`.
+- Planner unchanged: `src/retention-sweep.test.ts src/retention-sweep.strict.test.ts` -> `tests 31 / pass 31`; `packages/core` `src/domain/purge-policy.test.ts` -> `tests 7 / pass 7`.
+- `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` -> exit 0 (ingest).
+- `git diff 8520fa8 -- packages/ingest/src/retention-sweep.ts packages/core/src/domain/purge-policy.ts` -> empty.
+- Budgets (non-blank lines): sources max 138 (state), tests max 167 (guards). `node scripts/lint-dirsize.mjs`: only the known `packages/index/src/pipeline: 34 files (budget 30)`; `packages/ingest/src` has 28 entries (budget 30).
+- Sample on a temp fixture (injected now, 5 sessions), exit 0, excerpt:
+
+```
+RECORDING badsize-src => KEEP
+  guard: size-mismatch (not assessable) - state records 500 B but the file is 20 B (tolerance 1%); the planner alone said purge-eligible
+RECORDING e-nomedia-src => KEEP
+  guard: media-not-found (not assessable) - media file evidence: not-found; the planner alone said purge-eligible
+RECORDING justwritten-src => KEEP
+  guard: recently-modified - media modified 0.00 h ago, under the 24.00 h quiet period; the planner alone said purge-eligible
+RECORDING ok-src => ELIGIBLE        (size 100 B, media-mtime-age 720.00 h)
+RECORDING outside-src => KEEP
+  guard: media-path-outside-root (not assessable) - media file evidence: outside-root; the planner alone said purge-eligible
+TOTALS eligible: 1 recording(s), 100 B | kept: 1 recording(s), 10 B | size unknown for 2 (not counted in bytes)
+not assessable: 3 recording(s), 20 B known (policy says eligible, but the media file was not found, not trusted or not readable; ...)
+```
+
+Not done / unverified: no ACL-denied unreadable-file case; depcruise not run; only a directory junction is tested for link-out (file symlinks need privileges on Windows).

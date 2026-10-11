@@ -85,7 +85,7 @@ function section(g: Gathered, plan: RetentionPlan | null, opts: ReportOptions, m
       if (!info.unreadable) lines.push(`  preconditions: ${preconditions(info, g, minAgeMs, now)}`);
     }
     if (fin.hit) lines.push(`  guard: ${fin.hit.code}${NOT_ASSESSABLE.has(fin.hit.code) ? " (not assessable)" : ""} - ${cleanText(fin.hit.detail, 200)}; the planner alone said purge-eligible`);
-    lines.push(`  reason: ${cleanText(reason, 200)}`);
+    lines.push(`  ${fin.hit ? "planner " : ""}reason: ${cleanText(reason, 200)}`);
     if (fin.eligible && item) lines.push(`  would retain ${item.retainWindows.length} evidence-clip window(s) (+/-${opts.clipPaddingSeconds}s)`);
   };
   for (const info of g.infos.filter((i) => i.unreadable)) entry(info, undefined, `unreadable state, kept: ${info.unreadable}`);
