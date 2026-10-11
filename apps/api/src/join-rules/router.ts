@@ -10,12 +10,13 @@
  * The tenant is ALWAYS `req.auth!.tenantId` (as routes/calendar.ts does); URL, query, headers and body
  * never name it, and a body field `tenantId` is rejected (400). Scopes: GET needs "calendar" (read); PUT and
  * both POSTs need the dedicated WRITE scope "join-rules" (a "calendar" read key must not gain write power).
- * Writes for one tenant are serialised in-process by a promise-chain mutex. Multi-PROCESS writers are
- * still unsupported (the store's read-modify-write is unlocked).
+ * Writes for one tenant are serialised in-process by a promise-chain mutex; across processes the store
+ * takes a per-tenant lock file (t037-join-rules-store-lock). Contention surfaces as 503 `join_rules_busy`
+ * + Retry-After (STORE_FAILURE below); GET never takes that lock (the store's load is lock-free).
  */
 import { Router, type Request, type Response } from "express";
 import { requireScope } from "../auth.js";
-import type { JoinRulesDeps } from "./deps.js";
+import type { JoinRulesDeps, JoinRulesStoreCode } from "./deps.js";
 
 /** Dedicated write scope (sibling mutating routes use their own scope: gmail, sources, ingest, keys, compete). */
 export const WRITE_SCOPE = "join-rules";
@@ -37,9 +38,28 @@ function fail(res: Response, status: number, error: string, message: string): vo
   res.status(status).json({ error, message });
 }
 
-/** Non-leaking: never echoes the stored file, its path, or the store's own message. */
-function storeFailure(res: Response): void {
-  fail(res, 500, "join_rules_unavailable", "join rules are unavailable for this tenant");
+interface Mapped { status: number; error: string; message: string; retryAfterSeconds?: number }
+const UNAVAILABLE: Mapped = { status: 500, error: "join_rules_unavailable", message: "join rules are unavailable for this tenant" };
+/** Matches the store lock's default wait (lockWaitMs 5000): by then a live holder has normally finished. */
+export const BUSY_RETRY_AFTER_SECONDS = 5;
+const BUSY: Mapped = { status: 503, error: "join_rules_busy", message: "join rules are busy; try again in a few seconds", retryAfterSeconds: BUSY_RETRY_AFTER_SECONDS };
+/**
+ * The ONE status table for store failures, total over the store's code union (a new code fails tsc here).
+ * `too-large` -> 413 and `invalid` -> 400 are decided at the call sites that know the cause (PUT save,
+ * approval / opt-out value); reaching this table means the failure came from a stored file or an internal
+ * path, which stays the fixed 500 as before.
+ */
+export const STORE_FAILURE: Record<JoinRulesStoreCode, Mapped> = {
+  "bad-tenant": UNAVAILABLE, corrupt: UNAVAILABLE, "too-large": UNAVAILABLE, invalid: UNAVAILABLE, "tenant-mismatch": UNAVAILABLE,
+  "not-a-file": UNAVAILABLE, "write-failed": UNAVAILABLE, "lock-failed": UNAVAILABLE, locked: BUSY,
+};
+
+/** Non-leaking: never echoes the stored file, its path, or the store's own message. Unknown errors -> 500. */
+function storeFailure(res: Response, e?: unknown): void {
+  const code = storeCode(e);
+  const m = code !== undefined && Object.hasOwn(STORE_FAILURE, code) ? STORE_FAILURE[code as JoinRulesStoreCode] : UNAVAILABLE;
+  if (m.retryAfterSeconds !== undefined) res.setHeader("Retry-After", String(m.retryAfterSeconds));
+  fail(res, m.status, m.error, m.message);
 }
 
 function bodyOf(req: Request, allowed: readonly string[]): Record<string, unknown> {
@@ -72,14 +92,14 @@ export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
     } catch (e) {
       if (e instanceof BadRequest) return fail(res, 400, "bad_request", e.message);
       if (e instanceof StatusError) return fail(res, e.status, e.error, e.message);
-      storeFailure(res);
+      storeFailure(res, e);
     }
   }
 
   router.get("/calendar/join-rules", requireScope("calendar"), async (req: Request, res: Response) => {
     try {
       res.status(200).json(await deps.load(req.auth!.tenantId));
-    } catch { storeFailure(res); }
+    } catch (e) { storeFailure(res, e); }
   });
 
   router.put("/calendar/join-rules", requireScope(WRITE_SCOPE), (req: Request, res: Response) =>

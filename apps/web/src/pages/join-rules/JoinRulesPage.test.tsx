@@ -309,3 +309,14 @@ test("direct route without a key shows the login gate and requests nothing", () 
   localStorage.clear(); window.history.replaceState(null, "", "/join-rules"); render(<App />);
   expect(screen.getByLabelText("API key")).toBeInTheDocument(); expect(api).not.toHaveBeenCalled();
 });
+
+test("503 join_rules_busy (the API's fixed busy message) shows 'busy, try again', not 'not available'; on save and on load", async () => {
+  const busy = "join rules are busy; try again in a few seconds";
+  await ready();
+  fireEvent.change(screen.getByLabelText("Rule 1 name"), { target: { value: "kept-text" } });
+  failures["PUT /calendar/join-rules"] = [{ status: 503, message: busy }];
+  fireEvent.click(screen.getByRole("button", { name: "Save rules" }));
+  await waitFor(() => expect(screen.getAllByRole("alert").length).toBeGreaterThan(0));
+  expect(alerts()).toContain("Join rules are busy");
+  expect(alerts()).not.toContain("not available");
+});
