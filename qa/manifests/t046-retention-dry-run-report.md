@@ -1,7 +1,7 @@
 # Manifest - t046-retention-dry-run-report (T-046, retention half, operator report)
 
 Status: ready-for-check
-Fix cycle: 1
+Fix cycle: 2
 Lane: t046dry (branch `lane/t046dry`, base 8520fa8). Code commit a0d18a8.
 Tier: 3 (next roadmap task, T-046); a new feature slice, not a ledger finding.
 Round cap: PASSed verdicts naming the retention seam: `t046-retention-sweep-planner` (cycle 1 PASS), `test-gaps-t046-004-t037api-003` (PASS), and the T-026 `purge-retention-policy` verdict (no `VERDICT:` line in the usual form; counted as a third). The class-based cap (D-014) limits non-security FINDINGS on a seam to 2 PASSes; it does not bar a new roadmap feature (tier 3 "is not optional"). A new operator command with new code, new tests and no change to the planner or policy is a different unit; the seam of THIS unit is "gather local state and print" and has 0 PASSes. This is also destructive-adjacent (security class), which is never capped. Classification: new feature slice of T-046, proceeding. No issue filed (`qa/issues.t046dry.jsonl` not created: nothing found).
@@ -168,3 +168,67 @@ not assessable: 3 recording(s), 20 B known (policy says eligible, but the media 
 ```
 
 Not done / unverified: no ACL-denied unreadable-file case; depcruise not run; only a directory junction is tested for link-out (file symlinks need privileges on Windows).
+
+## Fix cycle 2
+
+Cycle-1 verdict FAIL (`qa/verdicts/t046-retention-dry-run-report.md`, second block): ISS-T046DRY-003 (high: two state rows can reference one media file, so a file was printed ELIGIBLE on the strength of one row while another row for it was KEEP, and three spellings of one path counted as three files, 300 B for a 100 B file), ISS-T046DRY-004 (medium: no as-of instant, no `now` check), ISS-T046DRY-005 (medium: ACL-denied file still ELIGIBLE, no read-open probe, pipeline state ignored). Low notes: exactly 24 h was ELIGIBLE; the size guard never fires on real state. The planner (`retention-sweep.ts`) and policy (`purge-policy.ts`) are byte-identical to base 8520fa8. Every new guard is DOWNGRADE-ONLY.
+
+### What ELIGIBLE means (also printed in the report header)
+ELIGIBLE = the existing planner said purge-eligible for the given thresholds, AND every media/clock/pipeline guard passed, AND every session record that references the same physical file is also ELIGIBLE. It does NOT mean safe to delete: no shipped writer records `processedAt` or `sizeBytes`, a writer holding a file open can be invisible to the OS, and no executor exists. It is a shortlist for human review.
+
+### 1. ISS-T046DRY-003: per physical file, ALL rule
+- Identity (`retention-report-media.ts` `fileKeys`): for each located file, after realpath and the containment check, the keys are `ino:<dev>:<file index>` (from `statSync(p, {bigint: true})`, used when the index is non-zero) and `path:<real path>`, lower-cased on win32 (case-insensitive file system). Records sharing ANY key are one file (union-find in `retention-report/assess.ts`). So `m/shared.webm`, `m/./shared.webm`, `M/SHARED.WEBM` and a hardlink are one file.
+- Rule: a file is ELIGIBLE only if EVERY record that references it is eligible after all guards. Otherwise every eligible member becomes KEEP `shared-media-not-all-eligible` (naming "N session record(s) reference this one physical file"). Members are the printed records PLUS session records the planner did not report as their own (other-tenant copies planted in the tenant dir, duplicate source ids); those are never eligible, so they veto the file. Records with no located file have no identity, are not assessable and never make a group eligible.
+- Unreadable session directories (no parseable source.json) cannot be matched to a file; the header counts them and warns that their paths are unknown. This is not blocked (a stated gap).
+
+### 2. ISS-T046DRY-005: three in-progress signals (each downgrade-only)
+(i) Readability probe: after stat, `openSync(real, "r")`, read the first 4 KiB and, for files over 4 KiB, the last 4 KiB, close in a finally. Failure (EACCES, EPERM, EBUSY, sharing violation) -> KEEP `media-unreadable` (not assessable). A read-only open cannot create, truncate or change the file or its mtime (atime may move on volumes that track it; not compared). The no-write scanner accepts exactly this literal `"r"` open: a new test asserts it is the only open in the whole import graph and that `r+`, `w`, `a`, `wx`, `w+`, `a+`, `rs+` substituted into it are rejected; the graph test allows `openSync/readSync/closeSync` from `node:fs` and nothing wider. Cannot see: a writer that holds the file open WITHOUT exclusive sharing, and an idle-looking file that is about to be written.
+(ii) Pipeline state: new optional `--operations-state <operations.json>` (the poller's `data/webinar-release/operations.json`, written by `scripts/webinar/run-pipeline.mjs`). Read-only, 5 MiB cap, 20,000-row cap (no shared safe reader exists; same lstat/size/parse pattern as `readJson`). Vocabulary found in that code: queued, recording, processing, ready, failed, action_required, cancelled. Only `ready` and `cancelled` are TERMINAL. `failed` is not terminal because the poller's recovery loop re-finalises `recording|processing|failed` rows from their artifact; `action_required` can be reconsidered. Every other status, including unknown strings, "READY" (case differs), empty, numbers and a missing status, means in progress: unknown means keep (`operation-in-progress`). A row matches a recording by session directory name or source id (case-insensitive) or by its `artifact` path resolving to the same file identity; rows of any tenant count (conservative). Cannot see: a recording the poller has not yet written a row for; a stale row that was never updated (it keeps, the safe direction).
+   If the file is not given, missing, unreadable, oversized or malformed, in-progress is UNKNOWN: the header carries `!! PIPELINE STATE UNAVAILABLE (<why>)` and every recording whose media mtime is within 30 days (inclusive) is KEEP `operation-state-unavailable` (not assessable). Justification: without the pipeline's rows the quiet period alone is the only evidence, so recent media is held; media untouched for over 30 days is not blocked, because a stalled row on a file nobody has touched for a month is implausible against the poller's retry limit, and blocking everything forever would make the report useless. The constant (`OPS_UNKNOWN_WINDOW_MS`) is a stated choice for the owner to revisit.
+(iii) mtime quiet period kept, boundary fixed: `now - mtime <= 24 h` is KEEP (strictly older required).
+
+### 3. ISS-T046DRY-004: clock rule (`retention-report/clock.ts`)
+The header prints `as of: <ISO, UTC>` (and the operator-confirmed value when given). A single clock set far AHEAD cannot be disproved by state alone, so: if `now` is more than 90 days after the newest recorded activity (a media mtime or processedAt not itself in the future), the clock is UNCONFIRMED and no recording is ELIGIBLE (each becomes KEEP `clock-unconfirmed`, not assessable) unless the operator passes `--as-of <ISO instant>` (strict `YYYY-MM-DDTHH:MM:SSZ`) within 24 h of the system clock. A `--as-of` that differs from the system clock by more than 24 h refuses verdicts even inside the horizon (`!! CLOCK MISMATCH`). A quiet system older than 90 days therefore also needs `--as-of`: refusal is the default when in doubt. A clock BEHIND the data stays caught per record (`clock-skew`, mtime more than 5 minutes ahead). It cannot see: a clock ahead by less than 90 days (the quiet period and min-age are the only margin), or an operator who confirms the wrong date.
+
+### 4. Totals and wording (sample, temp fixture: a and b spell one 100 B file, both eligible; c and d share one 50 B file and d is not indexed)
+```
+as of: 2026-10-11T12:00:00.000Z (UTC, the system clock)
+RECORDING a-src => ELIGIBLE
+RECORDING c-src => KEEP
+  guard: shared-media-not-all-eligible - 2 session record(s) reference this one physical file and not every one of them is eligible ...
+TOTALS eligible: 2 recording(s) = 1 file(s), 100 B (each physical file's bytes counted once)
+TOTALS kept by policy: 1 recording(s) = 0 file(s), 0 B
+TOTALS kept by guard: 1 recording(s) = 1 file(s), 50 B
+TOTALS not assessable: 0 recording(s) = 0 file(s), 0 B (policy says eligible or the file/clock/pipeline state could not be trusted; NOT counted as eligible)
+files referenced by more than one session record: 2; recordings with no located file (size unknown, bytes not counted): 0
+```
+Records are counted by their own verdict; each physical file's bytes are attributed ONCE to one bucket (eligible if all its records are; else the most restrictive of not assessable > kept by guard > kept by policy), so byte columns never double count a file and a shared file's records may appear in a different bucket than its bytes (above: d's record is "kept by policy", its file's 50 B sit under "kept by guard").
+
+### Size guard is inert on today's state
+No shipped writer records `sizeBytes` in source.json (grep `scripts/upload`, `scripts/webinar`), so the size-mismatch guard never fires on real state. It is not a protection today; it only helps once a writer records sizes.
+
+### D-015 against the ledger's recorded reproductions (`qa/issues.t046dry.jsonl`, verbatim)
+- ISS-T046DRY-003: 2/2 (fixture 1 dupA+dupB: both KEEP, 0 eligible file(s); fixture 2 A,B,C three spellings: one file, 100 B once, run with and without the file index).
+- ISS-T046DRY-004: 2/2 (as-of instant printed; clock +5 years: no ELIGIBLE, `CLOCK UNCONFIRMED`).
+- ISS-T046DRY-005: 2/2 (icacls deny on the file -> KEEP media-unreadable; deny on the parent directory -> KEEP media-unreadable; ACLs restored with `/remove:d` and `/reset` in a finally, trees deleted afterwards). Additional corpus (not a substitute): operation rows in 12 statuses incl. unknown, source-id and artifact-path matching, state missing/unreadable/malformed (5 variants), boundary at exactly 24 h.
+- Left out of the measurement, with reason: the ledger's pipeline-row suggestion (status recording|processing plus artifact path) has no recorded fixture in the ledger; it is covered by the additional corpus only.
+
+### Downgrade-only property
+`retention-report/property.test.ts`: 2,000 seeded sessions (5 batches x 400, plus the helper sessions that create hardlink targets) over a pool of 260 media files so files are shared, with `./`, `//` and upper-case spellings, hardlinks, mixed policy verdicts, young/future mtimes, malformed processedAt and pipeline rows (recording, processing, failed, unknown, ready). The oracle is independent of the command's identity code (device:index straight from `statSync`). Results: reported-ELIGIBLE is a subset of the planner's eligible set (0 violations); at FILE level no file is ELIGIBLE unless all its records are (0 violations); the eligible totals line equals the oracle's file count and byte sum for every batch. Non-vacuous (diagnostic line): eligible files 81, shared-media vetoes 174, multi-record files with none eligible 599, operation-in-progress 19.
+
+### Mutations: 19/19 killed
+Hand-built harness, untracked in the worktree and deleted before commit; per-mutation byte backup, restore in a finally, `git hash-object` before == after, 240 s hard kill; all 19 restores matched. Killed: group eligibility ANY instead of ALL; identity by raw path string; case-sensitive identity on Windows (killed by the file-index-hidden case test); bytes counted per row; readability probe removed; probe opened `r+` (scanner + seam flag assertion); unknown operation status treated as terminal; missing operations state treated as nothing in progress; quiet boundary back to exclusive; clock sanity check removed; as-of omitted from the header; a pipeline guard returning eligible; `--as-of` tolerance disabled; unmatched/other-tenant records not counted as group members; clock refusal ignored; file index ignored (hardlink); artifact-path matching removed; probe never closes the handle; shared veto made to keep eligible.
+
+### Evidence (from `packages/ingest`, node 24.19.0 direct)
+- `node --test --import tsx src/retention-report.test.ts src/retention-report.guards.test.ts src/retention-report.property.test.ts src/retention-report.safety.test.ts src/retention-report.nowrite.test.ts src/retention-report/*.test.ts` -> `tests 46 / pass 46 / fail 0`.
+- `node --test --import tsx src/retention-sweep.test.ts src/retention-sweep.strict.test.ts` -> `tests 31 / pass 31`; in `packages/core`: `node --test --import tsx src/domain/purge-policy.test.ts` -> `tests 7 / pass 7`.
+- `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` -> exit 0.
+- `git diff 8520fa8 -- packages/ingest/src/retention-sweep.ts packages/core/src/domain/purge-policy.ts` -> empty.
+- Budgets (non-blank lines): sources max 148 (`retention-report.ts`), tests max 175. `node scripts/lint-dirsize.mjs`: only the known `packages/index/src/pipeline: 34 files (budget 30)`; the new modules and tests live in the new directory `packages/ingest/src/retention-report/` (7 files), so `packages/ingest/src` stays at 28.
+- Existing tests changed by the new behaviour: the 24 h boundary expectation (now KEEP), the TOTALS regexes, the argv option list pinned by the nowrite test, one vacuity threshold in the old property test (eligible > 10, was > 20, because exactly-at-boundary cases are now KEEP); `baseArgs` now passes an empty operations file by default so other guards are not masked by the unknown-state guard.
+
+### Unverified
+- A real Windows sharing violation (another process holding the file exclusively): Node cannot take a deny-sharing handle, so the EBUSY/EPERM/EACCES path is tested through the injected fs seam only. The real ACL-deny path IS exercised with icacls.
+- File symlinks: no symlink privilege on this machine (directory junctions only, as in cycle 1).
+- The command has not been run against real data directories; dependency-cruiser was not re-run for the new subdirectory (imports are relative into `../`).
+- Unreadable session records (no parseable source.json) could reference any file; they are counted in the header, not used as vetoes.

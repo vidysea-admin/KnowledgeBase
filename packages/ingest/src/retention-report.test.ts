@@ -24,7 +24,7 @@ test("eligible and kept recordings are reported with reasons, sizes and byte tot
   assert.match(r.out, /claims-verified=FAIL\(0\/1 verified\)/);
   assert.match(r.out, /reason: 1 claim\(s\) citing this media are not yet verified/);
   assert.match(r.out, /would retain 1 evidence-clip window/);
-  assert.match(r.out, /TOTALS eligible: 1 recording\(s\), 100 B \| kept: 1 recording\(s\), 50 B/);
+  assert.match(r.out, /TOTALS eligible: 1 recording\(s\) = 1 file\(s\), 100 B[^\n]*\nTOTALS kept by policy: 1 recording\(s\) = 1 file\(s\), 50 B/);
   assert.match(r.out, /min-age-days=7 \(604800000 ms\) {2}clip-padding-seconds=15/);
 }));
 

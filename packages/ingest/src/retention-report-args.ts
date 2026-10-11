@@ -4,6 +4,7 @@
  * --apply, --force, --yes ...): anything not listed below is a usage error. The two retention
  * thresholds are an owner decision (ARCHITECTURE Q6) and have NO default.
  */
+import { parseIsoInstant } from "./strict-record.js";
 import { cleanText } from "./retention-report-text.js";
 
 export interface ReportOptions {
@@ -12,17 +13,23 @@ export interface ReportOptions {
   mediaRoot: string;
   minAgeDays: number;
   clipPaddingSeconds: number;
+  /** webinar poller operations.json (in-progress signal); absent = state unavailable, which the report warns about */
+  operationsState?: string;
+  /** operator-confirmed "today" (epoch ms) from --as-of; must match the system clock within a tolerance */
+  asOf?: number;
 }
 
 export const USAGE = [
-  "usage: retention-report --tenant <id> --data-root <dir> --min-age-days <N> --clip-padding-seconds <N> --media-root <dir>",
+  "usage: retention-report --tenant <id> --data-root <dir> --min-age-days <N> --clip-padding-seconds <N> --media-root <dir> [--operations-state <operations.json>] [--as-of <ISO instant>]",
   "  Report-only dry run: prints what the retention sweep planner WOULD mark purge-eligible. It deletes nothing and has no apply mode.",
   "  --media-root is required: the report only calls a recording purge-eligible after it has located and stat'd the media file under it.",
+  "  --operations-state: the webinar poller's data/webinar-release/operations.json. Recordings the pipeline marks recording/processing/failed/unknown are kept. Without it, recordings modified in the last 30 days are kept.",
+  "  --as-of: the date you believe it is (ISO, e.g. 2026-10-11T12:00:00Z). Required to get any ELIGIBLE verdict when the clock is >90 days past the newest activity; refused if it differs from the system clock by >24 h.",
   "  --min-age-days and --clip-padding-seconds are owner decisions (ARCHITECTURE Q6); there is no default.",
   "  example: retention-report --tenant toc --data-root ./data/upload --min-age-days 30 --clip-padding-seconds 15 --media-root ./data/media",
 ];
 
-const VALUED = ["--tenant", "--data-root", "--media-root", "--min-age-days", "--clip-padding-seconds"];
+const VALUED = ["--tenant", "--data-root", "--media-root", "--min-age-days", "--clip-padding-seconds", "--operations-state", "--as-of"];
 const MAX_DAYS = 36500;
 const THRESHOLD_NOTE = "thresholds are an owner decision (ARCHITECTURE Q6) and this command has no default";
 
@@ -64,7 +71,11 @@ export function parseArgs(argv: readonly string[]): ParsedArgs {
   const dataRoot = given.get("--data-root");
   if (!tenant || tenant.length > 200 || /\p{Cc}/u.test(tenant)) return { ok: false, message: "--tenant is required (1-200 characters, no control characters)" };
   if (!dataRoot) return { ok: false, message: "--data-root is required" };
+  const asOfRaw = given.get("--as-of");
+  const asOf = asOfRaw === undefined ? undefined : parseIsoInstant(asOfRaw);
+  if (asOf === null) return { ok: false, message: "--as-of must be an ISO instant like 2026-10-11T12:00:00Z" };
+  const operationsState = given.get("--operations-state");
   const mediaRoot = given.get("--media-root");
   if (!mediaRoot) return { ok: false, message: "--media-root is required: a report that cannot see the media files cannot say anything is purgeable" };
-  return { ok: true, opts: { tenant, dataRoot, minAgeDays, clipPaddingSeconds, mediaRoot } };
+  return { ok: true, opts: { tenant, dataRoot, minAgeDays, clipPaddingSeconds, mediaRoot, ...(operationsState ? { operationsState } : {}), ...(asOf !== undefined ? { asOf } : {}) } };
 }

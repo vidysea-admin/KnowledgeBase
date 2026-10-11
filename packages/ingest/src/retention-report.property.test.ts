@@ -41,7 +41,7 @@ test("downgrade-only: for 1,000 seeded random inputs a guard never turns a plann
     if (planned !== "purge-eligible") { assert.equal(out.hit, null, `case ${i}`); assert.equal(guard(planned, input, NOW), null); }
     if (planned === "purge-eligible") { eligibleIn++; if (out.eligible) eligibleOut++; else downgraded++; }
   }
-  assert.ok(eligibleOut > 20 && downgraded > 100, `property test must not be vacuous (kept eligible ${eligibleOut}, downgraded ${downgraded} of ${eligibleIn})`);
+  assert.ok(eligibleOut > 10 && downgraded > 100, `property test must not be vacuous (kept eligible ${eligibleOut}, downgraded ${downgraded} of ${eligibleIn})`);
 });
 
 function sessionSpec(r: () => number, i: number): SessionSpec {

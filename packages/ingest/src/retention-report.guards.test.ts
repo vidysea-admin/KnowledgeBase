@@ -97,13 +97,15 @@ test("--media-root is required and must be an existing directory", () => withRoo
 }));
 
 // min-age 0.01 d (about 14 min) with processedAt 2 h ago keeps the after-processed guard out of the way, so only the quiet period and skew are measured.
-test("quiet period boundary: exactly at it is eligible, 1 s inside is KEEP; clock skew boundary", () => {
+test("quiet period boundary: exactly at it is KEEP (strictly older required), 1 ms past is eligible; clock skew boundary", () => {
   const fresh = { processedAt: iso(2 * 3_600_000) };
   const r = runCases({
     "q-5s": { ...fresh, mediaMtimeMs: NOW - 5000 },
     "q-just-inside": { ...fresh, mediaMtimeMs: NOW - QUIET_PERIOD_MS + 1000 },
     "q-exact": { ...fresh, mediaMtimeMs: NOW - QUIET_PERIOD_MS },
     "q-just-past": { ...fresh, mediaMtimeMs: NOW - QUIET_PERIOD_MS - 1000 },
+    "q-1ms-past": { ...fresh, mediaMtimeMs: NOW - QUIET_PERIOD_MS - 1 },
+    "q-1ms-inside": { ...fresh, mediaMtimeMs: NOW - QUIET_PERIOD_MS + 1 },
     "f-1min": { ...fresh, mediaMtimeMs: NOW + 60_000 },
     "f-edge": { ...fresh, mediaMtimeMs: NOW + CLOCK_SKEW_MS },
     "f-over": { ...fresh, mediaMtimeMs: NOW + CLOCK_SKEW_MS + 1000 },
@@ -111,7 +113,9 @@ test("quiet period boundary: exactly at it is eligible, 1 s inside is KEEP; cloc
   }, "0.01");
   assert.deepEqual(r["q-5s"], ["KEEP", "recently-modified"]);
   assert.deepEqual(r["q-just-inside"], ["KEEP", "recently-modified"]);
-  assert.deepEqual(r["q-exact"], ["ELIGIBLE", "none"]);
+  assert.deepEqual(r["q-exact"], ["KEEP", "recently-modified"]); // fix cycle 2: strictly older than the quiet period is required
+  assert.deepEqual(r["q-1ms-inside"], ["KEEP", "recently-modified"]);
+  assert.deepEqual(r["q-1ms-past"], ["ELIGIBLE", "none"]);
   assert.deepEqual(r["q-just-past"], ["ELIGIBLE", "none"]);
   assert.deepEqual(r["f-1min"], ["KEEP", "recently-modified"]);
   assert.deepEqual(r["f-edge"], ["KEEP", "recently-modified"]);
@@ -162,8 +166,11 @@ test("totals, hand-computed: eligible, kept by policy, and the separate not-asse
   writeSession(root, media, { name: "f", ...old, mediaBytes: 20, recordedBytes: 500 });                         // not assessable 20 B known
   writeSession(root, media, { name: "g", ...old, mediaPath: "../g.webm" });                                     // not assessable, size unknown
   const out = runCmd(baseArgs(root, media)).out;
-  assert.match(out, /TOTALS eligible: 2 recording\(s\), 150 B \| kept: 2 recording\(s\), 70 B \| size unknown for 2 \(not counted in bytes\)/);
-  assert.match(out, /^not assessable: 3 recording\(s\), 20 B known/m);
+  assert.match(out, /^TOTALS eligible: 2 recording\(s\) = 2 file\(s\), 150 B/m);
+  assert.match(out, /^TOTALS kept by policy: 1 recording\(s\) = 1 file\(s\), 40 B/m);
+  assert.match(out, /^TOTALS kept by guard: 1 recording\(s\) = 1 file\(s\), 30 B/m);
+  assert.match(out, /^TOTALS not assessable: 3 recording\(s\) = 1 file\(s\), 20 B/m);
+  assert.match(out, /recordings with no located file \(size unknown, bytes not counted\): 2/);
   assert.equal(guardOf(out, "e"), "recently-modified");
   assert.doesNotMatch(block(out, "e"), /\(not assessable\)/);
   assert.match(block(out, "d"), /guard: media-not-found \(not assessable\)/);

@@ -15,16 +15,22 @@
  */
 import { planRetentionSweep, type PlanItem, type RetentionPlan } from "./retention-sweep.js";
 import { parseIsoInstant } from "./strict-record.js";
+import type { ClockCheck } from "./retention-report/clock.js";
 import { parseArgs, USAGE, type ReportOptions } from "./retention-report-args.js";
 import { gatherState, tenantSegment, type Gathered, type SessionInfo } from "./retention-report-state.js";
 import { cleanText } from "./retention-report-text.js";
-import { mediaRootUsable } from "./retention-report-media.js";
-import { NOT_ASSESSABLE, QUIET_PERIOD_MS, finalEligible } from "./retention-report-guards.js";
+import { NOT_ASSESSABLE, QUIET_PERIOD_MS } from "./retention-report-guards.js";
+import { assess, type Row, type Verdict } from "./retention-report/assess.js";
+import { checkClock, CLOCK_HORIZON_MS } from "./retention-report/clock.js";
+import { OPS_UNKNOWN_WINDOW_MS, TERMINAL_STATUSES, loadOps, type OpsState } from "./retention-report/ops.js";
+import { REAL_IO, mediaRootUsable, type MediaIo } from "./retention-report-media.js";
 
 export interface RunDeps {
   now: () => number;
   write: (line: string) => void;
   error: (line: string) => void;
+  /** file-system seam for tests; the default is the real read-only calls */
+  io?: MediaIo;
 }
 
 const DAY_MS = 86_400_000;
@@ -55,47 +61,40 @@ function preconditions(info: SessionInfo, g: Gathered, minAgeMs: number, now: nu
   return parts.join(" ");
 }
 
-interface Tot { n: number; bytes: number }
-
-function section(g: Gathered, plan: RetentionPlan | null, opts: ReportOptions, minAgeMs: number, now: number) {
+function section(g: Gathered, plan: RetentionPlan | null, opts: ReportOptions, minAgeMs: number, now: number, clock: ClockCheck, ops: OpsState) {
   const lines: string[] = [];
-  const eligible: Tot = { n: 0, bytes: 0 }, kept: Tot = { n: 0, bytes: 0 }, notAssessable: Tot = { n: 0, bytes: 0 };
-  let unknownSize = 0;
-  const tally = (t: Tot, size: number | null): void => { t.n++; t.bytes += size ?? 0; if (size === null) unknownSize++; };
   // Planner items follow media order; an index:N id names the media array slot. Own-tenant copies only.
   const byId = new Map<string, SessionInfo[]>();
   g.media.forEach((m, i) => {
     const info = g.infos[g.mediaInfo[i] ?? -1];
     if (info?.mediaId !== undefined && (info.mediaTenant === undefined || info.mediaTenant === g.tenantId)) byId.set(info.mediaId, [...(byId.get(info.mediaId) ?? []), info]);
   });
-  const entry = (info: SessionInfo | undefined, item: PlanItem | undefined, reason: string): void => {
-    const planned = item?.decision ?? "keep";
-    const fin = info === undefined
-      ? { eligible: false, hit: planned === "purge-eligible" ? { code: "media-not-found" as const, detail: "no session state matched this planner item" } : null }
-      : finalEligible(planned, { media: info.media, recordedBytes: info.recordedBytes, processedAtMs: parseIsoInstant(info.processedAt) }, now);
-    const size = info?.media.sizeBytes ?? null;
-    const verdict = fin.eligible ? "ELIGIBLE" : "KEEP";
-    if (fin.eligible) tally(eligible, size);
-    else if (fin.hit && NOT_ASSESSABLE.has(fin.hit.code)) tally(notAssessable, size);
-    else tally(kept, size);
-    lines.push(`RECORDING ${cleanText(item?.mediaId.startsWith("index:") ? info?.mediaId ?? item.mediaId : item?.mediaId ?? info?.dir ?? "?", 80)} => ${verdict}`);
-    if (info) {
-      lines.push(`  session: ${cleanText(info.dir, 80)}${info.title ? `  title: ${cleanText(info.title, 100)}` : ""}`);
-      lines.push(`  file: ${info.media.relPath ? cleanText(info.media.relPath, 120) : "(not located)"}  size: ${fmtBytes(size)}  age: ${parseIsoInstant(info.processedAt) === null ? "n/a" : `${days(now - (parseIsoInstant(info.processedAt) ?? now))} d since processedAt`}${info.media.mtimeMs === null ? "" : `  media-mtime-age: ${((now - info.media.mtimeMs) / 3_600_000).toFixed(2)} h`}`);
-      if (!info.unreadable) lines.push(`  preconditions: ${preconditions(info, g, minAgeMs, now)}`);
-    }
-    if (fin.hit) lines.push(`  guard: ${fin.hit.code}${NOT_ASSESSABLE.has(fin.hit.code) ? " (not assessable)" : ""} - ${cleanText(fin.hit.detail, 200)}; the planner alone said purge-eligible`);
-    lines.push(`  ${fin.hit ? "planner " : ""}reason: ${cleanText(reason, 200)}`);
-    if (fin.eligible && item) lines.push(`  would retain ${item.retainWindows.length} evidence-clip window(s) (+/-${opts.clipPaddingSeconds}s)`);
-  };
-  for (const info of g.infos.filter((i) => i.unreadable)) entry(info, undefined, `unreadable state, kept: ${info.unreadable}`);
+  const rows: Row[] = g.infos.filter((i) => i.unreadable).map((info) => ({ info, item: undefined }));
   for (const item of plan?.items ?? []) {
     let info: SessionInfo | undefined;
     if (item.mediaId.startsWith("index:")) info = g.infos[g.mediaInfo[Number(item.mediaId.slice(6))] ?? -1];
     else info = byId.get(item.mediaId)?.shift();
-    entry(info, item, item.reason);
+    rows.push({ info, item });
   }
-  return { lines, eligible, kept, notAssessable, unknownSize };
+  const printed = new Set(rows.map((r) => r.info));
+  const a = assess(rows, g.infos.filter((i) => !printed.has(i)), now, clock, ops);
+  for (const row of rows) {
+    const { info, item } = row;
+    const v = a.verdicts.get(row) as Verdict;
+    const reason = row.item === undefined ? `unreadable state, kept: ${info?.unreadable ?? "?"}` : row.item.reason;
+    const size = info?.media.sizeBytes ?? null;
+    lines.push(`RECORDING ${cleanText(item?.mediaId.startsWith("index:") ? info?.mediaId ?? item.mediaId : item?.mediaId ?? info?.dir ?? "?", 80)} => ${v.eligible ? "ELIGIBLE" : "KEEP"}`);
+    if (info) {
+      lines.push(`  session: ${cleanText(info.dir, 80)}${info.title ? `  title: ${cleanText(info.title, 100)}` : ""}`);
+      lines.push(`  file: ${info.media.relPath ? cleanText(info.media.relPath, 120) : "(not located)"}  size: ${fmtBytes(size)}  age: ${parseIsoInstant(info.processedAt) === null ? "n/a" : `${days(now - (parseIsoInstant(info.processedAt) ?? now))} d since processedAt`}${info.media.mtimeMs === null ? "" : `  media-mtime-age: ${((now - info.media.mtimeMs) / 3_600_000).toFixed(2)} h`}`);
+      if (!info.unreadable) lines.push(`  preconditions: ${preconditions(info, g, minAgeMs, now)}`);
+      if (v.shared > 1) lines.push(`  shared-media: ${v.shared} session record(s) reference this one physical file`);
+    }
+    if (v.hit) lines.push(`  guard: ${v.hit.code}${NOT_ASSESSABLE.has(v.hit.code) ? " (not assessable)" : ""} - ${cleanText(v.hit.detail, 240)}${item?.decision === "purge-eligible" ? "; the planner alone said purge-eligible" : ""}`);
+    lines.push(`  ${v.hit ? "planner " : ""}reason: ${cleanText(reason, 200)}`);
+    if (v.eligible && item) lines.push(`  would retain ${item.retainWindows.length} evidence-clip window(s) (+/-${opts.clipPaddingSeconds}s)`);
+  }
+  return { lines, a };
 }
 
 export function runRetentionReport(argv: readonly string[], deps: RunDeps): number {
@@ -107,7 +106,8 @@ export function runRetentionReport(argv: readonly string[], deps: RunDeps): numb
   }
   const opts = parsed.opts;
   if (!mediaRootUsable(opts.mediaRoot)) { deps.error("retention-report: cannot read --media-root: it must be an existing directory"); return 3; }
-  const gathered = gatherState(opts);
+  const io = deps.io ?? REAL_IO;
+  const gathered = gatherState(opts, io);
   if (!gathered.ok) { deps.error(`retention-report: ${gathered.message}`); return 3; }
   const g = gathered.value;
   const minAgeMs = opts.minAgeDays * DAY_MS;
@@ -120,20 +120,32 @@ export function runRetentionReport(argv: readonly string[], deps: RunDeps): numb
     deps.error(`retention-report: planner refused the input: ${planned.errors.map((e) => cleanText(e, 160)).join("; ")}`);
     return 2;
   }
-  const s = section(g, planned.plan, opts, minAgeMs, now);
+  const ops = loadOps(opts.operationsState, io);
+  const clock = checkClock(now, g.infos.flatMap((i) => [parseIsoInstant(i.processedAt), i.media.mtimeMs]), opts.asOf);
+  const { lines, a } = section(g, planned.plan, opts, minAgeMs, now, clock, ops);
+  const t = a.totals;
+  const tot = (label: string, b: { records: number; files: number; bytes: number }): string => `TOTALS ${label}: ${b.records} recording(s) = ${b.files} file(s), ${b.bytes} B`;
   const out = [
     "RETENTION DRY RUN - report only. Nothing is deleted, moved or written; this command cannot delete.",
+    clock.asOfLine,
+    ...clock.banner,
+    ...(ops.kind === "unavailable" ? [`!! PIPELINE STATE UNAVAILABLE (${cleanText(ops.why, 60)}): in-progress recordings cannot be seen. Recordings whose media changed within ${OPS_UNKNOWN_WINDOW_MS / 86_400_000} d are kept (operation-state-unavailable). Pass --operations-state <data/webinar-release/operations.json>.`] : []),
     `tenant: ${cleanText(opts.tenant, 80)}  state: <data-root>/${tenantSegment(opts.tenant)}/ (tenant-segmented by sha-256 of the tenant id; each file also carries its own tenantId)`,
     `thresholds used (owner decision, ARCHITECTURE Q6, no default): min-age-days=${opts.minAgeDays} (${minAgeMs} ms)  clip-padding-seconds=${opts.clipPaddingSeconds}`,
     "tenant scoping: only this tenant's directory is read; legacy flat dirs (e.g. data/toc-migrated) are not tenant-scoped by directory and are never read.",
-    `media guards (downgrade-only, planner untouched): quiet period ${QUIET_PERIOD_MS / 3_600_000} h since the media file's mtime; media must be found inside --media-root and stat'd`,
+    `media guards (downgrade-only, planner untouched): media file found inside --media-root, opened read-only and read; quiet period ${QUIET_PERIOD_MS / 3_600_000} h (modified strictly longer ago than this); pipeline status must be terminal (${[...TERMINAL_STATUSES].join("/")}), unknown or non-terminal status keeps; clock check horizon ${CLOCK_HORIZON_MS / 86_400_000} d`,
+    "ELIGIBLE means only: the existing planner said purge-eligible for these thresholds, AND every guard above passed, AND every session record that references the same physical file is also ELIGIBLE.",
+    "ELIGIBLE does not mean: safe to delete. No shipped writer records processedAt or sizeBytes, a writer holding a file open can be invisible to the OS, and no executor exists. It is a shortlist for human review.",
     "note: no shipped writer records processedAt, so real state reports recordings as not processed unless session.json carries processedAt.",
-    `recordings: ${g.infos.length}  non-recording sessions skipped: ${g.nonRecording}  other-tenant records excluded: ${planned.plan.tenancyViolations.length}`,
+    `recordings: ${g.infos.length}  non-recording sessions skipped: ${g.nonRecording}  other-tenant records excluded: ${planned.plan.tenancyViolations.length}  unreadable session records: ${g.infos.filter((i) => i.unreadable).length} (their media paths are unknown and could reference any file)`,
     "",
-    ...s.lines,
+    ...lines,
     "",
-    `TOTALS eligible: ${s.eligible.n} recording(s), ${s.eligible.bytes} B | kept: ${s.kept.n} recording(s), ${s.kept.bytes} B | size unknown for ${s.unknownSize} (not counted in bytes)`,
-    `not assessable: ${s.notAssessable.n} recording(s), ${s.notAssessable.bytes} B known (policy says eligible, but the media file was not found, not trusted or not readable; these are NOT counted as eligible or as kept-by-policy)`,
+    tot("eligible", t.eligible) + " (each physical file's bytes counted once)",
+    tot("kept by policy", t.policy),
+    tot("kept by guard", t.guard),
+    tot("not assessable", t.notAssessable) + " (policy says eligible or the file/clock/pipeline state could not be trusted; NOT counted as eligible)",
+    `files referenced by more than one session record: ${a.sharedFiles}; recordings with no located file (size unknown, bytes not counted): ${a.unlocated}`,
     ...g.notes.map((n) => `warning: ${cleanText(n, 200)}`),
   ];
   deps.write(out.join("\n"));

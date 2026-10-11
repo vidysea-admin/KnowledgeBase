@@ -6,13 +6,14 @@ import test from "node:test";
 import { importGraph, scanSource, strip } from "./retention-report.scan.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const ENTRY = ["retention-report.ts", "retention-report-args.ts", "retention-report-state.ts", "retention-report-text.ts", "retention-report-cli.ts", "retention-report-media.ts", "retention-report-guards.ts"];
+const ENTRY = ["retention-report.ts", "retention-report-args.ts", "retention-report-state.ts", "retention-report-text.ts", "retention-report-cli.ts", "retention-report-media.ts", "retention-report-guards.ts",
+  "retention-report/assess.ts", "retention-report/ops.ts", "retention-report/clock.ts"];
 // The @lkb/core barrel also re-exports an https alert sink; the report only uses these pure names, so the scan pins
 // the names imported from the barrel and follows the one file that defines them.
 const CORE_PURGE_POLICY = resolve(HERE, "..", "..", "core", "src", "domain", "purge-policy.ts");
 const CORE_NAMES = new Set(["deriveEvidenceClipWindows", "isPurgeEligible", "Claims", "EvidenceClipWindow", "Media", "Turns"]);
 const ALLOWED_BARE = new Set(["node:fs", "node:path", "node:crypto", "node:util", "@lkb/core"]);
-const READ_ONLY_FS = new Set(["lstatSync", "readdirSync", "readFileSync", "statSync", "realpathSync"]);
+const READ_ONLY_FS = new Set(["lstatSync", "readdirSync", "readFileSync", "statSync", "realpathSync", "openSync", "readSync", "closeSync"]);
 
 test("the report modules and everything they import contain no delete, write, rename or spawn API", () => {
   const g = importGraph(ENTRY.map((f) => join(HERE, f)).concat([join(HERE, "retention-sweep.ts")]), CORE_PURGE_POLICY);
@@ -45,6 +46,17 @@ test("scanner: only a literal read-only open flag passes; r+, w, a, x, numbers, 
 test("no apply-like option exists in the argument parser source", () => {
   const src = readFileSync(join(HERE, "retention-report-args.ts"), "utf8");
   const valued = /const VALUED = \[([^\]]*)\]/.exec(src)?.[1] ?? "";
-  assert.equal(valued.replace(/\s/g, ""), '"--tenant","--data-root","--media-root","--min-age-days","--clip-padding-seconds"');
+  assert.equal(valued.replace(/\s/g, ""), '"--tenant","--data-root","--media-root","--min-age-days","--clip-padding-seconds","--operations-state","--as-of"');
   assert.doesNotMatch(strip(src), /apply|force|\byes\b|execute|delete|purge-now/i);
+});
+
+test("the one file open in the report graph is the media probe's literal read-only open, and the scanner rejects every wider flag for it", () => {
+  const g = importGraph(ENTRY.map((f) => join(HERE, f)), CORE_PURGE_POLICY);
+  const opens = [...g.sources].flatMap(([file, src]) => [...strip(src).matchAll(/\b(?:openSync|open)\s*\(/g)].map(() => file));
+  assert.deepEqual(opens, [join(HERE, "retention-report-media.ts")]);
+  const probe = readFileSync(join(HERE, "retention-report-media.ts"), "utf8");
+  assert.match(probe, /io\.openSync\(real, "r"\)/);
+  for (const flag of ["r+", "w", "a", "wx", "w+", "a+", "rs+"]) {
+    assert.notDeepEqual(scanSource(probe.replace('io.openSync(real, "r")', `io.openSync(real, "${flag}")`)), [], `flag ${flag} must be rejected`);
+  }
 });

@@ -19,7 +19,7 @@ import { lstatSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { isPlain } from "./strict-record.js";
 import type { ReportOptions } from "./retention-report-args.js";
-import { NO_MEDIA, probeMedia, type MediaEvidence } from "./retention-report-media.js";
+import { NO_MEDIA, REAL_IO, probeMedia, type MediaEvidence, type MediaIo } from "./retention-report-media.js";
 
 export const CAPS = { maxSessions: 500, maxFileBytes: 5 * 1024 * 1024, maxTotalBytes: 64 * 1024 * 1024 };
 const SESSION_NAME = /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/;
@@ -82,7 +82,7 @@ function describe(r: Read): string {
   return r.ok ? (isPlain(r.value) ? "ok" : "not an object") : r.why;
 }
 
-export function gatherState(opts: ReportOptions): GatherResult {
+export function gatherState(opts: ReportOptions, io: MediaIo = REAL_IO): GatherResult {
   const tenantDir = join(opts.dataRoot, tenantSegment(opts.tenant));
   let names: string[];
   try {
@@ -115,7 +115,7 @@ export function gatherState(opts: ReportOptions): GatherResult {
     info.title = ownStr(ses.value, "title");
     info.mediaId = ownStr(src.value, "_id");
     info.mediaTenant = ownStr(src.value, "tenantId");
-    info.media = probeMedia(opts.mediaRoot, ownStr(src.value, "path") ?? ownStr(src.value, "audioPath"));
+    info.media = probeMedia(opts.mediaRoot, ownStr(src.value, "path") ?? ownStr(src.value, "audioPath"), io);
     const rec = own(src.value, "sizeBytes");
     info.recordedBytes = typeof rec === "number" && Number.isSafeInteger(rec) && rec >= 0 ? rec : null;
 

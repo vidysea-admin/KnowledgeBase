@@ -22,11 +22,13 @@ export const SIZE_TOLERANCE = 0.01;
 
 export type GuardCode =
   | "media-root-not-given" | "media-not-found" | "media-path-outside-root" | "media-unreadable"
-  | "recently-modified" | "clock-skew" | "media-modified-after-processed" | "size-mismatch";
+  | "recently-modified" | "clock-skew" | "media-modified-after-processed" | "size-mismatch"
+  | "clock-unconfirmed" | "operation-in-progress" | "operation-state-unavailable" | "shared-media-not-all-eligible";
 
 /** Codes meaning "the report could not see or trust the media": counted as NOT ASSESSABLE. */
 export const NOT_ASSESSABLE: ReadonlySet<GuardCode> = new Set<GuardCode>([
   "media-root-not-given", "media-not-found", "media-path-outside-root", "media-unreadable", "clock-skew", "size-mismatch",
+  "clock-unconfirmed", "operation-state-unavailable",
 ]);
 
 export interface GuardInput {
@@ -49,7 +51,7 @@ export function guard(planned: string, input: GuardInput, now: number): GuardHit
   const { sizeBytes, mtimeMs } = media;
   if (sizeBytes === null || mtimeMs === null || !Number.isFinite(mtimeMs)) return { code: "media-unreadable", detail: "size or mtime could not be read" };
   if (mtimeMs - now > CLOCK_SKEW_MS) return { code: "clock-skew", detail: `media mtime is ${h(mtimeMs - now)} h in the future (allowed skew ${h(CLOCK_SKEW_MS)} h)` };
-  if (now - mtimeMs < QUIET_PERIOD_MS) return { code: "recently-modified", detail: `media modified ${h(now - mtimeMs)} h ago, under the ${h(QUIET_PERIOD_MS)} h quiet period` };
+  if (now - mtimeMs <= QUIET_PERIOD_MS) return { code: "recently-modified", detail: `media modified ${h(now - mtimeMs)} h ago; strictly more than the ${h(QUIET_PERIOD_MS)} h quiet period is required` };
   if (processedAtMs !== null && mtimeMs - processedAtMs > AFTER_PROCESSED_MS) return { code: "media-modified-after-processed", detail: `media mtime is ${h(mtimeMs - processedAtMs)} h after processedAt (allowed ${h(AFTER_PROCESSED_MS)} h)` };
   if (recordedBytes !== null && Math.abs(recordedBytes - sizeBytes) > SIZE_TOLERANCE * Math.max(recordedBytes, sizeBytes)) {
     return { code: "size-mismatch", detail: `state records ${recordedBytes} B but the file is ${sizeBytes} B (tolerance ${SIZE_TOLERANCE * 100}%)` };

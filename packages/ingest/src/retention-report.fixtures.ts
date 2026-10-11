@@ -3,7 +3,7 @@
  * on-disk layout, runs the command, and snapshots a directory tree (content hash, size, mtime).
  */
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync, utimesSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { isAbsolute, join, relative, resolve } from "node:path";
 import { runRetentionReport } from "./retention-report.js";
@@ -83,8 +83,22 @@ export function runCmd(args: string[], now = NOW): Ran {
   return { code, out: out.join("\n"), err: err.join("\n") };
 }
 
+let emptyOpsFile: string | undefined;
+/** An operations.json with no rows, outside every fixture tree: "the pipeline has nothing in progress" (the tree snapshots stay clean). */
+export function emptyOps(): string {
+  if (!emptyOpsFile) {
+    const dir = mkdtempSync(join(tmpdir(), "t046dry-ops-"));
+    emptyOpsFile = join(dir, "operations.json");
+    writeFileSync(emptyOpsFile, JSON.stringify({ version: 1, operations: {} }));
+    process.on("exit", () => rmSync(dir, { recursive: true, force: true }));
+  }
+  return emptyOpsFile;
+}
+
+/** Default: the empty operations file, so tests of the other guards are not masked by the unknown-state guard. Pass --operations-state in `extra` to override. */
 export function baseArgs(root: string, mediaRoot: string, extra: string[] = [], tenant = "toc"): string[] {
-  return ["--tenant", tenant, "--data-root", root, "--media-root", mediaRoot, "--min-age-days", "7", "--clip-padding-seconds", "15", ...extra];
+  const ops = extra.includes("--operations-state") ? [] : ["--operations-state", emptyOps()];
+  return ["--tenant", tenant, "--data-root", root, "--media-root", mediaRoot, "--min-age-days", "7", "--clip-padding-seconds", "15", ...ops, ...extra];
 }
 
 /** Pins every mtime so a later snapshot differs if anything is touched. */
