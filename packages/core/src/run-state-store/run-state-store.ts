@@ -7,7 +7,8 @@
  *    leaves the old or the new complete file; a stray `.tmp` or lock file may remain.
  *  - Compare-and-swap: `save(runId, expected, next)`; `expected` is the state the caller loaded (null = "must
  *    not exist"). The stored state must have the same revision, i.e. the same per-stage attempt/attemptId/status
- *    and every other planner field, or the save is refused as `conflict`. No identity beyond RunState's own.
+ *    and every other planner field, or the save is refused as `conflict`. No identity beyond RunState's own. The
+ *    revision is checked after the lock is taken AND again right before the data rename (ISS-RUNLOCK-003).
  *  - The read-check-rename window runs under an exclusive `<id>.run-state.lock` file; a held lock is `locked`.
  *    The lock records its owner; a lock left by a dead process is taken over (rule and limits: run-state-lock.ts),
  *    the dead owner's orphan temp files are then reaped, and the token is re-checked right before the data rename.
@@ -39,6 +40,8 @@ const RENAME_RETRY_CODES = ["EPERM", "EACCES", "EBUSY"];
 const RENAME_RETRY_MS = 3000;
 
 class LockLost extends Error {}
+/** Raised by the pre-rename revision re-check; carries the typed result `save` returns. Nothing has been written. */
+class RevisionRefused extends Error { constructor(readonly refusal: RunStateSaveResult) { super("revision re-check refused"); } }
 
 function canonical(v: unknown): string {
   if (Array.isArray(v)) return `[${v.map(canonical).join(",")}]`;
@@ -100,7 +103,12 @@ export function createRunStateStore(root: string, fs: RunStateFsOps = realRunSta
     }
   }
 
-  function writeAtomic(runId: string, next: RunState, stillOwned: () => boolean): void {
+  /** True when `cur` is what the caller based its change on: absent for `expected === null`, else the same revision. */
+  const matches = (cur: Read, expected: RunState | null): boolean =>
+    cur.kind === "absent" ? expected === null : cur.kind === "state" && expected !== null && runStateRevision(cur.state) === runStateRevision(expected);
+  const CONFLICT: RunStateSaveResult = { ok: false, code: "conflict", message: "stored state does not match the expected state; reload and retry" };
+
+  function writeAtomic(runId: string, next: RunState, stillOwned: () => boolean, expected: RunState | null): void {
     const file = fileOf(runId);
     const tmp = `${file}.${fs.uuid()}.tmp`;
     const bytes = `${JSON.stringify({ format: RUN_STATE_FORMAT, runId, state: next })}\n`;
@@ -110,6 +118,11 @@ export function createRunStateStore(root: string, fs: RunStateFsOps = realRunSta
       fd = fs.createExclusive(tmp); created = true;
       fs.write(fd, bytes); fs.fsync(fd); fs.close(fd); fd = undefined;
       if (!stillOwned()) throw new LockLost("the lock no longer carries this writer's token");
+      // ISS-RUNLOCK-003: re-read the data file under the lock, immediately before the rename. A writer that was displaced
+      // (stalled past the live ceiling) and whose lock check still passed must not overwrite a newer revision.
+      const again = read(runId);
+      if (again.kind === "error") throw new RevisionRefused({ ok: false, code: again.code === "io-error" ? "io-error" : "corrupt-existing", message: again.message });
+      if (!matches(again, expected)) throw new RevisionRefused(CONFLICT);
       renameReplacing(tmp, file);
       created = false;
     } finally {
@@ -144,14 +157,13 @@ export function createRunStateStore(root: string, fs: RunStateFsOps = realRunSta
         if (got.takeover) reapRunStateTemps(lockCtx, root, runId);
         const cur = read(runId);
         if (cur.kind === "error") result = { ok: false, code: cur.code === "io-error" ? "io-error" : "corrupt-existing", message: cur.message };
-        else if (!(cur.kind === "absent" ? expected === null : expected !== null && runStateRevision(cur.state) === runStateRevision(expected)))
-          result = { ok: false, code: "conflict", message: "stored state does not match the expected state; reload and retry" };
+        else if (!matches(cur, expected)) result = CONFLICT;
         else {
-          writeAtomic(runId, next, () => runStateLockOwned(lockCtx, lock, token!));
+          writeAtomic(runId, next, () => runStateLockOwned(lockCtx, lock, token!), expected);
           result = { ok: true };
         }
       } catch (e) {
-        result = e instanceof LockLost
+        result = e instanceof RevisionRefused ? e.refusal : e instanceof LockLost
           ? { ok: false, code: "locked", message: `${lock} was taken over while this writer held it; nothing was written` }
           : { ok: false, code: "io-error", message: e instanceof Error ? e.message : String(e) };
       }
