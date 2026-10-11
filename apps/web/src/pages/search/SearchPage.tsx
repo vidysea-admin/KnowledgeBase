@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.js";
 import { ApiError } from "../../api/client.js";
+import { normalizeQuery } from "./query.js";
 import { searchTranscripts, type TranscriptSearchHit } from "../../api/search/client.js";
 
 type SearchState = { key: string; query: string } & (
@@ -14,35 +15,65 @@ function message(error: unknown): string {
   return "Search is unavailable. Try again.";
 }
 
+const inflight: { current: { id: string; promise: ReturnType<typeof searchTranscripts> } | null } = { current: null };
+
 export function SearchPage(): React.ReactElement {
   const { apiKey } = useAuth();
-  const [query, setQuery] = useState("");
+  const [params, setParams] = useSearchParams();
+  // The URL is the single source of truth for the executed query; the box is only a draft of it.
+  const urlQuery = normalizeQuery(params.get("q"));
+  const [query, setQuery] = useState(urlQuery);
   const [state, setState] = useState<SearchState | null>(null);
   const generation = useRef(0);
   const key = useRef(apiKey);
+  const previousKey = useRef(apiKey);
   key.current = apiKey;
   const current = state?.key === apiKey ? state : null;
+  useEffect(() => () => { generation.current++; }, []);
   useEffect(() => {
+    if (previousKey.current === apiKey) return;
+    previousKey.current = apiKey;
     generation.current++;
     setState(null);
     setQuery("");
+    setParams({}, { replace: true });
+  }, [apiKey, setParams]);
+  useEffect(() => {
+    setQuery(urlQuery);
+    if (!urlQuery || !apiKey) { generation.current++; setState(null); return; }
+    void run(urlQuery);
     return () => { generation.current++; };
-  }, [apiKey]);
+    // Runs per distinct URL query only; a key change clears the URL query above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlQuery]);
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function run(submitted: string) {
     if (!apiKey) return;
-    const submitted = query.trim(), request = ++generation.current, requestKey = apiKey;
-    if (!submitted) { setState({ key: requestKey, query: "", status: "failed", message: "Enter a search query." }); return; }
+    const request = ++generation.current, requestKey = apiKey, id = JSON.stringify([requestKey, submitted]);
     setState({ key: requestKey, query: submitted, status: "loading" });
+    // Reuse a still-pending identical request (React StrictMode re-runs mount effects in dev).
+    const pending = inflight.current?.id === id ? inflight.current.promise : searchTranscripts(requestKey, submitted);
+    inflight.current = { id, promise: pending };
+    const settle = () => { if (inflight.current?.promise === pending) inflight.current = null; };
     try {
-      const response = await searchTranscripts(requestKey, submitted);
+      const response = await pending;
+      settle();
       if (generation.current === request && key.current === requestKey)
         setState({ key: requestKey, query: submitted, status: "ready", hits: response.hits });
     } catch (error) {
+      settle();
       if (generation.current === request && key.current === requestKey)
         setState({ key: requestKey, query: submitted, status: "failed", message: message(error) });
     }
+  }
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!apiKey) return;
+    const submitted = normalizeQuery(query);
+    if (!submitted) { generation.current++; setState({ key: apiKey, query: "", status: "failed", message: "Enter a search query." }); return; }
+    // Same query as the URL: re-run in place (retry); otherwise push so Back returns to the earlier query.
+    if (submitted === urlQuery) void run(submitted); else setParams({ q: submitted });
   }
 
   return <>

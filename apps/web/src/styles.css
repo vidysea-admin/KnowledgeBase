@@ -234,3 +234,7 @@ body {
   font-weight: 600;
   cursor: pointer;
 }
+
+.global-search { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1rem; }
+.global-search label { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
+.global-search input { flex: 1; min-width: 0; }
