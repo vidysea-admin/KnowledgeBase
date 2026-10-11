@@ -45,3 +45,61 @@ test("Deadline kills owned descendant tree",async()=>{
   let alive=true;try{process.kill(pid,0)}catch{alive=false}assert.equal(alive,false,"owned descendant must be gone before rejection settles");
  }finally {rmSync(directory,{recursive:true,force:true});}
 });
+// --- ISS-AITRANSPORT-001: cleanup must never replace the primary outcome ---
+const eperm=()=>Object.assign(new Error("EPERM: operation not permitted, rmdir 'SECRET-PATH'"),{code:"EPERM"});
+function cleanupProbe(failures:number){
+ const dirs:string[]=[];const codes:string[]=[];let calls=0;
+ const cleanup={delayMs:1,onFailure:(c:string)=>{codes.push(c)},remove:(d:string)=>{calls++;dirs.push(d);if(calls<=failures)throw eperm();rmSync(d,{recursive:true,force:true})}};
+ return {cleanup,dirs,codes,get calls(){return calls}};
+}
+const sweep=(p:{dirs:string[]})=>{for(const d of p.dirs)rmSync(d,{recursive:true,force:true})};
+test("Cleanup EPERM after deadline: caller gets the timeout error, not EPERM",async()=>{
+ const p=cleanupProbe(99);
+ try{
+  await assert.rejects(createCliTransport({timeoutMs:300,cleanup:p.cleanup})(call("setInterval(()=>{},1000)")),(e:Error)=>/timed out/.test(e.message)&&!/EPERM|SECRET-PATH/.test(e.message));
+  assert.deepEqual(p.codes,["EPERM"]);
+ }finally{sweep(p)}
+});
+test("Cleanup throw after success: result is still returned",async()=>{
+ const p=cleanupProbe(99);
+ try{
+  const r=await createCliTransport({cleanup:p.cleanup})(call("console.log(JSON.stringify({result:'ok'}))"));
+  assert.deepEqual(r.body,{result:"ok"});
+ }finally{sweep(p)}
+});
+test("Cleanup throw after nonzero exit: the exit status is still returned",async()=>{
+ const p=cleanupProbe(99);
+ try{
+  const r=await createCliTransport({cleanup:p.cleanup})(call("process.exit(7)"));
+  assert.equal(r.status,7);
+ }finally{sweep(p)}
+});
+test("Cleanup throw after output overflow: overflow error wins",async()=>{
+ const p=cleanupProbe(99);
+ try{
+  await assert.rejects(createCliTransport({outputBytes:50,timeoutMs:5000,cleanup:p.cleanup})(call("process.stdout.write('x'.repeat(1000));setInterval(()=>{},1000)")),(e:Error)=>/output exceeds/.test(e.message)&&!/EPERM/.test(e.message));
+ }finally{sweep(p)}
+});
+test("Cleanup succeeding on the second attempt removes the directory silently",async()=>{
+ const p=cleanupProbe(1);
+ const r=await createCliTransport({cleanup:p.cleanup})(call("console.log(JSON.stringify({result:'ok'}))"));
+ assert.deepEqual(r.body,{result:"ok"});
+ assert.equal(p.calls,2);assert.deepEqual(p.codes,[]);assert.equal(existsSync(p.dirs[0]!),false);
+});
+test("Cleanup is attempted exactly once on success and bounded at 4 on persistent failure",async()=>{
+ const ok=cleanupProbe(0);
+ await createCliTransport({cleanup:ok.cleanup})(call("process.exit(0)"));
+ assert.equal(ok.calls,1);assert.equal(existsSync(ok.dirs[0]!),false);
+ const bad=cleanupProbe(99);
+ try{
+  await createCliTransport({cleanup:bad.cleanup})(call("process.exit(0)"));
+  assert.equal(bad.calls,4);assert.equal(new Set(bad.dirs).size,1);
+ }finally{sweep(bad)}
+});
+test("Cleanup reporter that throws cannot alter the outcome",async()=>{
+ const p=cleanupProbe(99);
+ try{
+  const r=await createCliTransport({cleanup:{...p.cleanup,onFailure:()=>{throw new Error("boom")}}})(call("console.log(JSON.stringify({result:'ok'}))"));
+  assert.deepEqual(r.body,{result:"ok"});
+ }finally{sweep(p)}
+});
