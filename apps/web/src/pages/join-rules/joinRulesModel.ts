@@ -123,7 +123,9 @@ export function parseView(raw: unknown): JoinRulesView | null {
 }
 
 export type PendingKind = "sender" | "domain" | "optout";
-export interface Pending { kind: PendingKind; value: string }
+/** Identity of the meeting an opt-out refers to. The editor does not know these today (it only has event ids); see postPending. */
+export interface MeetingHints { meetingUrl?: string; sessionKey?: string }
+export interface Pending { kind: PendingKind; value: string; hints?: MeetingHints }
 
 /** Client-side value check for the three add forms (the server re-checks). Returns the trimmed value or an error. */
 export function checkPendingValue(kind: PendingKind, raw: string): { value: string } | { error: string } {

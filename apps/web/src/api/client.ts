@@ -56,11 +56,22 @@ function invalidateAuth(apiKey: string): void {
 
 export class ApiError extends Error {
   status: number;
-  constructor(status: number, message: string) {
+  /** The response body's structured `error` code (e.g. "join_rules_busy"), when the body carried one. */
+  code?: string;
+  /** `Retry-After` in whole seconds (delta-seconds form only), when the response carried a valid one. */
+  retryAfterSeconds?: number;
+  constructor(status: number, message: string, extra: { code?: string; retryAfterSeconds?: number } = {}) {
     super(message);
     this.status = status;
+    if (extra.code !== undefined) this.code = extra.code;
+    if (extra.retryAfterSeconds !== undefined) this.retryAfterSeconds = extra.retryAfterSeconds;
     this.name = "ApiError";
   }
+}
+
+function parseRetryAfter(raw: string | null | undefined): number | undefined {
+  if (raw === null || raw === undefined || !/^\d{1,6}$/.test(raw.trim())) return undefined;
+  return Number(raw.trim());
 }
 
 export interface ApiFetchOptions {
@@ -90,13 +101,15 @@ export async function apiFetch<T>(path: string, apiKey: string | null, options: 
   if (!res.ok) {
     if (res.status === 401) invalidateAuth(apiKey);
     let message = `HTTP ${res.status}`;
+    let code: string | undefined;
     try {
-      const body = (await res.json()) as { message?: string };
+      const body = (await res.json()) as { message?: string; error?: unknown };
       if (body.message) message = body.message;
+      if (typeof body.error === "string") code = body.error;
     } catch {
       // response wasn't JSON; keep the generic message
     }
-    throw new ApiError(res.status, message);
+    throw new ApiError(res.status, message, { code, retryAfterSeconds: parseRetryAfter(res.headers?.get?.("retry-after")) });
   }
   return res.json() as Promise<T>;
 }

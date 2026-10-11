@@ -8,7 +8,21 @@ import {
   type DraftSet, type JoinRulesView, type Pending, type RuleSet,
 } from "./joinRulesModel.js";
 
-type Phase = { name: "loading" } | { name: "ready" } | { name: "blocked"; text: string; retry: boolean };
+type Phase = { name: "loading" } | { name: "ready" } | { name: "blocked"; text: string; retry: boolean; waitSeconds: number };
+
+/** Longest Retry-After the page will honour as a delay (a hostile or buggy header must not disable the control for long). */
+const MAX_RETRY_WAIT_SECONDS = 60;
+
+/** Retry control. `waitSeconds` is the server's Retry-After used as a MINIMUM delay before the button works; never auto-retries. */
+function RetryButton({ waitSeconds, onRetry }: { waitSeconds: number; onRetry: () => void }): React.ReactElement {
+  const [waiting, setWaiting] = useState(waitSeconds > 0);
+  useEffect(() => {
+    if (waitSeconds <= 0) return;
+    const t = setTimeout(() => setWaiting(false), waitSeconds * 1000);
+    return () => clearTimeout(t);
+  }, [waitSeconds]);
+  return <button type="button" disabled={waiting} onClick={onRetry}>Retry</button>;
+}
 interface Loaded { view: JoinRulesView; raw: string; draftJson: string }
 type Notice = { kind: "error" | "ok"; text: string } | null;
 
@@ -48,7 +62,7 @@ export function JoinRulesPage(): React.ReactElement {
     } catch (e) {
       if (keyRef.current !== apiKey) return;
       const p = classify(e);
-      setLoaded(null); setPhase({ name: "blocked", text: readText(p), retry: p.failure === "failed" || p.failure === "busy" });
+      setLoaded(null); setPhase({ name: "blocked", text: readText(p), retry: p.failure === "failed" || p.failure === "busy", waitSeconds: p.failure === "busy" ? Math.min(p.retryAfterSeconds ?? 0, MAX_RETRY_WAIT_SECONDS) : 0 });
     }
   }, [apiKey, adopt]);
   useEffect(() => { void load(); }, [load]);
@@ -100,7 +114,7 @@ export function JoinRulesPage(): React.ReactElement {
   async function confirmPending(p: Pending) {
     if (!apiKey) return;
     setBusy(true); setNotice(null);
-    try { await postPending(apiKey, p.kind, p.value); }
+    try { await postPending(apiKey, p.kind, p.value, p.hints); }
     catch (e) { writeProblem(e); setBusy(false); return; }
     try {
       adopt(await getJoinRules(apiKey), !dirty);
@@ -124,7 +138,7 @@ export function JoinRulesPage(): React.ReactElement {
       : phase.name === "loading" ? <p role="status">Loading join rules…</p>
       : phase.name === "blocked" ? <div className="card">
         <p role="alert" className="error-note">{phase.text}</p>
-        {phase.retry && <button type="button" onClick={() => void load()}>Retry</button>}
+        {phase.retry && <RetryButton waitSeconds={phase.waitSeconds} onRetry={() => void load()} />}
       </div>
       : loaded && <>
         {readOnly && <p role="alert" className="card error-note">{MESSAGES.readOnly}</p>}
