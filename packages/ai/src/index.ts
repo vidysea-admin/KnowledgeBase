@@ -19,3 +19,4 @@ export * from "./stt/chunk-audio.js";
 export * from "./trace.js";
 export * from "./trace-registry.js";
 export * from "./trace-file-sink.js";
+export * from "./trace-langfuse/sink.js";

@@ -11,6 +11,7 @@
 import type { Provider } from "./provider.js";
 import { isTelemetryEnabled, noopSink, traceProvider, type TraceRecord, type TraceSink } from "./trace.js";
 import { fileSinkFromEnv } from "./trace-file-sink.js";
+import { langfuseSinkFromEnv, selectsLangfuse } from "./trace-langfuse/sink.js";
 
 let installed: TraceSink | null = null;
 let envSink: TraceSink | null = null;
@@ -26,10 +27,31 @@ export function getTraceSink(): TraceSink {
   return installed ?? noopSink;
 }
 
+export interface EnvSinkFactories {
+  langfuse: (env: Record<string, string | undefined>) => TraceSink | null;
+  file: (env: Record<string, string | undefined>) => TraceSink;
+}
+
+/**
+ * Env-built sink. The Langfuse factory is consulted ONLY when `TELEMETRY_SINK=langfuse` (and
+ * TELEMETRY_ENABLED is true); otherwise this is exactly `fileSinkFromEnv`, as before. A Langfuse
+ * factory that declines (missing config, refused URL) falls back to the file sink.
+ */
+export function resolveEnvSink(
+  env: Record<string, string | undefined> = process.env,
+  f: EnvSinkFactories = { langfuse: (e) => langfuseSinkFromEnv(e), file: (e) => fileSinkFromEnv(e) },
+): TraceSink {
+  if (selectsLangfuse(env)) {
+    const lf = f.langfuse(env);
+    if (lf) return lf;
+  }
+  return f.file(env);
+}
+
 const registrySink: TraceSink = {
   record(rec: TraceRecord) {
     if (installed) return installed.record(rec);
-    envSink ??= fileSinkFromEnv();
+    envSink ??= resolveEnvSink();
     return envSink.record(rec);
   },
 };
