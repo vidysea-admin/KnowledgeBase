@@ -90,7 +90,11 @@ export type SkipReason =
   | "needs-review"
   | "cancelled"
   | "invalid-time"
-  | "unsafe-join-link";
+  | "unsafe-join-link"
+  // T-037 join-rules veto layer (join-rules-select.ts): removals the rules engine makes after selection.
+  | "opted-out"
+  | "rule-denied"
+  | "rules-unevaluable";
 
 export interface SkippedItem {
   sessionKey: string;

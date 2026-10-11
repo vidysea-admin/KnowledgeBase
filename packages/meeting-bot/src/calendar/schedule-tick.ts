@@ -6,8 +6,9 @@ import { fileURLToPath } from "node:url";
 import type { CalendarEvent } from "./calendar-client.js";
 import {
   selectAutoRecordItems, loadTrustedSenderConfig, redactJoinLink,
-  type AutoRecordCandidateInput, type AutoRecordItem, type SkippedItem,
+  type AutoRecordCandidateInput, type AutoRecordItem,
 } from "./auto-join.js";
+import { describeSkip } from "./skip-describe.js";
 import { readScheduledKeys, recordScheduled, writeScheduledJob, validateWebinarCalendarAcquisition, type WebinarCalendarAcquisition } from "./schedule-state.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
 
@@ -210,11 +211,6 @@ export function buildRealScheduleTickDeps(): ScheduleTickDeps {
 // taskNameFor was removed in fix cycle 2 (ISS-317): the Scheduled Task name is now derived
 // inside task-scheduler.ts's scheduleOnce, from the already-validated jobKey (buildTaskName),
 // never built here from an unvalidated sessionKey.
-
-function describeSkip(s: SkippedItem): string {
-  const detail = s.detail ? ` (${s.detail})` : "";
-  return `  skip [${s.reason}]${detail} — ${s.source}:${s.sourceId} "${s.title}"`;
-}
 
 function describeToSchedule(item: AutoRecordItem): string {
   return `  schedule — ${item.source}:${item.sourceId} "${item.title}" ${item.startTime} -> ${item.endTime} ` +
