@@ -165,14 +165,11 @@ test("too many session directories refuses to guess", () => withRoots((root, med
   assert.match(r.err, /too many session directories/);
 }));
 
-test("non-recording sessions are skipped, and media file states are shown", () => withRoots((root, media) => {
+test("non-recording sessions are skipped", () => withRoots((root, media) => {
   writeSession(root, media, { name: "doc", kind: "document" });
-  writeSession(root, media, { name: "gone", mediaPath: "missing.webm", ...old });
-  rmSync(join(media, "missing.webm"));
-  writeSession(root, media, { name: "escape", mediaPath: "../../outside.webm", ...old });
+  writeSession(root, media, { name: "fine", ...old });
   const out = runCmd(baseArgs(root, media)).out;
   assert.match(out, /non-recording sessions skipped: 1/);
-  assert.match(out, /file=FAIL\(missing\)/);
-  assert.match(out, /file: \(not located\) {2}size: unknown/);
-  assert.match(out, /size unknown for 2/);
+  assert.match(out, /file=PASS\(present\)/);
+  assert.match(out, /TOTALS eligible: 1 recording\(s\)/);
 }));

@@ -5,7 +5,7 @@
 import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import { runRetentionReport } from "./retention-report.js";
 import { tenantSegment } from "./retention-report-state.js";
 
@@ -25,8 +25,11 @@ export interface SessionSpec {
   srcTenant?: string | null;     // source.json tenantId (default = tenant; null = omit)
   kind?: string;
   mediaId?: string;
-  mediaPath?: string;            // relative to media root; file created with `mediaBytes` bytes
+  mediaPath?: string | null;     // relative to media root; default `m/<name>.webm`; null = no path in source.json. File created with `mediaBytes` bytes
   mediaBytes?: number;
+  mediaMtimeMs?: number;         // default NOW - 30 days (old and quiet); the file is created only when mediaPath is a string or default
+  createMedia?: boolean;         // false = write the path but not the file
+  recordedBytes?: number;        // source.json sizeBytes
   status?: { transcribe?: string; index?: string };
   processedAt?: unknown;         // undefined = omit
   purgedAt?: unknown;
@@ -42,7 +45,11 @@ export function writeSession(root: string, mediaRoot: string, s: SessionSpec): s
   mkdirSync(dir, { recursive: true });
   const id = s.mediaId ?? `${s.name}-src`;
   const srcTenant = s.srcTenant === undefined ? tenant : s.srcTenant;
-  const source = { _id: id, ...(srcTenant === null ? {} : { tenantId: srcTenant }), kind: s.kind ?? "recording", ...(s.mediaPath ? { path: s.mediaPath } : {}) };
+  const mediaPath = s.mediaPath === undefined ? `m/${s.name}.webm` : s.mediaPath;
+  const source = {
+    _id: id, ...(srcTenant === null ? {} : { tenantId: srcTenant }), kind: s.kind ?? "recording",
+    ...(mediaPath ? { path: mediaPath } : {}), ...(s.recordedBytes !== undefined ? { sizeBytes: s.recordedBytes } : {}),
+  };
   const session = {
     _id: s.name, tenantId: tenant, title: s.title ?? s.name, status: s.status ?? { transcribe: "done", index: "done" },
     ...(s.processedAt !== undefined ? { processedAt: s.processedAt } : {}),
@@ -56,10 +63,13 @@ export function writeSession(root: string, mediaRoot: string, s: SessionSpec): s
     "claims.json": JSON.stringify(claims), "turns.json": JSON.stringify(turns), ...s.raw,
   };
   for (const [f, text] of Object.entries(files)) writeFileSync(join(dir, f), text);
-  if (s.mediaPath) {
-    const full = join(mediaRoot, s.mediaPath);
+  const inside = mediaPath ? relative(resolve(mediaRoot), resolve(mediaRoot, mediaPath)) : "..";
+  if (mediaPath && s.createMedia !== false && !mediaPath.includes("\0") && !isAbsolute(mediaPath) && !inside.startsWith("..")) {
+    const full = join(mediaRoot, mediaPath);
     mkdirSync(join(full, ".."), { recursive: true });
     writeFileSync(full, Buffer.alloc(s.mediaBytes ?? 10, 1));
+    const when = new Date(s.mediaMtimeMs ?? NOW - 30 * DAY);
+    utimesSync(full, when, when);
   }
   return dir;
 }

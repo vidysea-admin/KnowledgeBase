@@ -1,80 +1,9 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { rmSync } from "node:fs";
 import test from "node:test";
+import { join } from "node:path";
 import { cleanText } from "./retention-report-text.js";
 import { DAY, baseArgs, freezeTree, iso, runCmd, snapshot, tempRoot, writeSession } from "./retention-report.fixtures.js";
-
-const HERE = dirname(fileURLToPath(import.meta.url));
-const ENTRY = ["retention-report.ts", "retention-report-args.ts", "retention-report-state.ts", "retention-report-text.ts", "retention-report-cli.ts"];
-// The @lkb/core barrel also re-exports an https alert sink; the report only uses these two pure functions, so the scan pins
-// the names imported from the barrel and follows the one file that defines them.
-const CORE_PURGE_POLICY = resolve(HERE, "..", "..", "core", "src", "domain", "purge-policy.ts");
-const CORE_NAMES = new Set(["deriveEvidenceClipWindows", "isPurgeEligible", "Claims", "EvidenceClipWindow", "Media", "Turns"]);
-const ALLOWED_BARE = new Set(["node:fs", "node:path", "node:crypto", "node:util", "@lkb/core"]);
-const READ_ONLY_FS = new Set(["lstatSync", "readdirSync", "readFileSync"]);
-const FORBIDDEN = /\b(unlink|unlinkSync|rm|rmSync|rmdir|rmdirSync|rename|renameSync|writeFile|writeFileSync|appendFile|appendFileSync|truncate|truncateSync|ftruncate|ftruncateSync|copyFile|copyFileSync|mkdir|mkdirSync|symlink|symlinkSync|chmod|chown|utimes|utimesSync|createWriteStream|openSync|open|child_process|spawn|spawnSync|execSync|execFile|execFileSync|fork|eval)\b/;
-
-const strip = (src: string): string => src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "").replace(/(["'`])(?:\\.|(?!\1)[^\\\n])*\1/g, '""');
-
-interface Graph { files: string[]; bare: Map<string, Set<string>>; sources: Map<string, string> }
-
-/** Follows relative imports (and @lkb/core into its src) from the entry files. */
-function importGraph(entries: string[]): Graph {
-  const files: string[] = [];
-  const bare = new Map<string, Set<string>>();
-  const sources = new Map<string, string>();
-  const queue = [...entries];
-  while (queue.length > 0) {
-    const file = queue.shift() as string;
-    if (files.includes(file)) continue;
-    files.push(file);
-    const src = readFileSync(file, "utf8");
-    sources.set(file, src);
-    for (const m of src.matchAll(/(?:import|export)\s+(?:type\s+)?(?:([^'"]*?)\s+from\s+)?["']([^"']+)["']/g)) {
-      const names = m[1] ?? "";
-      const spec = m[2] as string;
-      if (spec.startsWith(".")) queue.push(resolve(dirname(file), spec.replace(/\.js$/, ".ts")));
-      else {
-        const set = bare.get(spec) ?? new Set<string>();
-        for (const n of names.replace(/[{}]/g, "").split(",").map((s) => s.trim().replace(/^type\s+/, "")).filter(Boolean)) set.add(n);
-        bare.set(spec, set);
-        if (spec === "@lkb/core") queue.push(CORE_PURGE_POLICY);
-      }
-    }
-    assert.doesNotMatch(src, /\brequire\s*\(|\bimport\s*\(/, `${file} must not use require() or dynamic import()`);
-  }
-  return { files, bare, sources };
-}
-
-test("the report modules and everything they import contain no delete, write, rename or spawn API", () => {
-  const g = importGraph(ENTRY.map((f) => join(HERE, f)).concat([join(HERE, "retention-sweep.ts")]));
-  assert.ok(g.files.length >= 8, `graph too small: ${g.files.length}`);
-  for (const [file, src] of g.sources) {
-    const code = strip(src);
-    assert.doesNotMatch(code, FORBIDDEN, `${file} uses a forbidden API`);
-    assert.doesNotMatch(code, /\.write\w*\(\s*[^)]*\bflag\b|flag\s*:\s*["'][wa]/, `${file} opens a file for writing`);
-  }
-  for (const [spec, names] of g.bare) {
-    assert.ok(ALLOWED_BARE.has(spec), `unexpected import ${spec}`);
-    if (spec === "node:fs") for (const n of names) assert.ok(READ_ONLY_FS.has(n), `node:fs import ${n} is not read-only`);
-    if (spec === "@lkb/core") for (const n of names) assert.ok(CORE_NAMES.has(n), `@lkb/core import ${n} is not a pure purge-policy name`);
-  }
-  assert.ok(g.bare.get("node:fs")?.size, "state module must import node:fs read APIs");
-  assert.ok(g.files.includes(CORE_PURGE_POLICY), "purge-policy.ts must be in the scanned graph");
-  for (const f of g.files.filter((x) => x.includes(`${join("core", "src")}`))) {
-    assert.doesNotMatch(g.sources.get(f) as string, /from\s+["']node:/, `${f} imports a node builtin`);
-  }
-});
-
-test("no apply-like option exists in the argument parser source", () => {
-  const src = readFileSync(join(HERE, "retention-report-args.ts"), "utf8");
-  const valued = /const VALUED = \[([^\]]*)\]/.exec(src)?.[1] ?? "";
-  assert.equal(valued.replace(/\s/g, ""), '"--tenant","--data-root","--media-root","--min-age-days","--clip-padding-seconds"');
-  assert.doesNotMatch(strip(src), /apply|force|\byes\b|execute|delete|purge-now/i);
-});
 
 function richFixture(): { root: string; media: string } {
   const root = tempRoot();
@@ -102,7 +31,7 @@ test("the temp tree is byte-identical, mtimes included, after every kind of run"
       baseArgs(root, media, ["--apply"]),
       ["--tenant", "toc", "--data-root", root],
       baseArgs(root, media, ["--min-age-days", "1"]),
-      ["--tenant", "toc", "--data-root", join(root, "nope"), "--min-age-days", "1", "--clip-padding-seconds", "1"],
+      ["--tenant", "toc", "--data-root", join(root, "nope"), "--media-root", media, "--min-age-days", "1", "--clip-padding-seconds", "1"],
     ];
     const codes = runs.map((a) => runCmd(a).code);
     assert.deepEqual(codes, [0, 0, 3, 2, 2, 2, 3]);

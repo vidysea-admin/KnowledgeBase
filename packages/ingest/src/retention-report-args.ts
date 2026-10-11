@@ -9,16 +9,17 @@ import { cleanText } from "./retention-report-text.js";
 export interface ReportOptions {
   tenant: string;
   dataRoot: string;
-  mediaRoot?: string;
+  mediaRoot: string;
   minAgeDays: number;
   clipPaddingSeconds: number;
 }
 
 export const USAGE = [
-  "usage: retention-report --tenant <id> --data-root <dir> --min-age-days <N> --clip-padding-seconds <N> [--media-root <dir>]",
+  "usage: retention-report --tenant <id> --data-root <dir> --min-age-days <N> --clip-padding-seconds <N> --media-root <dir>",
   "  Report-only dry run: prints what the retention sweep planner WOULD mark purge-eligible. It deletes nothing and has no apply mode.",
+  "  --media-root is required: the report only calls a recording purge-eligible after it has located and stat'd the media file under it.",
   "  --min-age-days and --clip-padding-seconds are owner decisions (ARCHITECTURE Q6); there is no default.",
-  "  example: retention-report --tenant toc --data-root ./data/upload --min-age-days 30 --clip-padding-seconds 15",
+  "  example: retention-report --tenant toc --data-root ./data/upload --min-age-days 30 --clip-padding-seconds 15 --media-root ./data/media",
 ];
 
 const VALUED = ["--tenant", "--data-root", "--media-root", "--min-age-days", "--clip-padding-seconds"];
@@ -64,5 +65,6 @@ export function parseArgs(argv: readonly string[]): ParsedArgs {
   if (!tenant || tenant.length > 200 || /\p{Cc}/u.test(tenant)) return { ok: false, message: "--tenant is required (1-200 characters, no control characters)" };
   if (!dataRoot) return { ok: false, message: "--data-root is required" };
   const mediaRoot = given.get("--media-root");
-  return { ok: true, opts: { tenant, dataRoot, minAgeDays, clipPaddingSeconds, ...(mediaRoot ? { mediaRoot } : {}) } };
+  if (!mediaRoot) return { ok: false, message: "--media-root is required: a report that cannot see the media files cannot say anything is purgeable" };
+  return { ok: true, opts: { tenant, dataRoot, minAgeDays, clipPaddingSeconds, mediaRoot } };
 }

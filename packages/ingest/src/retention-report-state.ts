@@ -11,13 +11,15 @@
  * There is NO media-collection file on disk and no `processedAt` in any shipped writer: a real
  * state therefore reports every recording as "not processed" (KEEP) until the owner decides what
  * proves processing (Q6). A media record is derived from source.json; processedAt is passed on
- * ONLY when session.status says transcribe AND index are "done".
+ * ONLY when session.status says transcribe AND index are "done". Media size/mtime come from the
+ * read-only probe in ./retention-report-media.ts.
  */
 import { createHash } from "node:crypto";
 import { lstatSync, readdirSync, readFileSync } from "node:fs";
-import { isAbsolute, join, relative, sep } from "node:path";
+import { join } from "node:path";
 import { isPlain } from "./strict-record.js";
 import type { ReportOptions } from "./retention-report-args.js";
+import { NO_MEDIA, probeMedia, type MediaEvidence } from "./retention-report-media.js";
 
 export const CAPS = { maxSessions: 500, maxFileBytes: 5 * 1024 * 1024, maxTotalBytes: 64 * 1024 * 1024 };
 const SESSION_NAME = /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/;
@@ -28,9 +30,10 @@ export interface SessionInfo {
   mediaId?: string;
   mediaTenant?: string;
   title?: string;
-  relPath?: string;
-  sizeBytes: number | null;
-  fileState: "present" | "missing" | "unknown";
+  /** media file evidence from the read-only probe (size and mtime are the stat'd values) */
+  media: MediaEvidence;
+  /** size recorded in source.json (`sizeBytes`), if the state carries one */
+  recordedBytes: number | null;
   transcribed: boolean;
   indexed: boolean;
   processedAt?: unknown;
@@ -75,20 +78,6 @@ const own = (o: object, k: string): unknown => (Object.hasOwn(o, k) ? (o as Reco
 const ownPlain = (o: object, k: string): object | undefined => { const v = own(o, k); return isPlain(v) ? v : undefined; };
 const ownStr = (o: object, k: string): string | undefined => { const v = own(o, k); return typeof v === "string" && v ? v : undefined; };
 
-function mediaFile(opts: ReportOptions, rel: string | undefined): Pick<SessionInfo, "relPath" | "sizeBytes" | "fileState"> {
-  if (!rel || !opts.mediaRoot || isAbsolute(rel) || /^[a-z]:/i.test(rel)) return { sizeBytes: null, fileState: "unknown" };
-  const full = join(opts.mediaRoot, rel);
-  const back = relative(opts.mediaRoot, full);
-  if (back === "" || back === ".." || back.startsWith(`..${sep}`) || isAbsolute(back)) return { sizeBytes: null, fileState: "unknown" };
-  const shown = back.split(sep).join("/");
-  try {
-    const st = lstatSync(full);
-    return st.isFile() ? { relPath: shown, sizeBytes: st.size, fileState: "present" } : { relPath: shown, sizeBytes: null, fileState: "unknown" };
-  } catch (e) {
-    return { relPath: shown, sizeBytes: null, fileState: (e as NodeJS.ErrnoException).code === "ENOENT" ? "missing" : "unknown" };
-  }
-}
-
 function describe(r: Read): string {
   return r.ok ? (isPlain(r.value) ? "ok" : "not an object") : r.why;
 }
@@ -108,7 +97,7 @@ export function gatherState(opts: ReportOptions): GatherResult {
   const budget = { used: 0 };
   for (const name of names) {
     const dir = join(tenantDir, name);
-    const info: SessionInfo = { dir: name, sizeBytes: null, fileState: "unknown", transcribed: false, indexed: false, turnIds: new Set() };
+    const info: SessionInfo = { dir: name, media: NO_MEDIA, recordedBytes: null, transcribed: false, indexed: false, turnIds: new Set() };
     const src = readJson(join(dir, "source.json"), budget);
     const ses = readJson(join(dir, "session.json"), budget);
     if (!src.ok || !ses.ok || !isPlain(src.value) || !isPlain(ses.value)) {
@@ -126,7 +115,9 @@ export function gatherState(opts: ReportOptions): GatherResult {
     info.title = ownStr(ses.value, "title");
     info.mediaId = ownStr(src.value, "_id");
     info.mediaTenant = ownStr(src.value, "tenantId");
-    Object.assign(info, mediaFile(opts, ownStr(src.value, "path") ?? ownStr(src.value, "audioPath")));
+    info.media = probeMedia(opts.mediaRoot, ownStr(src.value, "path") ?? ownStr(src.value, "audioPath"));
+    const rec = own(src.value, "sizeBytes");
+    info.recordedBytes = typeof rec === "number" && Number.isSafeInteger(rec) && rec >= 0 ? rec : null;
 
     const turnsRead = readJson(join(dir, "turns.json"), budget);
     if (turnsRead.ok && Array.isArray(turnsRead.value)) {
