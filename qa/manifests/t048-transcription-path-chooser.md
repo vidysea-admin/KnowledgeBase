@@ -1,5 +1,5 @@
 # Manifest — t048-transcription-path-chooser
-**Status:** ready-for-check
+**Status:** checked-PASS (Checked: qa/verdicts/t048-transcription-path-chooser.md, cycle 0, a0082bc; pure chooser, unwired)
 **Fix cycle:** 0
 **Tier:** 3 (roadmap task). First slice of T-048. T-048 stays OPEN.
 **Goal task:** T-048 "Make gemini-3.8-flash single-call the default for recordings <= ~90 min; keep chunking as fallback" (TASKS.md:140; .goal/goal.json:962-969)
