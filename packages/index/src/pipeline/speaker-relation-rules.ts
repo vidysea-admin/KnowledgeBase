@@ -21,7 +21,7 @@
 import type { Turns } from "@lkb/core";
 import { HANDOVER_MARKERS, containsNameVerbatim, hasNamingCueAt, isDiscourseOnly, looksLikeAName, nameOccurrences, readsAsAPlaceOrOrg } from "./speaker-name-rules.js";
 import { isReportedAt } from "./speaker-reported-rules.js";
-import { isCleanSelfIdentificationAt } from "./speaker-selfid-rules.js";
+import { isCleanSelfIdentificationAt, turnHoldsOtherSelfIntroduction } from "./speaker-selfid-rules.js";
 
 export type RelationRoute = "selfIdentification" | "handover" | "thanks";
 /** Which relation routes may bind a name. Frozen: a route is switched on by editing this line, in a reviewed change. */
@@ -73,6 +73,7 @@ export function occurrenceAccepted(route: RelationRoute, raw: string, name: stri
   if (!looksLikeAName(name) || isDiscourseOnly(name)) return false;
   if (isReportedAt(text, name, at)) return false;
   if (route === "selfIdentification" ? !hasNamingCueAt(text, name, at) : readsAsAPlaceOrOrg(text, name)) return false;
+  if (route === "selfIdentification" && turnHoldsOtherSelfIntroduction(text, name)) return false;   // cycle 6 (ISS-PH3-008): a turn with a second name credits none
   return PATTERNS[route](text, name, at);
 }
 

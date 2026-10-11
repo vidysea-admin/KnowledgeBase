@@ -23,6 +23,8 @@
  * Places, organisations and role words ("Hello, I'm Google.") are unchanged policy (D-052; open Approver question).
  */
 
+import { looksLikeAName, isDiscourseOnly } from "./speaker-name-rules.js";
+
 const OPENER_WORDS = "hi|hello|hey|namaste|good (?:morning|afternoon|evening|day)|okay|ok|so|well|alright|now|um|uh|thanks|thank you|welcome|everyone|all|folks|friends|and|again|actually|there";
 const OPEN = String.raw`(?:(?:${OPENER_WORDS})[,\s]+)*`;
 /** A lead-in that announces the speaker's own introduction. */
@@ -100,3 +102,41 @@ export function isCleanSelfIdentificationAt(raw: string, name: string, at: numbe
   const next = sents[i + 1]?.s;
   return next === undefined || NEXT_OK.test(next);
 }
+
+/**
+ * FIX CYCLE 6 (ISS-PH3-008, critical; Approver ruling 2026-10-11). WHOLE-TURN AMBIGUITY, judged BEFORE any position / tail filter.
+ * A turn that holds a self-introduction CANDIDATE for a DIFFERENT name than `name` is the voice of more than one person (round-table
+ * introductions merged by diarization) or a self-correction: it cannot credit `name` to the label. Cycle 5 judged "is this the only
+ * name?" AFTER the allow-list had already dropped the second introduction, so the base's contradiction refusal (contract C7) never
+ * saw two names. A candidate here is any capitalised name run directly after a self-naming cue ("my name is|i am|i'm|this side|
+ * this is|call me") or directly before "here|speaking", ANYWHERE in the turn (no sentence, quote, tail or lead-in test), as long as
+ * it passes the two shape checks the base also applies to a proposed name (looksLikeAName, not isDiscourseOnly).
+ * NAME EQUALITY: exact, after collapsing whitespace and curly apostrophes. The base keys a label's names by exact string, so
+ * "Priya" vs "Priya Sharma" or "PRIYA" are two names there and are two names here (refuse). No case or diacritic folding.
+ */
+const SELF_CUE = /(?:^|[^\p{L}'])(?:my name is|my name's|i am|i'm|this side|this is|call me)\s+/giu;
+const CAP_RUN = new RegExp(String.raw`\p{Lu}[\p{L}'-]*(?: \p{Lu}[\p{L}'-]*)*`, "uy");
+const HERE_RUN = /(\p{Lu}[\p{L}'-]*(?: \p{Lu}[\p{L}'-]*)*) (?:here|speaking)(?![\p{L}])/gu;
+const LEADING_WORDS = new Set([...OPENER_WORDS.split(/[| ]/u), "i", "i'm", "thank", "you"]);
+
+/** Every name a turn offers as a self-introduction (unfiltered by position), in order of appearance. */
+export function selfIntroductionCandidates(raw: string): string[] {
+  const text = normalise(raw), out: string[] = [];
+  for (const m of text.matchAll(SELF_CUE)) {
+    CAP_RUN.lastIndex = m.index! + m[0].length;
+    const run = CAP_RUN.exec(text)?.[0];
+    if (run) out.push(run);
+  }
+  for (const m of text.matchAll(HERE_RUN)) {
+    const toks = m[1]!.split(" ");
+    while (toks.length > 0 && LEADING_WORDS.has(toks[0]!.toLowerCase())) toks.shift();
+    if (toks.length > 0) out.push(toks.join(" "));
+  }
+  return out.filter((c) => looksLikeAName(c) && !isDiscourseOnly(c));
+}
+
+/** Does the turn hold a self-introduction candidate that is NOT `name`? Then the turn is ambiguous and credits no name. */
+export const turnHoldsOtherSelfIntroduction = (raw: string, name: string): boolean => {
+  const nm = normalise(name).trim();
+  return selfIntroductionCandidates(raw).some((c) => c !== nm);
+};

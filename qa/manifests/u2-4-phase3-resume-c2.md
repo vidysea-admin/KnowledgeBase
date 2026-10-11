@@ -1,7 +1,7 @@
 # u2-4-phase3-resume-c2
 
 Status: ready-for-check
-Fix cycle: 5
+Fix cycle: 6
 Priority tier: 2 - open critical ISS-282 / ISS-104 and high ISS-283 / ISS-289 (also medium ISS-284, ISS-290). Authorized by D-122 (Approver ruling 2026-10-10: `origin/wave/u2-4-phase3-fix` is RESUMED through the maker-checker pair).
 Security class: data-write precondition (U2.4 phase-4 persists identities) - full ceremony, uncapped.
 Lane: `lane/ph3` (worktree KnowledgeBase-lanes/ph3), base 536a56a. Ledger shard: `qa/issues.ph3.jsonl` (one low row).
@@ -262,3 +262,74 @@ Cycle-4 grid (the 8 genuine templates x Paris, India, Google, Moderator, Diwali,
 
 ## Not delivered (unchanged in substance)
 The live gate is still outstanding and NOT claimed: Ollama qwen3:8b digest 500a1f067a9f, 2340 calls, `04-regate-eval.mts --runs 1,2,3 --tag c5` then `05-score.mjs --tag c5`. The five gate bars are not evidenced. Bar 5 (a correct addition) is not met even offline. Handover and thanks are OFF. Guards and shapes are English-only. Contract change C14 stays deferred to the Approver; qa/contracts is untouched. No ledger status changed. Unverified: behaviour on live model output; the tail lists (org words, STOP words) were not tuned against real transcripts beyond the recorded corpus; the 40 introductions are author-written, not sampled.
+
+---
+
+# Fix cycle 6 (ISS-PH3-008 critical, ISS-PH3-009 medium)
+
+## The Approver's ruling and its scope
+Umesh, 2026-10-11: do cycle 6, narrowly: close the two-introductions-in-one-turn case; nothing else. Nothing was loosened: no accepted shape added, no recall work, the single `call me` sentence untouched, no edit to qa/contracts, qa/verdicts, enforcement paths or ledger statuses. speakers-llm.ts is untouched (300 non-blank lines).
+
+## What failed, and why the candidate count must precede the filter
+Turn `Hello everyone, I'm Priya. Hello everyone, I'm Rashi.` with both names proposed for spk:0: the base ships nothing (two names for one label, contract C7); cycle 5 shipped spk:0 -> Priya. The allow-list refuses Rashi early (the sentence before it is not opener-only), so only Priya reaches the contradiction check, which sees ONE name and never fires. Counting "how many introductions does this turn hold" AFTER the filter counts only what the filter let through; the question must be asked of the raw turn, before any position, tail or lead-in test.
+
+## The rule as built
+1. `selfIntroductionCandidates(turn)` (speaker-selfid-rules.ts): every capitalised name run directly after a self-naming cue (`my name is | my name's | i am | i'm | this side | this is | call me`) or directly before `here | speaking`, ANYWHERE in the turn (no sentence, quote, tail or lead-in test), that passes the two shape checks the base also applies to a proposed name (`looksLikeAName`, not `isDiscourseOnly`). Leading opener words before an `X here` run ("Hi Priya here") are stripped. No new cue list: the cues are the base's `SELF_NAMING_CUES` plus the allow-list's own `this side | this is | here | speaking`.
+2. `turnHoldsOtherSelfIntroduction(turn, name)` is true when any candidate is not `name`. `occurrenceAccepted` (self-identification route only) returns false then. Effect: a turn holding a different-name candidate credits NO name to the label, whichever names the model proposed and whichever turn it cites.
+3. The same name twice ("Hello, I'm Priya. I'm Priya.") is not ambiguous and still ships.
+
+## Name-equality decision
+Exact string equality after collapsing whitespace and curly apostrophes. The base has no same-person rule: it keys a label's names by exact string (`byName`), so "Priya" vs "Priya Sharma" and "Priya" vs "PRIYA" are two names there and are two names here: the turn is refused. No case or diacritic folding. Pinned by test; mutants M3a/M3b (first-token equality, case folding) are killed.
+
+## Neighbours (item 2) and cases deliberately left OPEN
+- Falls out of the same rule, now refused: `Hi, I'm Rashi. I'm Priya.` (single proposal, either name), `Hello, I'm Rashi. Hello, I'm Priya.`, `Hi. I'm Priya. I'm Rashi.`
+- OPEN, no code: `Hi, I'm Rashi. I mean Priya.` (`I mean` is not a cue; adding it is a new cue list, out of scope; the base ships Rashi here too, so it is not a lane-vs-base regression) and `Hi, I'm Rashi. I'm kidding.` / `I'm Rashi and I am a fake.` (single name, low plausibility; ruled out of scope).
+- Observed, not changed: a turn mixing a self-introduction with an ADDRESS of another name ("Hello, I'm Priya. Rashi, what do you think?"): the lane never ships where the base refuses (checked on 6 such texts). The address cue is deliberately NOT a candidate: counting "Thank you, Priya, for the introduction. I'm Rashi." as ambiguous would cost a very common correct introduction. The Approver may want to rule on that trade-off.
+
+## ISS-PH3-009 (medium): closed
+The missing test was a few lines: `speaker-twointro.test.ts` asserts `Hello, I'm Rashi and I lead Priya.`, `... and I work with Rahul Mehta.`, `Hello, I am Rashi and I will be handing over to Priya.` and `... and I lead Admissions.` are refused (and lowercase `and I lead admissions` is still accepted). Mutant M5 (`[a-z]` -> `[A-Za-z]` in tailOk) is now killed. No design change.
+
+## D-015 by issue id (recorded reproductions verbatim, from the ledger rows; no authored corpus substitutes for them)
+| Issue | Corpus | Result |
+|---|---|---|
+| ISS-PH3-008 | the row's 4 two-name turns READ FROM qa/issues.ph3.jsonl, both names proposed, 8 layouts x 2 labels x every cite | `ISS-PH3-008: 184/184 two-name cells refused` (base ships 0 of them as well) |
+| ISS-PH3-008 | the row's 3 single-proposal texts | 1/3 refused (`I'm Priya`); 2/3 OPEN by name above (`I mean Priya`, `I'm kidding`) |
+| ISS-PH3-008 grid | 84 cells rebuilt from the row's description: 6 first sentences x 7 second sentences x 2 name pairs, both names proposed for spk:0 citing t1 | base ships 0, lane ships 0, lane-only 0. NOTE: this is my reconstruction; the checker's exact 14 base-shipping cells are not in the row, so the base count differs from the verdict's 14 |
+| ISS-104 | 20 recorded attacks | predicate 20/20; own, preceding, following turn 20/20 each (speaker-relation-ledger 8/8) |
+| ISS-PH3-006 | 17 forms x 7 names + Makrand case | predicate 121/121; end to end 5,566 cells, 0 shipped |
+| ISS-PH3-004 | 7 forms x 14 names | predicate 98/98; end to end 980/980 |
+| ISS-PH3-001 / -002 | 3 / 6 recorded texts | refused (speaker-relation-ledger 8/8 incl. both) |
+| ISS-255 | handover turn with/without full stop | speaker-name-rules 110/110 incl. the ISS-255 tests; replay ISS255 "4/4" |
+| ISS-282 | 8 recorded wrong links | `--- ISS-282 recorded wrong links refused: 8/8` |
+No count regressed.
+
+## Replay (offline, recorded c1 model text; tag c6r; no model, no network)
+`08-replay.mts --from c1 --tag c6r` then `05-score.mjs --tag c6r --raw-tag c1`: accepted 3, correct 3, precision 1, wrongIdentities 0, wrongPairs 0, additions 0, ISS255 "4/4", stableAll true. The three are spk:0 -> "Jubin Thakkar" (Leeds Arts t006), as in cycle 5. No correct name lost to the new rule. Bar 5 (a correct addition) is still NOT met offline.
+
+## Recall
+The cycle-5 set of 40 was not committed; reconstructed for this cycle as the 15 refused texts quoted verbatim in the cycle-5 section above plus 26 author-written introductions (41 texts; author-written, not sampled). Cycle-5 predicate (rule off): 25 of 41; cycle 6: 25 of 41; none lost. The new rule only refuses a turn that holds a second, different self-introduction cue+name.
+Differential (speakers-differential.test.ts, unchanged): `DIFF predicate: 1288 cells, base accepts 764, lane accepts 112, violations 0`; `DIFF end-to-end: 59248 cells, base ships 13752, lane ships 2240, lane-only 1331, outside the oracle class 0, base-only 12843`. Identical to cycle 5 (that grid proposes one name per cell, so it cannot see this class; the new 84-cell test does).
+
+## Mutations (own harness outside the repo: per-mutation byte backup, restore in `finally`, spawnSync timeout 170 s per file, restore verified by byte compare and `git hash-object` equal to the pre-mutation blob; run over the speaker-twointro, speaker-selfid-allowlist, speaker-name-rules, speaker-relation-ledger tests)
+| # | Mutation | Result |
+|---|---|---|
+| M1 | remove the whole-turn rule | KILLED (5): the 184-cell recorded test, the single-name test, the 84-cell grid, "same name twice ... different name refuses" |
+| M2 | count candidates AFTER the allow-list filter (the cycle-5 bug) | KILLED (5): same tests |
+| M3a | different names treated as the same (first-token equality) | KILLED (1): "name equality is EXACT" |
+| M3b | case folding | KILLED (1): "name equality is EXACT" |
+| M3c | no name is ever "other" | KILLED (5) |
+| M4 | rule applied to the first sentence only | KILLED (6): grid, recorded cells, single-name, whole-turn |
+| M5 | ISS-PH3-009: capitals allowed in the `and I lead ...` tail | KILLED (1): "ISS-PH3-009 ..." |
+| M6 | drop the `X here|speaking` candidate form | KILLED (1): "candidates are found anywhere in the turn" |
+Restore verified after every mutation. My first run of M4 was invalid (the mutation text lost a backslash and was a no-op, so it printed SURVIVED); re-done with a working mutation, killed.
+
+## Evidence (node v24.19.0, from packages/index unless noted, each under timeout 170)
+- `node --test --import tsx src/pipeline/<file>.test.ts`: speaker-twointro (new) pass 8 fail 0; speaker-selfid-allowlist 6/0; speaker-selfid-ledger 8/0; speaker-relation-ledger 8/0; speaker-relation-rules 10/0; speaker-name-rules 110/0; speakers-llm 50/0; speakers-windows 29/0; speakers-differential 5/0; speakers 16/0; speaker-docs 13/0.
+- Key output: `ISS-PH3-008: 184/184 two-name cells refused (recorded two-name turns 4); base ships 0` and `ISS-PH3-008 grid: 84 cells, base ships 0, lane ships 0, lane-only 0`.
+- `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json`: no output, exit 0.
+- `node scripts/lint-dirsize.mjs`: `lint-dirsize: OK (110 dir(s) within budget)`. `lint-loc`: the same 7 pre-existing violations, none in speaker files. Non-blank lines: speakers-llm.ts 300 (untouched), speaker-selfid-rules.ts 131, speaker-relation-rules.ts 102, speaker-twointro.test.ts 118, speaker-name-rules.test.ts 399 (untouched).
+- `node --import tsx qa/probes/iss282-c0-replay.mts`: `--- ISS-282 recorded wrong links refused: 8/8`.
+- New files: speaker-twointro.test.ts, measurement-summary.c6r.json, run-results.c6r.jsonl.
+
+## Not delivered / standing statements
+The live gate has NOT been run (Ollama qwen3:8b digest 500a1f067a9f, 2340 calls: `04-regate-eval.mts --runs 1,2,3 --tag c6` then `05-score.mjs --tag c6`). ISS-104 and ISS-282 are NOT closed by this unit and no ledger status was changed. Handover and thanks stay OFF. Unverified: behaviour on live model output (a real model proposing both names of a merged turn); the 84-cell grid is a reconstruction of the checker's; English-only cues; the recall set is author-written.
