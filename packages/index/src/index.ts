@@ -29,3 +29,5 @@ export { looksLikeAName, isDiscourseOnly, containsNameVerbatim, citesNameAsAnInt
 export { buildSpeakerDocs, type SessionResolution, type SpeakerCollision, type SpeakerDocsResult } from "./pipeline/speaker-docs.js";
 
 export { buildSourceSlices, sourceSpanText, type SourceSpan, type SourceSlicePlan } from "./chunk/source-spans.js";
+export { verifyQuote, verifyQuotes, normaliseForQuote, type QuoteSourceTurn, type ClaimedQuote, type QuoteVerdict, type QuoteLocation, type QuoteRefusal } from "./pipeline/quote-verify.js";
+export { windowTranscript, type WindowTurn, type WindowEntry, type TranscriptWindow, type WindowOptions } from "./pipeline/transcript-windows.js";
