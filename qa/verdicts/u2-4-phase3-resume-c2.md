@@ -1,6 +1,92 @@
 # Verdict - u2-4-phase3-resume-c2
 
-## Cycle 4 (current)
+## Cycle 5 (current)
+
+VERDICT: FAIL
+Cycle checked: 5
+Date: 2026-10-11 · Checker (independent; did not build the unit) · Candidate: lane/ph3 7b4dbb8 (cycle-4 commit 301b9cc; base 536a56a)
+SCOPE: offline only (deterministic rules, offline replay, targeted tests). No model, Ollama, network, browser, database, monorepo build or full suite. This verdict is NOT the phase-3 gate: the live run (2340 calls) was not run, so ISS-104 and ISS-282 are NOT marked verified and no existing ledger row's status was changed. Scratch harnesses lived in the session scratchpad (ph3chk) and touch no tracked file.
+Judged against: qa/contracts/speaker-resolution-llm.md (unchanged; recall is not a contract criterion; C7 and C6 are), D-015, D-052, security class (uncapped).
+
+### Why FAIL
+The allow-list closes every shape the previous cycles named, and my 1,151 own inputs found no quoted, reported, negated, questioned, role-played or third-party attribution. It fails on a class the allow-list CREATES: because the walk-back refuses every non-opener sentence before the cue, a turn holding two self-introductions keeps the first name and drops the second, so the label ends with ONE surviving name and the base's contradiction refusal (contract C7) never fires.
+Reproduction (extractSpeakers, injected complete returning BOTH names for spk:0 citing t1; turns [spk:0 "Hello everyone, I'm Priya. Hello everyone, I'm Rashi.", spk:1 "ok"]): BASE ships nothing, LANE ships spk:0 -> Priya. Grid of 84 cells (6 first sentences x 7 second sentences x 2 name pairs): base ships 14, lane ships 70, lane-only 70 (ISS-PH3-008, critical). Plausible in a real webinar: round-table introductions merged into one turn by diarization. It is the same defect shape as ISS-PH3-006 (lane ships where the base refuses), so by the stated merge-safety definition the answer to "safe to merge ahead of the live run?" is NO.
+
+### 1. D-015, run by me, recorded reproductions parsed from the ledger rows (not the maker's tables); end to end = 8 layouts x 2 labels x every cite, base = frozen 536a56a
+| Issue | Cases | Predicate refused | End to end refused (shipping cells) |
+|---|---|---|---|
+| ISS-104 (20 recorded attacks, regex-parsed from the row) | 20 | 20/20 | 20/20 (0) |
+| ISS-PH3-006 (17 forms from the row x 7 names + the Makrand case both ways) | 121 | 121/121 | 121/121 (0) |
+| ISS-PH3-004 (7 forms from the row x 14 names) | 98 | 98/98 | 98/98 (0) |
+| ISS-PH3-001 (3 texts in the row) | 3 | 3/3 | 3/3 (0) |
+| ISS-PH3-002 (6 texts in the row) | 6 | 6/6 | 6/6 (0) |
+| ISS-255 (the handover turn "I invite our next speaker, Ruby, from Uni-Italia", with and without the full stop) | 2 | 2/2 | 2/2 (0) |
+| ISS-282 (8 recorded wrong links replayed through the current path: `node --import tsx qa/probes/iss282-c0-replay.mts`) | 8 | n/a | 8/8 |
+| ISS-093 / ISS-094 / ISS-098 | In this ledger those ids are unrelated rows (golden set, provenance, chunker); the speaker seam's ISS-093 is ISS-104 (D-019), whose 20 are above. ISS-094 and ISS-098 are recall corpora in tests this cycle did not touch (no diff in those blocks): speaker-name-rules.test.ts (ISS-093 corpus, ISS-098's ten recall texts, D-015 byte-faithfulness test) and speakers-llm.test.ts (ISS-094 forms); the nine speaker test files pass 242/242. | | |
+Cases still attributing a name: none among the recorded ones. The ISS-098/ISS-094 recall texts still resolve (tests green).
+
+### 2. The edited tests and ledger case, ruled one by one
+- speaker-name-rules.test.ts, four former positives now asserted REFUSED ("We met in Paris. My name is Paris.", "I am in Mumbai today. My name is Mumbai Sharma.", "Our office is in Priya's building. My name is Priya.", "Coming up next, I will share the slides. My name is Nilesh."): LEGITIMATE consequence of the design (a free sentence before the cue refuses; none is a recorded ledger reproduction; ISS-104's 20 are untouched and byte-checked). Cost is recall, declared. Two caveats, not defects: the twins that replaced them ("Hi, my name is Paris.") no longer have a place reading in the sentence before, so the D-052 "strong cue survives a place signal" property is pinned only in its weakest form; and the handover twin ("Hello everyone, I would like to introduce myself, my name is Nilesh.") contains NO handover marker, so "a handover marker does not block direct self-naming" is now pinned only through the one hard-coded sentence of ruling 7.
+- speakers-windows.test.ts ISS-282: "I'm Kshitij, and over to Ruby." became "I'm Kshitij. Over to Ruby.": legitimate (the original is refused by the tail rule); not a recorded reproduction (the recorded ISS-282 cases are the 8 replay links, still 8/8). Note: with handover and thanks OFF a self-identification can bind only its own speaker's label, so the one-evidence-turn-two-labels guard is now unreachable code; this test cannot fail on it.
+- speaker-relation-ledger.test.ts M7: "At Priya's desk, Priya here." self-identification true to false: legitimate (a free clause precedes the cue); the M7 purpose (possessive exemption, citesNameAsAnIntroduction true) is still asserted.
+- speaker-selfid-ledger.test.ts: "They call me Nikhil." removed from the "accepted on purpose" list: legitimate (a cycle-4 maker assertion, not a ledger reproduction); now pinned as refused in speaker-selfid-allowlist.test.ts.
+No edit hides a failure of a recorded reproduction.
+
+### 3. Independent attack (my own 1,151 inputs, probe attack.mts; none from the maker's grid; predicate-level, accepted ones end to end in 8 layouts x 2 labels x every cite, lane vs frozen base)
+Families: quoting/reporting, questions, negation, capitalised states/adjectives (46 words), places/orgs/roles/months/days/brands (43), role-play, reading aloud, introducing others, common-word names (17), addressee/opener abuse, lead-in abuse, `N here|speaking`, `this side`, apostrophes, zero-width, bidi, ALL-CAPS and lower case, merged speakers, one-character changes of the call-me sentence, 100+ tail variants (`and I ...`, `from ...`).
+Result: 605 predicate-accepted. ZERO from quoting, reporting, questions, negation, role-play, reading aloud, other-person introductions, addressee/opener abuse, lead-in abuse or the call-me variants. Lane own-turn acceptance minus base own-turn acceptance: 1 case (curly "I’m Rashi", a correct introduction the base cannot read). Neighbour-citation cells are lane-only by design.
+Accepted though a careful human would NOT take it as a clean self-introduction (plausibility in a real webinar):
+1. (HIGH, ISS-PH3-008) two self-introductions in one turn, both names proposed: lane ships the first, base refuses; single-name proposals ship in both ("Hi, I'm Rashi. I'm Priya.", "Hello, I'm Rashi. Hello, I'm Priya.", "Hi. I'm Priya. I'm Rashi." -> Priya).
+2. (LOW) retraction or reassignment in the next sentence passes the first-word whitelist: "Hi, I'm Rashi. I mean Priya.", "Hi, I'm Rashi. I'm sorry, I'm Priya.", "Hi, I'm Rashi. I'm kidding.", "Hi, I'm Rashi. I'm not.", "Hi, I'm Rashi. We are all Rashi." (implausible in a webinar).
+3. (LOW) derogating tail: "Hello, I'm Rashi and I am a fake|liar|bot|robot|imposter.", "... and I lead nothing|zero."; org slot with negating capitals: "Hello, I'm Rashi from The Fake Rashi|The Not Rashi Team|The Fraud Department."; idiom parentheses: "Hi all, Rahul here (not)." / "(sarcastic)" / "(he)".
+4. (LOW, pre-existing policy) role/word names under a cue: "Hello, Doctor here.", "Sound here.", "Hi, Chat speaking.", "Hello, I'm Happy.", "Hello, I'm Google."; the base ships the same when cited directly; the D-052 question stays with the Approver. Also "Hi everyone, this is Rahul Mehta from Vidysea." (a moderator introducing a guest reads the same; accepted by design since ISS-094, inherent ambiguity, same as base).
+
+### 4. "No additions over base" (my inputs)
+Same-citation lane-accepts-that-base-refuses: 1 of 1,151 (the curly apostrophe, correct). Different-citation (block-location) lane-only cells: all genuine own-turn self-introductions of the proposed label, except the ISS-PH3-008 class (70 of 84 merged-turn cells are lane-only and not clean). So zero is NOT met: ISS-PH3-008.
+
+### 5. Offline replay (mine, fresh tag c5chk; script and scorer read first, node:fs and local imports only; output files deleted)
+Lane: accepted 3, correct 3, precision 1, wrongIdentities 0, wrongPairs 0, additions 0, ISS255 4/4. The three are one identity across 3 runs: spk:0 -> "Jubin Thakkar", evidence 2026-08-24-uniaccess-leeds-arts-university-t006; I read t006: "Um, let me quickly introduce myself first. My name is Jubin Thakkar." (4th sentence of an 11,500-character turn): correct. Base (same script with the frozen 536a56a import, tag c5base): accepted 15, correct 0, wrong 15 (Priyanka Roy, Sonal, Shithij, Jubin, Bhavya, 3 runs each), ISS255 4/4. No correct name lost versus cycle 4 (3/3/0 then and now). Phase-3 bar 5 (a correct addition) is still not met offline (additions 0).
+
+### 6. Recall (my own 40 natural webinar introductions, English and Hinglish, with titles, roles and organisations; probe recall.mts, model citing the turn itself)
+ACCEPTED 5 of 40 (12.5%); the maker reports 25 of 40 on author-written lines. Accepted: "Hello everyone, this is Farah Khan from British Council.", "Hi, good morning. My name is Imran Sheikh. I'm an alumnus of ...", "Good afternoon, I'm Ayesha. I recently graduated from Monash.", "Hi everyone. I'm Ritu. I look after admissions for Australia.", "Hello everyone, I'm Yash and I will be your speaker today." Commonest refusals: a comma-joined second clause after the name ("I'm Karan, I'm the regional manager", "I'm Divya, I'm joining you from Bangalore"); `and I'm <non-article>` and `and I'll ...`; a role appositive ("co-founder of StudyBridge", "senior consultant at KPMG"); `from <lowercase org words>`; `N here, I'll ...`; a non-opener sentence before ("Thanks for having me.", "Welcome to the session."); "Dr."/"Prof." splitting the sentence; Hindi-mixed lines. Recall is not a contract criterion (C1 keeps verbatim names), so this is not a FAIL reason, but the Approver should know that on natural speech the lane attributes roughly one introduction in eight, and the replay shows 1 correct name in 23 sessions. The feature is correct when it speaks and nearly silent.
+
+### 7. The call-me sentence and ISS-255
+`Before I invite our next speaker, I should say: call me N.` is hard-coded as a regex whose only reason to exist is one older test ("ISS-255: handover markers do not block genuine direct self-naming"); the shape is labelled "(ISS-255 test only)" in the table. Ruling: this is fitting the code to the test, not a design. Safety-harmless (one fixed sentence; every one-character variant I tried is refused) but it should not be production code: the test should use a shape the allow-list really accepts that carries a handover marker, or the property should be retired by a declared decision. ISS-255 itself is honestly served on its recorded direction (the moderator's handover turn is refused for the speaking label, 2/2, replay ISS255 4/4); its recall leg (a real speaker who self-names after a handover marker still resolves) is pinned only through this one string. Low note.
+
+### 8. Mutations on the allow-list (own harness mut.mjs: per-mutation byte backup, restore in `finally`, spawnSync timeout 170 s, `git hash-object` equal to `git rev-parse HEAD:<file>` after each; all 14 restores hash-equal; the nine speaker test files each time)
+| # | Mutation | Result |
+|---|---|---|
+| M1 | drop the closed tail check | KILLED (5): D-015 ISS-PH3-006 predicate and end-to-end tests, allow-list "refused however innocent" |
+| M2 | allow any earlier sentence | KILLED (7): the four "cycle 5 recall cost" tests among them |
+| M3 | role-clause words may be capitalised (second name in an `and I lead ...` tail) | SURVIVED (0) -> ISS-PH3-009 |
+| M4 | widen `this is` to one token | KILLED (2): differential predicate and end-to-end |
+| M5 | opener list accepts any word | KILLED (11) |
+| M6 | drop the next-sentence check | KILLED (3): allow-list refused list, differential x2 |
+| M7 | remove the namingTurns speaker==label filter | KILLED (1): "ISS-PH3-007: namingTurns binds ONLY turns spoken by the proposed label" (the direct test works; ISS-PH3-007 left `open`, verifiable on a PASS) |
+| M8 | accept filler after the name | KILLED (3) |
+| M9 | drop isReportedAt from the gate | KILLED (2) |
+| M10 | remove the call-me shape | KILLED (3): the ISS-255 test, the accepted-shapes test, the block-binding test |
+| M11 | drop curly-apostrophe normalisation in the gate | SURVIVED (0): equivalent for safety (the module normalises again), recall only |
+| M12 | allow a question-mark ending | KILLED (1) |
+| M13 | `N here|speaking` accepts any preceding text | KILLED (3) |
+| M14 | lead-in no longer stops the walk back | KILLED (1) |
+Score 12 of 14 killed; the survivors are a real gap (M3) and an equivalent (M11). Nothing in the suite tests the contradiction behaviour of ISS-PH3-008.
+
+### 9. Budgets, scope, types
+Targeted run: the nine speaker test files 242/242 pass; the differential prints `DIFF predicate: 1288 cells, base accepts 764, lane accepts 112, violations 0` and `DIFF end-to-end: 59248 cells ... outside the oracle class 0` (its oracle cannot see ISS-PH3-008: the grid proposes ONE name per cell). `node node_modules/typescript/lib/tsc.js --noEmit -p packages/index/tsconfig.json` exit 0; `lint-dirsize` OK (110 dirs); `lint-loc` 7 violations, none in speaker files. Non-blank lines: speakers-llm.ts 300 (at the limit), speaker-name-rules.test.ts 399/400, speaker-relation-rules.ts 101, speaker-selfid-rules.ts 95, speaker-reported-rules.ts 44, speakers-differential.test.ts 159. Scope: 7b4dbb8 touches only packages/index/src/pipeline, the unit's evidence and manifest; no qa/contracts, no enforcement path. Contract left unchanged (C7 already covers ISS-PH3-008).
+
+### Established and remaining
+Established (offline): every recorded reproduction of ISS-104, ISS-282, ISS-255, ISS-PH3-001/002/004/006 is refused end to end; evidence is spoken by the proposed label; replay 3/3/0 against the base's 15 wrong; no quoted, reported, negated, questioned, role-played or other-person form among 1,151 own inputs is accepted.
+Not established: the live gate (Ollama qwen3:8b, 2340 calls: `node --import tsx qa/evidence/u2-4-phase3-precision-regate-2026-09-22/04-regate-eval.mts --runs 1,2,3 --tag c6`, then `05-score.mjs --tag c6`); phase-3 bars 1 to 5; stability across runs; merged-turn behaviour under a real model; anything beyond these 23 sessions' vocabulary. ISS-104 and ISS-282 remain unverified.
+Recommendation: fix ISS-PH3-008 as one structural change (a turn that holds a second self-introduction of a different name refuses every name in it, and the contradiction check counts base-cue candidates, not allow-listed ones), add the 84-cell grid to the differential, then re-check. Merge ahead of the live run: NO.
+
+ISSUES-WRITTEN: ISS-PH3-008 (critical, new), ISS-PH3-009 (medium, new), both in qa/issues.ph3.jsonl. No existing row changed.
+
+EXPLANATION: Cycle 5 is the right structure and delivers what it claims on the recorded and the named shapes: 121/121, 98/98, 20/20, 8/8, no wrong attribution from any quoting, negation, question, role-play or address form in 1,151 inputs of my own, and a replay of 3/3/0 against 15 wrong. What it does not do is keep the base's other protection, the contradiction refusal: an allow-list that drops the second of two introductions leaves a single name nobody contradicts, and the differential cannot see it because it proposes one name per cell. The price is recall (5 of 40 natural introductions), a trade the Approver should accept knowingly, not a defect. Low notes (not backlog): the next-sentence whitelist and the open capitalised org slot admit implausible retractions and negating org phrases; the call-me sentence is test-fitted; the one-turn-two-labels guard is now unreachable; place/role/word names under a cue are unchanged D-052 policy.
+
+---
+
+## Cycle 4 (superseded by cycle 5; kept as recorded)
 
 VERDICT: FAIL
 Cycle checked: 4
