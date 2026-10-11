@@ -1,6 +1,6 @@
 # t050-file-backed-job-queue
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t050-file-backed-job-queue.md, cycle 1, eb29289; unwired; single process; ISS-JOBQUEUE-002 open as before-wiring condition)
 Fix cycle: 1
 Tier: 3 (roadmap task T-050, slice 4a of "Proposed next slices" item 4 in qa/manifests/t050-resumable-pipeline-planner.md: "Job queue seam (interface + file-backed impl)"). T-050 stays open.
 Lane: lane/jobqueue. Class: data write (a queue file is written): full ceremony. Ledger for this lane: qa/issues.jobqueue.jsonl, ids ISS-JOBQUEUE-NNN (none filed).
