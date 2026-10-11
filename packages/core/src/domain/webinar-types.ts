@@ -4,6 +4,9 @@ export interface TrustedSenderConfig {
   domains: string[];
 }
 
+/** `location`/`description` links are free text chosen by whoever sent the invitation. */
+export type MeetingUrlSource = "conference" | "location" | "description";
+
 export interface CalendarEvent {
   id: string;
   title: string;
@@ -13,6 +16,9 @@ export interface CalendarEvent {
   endTime: string;
   /** Absent when the event has no video-call link (nothing to auto-join). */
   meetingUrl?: string;
+  /** T-036: where `meetingUrl` came from. Absent = a row that predates the field (conference data only: free-text
+   * links did not exist then) and is read as `conference`; any value other than `conference` is not auto-joinable. */
+  meetingUrlSource?: MeetingUrlSource;
   organizer?: string;
   cancelled?: boolean;
   recurringEventId?: string;
@@ -55,6 +61,8 @@ export interface AutoRecordCandidateInput {
   senderAuthenticated?: boolean;
   status: "pending" | "approved" | "rejected" | "auto_approved";
   meetingUrl?: string;
+  /** Set only when a calendar-linked snapshot supplied the URL (see CalendarEvent.meetingUrlSource). */
+  meetingUrlSource?: MeetingUrlSource;
   startTime?: string;
   endTime?: string;
   kind?: "past-recording" | "upcoming";
@@ -96,6 +104,8 @@ export const SKIP_REASONS = [
   "opted-out",
   "rule-denied",
   "rules-unevaluable",
+  // T-036: the join link came from an invite's free text (chosen by the sender), not from Google's conference data.
+  "unverified-link-source",
 ] as const;
 
 export type SkipReason = (typeof SKIP_REASONS)[number];

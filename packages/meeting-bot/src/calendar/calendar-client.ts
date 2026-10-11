@@ -49,9 +49,10 @@ function semantic(row: Occurrence): string {
 }
 function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occurrence {
   const common = ["id", "title", "startTime", "endTime", "meetingUrl", "cancelled", "providerUpdated"];
-  shape(input, [...common, ...(source === "calendar" ? ["organizer", "recurringEventId", "originalStartTime"] : ["senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId"])]);
+  shape(input, [...common, ...(source === "calendar" ? ["organizer", "recurringEventId", "originalStartTime", "meetingUrlSource"] : ["senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId"])]);
   text(input.id, 1024, true); text(input.title, 2000); text(input.meetingUrl, 8192);
   text(input.startTime, 128); text(input.endTime, 128); text(input.organizer, 320);
+  text(input.meetingUrlSource, 32); // any short string is kept as-is: auto-join.ts treats everything but "conference" as untrusted
   if (input.cancelled !== undefined && typeof input.cancelled !== "boolean") fail();
   if (source === "gmail" && (!["pending", "approved", "rejected", "auto_approved"].includes(input.status ?? "") ||
       (input.kind !== undefined && !["upcoming", "past-recording"].includes(input.kind)) ||
@@ -67,7 +68,7 @@ function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occ
     }
   }
   const snapshot: Snapshot = {id: input.id, title: input.title ?? "", cancelled: input.cancelled ?? false};
-  for (const key of source === "calendar" ? ["meetingUrl", "organizer", "recurringEventId"] : ["meetingUrl", "senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId"]) {
+  for (const key of source === "calendar" ? ["meetingUrl", "meetingUrlSource", "organizer", "recurringEventId"] : ["meetingUrl", "senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId"]) {
     const value = input[key as keyof Snapshot];
     if (value !== undefined) Object.assign(snapshot, {[key]: value});
   }
@@ -218,7 +219,8 @@ export function reconcileWebinarSources(input: {
     const unresolved = row.unresolved ?? linked?.unresolved ??
       (available && orphan && row.source === "gmail" && !linked ? "unproven-calendar-history" : undefined);
     const snapshot: Snapshot = linked ? {...row.snapshot, title: linked.snapshot.title, startTime: linked.snapshot.startTime, endTime: linked.snapshot.endTime,
-      meetingUrl: linked.snapshot.meetingUrl, cancelled: linked.snapshot.cancelled} : row.snapshot;
+      meetingUrl: linked.snapshot.meetingUrl, cancelled: linked.snapshot.cancelled,
+      ...(linked.snapshot.meetingUrlSource !== undefined ? {meetingUrlSource: linked.snapshot.meetingUrlSource} : {})} : row.snapshot;
     const current = row.accepted ? identity(snapshot) : undefined, prior = previous.occurrences[key];
     const priorIdentity = prior && identity(prior.linkedCalendar ? previous.occurrences[prior.linkedCalendar]!.snapshot : prior.snapshot);
     const priorSnapshot = prior?.linkedCalendar ? previous.occurrences[prior.linkedCalendar]!.snapshot : prior?.snapshot;

@@ -17,7 +17,10 @@ export interface UpcomingMeeting {
   /** Absent when the event has no joinable video-conference link. */
   meetingUrl?: string;
   /** Set only when a description/location scan found no safe single join link (T-036): the scheduler/UI must not guess. */
-  meetingLinkIssue?: "ambiguous" | "registration-only";
+  meetingLinkIssue?: "ambiguous" | "registration-only" | "host-start-link";
+  /** Where meetingUrl came from (T-036): `conference` = Google's own conference data; `location`/`description` = free text
+   * written by whoever sent the invitation, so the scheduler must NOT auto-join it. Present whenever meetingUrl is. */
+  meetingUrlSource?: "conference" | "location" | "description";
   organizer?: string;
   cancelled?: boolean;
   recurringEventId?: string;

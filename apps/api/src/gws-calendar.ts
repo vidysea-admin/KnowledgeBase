@@ -165,6 +165,7 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, cha
       startTime: e.start?.dateTime ?? e.start?.date ?? "",
       endTime: e.end?.dateTime ?? e.end?.date ?? "",
       meetingUrl,
+      ...(meetingUrl !== undefined && link.source ? {meetingUrlSource: link.source} : {}),
       ...(link.issue ? {meetingLinkIssue: link.issue} : {}),
       organizer: e.organizer?.email,
       cancelled: e.status === "cancelled",

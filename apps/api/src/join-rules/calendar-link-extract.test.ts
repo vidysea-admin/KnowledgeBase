@@ -78,7 +78,7 @@ test("registration-only link is not a join link and gets a typed reason", () => 
 test("two different join links are ambiguous: no url; same meeting twice is one", () => {
   assert.deepEqual(d(`${ZOOM} and ${MEET}`), { issue: "ambiguous" });
   assert.deepEqual(d(`${ZOOM} and https://us02web.zoom.us/j/9999999999`), { issue: "ambiguous" });
-  assert.equal(d(`${ZOOM} and https://zoom.us/j/1234567890?pwd=zzz`).url, ZOOM, "same identity, first URL kept");
+  assert.equal(d(`${ZOOM} and https://zoom.us/j/1234567890?pwd=abc`).url, ZOOM, "same identity and passcode, first URL kept");
   assert.deepEqual(l(`${ZOOM} ${MEET}`), { issue: "ambiguous" });
 });
 
@@ -152,4 +152,51 @@ test("recogniser parity drift guard: every exact host in meeting-bot platform.ts
   }
   assert.ok(src.includes("(webinar|meeting)\\.zoho\\.(in|com|eu|com\\.au|jp)"), "zoho host pattern changed upstream: re-sync recognise()");
   assert.ok(recognise("https://webinar.zoho.in/meeting/join?key=1") && recognise("https://webinar.zoho.eu/x?sessionid=1"));
+});
+
+test("ISS-T036CAL-003 recorded: the passcode variant wins in both orders; two different passcodes are ambiguous", () => {
+  const plain = "https://zoom.us/j/999999999", pwd = "https://zoom.us/j/999999999?pwd=SECRET";
+  let ok = 0;
+  assert.equal(d(`${plain} and ${pwd}`).url, pwd); ok++;
+  assert.equal(d(`${pwd} and ${plain}`).url, pwd); ok++;
+  assert.deepEqual(d(`${plain} ${pwd} ${plain}`), { url: pwd, source: "description" });
+  assert.deepEqual(d(`https://zoom.us/j/999999999?pwd=A and https://zoom.us/j/999999999?pwd=B`), { issue: "ambiguous" }); ok++;
+  assert.deepEqual(d(`${plain} https://zoom.us/j/999999999?pwd=A https://zoom.us/j/999999999?pwd=B`), { issue: "ambiguous" }, "order independent");
+  assert.deepEqual(d(`https://zoom.us/j/999999999?pwd=B ${plain} https://zoom.us/j/999999999?pwd=A`), { issue: "ambiguous" });
+  assert.deepEqual(l(`${plain} ${pwd}`), { url: pwd, source: "location" });
+  console.log(`ISS-T036CAL-003: ${ok}/3 recorded reproductions now behave as required (pwd kept in both orders; pwd=A vs pwd=B ambiguous)`);
+  assert.equal(ok, 3);
+});
+
+test("ISS-T036CAL-005 recorded: Zoom host-start links are never returned; alone they give a typed issue; never a zak anywhere", () => {
+  const start = "https://zoom.us/s/12345678901?zak=TOKEN";
+  assert.deepEqual(d(start), { issue: "host-start-link" });
+  const cases = [start, "https://zoom.us/s/12345678901", "https://us02web.zoom.us/s/12345678901?pwd=a", "https://zoom.us/j/12345678901?zak=TOKEN",
+    "https://zoom.us/j/12345678901?ZAK=TOKEN", "https://zoom.us/j/12345678901?a=1&%7aak=T", "https://meet.google.com/abc-defg-hij?zak=T",
+    "https://us02web.zoom.us/wc/join/12345678901?zak=x", "https://zoom.us/j/12345678901#zak=TOKEN", "https://zoom.us/j/12345678901?zak=%257A%2561k%253DT",
+    `https://www.google.com/url?q=${encodeURIComponent(start)}`, `<a href="${start}">join</a>`];
+  let refused = 0;
+  for (const c of cases) { const out = d(c); assert.equal(out.url, undefined, c); assert.equal(/zak/i.test(JSON.stringify(out)), false, c); refused++; }
+  assert.deepEqual(l(start), { issue: "host-start-link" });
+  assert.equal(d(`${start} and https://zoom.us/j/12345678901`).url, "https://zoom.us/j/12345678901", "the join link of the same meeting is still returned, without the token");
+  assert.equal(d("https://zoom.us/j/12345678901?pwd=abcZAKdef").url, "https://zoom.us/j/12345678901?pwd=abcZAKdef", "zak inside a passcode value is not a token");
+  console.log(`ISS-T036CAL-005: ${refused}/${cases.length} host-start shapes refused (the recorded one included), none returned`);
+  assert.equal(refused, cases.length);
+});
+
+test("ISS-T036CAL-002 recorded: every embedded-redirect URL the checker listed is refused (and the https:/ href form)", () => {
+  const recorded = [
+    "https://zoom.us/j/12345678901?redirect=https://evil.com", "https://zoom.us/j/12345678901?url=//evil.com", "https://zoom.us/j/12345678901?next=%2f%2fevil.com",
+    "https://zoom.us/j/12345678901?x=https%3A%2F%2Fevil.com", "https://zoom.us/j/12345678901?x=%2568ttps%253A%252F%252Fevil.com", "https:/zoom.us/j/12345678901",
+  ];
+  let refused = 0;
+  for (const u of recorded) { assert.equal(recognise(u), undefined, u); assert.deepEqual(d(`Join ${u}`), {}, u); assert.deepEqual(d(`<a href="${u}">x</a>`), {}, u); refused++; }
+  // the same refusal on every platform and through the Google wrapper
+  for (const base of [ZOOM_W, MEET, TEAMS, ZOHO, ONAIR, "https://x.webex.com/meet/room"]) {
+    const sep = base.includes("?") ? "&" : "?";
+    for (const q of ["redirect=https://evil.com", "return_to=x", "goto=y", "k=//evil.com", "k=%5C%5Cevil.com", "k=javascript:alert(1)"]) assert.equal(recognise(`${base}${sep}${q}`), undefined, base + q);
+  }
+  assert.deepEqual(d(`https://www.google.com/url?q=${encodeURIComponent(recorded[0]!)}`), {});
+  console.log(`ISS-T036CAL-002: ${refused}/${recorded.length} recorded embedded-redirect reproductions refused (differential corpus: calendar-link-differential.test.ts)`);
+  assert.equal(refused, recorded.length);
 });
