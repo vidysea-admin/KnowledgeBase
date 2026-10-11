@@ -17,7 +17,7 @@ export interface LabelScan { total: number; observed: number; cands: { name: str
 export type TileRefusal = "no-observations" | "insufficient-coverage" | "insufficient-duration" | "insufficient-fraction"
   | "runner-up-too-strong" | "two-strong-names" | "non-person-name" | "bot-own-name";
 export interface Gates { minSec: number; minFrac: number; maxRun: number; minCov: number; botKey: string; extra?: (n: string) => boolean }
-export type Verdict = { name: string; agreeSec: number; topFrac: number; runFrac: number } | { reason: TileRefusal };
+export type TileVerdict = { name: string; agreeSec: number; topFrac: number; runFrac: number } | { reason: TileRefusal };
 
 const cmp = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
 const EPS = 1e-9;
@@ -50,7 +50,7 @@ export function scanShift(holds: Hold[], byLabel: Map<string, Eff[]>, lag: numbe
 }
 
 /** The v0 threshold chain, unchanged, applied to one label at one shift. */
-export function decide(l: LabelScan, g: Gates): Verdict {
+export function decideTile(l: LabelScan, g: Gates): TileVerdict {
   const top = l.cands[0], second = l.cands[1];
   if (!top || l.observed <= 0) return { reason: "no-observations" };
   if (l.observed + EPS < g.minCov * l.total) return { reason: "insufficient-coverage" };

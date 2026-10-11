@@ -37,7 +37,7 @@
  * covers: O(K (m log n + covered holds)) (`options.counter.ops`).
  */
 import { foldKey, normalizeDisplayName } from "./speaker-tile-names.js";
-import { decide, scanShift, type Eff, type Gates, type Hold, type LabelScan, type Verdict } from "./speaker-tile-scan.js";
+import { decideTile, scanShift, type Eff, type Gates, type Hold, type LabelScan, type TileVerdict } from "./speaker-tile-scan.js";
 
 export { MAX_NAME_LENGTH, normalizeDisplayName } from "./speaker-tile-names.js";
 export interface TileObservation { tSec: number; displayName: string | null; confidence?: number; source?: string }
@@ -196,7 +196,7 @@ export function alignTileNamesToTurns(logIn: unknown, turnsIn: unknown, optionsI
   const inner: number[] = [];
   for (let k = 0; k * LAG_STEP_SEC <= maxLag + 1e-9; k++) inner.push(k * LAG_STEP_SEC);
   if (inner[inner.length - 1]! < maxLag - 1e-9) inner.push(maxLag);
-  const verdicts: Map<string, Verdict>[] = [];
+  const verdicts: Map<string, TileVerdict>[] = [];
   let scan0 = new Map<string, LabelScan>();
   let inBest = { lag: 0, a: -Infinity };
   for (const lag of inner) {
@@ -204,7 +204,7 @@ export function alignTileNamesToTurns(logIn: unknown, turnsIn: unknown, optionsI
     if (lag === 0) scan0 = sc;
     const a = agreement(sc);
     if (a > inBest.a + 1e-9) inBest = { lag, a };
-    verdicts.push(new Map([...sc.entries()].map(([l, s]) => [l, decide(s, gates)] as const)));
+    verdicts.push(new Map([...sc.entries()].map(([l, s]) => [l, decideTile(s, gates)] as const)));
   }
   let outBest = { lag: 0, a: -Infinity };
   let shifts = inner.length;
@@ -242,7 +242,7 @@ export function alignTileNamesToTurns(logIn: unknown, turnsIn: unknown, optionsI
     if (misaligned) { labels.push(refused("timeline-misaligned")); continue; }
     const vs = verdicts.map((vm) => vm.get(label)!);
     const first = vs[0]!;
-    const named = vs.filter((v): v is Extract<Verdict, { name: string }> => "name" in v);
+    const named = vs.filter((v): v is Extract<TileVerdict, { name: string }> => "name" in v);
     if (named.length === 0) { labels.push(refused("reason" in first ? first.reason : "no-observations")); continue; }
     if (named.length < vs.length || named.some((v) => v.name !== named[0]!.name)) { labels.push(refused("lag-unstable")); continue; }
     const name = named[0]!.name;

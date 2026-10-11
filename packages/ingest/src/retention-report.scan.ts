@@ -50,10 +50,10 @@ export function scanSource(src: string): string[] {
   return out;
 }
 
-export interface Graph { files: string[]; bare: Map<string, Set<string>>; sources: Map<string, string> }
+export interface ImportGraph { files: string[]; bare: Map<string, Set<string>>; sources: Map<string, string> }
 
 /** Follows relative imports (and `@lkb/core` into `corePolicy`) from the entry files. */
-export function importGraph(entries: string[], corePolicy: string): Graph {
+export function importGraph(entries: string[], corePolicy: string): ImportGraph {
   const files: string[] = [];
   const bare = new Map<string, Set<string>>();
   const sources = new Map<string, string>();
