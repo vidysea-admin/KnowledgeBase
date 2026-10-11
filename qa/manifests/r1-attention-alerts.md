@@ -117,5 +117,6 @@ M1 mask one token instead of to end: `D-015 ledger corpus`, `ISS-R1ALERTS-006 sh
 - `node scripts/lint-dirsize.mjs` -> `lint-dirsize: OK (111 dir(s) within budget)`
 - Non-blank lines: 142 / 187 (limit 300); tests 205 / 217 / 129 (limit 400).
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/r1-attention-alerts.md (cycle 2, 1f734a5)
 Fix cycle: 2
