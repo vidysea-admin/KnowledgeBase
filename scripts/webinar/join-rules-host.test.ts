@@ -363,3 +363,16 @@ test("un-opt on a corrupt stored file is a 500 and the bytes are unchanged; an o
     assert.equal(readFileSync(joinRulesFilePath(dir, "tenant-a"), "utf8"), "{not json");
   } finally { await s.close(); }
 }));
+
+// iss-unopt-001-cross-process-lost-update: the adapter's un-opt is the store's locked read-modify-write (not load outside the lock + locked save).
+test("un-opt adapter takes the tenant lock for the whole operation: a live foreign lock gives the store's typed `locked` even for a no-op, and nothing is written", () => withDir(async dir => {
+  const deps = createJoinRulesDeps({ stateDir: dir });
+  deps.recordOptOut("tenant-a", "cal1");
+  const f = joinRulesFilePath(dir, "tenant-a"), before = readFileSync(f);
+  writeFileSync(f.replace(/\.json$/, ".lock"), JSON.stringify({ token: "someone-else", pid: process.pid, at: new Date().toISOString() }));
+  const t0 = Date.now();
+  for (const id of ["cal1", "nobody"]) assert.throws(() => deps.removeOptOut("tenant-a", id), (e: any) => e?.code === "locked", id);
+  assert.ok(Date.now() - t0 < 20000);
+  assert.ok(readFileSync(f).equals(before));
+  assert.deepEqual(loadJoinRules(dir, "tenant-a").state.optedOutEventIds, ["cal1"]);
+}));

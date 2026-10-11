@@ -5,7 +5,7 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, readdirSyn
 import { tmpdir } from "node:os";
 import path from "node:path";
 import {
-  loadJoinRules, saveJoinRules, recordTenantApproval, recordTenantOptOut, joinRulesFilePath, JoinRulesStoreError,
+  loadJoinRules, saveJoinRules, recordTenantApproval, recordTenantOptOut, recordTenantUnOptOut, joinRulesFilePath, JoinRulesStoreError,
   JOIN_RULES_MAX_BYTES, type StoredJoinRules,
 } from "./join-rules-store.js";
 import { evaluateJoinRules, recordOptOut, validateJoinRuleState, type JoinRuleState } from "./join-rules.js";
@@ -137,11 +137,10 @@ const ROOM = "https://zoom.us/my/room.name";
 const OWN_RULES = { version: 1 as const, ownDomains: [], rules: [{ id: "r-allow", effect: "allow" as const, match: { domain: "x.com" } }] };
 const ev = (id: string, meetingUrl: string) => ({ id, organizer: "a@x.com", meetingUrl });
 const decide = (dir: string, tenant: string, id: string, url: string) => { const l = loadJoinRules(dir, tenant); return evaluateJoinRules(ev(id, url), l.ruleSet, l.state); };
-/** What the production adapter does (scripts/webinar/join-rules-host.ts): load -> pure removal -> locked save; a no-op writes nothing. */
+/** What the production adapter does (scripts/webinar/join-rules-host.ts): the store's locked load -> pure removal -> write; a no-op writes nothing. */
 function unOpt(dir: string, tenant: string, id: string, meeting?: OptOutMeeting) {
-  const cur = loadJoinRules(dir, tenant); const r = removeOptOutEntries(cur.state, id, meeting);
-  if (r.state !== cur.state) saveJoinRules(dir, tenant, { ruleSet: cur.ruleSet, state: r.state });
-  return r;
+  const r = recordTenantUnOptOut(dir, tenant, id, {}, meeting);
+  return { state: r.state, removedEventId: r.removedEventId, removedMeetings: r.removedMeetings };
 }
 const base = (over: Partial<JoinRuleState> = {}): JoinRuleState => ({ approvedSenders: ["s@x.com"], approvedDomains: ["d.com"], optedOutEventIds: ["cal1", "cal10", "Cal1"], ...over });
 

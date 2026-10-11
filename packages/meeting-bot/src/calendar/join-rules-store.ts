@@ -29,7 +29,7 @@ import {
   EMPTY_JOIN_RULE_STATE, recordRuleApproval as applyApproval, recordOptOut as applyOptOut,
   validateJoinRuleSet, validateJoinRuleState, type JoinRuleSet, type JoinRuleState,
 } from "./join-rules.js";
-import type { OptOutMeeting } from "./join-rules-optout.js";
+import { removeOptOutEntries, type OptOutMeeting } from "./join-rules-optout.js";
 import { acquireLock, releaseLock, sleep, LockFailure } from "./join-rules-store-lock.js";
 import { lockStillOwned, type LockOptions, type TakeoverInfo } from "./join-rules-store-lock.js";
 
@@ -207,4 +207,24 @@ export function recordTenantApproval(stateDir: string, tenantId: string, approva
 /** Per-meeting opt-out; same lock and load-first behaviour. */
 export function recordTenantOptOut(stateDir: string, tenantId: string, eventId: string, opts: Omit<StoreOptions, "overwriteInvalid"> = {}, meeting?: OptOutMeeting): JoinRuleState {
   return mutateState(stateDir, tenantId, opts, s => applyOptOut(s, eventId, meeting));
+}
+
+/**
+ * Un-opt (unit `iss-unopt-001-cross-process-lost-update`): the WHOLE load -> pure removal (`removeOptOutEntries`) -> write is one
+ * critical section under the tenant lock, like approve / opt-out, so another process's approval or opt-out made meanwhile can
+ * neither be lost nor be undone by this write. A no-op removal (nothing matched) writes nothing. A writer that cannot take the
+ * lock within `lockWaitMs` throws `JoinRulesStoreError("locked")` and has written nothing; a bad stored file blocks the write
+ * (load throws). Fail direction: an error or `locked` leaves the opt-out in place.
+ */
+export function recordTenantUnOptOut(stateDir: string, tenantId: string, eventId: string, opts: Omit<StoreOptions, "overwriteInvalid"> = {}, meeting?: OptOutMeeting):
+  { state: JoinRuleState; removedEventId: boolean; removedMeetings: string[] } {
+  const file = joinRulesFilePath(stateDir, tenantId);
+  return withTenantLock(file, opts, owns => {
+    const cur = loadJoinRules(stateDir, tenantId);
+    opts.afterRead?.();
+    let r!: ReturnType<typeof removeOptOutEntries<JoinRuleState>>;
+    wrapInvalid(() => { r = removeOptOutEntries(cur.state, eventId, meeting); });
+    if (r.state !== cur.state) writeAtomic(file, encode(tenantId, { ruleSet: cur.ruleSet, state: r.state }), opts.rename, owns);
+    return { state: r.state, removedEventId: r.removedEventId, removedMeetings: r.removedMeetings };
+  });
 }
