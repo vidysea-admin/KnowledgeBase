@@ -1,5 +1,5 @@
 # Manifest — t035-lean-video-over-target-report
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t035-lean-video-over-target-report.md, cycle 0, 1e8ff30)
 Fix cycle: 0
 Lane: LEANOVER (branch lane/leanover, base f016d4c). Issue addressed: ISS-T035LEAN-001 (medium, qa/issues.t035lean.jsonl).
 
