@@ -29,7 +29,11 @@ function argOf(name, fallback) {
 const tenantId = argOf("tenant", "toc");
 const label = argOf("label", "live-verify");
 
-const { connect, getDb } = await import("../packages/db/src/index.ts");
+const { connect, getDb, assertValidTenantId } = await import("../packages/db/src/index.ts");
+
+// Same validator the data accessor uses (ISS-AUTHTENANT-002): refuse BEFORE connecting or touching api_keys, with a clean message and exit 1.
+try { assertValidTenantId(tenantId, "mint-key --tenant"); }
+catch (err) { console.error(`mint-key: ${err.message}`); process.exit(1); }
 
 const url = process.env.MONGODB_URL;
 if (!url) throw new Error("MONGODB_URL not set in environment/.env");

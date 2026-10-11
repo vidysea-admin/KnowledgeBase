@@ -8,7 +8,7 @@ import { randomUUID, randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import {
-  getDb, createEvalRun, recordScore as recordEvalRunScore,
+  getDb, assertValidTenantId, createEvalRun, recordScore as recordEvalRunScore,
   sessions as sessionsColl, sources as sourcesColl, gaps as gapsColl,
   claims as claimsColl, turns as turnsColl, sessionPages as sessionPagesColl, graphEdges as graphEdgesColl,
   listAll as listAllMeetingCandidates, createIfNew as createMeetingCandidateIfNew,
@@ -58,6 +58,7 @@ export function createMongoTreeStore(): TreeStore {
       // node_id shape wrong once, live, on 2026-09-04, before this file matched what buildTree
       // actually produces. It now also matches on the real `tenantId` field (ISS-062) --
       // TreeIndexRootDocument satisfies TreeStore's TreeIndexNode return type (it's a superset).
+      try { assertValidTenantId(tenantId, "treeStore.load"); } catch { return null; } // invalid tenant: no tree and NO query (ISS-AUTHTENANT-002); the route answers its 404
       return getDb().collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
     },
   };
@@ -76,6 +77,7 @@ export function createMongoEvalRunStore(): EvalRunStore {
  * per-attempt writes in `production.ts`; both land in the same collection. */
 export function createMongoJobWriter(): WriteJobFn {
   return async (entry) => {
+    assertValidTenantId(entry?.tenantId, "jobWriter");
     await getDb().collection<Jobs>("jobs").insertOne({ _id: randomUUID(), ...entry });
   };
 }
@@ -138,6 +140,7 @@ export function createMongoCitationsDeps(): CitationsDeps {
 export function createMongoGraphReadDeps(): GraphReadDeps {
   return {
     async loadGraph(tenantId): Promise<KnowledgeGraph | null> {
+      assertValidTenantId(tenantId, "graph.load"); // before the hand-built tree_index query (the accessors below only throw after it was issued)
       const treeRootP = getDb().collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
       const [treeRoot, entityEdges, sessionDocs] = await Promise.all([treeRootP, graphEdgesColl(tenantId).find({}).toArray(), sessionsColl(tenantId).find({}).toArray()]);
       if (!treeRoot && entityEdges.length === 0) return null;
@@ -207,6 +210,7 @@ export function createMongoKeysDeps(): KeysDeps {
 
   return {
     async listKeys(tenantId): Promise<ApiKeySummary[]> {
+      assertValidTenantId(tenantId, "apiKeys.list");
       const docs = await coll().find({ tenantId }).toArray();
       return docs.map((d) => ({
         _id: d._id,
@@ -217,6 +221,7 @@ export function createMongoKeysDeps(): KeysDeps {
       }));
     },
     async createKey(tenantId, label, scopes) {
+      assertValidTenantId(tenantId, "apiKeys.create");
       const id = randomUUID();
       const rawKey = `lkb_${randomBytes(24).toString("hex")}`;
       await coll().insertOne({
@@ -231,6 +236,7 @@ export function createMongoKeysDeps(): KeysDeps {
       return { id, rawKey };
     },
     async revokeKey(tenantId, id) {
+      assertValidTenantId(tenantId, "apiKeys.revoke");
       const result = await coll().updateOne(
         { _id: id, tenantId, revokedAt: null },
         { $set: { revokedAt: new Date().toISOString() } },

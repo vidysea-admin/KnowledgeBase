@@ -1,7 +1,7 @@
 
 import { randomUUID } from "node:crypto";
 import type { Db } from "mongodb";
-import { getDb, scopedCollection } from "@lkb/db";
+import { getDb, scopedCollection, assertValidTenantId } from "@lkb/db";
 import type { SessionPages, Chunks, Claims, Sessions, TreeIndexRootDocument, Turns } from "@lkb/core";
 import { summarizeSession, extractClaims, buildChunks, buildTree, regenerate, treeIndexRootFilter, type SummarizeCompleteFn, runtimeChronologicalTurns, assertGroundedTurns, validateRuntimePage, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin } from "@lkb/index";
 import { recordVectorGap } from "./vector-gap.js";
@@ -29,6 +29,7 @@ export interface IndexSessionDeps {
 
 
 async function loadTreeRoot(tenantId: string, db: Pick<Db, "collection">): Promise<TreeIndexRootDocument | null> {
+  assertValidTenantId(tenantId, "indexSession.loadTreeRoot"); // hand-built filter (ISS-AUTHTENANT-002)
   return db.collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
 }
 
@@ -115,6 +116,7 @@ export async function indexSession(
   sessionId: string,
   deps: IndexSessionDeps,
 ): Promise<IndexSessionResult> {
+  assertValidTenantId(tenantId, "indexSession"); // first statement: nothing below (reads, deletes, upserts) runs for an invalid tenant
   const db = deps.db ?? getDb();
   // Tenant-scoped through the SAME injected handle: `scopedCollection` still forces a tenantId at
   // every call site (its whole purpose), it just no longer reaches past the injection to getDb().
@@ -262,6 +264,7 @@ export async function indexSession(
     // Setting it here, once, at the write boundary, is what actually closes ISS-062: every root
     // this function ever persists from this point on carries the field, migrated or not.
     const rootDoc: TreeIndexRootDocument = { ...newRoot, tenantId };
+    assertValidTenantId(tenantId, "indexSession.tree_index.write"); // hand-built filter AND stamped document (ISS-AUTHTENANT-002)
     await db.collection<TreeIndexRootDocument>("tree_index")
       .replaceOne(treeIndexRootFilter(tenantId), rootDoc, { upsert: true });
 

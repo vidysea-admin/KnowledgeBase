@@ -1,4 +1,5 @@
 import { MongoClient } from "mongodb";
+import { assertValidTenantId } from "@lkb/db";
 import { assertActivityLimit, projectActivitySnapshot, queueTimestamp, type ActivityHealthDeps, type ActivityJob } from "./types.js";
 
 export interface QueueConfiguration { tenantId: string; actor: string; database: string; mongodbUrl: string }
@@ -30,6 +31,7 @@ export function createQueueActivityHealthReader(configuration: QueueConfiguratio
   return { async readActivityHealth(tenantId, limit) {
     assertActivityLimit(limit);
     if (!tenantId || tenantId !== configuration.tenantId) throw new Error("Upload queue unavailable for tenant");
+    assertValidTenantId(configuration.tenantId, "activityHealth.queue"); // env-derived, only trimmed upstream: reject control chars before the hand-built filter (ISS-AUTHTENANT-002)
     const rows = await collection.find({ tenantId: configuration.tenantId, kind: "transcribe.rpc" },
       { projection, sort: { createdAt: -1, _id: -1 }, limit: limit + 1, maxTimeMS: 5000 }).toArray();
     if (!Array.isArray(rows) || rows.length > limit + 1) throw new Error("Invalid queue read");

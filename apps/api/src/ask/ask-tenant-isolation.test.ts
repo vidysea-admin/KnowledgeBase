@@ -99,7 +99,7 @@ test("tree load: empty / undefined tenant matches no root and returns null", asy
   for (const bad of ["", undefined as unknown as string]) {
     const db = new BlindDb(corpus());
     assert.equal(await realTreeStore(db, []).load(bad), null, `tenant ${JSON.stringify(bad)}`);
-    assert.equal(db.queries[0]!.returned, 0);
+    assert.deepEqual(db.queries, [], "invalid tenant: no query at all (ISS-AUTHTENANT-002 guard)");
   }
 });
 
