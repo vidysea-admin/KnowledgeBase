@@ -68,7 +68,8 @@ const PATTERNS: Record<RelationRoute, (text: string, name: string, at: number) =
  * reading); then the pattern. TEST SEAM ONLY: it ignores `RELATION_ROUTES`, so the tests can ask what a route
  * WOULD ship if switched on. No production module may import it (pinned by a test that scans src/).
  */
-export function occurrenceAccepted(route: RelationRoute, text: string, name: string, at: number): boolean {
+export function occurrenceAccepted(route: RelationRoute, raw: string, name: string, at: number): boolean {
+  const text = raw.replaceAll("’", "'");   // curly and straight apostrophes are one; same length, so `at` agrees
   if (!looksLikeAName(name) || isDiscourseOnly(name)) return false;
   if (isReportedAt(text, name, at)) return false;
   if (route === "selfIdentification" ? !hasNamingCueAt(text, name, at) : readsAsAPlaceOrOrg(text, name)) return false;

@@ -83,7 +83,7 @@ test("M7 (cycle-2 checker): the possessive exemption in readsAsAPlaceOrOrg is an
   const text = "At Priya's desk, Priya here.";
   assert.deepEqual(nameOccurrences(text, "Priya"), [text.lastIndexOf("Priya")]);
   assert.equal(citesNameAsAnIntroduction(text, "Priya"), true);
-  assert.equal(citesNameAsSelfIdentification(text, "Priya"), true);
+  assert.equal(citesNameAsSelfIdentification(text, "Priya"), false, "cycle 5: the free clause \"At Priya's desk,\" before the cue is not an opener");
   assert.equal(citesNameAsAnIntroduction("Our students in Priya were many, Priya here.", "Priya"), false, "a non-possessive governed occurrence DOES demote the weak cue");
 });
 

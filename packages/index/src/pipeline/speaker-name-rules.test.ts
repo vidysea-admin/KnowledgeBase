@@ -349,14 +349,20 @@ for (const [text, name] of [
 
 /** The signal must not cost the strong cues: a real person named Paris still self-names. */
 for (const [text, name] of [
-  ["We met in Paris. My name is Paris.", "Paris"],
-  ["I am in Mumbai today. My name is Mumbai Sharma.", "Mumbai Sharma"],
+  ["Hi, my name is Paris.", "Paris"],
+  ["Hello, my name is Mumbai Sharma.", "Mumbai Sharma"],
   ["Paris here, from admissions.", "Paris"],
-  ["Our office is in Priya's building. My name is Priya.", "Priya"],
+  ["Hello everyone, I'm Priya.", "Priya"],
 ] as [string, string][]) {
   test(`ISS-104 place signal recall: still resolves ${JSON.stringify(name)} in ${JSON.stringify(text)}`, async () => {
     assert.equal(await shipped(text, name), true, "an explicit naming cue or a direct address survives the place signal");
   });
+}
+
+/** Cycle 5 recall cost (allow-list, ISS-PH3-006): a FREE sentence before the cue is no longer harmless, so these four former positives are refused. */
+for (const [text, name] of [["We met in Paris. My name is Paris.", "Paris"], ["I am in Mumbai today. My name is Mumbai Sharma.", "Mumbai Sharma"],
+  ["Our office is in Priya's building. My name is Priya.", "Priya"], ["Coming up next, I will share the slides. My name is Nilesh.", "Nilesh"]] as [string, string][]) {
+  test(`cycle 5 recall cost: refused, a free sentence precedes the cue: ${JSON.stringify(text)}`, async () => { assert.equal(await shipped(text, name), false); });
 }
 
 /**
@@ -414,6 +420,6 @@ test("ISS-104 handover: `coming up next` refuses the introduced name for the CUR
     "the announced speaker is not this turn's speaker");
 });
 test("ISS-104 handover: self-naming in the same turn still resolves", async () => {
-  assert.equal(await shipped("Coming up next, I will share the slides. My name is Nilesh.", "Nilesh"), true,
+  assert.equal(await shipped("Hello everyone, I would like to introduce myself, my name is Nilesh.", "Nilesh"), true,
     "a self-naming cue survives the handover gate");
 });

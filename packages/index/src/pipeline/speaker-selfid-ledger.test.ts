@@ -80,8 +80,8 @@ test("block-binding rule: a genuine self-identification binds ONLY the label tha
   }
 });
 
-test("accepted on purpose (recall kept): they call me X; I would like to introduce myself, I'm X; places and roles under an explicit self-naming cue (D-052)", () => {
-  for (const [T, N] of [["They call me Nikhil.", "Nikhil"], ["Hello everyone, I would like to introduce myself, I'm Ruby.", "Ruby"], ["Hello, I'm Google.", "Google"], ["I am Moderator today.", "Moderator"],
+test("accepted on purpose (recall kept): I would like to introduce myself, I'm X; places and roles under an explicit self-naming cue (D-052)", () => {
+  for (const [T, N] of [["Hello everyone, I would like to introduce myself, I'm Ruby.", "Ruby"], ["Hello, I'm Google.", "Google"], ["I am Moderator today.", "Moderator"],
     ["Hi, this is Mumbai Sharma.", "Mumbai Sharma"]] as [string, string][]) assert.equal(citesNameAsSelfIdentification(T, N), true, T);
 });
 

@@ -1,7 +1,7 @@
 # u2-4-phase3-resume-c2
 
 Status: ready-for-check
-Fix cycle: 4
+Fix cycle: 5
 Priority tier: 2 - open critical ISS-282 / ISS-104 and high ISS-283 / ISS-289 (also medium ISS-284, ISS-290). Authorized by D-122 (Approver ruling 2026-10-10: `origin/wave/u2-4-phase3-fix` is RESUMED through the maker-checker pair).
 Security class: data-write precondition (U2.4 phase-4 persists identities) - full ceremony, uncapped.
 Lane: `lane/ph3` (worktree KnowledgeBase-lanes/ph3), base 536a56a. Ledger shard: `qa/issues.ph3.jsonl` (one low row).
@@ -172,3 +172,93 @@ What D-052 says (docs/DECISIONS.md, `## D-052 | 2026-09-28`, Ruling 2, Approver 
 
 ## Not delivered (unchanged in substance)
 The live gate is still outstanding and NOT claimed: Ollama qwen3:8b digest 500a1f067a9f, 2340 calls, `04-regate-eval.mts --runs 1,2,3 --tag c2` then `05-score.mjs --tag c2`. The five gate bars are not evidenced. Bar 5 (a correct addition) is not met even offline (additions 0). Handover and thanks are OFF. Contract change C14 stays deferred to the Approver; qa/contracts is untouched. ISS-283 not delivered. No ledger status changed. Unverified: behaviour on live model output; the oracle and the guards are English-only; the hedge and negation word lists were not tuned against real transcripts beyond the recorded corpus.
+
+---
+
+# Fix cycle 5 (checker verdict u2-4-phase3-resume-c2, cycle 4: FAIL; ISS-PH3-006 critical, ISS-PH3-007 low)
+
+## Why four cycles of deny-listing failed
+Cycles 1 to 4 each answered "is this a clean self-identification?" with a list of BAD contexts (reporting verbs, hedges, negation, quote marks). A list over free text is closed only for contexts someone has already seen; each checker round found one more ("I am N, he said." where the verb comes AFTER, "His words:", "Repeat after me", "in the movie", "Usne kaha", and "I am Rashi and this is Makrand" where a second name rides along). The block-location path turns any base-cue false positive into a shipment under a neighbouring citation, so every unlisted context was a wrong name. Cycle 5 inverts the rule: a name is accepted only when the sentence holding the cue is, end to end, one of a few positively described shapes; every unknown word, in any language, fails to match. The independent oracle in the differential test is inverted too: it ENUMERATES the allowed strings (a generated set), so there is no deny-list in the test to be outflanked.
+
+## The allow-list (speaker-selfid-rules.ts, 95 non-blank lines; `isCleanSelfIdentificationAt`)
+Unit of text: the SENTENCE that holds the cue, plus a positive test of its neighbours. Why not the whole turn: the one correct name in the recorded corpus (Jubin Thakkar, 2026-08-24 Leeds Arts) is the 4th sentence of a 132-sentence turn ("Well, thank you so much for sharing that, and ... Um, let me quickly introduce myself first. My name is Jubin Thakkar. I am the South Asia representative ..."). A whole-turn rule would refuse the only correct name.
+- The sentence = OPENERS, then a cue, then exactly ONE name (the candidate), then a closed TAIL, then `.` or `!` or nothing. A `?` refuses. No filler: "I'm Rashi, yeah." refuses.
+- Before it: walking back, every earlier sentence must be opener-only ("Hi everyone.", "Thank you.") until the start of the turn or a LEAD-IN sentence ("Let me quickly introduce myself first."); a lead-in announces the speaker's own introduction, so what precedes it is free. Any other sentence directly before ("Repeat after me.", "Quote.", "He said hello.") refuses: that is how framing crosses a full stop.
+- After it: the next sentence, if any, must open with a closed first-person or continuation word (I, I'm, we, my, our, today, welcome, thank(s), and, so, before, first, let, over, hi, hello, good, okay, uh, um, please, now, also). "That is what he said." / "Those were his words." / "Unquote." refuse.
+- Typography: straight and curly apostrophes identical (normalised in `occurrenceAccepted` and again in the module), whitespace collapsed.
+Openers (closed list in the file): hi, hello, hey, namaste, good morning/afternoon/evening/day, okay, ok, so, well, alright, now, um, uh, thanks, thank you, welcome, everyone, all, folks, friends, and, again, actually, there. Lead-in phrase (same sentence or the previous one): let me / I would like to / I'd like to / I want to / allow me to, with quickly|briefly|just|first|also, then "introduce myself".
+Cues (`SHAPES` table): (1) `my name is|my name's|I am|I'm|this side` + name; (2) `this is` + name, FULL NAME only (2+ tokens; "This is Priya." introduces someone), optionally followed by `speaking`; (3) name + `here|speaking`, with the idiom tails below; (4) the single exact shape `Before I invite our next speaker, I should say: call me N.`
+Tail (what may follow the name; `tailOk`): nothing; ` today`; `, and welcome`; ` from <up to 5 words>` where every word is capitalised/numeric or in a closed lowercase list (the, of, team, office, department, university, college, school, institute, admissions, marketing, sales, international, recruitment, outreach, partnerships, regional, programme, program, group, company, centre, center); ` and I lead|head|manage|handle|run|look after|work with/on/at/in/for ...`, ` and I am|I'm a|an|the ...`, ` and I will|I'll be ...`, ` and today we|I ...`, each followed by 1 to 6 plain lowercase words outside a small STOP set (negation, reporting and role-play words; belt and braces inside a six-word clause). "in the movie", "ka friend", "'s colleague", a second capitalised name after "and", any other comma clause and any Hindi word start no listed tail, so they refuse. The "<Name> here|speaking" shape alone also accepts the idiom tails pinned by ISS-098 and ISS-104 recall tests: ` here`, ` again`, ` now`, ` over Zoom`, ` (word)`, ` as the <1-3 words>`, ` to talk about <1-4 words>`, ` -- good to be here|with you`, `... thanks all`, ` today from <org>`, ` speaking from <org>`.
+Accepted: "My name is Ruby and I lead admissions." / "Hi all, Ruby here." / "Hello, I’m Rashi from the Leeds office." / "This is Makrand Rajadhyaksha from Vidysea." / the Jubin turn. Refused: "I am Rashi and this is Makrand Rajadhyaksha." (BOTH names), "I'm Rashi, yeah.", "Call me Nikhil.", "They call me Nikhil.", "Thank you, Priya. I'm Rashi.", "I'm Rashi. That is what he said.", "Mera naam Rashi hai.", "Rashi here has an announcement.".
+Still applied first, unchanged: name-shaped and not a function word; `isReportedAt` (quote or reporting) on every route; the base cue; evidence spoken by the bound label; frozen routes, handover and thanks OFF. Hindi cues ("mera naam N hai", "main N hoon") are NOT added: recall for a later, separately checked unit. "myself Rashi" is not a base cue and stays refused.
+
+## `call me` (decision)
+Accepted: ONLY the exact shape `Before I invite our next speaker, I should say: call me Ruby.`, required by speaker-name-rules.test.ts "ISS-255: handover markers do not block genuine direct self-naming". "Call me X" and "They call me X" are now REFUSED (their only requirement was cycle 4's own selfid-ledger "accepted on purpose" assertion, which I removed; the cycle-4 checker called hostile variants arguable). Pinned as refused in speaker-selfid-allowlist.test.ts.
+
+## Which existing test requires which accepted shape
+- `I am|I'm|my name is|my name's N` with tails and openers: speaker-relation-rules.test.ts (Ruby, "...I lead admissions."), speakers-llm.test.ts ("I am Amrita Mhapankar, and welcome.", "Actually, my name is Rahul Mehta."), speaker-selfid-ledger.test.ts (lead-in "Hello everyone, I would like to introduce myself, I'm Ruby.").
+- Opener-only previous sentences and a first-person next sentence: speaker-name-rules.test.ts ISS-255 recorded ground truth "Thank you. Hello everyone. My name is Ruby. I work at Uni-Italia."; the lead-in rule: the recorded Jubin turn.
+- `this side N`: speakers-llm.test.ts "Good morning, this side Nilesh Gotecha from CEPT." and ISS-094. `this is <Full Name>`: speaker-relation-rules.test.ts, ISS-094, speakers-llm.test.ts.
+- `N here|speaking` + idiom tails: ISS-098 recall (10 texts), ISS-104 here-idiom recall (6 texts), speakers-llm.test.ts "Anita Desai here.", "Ruby here again.", "Hello, D'Souza here.".
+
+## Test edits that record a recall cost (changed on purpose)
+- speaker-name-rules.test.ts: four former positives need a FREE sentence before the cue ("We met in Paris. My name is Paris.", "I am in Mumbai today. My name is Mumbai Sharma.", "Our office is in Priya's building. My name is Priya.", "Coming up next, I will share the slides. My name is Nilesh."). They are now asserted REFUSED ("cycle 5 recall cost"), with allow-list-friendly twins in the positive lists ("Hi, my name is Paris.", "Hello, my name is Mumbai Sharma.", "Hello everyone, I'm Priya.", "Hello everyone, I would like to introduce myself, my name is Nilesh."). The file is at 399 non-blank lines (budget 400).
+- speakers-windows.test.ts ISS-282: "I'm Kshitij, and over to Ruby." became "I'm Kshitij. Over to Ruby." (a second name in the same sentence now refuses Kshitij too; two sentences keep the test's purpose: one evidence turn never binds two labels).
+- speaker-relation-ledger.test.ts M7: "At Priya's desk, Priya here." self-identification now asserted false (a free clause precedes the cue).
+- speaker-selfid-ledger.test.ts: "They call me Nikhil." removed from the accepted list.
+
+## The repaired differential test (speakers-differential.test.ts, 159 non-blank lines) and the proof it fails on the cycle-4 sources
+Grid: 14 names x 92 templates x 8 layouts (the cycle-4 seven plus "own block with a third-person mention") x 2 labels x every cite = 59,248 end-to-end cells through `extractSpeakers`, base and lane; 1,288 predicate cells. New templates: all 17 recorded ISS-PH3-006 forms verbatim, the Makrand case in both directions, "I am {N} and this is Priya.", framing across a full stop (Repeat after me. / Quote. / He said hello. / Reading aloud from the script.), trailing attribution ("That is what he said.", "Those were his words.", "Unquote."), role play, Hindi-mixed ("Mera naam N hai.", "Namaste, usne bola I'm N."), filler ("I'm N, yeah."), plus new genuine multi-sentence and curly-apostrophe forms. The oracle is a generated set (BEFORE x OPENER x FORM x TAIL x END x AFTER); it imports nothing from production and does not copy the allow-list table. The test asserts EVERY lane shipment's evidence is spoken by the shipped label and is in that set.
+Result now: `DIFF predicate: 1288 cells, base accepts 764, lane accepts 112, violations 0`; `DIFF end-to-end: 59248 cells, base ships 13752, lane ships 2240, lane-only 1331 [["person",617],["place-org-role",714]], outside the oracle class 0, base-only (recall lost) 12843`.
+Against the cycle-4 sources (speaker-relation-rules.ts and speaker-selfid-rules.ts from 301b9cc written in, same new test, byte backup restored in `finally`, `git hash-object` equal afterwards): `DIFF predicate: 1288 cells, base accepts 764, lane accepts 478, violations 377`; `DIFF end-to-end: ... lane ships 9560, lane-only 1111, outside the oracle class 7540`; 2 of 5 tests fail. So the repaired test catches ISS-PH3-006: 7,540 shipments outside the allowed class on the cycle-4 sources, 0 now.
+Mutation runs (per-mutation backup, restore in `finally`, hash check after each; every restore hash-equal):
+| Mutation | Test | Result |
+|---|---|---|
+| allow-list always true | differential | KILLED (fail 2) |
+| drop the previous-sentence walk | differential | KILLED (fail 2) |
+| drop the next-sentence check | differential | KILLED (fail 2) |
+| tail accepts anything | differential | KILLED (fail 2) |
+| drop `isReportedAt` from the gate | speaker-selfid-ledger | KILLED (fail 2) |
+| ISS-PH3-007: remove the speaker==label filter in `namingTurns` | speaker-selfid-allowlist (new, direct call) | KILLED (fail 1); the differential alone still passes it, as the checker said (equivalent through `extractSpeakers`) |
+
+## ISS-PH3-007
+speaker-selfid-allowlist.test.ts: a direct `namingTurns` call on a block holding spk:0 "Hello, I'm Nikhil.", spk:1 "Hello, I'm Priya.", spk:0 "Thanks." Asserts label spk:0 binds Nikhil at [0] and Priya at [] (another label's self-introduction does not bind), and the mirror for spk:1.
+
+## D-015 by issue id (recorded reproductions verbatim; predicate level and end to end)
+| Issue | Corpus | Result |
+|---|---|---|
+| ISS-PH3-006 | the row's 17 forms READ FROM qa/issues.ph3.jsonl x 7 names, plus the Makrand case for both names | predicate 121/121 refused; end to end 8 layouts x 2 labels x every cite (5,566 turn cells): 0 shipped (speaker-selfid-allowlist.test.ts) |
+| ISS-PH3-004 | 7 forms x 14 names (98 texts) | predicate 98/98 refused; end to end 980/980 refused (speaker-selfid-ledger.test.ts) |
+| ISS-PH3-001 / -002 | 3 / 6 recorded texts | refused, predicate and all layouts (speaker-relation-ledger.test.ts 8/8) |
+| ISS-104 | 20 recorded attacks | predicate 20/20; own turn 20/20; preceding 20/20; following 20/20 refused |
+| ISS-282 | 8 recorded wrong links | `qa/probes/iss282-c0-replay.mts`: `ISS-282 recorded wrong links refused: 8/8` |
+| ISS-093 | its 20 | still asserted in speaker-name-rules.test.ts (110/110) |
+| ISS-094 / ISS-098 | as asserted | the ten ISS-098 recall texts and the ISS-094 forms still resolve (speaker-name-rules.test.ts, speakers-llm.test.ts) |
+OPEN, by name: none among the recorded cases. ISS-PH3-003's unpinned-session and block-stats parts remain open (unchanged).
+
+## Replay (offline, recorded c1 model text; no model, no network)
+`08-replay.mts --from c1 --tag c5r`, then `node --import tsx 05-score.mjs --tag c5r --raw-tag c1`:
+| Code | accepted | correct | wrong | additions |
+|---|---|---|---|---|
+| base 536a56a | 15 | 0 | 15 | 0 |
+| lane cycle 4 | 3 | 3 | 0 | 0 |
+| lane cycle 5 | 3 | 3 | 0 | 0 |
+Same name as cycle 4 (Jubin Thakkar, spk:0, one per run x 3 runs); no correct name lost. It is the long Leeds Arts monologue; the allow-list accepts it through the lead-in sentence ("Um, let me quickly introduce myself first.") and the first-person next sentence ("I am the South Asia representative ..."), generic shapes, not a special case. wrongPairs 0, ISS255 "4/4", stableAll true. Bar 5 (a correct addition) is NOT met even offline (additions 0). Nothing was tuned. New files: measurement-summary.c5r.json, run-results.c5r.jsonl.
+
+## Recall cost: 40 natural introductions (author-written for this report; the number goes to the owner)
+The lane accepts 25 of 40 (24 before one unambiguous opener, "there", was added for "Hi there! I'm Jubin."). Refused (15):
+- Free text or a comma clause around the name: "Hi, this is Kshitij from Vidysea." (this is + single name), "Hi, it's Ruby here from the Leeds office." (cue "it's" is not a base cue), "I think most of you know me, I'm Sumit." (free clause before), "Thanks for having me. I'm Sonal.", "So, I'm Ankit, and welcome to the session.", "Hello everyone, I'm Ruby, and I'm the regional manager.", "Hi, I am Makrand, from the visa team." (lowercase "visa" not in the org list), "Hi everyone, I’m Anisha, thrilled to be here.", "Hello all, Prasanti here, happy to join.", "Good morning everyone. I'm Sonal, and I am a counsellor at Vidysea." (comma before "and I am"), "Welcome to the webinar, my name is Rashi.".
+- Other cues: "Myself Rashi, I lead the South Asia team.", "Hi, myself Ankit from CEPT." (not base cues), "This side Nupur, good morning all." (trailing clause), "Hello, you can call me Sumit.".
+The three the cycle-4 checker named stay refused. No shapes were added to inflate the count. Candidate later units, each separately checked: single-name "this is", "it's N here", comma-and tails, Hindi cues.
+
+## Places, organisations and role words (policy unchanged; D-052; open Approver question)
+Cycle-4 grid (the 8 genuine templates x Paris, India, Google, Moderator, Diwali, English, Everyone, Not, Sorry x the 7 old layouts x 2 labels x every cite): base ships 768, lane cycle 4 756, lane cycle 5 540 (Paris, India, Google, Moderator, Diwali, English 90 each; Everyone, Not, Sorry 0). Not worse. In the new differential grid 714 of 1,331 lane-only shipments are of this kind (inside the oracle class by definition).
+
+## Evidence (cycle 5; node v24.19.0, from packages/index unless noted, each under timeout)
+- `node --test --import tsx src/pipeline/<file>.test.ts`: speaker-relation-rules pass 10 fail 0; speaker-relation-ledger 8/0; speaker-selfid-ledger 8/0; speaker-selfid-allowlist (new) 6/0; speakers-differential 5/0 (about 27 s); speakers-llm 50/0; speaker-name-rules 110/0; speakers-windows 29/0; speakers 16/0; speaker-docs 13/0. Repo root: `node --test qa/evidence/u2-4-phase3-precision-regate-2026-09-22/corpus-lock.test.mjs` pass 4 fail 0.
+- `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json`: no output, exit 0.
+- `node scripts/lint-dirsize.mjs`: `lint-dirsize: OK (110 dir(s) within budget)` before and after. `lint-loc.mjs`: the same 7 pre-existing violations, none in speaker files. Non-blank lines: speaker-selfid-rules.ts 95, speaker-relation-rules.ts 101, speaker-reported-rules.ts 44, speakers-llm.ts 300 (untouched), speakers-differential.test.ts 159, speaker-selfid-allowlist.test.ts 78, speaker-name-rules.test.ts 399.
+- `node --import tsx qa/probes/iss282-c0-replay.mts`: `--- ISS-282 recorded wrong links refused: 8/8`.
+
+## Not delivered (unchanged in substance)
+The live gate is still outstanding and NOT claimed: Ollama qwen3:8b digest 500a1f067a9f, 2340 calls, `04-regate-eval.mts --runs 1,2,3 --tag c5` then `05-score.mjs --tag c5`. The five gate bars are not evidenced. Bar 5 (a correct addition) is not met even offline. Handover and thanks are OFF. Guards and shapes are English-only. Contract change C14 stays deferred to the Approver; qa/contracts is untouched. No ledger status changed. Unverified: behaviour on live model output; the tail lists (org words, STOP words) were not tuned against real transcripts beyond the recorded corpus; the 40 introductions are author-written, not sampled.

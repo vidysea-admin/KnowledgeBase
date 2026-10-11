@@ -252,7 +252,7 @@ test("fix cycle 3: a handover by ANOTHER speaker no longer binds the label whose
 });
 
 test("ISS-282: one evidence turn never binds two labels", async () => {
-  const turns = [turn("t1", "spk:1", "I'm Kshitij, and over to Ruby."), turn("t2", "spk:0", "Hello all.")];
+  const turns = [turn("t1", "spk:1", "I'm Kshitij. Over to Ruby."), turn("t2", "spk:0", "Hello all.")];
   const alone = await extractSpeakers(turns, replies([{ speakerRef: "spk:1", displayName: "Kshitij", turnIds: ["t1"] }]));
   assert.deepEqual(alone.resolved.map((r) => r.displayName), ["Kshitij"], "on its own, t1 binds spk:1 by self-identification");
   const both = await extractSpeakers(turns, replies([
