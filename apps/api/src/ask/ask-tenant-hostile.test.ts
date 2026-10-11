@@ -122,9 +122,10 @@ for (const [tenant, mine, other] of [[A, SENT_A, SENT_B], [B, SENT_B, SENT_A]] a
   });
 }
 for (const [name, value] of HOSTILE) {
-  test(`real tree store: ${label(name)} returns null; the filter is the plain-string root filter of exactly that value`, async () => {
+  test(`real tree store: ${label(name)} returns null; ${name === "valid tenant with NO data" ? "the filter is the plain-string root filter of exactly that value" : "NO query is issued (ISS-AUTHTENANT-002 guard)"}`, async () => {
     const db = new BlindDb(corpus());
     assert.equal(await realTreeStore(db, []).load(value as string), null);
+    if (name !== "valid tenant with NO data") { assert.deepEqual(db.queries, [], "an invalid tenant never reaches the database"); return; }
     assert.equal(db.queries.length, 1);
     const f = db.queries[0]!.filter;
     assert.equal(db.queries[0]!.returned, 0, `filter ${JSON.stringify(f)} must match no row`);

@@ -4,7 +4,7 @@
  * never touch Mongo or a real network/CLI call; `startServer` is the thin `listen()` wrapper
  * `production.ts` (the real Mongo + real-provider entrypoint) calls. Budget: <=80 LOC (own note).
  */
-import express, { type Express } from "express";
+import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import type { Server } from "node:http";
 import type { ApiKeyStore } from "./auth.js";
 import { requireAuth } from "./auth.js";
@@ -92,6 +92,14 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createKeysRouter(deps.keys));
   app.use(createIngestRouter(deps.ingest));
   app.use(createStubsRouter());
+  // Terminal handler (ISS-AUTHTENANT-002): an error with no HTTP status (e.g. a tenant guard throwing in a store) gets a fixed 500 body, never
+  // Express's default stack page. Errors that carry a 4xx/5xx status (body-parser) still go to the default handler, unchanged.
+  app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
+    const e = err as { status?: unknown; statusCode?: unknown } | null, s = e?.status ?? e?.statusCode;
+    if (res.headersSent || (typeof s === "number" && s >= 400 && s < 600)) { next(err); return; }
+    console.error(err); // server log only
+    res.status(500).json({ error: "internal_error", message: "internal error" });
+  });
   return app;
 }
 

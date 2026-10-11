@@ -7,7 +7,7 @@
  * its documented collection shapes (`src/db/types.ts` there: `PersonDoc`/`MessageDoc`/`GroupDoc`).
  */
 import { MongoClient, ObjectId, type Db } from "mongodb";
-import { getDb as getAppDb } from "@lkb/db";
+import { getDb as getAppDb, assertValidTenantId } from "@lkb/db";
 import type { Sources, Sessions, Turns } from "@lkb/core";
 import { createWhatsAppSource, type WhatsAppFetcher, type WhatsAppMessage, type ConsentContext, type Turn } from "@lkb/ingest";
 import type { WhatsAppRouteDeps, WhatsAppGroup, WhatsAppIngestResult } from "../routes/whatsapp.js";
@@ -123,6 +123,7 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: Wh
       // from the request body (routes/whatsapp.ts), letting any `whatsapp`-scoped key ingest any
       // archiver owner's private groups. It is now ALWAYS resolved here, from the live trackable-
       // groups list, by the groupJid the caller actually asked to ingest -- never client-supplied.
+      assertValidTenantId(tenantId, "whatsapp.ingestGroup"); // before owner resolution and the raw replaceOne/bulkWrite filters (ISS-AUTHTENANT-002)
       const ownerUserId = await ownerFor(tenantId);
       const groups = await listGroups(ownerUserId);
       const group = groups.find((g) => g.groupJid === groupJid && g.ownerUserId === ownerUserId);

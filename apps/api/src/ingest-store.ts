@@ -9,7 +9,7 @@
  * no second "ingested content" view is built, the existing one is reused.
  */
 import { randomUUID } from "node:crypto";
-import { getDb } from "@lkb/db";
+import { getDb, assertValidTenantId } from "@lkb/db";
 import type { Sources, Sessions, Turns } from "@lkb/core";
 import { createUrlSource, type ConsentContext, type Turn } from "@lkb/ingest";
 import type { IngestDeps, IngestResult } from "./routes/ingest.js";
@@ -35,6 +35,7 @@ export function createMongoIngestDeps(indexSession?: BoundIndexer): IngestDeps {
 
   return {
     async ingestUrl(tenantId, url): Promise<IngestResult> {
+      assertValidTenantId(tenantId, "ingestUrl"); // before any fetch or raw insert stamps this tenant on sources/sessions/turns (ISS-AUTHTENANT-002)
       // A self-served "paste a URL" ingestion is public web content by construction, never the
       // D-008 "silent" last-resort mode -- the caller explicitly handed us this URL to fetch.
       const consent: ConsentContext = { captureMode: "public", given: true, recordedBy: "web-ingest" };
