@@ -15,9 +15,10 @@ const writes = () => api.mock.calls.filter(c => c[2]?.method !== undefined && c[
 
 beforeEach(() => {
   getFail = []; putFail = []; api.mockReset();
-  api.mockImplementation((async (_path: string, _k: string | null, opts?: { method?: string }) => {
+  api.mockImplementation((async (_path: string, _k: string | null, opts?: { method?: string; onResponseHeaders?: (h: Headers) => void }) => {
     const f = (opts?.method === "PUT" ? putFail : opts?.method === "POST" ? [] : getFail).shift();
     if (f) throw f;
+    if (opts?.method !== "POST") opts?.onResponseHeaders?.(new Headers({ etag: '"e1"' }));
     return opts?.method === "POST" ? { state: VIEW.state } : structuredClone(VIEW);
   }) as never);
   localStorage.setItem("lkbApiKey", "sample-key");

@@ -17,9 +17,10 @@ let rules: unknown[];
 beforeEach(() => {
   rules = [{ id: "allow-asha", effect: "allow", match: { email: "asha@example.com" } }];
   api.mockReset();
-  api.mockImplementation((async (path: string, _k: string | null, opts?: { method?: string }) => {
+  api.mockImplementation((async (path: string, _k: string | null, opts?: { method?: string; onResponseHeaders?: (h: Headers) => void }) => {
     if (opts?.method === "POST") return { state: { approvedSenders: [], approvedDomains: [], optedOutEventIds: [] } };
     if (path !== "/calendar/join-rules") throw new ApiError(404, "no");
+    opts?.onResponseHeaders?.(new Headers({ etag: '"e1"' }));
     return { ruleSet: { version: 1, ownDomains: [], rules }, state: { approvedSenders: [], approvedDomains: [], optedOutEventIds: [] } };
   }) as never);
   localStorage.setItem("lkbApiKey", "sample-key");
