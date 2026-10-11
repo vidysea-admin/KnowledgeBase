@@ -2,7 +2,7 @@
 **Issues addressed:** ISS-DUPESFIX-001 (high; filed in qa/issues.dupesfix.jsonl)
 **Lane:** lane/dupesfix (base 01635f6). Tier 2: restores a CI stage this week's parallel merges turned red.
 **Scope:** pure rename of identifiers + their imports. No logic change, nothing shared, nothing merged.
-**Status:** ready-for-check
+**Status:** checked-PASS (Checked: qa/verdicts/iss-dupesfix-duplicate-export-names.md, cycle 0, 06d24fb)
 **Fix cycle:** 0
 
 ## BEFORE / AFTER (`node scripts/lint-dupes.mjs`)
