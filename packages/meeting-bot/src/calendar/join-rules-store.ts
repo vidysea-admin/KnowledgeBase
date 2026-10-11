@@ -17,7 +17,7 @@
  * per-tenant lock file `<stateDir>/join-rules/<tenant>.lock` (join-rules-store-lock.ts) for the whole read-validate-modify-write,
  * released in a `finally`. Timeout -> `locked`, nothing written; a stale lock is reported, never stolen. Loading takes NO lock:
  * the write is temp file + rename, so a reader sees the old or the new file, never a partial one. The lock is ADVISORY.
- * A lock whose holder is provably dead (same host, pid gone) is taken over automatically (join-rules-store-lock.ts; `onLockTakeover` reports it,
+ * A lock whose holder is provably dead (same host, pid gone, lock older than lockStaleMs) is taken over automatically (join-rules-store-lock.ts; `onLockTakeover` reports it,
  * with no path); a live / other-host / undeterminable holder stays `locked`. Immediately before the final rename the writer re-checks that the
  * lock still carries its own token and throws `locked` (nothing written) if not, so a holder wrongly judged dead cannot complete a write.
  * `saveJoinRules` refuses to replace an unreadable / corrupt / wrong-tenant file unless `overwriteInvalid: true` (the repair path).
@@ -29,7 +29,8 @@ import {
   EMPTY_JOIN_RULE_STATE, recordRuleApproval as applyApproval, recordOptOut as applyOptOut,
   validateJoinRuleSet, validateJoinRuleState, type JoinRuleSet, type JoinRuleState,
 } from "./join-rules.js";
-import { acquireLock, releaseLock, lockStillOwned, sleep, LockFailure, type LockOptions, type TakeoverInfo } from "./join-rules-store-lock.js";
+import { acquireLock, releaseLock, sleep, LockFailure } from "./join-rules-store-lock.js";
+import { lockStillOwned, type LockOptions, type TakeoverInfo } from "./join-rules-store-lock.js";
 
 export const JOIN_RULES_MAX_BYTES = 1024 * 1024;
 const TENANT_ID = /^[a-z0-9][a-z0-9_-]{0,63}$/;

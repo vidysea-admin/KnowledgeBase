@@ -193,13 +193,22 @@ async function killedHolder(dir: string): Promise<string> {
   assert.ok(existsSync(lock), "precondition: the killed writer left its lock behind");
   return lock;
 }
+// CHANGED by the age requirement (fix cycle 1): the recorded repro 1 expected recovery the instant after the kill; a takeover now also needs lock age > staleMs,
+// so the injected clock stands 31 s after the lock was written (real kill, real OS liveness probe). The young case is pinned by the next test.
 for (const [name, extra] of [["ISS-T037LOCK-001 repro 1 (lockWaitMs:1000)", {}], ["ISS-T037LOCK-001 repro 2 (lockWaitMs:1000, lockStaleMs:200)", { lockStaleMs: 200 }]] as const)
   test(`${name}: killed writer's lock is recovered with no manual action; the write succeeds`, () => withDir(async dir => {
     const lock = await killedHolder(dir); let info: any;
-    const st = recordTenantOptOut(dir, "ta", "e2", { lockWaitMs: 1000, onLockTakeover: i => { info = i; }, ...extra });
+    const st = recordTenantOptOut(dir, "ta", "e2", { lockWaitMs: 1000, onLockTakeover: i => { info = i; }, lockTest: { now: () => Date.now() + 31000 }, ...extra });
     assert.deepEqual(st.optedOutEventIds, ["e2"]); assert.ok(info && Number.isInteger(info.pid) && !JSON.stringify(info).includes(dir));
     assert.deepEqual(files(dir).filter(f => f !== "ta.json"), [], "no lock, tombstone or temp left"); assert.ok(!existsSync(lock));
   }));
+
+test("ISS-T037LOCK-001 with the age rule: a killed writer's lock younger than staleMs stays `locked` (the delay), untouched; recovered once older", () => withDir(async dir => {
+  const lock = await killedHolder(dir), before = readFileSync(lock, "utf8");
+  assert.throws(() => recordTenantOptOut(dir, "ta", "e2", { lockWaitMs: 50 }), code("locked"));
+  assert.equal(readFileSync(lock, "utf8"), before); assert.deepEqual(files(dir), ["ta.lock"]);
+  recordTenantOptOut(dir, "ta", "e2", { lockWaitMs: 1000, lockTest: { now: () => Date.now() + 31000 } }); assert.deepEqual(files(dir), ["ta.json"]);
+}));
 
 test("dead holder on this host: takeover, the write succeeds, takeover reported without a path", () => withDir(dir => {
   tenantLock(dir); let info: any, n = 0;
@@ -231,35 +240,40 @@ test("garbage lock content is never taken over, even with the probe saying dead"
   }
 }));
 
-test("clock stepped hours forward and back: a live holder is never taken over; a dead one is recovered regardless of the clock", () => withDir(dir => {
+// CHANGED (fix cycle 1): was "a dead one is recovered regardless of the clock" for skew +3h AND -3h. With the age rule a clock stepped BACK makes the lock look
+// younger/future, so it is NOT taken (delay only); stepped forward it still is. Old loop `[3 * 3600e3, -3 * 3600e3]` -> `[3 * 3600e3]` plus the back-step refusal.
+test("clock stepped hours forward and back: a live holder is never taken over; a dead one is recovered after a forward step and refused (delay only) after a back step", () => withDir(dir => {
   const lock = tenantLock(dir, "acme", staleBody({ at: new Date().toISOString() }));
   for (const skew of [3 * 3600e3, -3 * 3600e3, 40 * 86400e3, -40 * 86400e3])
     for (const staleMs of [1, 30000]) {
       assert.throws(() => acquireLock(lock, { ...inj(() => "alive"), now: () => Date.now() + skew, staleMs }), (e: unknown) => e instanceof LockFailure && e.code === "locked", `skew ${skew}`);
       assert.equal(JSON.parse(readFileSync(lock, "utf8")).token, "dead-token");
     }
-  for (const skew of [3 * 3600e3, -3 * 3600e3]) {
-    const t = acquireLock(lock, { ...inj(), now: () => Date.now() + skew }); assert.ok(lockStillOwned(lock, t)); releaseLock(lock, t); tenantLock(dir);
-  }
+  const dead = tenantLock(dir, "acme", staleBody({ at: new Date().toISOString() }));
+  for (const skew of [-3 * 3600e3, -40 * 86400e3]) assert.throws(() => acquireLock(dead, { ...inj(), now: () => Date.now() + skew }), (e: unknown) => e instanceof LockFailure && e.code === "locked", `back ${skew}`);
+  assert.equal(JSON.parse(readFileSync(dead, "utf8")).token, "dead-token");
+  const t = acquireLock(dead, { ...inj(), now: () => Date.now() + 3 * 3600e3 }); assert.ok(lockStillOwned(dead, t)); releaseLock(dead, t);
 }));
 
+// CHANGED (fix cycle 1): steps are now claim/reread/replace/verify (the hard-link tombstone steps judged/linked/verified/renamed are gone); the removed
+// `seen` assertion pinned the tombstone sequence. Same property: exactly one winner at every interleaving point, nothing left behind.
 test("two takers racing a dead lock: every interleaving of the critical steps yields exactly one holder", () => withDir(dir => {
-  for (const at of ["judged", "linked", "verified", "renamed"]) {
+  for (const at of ["claim", "reread", "replace", "verify"]) {
     const lock = tenantLock(dir); const out: (string | Error)[] = []; let fired = false;
     const run = (o: LockOptions) => { try { out.push(acquireLock(lock, o)); } catch (e) { out.push(e as Error); } };
-    const seen: string[] = [];
-    run({ ...inj(), step: n => { seen.push(n); if (n === at && !fired) { fired = true; run(inj()); } } });
-    if (at === "judged") assert.deepEqual(seen, ["judged", "linked"], "the tombstone check refuses a replaced lock before anything live is renamed (no restore needed)");
+    run({ ...inj(), step: n => { if (n === at && !fired) { fired = true; run(inj()); } } });
     assert.ok(fired, at); const wins = out.filter(x => typeof x === "string"), losses = out.filter(x => x instanceof LockFailure);
     assert.equal(wins.length, 1, `${at}: exactly one winner (${out.map(String)})`); assert.equal(losses.length, 1, at);
-    assert.equal(JSON.parse(readFileSync(lock, "utf8")).token, wins[0]); assert.deepEqual(files(dir), ["acme.lock"], `${at}: no tombstones left`);
+    if (at === "reread" || at === "replace") assert.match((losses[0] as Error).message, /takeover claim/, "the loser is told a claim exists");
+    assert.equal(JSON.parse(readFileSync(lock, "utf8")).token, wins[0]); assert.deepEqual(files(dir), ["acme.lock"], `${at}: no claim or temp left`);
     rmSync(lock);
   }
 }));
 
+// CHANGED (fix cycle 1): setup only - the wrongly-judged holder's lock must be older than staleMs to be taken, so the taker's clock stands 31 s later (assertions unchanged).
 test("a holder wrongly judged dead wakes after the takeover: it cannot complete its write, and its release leaves the new lock alone", () => withDir(dir => {
   saveJoinRules(dir, "acme", sample()); const before = readFileSync(joinRulesFilePath(dir, "acme"), "utf8"); let newToken = "";
-  assert.throws(() => recordTenantOptOut(dir, "acme", "ev-late", { afterRead: () => { newToken = acquireLock(lockOf(dir, "acme"), { waitMs: 0, isAlive: p => (p === process.pid ? "dead" : "alive") }); } }), code("locked"));
+  assert.throws(() => recordTenantOptOut(dir, "acme", "ev-late", { afterRead: () => { newToken = acquireLock(lockOf(dir, "acme"), { waitMs: 0, now: () => Date.now() + 31000, isAlive: p => (p === process.pid ? "dead" : "alive") }); } }), code("locked"));
   assert.equal(readFileSync(joinRulesFilePath(dir, "acme"), "utf8"), before, "the woken holder wrote nothing");
   assert.ok(lockStillOwned(lockOf(dir, "acme"), newToken), "its release did not delete the new holder's lock");
   assert.deepEqual(files(dir), ["acme.json", "acme.lock"]);
@@ -274,11 +288,14 @@ test("tenant isolation: taking over tenant A's dead lock never touches tenant B'
   assert.throws(() => recordTenantOptOut(dir, "beta", "ev", storeOpts()), code("locked"));
 }));
 
-test("an abandoned takeover tombstone expires (eventual recovery); a fresh one keeps the lock `locked`", () => withDir(dir => {
-  const lock = tenantLock(dir); const tomb = `${lock}.stale.dead-token`; writeFileSync(tomb, staleBody());
-  assert.throws(() => acquireLock(lock, inj()), (e: unknown) => e instanceof LockFailure && e.code === "locked", "fresh tombstone = taker in progress");
-  const old = new Date(Date.now() - 3600e3); utimesSync(tomb, old, old);
-  const t = acquireLock(lock, { ...inj(), waitMs: 1000, sleep: () => {} }); assert.ok(lockStillOwned(lock, t));
+// CHANGED (fix cycle 1): the tombstone-expiry test is replaced by the abandoned-claim policy (a claim is never removed automatically; it blocks only its own dead token).
+test("an abandoned claim is never removed automatically and blocks only that dead token; a later dead lock with another token is recovered", () => withDir(dir => {
+  const lock = tenantLock(dir); const claim = `${lock}.claim.dead-token`; const cb = staleBody({ token: "claimant", pid: DEAD });
+  writeFileSync(claim, cb); const old = new Date(Date.now() - 3600e3); utimesSync(claim, old, old);
+  assert.throws(() => acquireLock(lock, inj()), (e: unknown) => e instanceof LockFailure && e.code === "locked" && (e as Error).message.includes("takeover claim"));
+  assert.equal(readFileSync(claim, "utf8"), cb, "claim untouched, however old"); assert.equal(JSON.parse(readFileSync(lock, "utf8")).token, "dead-token");
+  writeFileSync(lock, staleBody({ token: "dead-two" })); // a different dead holder: a different claim name
+  const t = acquireLock(lock, inj()); assert.ok(lockStillOwned(lock, t)); assert.equal(readFileSync(claim, "utf8"), cb);
 }));
 
 test("defaultIsAlive: this process alive, an exited child dead, nonsense pids never `dead`", async () => {
