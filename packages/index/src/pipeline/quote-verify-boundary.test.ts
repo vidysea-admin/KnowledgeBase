@@ -90,6 +90,7 @@ const HARD: Array<[string, string, string, Expect]> = [
   ["interrupted speech dash (FALSE REFUSAL, documented)", "so I think no I— I mean it really", "so I think no I", "cut"],
   ["leading ellipsis in source (FALSE REFUSAL, documented)", "...so we agreed on this", "so we agreed on this", "cut"],
   ["5' (feet) quoting 5", "yes he is about 5' tall and strong", "yes he is about 5", "cut"],
+  ["astral digit then unit mark", "yes he is about \u{1D7D3}' tall and strong", "yes he is about \u{1D7D3}", "cut"],
   ["5\" (inches) quoting 5", 'yes it is about 5" long and wide', "yes it is about 5", "cut"],
   ["curly-quoted phrase, inside", "he said “we agree on this” today", "we agree on this", "ok"],
   ["signed number whole", "a -5 drop overall now", "-5 drop overall now", "ok"],

@@ -31,6 +31,7 @@ const CLOSING = new Set([..."\"'.,;:!?)]}»›…।॥"]);
 const MAX_RUN = 8;
 const DIGIT = /\p{N}/u;
 
+/** The whole code point ending at index `i` (a digit may be astral: mathematical digits). */
 function codePointBefore(s: string, i: number): string {
   const lo = s.charCodeAt(i - 1);
   if (lo >= 0xdc00 && lo <= 0xdfff && i >= 2) {
@@ -45,10 +46,10 @@ export function quoteMayStart(s: string, a: number): boolean {
   let i = a;
   for (let n = 0; n <= MAX_RUN; n++) {
     if (i <= 0) return true;
-    const ch = codePointBefore(s, i);
+    const ch = s.charAt(i - 1); // no astral code point is whitespace/opening/closing: a surrogate half is just "not a member"
     if (isWhitespace(ch)) return true;
     if (!OPENING.has(ch)) return false;
-    i -= ch.length;
+    i--;
   }
   return false;
 }
@@ -58,11 +59,11 @@ export function quoteMayEnd(s: string, b: number): boolean {
   let i = b;
   for (let n = 0; n <= MAX_RUN; n++) {
     if (i >= s.length) return true;
-    const ch = String.fromCodePoint(s.codePointAt(i)!);
+    const ch = s.charAt(i);
     if (isWhitespace(ch)) return true;
     if (!CLOSING.has(ch)) return false;
     if (n === 0 && (ch === '"' || ch === "'") && b > 0 && DIGIT.test(codePointBefore(s, b))) return false;
-    i += ch.length;
+    i++;
   }
   return false;
 }
