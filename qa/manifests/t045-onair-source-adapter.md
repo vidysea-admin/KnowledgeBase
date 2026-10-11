@@ -58,5 +58,5 @@ Honest note: mutating ONLY the authority suffix check survived (0 failures) beca
 - No fetch, download, transcription, HTML parsing; no `Source` implementation; nothing verified against the live site; the "one successful run per source" clause is not met; the login step ("after a one-time login") is untouched.
 - T-045 stays `in_progress`: still needs OnAir media acquisition (browser/login path), a live yt-dlp YouTube run, Meet/Teams/Zoom runs, and registration of the adapters.
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t045-onair-source-adapter.md, cycle 0, 1fe99e1)
 Fix cycle: 0
