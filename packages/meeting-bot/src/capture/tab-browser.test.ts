@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync, symlinkSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { createTabCaptureReceiver, writeOwnedTabStatus } from "./tab-browser.js";
+import { fileURLToPath } from "node:url";
+import { createTabBrowserDeps, createTabCaptureReceiver, writeOwnedTabStatus } from "./tab-browser.js";
 
 const origin = "chrome-extension://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 test("tab receiver authenticates, persists ordered media and makes acknowledged retries idempotent", async () => {
@@ -85,3 +86,62 @@ test("owned status retains deduplicated durable control gaps and refuses corrupt
     assert.equal(existsSync(path.join(dir,"absent")),false);assert.ok(!readdirSync(dir).some(name=>name.endsWith(".tmp")));
   }finally{rmSync(dir,{recursive:true,force:true});}
 });
+
+// ISS-T034EXT-002/-006: the extension's capture-stopped{failed} must decide the outcome (fake extension = a child node process).
+const fakeExtension = [
+  'import {readFileSync} from "node:fs";',
+  'const argv = process.argv, ext = argv[argv.indexOf("--capture-extension") + 1];',
+  'const cfg = JSON.parse(readFileSync(ext + "/config.json", "utf8")), scenario = process.env.FAKE_SCENARIO;',
+  'const post = (route, body) => fetch(cfg.endpoint + route, {method: "POST", body, headers: {Origin: "chrome-extension://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", Authorization: "Bearer " + cfg.token}});',
+  'const ev = (o) => post("/event", JSON.stringify(o));',
+  'await ev({event: "capture-started"}); await post("/chunk?seq=0", "partial-media");',
+  'for (;;) { if ((await (await post("/control", "{}")).json()).stop) break; await new Promise((r) => setTimeout(r, 30)); }',
+  'if (scenario === "error-then-clean-stop") await ev({event: "capture-error", error: "track lost"});',
+  'await ev(process.env.FAKE_STOP ? JSON.parse(process.env.FAKE_STOP) : {event: "capture-stopped", failed: scenario === "lost-error-failed-stop"});',
+].join("\n");
+async function runFake(scenario: string, stopJson?: string) {
+  if (stopJson === undefined) delete process.env.FAKE_STOP; else process.env.FAKE_STOP = stopJson;
+  const dir = mkdtempSync(path.join(tmpdir(), "lkb-tabfail-")), script = path.join(dir, "fake-extension.mjs");
+  writeFileSync(script, fakeExtension); process.env.FAKE_SCENARIO = scenario;
+  const tab = createTabBrowserDeps({python: process.execPath, joinScript: script, profileDir: path.join(dir, "profile"), recordDir: path.join(dir, "record"),
+    extensionDir: fileURLToPath(new URL("../../py/tab-capture", import.meta.url)), sessionId: "fixture", tenantId: "fixture", startupTimeoutMs: 15000, log: () => {}});
+  const {sessionHandle} = await tab.deps.launch("http://127.0.0.1/", {tenantId: "fixture", consentNote: "fixture capture only"});
+  let outcome: unknown = "resolved";
+  await tab.deps.stop!(sessionHandle).catch((error: Error) => { outcome = error.message; });
+  const output = tab.outputPath(sessionHandle)!, status = JSON.parse(readFileSync(`${output}.status.json`, "utf8"));
+  const media = existsSync(output) ? readFileSync(output, "utf8") : undefined;
+  rmSync(dir, {recursive: true, force: true});
+  return {outcome, status, media};
+}
+test("ISS-T034EXT-002/006: a normal stop is still a success (default parity)", {timeout: 60000}, async () => {
+  const r = await runFake("clean");
+  assert.equal(r.outcome, "resolved"); assert.equal(r.status.state, "stopped"); assert.equal(r.media, "partial-media");
+});
+test("ISS-T034EXT-006: capture-stopped failed:true with its capture-error POST lost is a FAILURE; partial media kept, status failed, not stopped", {timeout: 60000}, async () => {
+  const r = await runFake("lost-error-failed-stop");
+  assert.match(String(r.outcome), /failed stop; media is incomplete/);
+  assert.equal(r.status.state, "failed"); assert.match(r.status.error, /incomplete/); assert.equal(r.status.bytes, 13);
+  assert.equal(r.media, "partial-media", "the partial file is kept for recovery, never deleted or promoted");
+});
+test("ISS-T034EXT-002: a capture-error seen earlier is sticky even when the later capture-stopped says failed:false", {timeout: 60000}, async () => {
+  const r = await runFake("error-then-clean-stop");
+  assert.match(String(r.outcome), /track lost/); assert.equal(r.status.state, "failed"); assert.equal(r.media, "partial-media");
+});
+
+// ISS-T034FIX-003: fail closed. The seven recorded values of the stop message's failed field.
+const STOP_TABLE: [string, string, "ok" | RegExp][] = [
+  ["false", '{"event":"capture-stopped","failed":false}', "ok"],
+  ["true", '{"event":"capture-stopped","failed":true}', /reported a failed stop/],
+  ['"true"', '{"event":"capture-stopped","failed":"true"}', /Malformed capture-stopped/],
+  ['"false"', '{"event":"capture-stopped","failed":"false"}', /Malformed capture-stopped/],
+  ["1", '{"event":"capture-stopped","failed":1}', /Malformed capture-stopped/],
+  ["null", '{"event":"capture-stopped","failed":null}', /Malformed capture-stopped/],
+  ["missing", '{"event":"capture-stopped"}', /Malformed capture-stopped/],
+];
+for (const [label, json, expected] of STOP_TABLE) {
+  test(`ISS-T034FIX-003: capture-stopped failed=${label} -> ${expected === "ok" ? "clean stop" : "failure"} (fail closed)`, {timeout: 60000}, async () => {
+    const r = await runFake("clean", json);
+    if (expected === "ok") { assert.equal(r.outcome, "resolved"); assert.equal(r.status.state, "stopped"); return; }
+    assert.match(String(r.outcome), expected); assert.equal(r.status.state, "failed"); assert.equal(r.media, "partial-media");
+  });
+}

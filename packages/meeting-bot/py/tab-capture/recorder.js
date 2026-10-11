@@ -1,6 +1,6 @@
 // Bounded, ordered chunk delivery. A failed receiver ends capture instead of buffering hours.
 let recorder, stream, context, meterTimer, controlTimer, config;
-let queuedBytes = 0, sequence = 0, queue = Promise.resolve(), failed = false, finishing = false;
+let queuedBytes = 0, sequence = 0, queue = Promise.resolve(), failed = false, finishing = false, starting = false;
 const MAX_QUEUE = 16 * 1024 * 1024;
 async function request(route, body, contentType = "application/json") {
   const response = await fetch(`${config.endpoint}${route}`, {method: "POST", body,
@@ -22,8 +22,23 @@ async function fail(error) {
   await event({event: "capture-error", error: String(error.message || error)}).catch(() => {});
   await stop();
 }
+// The receiver binds 127.0.0.1 only and the manifest host scope is 127.0.0.1 only: no other form can work,
+// so no other form is accepted. Strict raw-string match (no URL normalisation, no userinfo, no path).
+const LOOPBACK = /^http:\/\/127\.0\.0\.1:([1-9]\d{0,4})$/;
+function validConfig(c) {
+  const m = typeof c?.endpoint === "string" && LOOPBACK.exec(c.endpoint);
+  return !!m && Number(m[1]) <= 65535 && typeof c.token === "string" && c.token.length > 0;
+}
+// Only this extension's own contexts (background worker, offscreen pages): never a content script (sender.tab) or another id.
+const ownSender = (s) => !!s && s.id === chrome.runtime.id && !s.tab
+  && (s.url === undefined || s.url.startsWith(`chrome-extension://${chrome.runtime.id}/`));
 async function start(message) {
-  if (recorder) throw new Error("A capture is already active");
+  if (!validConfig(message.config)) throw new Error("Capture endpoint must be http://127.0.0.1:<port>; refusing to start");
+  if (recorder || starting) throw new Error("A capture is already active");
+  starting = true;
+  try { await open(message); } catch (error) { if (!recorder) starting = false; throw error; }
+}
+async function open(message) {
   config = message.config;
   const media = {mandatory: {chromeMediaSource: "tab", chromeMediaSourceId: message.streamId}};
   stream = await navigator.mediaDevices.getUserMedia({audio: media, video: {
@@ -44,6 +59,7 @@ async function start(message) {
     if (queuedBytes > MAX_QUEUE || data.size > 8 * 1024 * 1024) { void fail(new Error("Recorder upload backlog exceeded its limit")); return; }
     const seq = sequence++;
     queue = queue.then(async () => {
+      if (failed) return; // a lost chunk ends the capture: never send later chunks past the gap
       for (let attempt = 0; attempt < 3; attempt++) {
         try { await request(`/chunk?seq=${seq}`, data, "video/webm"); return; }
         catch (error) { if (attempt === 2) throw error; }
@@ -57,7 +73,10 @@ async function start(message) {
     await context.close();
     await event({event: "capture-stopped", failed}).catch(() => {});
   };
-  stream.getTracks().forEach((track) => track.addEventListener("ended", () => { void stop(); }));
+  // A track ending while no stop was requested means audio/video was lost mid-recording: a failed recording.
+  stream.getTracks().forEach((track) => track.addEventListener("ended", () => {
+    if (!finishing) void fail(new Error(`${track.kind} track ended unexpectedly`));
+  }));
   recorder.start(2000);
   await event({event: "capture-started", mimeType});
   meterTimer = setInterval(() => {
@@ -75,8 +94,9 @@ async function start(message) {
     } catch (error) { await fail(error); }
   }, 1000);
 }
-chrome.runtime.onMessage.addListener((message, _sender, respond) => {
+chrome.runtime.onMessage.addListener((message, sender, respond) => {
   if (message.target !== "recorder" || message.type !== "start") return;
+  if (!ownSender(sender)) { respond({ok: false, error: "Sender refused"}); return; }
   start(message).then(() => respond({ok: true})).catch(async (error) => {
     stream?.getTracks().forEach((track) => track.stop());
     await context?.close(); respond({ok: false, error: error.message});

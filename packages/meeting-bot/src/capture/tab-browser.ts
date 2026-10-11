@@ -180,6 +180,16 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
         receiver = await createTabCaptureReceiver(output, (event) => {
           if (event.event === "capture-started") { ready = true; captureStartedAt = new Date().toISOString(); status("recording"); }
           if (event.event === "capture-error") { failure = String(event.error ?? "Capture failed"); status("failed", failure); }
+          // A stop that is not failed:false is a failure by itself: the capture-error POST may have been lost.
+          // The partial .webm stays on disk, status "failed" (never "stopped"); stop() throws so nothing finalizes it.
+          // Fail closed (ISS-T034FIX-003): a stop is clean ONLY when failed is exactly boolean false. A missing or
+          // non-boolean field (e.g. an old extension build) is a malformed stop and counts as a failure.
+          const stopFailed = event.event === "capture-stopped" ? (event as {failed?: unknown}).failed : false;
+          if (stopFailed !== false && !failure) {
+            failure = stopFailed === true ? "Recorder reported a failed stop; media is incomplete"
+              : "Malformed capture-stopped message (failed is not boolean false); media treated as incomplete";
+            status("failed", failure);
+          }
           const run = runs.get(handle);
           if (run && event.event === "capture-stopped") run.stopped = true;
           if (run && failure) run.failure = failure;
