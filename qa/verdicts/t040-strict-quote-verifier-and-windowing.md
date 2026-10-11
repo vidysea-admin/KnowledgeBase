@@ -97,3 +97,34 @@ ISSUES-WRITTEN: ISS-T040QUOTE-002 (high), ISS-T040QUOTE-003 (medium); ISS-T040QU
 ## Merge conditions
 Do not merge. Fix cycle 2 needs: ISS-T040QUOTE-002 (symbol glued to the cut side counts as inside, with the 7 exact cases above plus a symbol-scan property as regression, reported by id per D-015),
 ISS-T040QUOTE-003 (U+FEFF), and the three manifest edits above. Nothing else is required; no existing assertion may change. After PASS the lane may merge with no conflicts (no overlap with main).
+
+# Cycle 2
+
+**VERDICT: PASS**
+**Cycle checked:** 2
+**Commit checked:** 1bac09f (code commits 8ed30c3, ce5d96b; cycle-1 verdict 4e13621)
+**Scope:** pure helpers, unwired; T-040 stays open; no model run.
+
+## EXPLANATION
+**D-015 (own run from the ledger rows):** ISS-T040QUOTE-001 3/3 refused; -002 7/7 refused; -003 1/1 refused. None left open.
+
+**False verified: none in about 62,000 inputs of my own.** (a) 279 hand-built edge cases plus targeted reruns; (b) a 60,000-cut seeded fuzz over an alphabet of letters, digits, ~50 symbols, closing/opening characters, Cf/odd characters and 10 space kinds, with an independent token-level oracle (middle tokens equal, ends differ only by opening/closing characters, wrappers aside): 2,864 verified, 0 violations (the one oracle hit was a legitimate wrapper unwrap). Checked and refused: 3.5 / 3.)x / 3.).x / 3.,x; 5' 5" 5’ 5” 5′ 5″ 5'' 5'. 5',; f(x) start; 5"wide; every Cf, ZWSP, WJ, BOM, U+180E, soft hyphen, U+034F, Hangul fillers, U+3164, U+2800, tag chars and variation selectors adjacent to a cut (29 code points x 7 placements); decomposed resume+U+0301 (cut inside grapheme: not-found/partial); Han/Thai/Tibetan/Lao/Khmer interior cuts, glued mixed-script cuts. Accepted by design: "3. 5" and "1, 000" quoting "...3" / "...1" (closing mark then whitespace), "rock ' n" quoting "rock", "'tis" quoting "tis", "5.'" quoting "5", and "10<thin/narrow-nbsp/nbsp/figure space/ideographic space>000" quoting "10" (space-separated numbers). All are whole-token truncations: documented-limit class, not FAIL.
+
+**Scan cap:** closing run of 0-8 accepted, 9+ refused (dots, parens, "!", mixed, quotes); opening run likewise; 9+ followed by alnum also refused; the cap cannot turn a refusal into acceptance (overflow returns false). Mutation with overflow=accept killed.
+
+**Timing (1 MB source, long dot/paren/a-run/mixed punctuation):** 1 quote 0.8-1.3 s, 200 quotes 3.1-3.4 s; 100,000 repeats of "wait.........(9 dots) now" x 200 quotes 1.9 s: linear, no quadratic behaviour.
+
+**False refused, 40+ honest quotes** (English, Hinglish, Devanagari with danda, wrapper quotes, commas, "?", ")" and "]", possessives, hyphenated words, "5 kg", "10%", "₹500", "5-10"): 42 of 45 verified; the 3 refusals were my own errors (under minimum length twice, one quote dropped "₹"). No genuine boundary refusal on ordinary sentence-level quotes. Known false-refusal shapes (all in the manifest's list): possessive/contraction cut, trailing interrupted-speech dash, leading ellipsis, Cf adjacent to cut, >8 marks, unspaced scripts, quote mark after a digit (also `he said "I want 5"` quoting `I want 5`).
+
+**Earlier items hold:** all 98 unit tests pass (5 test files; maker's 108 includes summarize); offsets slice correctly in the unit tests; mixed curly/straight wrapper pair accepted and documented; speaker filter before cap, windowing and one-turn rule are covered by unchanged passing tests. `git diff 4e13621 1bac09f -- '*.test.ts'`: additions only (288 insertions, 0 deletions). The removed surrogate code was dead: `quoteMayStart/End` read `charAt` and no astral code point is whitespace/opening/closing; lone surrogates are rejected earlier in normaliseQuote (tests unchanged and green). Scope unchanged (only quote-token-rule.ts, quote-verify.ts, 2 new tests, manifest; summarize.ts, speaker-*, run-pipeline.mjs untouched). `tsc --noEmit` exit 0; `lint-dirsize` OK; file sizes 65-242 non-blank lines; `git merge-tree` against codex/machine-migration-2026-10-09: clean, no conflicts; index.ts export lines unchanged by this cycle.
+
+**Limits section:** adequate. READ THIS FIRST states contiguity-not-meaning, wiring requirement, wrapper policy, defaults' origin; cycle-1 clause section is marked SUPERSEDED; "Limits added by cycle 2" lists new false refusals and space-separated numbers, and the cycle-0 apostrophe statement is gone. Non-blocking nits (low, not filed): the number limit names "1 000" only and not "1, 000", "3. 5" or thin/narrow no-break spaces; matching-rule 6 in the cycle-0 section still says "word boundary" (superseded by the allow-list text in the cycle-2 section).
+
+**Mutations (19 of mine; per-mutation byte backup, restore in finally, 280 s SIGKILL timeout, `git hash-object` == `git rev-parse HEAD:` true after each; git status clean):** closing gains +, %, - killed; opening gains $ killed; opening chain not required to follow whitespace killed; whitespace gains U+FEFF, U+200B killed; Cf as whitespace killed; cap overflow accepts (start and end) killed; unit-mark rule removed killed; unit mark extended to "." killed; end-of-text and start-of-text not boundaries killed; MAX_RUN 7 killed. SURVIVED: MAX_RUN 9 (off-by-one on the cap value: the suite pins "long run refused" but not exactly 9; behaviour at 9 is correct today; low, file-don't-fix).
+
+**Harness note:** my harnesses (mut.mjs, mutB.mjs, written by me) lived in the shared scratchpad and touched only the absolute path of this worktree's quote-token-rule.ts; both were deleted afterwards. I also once ran `node mut2.mjs` in the scratchpad, which I had not written (a foreign file); it failed immediately with ENOENT on a relative `src/domain/lean-video.ts` and modified nothing (my worktree status was clean afterwards).
+
+ISSUES-WRITTEN: none. ISS-T040QUOTE-002 and ISS-T040QUOTE-003 marked verified.
+
+## Merge conditions (cycle 2)
+May merge (source scope only; unwired; T-040 stays open). No conflicts expected. Optional manifest nits above. Wiring unit must still honour the limits section (contiguity not meaning; show surrounding sentence).
