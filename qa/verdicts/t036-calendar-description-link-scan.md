@@ -157,3 +157,60 @@ ISSUES-WRITTEN: ISS-T036CAL-010 (high). ISS-T036CAL-006..009 marked `verified-cy
 
 ## Standing statement for the owner
 Free-text calendar links are found but never auto-joined and raise no alert. Whether they may ever be auto-joined, and how a calendar event is approved (no approval path exists), is the Approver's decision (Umesh). ISS-376 (record-every-webinar skips the sender-trust check for Gmail candidates) remains open and separate.
+
+
+---
+
+# Cycle 3
+
+VERDICT: PASS
+Cycle checked: 3
+Commit checked: ced676f (branch lane/t036cal, on top of checker commit d26e4d1)
+Scope: fixtures only; not validated against live Google Calendar; real invite HTML and event field presence unverified. Loopback test server only. `@lkb/core` junctions re-verified (both point at C:\Users\product\Desktop\KnowledgeBase\packages\core, untouched); temporary `paths` tsconfigs inside the worktree, deleted afterwards.
+
+## EXPLANATION
+
+ISS-T036CAL-010 is fixed and nothing I could construct lets an untrusted calendar row change a trusted row's outcome, except a pre-existing tombstone door (ISS-T036CAL-011) that is byte-for-byte the same on the pre-unit code and is filed separately.
+
+### 1. ISS-T036CAL-010 by my own reproduction
+Real mapper -> `prepareWebinarSourceState` (production scope) and `reconcileWebinarSources` (legacy scope) -> `selectAutoRecordItems`: legitimate conference event plus 1, 2 or 50 outsider rows (carriers cycling description, location, anchors, Google wrapper; same link and another link), both fetch orders, every-webinar true/false: 12/12 combinations equal to the run without the outsider rows (legit occurrence, calendarEvents, transitions, inventory deep-equal; nothing unresolved or ambiguous-identity; legit scheduled; outsiders listed and skipped `unverified-link-source`). Six carriers x trusted/untrusted organiser x two orders x two modes: 48/48.
+
+### 2. Independent non-interference property
+Random trusted sets T (conference and legacy calendar rows, authenticated/pending Gmail rows, linked pairs, cancelled rows, same-start rows, recurring instances) plus untrusted rows F that copy urls, starts, titles, organisers and session-key-looking ids from T, with differing revisions and source values (location, description, garbage, wrong case): 700 seeds x 2 scopes x 2 modes x 2 fetch orders = 5,600 runs. Compared per run: scheduled/skipped entries and session keys of every T row, the full occurrence records of T keys (unresolved, linkedCalendar), their transitions and inventory, and `newStartsBlocked`. Violations: 0. F rows scheduled: 0. Start-blocking caused by F: 0. 8,514 F rows listed as skipped `unverified-link-source`. The only violations that exist are cancelled F rows (852 cases in my first run, all with a cancelled F row): see section 3. Same-id case: the mapper uses the Calendar event id, which is unique within a calendar listing, so two rows with one id (or an outsider reusing our recurringEventId) are not representable from the Calendar API (iCalUID is sender-chosen but Google gives each invite its own event id). Had it been representable, the less-trusted copy would win at the same revision (downgrade) or give `contradictory-revision`; documented, not reachable.
+
+### 3. Tombstone door (reachable, pre-existing)
+Pre-unit calendar-client.ts (8520fa8, temp module) vs ced676f, same scenario, identical results: legacy scope: adding a cancelled unknown-id row (minimal, with details, or with a free-text link) turns `calendarEvents`/`candidates` to empty and `newStartsBlocked` true; available scope: all unlinked Gmail rows become `unproven-calendar-history`. Reachable by an outsider who sends then cancels an invite between two ticks. It predates this unit and is not widened by it: filed as ISS-T036CAL-011 (high, preexisting). Not a reason to fail this unit; the owner should know it exists.
+
+### 4. Gmail twin and changed assertion
+The changed auto-join assertion (a Gmail row is no longer linked to, and does not inherit provenance from, a free-text calendar row) is the correct consequence of rows holding no aliases. Legitimate case: an authenticated approved Gmail invite whose calendar twin has the link only in its description: the Gmail row's outcome is deep-equal to the pre-unit shape (twin without a link) in both modes; exactly one join (gmail g0 scheduled; calendar twin skipped `unverified-link-source`); a pending unauthenticated Gmail row is unchanged (scheduled in every-webinar, untrusted otherwise).
+
+### 5. Opt-outs
+Through reconcile -> select -> `applyJoinRules`, with two outsider rows sharing the URL: opt-out by calendar id, by Gmail id and by stored URL identity give the same result as without the outsider rows (in non-every-webinar mode an opt-out of the Gmail id leaves the calendar row, exactly as without outsiders: pre-existing). An opt-out of the outsider row's id alone (no URL hint) removes nothing trusted. An opt-out recorded from the web for the free-text row WITH its meetingUrl hint stores the identity and vetoes the trusted rows of that URL: the user's own explicit choice, works as intended (note). An opt-out of an unrelated meeting removes nothing of the real one.
+
+### 6. Legacy and parity
+50 legacy events still reconcile to 50 joinable events, deep-equal apart from the added field, all 50 rows keep their alias. Default parity vs the 8520fa8 selection: 864 full selections identical, 863 items scheduled. 25/25 persisted x fresh source cells (same url, same revision) as expected. Real contradictions still detected (title, time, url at the same revision; two copies in one fetch; newer revision accepted; cancellation transitions).
+
+### 7. Merge edit re-validated (trial merge with main 95da071; merge-tree clean, tree aeb7707; merge aborted, worktree clean)
+Unedited `packages/meeting-bot/src/alert-who-production.test.ts`: 2 of 4 fail. With the cycle-2 edit (below) against the cycle-3 code: 4/4. The changed inventory session keys did not require a different fixture. No other test on main hard-codes 14 reasons. Merged tree: SKIP_REASONS 15, tsc exit 0 for core, meeting-bot, api; vocabulary test 3/3; packages/meeting-bot/src/calendar 29 files on the merged tree (limit 30); apps/api/src 31 (unchanged); dirsize OK on the merged tree.
+
+### 8. Cycles 1 and 2 still hold
+48-case attack probe 48/48; matrix cells as expected; differential 3/3; extractor 17/17; privacy and recogniser code unchanged this cycle. D-015: 001 48/48 and 010 (above) re-run by me; 002 to 009 rest on my cycle-1 and cycle-2 runs (the code they exercise was not touched in cycle 3) plus the unchanged green lane tests.
+
+### 9. Mutations (own harness, per-mutation byte backup, finally-restore, hash equals HEAD blob, harness deleted)
+10 run, 8 killed: untrusted rows contribute aliases; a row turned free-text keeps its aliases; location excluded but not description; untrusted admitted to the every-webinar barriers; untrusted admitted to the session-key collapse; absent source treated as untrusted (legacy broken); untrusted inventory carries a session key; Gmail-link validation not relaxed. 2 survivors, both redundant guards: transition `currentKey` for untrusted rows (their aliases are empty, so nothing matches) and the `aliasOwners` skip (aliases already empty).
+
+### 10. Gates
+Extractor 17, differential 3, calendar route 15, gws-gmail 25; auto-join 39, schedule-tick 14, webinar-policy 19, schedule-state 18, link-source allowlist 4 / reconcile 7 / alias 9, join-rules-select 11, optout-identity 22, attention-alerts 11, alert-title-policy 12, telegram 6, sender-authentication 5, attendance 33, vocabulary 3. tsc exit 0 for core, meeting-bot, api on the lane and on the trial-merged tree. dirsize/loc fail only on unrelated packages/index/src/pipeline and sb_join.py (lane). No new file in calendar/ (25) or apps/api/src.
+
+ISSUES-WRITTEN: ISS-T036CAL-011 (high, preexisting tombstone door); ISS-T036CAL-010 marked `verified-cycle3`.
+
+## Merge conditions
+1. At the merge close-out apply this edit to `packages/meeting-bot/src/alert-who-production.test.ts` on the merged tree (validated 4/4 on main 95da071):
+   - after the line `  ev("evP8", "Webinar Past", { meetingUrl: "https://zoom.us/j/44444444444", startTime: "2026-10-10T08:00:00.000Z", endTime: "2026-10-10T09:00:00.000Z" }),` add `  ev("evF10", "Webinar FreeText", { meetingUrl: "https://zoom.us/j/88888888888", meetingUrlSource: "description" }),`
+   - after `  "rules-unevaluable": [false, false, ""],` add `  "unverified-link-source": [false, false, ""],`
+   - title `covers all 14 skip reasons from core` -> `covers all 15 skip reasons from core`.
+2. Re-run the merged tree's targeted tests and tsc after the edit.
+3. ISS-T036CAL-011 is open against the reconciliation seam (pre-existing); not a condition of this merge.
+
+## Standing statement for the owner
+Free-text calendar links are found but never auto-joined and raise no alert; an outsider's invite can no longer affect any trusted meeting's outcome except through the pre-existing cancelled-tombstone rule (ISS-T036CAL-011). Whether free-text links may ever be auto-joined, and how a calendar event is approved (no approval path exists), is the Approver's decision (Umesh). ISS-376 remains open and separate.
