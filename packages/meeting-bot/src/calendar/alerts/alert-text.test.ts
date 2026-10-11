@@ -52,7 +52,7 @@ test("step separators to space: newline, tab, LS, PS, NEL, VT, FF split a keywor
   for (const sep of ["\n", "\r\n", "\t", u(0x2028), u(0x2029), u(0x85), u(0x0b), u(0x0c), u(0xa0), u(0x3000)]) {
     assert.ok(!out("key" + sep + "Sekretw").includes("Sekretw"), JSON.stringify(sep));
     assert.ok(!out("https://zoom.us/j/1?pwd=" + sep + "SPL1T").includes("SPL1T"), JSON.stringify(sep));
-    assert.equal(out("Hello" + sep + "World").includes("Hello World"), true, JSON.stringify(sep));
+    assert.equal(out("Weekly" + sep + "Class").includes("Weekly Class"), true, JSON.stringify(sep)); // allow-listed words (ISS-R1ALERTS-009); "Hello World" would now be hidden
   }
 });
 test("step strip Cc: control characters cannot split a keyword or a number", () => {

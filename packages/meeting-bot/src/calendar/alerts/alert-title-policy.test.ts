@@ -55,12 +55,12 @@ test("D-015 per policy: ISS-R1ALERTS-009 / -010 / -011 reproductions, both route
       }
       tally[`${policy} ${id}`] = [refused, cases.length];
       console.log(`[${policy}] ${id}: ${refused}/${cases.length} refused`);
-      if (policy === "omit" || id === "ISS-R1ALERTS-011") assert.equal(refused, cases.length, `${policy} ${id}`);
+      assert.equal(refused, cases.length, `${policy} ${id}`);
     }
   }
-  // masked policy: documented limit. 009 and 010 are NOT closed by it (no keyword / misspelt keyword).
-  assert.ok(tally["masked ISS-R1ALERTS-009"]![0] < R009.length);
-  assert.ok(tally["masked ISS-R1ALERTS-010"]![0] < R010.length);
+  // masked policy now ALLOW-LISTS words (title-allowlist.ts): 009 and 010 are closed by it, not by a keyword list.
+  assert.equal(tally["masked ISS-R1ALERTS-009"]![0], R009.length);
+  assert.equal(tally["masked ISS-R1ALERTS-010"]![0], R010.length);
 });
 
 test("masked -011: a keyword ANYWHERE hides the WHOLE title with exactly one (hidden)", () => {
@@ -224,9 +224,9 @@ test("ISS-ALERTFIX-002: a polluted Object.prototype.titlePolicy changes nothing 
 
 test("ISS-ALERTFIX-002: an OWN \"masked\" still opts in (the opt-in keeps working), also when the prototype says otherwise", () => {
   for (const route of ["skipped", "job"] as const) {
-    assert.ok(blob(buildAttentionAlerts({ ...base, ...withTitle(route), titlePolicy: "masked" } as never)).includes("Weekly tiger"), route);
+    assert.ok(blob(buildAttentionAlerts({ ...base, ...withTitle(route), titlePolicy: "masked" } as never)).includes("Event: (hidden)"), route);
     const inheritsOmit = Object.assign(Object.create({ titlePolicy: "omit" }), base, withTitle(route), { titlePolicy: "masked" });
-    assert.ok(blob(buildAttentionAlerts(inheritsOmit)).includes("Weekly tiger"), `${route} own beats prototype`);
+    assert.ok(blob(buildAttentionAlerts(inheritsOmit)).includes("Event: (hidden)"), `${route} own beats prototype`);
   }
 });
 
