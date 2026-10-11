@@ -127,3 +127,34 @@ test("custom small limit and clamping of silly options", () => {
   coverage(turns, silly);
   assert.ok(silly.every((w) => w.text.length <= 16000 && w.overlap === 0));
 });
+
+// Named, fast window-limit boundaries (fix cycle 1). A regression in the limit comparison must fail an
+// assertion here, never stall the suite: each test has a timeout and windowTranscript has a progress guard.
+test("window limit off-by-one, both directions: a line of exactly maxChars fits, one more splits", { timeout: 5000 }, () => {
+  const fit = windowTranscript([{ id: "a", text: "x".repeat(100) }], { maxChars: 100 });
+  assert.equal(fit.length, 1);
+  assert.equal(fit[0]!.charCount, 100);
+  assert.equal(fit[0]!.entries.length, 1);
+  const over = windowTranscript([{ id: "a", text: "x".repeat(101) }], { maxChars: 100 });
+  assert.equal(over.length, 2);
+  assert.deepEqual(over[0]!.entries.map((e) => [e.start, e.end]), [[0, 100]]);
+  assert.deepEqual(over[1]!.entries.map((e) => [e.start, e.end]), [[100, 101]]);
+  assert.ok(over.every((w) => w.charCount <= 100));
+});
+
+test("window limit off-by-one: two entries joined by one newline fit at exactly maxChars, not at +1", { timeout: 5000 }, () => {
+  const pair = (b: number) => windowTranscript([{ id: "a", text: "a".repeat(49) }, { id: "b", text: "b".repeat(b) }], { maxChars: 100 });
+  const exact = pair(50); // 49 + 1 + 50 = 100
+  assert.equal(exact.length, 1);
+  assert.equal(exact[0]!.charCount, 100);
+  const spill = pair(51); // 101
+  assert.equal(spill.length, 2);
+  assert.ok(spill.every((w) => w.charCount <= 100));
+  const under = pair(49); // 99
+  assert.equal(under.length, 1);
+});
+
+test("an oversized turn is cut into slices of exactly maxChars (no whitespace), remainder last", { timeout: 5000 }, () => {
+  const ws = windowTranscript([{ id: "a", text: "q".repeat(250) }], { maxChars: 100 });
+  assert.deepEqual(ws.flatMap((w) => w.entries.map((e) => [e.start, e.end])), [[0, 100], [100, 200], [200, 250]]);
+});

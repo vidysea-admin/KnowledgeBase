@@ -102,6 +102,7 @@ export function windowTranscript(turns: WindowTurn[], options: WindowOptions = {
     let end = start;
     let size = -1;
     while (end < entries.length && size + 1 + entries[end]!.line.length <= maxChars) { size += 1 + entries[end]!.line.length; end++; }
+    if (end === start) end = start + 1; // progress guard: an entry that cannot fit still gets its own window
     // `end > start + overlap` is guaranteed by the overlap search below; the first window starts fresh.
     windows.push(toWindow(entries.slice(start, end), windows.length, overlap));
     if (end >= entries.length) break;

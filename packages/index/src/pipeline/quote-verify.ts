@@ -24,14 +24,24 @@
  *     occurs in the source; otherwise it is REFUSED ("ellipsis-stitched"); passages are never stitched.
  *  5. Minimum length: 12 code points AND 2 tokens after normalisation, so a one-word "quote"
  *     cannot pass. Maximum 2000 UTF-16 units.
- *  6. A match must start and end on a grapheme-cluster boundary and on a word boundary (it may
- *     not begin or end in the middle of a word), so "reven" is not a quote of "revenue".
- *  7. A quote occurring in several places reports ALL of them (up to MAX_LOCATIONS, then
- *     `truncated: true`), in source order.
+ *  6. A match must start and end on a grapheme-cluster boundary and on a TOKEN boundary: it may not
+ *     begin or end inside a word, number, e-mail, URL, handle or hyphenated/apostrophe word, so
+ *     "reven" is not a quote of "revenue" and "the price is 3" is not a quote of "the price is 3.5"
+ *     (clauses C1-C4 in quote-token-rule.ts; refuses when in doubt).
+ *  7. A quote occurring in several places reports the locations BY THE CLAIMED SPEAKER (all of them
+ *     when no speaker is claimed), in source order, up to MAX_LOCATIONS, then `truncated: true`.
+ *     The speaker filter runs BEFORE the cap, so a hit by the claimed speaker is never hidden.
+ *  8. WRAPPERS: if the quote as given does not verify and it is wrapped in ONE matching pair of
+ *     quotation marks (" or ', curly forms included) with no further mark of that kind inside, the
+ *     inside is verified instead (length rules apply to the inside) and the verdict says
+ *     `unwrapped: true`. Nothing else is stripped: no full stop, no ellipsis, no inner whitespace
+ *     change beyond the normal trim. A quote verbatim WITH its marks in the source verifies as given.
  *
  * COMPLEXITY: building the index is O(n) in source length, each quote is one KMP pass
  * O(n + m); there is no backtracking, so no quadratic or exponential input exists.
  */
+import { cutInsideToken } from "./quote-token-rule.js";
+
 export interface QuoteSourceTurn { id: string; text: string; speakerRef?: string }
 export type ClaimedQuote = string | { text: string; speakerRef?: string };
 export type QuoteRefusal =
@@ -39,14 +49,13 @@ export type QuoteRefusal =
   | "ellipsis-stitched" | "spans-turn-boundary" | "partial-word" | "wrong-speaker" | "not-found";
 export interface QuoteLocation { turnId: string; turnIndex: number; start: number; end: number; speakerRef?: string }
 export type QuoteVerdict =
-  | { ok: true; quote: string; locations: QuoteLocation[]; truncated: boolean }
+  | { ok: true; quote: string; locations: QuoteLocation[]; truncated: boolean; unwrapped: boolean }
   | { ok: false; quote: string; reason: QuoteRefusal };
 
 export const MIN_QUOTE_CODE_POINTS = 12;
 export const MIN_QUOTE_TOKENS = 2;
 export const MAX_QUOTE_LENGTH = 2000;
 export const MAX_LOCATIONS = 20;
-const MAX_RAW_OCCURRENCES = 1000;
 
 const CURLY_SINGLE = /[‘’‚‛]/g;
 const CURLY_DOUBLE = /[“”„‟]/g;
@@ -54,7 +63,6 @@ const DASHES = /[‐-―−]/g;
 const WS = /^\s+$/u;
 const NON_ASCII = /[^\x00-\x7f]/;
 const LONE_SURROGATE = /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/;
-const WORD = /[\p{L}\p{N}\p{M}]/u;
 const ELLIPSIS = /\.{3}|…/;
 let segmenter: Intl.Segmenter | undefined;
 
@@ -128,8 +136,16 @@ function normaliseQuote(q: string): { str: string } | QuoteRefusal {
   for (const ch of q) if (/\p{Cc}/u.test(ch) && !/\s/.test(ch)) return "invalid-characters";
   const { str } = normaliseWithMap(q);
   if (str === "") return "empty";
-  if ([...str].length < MIN_QUOTE_CODE_POINTS || str.split(" ").length < MIN_QUOTE_TOKENS) return "too-short";
   return { str };
+}
+const tooShort = (s: string): boolean => [...s].length < MIN_QUOTE_CODE_POINTS || s.split(" ").length < MIN_QUOTE_TOKENS;
+
+/** The inside of ONE matching pair of wrapping quotation marks (normalised form), else undefined. */
+function unwrap(str: string): string | undefined {
+  const o = str.charAt(0);
+  if (str.length < 3 || (o !== '"' && o !== "'") || str.charAt(str.length - 1) !== o) return undefined;
+  const inner = str.slice(1, -1);
+  return inner.includes(o) ? undefined : inner.trim();
 }
 
 /** KMP: all (possibly overlapping) start offsets of `pat` in `text`, up to `cap`. O(n + m). */
@@ -148,18 +164,6 @@ function findAll(text: string, pat: string, cap: number): number[] {
     if (k === m) { hits.push(i - m + 1); if (hits.length >= cap) break; k = fail[k - 1]!; }
   }
   return hits;
-}
-
-function wordCharBefore(s: string, i: number): boolean {
-  if (i <= 0) return false;
-  let c = s.charAt(i - 1);
-  if (/[\udc00-\udfff]/.test(c) && i >= 2) c = s.slice(i - 2, i);
-  return WORD.test(c);
-}
-function wordCharAt(s: string, i: number): boolean {
-  if (i >= s.length) return false;
-  const cp = s.codePointAt(i);
-  return cp !== undefined && WORD.test(String.fromCodePoint(cp));
 }
 
 function pieceContaining(ix: Index, r: Range, idx: number): number {
@@ -188,40 +192,48 @@ function locate(ix: Index, a: number, b: number): "ok" | "cross" | "partial" | {
   const firstP = pieceContaining(ix, r, a);
   const lastP = pieceContaining(ix, r, b - 1);
   if (firstP < 0 || lastP < 0 || ix.pieces[firstP]!.nStart !== a || ix.pieces[lastP]!.nEnd !== b) return "partial";
-  if (wordCharAt(ix.g, a) && wordCharBefore(ix.g, a)) return "partial";
-  if (wordCharBefore(ix.g, b) && wordCharAt(ix.g, b)) return "partial";
+  if (cutInsideToken(ix.g, a) || cutInsideToken(ix.g, b)) return "partial";
   const t = ix.turns[r.turnIndex]!;
   const loc: QuoteLocation = { turnId: String(t.id), turnIndex: r.turnIndex, start: ix.pieces[firstP]!.oStart, end: ix.pieces[lastP]!.oEnd };
   if (t.speakerRef !== undefined) loc.speakerRef = t.speakerRef;
   return { loc };
 }
 
-function verifyOne(ix: Index, claimed: ClaimedQuote): QuoteVerdict {
-  const text = typeof claimed === "string" ? claimed : claimed?.text;
-  if (typeof text !== "string") return { ok: false, quote: "", reason: "not-a-string" };
-  const speaker = typeof claimed === "string" ? undefined : claimed.speakerRef;
+/** Verify one NORMALISED string. `speaker` filters BEFORE the location cap. */
+function attempt(ix: Index, str: string, speaker: string | undefined, text: string): QuoteVerdict {
   const fail = (reason: QuoteRefusal): QuoteVerdict => ({ ok: false, quote: text, reason });
-  const nq = normaliseQuote(text);
-  if (typeof nq === "string") return fail(nq);
-  const hits = findAll(ix.g, nq.str, MAX_RAW_OCCURRENCES);
+  if (tooShort(str)) return fail("too-short");
   const locations: QuoteLocation[] = [];
-  let cross = false, partial = false, truncated = false;
-  for (const a of hits) {
-    const res = locate(ix, a, a + nq.str.length);
+  let cross = false, partial = false, otherSpeaker = false, truncated = false;
+  for (const a of findAll(ix.g, str, Infinity)) {
+    const res = locate(ix, a, a + str.length);
     if (res === "cross") cross = true;
     else if (res === "partial") partial = true;
     else if (typeof res === "object") {
+      if (speaker !== undefined && res.loc.speakerRef !== speaker) { otherSpeaker = true; continue; }
       if (locations.length >= MAX_LOCATIONS) { truncated = true; break; }
       locations.push(res.loc);
     }
   }
-  if (locations.length === 0) {
-    if (ELLIPSIS.test(nq.str) && !cross && !partial) return fail("ellipsis-stitched");
-    return fail(cross ? "spans-turn-boundary" : partial ? "partial-word" : ELLIPSIS.test(nq.str) ? "ellipsis-stitched" : "not-found");
-  }
-  const scoped = speaker === undefined ? locations : locations.filter((l) => l.speakerRef === speaker);
-  if (scoped.length === 0) return fail("wrong-speaker");
-  return { ok: true, quote: text, locations: scoped, truncated };
+  if (locations.length > 0) return { ok: true, quote: text, locations, truncated, unwrapped: false };
+  if (otherSpeaker) return fail("wrong-speaker");
+  if (ELLIPSIS.test(str) && !cross && !partial) return fail("ellipsis-stitched");
+  return fail(cross ? "spans-turn-boundary" : partial ? "partial-word" : ELLIPSIS.test(str) ? "ellipsis-stitched" : "not-found");
+}
+
+function verifyOne(ix: Index, claimed: ClaimedQuote): QuoteVerdict {
+  const text = typeof claimed === "string" ? claimed : claimed?.text;
+  if (typeof text !== "string") return { ok: false, quote: "", reason: "not-a-string" };
+  const speaker = typeof claimed === "string" ? undefined : claimed.speakerRef;
+  const nq = normaliseQuote(text);
+  if (typeof nq === "string") return { ok: false, quote: text, reason: nq };
+  const whole = attempt(ix, nq.str, speaker, text);
+  if (whole.ok) return whole;
+  const inner = unwrap(nq.str);
+  if (inner === undefined) return whole;
+  const stripped = attempt(ix, inner, speaker, text);
+  if (stripped.ok) return { ...stripped, unwrapped: true };
+  return stripped.reason === "too-short" ? stripped : whole;
 }
 
 /** Total: never throws; one verdict per input quote, in order. */
