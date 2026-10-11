@@ -51,6 +51,8 @@ export interface ScheduleTickDeps {
   joinRulesEnforce?: unknown;
   /** This tick's own tenant (LKB_TENANT_ID); join rules are loaded for this tenant only. */
   joinRulesTenantId?: string;
+  /** The API key's tenant when known (none of the tick's responses carries it today; production leaves this unset). */
+  joinRulesKeyTenantId?: unknown;
   joinRulesIo?: JoinRulesEnforceIo;
 }
 
@@ -242,7 +244,7 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
   });
   // Veto-only join rules (T-037); `off` (the default) returns `selected` itself without opening the store.
   const result = await enforceJoinRules(selected, {
-    mode: deps.joinRulesEnforce, tenantId: deps.joinRulesTenantId, stateDir: deps.stateDir, log: deps.log, io: deps.joinRulesIo,
+    mode: deps.joinRulesEnforce, tenantId: deps.joinRulesTenantId, keyTenantId: deps.joinRulesKeyTenantId, stateDir: deps.stateDir, log: deps.log, io: deps.joinRulesIo,
   });
 
   deps.log(`schedule-tick: ${result.toSchedule.length} to schedule, ${result.skipped.length} skipped ` +
