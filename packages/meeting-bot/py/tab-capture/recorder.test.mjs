@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import vm from "node:vm";
 import { makeRecorderWorld, flush, deferred, okResponse, badResponse } from "./tab-capture-harness.mjs";
 
 const T = { timeout: 20000 };
@@ -279,4 +280,32 @@ test("ISS-T034EXT-005: sender table, foreign id / content-script tab / web url a
 test("ISS-T034EXT-005: a refused start does not poison the recorder: a later valid start from the real sender works", T, async () => {
   const w = makeRecorderWorld(); await w.send(w.startMsg, { id: "other-extension" }).reply;
   assert.equal((await w.begin()).ok, true);
+});
+
+// ISS-T034EXT-005 regression (lane recsender): replays the ledger row's OWN recorded reproductions, read from the row at test time.
+const ledgerRow = () => readFileSync(new URL("../../../../qa/issues.t034ext.jsonl", import.meta.url), "utf8").split("\n").filter(Boolean)
+  .map((l) => JSON.parse(l)).find((r) => r.id === "ISS-T034EXT-005");
+test("ISS-T034EXT-005 ledger replay 1/2: recorded foreign sender {id:'other-extension', url:'https://evil.example/p.html'} start is refused", T, async () => {
+  assert.ok(ledgerRow().evidence.includes("{id:'other-extension', url:'https://evil.example/p.html'}"), "row still records this reproduction");
+  const w = makeRecorderWorld(); const reply = await w.send(w.startMsg, { id: "other-extension", url: "https://evil.example/p.html" }).reply; await flush();
+  assert.equal(reply.ok, false); assert.equal(w.getUserMediaCalls, 0); assert.equal(w.calls.length, 0); assert.equal(w.recorders.length, 0);
+});
+test("ISS-T034EXT-005 ledger replay 2/2: recorded config {endpoint:'https://evil.example', token:'stolen'} starts nothing and POSTs nowhere", T, async () => {
+  assert.ok(ledgerRow().evidence.includes("{endpoint:'https://evil.example', token:'stolen'}"), "row still records this reproduction");
+  const cfg = { endpoint: "https://evil.example", token: "stolen" }; const w = makeRecorderWorld({ config: cfg });
+  const reply = await w.send({ ...w.startMsg, config: cfg }).reply; await flush();
+  assert.equal(reply.ok, false); assert.equal(w.getUserMediaCalls, 0); assert.equal(w.calls.length, 0);
+});
+test("ISS-T034EXT-005 fail closed: runtime id missing/empty/non-string refuses even a sender with an equally missing id; null/odd messages do not throw", T, async () => {
+  for (const id of [undefined, "", null, 7]) {
+    const w = makeRecorderWorld(); vm.runInContext("chrome.runtime.id = __id", Object.assign(w.ctx, { __id: id }));
+    const reply = await w.send(w.startMsg, { id }).reply; await flush();
+    assert.equal(reply.ok, false, String(id)); assert.equal(w.getUserMediaCalls, 0);
+  }
+  const w = makeRecorderWorld();
+  for (const m of [null, undefined, 5, "start", []]) assert.equal(w.send(m, { id: "ext-id" }).ret, undefined);
+  assert.equal(w.getUserMediaCalls, 0); assert.equal(w.calls.length, 0);
+  for (const sender of [{ id: "ext-id", url: 5 }, { id: "ext-id", url: { startsWith: () => true } }]) {
+    const x = makeRecorderWorld(); assert.equal((await x.send(x.startMsg, sender).reply).ok, false);
+  }
 });
