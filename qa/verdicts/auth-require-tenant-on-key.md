@@ -117,3 +117,67 @@ ISSUES-WRITTEN: ISS-AUTHTENANT-004 (high), ISS-AUTHTENANT-005 (high), in qa/issu
 EXPLANATION: Route, hydrator and arms protections are now genuinely asserted and mutation-tested (all production mutations above the tree store killed). The unit still fails because the tree store, where a hostile tenant becomes a Mongo filter on the Ask path, is a test replica: a hard-coded tenant, operator-spread filter or String-coercion in the real `load` leaves the suite green, guarded only by a source-text pin. Separately the advertised post-merge check would itself fail 3 cases. Low notes: sentinel search skips headers; ask-tenant-isolation.test.ts is 338 lines.
 
 If cycle 2 passes, merge conditions on the main tree: `cd apps/api && node --test --import tsx src/ask/ask-tenant-hostile.test.ts` must show `skipped 0, fail 0`; then the whole apps/api suite (only the environmental activity-health Python failure acceptable); packages/db tests.
+
+---
+
+# Cycle 2 (checker, independent re-derivation)
+
+VERDICT: PASS
+Cycle checked: 2
+Commit checked: 29acb72 (lane/authtenant). `git diff 5a55653 29acb72 --stat`: tests, the new kit and qa files only; no production file changed since cycle 0.
+
+## Is the store under test REAL (point 1)
+Trace (`real tree store: tenant tB ...` and the route tests via `runAskWithAuth`): test -> `realTreeStore(db,loads).load(t)` -> PRODUCTION `createMongoTreeStore().load` (apps/api/src/store.ts:55) -> PRODUCTION `treeIndexRootFilter` (packages/index tree/build.ts:49) -> PRODUCTION `getDb()` set by the PRODUCTION `@lkb/db` `connect()` -> `MongoClient.prototype.db()` -> kit `clientDb.collection()` -> `BlindDb` `findOne(filter)`. Route tests also run the PRODUCTION `createAskRouter` (`req.auth!.tenantId` -> `tree.load`, `requestDepsFor`), `createSourceRequestDepsFor`, `createAskArmsFor`, `createSourceHydrator` and `scopedCollection` over the same recording fake. Patched: only `MongoClient.prototype.connect/db/close` (the driver; `new MongoClient(url)` merely parses the url), plus test-injected `db`, `embed`, `dispatch` and a stub `req.auth` middleware. Nothing in store.ts, tree/build.ts or the route is replaced.
+The fake DOES evaluate the filter it receives (Mongo-subset matcher: equality, null-matches-missing, array equality, $ne/$gt/$in/$regex/$exists) and records it; it is tenant-blind only in that it adds no tenant of its own. So "returns only A" depends on the filter being right: a dropped filter argument returns the first root, a wrong collection returns nothing, both killed (N1, N2, N6).
+The prototype patch is never restored (import-scoped). Containment: the package script `node --test` runs each file in its own process; I also ran hostile + isolation together with `activity-health/queue-reader`, `activity-health/router`, `indexing/session`, `whatsapp/store-mongo-snapshot` under `--test-isolation=process` AND `none`: identical (122 tests, 106 pass, 15 skipped, 1 fail), and the 1 failure is the activity-health router "Python first/reclaim" test, which fails the same way alone without the kit (environmental upload-queue timeout). No interference. Low note: the unrestored patch would leak if a future test imported the kit into a shared process with a Mongo-reliant test.
+
+## Mutations (point 2): killer set = hostile + isolation only; per-mutation byte backup, restore in finally, `git hash-object` == `git rev-parse HEAD:<file>` after every one
+Final hashes (all equal HEAD): store.ts d0f92105829df03935ed4d3427fbefabacbd08e1; packages/index tree/build.ts 6973bd34fdbb0caa08fe5c118c93c368d68c73c9; routes/ask/ask.ts f70309dda39b52b4f980864d57b76e6332e18fd1; ask/source-context.ts 408152ac14e72bb136f4ffaffba1b9ef23b3ef68; ask-arms.ts 542cf757cbbc491f8aa67d6091761e5dde63567b.
+
+| id | mutation (site) | result | killers (examples) |
+|---|---|---|---|
+| M14 | store `treeIndexRootFilter("tA")` | KILLED | positive control; real tree store tB |
+| M15 | store operator-spread, node_id -> `$exists` | KILLED | real tree store tA/tB; filter tests |
+| M16 | store `String(tenantId).trim()` | KILLED | real tree store whitespace/undefined/null/number |
+| M1 | store drops node_id | KILLED | real tree store tA/tB |
+| M2 | store ignores tenant | KILLED | positive control, real tree store |
+| N1 | `findOne()` filter dropped | KILLED | positive control, tB root test |
+| N2 | queries `tree_index_v2` | KILLED | positive control |
+| N3 | `tenantId.toLowerCase()` | KILLED | positive control |
+| N4 | `tenantId:{$in:[tenant]}` | KILLED | real tree store (filter deepEqual) |
+| N5 | tenantId conjunct removed, node_id kept (applied in store.ts: the lane's build.ts is not what `@lkb/index` resolves to) | KILLED | positive control, real tree store incl. `[tA]` |
+| N6 | filter passed as options arg `findOne({}, filter)` | KILLED | positive control, real tree store |
+| N7 | second unscoped tree_index query | KILLED | positive control, real tree store (exact one query) |
+| N8 | `tenantId \|\| "tA"` fallback | KILLED | real tree store empty / undefined |
+| N9 | route tenant from `x-tenant-id` header | KILLED | "HTTP /ask: tenant-like body fields, query string and headers cannot override" |
+| N10 | route tenant from body | KILLED | same + legacy arms path |
+| N11 | route `requestDepsFor("tB")` | KILLED | positive control, bypassed-tree cases |
+| N12 | hydrator turns query unscoped | KILLED | positive control, bypassed-tree cases |
+| N13 | arms chunks query unscoped | KILLED | positive control |
+| N14 | arms turns query unscoped | KILLED | positive control |
+| N15 | route loads tB for tA | KILLED | positive control, HTTP /ask as tenant A |
+
+20/20 killed; no cross-tenant read or unscoped query survives the behavioural set.
+What the source-text pin (`tree-index-root-filter-single-source.test.ts`) adds: run alone against the same 20 mutations it kills only M1, M2 and N1 (3/20). It is a redundant second line, not load-bearing.
+
+## Array tenant `[tA]` (point 3)
+Probe through the real store with auth bypassed: filter `{node_id:"tenant:tA",level:"tenant",tenantId:["tA"]}`. Against a stored string-tenant row: null (no row). The store does not use `scopedCollection`, so the old and new `@lkb/db` guards make no difference on this path (null under both); requireAuth refuses an array before the store in production. Safe by type-strictness of the `tenantId` conjunct, with one stated precondition: a hypothetical stored row `{tenantId:["tA"],node_id:"tenant:tA"}` WOULD match (probe returned the row). That row cannot legally exist: `schema/tree_index.schema.json` requires `tenantId` `type: string`, buildTree writes strings, and no caller can obtain an array auth tenant (requireAuth rejects it). No real path to data, so no new issue; the unvalidated `treeIndexRootFilter` is already ISS-AUTHTENANT-002 (medium, file-don't-fix). Test N5 plus the `[A]` real-store case pin the conjunct.
+
+## Post-merge simulation (point 4), my own
+Temp wrapper (deleted): `mock.module("@lkb/db", {...real, scopedCollection, withTenant from this lane's packages/db/src/lib/tenantScope.ts})`, then import of hostile and isolation, `node --test --experimental-test-module-mocks --import tsx`: guard probe `refuses operator objects: true`; tests 86 / pass 86 / fail 0 / skipped 0 (hostile 70 + isolation 16). Un-merged lane: `tests 86 / pass 71 / fail 0 / skipped 15`.
+
+## D-015 by my own run (point 5)
+- ISS-AUTHTENANT-001: 3/3 recorded cases ("", undefined, {$ne:null}) refused 404 through the REAL store; load received the raw value; no turns/chunks query; no model call.
+- ISS-AUTHTENANT-004: recorded M14/M15/M16 3/3 killed, M1/M2 2/2 (5/5 behavioural), plus 15 of my own (20/20).
+- ISS-AUTHTENANT-005: 3/3 recorded failing cases (tNone in bypassed-tree, arms, hydrator) pass in my simulation (86/86, skipped 0).
+- ISS-AUTHSCOPE-001: 4/4 recorded cases (missing, null, "", 5) refused 401 (require-scope.test.ts green in the join-rules run).
+
+## Regression and budgets (point 6)
+apps/api (`src/ask/*.test.ts`, ask-arms, routes/ask/ask, server, join-rules/*, routes/keys, routes/calendar, tree-index-root-filter-single-source, auth): tests 201 / pass 186 / fail 0 / skipped 15 (the 15 operator-object cases awaiting the new guard). packages/db: 29 / 29. `tsc --noEmit -p tsconfig.json`: apps/api exit 0, packages/db exit 0. `lint-dirsize: OK (112 dir(s) within budget)`. `lint-loc` reports two violations, both pre-existing and untouched here (packages/index/src/pipeline/speakers-llm.ts 313, packages/meeting-bot/py/sb_join.py 1142). tenant-test-kit.ts is not named *.test.ts, so it takes the SOURCE budget (300 non-blank lines, structure.config.json testPatterns): 71, fine; hostile 198 and isolation 293 are under the 400 test budget. The kit is imported only by the two tenant tests (git grep); apps/api has no build step (runs under tsx) so it is unreachable from index.ts, but tsconfig `include: src/**/*.ts` typechecks it and a future tsc build would emit it to dist (inert unless imported). Low note.
+
+## Issues
+ISSUES-WRITTEN: none. Marked verified on my own evidence: ISS-AUTHTENANT-001, -004, -005. ISS-AUTHTENANT-002 (medium) and -003 (low) left open as they are.
+
+EXPLANATION: The store is now the production code over a filter-evaluating recording fake; 20/20 mutations of the Ask read path's tenant handling die behaviourally, the text pin is redundant, and the simulated post-merge run is 86/86 with 0 skipped. Low notes: unrestored prototype patch (safe under per-file process isolation, shown by the isolation=none run); kit sits in production src and under the tsconfig include; lint-loc failures elsewhere are pre-existing.
+
+Merge conditions (PASS): (1) merge so apps/api resolves `@lkb/db` to this lane's packages/db (auth.ts and tenantScope.ts land together; target branch codex/machine-migration-2026-10-09 has no changes to those paths since the merge base). (2) Post-merge `cd apps/api && node --test --import tsx src/ask/ask-tenant-hostile.test.ts src/ask/ask-tenant-isolation.test.ts` must show tests 86 / fail 0 / skipped 0 (`skipped 15` means the new guard is not in effect). (3) Full apps/api suite once (only the environmental activity-health Python failure acceptable) and packages/db tests. (4) Maker closes out the manifest; ISS-AUTHTENANT-002 stays open as medium.
