@@ -16,6 +16,7 @@ import { createWatchedSourcesRouter, type WatchedSourceDeps } from "./routes/wat
 import { createCitationsRouter, type CitationsDeps } from "./routes/citations.js";
 import { createClaimsListRouter, unavailableClaimsListDeps, type ClaimsListDeps } from "./claims/router.js";
 import { createHealthRouter, type HealthDeps } from "./routes/health.js";
+import { createSystemStatusRouter, unavailableSystemStatusDeps, type SystemStatusDeps } from "./routes/system-status.js";
 import { createSearchRouter, type SearchDeps } from "./routes/search.js";
 import { createGraphRouter, type GraphReadDeps } from "./routes/graph.js";
 import { createCalendarRouter, type CalendarReadDeps } from "./routes/calendar.js";
@@ -44,6 +45,8 @@ export interface ServerDeps {
   /** T-007 read-only claims list. Optional: absent -> GET /claims answers 503 (fail closed). */
   claims?: ClaimsListDeps;
   health: HealthDeps;
+  /** Tenant-scoped status counts for the signed-in caller; absent = fail closed (503). */
+  systemStatus?: SystemStatusDeps;
   search: SearchDeps;
   graph: GraphReadDeps;
   calendar: CalendarReadDeps;
@@ -79,6 +82,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createHealthRouter(deps.health));
   app.use(requireAuth(deps.keyStore));
   app.use(createRateLimiter(deps.rateLimit));
+  app.use(createSystemStatusRouter(deps.systemStatus ?? unavailableSystemStatusDeps));
   app.use(createAskRouter(deps.ask));
   app.use(createCompeteRouter({ ...deps.ask, evalRuns: deps.evalRuns }));
   app.use(createBrainRouter(deps.brain));

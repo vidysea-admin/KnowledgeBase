@@ -6,6 +6,7 @@
  * (`ai-transport.ts`). Kept out of `server.ts` so that file stays <=80 LOC and injectable-only.
  * Never imported by tests.
  */
+import { createMongoSystemStatusDeps } from "../system-status-store.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { complete as routeComplete, embed as routeEmbed, parseRoutingYaml, GeminiProvider, ClaudeCodeProvider, OllamaProvider, type Provider } from "@lkb/ai";
@@ -186,6 +187,7 @@ export function buildProductionDeps(): ServerDeps {
     claims: createMongoClaimsListDeps(),
     // U4b/R2: the same Mongo health deps as before, plus the injected watcher-silence detector.
     health: { ...createMongoHealthDeps(), watchSilence: createMongoWatchSilenceDeps() },
+    systemStatus: createMongoSystemStatusDeps(),
     // U4d: the same A13 watched-sources deps as before, plus the watch_state/watch_heartbeat read
     // surface GET /watch-state serves (routes/watched-sources.ts).
     watchedSources: { ...createMongoWatchedSourceDeps(), ...createMongoWatchStateReadDeps() },
