@@ -221,6 +221,21 @@ test("flush and close are bounded with a hanging fetch; close aborts it and leav
   assert.equal(sink.stats.pending, 0);
 });
 
+test("close during a backoff sleep wakes it, drops the batch and leaves no timer running", async () => {
+  const { calls, f } = recorder(503);
+  const { sink, c } = make(f, { backoffMs: 5000, maxRetries: 3 });
+  sink.record(rec());
+  for (let i = 0; i < 5; i++) await new Promise((r) => setImmediate(r));
+  assert.equal(calls.length, 1);
+  assert.ok([...c.live].some((h) => h.ms === 5000), "backoff timer should be pending");
+  const cl = sink.close();
+  c.fire(30_000);
+  await cl;
+  assert.equal(c.live.size, 0);
+  assert.equal(calls.length, 1);
+  assert.equal(sink.stats.pending, 0);
+});
+
 test("no unhandled rejection from a rejecting fetch after the request was abandoned", async () => {
   const seen: unknown[] = [];
   const h = (e: unknown): void => void seen.push(e);
