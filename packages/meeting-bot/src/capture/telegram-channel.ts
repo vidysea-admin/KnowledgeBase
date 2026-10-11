@@ -9,6 +9,15 @@
 import https from "node:https";
 
 import type { NotifyChannel } from "./notify-channels.js";
+import { SKIP_REASON_MEANING } from "../calendar/skip-describe.js";
+
+/** Operation reasons that are not SkipReasons (the pipeline's own states). */
+const OPERATION_ONLY_REASONS = ["retry-limit", "interrupted-no-recording-artifact", "missed-while-processing", "missed-coverage",
+  "rescheduled", "controller-disconnected", "coverage-review"];
+/** Every reason an alert may name. The skip half is derived from the total SKIP_REASON_MEANING record, so a new SkipReason is covered automatically. */
+export const NOTIFIABLE_REASONS: readonly string[] = [...OPERATION_ONLY_REASONS, ...Object.keys(SKIP_REASON_MEANING)];
+/** Anything outside the vocabulary (free-text errors, future values) gets one neutral label, never raw text and never dropped. */
+export const notifiableReason = (reason: unknown): string => typeof reason === "string" && NOTIFIABLE_REASONS.includes(reason) ? reason : "pipeline-failed";
 
 const SEND_TIMEOUT_MS = 8_000;
 
@@ -101,9 +110,7 @@ export function createOperationNotifications(deps: {
   const enqueue = (id: string, feed = false) => {
     const collection = feed ? state.discovery : state.operations, row = collection[id];
     if (!feed && !['failed', 'action_required', 'ready'].includes(row.status)) return;
-    const knownReasons = ['retry-limit', 'interrupted-no-recording-artifact', 'missed-while-processing', 'missed-coverage',
-      'cancelled', 'rescheduled', 'controller-disconnected', 'coverage-review', 'overlap-lost', 'needs-registration', 'needs-review', 'invalid-time', 'unsafe-join-link'];
-    const reason = feed || row.status === 'ready' ? '' : knownReasons.includes(row.reason) ? row.reason : 'pipeline-failed';
+    const reason = feed || row.status === 'ready' ? '' : notifiableReason(row.reason);
     const fingerprint = `${row.status}:${reason}`, notice = feed ? {feed: id, status: row.status} : {sessionId: id, status: row.status, reason};
     notifications = notifications.then(async () => {
       if (collection[id].notification?.acknowledged === fingerprint) return;

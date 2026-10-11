@@ -5,7 +5,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { createTelegramChannel } from "./telegram-channel.js";
+import { SKIP_REASON_MEANING } from "../calendar/skip-describe.js";
+import { createOperationNotifications, createTelegramChannel } from "./telegram-channel.js";
 
 function logCapture() {
   const lines: string[] = [];
@@ -67,4 +68,18 @@ test("a rejecting transport's error has the token redacted before it leaves the 
       return true;
     },
   );
+});
+
+test("operation alerts name every SkipReason as-is and map an unknown reason to the neutral label (ISS-T037W1-003)", async () => {
+  const SKIP_REASONS = Object.keys(SKIP_REASON_MEANING); // total Record<SkipReason,string>: one entry per SkipReason
+  assert.equal(SKIP_REASONS.length, 14);
+  for (const r of ["opted-out", "rule-denied", "rules-unevaluable"]) assert.ok(SKIP_REASONS.includes(r), r);
+  const sent: Array<{ reason?: string }> = [];
+  const state: Record<string, any> = { operations: {} };
+  [...SKIP_REASONS, "brand-new-reason"].forEach((reason, i) => { state.operations[`op-${i}`] = { status: "action_required", reason }; });
+  const n = createOperationNotifications({ state, save: () => {}, log: () => {}, now: () => "2026-10-11T00:00:00.000Z",
+    notifyOperation: async (notice) => { sent.push(notice); return "sent"; } });
+  for (const id of Object.keys(state.operations)) n.enqueue(id);
+  await n.wait();
+  assert.deepEqual(sent.map((s) => s.reason), [...SKIP_REASONS, "pipeline-failed"]);
 });
