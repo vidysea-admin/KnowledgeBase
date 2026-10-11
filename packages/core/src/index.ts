@@ -28,6 +28,7 @@ export * from "./generated/watch_reports.js";
 export * from "./generated/watch_state.js";
 export * from "./generated/watched_sources.js";
 
+export * from "./domain/keyframe-dedupe.js";
 export * from "./domain/purge-policy.js";
 export * from "./domain/sender-authentication.js";
 export * from "./domain/webinar-types.js";
