@@ -8,9 +8,9 @@
   "progress": {
     "total": 95,
     "done": 51,
-    "in_progress": 10,
+    "in_progress": 24,
     "blocked": 0,
-    "pending": 34,
+    "pending": 20,
     "current": "U2.2",
     "percent": 54
   },
@@ -707,7 +707,7 @@
     {
       "id": "U3.2",
       "title": "Search page / global search bar",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [
         "U3.1"
@@ -797,7 +797,7 @@
     {
       "id": "T-034",
       "title": "In-browser tab capture (extension + MediaRecorder); OBS becomes fallback",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -807,7 +807,7 @@
     {
       "id": "T-035",
       "title": "Lean video (720p, low fps) — target <400 MB/hour",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -817,7 +817,7 @@
     {
       "id": "T-036",
       "title": "Discovery: Gmail + Calendar webinar-link scan incl. Zoho/OnAir/YouTube Live",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -850,7 +850,7 @@
     {
       "id": "T-039",
       "title": "\"Send bot now\" to a live meeting (CLI/API/web)",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -860,7 +860,7 @@
     {
       "id": "T-040",
       "title": "Post-processing: summary, facts, Q&A, action items with timestamp citations",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -870,7 +870,7 @@
     {
       "id": "T-041",
       "title": "Slide keyframes → OCR → attached to turns by time",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -880,7 +880,7 @@
     {
       "id": "T-042",
       "title": "Speaker naming for webinar turns (Zoho tile names + intros + sync-speakers)",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -910,7 +910,7 @@
     {
       "id": "T-045",
       "title": "More sources: OnAir on-demand, YouTube via yt-dlp, Meet/Teams/Zoom via browser bot",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -920,7 +920,7 @@
     {
       "id": "T-046",
       "title": "Retention policy for raw video (D-008) + real /meeting-bot web page",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -941,7 +941,7 @@
     {
       "id": "T-049",
       "title": "Langfuse self-hosted tracing on every Gemini call (transcribe, extract, ask): latency, tokens, cost, retries, failures",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -951,7 +951,7 @@
     {
       "id": "T-050",
       "title": "Pipeline as a thin LangGraph 1.x workflow (capture → transcribe → extract → index) with checkpoint/resume + a job queue; /ask router as a graph",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -961,7 +961,7 @@
     {
       "id": "T-048",
       "title": "Make gemini-3.8-flash single-call the default for recordings ≤ ~90 min; keep chunking as fallback",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -1062,7 +1062,7 @@
     {
       "id": "T-057",
       "title": "Sessions explorer graph health jobs analytics notifications Sheets and setup UI",
-      "status": "pending",
+      "status": "in_progress",
       "deps": [
         "T-010",
         "U2.6",
