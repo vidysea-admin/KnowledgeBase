@@ -158,7 +158,9 @@ test("enabling values are not warned about and `off` stays silent", async () => 
 });
 
 // ---------- B: ISS-T037WIRE-001 (partly) ----------
-test("ISS-T037WIRE-001 recorded repro, production shape (key tenant unknowable): B's empty store lets A's g1 through — NOT detectable, pinned as the OPEN residual", async () => {
+// Seam path only: the tick is called WITHOUT a key tenant (joinRulesKeyTenantId undefined), so nothing can be attributed and the rules store is read as is.
+// This is NOT production: buildRealScheduleTickDeps now supplies the key tenant; that path is covered by join-rules-wiring/key-tenant.test.ts (ISS-T037WIRE-001 recorded repro, production shape).
+test("ISS-T037WIRE-001 recorded repro, test seam with NO key tenant supplied (not production): B's empty store lets A's g1 through; production path is in join-rules-wiring/key-tenant.test.ts", async () => {
   await withRoot(async (root) => {
     save(root, A, { optedOutEventIds: ["g1"] });
     for (const mode of MODES) {

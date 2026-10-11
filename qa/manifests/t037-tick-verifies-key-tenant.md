@@ -36,6 +36,7 @@ Verified every enforcing tick; nothing is cached. A key rotation changes the ten
 - `packages/meeting-bot/src/calendar/join-rules-wiring/key-tenant.test.ts` (186, NEW).
 - Directory budget: `packages/meeting-bot/src/calendar` still holds 28 loose files (limit 30); new files are in the subfolder `join-rules-wiring/`. `node scripts/lint-dirsize.mjs`: `lint-dirsize: OK (120 dir(s) within budget)`.
 - Note for the checker: `join-rules-enforce-preconditions.test.ts` "production shape ... OPEN residual" still passes because it builds deps without `loadKeyTenant`; it no longer describes `buildRealScheduleTickDeps`. Not edited (existing test); the production-shape case is now covered by key-tenant.test.ts.
+- Merge condition (checker): the stale "OPEN residual" test in join-rules-enforce-preconditions.test.ts was retitled/commented as a test-seam case (no key tenant supplied, not production); assertions unchanged.
 
 ## Evidence
 node = `C:\Users\product\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe`, run from `packages/meeting-bot`:
