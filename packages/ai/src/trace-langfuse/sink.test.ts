@@ -78,7 +78,7 @@ test("batching: a synchronous burst goes out in batches of at most batchSize", a
 
 test("credentials never appear in errors, error-callback codes or warnings", async () => {
   const thrown: string[] = [];
-  const f: FetchFn = async (_u, init) => { throw new Error(`boom ${String(init.headers.authorization)} ${SEC}`); };
+  const f: FetchFn = async (_u, init) => { throw new Error(`boom ${String((init.headers as Record<string, string>).authorization)} ${SEC}`); };
   const { sink, errors } = make(f, { maxRetries: 1 });
   sink.record(rec());
   await sink.flush();
