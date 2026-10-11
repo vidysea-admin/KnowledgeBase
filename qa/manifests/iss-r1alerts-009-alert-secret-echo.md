@@ -1,6 +1,6 @@
 # iss-r1alerts-009-alert-secret-echo
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2 (open HIGH issue ISS-R1ALERTS-009, r1-attention-alerts seam). Class: security (credential handling), full ceremony.
 Lane: lane/alertredact. Ledger for this lane: qa/issues.alertredact.jsonl (ISS-ALERTREDACT-001 filed, low). Package: packages/meeting-bot only.
