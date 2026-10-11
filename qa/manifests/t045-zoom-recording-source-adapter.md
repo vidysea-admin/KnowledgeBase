@@ -112,5 +112,5 @@ Not applicable: "id not host-qualified when two hosts accepted" (one host accept
 ### What the owner must supply to widen acceptance
 One real link per shape, with the real token: a `/rec/play/` link; a recording link on a regional/tenant subdomain (e.g. `us06web.zoom.us/rec/share/...`); any vanity-host link; and one passcode-bearing link (`?pwd=`). Until then these stay `unverified-shape`.
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t045-zoom-recording-source-adapter.md, cycle 1, 4a9796e; URL recognition only, unregistered)
 Fix cycle: 1
