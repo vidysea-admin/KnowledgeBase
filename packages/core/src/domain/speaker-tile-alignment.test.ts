@@ -51,10 +51,11 @@ test("lag of 1 to 3 seconds still maps every label", () => {
 });
 
 test("rename mid-meeting: dominant name accepted when the other is within maxRunnerUpFraction, refused above it", () => {
-  const mk = (oldSec: number) => run([[0, oldSec, "spk:0", "Priya"], [oldSec, 100, "spk:0", "Priya S"]]);
+  const L0 = { maxLagSec: 0 }; // exact-limit arithmetic is tested at lag 0 only; under lag stability a limit-exact split is lag-unstable
+  const mk = (oldSec: number) => run([[0, oldSec, "spk:0", "Priya"], [oldSec, 100, "spk:0", "Priya S"]], L0);
   assert.equal(nameOf(by(mk(80), "spk:0")), "Priya", "20/100 is exactly the limit: accepted");
   assert.equal(reasonOf(by(mk(79), "spk:0")), "two-strong-names", "21/100 is over the limit");
-  const small = run([[0, 30, "spk:0", "Priya"], [30, 38, "spk:0", "Rahul"]]);
+  const small = run([[0, 30, "spk:0", "Priya"], [30, 38, "spk:0", "Rahul"]], L0);
   assert.equal(reasonOf(by(small, "spk:0")), "runner-up-too-strong", "8 s of another name is over 20% of 38 s but under minNameSeconds");
   assert.equal(nameOf(by(mk(95), "spk:0")), "Priya");
   const r70 = by(mk(70), "spk:0");
@@ -100,14 +101,15 @@ test("injectable predicate can only add refusals; a throwing predicate refuses",
 });
 
 test("thresholds: too little time, too thin coverage, fraction taken from OBSERVED time not meeting time", () => {
-  assert.equal(reasonOf(by(run([[0, 9, "spk:0", "Priya"]]), "spk:0")), "insufficient-duration");
-  assert.equal(nameOf(by(run([[0, 10, "spk:0", "Priya"]]), "spk:0")), "Priya", "exactly 10 s is enough");
-  const thin = alignTileNamesToTurns(samples([[0, 20, "spk:0", "Priya"]]), [T("a", 0, 100, "spk:0")]);
+  const L0 = { maxLagSec: 0 }; // exact-threshold arithmetic at lag 0 only (see the lag-stability tests for the shifted rule)
+  assert.equal(reasonOf(by(run([[0, 9, "spk:0", "Priya"]], L0), "spk:0")), "insufficient-duration");
+  assert.equal(nameOf(by(run([[0, 10, "spk:0", "Priya"]], L0), "spk:0")), "Priya", "exactly 10 s is enough");
+  const thin = alignTileNamesToTurns(samples([[0, 20, "spk:0", "Priya"]]), [T("a", 0, 100, "spk:0")], L0);
   assert.equal(reasonOf(by(thin, "spk:0")), "insufficient-coverage", "20% coverage");
-  const ok = alignTileNamesToTurns(samples([[0, 40, "spk:0", "Priya"]]), [T("a", 0, 100, "spk:0"), T("b", 100, 1000, "spk:1")]);
+  const ok = alignTileNamesToTurns(samples([[0, 40, "spk:0", "Priya"]]), [T("a", 0, 100, "spk:0"), T("b", 100, 1000, "spk:1")], L0);
   assert.equal(nameOf(by(ok, "spk:0")), "Priya", "40 s all agreeing out of 100 s is 100% of observed, 40% coverage");
-  assert.equal(reasonOf(by(run([[0, 55, "spk:0", "Priya"], [55, 100, "spk:0", "Rahul"]], { maxRunnerUpFraction: 1 }), "spk:0")), "insufficient-fraction");
-  assert.equal(reasonOf(by(run([[0, 10, "spk:0", null]]), "spk:0")), "no-observations");
+  assert.equal(reasonOf(by(run([[0, 55, "spk:0", "Priya"], [55, 100, "spk:0", "Rahul"]], { maxRunnerUpFraction: 1, ...L0 }), "spk:0")), "insufficient-fraction");
+  assert.equal(reasonOf(by(run([[0, 10, "spk:0", null]], L0), "spk:0")), "no-observations");
 });
 
 test("flicker: brief wrong highlights are tolerated, heavy flicker is not; low-confidence samples are releases", () => {
@@ -156,8 +158,9 @@ test("overlapping turns: same-label overlap is not double counted; different lab
 });
 
 test("empty and missing inputs", () => {
-  assert.deepEqual(alignTileNamesToTurns([], []), { labels: [], errors: [] });
-  assert.deepEqual(alignTileNamesToTurns(undefined, undefined), { labels: [], errors: [] });
+  const nothing = { labels: [], errors: [], meeting: { status: "ok", conflictInstants: 0, shiftsEvaluated: 13, diagnostics: null } };
+  assert.deepEqual(alignTileNamesToTurns([], []), nothing);
+  assert.deepEqual(alignTileNamesToTurns(undefined, undefined), nothing);
   assert.equal(reasonOf(by(alignTileNamesToTurns([], [T("a", 0, 30, "spk:0")]), "spk:0")), "no-observations");
   assert.deepEqual(alignTileNamesToTurns(samples([[0, 30, "x", "Priya"]]), []).labels, []);
 });

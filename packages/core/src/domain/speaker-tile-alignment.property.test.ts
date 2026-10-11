@@ -40,10 +40,16 @@ function gen(seed: number, horizon: number): { log: Ob[]; turns: Tn[] } {
 function oracle(log: Ob[], turns: Tn[], maxHold: number, horizon: number): Map<string, Map<string, number>> {
   const sorted = log.slice().sort((a, b) => a.tSec - b.tSec || ((a.displayName ?? "") < (b.displayName ?? "") ? -1 : (a.displayName ?? "") > (b.displayName ?? "") ? 1 : 0));
   const out = new Map<string, Map<string, number>>();
+  // coincident observations with different values are an ambiguous instant: one release (cycle 1)
+  const merged: Ob[] = [];
+  for (const o of sorted) {
+    const last = merged[merged.length - 1];
+    if (last && last.tSec === o.tSec) { if (last.displayName !== o.displayName) last.displayName = null; } else merged.push({ ...o });
+  }
   for (let x = 0; x < horizon + 40; x += 0.5) {
     const labels = new Set(turns.filter((t) => t.tStart <= x && x < t.tEnd).map((t) => t.speakerRef));
     let holder: Ob | null = null;
-    for (const o of sorted) if (o.tSec <= x) holder = o;
+    for (const o of merged) if (o.tSec <= x) holder = o;
     const shown = holder && holder.displayName !== null && x < holder.tSec + maxHold ? holder.displayName : null;
     for (const l of labels) {
       const m = out.get(l) ?? new Map<string, number>();
@@ -95,16 +101,31 @@ test("invariants on 600 seeded meetings: one name per label, one label per name,
   }
 });
 
-test("scale: 50,000 observations x 20,000 turns stays near-linear by operation count", () => {
+test("scale: 50,000 observations x 20,000 turns stays near-linear by operation count (K shifts, K constant)", () => {
   const log: { tSec: number; displayName: string }[] = [], turns: Tn[] = [];
   for (let i = 0; i < 20000; i++) turns.push({ id: `t${i}`, tStart: i * 5, tEnd: i * 5 + 5, speakerRef: `spk:${i % 20}` });
   for (let i = 0; i < 50000; i++) log.push({ tSec: i * 2, displayName: `Person ${Math.floor(i * 2 / 5) % 20}` });
   const counter = { ops: 0 };
   const res = alignTileNamesToTurns(log, turns, { counter });
   assert.equal(res.labels.length, 20);
+  assert.equal(res.labels.filter((l) => l.decision.status === "named").length, 0, "5 s turns are lag-sensitive: nothing may be named");
+  assert.ok(res.labels.every((l) => l.decision.status === "refused" && (l.decision.reason === "lag-unstable" || l.decision.reason === "timeline-misaligned")));
+  const k = res.meeting.shiftsEvaluated;
+  assert.ok(k === 53, `default shifts ${k}`);
+  assert.ok(counter.ops < k * 700_000, `ops ${counter.ops} (per shift ${Math.round(counter.ops / k)}, bound 700,000 per shift)`);
+  console.log(`scale ops=${counter.ops} over ${k} shifts (naive pairing would be ${50000 * 20000})`);
+});
+
+test("scale, long turns: 4,000 turns of 50 s x 50,000 observations: all 20 labels still resolve, same per-shift bound", () => {
+  const log: { tSec: number; displayName: string }[] = [], turns: Tn[] = [];
+  for (let i = 0; i < 4000; i++) turns.push({ id: `t${i}`, tStart: i * 50, tEnd: i * 50 + 50, speakerRef: `spk:${i % 20}` });
+  for (let i = 0; i < 50000; i++) log.push({ tSec: i * 4, displayName: `Person ${Math.floor(i * 4 / 50) % 20}` });
+  const counter = { ops: 0 };
+  const res = alignTileNamesToTurns(log, turns, { counter });
+  assert.equal(res.meeting.status, "ok");
   assert.equal(res.labels.filter((l) => l.decision.status === "named").length, 20);
-  assert.ok(counter.ops < 700_000, `ops ${counter.ops}`);
-  console.log(`scale ops=${counter.ops} (naive would be ${50000 * 20000})`);
+  assert.ok(counter.ops < res.meeting.shiftsEvaluated * 700_000, `ops ${counter.ops}`);
+  console.log(`scale-long ops=${counter.ops} over ${res.meeting.shiftsEvaluated} shifts`);
 });
 
 test("hostile input: bad shapes become typed errors, prototype keys and odd names stay inert data, never throws", () => {
@@ -118,8 +139,8 @@ test("hostile input: bad shapes become typed errors, prototype keys and odd name
   for (const x of [undefined, null, 5, "s", {}, NaN]) assert.doesNotThrow(() => alignTileNamesToTurns(x, x, x as never));
 
   const evil = ["__proto__", "constructor", "toString", "hasOwnProperty"];
-  const log = evil.flatMap((n, k) => Array.from({ length: 20 }, (_, i) => ({ tSec: k * 20 + i, displayName: n })));
-  const turns = evil.map((n, k) => ({ id: n, tStart: k * 20, tEnd: k * 20 + 20, speakerRef: n }));
+  const log = evil.flatMap((n, k) => Array.from({ length: 60 }, (_, i) => ({ tSec: k * 60 + i, displayName: n })));
+  const turns = evil.map((n, k) => ({ id: n, tStart: k * 60, tEnd: k * 60 + 60, speakerRef: n }));
   const r2 = alignTileNamesToTurns(log, turns);
   assert.deepEqual(r2.labels.map((l) => l.speakerRef).sort(), [...evil].sort());
   assert.deepEqual(r2.labels.map((l) => l.decision.status === "named" && l.decision.claim.displayName).sort(), [...evil].sort());

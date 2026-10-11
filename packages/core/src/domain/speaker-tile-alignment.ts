@@ -9,28 +9,42 @@
  * Turns are never rewritten; the output carries provenance (turn ids, time range) only.
  *
  * Time: seconds from session start, intervals half-open. An observation holds from its time until the
- * next observation, capped at `maxHoldSec` (so one stale sample cannot claim minutes). `displayName:
- * null`, blank, or confidence < `minConfidence` is a RELEASE (nobody highlighted from then on).
- * Per label, turns are unioned (a turn's start is clipped to the previous same-label turn's end), so
- * seconds are never double counted; turns of DIFFERENT labels may overlap and each is credited.
+ * next observation, capped at `maxHoldSec`. `displayName: null`, blank, or confidence < `minConfidence`
+ * is a RELEASE. Per label, turns are unioned (seconds never double counted); turns of DIFFERENT labels
+ * may overlap and each is credited.
  *
- * Per label (all thresholds are options; defaults below; "observed" = seconds of the label's turns
- * during which SOME name was highlighted, including non-person names):
- *  (a) top name needs >= minNameSeconds AND >= minNameFraction of observed;
- *  (b) runner-up must be <= maxRunnerUpFraction of observed (clear winner); a runner-up that itself
- *      reaches minNameSeconds is reported as `two-strong-names` (diarizer merged two people);
- *  (c) observed must cover >= minCoverageFraction of the label's total turn seconds;
- *  (d) cross-label: a name that would win two labels is refused for BOTH (`name-on-multiple-labels`);
- *  (e) a top name that is not a person name (device/room/role/phone/bot/control chars) is never proposed.
- * Names are equal iff equal after NFC + whitespace collapse + trim; NO case-folding, no title stripping.
- * Never throws; hostile items are excluded and reported in `errors`. Complexity: sort O(n log n + m log m);
- * per effective turn one binary search over holds plus the holds it covers (`options.counter.ops`).
+ * SIMULTANEOUS OBSERVATIONS. Observations within CONFLICT_EPS_SEC of each other that differ (two names,
+ * or a name and a release) are an AMBIGUOUS INSTANT: they collapse to one release, so that interval
+ * counts for no name and lowers coverage; never chosen by sort order. Equal ones are one observation.
+ *
+ * LAG STABILITY. The delay between speech and the highlight is unknown and varies, and for short
+ * alternating turns it decides the winner. So the per-label chain is evaluated at EVERY shift lag in
+ * {0, 0.5, ..., maxLagSec} (log shifted earlier by lag; `speaker-tile-scan.ts`). A name is proposed for a
+ * label only if the SAME name passes EVERY threshold at EVERY shift (worst case, not best case);
+ * otherwise `lag-unstable`. A name that would win two labels at ANY shift is refused for both.
+ * MISALIGNMENT: agreement A(lag) = sum over labels of the TOP name's seconds is also scanned over
+ * [-10, maxLagSec + 30] s (step 1 outside the stable range). If some lag outside [0, maxLagSec] beats the
+ * best inside by more than `misalignMarginFraction` of all label seconds, NO name is proposed for the
+ * meeting (`timeline-misaligned`). A constant offset that preserves the structure is undetectable here.
+ *
+ * Per label per shift: top >= minNameSeconds and >= minNameFraction of "observed" (seconds of the label's
+ * turns with SOME name highlighted); runner-up <= maxRunnerUpFraction of observed (one reaching
+ * minNameSeconds is `two-strong-names`); observed >= minCoverageFraction of total; the top name is a
+ * person name and not the bot. Names pool inside a label by NFC + whitespace collapse (no case-folding);
+ * exclusion and cross-label refusal use `foldKey` (NFKC + case-fold), which can only add refusals.
+ * Never throws; hostile items are excluded and reported in `errors`. Complexity: sorts O(n log n + m log m)
+ * plus K shifts (K <= 101, a constant), each one binary search per effective turn plus the holds it
+ * covers: O(K (m log n + covered holds)) (`options.counter.ops`).
  */
+import { foldKey, normalizeDisplayName } from "./speaker-tile-names.js";
+import { decide, scanShift, type Eff, type Gates, type Hold, type LabelScan, type Verdict } from "./speaker-tile-scan.js";
+
+export { MAX_NAME_LENGTH, normalizeDisplayName } from "./speaker-tile-names.js";
 export interface TileObservation { tSec: number; displayName: string | null; confidence?: number; source?: string }
 export interface TileTurn { id: string; tStart: number; tEnd: number; speakerRef: string }
 export interface TileAlignOptions {
   minNameSeconds?: number; minNameFraction?: number; maxRunnerUpFraction?: number; minCoverageFraction?: number;
-  maxHoldSec?: number; minConfidence?: number; botDisplayName?: string;
+  maxHoldSec?: number; minConfidence?: number; maxLagSec?: number; misalignMarginFraction?: number; botDisplayName?: string;
   isNonPersonName?: (normalizedName: string) => boolean; counter?: { ops: number };
 }
 export const TILE_DEFAULTS = {
@@ -46,54 +60,55 @@ export const TILE_DEFAULTS = {
   maxHoldSec: 5,
   /** 0.5: weaker observations are releases, not votes. */
   minConfidence: 0.5,
+  /** 6 s: the checker swapped names at 3 s and 5 s lag; the stable range must cover that with room. */
+  maxLagSec: 6,
+  /** 0.02: an out-of-range lag must beat the in-range best by 2% of all label seconds to call it misaligned. */
+  misalignMarginFraction: 0.02,
 } as const;
+/** Stable-range grid step. Worst-case error vs the exact optimum is <= step per turn boundary. */
+export const LAG_STEP_SEC = 0.5;
+export const DIAG_NEG_SEC = 10;
+export const DIAG_POS_SEC = 30;
+export const CONFLICT_EPS_SEC = 1e-6;
 
 export type TileErrorCode = "invalid-input" | "invalid-id" | "duplicate-id" | "invalid-time" | "end-before-start"
   | "invalid-name" | "invalid-confidence" | "invalid-source" | "invalid-label" | "invalid-option";
 export interface TileError { kind: "observation" | "turn" | "options"; index: number; id?: string; code: TileErrorCode }
 export type RefusalReason = "no-observations" | "insufficient-coverage" | "insufficient-duration"
   | "insufficient-fraction" | "runner-up-too-strong" | "two-strong-names" | "non-person-name"
-  | "bot-own-name" | "name-on-multiple-labels";
+  | "bot-own-name" | "name-on-multiple-labels" | "lag-unstable" | "timeline-misaligned";
 
 export interface DisplayNameClaim { kind: "display-name-claim"; source: "platform-display-name"; verified: false; displayName: string }
 export interface TileEvidence {
+  /** Seconds at lag 0 (the log as given). */
   agreeSec: number; disagreeSec: number; observedSec: number; totalSec: number;
   runnerUp: { name: string; sec: number } | null; turnIds: string[]; from: number; to: number;
+  /** Worst case over every stable shift; all thresholds held at each one. */
+  lagStability: { maxLagSec: number; stepSec: number; shifts: number; worstWinnerFraction: number; worstRunnerUpFraction: number; minAgreeSec: number };
 }
 export type LabelDecision = { status: "named"; claim: DisplayNameClaim; evidence: TileEvidence } | { status: "refused"; reason: RefusalReason };
 export interface LabelResult {
   speakerRef: string; totalSec: number; observedSec: number; candidates: { name: string; sec: number }[]; decision: LabelDecision;
 }
-export interface TileAlignResult { labels: LabelResult[]; errors: TileError[] }
+export interface TileMeeting {
+  status: "ok" | "timeline-misaligned"; conflictInstants: number; shiftsEvaluated: number;
+  diagnostics: { inRangeBestLagSec: number; inRangeAgreementSec: number; outOfRangeBestLagSec: number; outOfRangeAgreementSec: number; gainSec: number; marginSec: number } | null;
+}
+export interface TileAlignResult { labels: LabelResult[]; errors: TileError[]; meeting: TileMeeting }
 
 type Rec = Record<string, unknown>;
 const cmp = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
-export const normalizeDisplayName = (s: string): string => s.normalize("NFC").replace(/\s+/gu, " ").trim();
-
-/** Small documented set (NOT a full list; extend through `isNonPersonName`, which can only add refusals). */
-const NON_PERSON_WORDS = /(?:^|[^\p{L}\p{N}])(?:iphone|ipad|android|galaxy|pixel|macbook|laptop|room|guest|host|co-host|presenter|panelist|attendee|participant|notetaker|recorder|bot|dial-in|phone|unknown|speaker|moderator|admin|zoom|webex)(?![\p{L}\p{N}])/iu;
-const UNSAFE_CHARS = /[\p{Cc}\u{200B}\u{200E}\u{200F}\u{061C}\u{202A}-\u{202E}\u{2066}-\u{2069}\u{FEFF}\u{2028}\u{2029}]/u;
-export const MAX_NAME_LENGTH = 100;
-
-function nonPerson(name: string, extra?: (n: string) => boolean): boolean {
-  if (name.length > MAX_NAME_LENGTH || UNSAFE_CHARS.test(name) || !/\p{L}/u.test(name) || NON_PERSON_WORDS.test(name)) return true;
-  if (extra) { try { return extra(name) !== false; } catch { return true; } }
-  return false;
-}
 
 function pickNum(o: Rec, key: keyof typeof TILE_DEFAULTS, errors: TileError[]): number {
   const v = o[key];
   if (v === undefined) return TILE_DEFAULTS[key];
-  const frac = key !== "minNameSeconds" && key !== "maxHoldSec";
-  if (typeof v === "number" && Number.isFinite(v) && v >= 0 && (!frac || v <= 1)) return v;
+  const max = key === "maxLagSec" ? 30 : key === "minNameSeconds" || key === "maxHoldSec" ? Infinity : 1;
+  if (typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= max) return v;
   errors.push({ kind: "options", index: -1, code: "invalid-option" });
   return TILE_DEFAULTS[key];
 }
 const badTime = (v: unknown): boolean => typeof v !== "number" || !Number.isFinite(v) || v < 0;
-
-interface Hold { from: number; to: number; name: string }
-interface Eff { s: number; e: number; id: string }
-interface Acc { sec: number; turns: Set<string>; from: number; to: number }
+const agreement = (m: Map<string, LabelScan>): number => { let a = 0; for (const l of m.values()) a += l.cands.length ? l.cands[0]!.sec : 0; return a; };
 
 export function alignTileNamesToTurns(logIn: unknown, turnsIn: unknown, optionsIn?: TileAlignOptions): TileAlignResult {
   const errors: TileError[] = [];
@@ -101,17 +116,19 @@ export function alignTileNamesToTurns(logIn: unknown, turnsIn: unknown, optionsI
   const minSec = pickNum(o, "minNameSeconds", errors), minFrac = pickNum(o, "minNameFraction", errors);
   const maxRun = pickNum(o, "maxRunnerUpFraction", errors), minCov = pickNum(o, "minCoverageFraction", errors);
   const maxHold = pickNum(o, "maxHoldSec", errors), minConf = pickNum(o, "minConfidence", errors);
+  const maxLag = pickNum(o, "maxLagSec", errors), margin = pickNum(o, "misalignMarginFraction", errors);
   const extra = typeof o.isNonPersonName === "function" ? (o.isNonPersonName as (n: string) => boolean) : undefined;
-  let bot = "";
+  let botKey = "";
   if (o.botDisplayName !== undefined) {
-    if (typeof o.botDisplayName === "string") bot = normalizeDisplayName(o.botDisplayName).toLowerCase();
+    if (typeof o.botDisplayName === "string") botKey = foldKey(o.botDisplayName);
     else errors.push({ kind: "options", index: -1, code: "invalid-option" });
   }
+  const gates: Gates = { minSec, minFrac, maxRun, minCov, botKey, ...(extra ? { extra } : {}) };
   const counter = o.counter && typeof o.counter === "object" ? (o.counter as { ops: number }) : undefined;
   const tick = (): void => { if (counter) counter.ops++; };
 
-  // ---- observations -> holds (disjoint, time-ordered) ----
-  const obs: { t: number; name: string | null }[] = [];
+  // ---- observations -> (ambiguous instants collapsed) -> holds (disjoint, time-ordered) ----
+  const raw0: { t: number; name: string | null }[] = [];
   if (Array.isArray(logIn)) {
     logIn.forEach((raw: unknown, index) => {
       if (typeof raw !== "object" || raw === null) { errors.push({ kind: "observation", index, code: "invalid-input" }); return; }
@@ -123,10 +140,19 @@ export function alignTileNamesToTurns(logIn: unknown, turnsIn: unknown, optionsI
       if (code) { errors.push({ kind: "observation", index, code }); return; }
       const name = r.displayName === null ? "" : normalizeDisplayName(r.displayName as string);
       const weak = r.confidence !== undefined && (r.confidence as number) < minConf;
-      obs.push({ t: r.tSec as number, name: name === "" || weak ? null : name });
+      raw0.push({ t: r.tSec as number, name: name === "" || weak ? null : name });
     });
   } else if (logIn !== undefined) errors.push({ kind: "observation", index: -1, code: "invalid-input" });
-  obs.sort((a, b) => a.t - b.t || cmp(a.name ?? "", b.name ?? ""));
+  raw0.sort((a, b) => a.t - b.t || cmp(a.name ?? "", b.name ?? ""));
+  const obs: { t: number; name: string | null }[] = [];
+  let conflictInstants = 0;
+  for (let i = 0; i < raw0.length;) {
+    let j = i;
+    const names = new Set<string | null>();
+    while (j < raw0.length && raw0[j]!.t - raw0[i]!.t <= CONFLICT_EPS_SEC) names.add(raw0[j++]!.name);
+    if (names.size > 1) { conflictInstants++; obs.push({ t: raw0[i]!.t, name: null }); } else obs.push({ t: raw0[i]!.t, name: [...names][0]! });
+    i = j;
+  }
   const holds: Hold[] = [];
   obs.forEach((ob, i) => {
     if (ob.name === null) return;
@@ -166,65 +192,68 @@ export function alignTileNamesToTurns(logIn: unknown, turnsIn: unknown, optionsI
     if (e > s) list.push({ s, e, id: t.id as string });
   }
 
-  // ---- per label: seconds per (name) via binary search + covered-hold walk ----
-  const firstEndingAfter = (x: number): number => {
-    let lo = 0, hi = holds.length;
-    while (lo < hi) { tick(); const mid = (lo + hi) >> 1; if (holds[mid]!.to <= x) lo = mid + 1; else hi = mid; }
-    return lo;
+  // ---- shifts: stable range [0, maxLag] step 0.5 (per-label verdicts), then outer diagnostic lags ----
+  const inner: number[] = [];
+  for (let k = 0; k * LAG_STEP_SEC <= maxLag + 1e-9; k++) inner.push(k * LAG_STEP_SEC);
+  if (inner[inner.length - 1]! < maxLag - 1e-9) inner.push(maxLag);
+  const verdicts: Map<string, Verdict>[] = [];
+  let scan0 = new Map<string, LabelScan>();
+  let inBest = { lag: 0, a: -Infinity };
+  for (const lag of inner) {
+    const sc = scanShift(holds, byLabel, lag, tick);
+    if (lag === 0) scan0 = sc;
+    const a = agreement(sc);
+    if (a > inBest.a + 1e-9) inBest = { lag, a };
+    verdicts.push(new Map([...sc.entries()].map(([l, s]) => [l, decide(s, gates)] as const)));
+  }
+  let outBest = { lag: 0, a: -Infinity };
+  let shifts = inner.length;
+  if (holds.length > 0 && byLabel.size > 0) {
+    const outer: number[] = [];
+    for (let k = 1; k <= DIAG_NEG_SEC; k++) outer.push(-k);
+    for (let k = 1; k <= DIAG_POS_SEC; k++) outer.push(maxLag + k);
+    for (const lag of outer) {
+      const a = agreement(scanShift(holds, byLabel, lag, tick));
+      if (a > outBest.a + 1e-9) outBest = { lag, a };
+    }
+    shifts += outer.length;
+  } else outBest = { lag: inBest.lag, a: inBest.a };
+  let totalAll = 0;
+  for (const l of scan0.values()) totalAll += l.total;
+  const marginSec = margin * totalAll, gainSec = outBest.a - inBest.a;
+  const misaligned = gainSec > marginSec + 1e-9;
+  const meeting: TileMeeting = {
+    status: misaligned ? "timeline-misaligned" : "ok", conflictInstants, shiftsEvaluated: shifts,
+    diagnostics: scan0.size === 0 ? null : { inRangeBestLagSec: inBest.lag, inRangeAgreementSec: inBest.a, outOfRangeBestLagSec: outBest.lag, outOfRangeAgreementSec: outBest.a, gainSec, marginSec },
   };
-  const pre = new Map<string, { res: LabelResult; name: string | null }>();
-  for (const label of [...byLabel.keys()].sort(cmp)) {
-    const effs = byLabel.get(label)!;
-    const acc = new Map<string, Acc>();
-    let total = 0;
-    for (const { s, e, id } of effs) {
-      total += e - s;
-      for (let j = firstEndingAfter(s); j < holds.length && holds[j]!.from < e; j++) {
-        tick();
-        const h = holds[j]!, from = Math.max(s, h.from), to = Math.min(e, h.to);
-        if (to <= from) continue;
-        let a = acc.get(h.name);
-        if (!a) acc.set(h.name, (a = { sec: 0, turns: new Set(), from, to }));
-        a.sec += to - from; a.turns.add(id); a.from = Math.min(a.from, from); a.to = Math.max(a.to, to);
-      }
-    }
-    const cands = [...acc.entries()].map(([name, a]) => ({ name, sec: a.sec })).sort((x, y) => y.sec - x.sec || cmp(x.name, y.name));
-    const observed = cands.reduce((n, c) => n + c.sec, 0);
-    const top = cands[0], second = cands[1];
-    const refuse = (reason: RefusalReason): { res: LabelResult; name: null } =>
-      ({ res: { speakerRef: label, totalSec: total, observedSec: observed, candidates: cands, decision: { status: "refused", reason } }, name: null });
-    const eps = 1e-9;
-    let outcome: { res: LabelResult; name: string | null };
-    if (!top || observed <= 0) outcome = refuse("no-observations");
-    else if (observed + eps < minCov * total) outcome = refuse("insufficient-coverage");
-    else if (bot !== "" && top.name.toLowerCase() === bot) outcome = refuse("bot-own-name");
-    else if (nonPerson(top.name, extra)) outcome = refuse("non-person-name");
-    else if (top.sec + eps < minSec) outcome = refuse("insufficient-duration");
-    else if (second && second.sec > maxRun * observed + eps) outcome = refuse(second.sec + eps >= minSec ? "two-strong-names" : "runner-up-too-strong");
-    else if (top.sec + eps < minFrac * observed) outcome = refuse("insufficient-fraction");
-    else {
-      const a = acc.get(top.name)!;
-      const evidence: TileEvidence = {
-        agreeSec: top.sec, disagreeSec: observed - top.sec, observedSec: observed, totalSec: total,
-        runnerUp: second ? { name: second.name, sec: second.sec } : null,
-        turnIds: [...a.turns], from: a.from, to: a.to,
-      };
-      outcome = {
-        res: { speakerRef: label, totalSec: total, observedSec: observed, candidates: cands,
-          decision: { status: "named", claim: { kind: "display-name-claim", source: "platform-display-name", verified: false, displayName: top.name }, evidence } },
-        name: top.name,
-      };
-    }
-    pre.set(label, outcome);
+
+  // ---- cross-label: a name (foldKey) that wins two labels at ANY stable shift is refused for both ----
+  const dup = new Set<string>();
+  for (const vm of verdicts) {
+    const wins = new Map<string, number>();
+    for (const v of vm.values()) if ("name" in v) { const k = foldKey(v.name); wins.set(k, (wins.get(k) ?? 0) + 1); }
+    for (const [k, n] of wins) if (n > 1) dup.add(k);
   }
 
-  // ---- cross-label: one display name may not win two labels ----
-  const wins = new Map<string, number>();
-  for (const { name } of pre.values()) if (name !== null) wins.set(name, (wins.get(name) ?? 0) + 1);
   const labels: LabelResult[] = [];
-  for (const { res, name } of pre.values()) {
-    if (name !== null && (wins.get(name) ?? 0) > 1) labels.push({ ...res, decision: { status: "refused", reason: "name-on-multiple-labels" } });
-    else labels.push(res);
+  for (const [label, s0] of scan0) {
+    const base = { speakerRef: label, totalSec: s0.total, observedSec: s0.observed, candidates: s0.cands };
+    const refused = (reason: RefusalReason): LabelResult => ({ ...base, decision: { status: "refused", reason } });
+    if (misaligned) { labels.push(refused("timeline-misaligned")); continue; }
+    const vs = verdicts.map((vm) => vm.get(label)!);
+    const first = vs[0]!;
+    const named = vs.filter((v): v is Extract<Verdict, { name: string }> => "name" in v);
+    if (named.length === 0) { labels.push(refused("reason" in first ? first.reason : "no-observations")); continue; }
+    if (named.length < vs.length || named.some((v) => v.name !== named[0]!.name)) { labels.push(refused("lag-unstable")); continue; }
+    const name = named[0]!.name;
+    if (dup.has(foldKey(name))) { labels.push(refused("name-on-multiple-labels")); continue; }
+    const a = s0.acc.get(name)!, second = s0.cands[1];
+    labels.push({ ...base, decision: { status: "named", claim: { kind: "display-name-claim", source: "platform-display-name", verified: false, displayName: name }, evidence: {
+      agreeSec: s0.cands[0]!.sec, disagreeSec: s0.observed - s0.cands[0]!.sec, observedSec: s0.observed, totalSec: s0.total,
+      runnerUp: second ? { name: second.name, sec: second.sec } : null, turnIds: [...a.turns], from: a.from, to: a.to,
+      lagStability: { maxLagSec: maxLag, stepSec: LAG_STEP_SEC, shifts: inner.length, worstWinnerFraction: Math.min(...named.map((v) => v.topFrac)),
+        worstRunnerUpFraction: Math.max(...named.map((v) => v.runFrac)), minAgreeSec: Math.min(...named.map((v) => v.agreeSec)) },
+    } } });
   }
-  return { labels, errors };
+  return { labels, errors, meeting };
 }
