@@ -1,6 +1,6 @@
 # Manifest — t042-speaker-tile-alignment
 
-**Status:** ready-for-check
+**Status:** checked-PASS (Checked: qa/verdicts/t042-speaker-tile-alignment.md, cycle 1, aa167d0; pure alignment on synthetic data, unwired, with wiring preconditions)
 **Fix cycle:** 1
 **Goal task:** T-042 "Speaker naming for webinar turns (Zoho tile names + intros + sync-speakers)", FIRST slice only. Tier 3 (roadmap) pull. Roadmap row (docs/meeting-bot-roadmap.md:69): "map `spk:N` to panelist names (Zoho tile names + self-introductions + existing `sync-speakers`)"; exit criterion "today's 4 panelists named correctly". NOT claimed: T-042 stays open.
 **Round cap / classification:** the deterministic speaker-RULES seam in `packages/index` (self-introduction rules) has 14 speaker-related verdicts in `qa/verdicts` (`u2-4-*` and siblings), well past the cap of 2 PASSes for non-security polish. This unit is a DIFFERENT mechanism: aligning the meeting platform's displayed participant names to diarized turns by time, in a NEW pure module in `packages/core/src/domain`. It is a new feature slice of a roadmap task, not a finding-driven round on the rules seam, and it touches NO `packages/index/speaker-*` file. It is attribution-relevant (a wrong name is a fabricated attribution about a real person), so it gets full ceremony. If the checker reads the cap as seam-wide, raise a HUMAN_GATE.
