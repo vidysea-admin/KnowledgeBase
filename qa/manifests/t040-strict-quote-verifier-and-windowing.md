@@ -1,6 +1,6 @@
 # Manifest — t040-strict-quote-verifier-and-windowing
 
-**Lane:** T040QUOTE (branch lane/t040quote, base c08a431). **Status:** ready-for-check. **Fix cycle:** 2
+**Lane:** T040QUOTE (branch lane/t040quote, base c08a431). **Status:** checked-PASS (Checked: qa/verdicts/t040-strict-quote-verifier-and-windowing.md, cycle 2, eb45cc9). **Fix cycle:** 2
 **Backlog tier:** 3 (roadmap slice of T-040; T-040 stays `open`/`in_progress`, TASKS.md and goal.json NOT edited).
 **Severity gate:** no auth, no tenancy, no data write, no stored schema, no model call, no DB. Pure functions only, not called by any stage. Issue ids for this lane would be `ISS-T040QUOTE-NNN` in `qa/issues.t040quote.jsonl` (none filed).
 **Round cap:** 0 prior PASSes name this seam.
