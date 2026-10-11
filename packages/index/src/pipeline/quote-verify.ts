@@ -9,7 +9,8 @@
  *  1. Exact substring match on normalised text. No case folding, no stemming, no fuzzy matching.
  *  2. The ONLY normalisation (applied identically to source and quote, loss-free for meaning):
  *     a. Unicode NFC, per grapheme cluster (canonically equivalent encodings compare equal).
- *     b. Every run of whitespace (/\s/u) becomes ONE space. A run never disappears, so word
+ *     b. Every run of whitespace (the explicit set in quote-token-rule.ts; NOT JS \s, which would
+ *        also swallow U+FEFF) becomes ONE space. A run never disappears, so word
  *        boundaries and word order are preserved; leading/trailing whitespace of a quote or turn
  *        is trimmed.
  *     c. Curly single quotes (U+2018 U+2019 U+201A U+201B) become ' and curly double quotes
@@ -17,30 +18,33 @@
  *     d. Dash variants (U+2010..U+2015, U+2212) become "-" (typography only).
  *     Nothing touches letters or digits and nothing deletes a non-space character, so two strings
  *     with a different letter, digit, word order or word count never become equal.
- *     NOT normalised on purpose: case, NFKC compatibility forms, zero-width characters, accents.
+ *     NOT normalised on purpose: case, NFKC compatibility forms, accents, and format (Cf) characters
+ *     (zero-width, U+FEFF, bidi, soft hyphen: kept as characters, never stripped, never whitespace).
  *  3. A quote is searched per turn. A quote that only matches across a turn boundary is REFUSED
  *     ("spans-turn-boundary"); a match never crosses speakers.
  *  4. A quote containing an ellipsis ("..." or U+2026) is verified only if that exact ellipsis
  *     occurs in the source; otherwise it is REFUSED ("ellipsis-stitched"); passages are never stitched.
  *  5. Minimum length: 12 code points AND 2 tokens after normalisation, so a one-word "quote"
  *     cannot pass. Maximum 2000 UTF-16 units.
- *  6. A match must start and end on a grapheme-cluster boundary and on a TOKEN boundary: it may not
- *     begin or end inside a word, number, e-mail, URL, handle or hyphenated/apostrophe word, so
- *     "reven" is not a quote of "revenue" and "the price is 3" is not a quote of "the price is 3.5"
- *     (clauses C1-C4 in quote-token-rule.ts; refuses when in doubt).
+ *  6. A match must start and end on a grapheme-cluster boundary and on an ALLOW-LISTED boundary: it
+ *     may start only at a turn start or after whitespace (plus opening quote/bracket) and end only at
+ *     a turn end or before whitespace (plus closing sentence punctuation/quote/bracket). Every other
+ *     character, named or not, is inside a token: "reven" is not a quote of "revenue", "has 10" is not
+ *     a quote of "has 10+ years", "is 3" is not a quote of "is 3.5" (quote-token-rule.ts; fail closed).
  *  7. A quote occurring in several places reports the locations BY THE CLAIMED SPEAKER (all of them
  *     when no speaker is claimed), in source order, up to MAX_LOCATIONS, then `truncated: true`.
  *     The speaker filter runs BEFORE the cap, so a hit by the claimed speaker is never hidden.
  *  8. WRAPPERS: if the quote as given does not verify and it is wrapped in ONE matching pair of
  *     quotation marks (" or ', curly forms included) with no further mark of that kind inside, the
- *     inside is verified instead (length rules apply to the inside) and the verdict says
+ *     inside is verified instead (length rules apply to the inside; curly and straight forms of one mark
+ *     are the same mark by rule 2c, so a curly-open/straight-close pair is accepted) and the verdict says
  *     `unwrapped: true`. Nothing else is stripped: no full stop, no ellipsis, no inner whitespace
  *     change beyond the normal trim. A quote verbatim WITH its marks in the source verifies as given.
  *
  * COMPLEXITY: building the index is O(n) in source length, each quote is one KMP pass
  * O(n + m); there is no backtracking, so no quadratic or exponential input exists.
  */
-import { cutInsideToken } from "./quote-token-rule.js";
+import { isWhitespace, quoteMayEnd, quoteMayStart } from "./quote-token-rule.js";
 
 export interface QuoteSourceTurn { id: string; text: string; speakerRef?: string }
 export type ClaimedQuote = string | { text: string; speakerRef?: string };
@@ -60,7 +64,6 @@ export const MAX_LOCATIONS = 20;
 const CURLY_SINGLE = /[‘’‚‛]/g;
 const CURLY_DOUBLE = /[“”„‟]/g;
 const DASHES = /[‐-―−]/g;
-const WS = /^\s+$/u;
 const NON_ASCII = /[^\x00-\x7f]/;
 const LONE_SURROGATE = /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/;
 const ELLIPSIS = /\.{3}|…/;
@@ -92,7 +95,7 @@ function normaliseWithMap(text: string): { str: string; pieces: Piece[] } {
   let lastWs = false;
   for (const g of graphemes(text)) {
     const oEnd = o + g.length;
-    if (WS.test(g)) {
+    if (isWhitespace(g)) {
       if (lastWs) { pieces[pieces.length - 1]!.oEnd = oEnd; }
       else { pieces.push({ nStart: n, nEnd: n + 1, oStart: o, oEnd }); parts.push(" "); n += 1; lastWs = true; }
     } else {
@@ -133,7 +136,7 @@ function buildIndex(turns: QuoteSourceTurn[]): Index {
 function normaliseQuote(q: string): { str: string } | QuoteRefusal {
   if (q.length > MAX_QUOTE_LENGTH) return "too-long";
   if (LONE_SURROGATE.test(q)) return "invalid-characters";
-  for (const ch of q) if (/\p{Cc}/u.test(ch) && !/\s/.test(ch)) return "invalid-characters";
+  for (const ch of q) if (/\p{Cc}/u.test(ch) && !isWhitespace(ch)) return "invalid-characters";
   const { str } = normaliseWithMap(q);
   if (str === "") return "empty";
   return { str };
@@ -145,7 +148,7 @@ function unwrap(str: string): string | undefined {
   const o = str.charAt(0);
   if (str.length < 3 || (o !== '"' && o !== "'") || str.charAt(str.length - 1) !== o) return undefined;
   const inner = str.slice(1, -1);
-  return inner.includes(o) ? undefined : inner.trim();
+  return inner.includes(o) ? undefined : inner.replace(/^ +| +$/g, "");
 }
 
 /** KMP: all (possibly overlapping) start offsets of `pat` in `text`, up to `cap`. O(n + m). */
@@ -192,7 +195,7 @@ function locate(ix: Index, a: number, b: number): "ok" | "cross" | "partial" | {
   const firstP = pieceContaining(ix, r, a);
   const lastP = pieceContaining(ix, r, b - 1);
   if (firstP < 0 || lastP < 0 || ix.pieces[firstP]!.nStart !== a || ix.pieces[lastP]!.nEnd !== b) return "partial";
-  if (cutInsideToken(ix.g, a) || cutInsideToken(ix.g, b)) return "partial";
+  if (!quoteMayStart(ix.g, a) || !quoteMayEnd(ix.g, b)) return "partial";
   const t = ix.turns[r.turnIndex]!;
   const loc: QuoteLocation = { turnId: String(t.id), turnIndex: r.turnIndex, start: ix.pieces[firstP]!.oStart, end: ix.pieces[lastP]!.oEnd };
   if (t.speakerRef !== undefined) loc.speakerRef = t.speakerRef;
@@ -233,7 +236,7 @@ function verifyOne(ix: Index, claimed: ClaimedQuote): QuoteVerdict {
   if (inner === undefined) return whole;
   const stripped = attempt(ix, inner, speaker, text);
   if (stripped.ok) return { ...stripped, unwrapped: true };
-  return stripped.reason === "too-short" ? stripped : whole;
+  return stripped.reason === "too-short" || stripped.reason === "wrong-speaker" ? stripped : whole;
 }
 
 /** Total: never throws; one verdict per input quote, in order. */
