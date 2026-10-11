@@ -1,0 +1,30 @@
+# Verdict: t046-meeting-bot-page-sections
+
+VERDICT: PASS
+Cycle checked: 0
+Commit checked: d6b440d (code 2bf6853, from f73eca0), lane/t046page
+Scope: SOURCE SCOPE ONLY per D-024; real API payloads not exercised. No browser, dev server or build. The D-024 live-browser check is still owed. T-046 stays open.
+
+## EXPLANATION
+
+Re-derived, not trusted from the manifest.
+
+1. Wording: every string in the five new components, MeetingBotPage and the model was read, plus attributes (only aria-label on the session link, aria-labelledby, role, class, href). Nothing says or implies the bot will join/record a listed meeting, that a meeting is scheduled for recording, that join rules/opt-outs are applied, or that a recording is safe/complete. The upcoming note says "Appearing here is not a decision to record...". Reason labels are neutral ("opt-out recorded", "join rule recorded", "join rules not evaluated"). Status and reason go through known-vocabulary maps; hostile values (`<script>`, `<img src=x>`) render "unrecognised status" / "unrecognised reason", never raw. Pipeline status likewise ("unknown"). Mutations M2, M8, M11 killed.
+2. "Live now": derived from status in {recording, processing} only. There is NO staleness bound: a row with status `recording` and updatedAt 24 h old renders under "Live now" with the note "Operations currently recording or processing". Only the small "Last update:" line shows its age. Rated MEDIUM (ISS-T046PAGE-001). Not FAIL-level: the data really is the runner's reported state, no join/record promise or enforcement claim is made, and the age is shown on the row. Recommended follow-up, not a merge blocker.
+3. Platform label: `new URL` via safeHttpUrl, then exact host or `.`-suffix match. 30 hosts tested: `zoom.us.evil.example`, `evilzoom.us`, `zoom.us@evil.example`, `evil.example/zoom.us`, `?u=https://zoom.us`, `meet.google.com.evil.io`, `teams-microsoft.com`, `webex.com.evil.io`, trailing-dot `zoom.us.`, Cyrillic-o and punycode look-alikes all give "other"; `javascript:`, `//zoom.us`, `zoom.us/j`, `ftp:`, `https://` give "unknown"; genuine hosts (and `ZOOM.US`, userinfo `user:pw@zoom.us`, `us02web.zoom.us`) give the right name. `zoom.us\@evil.example` parses to host zoom.us (WHATWG backslash rule), which is its true destination. No false-positive label.
+4. URL leak: a meeting with `https://zoom.us/j/12345?pwd=SECRETPWD#frag` and as the id: neither the pwd, the meeting number, the path nor the link appear in text, any attribute, or console.log/error/warn. Keys are array indexes. No data- attributes.
+5. Hostile payloads (all three endpoints): script/img tags render as inert escaped text; bidi overrides replaced; 5,000-char titles cut to 160 + ellipsis; null/wrong-type/array items skipped or placeholdered; `__proto__`, `constructor`, `../x`, `a/b`, `a%2Fb`, `a?b`, `a#b`, `..`, empty, spaces, 200-char ids get no link ("No session page available") and the resulting hrefs were only `/sessions/<[A-Za-z0-9._:%-]+>`; no query or fragment can be added. 10,000 sessions and 10,000 operations: cap applied by slice before render (`<120` cards). Note `javascript:1` passes the id shape and becomes the internal route `/sessions/javascript%3A1` (percent-encoded, inert, same-origin route): low.
+6. Independence and requests: 3 requests per load (each endpoint once). Under StrictMode dev double-mount each fires twice (6) because the effect re-runs; production builds do not. Low, dev-only; the maker test does not assert StrictMode. 403 names the section's own scope (calendar vs sessions; M10 killed). Malformed JSON on /sessions leaves the others rendered with a per-section Retry; double click gave one extra fetch. A 401 on all three dispatches the shared invalidation event 3 times (handler is keyed on the failing key and idempotent): low. A failed poll keeps stale rows with a "may be stale" note.
+7. Tenant scope (from handlers, read only): /sessions, /webinar-operations and /calendar/upcoming pass `req.auth.tenantId`; webinar-operations returns empty on tenant mismatch and rejects rows of another tenant; scopes are `sessions`, `sessions`, `calendar`. No API finding.
+8. Sizes/dates: missing size is "unknown" (M12 killed), invalid date "time unknown", dates via toLocaleString like the page's neighbours; no duration. The ready-operation link uses the operation id as session id; that link existed before this unit (unchanged behaviour) and is validated.
+9. Existing tests: diff of MeetingBotPage.test.tsx adds only the `beforeEach` stubbing two empty calls plus imports; no assertion removed or weakened. The h1 changed from "Webinar operations" to "Meeting bot" (also kept as an h2); nothing else in apps/web references the old heading (nav label is "Meeting Bot").
+10. Manifest's "could not show" list is consistent with the API: /sessions list items carry no bytes, duration, retention; /calendar/upcoming no decision field.
+11. Scope: only apps/web and manifest changed; client.ts, Calendar page, join-rules untouched; no dependency change. `lint-dirsize` OK. `git merge-tree` against codex/machine-migration-2026-10-09: clean (tree cbc1c8d5), no conflicts with the global search bar.
+
+Evidence: vitest on MeetingBotPage.test.tsx, meeting-bot/, App.routes.test.tsx: 4 files, 35 passed. `tsc --noEmit` apps/web: exit 0. Mutations: 12 own mutations (any status live; raw status; raw reason; platform includes("zoom"); suffix without dot; link in title attr; id unencoded + loose regex; one failing section blanks the upcoming section; row cap removed; will-be-recorded aria-label; wrong scope; missing size 0 B), each with a per-mutation byte backup, restore in `finally`, 150 s hard timeout and git-hash check: 12 killed, 0 survived. Harness and my extra test file were untracked and deleted.
+
+ISSUES-WRITTEN: ISS-T046PAGE-001 (medium: Live now has no staleness bound)
+
+## Merge conditions
+- Source-scope PASS only; live-browser (D-024) check still owed; T-046 stays open.
+- ISS-T046PAGE-001 should be addressed in the next unit touching OperationsSections (not blocking).
