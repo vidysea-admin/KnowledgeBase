@@ -7,10 +7,10 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, rmSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
-import { basename, join } from "node:path";
+import { basename, dirname, join, relative } from "node:path";
 import { ledgerFiles, readLedgerRows, auditIssueRefs, G4_FROZEN, ROOT } from "./tracker-audit.mjs";
 
 // D-019 said "every reader treats the union of qa/issues.jsonl and qa/issues.*.jsonl as the
@@ -306,13 +306,31 @@ test("ledger reader preserves parsed non-string IDs and refuses file read errors
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
+/**
+ * Copy `entryRel` (repo-relative) into `dest` together with every file it reaches through RELATIVE
+ * imports, transitively, at the same relative paths. Derived from the script's real imports so a
+ * newly added import cannot silently stale a hand-kept file list (the failure this replaces:
+ * tracker-audit gained ./qa/unmerged-worktrees.mjs and the fixture copied only two files).
+ */
+function copyWithRelativeImports(entryRel, dest, seen = new Set()) {
+  if (seen.has(entryRel)) return seen;
+  seen.add(entryRel);
+  mkdirSync(dirname(join(dest, entryRel)), { recursive: true });
+  copyFileSync(join(ROOT, entryRel), join(dest, entryRel));
+  const src = readFileSync(join(ROOT, entryRel), "utf8");
+  for (const m of src.matchAll(/(?:from\s+|import\s*\(?\s*)["'](\.{1,2}\/[^"']+)["']/g)) {
+    const target = relative(ROOT, join(ROOT, dirname(entryRel), m[1])).split("\\").join("/");
+    copyWithRelativeImports(target, dest, seen);
+  }
+  return seen;
+}
+
 test("selected CLI gate cannot hide duplicate ledger IDs", () => {
   const root = ledgerRoot({ "issues.jsonl": [{ id: "ISS-DUP-CLI" }], "issues.a.jsonl": [{ id: "ISS-DUP-CLI" }] });
   try {
-    mkdirSync(join(root, "scripts", "lib"), { recursive: true });
     mkdirSync(join(root, ".goal"));
-    copyFileSync(join(ROOT, "scripts", "tracker-audit.mjs"), join(root, "scripts", "tracker-audit.mjs"));
-    copyFileSync(join(ROOT, "scripts", "lib", "tracker-audit.mjs"), join(root, "scripts", "lib", "tracker-audit.mjs"));
+    const copied = copyWithRelativeImports("scripts/tracker-audit.mjs", root);
+    assert.ok(copied.has("scripts/lib/tracker-audit.mjs"), "import closure must include the audit library");
     writeFileSync(join(root, ".goal", "goal.json"), JSON.stringify({ tasks: [{ id: "T-001", status: "done" }], progress: { total: 1, done: 1, percent: 100 } }));
     writeFileSync(join(root, "TASKS.md"), "| T-001 | done | fixture |\n");
     const run = () => spawnSync(process.execPath, [join(root, "scripts", "tracker-audit.mjs"), "--gate", "g1"], { encoding: "utf8", timeout: 10000 });
