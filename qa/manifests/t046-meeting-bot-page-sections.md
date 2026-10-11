@@ -1,6 +1,6 @@
 # t046-meeting-bot-page-sections
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t046-meeting-bot-page-sections.md, cycle 0, 4eb15b7; SOURCE SCOPE ONLY per D-024)
 Fix cycle: 0
 Priority tier: 3 (roadmap): T-046 "real /meeting-bot web page (upcoming · live status · past recordings · transcript links)", docs/meeting-bot-roadmap.md row T-046. T-046 STAYS OPEN.
 Security class: read-only UI over existing GET endpoints; no auth, tenancy or data-write change. Hostile-data rendering is nevertheless tested.
