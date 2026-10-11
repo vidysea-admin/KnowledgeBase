@@ -1,5 +1,5 @@
 # Manifest — t041-slide-turn-alignment
-**Status:** ready-for-check
+**Status:** checked-PASS (Checked: qa/verdicts/t041-slide-turn-alignment.md, cycle 0, 3ec3dbd)
 **Fix cycle:** 0
 **Tier:** 3 (roadmap task). First slice of T-041. T-041 stays OPEN.
 **Goal task:** T-041 "Slide keyframes -> OCR -> attached to turns by time" (done when: "slide text is searchable next to the speech", docs/meeting-bot-roadmap.md)
