@@ -60,5 +60,5 @@ Queue `maxPending` 1000 (drop NEWEST, counted, one `queue_full` code, same as fi
 All 14 killed, all files restored to HEAD hash:
 1 forbidden field forwarded: hostile-substring test. 2 message instead of code: credentials test. 3 key in URL: Basic-auth/URL test. 4 remote http accepted: validateBaseUrl table + construction + env tests. 5 redirect followed: Basic-auth test + redirect test. 5b 3xx not a failure: redirect test. 6 4xx retried: 4xx test. 7 queue cap removed: 100,000-emit test. 8 emit throws after a fetch failure (guard removed): "record() after earlier delivery failures". 9 sink selected without the setting: default-selection test. 10 retries +5: 5xx retry-count test. 11 tenantId unvalidated: hostile test. 12 flush unbounded: hanging-fetch test. 13 close leaves timers: backoff-sleep close test (first run survived; test added in the same unit, then killed). Mutation 5 initially "survived" because the pattern matched a doc comment; corrected pattern killed.
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t049-langfuse-trace-sink.md, cycle 0, 0fd0b4d; safety verified against a fake; wire format UNVERIFIED; off by default)
 Fix cycle: 0
