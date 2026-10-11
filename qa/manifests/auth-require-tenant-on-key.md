@@ -111,5 +111,6 @@ The source-text pin `tree-index-root-filter-single-source.test.ts` is kept as a 
 
 **Merge conditions (main tree).** (1) Before the db change is what `@lkb/db` resolves to, the hostile test shows `skipped 15`; after merge `cd apps/api && node --test --import tsx src/ask/ask-tenant-hostile.test.ts` must show `tests 70 / fail 0 / skipped 0` (the simulation above reproduces exactly that state). (2) The whole apps/api suite (only the environmental activity-health Python failure acceptable). (3) packages/db tests.
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/auth-require-tenant-on-key.md (cycle 2, 0c699b1)
 Fix cycle: 2
