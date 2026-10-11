@@ -54,3 +54,37 @@ ISSUES-WRITTEN: ISS-T037OPT-004 (medium, production adapter drops hints), ISS-T0
 2. Do not wire schedule-tick or the editor page until W7 (a)-(d) hold.
 3. Add the ISS-T037OPT-005 pin tests (prefix, tag separation) before or with the wiring unit.
 4. Keep ISS-T037W1-001 open; the manifest close-out must not claim the issue fixed.
+
+---
+
+# Cycle 1
+
+VERDICT: PASS (same stated scope: library, store, API and now the host adapter; NOT end to end for ISS-T037W1-001, see W7 (b) and (d))
+Cycle checked: 1
+Commit checked: 18e58f3 (lane/t037opt, from 1414d79)
+Checker: independent, node 24, targeted tests only, each under a timeout; mutations by byte backup per mutation, restore in a trap, `git hash-object` equal to `git rev-parse HEAD:<file>` after each.
+
+## Findings against the cycle-0 merge conditions
+1. Fold (condition 1): the 10 tests of the deleted join-rules-optout-meeting.test.ts are in join-rules-optout-identity.test.ts. The body from `const RS` to the last test diffs identical to the old file apart from one added blank line; the only removed lines are the four helper declarations (`ZOOM`, `sel`, `it`, `ids`) which the host file already declares character for character. The 10 pre-existing tests are unchanged except one comment (a pointer to the deleted file). 22 tests run, 22 pass; 381 non-blank lines. Calendar directory: 25 files on the lane, 30 after a trial merge with main; `lint-dirsize: OK (112 dir(s))` on both.
+2. Pins (condition 3): M2 applied as `startsWith`, `includes` and reverse-prefix (`w.startsWith(e)`): each fails exactly the M2 pin. M6 applied as tag-stripped (`e.slice(4)===w.slice(4)`) and tag-swapped: each fails exactly the M6 pin. All five restores verified by hash. The pins assert behaviour (a longer, shorter and embedded id; each tag against the other namespace) with controls, not one spelling.
+3. Adapter (condition W7 a): the change is one line, `recordOptOut: (t, id, meeting) => recordTenantOptOut(stateDir, t, id, {}, meeting)`. Validation is unchanged and downstream: the router allowlists body keys (`bodyOf` rejects unknown fields, so nothing else reaches the adapter), bounds the two strings, and the store normalises through `addMeetingEntries`/`urlEntry`/`keyEntry` (degenerate hints are dropped, id still stored, 200). The tenant is `req.auth!.tenantId`; the adapter never sees the body. A request without hints calls `recordTenantOptOut(stateDir, t, id, {}, undefined)`, which is the same call as before (`opts` defaulted to `{}`, `meeting` undefined), so the stored document is the same. With the adapter line reverted the new test fails (1/5), restored by hash.
+4. Merge-readiness: files changed on both sides since 1414d79 are only apps/api/src/join-rules/deps.ts and router.ts. `git merge` auto-merges both with no conflict: main changed the header comment, the `JoinRulesStoreCode` import/type, `storeFailure(res, e)` and the status table; this lane changed the route comment, the opt-outs handler and nothing in those hunks. After the trial merge: apps/api tsc clean, router.test 14/14, identity test 22/22.
+
+## D-015 by my own run
+- ISS-T037OPT-004: 5/5 hinted opt-out checks (URL hint stored as `url:zoom:123456789`, sibling alone vetoed `opted-out`, sessionKey hint stored, other tenant untouched); 1/5 with the adapter reverted.
+- ISS-T037OPT-005: 2/2 named mutants killed, 5/5 spellings.
+- ISS-T037W1-001: 5/5 hinted; 0/1 id-only (verbatim recorded state still lets g1 through; open by design).
+- Ledger marks: ISS-T037OPT-004 and -005 verified. ISS-T037W1-001 stays open. W7 updated: (a) and (c) MET by 18e58f3; (b) the production client sends the hints and (d) un-opt or written acceptance remain.
+
+## Regression
+meeting-bot join-rules*, auto-join, schedule-tick, schedule-state: 182/182. apps/api join-rules tests: 48/48. scripts/webinar join-rules-host: 10/10. `tsc --noEmit` clean in packages/meeting-bot and apps/api. `lint-dirsize` OK. `lint-loc` reports two violations (packages/index speakers-llm.ts 313, packages/meeting-bot/py/sb_join.py 1142), neither touched by this lane.
+
+## EXPLANATION
+The cycle meets the conditions it claimed. The fold loses nothing, the pins are behavioural, and the adapter change is minimal and leaves validation, tenant source and the no-hint path as they were. Production still stores an identity only if a client sends the hints (W7 (b)); until then the id-only gap in ISS-T037W1-001 remains. Not a defect of this cycle.
+
+ISSUES-WRITTEN: none (ISS-T037OPT-004 and -005 marked verified; ISS-T037OPT-001, -002, -003 remain open)
+
+## Merge conditions remaining
+1. Merge into codex/machine-migration-2026-10-09 (clean auto-merge expected). Re-run on the main tree after merge: `node scripts/lint-dirsize.mjs` (calendar directory will be exactly 30, so the other lane moving alert files out must not add any back), apps/api `tsc --noEmit` and join-rules tests, packages/meeting-bot identity test (22), scripts/webinar join-rules-host test (10).
+2. If another lane adds any file to packages/meeting-bot/src/calendar before this merge, the directory exceeds 30: fold or relocate then.
+3. Do not wire schedule-tick or the editor page until W7 (b) and (d) hold; ISS-T037W1-001 stays open and the manifest close-out must not claim it fixed.
