@@ -1,6 +1,6 @@
 # Manifest — t034-tab-capture-extension-logic-tests
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t034-tab-capture-extension-logic-tests.md, cycle 0, c085e05; logic tests with fakes, no real browser)
 Fix cycle: 0
 
 **Goal task:** T-034 (in-browser tab capture), roadmap tier 3 pull. TEST-ONLY. T-034 stays OPEN.
