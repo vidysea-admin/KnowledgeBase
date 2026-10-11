@@ -1,5 +1,5 @@
 # ai-transport: ephemeral-dir cleanup masks the primary outcome
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/ai-transport-cleanup-masks-timeout.md, cycle 0, 73afea0)
 Fix cycle: 0
 Owner: aitransport lane
 Tier: 3 (non-security reliability defect, medium; roadmap-style fix, light ceremony).
