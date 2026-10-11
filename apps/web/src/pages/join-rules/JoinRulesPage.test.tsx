@@ -21,7 +21,7 @@ const initial = (): Server => ({
 });
 let server: Server;
 /** Per "METHOD path" failures: a status number (ApiError) or consumed once per entry. */
-let failures: Record<string, { status: number; message?: string }[]>;
+let failures: Record<string, { status: number; message?: string; code?: string }[]>;
 const calls = () => api.mock.calls.map(c => ({ path: c[0], method: c[2]?.method ?? "GET", body: c[2]?.body }));
 const writes = () => calls().filter(c => c.method !== "GET");
 
@@ -31,7 +31,7 @@ beforeEach(() => {
   api.mockImplementation((async (path: string, _key: string | null, opts?: { method?: string; body?: unknown }) => {
     const id = `${opts?.method ?? "GET"} ${path}`;
     const fail = failures[id]?.shift();
-    if (fail) throw new ApiError(fail.status, fail.message ?? `HTTP ${fail.status}`);
+    if (fail) throw new ApiError(fail.status, fail.message ?? `HTTP ${fail.status}`, { code: fail.code });
     const body = opts?.body as Record<string, string> | undefined;
     if (id === "PUT /calendar/join-rules") { server.ruleSet = body; return structuredClone(server); }
     if (id === "POST /calendar/join-rules/approvals") { server.state[body!.kind === "sender" ? "approvedSenders" : "approvedDomains"].push(body!.value!); return { state: server.state }; }
@@ -314,7 +314,7 @@ test("503 join_rules_busy (the API's fixed busy message) shows 'busy, try again'
   const busy = "join rules are busy; try again in a few seconds";
   await ready();
   fireEvent.change(screen.getByLabelText("Rule 1 name"), { target: { value: "kept-text" } });
-  failures["PUT /calendar/join-rules"] = [{ status: 503, message: busy }];
+  failures["PUT /calendar/join-rules"] = [{ status: 503, message: busy, code: "join_rules_busy" }];
   fireEvent.click(screen.getByRole("button", { name: "Save rules" }));
   await waitFor(() => expect(screen.getAllByRole("alert").length).toBeGreaterThan(0));
   expect(alerts()).toContain("Join rules are busy");

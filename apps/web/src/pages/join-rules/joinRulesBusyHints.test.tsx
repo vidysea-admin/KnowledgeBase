@@ -1,0 +1,129 @@
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
+import { ApiError, apiFetch } from "../../api/client.js";
+import { AuthProvider } from "../../auth/AuthContext.js";
+import { JoinRulesPage } from "./JoinRulesPage.js";
+import { classify, optOutBody, postPending } from "./joinRulesClient.js";
+
+vi.mock("../../api/client.js", async orig => ({ ...(await orig<typeof import("../../api/client.js")>()), apiFetch: vi.fn() }));
+const api = vi.mocked(apiFetch);
+const VIEW = { ruleSet: { version: 1, ownDomains: [], rules: [{ id: "r1", effect: "allow", match: { platform: "zoom" } }] }, state: { approvedSenders: [], approvedDomains: [], optedOutEventIds: [] } };
+const BUSY_MSG = "Join rules are busy (another change is in progress). Wait a few seconds and try again.";
+const UNAVAILABLE_MSG = "Rule editing is not available on this server yet.";
+let getFail: ApiError[]; let putFail: ApiError[];
+const writes = () => api.mock.calls.filter(c => c[2]?.method !== undefined && c[2].method !== "GET");
+
+beforeEach(() => {
+  getFail = []; putFail = []; api.mockReset();
+  api.mockImplementation((async (_path: string, _k: string | null, opts?: { method?: string }) => {
+    const f = (opts?.method === "PUT" ? putFail : opts?.method === "POST" ? [] : getFail).shift();
+    if (f) throw f;
+    return opts?.method === "POST" ? { state: VIEW.state } : structuredClone(VIEW);
+  }) as never);
+  localStorage.setItem("lkbApiKey", "sample-key");
+});
+afterEach(() => { cleanup(); localStorage.clear(); vi.useRealTimers(); });
+const mount = () => render(<AuthProvider><JoinRulesPage /></AuthProvider>);
+const alerts = () => screen.getAllByRole("alert").map(a => a.textContent).join(" | ");
+const optOut = (id: string) => {
+  fireEvent.change(screen.getByLabelText("Event id to opt out of"), { target: { value: id } });
+  fireEvent.click(screen.getByRole("button", { name: "Opt out of event…" })); fireEvent.click(screen.getByRole("button", { name: "Confirm opt-out" }));
+};
+
+// ---- ISS-T037OPT-002: what the opt-out request carries
+test("hints present: the opt-out body carries meetingUrl and sessionKey under the router's key names, trimmed", () => {
+  expect(optOutBody("evt-1", { meetingUrl: " https://meet.example.com/abc ", sessionKey: "sess-9" })).toEqual({ eventId: "evt-1", meetingUrl: "https://meet.example.com/abc", sessionKey: "sess-9" });
+  void postPending("k", "optout", "evt-1", { meetingUrl: "https://meet.example.com/abc" });
+  expect(api).toHaveBeenLastCalledWith("/calendar/join-rules/opt-outs", "k", { method: "POST", body: { eventId: "evt-1", meetingUrl: "https://meet.example.com/abc" } });
+});
+
+test("hints absent, empty, blank or non-string: the keys are omitted, never fabricated", () => {
+  for (const h of [undefined, {}, { meetingUrl: "", sessionKey: "  " }, { meetingUrl: 5 as never, sessionKey: null as never }]) expect(optOutBody("evt-1", h)).toEqual({ eventId: "evt-1" });
+});
+
+test("the body contains only allow-listed keys even when extra properties are passed", () => {
+  const body = optOutBody("evt-1", { meetingUrl: "https://m.example.com/x", sessionKey: "s", token: "leak", eventId: "other" } as never);
+  expect(Object.keys(body).sort()).toEqual(["eventId", "meetingUrl", "sessionKey"]);
+  expect(body.eventId).toBe("evt-1");
+});
+
+test("approvals never carry meeting hints", () => {
+  void postPending("k", "sender", "a@example.com", { meetingUrl: "https://m.example.com/x" });
+  expect(api).toHaveBeenLastCalledWith("/calendar/join-rules/approvals", "k", { method: "POST", body: { kind: "sender", value: "a@example.com" } });
+});
+
+test("the page's opt-out (event id only, the editor has no URL or session key) sends exactly { eventId }", async () => {
+  mount(); await screen.findByLabelText("Rule 1 name");
+  optOut("evt-77"); await screen.findByText("Opted out of event evt-77.");
+  expect(writes()).toHaveLength(1);
+  expect(writes()[0]![0]).toBe("/calendar/join-rules/opt-outs");
+  expect(writes()[0]![2]!.body).toEqual({ eventId: "evt-77" });
+});
+
+// ---- ISS-JRLOCK-002: busy is the status + code, never the message text
+test("busy (503 + join_rules_busy) on save shows the busy message", async () => {
+  mount(); await screen.findByLabelText("Rule 1 name");
+  fireEvent.change(screen.getByLabelText("Rule 1 name"), { target: { value: "kept" } });
+  putFail = [new ApiError(503, "join rules are busy; try again in a few seconds", { code: "join_rules_busy" })];
+  fireEvent.click(screen.getByRole("button", { name: "Save rules" }));
+  await waitFor(() => expect(alerts()).toBe(BUSY_MSG));
+});
+
+test("ISS-JRLOCK-002 recorded reproduction: api message changed to 'join rules are busy, retry shortly' still shows busy, not 'not available'", async () => {
+  mount(); await screen.findByLabelText("Rule 1 name");
+  fireEvent.change(screen.getByLabelText("Rule 1 name"), { target: { value: "kept" } });
+  putFail = [new ApiError(503, "join rules are busy, retry shortly", { code: "join_rules_busy" })];
+  fireEvent.click(screen.getByRole("button", { name: "Save rules" }));
+  await waitFor(() => expect(alerts()).toBe(BUSY_MSG));
+  expect(alerts()).not.toContain("not available");
+});
+
+test("ISS-JRLOCK-002 (c)/(d): busy on initial LOAD shows the busy text and an enabled Retry button", async () => {
+  getFail = [new ApiError(503, "anything", { code: "join_rules_busy" })];
+  mount(); await screen.findByRole("alert");
+  expect(alerts()).toBe(BUSY_MSG);
+  expect(screen.getByRole("button", { name: "Retry" })).toBeEnabled();
+});
+
+test("the old busy message text WITHOUT the code is not busy", () => {
+  expect(classify(new ApiError(503, "join rules are busy; try again in a few seconds")).failure).toBe("unavailable");
+});
+
+test("503 with the other code (no store configured) shows the unavailable message and no retry", async () => {
+  getFail = [new ApiError(503, "x", { code: "join_rules_unavailable" })];
+  mount(); await screen.findByRole("alert");
+  expect(alerts()).toBe(UNAVAILABLE_MSG); expect(screen.queryByRole("button", { name: "Retry" })).toBeNull();
+});
+
+test("the busy code is compared exactly: upper-case or padded variants are not busy", () => {
+  expect(classify(new ApiError(503, "m", { code: "JOIN_RULES_BUSY" })).failure).toBe("unavailable");
+  expect(classify(new ApiError(503, "m", { code: "join_rules_busy " })).failure).toBe("unavailable");
+});
+
+test("the busy code on a non-503 status is not busy", () => {
+  expect(classify(new ApiError(500, "m", { code: "join_rules_busy" })).failure).toBe("failed");
+});
+
+test("500 is the generic failure on load and on save", async () => {
+  getFail = [new ApiError(500, "boom", { code: "join_rules_busy" })];
+  mount(); await screen.findByRole("alert");
+  expect(alerts()).toBe("Unable to load join rules.");
+  fireEvent.click(screen.getByRole("button", { name: "Retry" })); await screen.findByLabelText("Rule 1 name");
+  fireEvent.change(screen.getByLabelText("Rule 1 name"), { target: { value: "kept" } });
+  putFail = [new ApiError(500, "boom")];
+  fireEvent.click(screen.getByRole("button", { name: "Save rules" }));
+  await waitFor(() => expect(alerts()).toContain("The change could not be saved."));
+});
+
+test("Retry-After is a minimum delay for the Retry control: disabled until it elapses, no automatic retry", async () => {
+  getFail = [new ApiError(503, "busy", { code: "join_rules_busy", retryAfterSeconds: 5 })];
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  mount(); const retry = await screen.findByRole("button", { name: "Retry" });
+  expect(retry).toBeDisabled();
+  await act(async () => { vi.advanceTimersByTime(4900); });
+  expect(screen.getByRole("button", { name: "Retry" })).toBeDisabled();
+  await act(async () => { vi.advanceTimersByTime(200); });
+  expect(screen.getByRole("button", { name: "Retry" })).toBeEnabled();
+  expect(api).toHaveBeenCalledTimes(1);
+  fireEvent.click(screen.getByRole("button", { name: "Retry" })); await screen.findByLabelText("Rule 1 name");
+});
