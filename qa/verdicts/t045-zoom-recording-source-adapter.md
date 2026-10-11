@@ -35,3 +35,27 @@ ISSUES-WRITTEN: ISS-T045NEXT-001 (medium) in qa/issues.t045next.jsonl
 3. Manifest: state that recordingId and canonicalUrl are bearer secrets, not to be logged or shown without redaction; correct the "canonical rebuilt on bare zoom.us" wording.
 4. Re-run the three adapter tests and tsc; add a test that kills the "harmless query kept" mutation by name (currently one killer).
 Not to be merged as it stands. Manifest status not flipped; TASKS.md untouched.
+
+---
+
+# Cycle 1 (checker)
+
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: b831629
+Scope: pure URL recognition; unverified against the live site; unregistered; T-045 stays in_progress.
+
+## EXPLANATION
+Evidence: qa/contracts/gmail-meeting-candidates-approval.md:128 reads "a real `zoom.us/rec/share/...` link" (bare host `zoom.us`; the line is an abridged prose quote, not a full URL) and apps/api/src/gws-gmail.ts:63 matches `zoom\.us\/rec`. Neither shows a subdomain, so accepting only the bare host is the grounded choice; refusing subdomains/`/rec/play/` as `unverified-shape` is right. Caveat: the substring `zoom.us/rec` would also match a subdomain link, so the sample is consistent with, not proof of, bare-host-only; the owner sample requested in the manifest settles it.
+
+D-015: ISS-T045NEXT-001: 2/2 recorded reproductions refused `unverified-shape` (re-run in the unit's test and in my own probe).
+
+Own probe, 51 URLs, 0 wrong: 7 grounded forms accepted, canonical host exactly `zoom.us`, canonical == normalised input, no query/fragment survives, idempotent. 24 subdomain/vanity/`/rec/play/` variants (with and without pwd/fragment) all `unverified-shape`. Hostile hosts got generic reasons only, never `unverified-shape`: zoom.us.evil.example, evilzoom.us, xn--, zoom.com, zoomgov.com, a.b.zoom.us, trailing dot -> host-not-allowed; userinfo -> credentials; ports -> port; fullwidth/U+3002 -> bad-characters; http -> not-https. `/j/ /my/ /wc/ /s/` -> path-not-supported. `unverified-shape` is reachable only for hosts in the zoom.us family with a valid path and token, so it does not mark attacker-controlled hosts as "almost ours".
+
+Bearer-secret section (manifest "Fix cycle 1"): states recordingId AND canonicalUrl contain a bearer secret, must not be logged, shown in alerts/UI, or widely stored, as a requirement on the future wiring unit. Satisfies merge condition 3.
+
+Mutations (own harness, absolute paths, per-mutation byte backup, restore in finally, 200 s SIGKILL timeout, deleted): subdomain accepted KILLED; unverified-shape collapsed to host-not-allowed KILLED; host rewritten to www.zoom.us KILLED; query kept KILLED. 4/4. Hash after = HEAD blob 49e1d6c5.
+
+Mechanics: zoom 13/13, youtube 10/10, onair 6/6; tsc exit 0; lint-dirsize shows only the unrelated packages/index/src/pipeline (34 > 30), fixed on main, sources dir clean; `git merge-tree` against codex/machine-migration-2026-10-09 clean (exit 0). Nothing registered.
+
+ISSUES-WRITTEN: none (ISS-T045NEXT-001 marked verified)
