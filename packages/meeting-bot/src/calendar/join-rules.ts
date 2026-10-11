@@ -31,6 +31,7 @@
  */
 import { detectPlatform, type Platform } from "../platform.js";
 import { normalizeDomain, normalizeEmail } from "./join-rules-normalize.js";
+import { addMeetingEntries, normalizeMeetingEntries, optedOutMeetingMatch, type OptOutMeeting } from "./join-rules-optout.js";
 
 export const PLATFORMS: readonly Platform[] = ["meet", "teams", "zoom", "webex", "zoho", "cloudonair", "unknown"];
 
@@ -65,6 +66,8 @@ export interface JoinRuleState {
   approvedSenders: readonly string[];
   approvedDomains: readonly string[];
   optedOutEventIds: readonly string[];
+  /** Optional (absent in older documents): meeting identities of opted-out meetings, see join-rules-optout.ts. */
+  optedOutMeetings?: readonly string[];
 }
 
 export const EMPTY_JOIN_RULE_STATE: JoinRuleState = { approvedSenders: [], approvedDomains: [], optedOutEventIds: [] };
@@ -128,6 +131,9 @@ export function evaluateJoinRules(event: JoinRuleEvent, rawRuleSet: JoinRuleSet,
   if (Array.isArray(rawOptOuts) && typeof event.id === "string" && rawOptOuts.includes(event.id)) {
     return skip("meeting-opt-out", `opt-out:${event.id}`);
   }
+  // Same meeting recorded under another record (ISS-T037W1-001): works even when the opted-out record is absent.
+  const meetingHit = optedOutMeetingMatch(isObj(rawState) ? rawState.optedOutMeetings : undefined, event.id, event.meetingUrl);
+  if (meetingHit !== undefined) return skip("meeting-opt-out", `opt-out:${meetingHit}`);
   let ruleSet: JoinRuleSet;
   let state: JoinRuleState;
   try {
@@ -181,11 +187,16 @@ export function recordRuleApproval(state: JoinRuleState, approval: { kind: "send
   throw new Error(`recordRuleApproval: unknown kind ${JSON.stringify((approval as { kind: unknown }).kind)}`);
 }
 
-/** Per-meeting opt-out; returns NEW state. */
-export function recordOptOut(state: JoinRuleState, eventId: string): JoinRuleState {
+/**
+ * Per-meeting opt-out; returns NEW state. `meeting` (optional) adds the meeting identity / sessionKey so the veto does not
+ * depend on this record being present later; underivable or degenerate hints are ignored (id-only, as before).
+ */
+export function recordOptOut(state: JoinRuleState, eventId: string, meeting?: OptOutMeeting): JoinRuleState {
   if (typeof eventId !== "string" || eventId === "") throw new Error("recordOptOut: eventId must be a non-empty string");
+  const meetings = addMeetingEntries(state.optedOutMeetings, meeting);
   return { approvedSenders: [...state.approvedSenders], approvedDomains: [...state.approvedDomains],
-    optedOutEventIds: state.optedOutEventIds.includes(eventId) ? [...state.optedOutEventIds] : [...state.optedOutEventIds, eventId] };
+    optedOutEventIds: state.optedOutEventIds.includes(eventId) ? [...state.optedOutEventIds] : [...state.optedOutEventIds, eventId],
+    ...(meetings ? { optedOutMeetings: meetings } : {}) };
 }
 
 /** Structural twin of core's `TrustedSenderConfig` (kept local so the module stays decoupled). */
@@ -224,7 +235,7 @@ function rejectUnknownKeys(obj: Record<string, unknown>, allowed: readonly strin
 /** Validates persisted/untrusted state and returns a normalised copy. Throws `JoinRuleSetValidationError`. */
 export function validateJoinRuleState(input: unknown): JoinRuleState {
   if (!isObj(input)) throw new JoinRuleSetValidationError("$state", "must be an object");
-  rejectUnknownKeys(input, ["approvedSenders", "approvedDomains", "optedOutEventIds"], "$state");
+  rejectUnknownKeys(input, ["approvedSenders", "approvedDomains", "optedOutEventIds", "optedOutMeetings"], "$state");
   const list = (key: string): unknown[] => {
     const v = input[key];
     if (!Array.isArray(v)) throw new JoinRuleSetValidationError(`$state.${key}`, "must be an array");
@@ -244,7 +255,11 @@ export function validateJoinRuleState(input: unknown): JoinRuleState {
     if (typeof v !== "string" || v === "") throw new JoinRuleSetValidationError(`$state.optedOutEventIds[${i}]`, "must be a non-empty string");
     return v;
   });
-  return { approvedSenders, approvedDomains, optedOutEventIds };
+  if (input.optedOutMeetings === undefined) return { approvedSenders, approvedDomains, optedOutEventIds }; // old document: shape unchanged
+  let optedOutMeetings: string[];
+  try { optedOutMeetings = normalizeMeetingEntries(input.optedOutMeetings); }
+  catch (e) { throw new JoinRuleSetValidationError("$state.optedOutMeetings", e instanceof Error ? e.message : "invalid"); }
+  return { approvedSenders, approvedDomains, optedOutEventIds, optedOutMeetings };
 }
 
 /** Validates JSON-parsed input and returns a normalised copy. Throws `JoinRuleSetValidationError`. */

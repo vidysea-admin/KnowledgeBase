@@ -13,7 +13,9 @@
  * Opt-outs follow the MEETING (ISS-T037VETO-002): an item is also tested under the ids of every record in the
  * same selection that shares its sessionKey or its platform meeting identity (`meetingIdentity`, send-now.ts).
  * Matching itself stays in `evaluateJoinRules`; this only widens the ids offered to it, so it can only remove.
- * Limit: a sibling that is not in the selection at all cannot be found (ISS-T037W1-001).
+ * A sibling that is NOT in the selection is covered by the stored meeting identity/sessionKey of the opt-out
+ * (`state.optedOutMeetings`, join-rules-optout.ts; ISS-T037W1-001), matched inside `evaluateJoinRules`. Opt-outs recorded
+ * without a meeting URL/sessionKey (older documents, or a client that sent none) still follow ids only.
  *
  * Items carry no tenant: the caller passes ONE tenant's rules/state, and the function holds no state.
  */
@@ -48,7 +50,7 @@ function siblingIds(selection: SelectAutoRecordItemsResult): Map<AutoRecordItem,
   const firstByKey = new Map<string, number>();
   entries.forEach((e, i) => {
     const keys: string[] = [];
-    if (typeof e.sessionKey === "string") keys.push(`k:${e.sessionKey}`);
+    if (typeof e.sessionKey === "string" && e.sessionKey.trim() !== "") keys.push(`k:${e.sessionKey}`); // empty key must not group unrelated records
     const m = scheduled.has(e) ? identityOf(e.meetingUrl) : undefined;
     if (m) keys.push(`m:${m}`);
     for (const k of keys) {

@@ -13,7 +13,11 @@ export interface JoinRuleValue { id: string; effect: "allow" | "deny"; match: Jo
 export interface JoinRuleSetValue { version: 1; ownDomains: readonly string[]; rules: readonly JoinRuleValue[] }
 export interface JoinRuleStateValue {
   approvedSenders: readonly string[]; approvedDomains: readonly string[]; optedOutEventIds: readonly string[];
+  /** Optional: absent in documents written before ISS-T037W1-001; the store derives/validates the entries. */
+  optedOutMeetings?: readonly string[];
 }
+/** Hints about the opted-out record's meeting; the store derives the identity (apps/* cannot import meeting-bot). */
+export interface OptOutMeetingHint { meetingUrl?: string; sessionKey?: string }
 export interface StoredJoinRulesValue { ruleSet: JoinRuleSetValue; state: JoinRuleStateValue }
 
 type MaybePromise<T> = T | Promise<T>;
@@ -31,5 +35,6 @@ export interface JoinRulesDeps {
   /** The engine's own `validateJoinRuleSet`; throws on invalid input, returns a normalised copy. */
   validateRuleSet(input: unknown): JoinRuleSetValue;
   recordApproval(tenantId: string, approval: { kind: "sender" | "domain"; value: string }): MaybePromise<JoinRuleStateValue>;
-  recordOptOut(tenantId: string, eventId: string): MaybePromise<JoinRuleStateValue>;
+  /** `meeting` is passed ONLY when the client sent a hint; without it the opt-out is by id alone, as before. */
+  recordOptOut(tenantId: string, eventId: string, meeting?: OptOutMeetingHint): MaybePromise<JoinRuleStateValue>;
 }

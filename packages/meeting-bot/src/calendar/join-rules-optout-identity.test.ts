@@ -105,12 +105,15 @@ test("an item whose URL yields no identity is matched by ids only", () => {
   assert.deepEqual(ids(r), ["b", "d"]);
 });
 
-test("CURRENT LIMITATION (ISS-T037W1-001): an opt-out whose record is absent from the selection misses its sibling", () => {
-  // calX was opted out but is no longer in the selection (calendar fetch failed / event edited away); the
-  // Gmail copy of the same meeting still joins. Storing the meeting identity with the opt-out (design ii) closes this.
+test("ISS-T037W1-001 (fixed in t037-optout-meeting-identity-store): an id-only opt-out of an ABSENT record still misses; the stored identity closes it", () => {
+  // Old/id-only state (no meeting identity recorded): the absent calX cannot be linked to g1 - unchanged, documented behaviour.
   const g1 = it("g1", { source: "gmail", sessionKey: "gmail:g1" });
   const r = applyJoinRules(freeze(sel([g1])), rs(), { state: st(["calX"]) });
-  assert.deepEqual(ids(r), ["g1"], "this is open: if it starts failing, the issue was fixed - update it");
+  assert.deepEqual(ids(r), ["g1"], "id-only opt-out of an absent record: nothing links it (old documents keep this behaviour)");
+  // With the identity stored alongside the opt-out (the fix), the absent-record repro is vetoed: see join-rules-optout-meeting.test.ts.
+  const fixed = applyJoinRules(freeze(sel([g1])), rs(), { state: { ...st(["calX"]), optedOutMeetings: ["url:zoom:123456789"] } });
+  assert.deepEqual(ids(fixed), [], "stored identity vetoes g1 although calX is absent");
+  assert.equal(fixed.skipped[0]!.reason, "opted-out");
   // the opt-out by id still matches a record that IS present
   assert.deepEqual(ids(applyJoinRules(sel([g1]), rs(), { state: st(["g1"]) })), []);
 });
