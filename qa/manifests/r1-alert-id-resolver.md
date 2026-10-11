@@ -1,6 +1,6 @@
 # Manifest - r1-alert-id-resolver
 
-**Status:** ready-for-check
+**Status:** checked-PASS (Checked: qa/verdicts/r1-alert-id-resolver.md, cycle 1, ba6e891)
 **Fix cycle:** 1
 **Lane:** ALERTID (branch lane/alertid, base 33baf6f). **Security class:** credential handling (meeting passcodes must not reach operator alerts). Full ceremony.
 **Backlog tier:** 2 (closes wiring precondition W9 behind open high ISS-R1ALERTS-009: the safe `omit` default is only usable if an operator can find the meeting). Round cap: security class, never capped.
