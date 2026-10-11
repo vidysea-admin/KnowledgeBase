@@ -1,6 +1,6 @@
 # t037-wiring-enable-preconditions
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t037-wiring-enable-preconditions.md, cycle 0, fc3aae5; enforcement remains DISABLED; tenant condition only partly closed)
 Fix cycle: 0
 Priority tier: 2 (closes before-enable conditions (B)2 and (B)3 of `qa/verdicts/t037-scheduler-wiring-behind-flag.md`; ISS-T037WIRE-001 is high at enablement, security class).
 Security class: decides which meetings the bot records - FULL ceremony, never round-capped.
