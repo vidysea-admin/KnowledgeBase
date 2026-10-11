@@ -7,7 +7,7 @@ const NOW = "2026-10-10T00:00:00.000Z";
 const sk = (reason: string, key = "cal:e1", title = "Weekly Webinar"): SkippedItem =>
   ({ sessionKey: key, source: "calendar", sourceId: "e1", title, reason } as SkippedItem);
 const run = (extra: Record<string, unknown> = {}) =>
-  buildAttentionAlerts({ timeZone: "Asia/Kolkata", now: NOW, ...extra } as never);
+  buildAttentionAlerts({ titlePolicy: "masked", timeZone: "Asia/Kolkata", now: NOW, ...extra } as never);
 function deepFreeze<T>(o: T): T {
   if (o && typeof o === "object") { Object.freeze(o); for (const v of Object.values(o)) deepFreeze(v); }
   return o;
@@ -45,7 +45,7 @@ test("action_required job rows: mapped reasons and generic reason", () => {
 
 test("dedupe key stable across ticks, differs by event and case, has no time or url", () => {
   const a1 = run({ skipped: [sk("overlap-lost")], startTimes: { "cal:e1": "2026-10-12T10:00:00Z" } }).alerts[0]!;
-  const a2 = buildAttentionAlerts({ skipped: [sk("overlap-lost", "cal:e1", "Renamed title")], timeZone: "UTC", now: "2026-10-11T00:00:00Z",
+  const a2 = buildAttentionAlerts({ titlePolicy: "masked", skipped: [sk("overlap-lost", "cal:e1", "Renamed title")], timeZone: "UTC", now: "2026-10-11T00:00:00Z",
     startTimes: { "cal:e1": "2026-10-12T10:00:00Z" } }).alerts[0]!;
   assert.equal(a1.key, a2.key);
   assert.notEqual(a1.key, run({ skipped: [sk("overlap-lost", "cal:e2")] }).alerts[0]!.key);
@@ -127,11 +127,11 @@ test("malformed input is counted, never thrown", () => {
   assert.equal(r.ignored.count, 9);
   assert.equal(run({ skipped: "no", jobs: [] }).ignored.count, 2);
   assert.doesNotThrow(() => buildAttentionAlerts(undefined as never));
-  assert.doesNotThrow(() => buildAttentionAlerts({ timeZone: 5, now: 9 } as never));
+  assert.doesNotThrow(() => buildAttentionAlerts({ titlePolicy: "masked", timeZone: 5, now: 9 } as never));
 });
 
 test("inputs are not mutated (deep-frozen)", () => {
-  const input = deepFreeze({ skipped: [sk("needs-registration")], jobs: { j: { status: "action_required", reason: "retry-limit", title: "t" } },
+  const input = deepFreeze({ titlePolicy: "masked", skipped: [sk("needs-registration")], jobs: { j: { status: "action_required", reason: "retry-limit", title: "t" } },
     startTimes: { "cal:e1": "2026-10-12T00:00:00Z" }, timeZone: "Asia/Kolkata", now: NOW });
   const r = buildAttentionAlerts(input as never);
   assert.equal(r.alerts.length, 2);
