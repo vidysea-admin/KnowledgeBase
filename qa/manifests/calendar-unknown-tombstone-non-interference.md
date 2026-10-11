@@ -1,7 +1,8 @@
 # calendar-unknown-tombstone-non-interference
 
 Status: ready-for-check
-Fix cycle: 0
+**Handshake status:** ready-for-check
+Fix cycle: 1
 Priority tier: 2 - open HIGH ledger issue ISS-T036CAL-011 (pre-existing, found by the t036 checker, cycle 3)
 Security class: an outsider can stop the bot from recording the user's legitimate meetings (denial of the product's core function). FULL ceremony; never round-capped.
 Lane: lane/tombstone (base 01635f6). New issues go to qa/issues.tombstone.jsonl as ISS-TOMBSTONE-NNN (filed: ISS-TOMBSTONE-001, the residual).
@@ -81,3 +82,32 @@ P2: 1076 known-cancellation runs (840 with the victim cleanly cancelled); violat
 ```
 One at a time, each `node --test --import tsx src/calendar/<file>.test.ts`: webinar-policy 19/19, schedule-state 18/18, auto-join 39/39, schedule-tick 14/14, join-rules-select 11/11, join-rules-optout-identity 22/22, link-source-allowlist 4/4, link-source-reconcile 7/7, link-source-alias 9/9, all fail 0. `src/alert-who-production.test.ts` 2/4 (pre-existing, see above).
 `node C:\Users\product\Desktop\KnowledgeBase\node_modules\typescript\lib\tsc.js --noEmit -p tsconfig.json` (packages/meeting-bot): exit 0. `node scripts/lint-dirsize.mjs`: `lint-dirsize: OK (124 dir(s) within budget)`.
+
+## Fix cycle 1 (responds to verdict FAIL, cycle 0, commit checked 2a19974)
+
+### What changed
+- `tombstone/unknown-tombstone-reach.ts` rewritten: no exact-start or exact-identity selector remains. Unlinked Gmail rows are held by a finite WINDOW. Tombstone with a usable start S: rows starting within +-24h of S (covers every timezone misreading; self-expiring). Tombstone without one (id only, all-day, recurring instance, link only): rows starting in [T-24h, T+14d], T = Google `updated`, else the first tick that saw it. The tombstone's link is no longer consulted (a trusted link's start covers the same rows). Calendar rows, linked pairs and `newStartsBlocked` are untouched as before.
+- `calendar-client.ts` (+2 lines): a NEW unknown tombstone with no `updated` is stamped with `checkedAt` as `providerUpdated`/`revision` (first-seen; no state-shape change, stored state stays valid; a refetch does not move it).
+- Tests rewritten/added in `unknown-tombstone-non-interference.test.ts`; `Row` renamed `TombstoneRow` (ISS-TOMBSTONE-006).
+- New issue: ISS-TOMBSTONE-007 (residuals). Existing ledger rows not touched.
+
+### Assumptions (policy; the Approver may change them)
+- HOLD_HORIZON_MS = 14 days, START_WINDOW_MS = LEAD_SLACK_MS = 24h (constants in the reach module). Fail-closed choice for a start-less tombstone: hold anything that can start between 24h before its cancellation and 14 days after; beyond that a Gmail-only copy of such a cancelled meeting is joinable (ISS-TOMBSTONE-007 d).
+- A pre-fix stored tombstone with no clock at all still holds near... every unlinked row with a start (no expiry), fail closed (007 b).
+
+### Reproduction counts (recorded cases re-run verbatim, 2 scopes x 2 modes cells)
+- ISS-TOMBSTONE-001: 2/2 refused (recorded case, both scopes: g5 and g6 held, g1 and c0/c1 run).
+- ISS-TOMBSTONE-002: 16/16 refused (+1 min, 10:30Z, same instant written +05:30, EST misread 05:30Z vs 16:00Z).
+- ISS-TOMBSTONE-003: 20/20 refused (zoom /j/ vs /w/?tk=, meet(1) vs meet(0) same start, same url Gmail +1 min, same url+start, ?pwd variant).
+- ISS-TOMBSTONE-004: 6/6 as specified (hold near-term; tombstone absent on ticks 1-4 and hold ends by horizon: a row 20 days out is not held at +5 days, a new row 41 days out runs at +40 days) plus the baseline-of-old-deleted-events case (Google `updated` in August holds nothing) and the first-seen stamp not moving on refetch.
+- ISS-TOMBSTONE-005: left OPEN, named: the start-copy attack still holds the victim's unlinked row inside the 24h window (now bounded and expiring). Narrowing it needs an organiser/sender match (Approver decision, see 007).
+- ISS-TOMBSTONE-006: fixed; `scripts/lint-dupes.mjs` now reports 5 violations, all pre-existing, none for `Row`.
+- ISS-T036CAL-011 recorded reproduction (12/12) and properties P1 (3200 runs, 0 violations) and P2 (1076 runs, 0 violations) still pass.
+
+### Verdict merge conditions
+1 fixed (near-miss and differently-formed-link tests exist; the 5-minute-window and exact-start mutations are killed). 2 fixed by expiry (stamp plus horizon); a documented operator release is NOT added (state reset still clears everything). 3 done. 4 NOT done: the D-060 floor amendment for the changed `webinar-policy.test.ts` assertion needs an Approver-recorded entry (Umesh); I did not touch docs/DECISIONS.md. 5 NOT done: no live Google check.
+
+### Evidence (commands run from packages/meeting-bot with `node --test --import tsx <file>`)
+- unknown-tombstone-non-interference.test.ts: pass 12, fail 0. unknown-tombstone-property.test.ts: pass 2, fail 0. webinar-policy.test.ts 19/19, schedule-state.test.ts 18/18, auto-join.test.ts 39/39.
+- `node tsc.js --noEmit -p tsconfig.json` (packages/meeting-bot): exit 0.
+- Mutations (own harness, untracked, deleted; per-mutation byte backup restored in finally; `git hash-object` of the reach file after = d00864e9c80574ad810fa42b3769f24f31665ec9 = the committed blob): start window 5 min KILLED; exact start only KILLED; no horizon KILLED; span never holds KILLED; no lead slack KILLED; no-clock row holds nothing KILLED (after adding the no-clock test; it first SURVIVED).

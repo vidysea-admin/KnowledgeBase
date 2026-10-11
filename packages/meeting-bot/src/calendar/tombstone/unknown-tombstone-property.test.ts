@@ -7,29 +7,29 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { MODES, REV, SCOPES, cal, mail, meet, outcomeOf, pick, recon, slot, type Row } from "./tombstone-fixtures.js";
+import { MODES, REV, SCOPES, cal, mail, meet, outcomeOf, pick, recon, slot, type TombstoneRow } from "./tombstone-fixtures.js";
 
 function rng(seed: number) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const LATER = "2026-10-11T10:05:00.000Z";
 
-interface Case { calendar: Row[]; gmail: Row[]; protectedIds: Set<string>; tombstones: Row[] }
+interface Case { calendar: TombstoneRow[]; gmail: TombstoneRow[]; protectedIds: Set<string>; tombstones: TombstoneRow[] }
 function makeCase(seed: number): Case {
   const r = rng(seed), int = (n: number) => Math.floor(r() * n), chance = (p: number) => r() < p;
-  const calendar: Row[] = [], gmail: Row[] = [], protectedIds = new Set<string>();
+  const calendar: TombstoneRow[] = [], gmail: TombstoneRow[] = [], protectedIds = new Set<string>();
   const n = 1 + int(5);
   for (let i = 0; i < n; i++) {
     const idx = int(8);                                                    // small pools: starts and urls collide across rows
-    const extra: Row = chance(0.3) ? { recurringEventId: `rec${i}`, originalStartTime: { dateTime: slot(idx)[0] }, id: `c${i}_inst` } : { id: `c${i}` };
+    const extra: TombstoneRow = chance(0.3) ? { recurringEventId: `rec${i}`, originalStartTime: { dateTime: slot(idx)[0] }, id: `c${i}_inst` } : { id: `c${i}` };
     const c = cal(idx, { ...extra, ...(chance(0.2) ? { meetingUrlSource: undefined } : {}), ...(chance(0.15) ? { organizer: "other@example.org" } : {}) });
     if (chance(0.15)) c.cancelled = true;
     calendar.push(c); protectedIds.add(String(c.id));
     if (chance(0.5) && !c.cancelled) { const g = mail(idx, { id: `g${i}`, ...(chance(0.3) ? { senderAuthenticated: false, status: "pending" } : {}) }); gmail.push(g); protectedIds.add(`g${i}`); }
   }
   for (let j = 0; j < int(3); j++) gmail.push(mail(8 + j, { id: `u${j}`, meetingUrl: `https://zoom.us/j/${700000000 + j}` }));   // unlinked Gmail rows (not protected: see residual)
-  const tombstones: Row[] = [];
+  const tombstones: TombstoneRow[] = [];
   for (let k = 0; k < int(9); k++) {
     const src = calendar[int(calendar.length)]!, id = `ghost${seed}_${k}`;
-    const copy: Row = { id, cancelled: true, title: src.title, organizer: src.organizer, startTime: src.startTime, endTime: src.endTime, providerUpdated: chance(0.5) ? REV : "2026-10-02T00:00:00.000Z" };
+    const copy: TombstoneRow = { id, cancelled: true, title: src.title, organizer: src.organizer, startTime: src.startTime, endTime: src.endTime, providerUpdated: chance(0.5) ? REV : "2026-10-02T00:00:00.000Z" };
     switch (int(8)) {
       case 0: tombstones.push({ id, cancelled: true }); break;
       case 1: tombstones.push(copy); break;                                                                      // start/title/organiser copied, no link

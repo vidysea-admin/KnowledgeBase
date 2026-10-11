@@ -204,6 +204,8 @@ export function reconcileWebinarSources(input: {
         if (matches.length <= 1 && (matches.length || children.length)) targets = [...new Set([...matches, ...children].map(([target]) => target))];
         else row.unresolved = matches.length ? "ambiguous-provider" : "unknown-tombstone";
       } else if (source === "calendar" && row.snapshot.cancelled && !previous.occurrences[key]?.accepted) row.unresolved = "unknown-tombstone";
+      // ISS-TOMBSTONE-004: a NEW unknown tombstone that Google sent no `updated` for is stamped with the first tick that saw it, so its hold can lapse (tombstone/unknown-tombstone-reach.ts).
+      if (row.unresolved === "unknown-tombstone" && row.snapshot.providerUpdated === undefined && !previous.occurrences[key]) { row.snapshot.providerUpdated = input.checkedAt; row.revision = input.checkedAt; }
       if (row.unresolved) { row.accepted = false; row.providerIds = []; row.aliases = []; }
       for (const target of targets) {
         const current = JSON.parse(JSON.stringify(row)) as Occurrence;
