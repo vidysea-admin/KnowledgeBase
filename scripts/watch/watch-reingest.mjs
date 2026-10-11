@@ -1,11 +1,12 @@
 // scripts/watch/watch-reingest.mjs — run-watch-loc-split: the `--reingest` repair path moved VERBATIM from
 // run-watch.mjs (only `export` added).
-import { existsSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { decideReingestAction, assertIndexed, ingestOneDriveFile } from "./lib/ingest-chain.mjs";
 import { ROOT, TENANT, RECORDINGS_DIR, AUDIO_DIR, CALENDAR_FIRST_YEAR, MONTHS, MONGODB_DB } from "./watch-config.mjs";
 import { runGws, findCurrentMonthFolder } from "./watch-sources.mjs";
 import { markDriveState } from "./watch-store.mjs";
+import { replaceSessionRows, withFailureRecorded } from "./lib/reingest-swap.mjs";
 
 /**
  * `--reingest <driveFileId>` — the u2-fix1 live repair for ISS-304/305/306. NOT the normal
@@ -88,54 +89,19 @@ export async function runReingest(gdrive, driveFileId, calendarEvents, now) {
       `--reingest: "${correctSessionId}" has ${turnCount} turns but 0 chunks under its own correct id — ` +
         `repairing by re-indexing only (no re-download/re-transcribe/re-seed).`,
     );
-    const { buildIndexer } = await import("../../apps/api/src/composition/production.ts");
-    const indexResult = await buildIndexer()(TENANT, correctSessionId);
-    assertIndexed(correctSessionId, turnCount, indexResult.chunks);
-    await markDriveState(driveFileId, "ingested", { sessionId: correctSessionId, repairedFrom: oldSessionId });
-    console.log(
-      `--reingest: DONE (reindex-only). driveFileId=${driveFileId} sessionId=${correctSessionId} ` +
-        `chunks=${indexResult.chunks.written}`,
-    );
+    // ISS-316: any failure here (buildIndexer, assertIndexed, the success write) is recorded as
+    // `failed` with its reason, like every other path in this module; the error is rethrown.
+    await withFailureRecorded((reason) => markDriveState(driveFileId, "failed", { failureReason: reason }), async () => {
+      const { buildIndexer } = await import("../../apps/api/src/composition/production.ts");
+      const indexResult = await buildIndexer()(TENANT, correctSessionId);
+      assertIndexed(correctSessionId, turnCount, indexResult.chunks);
+      await markDriveState(driveFileId, "ingested", { sessionId: correctSessionId, repairedFrom: oldSessionId });
+      console.log(
+        `--reingest: DONE (reindex-only). driveFileId=${driveFileId} sessionId=${correctSessionId} ` +
+          `chunks=${indexResult.chunks.written}`,
+      );
+    });
     return;
-  }
-
-  const before = {};
-  const after = {};
-  if (oldSessionId) {
-    const filters = {
-      sources: { tenantId: TENANT, _id: `gdrive-${driveFileId}` },
-      sessions: { tenantId: TENANT, _id: oldSessionId },
-      turns: { tenantId: TENANT, sessionId: oldSessionId },
-      session_pages: { tenantId: TENANT, sessionId: oldSessionId },
-      claims: { tenantId: TENANT, "evidence.sessionId": oldSessionId },
-      chunks: { tenantId: TENANT, sourceRef: oldSessionId },
-    };
-    for (const [coll, filter] of Object.entries(filters)) before[coll] = await db.collection(coll).countDocuments(filter);
-    // tree_index has no per-session row (one root doc per tenant, built FROM all sessions) —
-    // there is nothing scoped to this sessionId to delete here; `indexSession`'s own
-    // `regenerate()` call, reached via the re-ingest below, folds the corrected session back into
-    // it. Reported for visibility only, never targeted for deletion.
-    before.tree_index = await db.collection("tree_index").countDocuments({ tenantId: TENANT });
-
-    console.log(`--reingest: before-delete counts for old sessionId "${oldSessionId}":`, before);
-    if (oldSessionId !== correctSessionId) {
-      for (const [coll, filter] of Object.entries(filters)) {
-        const res = await db.collection(coll).deleteMany(filter);
-        after[coll] = before[coll] - res.deletedCount;
-      }
-      after.tree_index = before.tree_index;
-      const oldDir = join(ROOT, "data", "toc-migrated", oldSessionId);
-      if (existsSync(oldDir)) {
-        const { rmSync } = await import("node:fs");
-        rmSync(oldDir, { recursive: true, force: true });
-        console.log(`--reingest: removed ${oldDir}`);
-      }
-    } else {
-      for (const coll of Object.keys(filters)) after[coll] = before[coll];
-    }
-    console.log(`--reingest: after-delete counts:`, after);
-  } else {
-    console.log("--reingest: no prior watch_state row/sessionId — nothing to delete, proceeding straight to re-ingest.");
   }
 
   // No intermediate "pending" marker here: `watch_state.schema.json`'s `status` enum is
@@ -143,16 +109,41 @@ export async function runReingest(gdrive, driveFileId, calendarEvents, now) {
   // `listSeenIds`) rely on, and this repair is not the place to widen it for a transient state a
   // single synchronous call doesn't need. The row is only touched again once the outcome is known.
   const monthName = MONTHS[now.getUTCMonth()];
-  try {
-    const sessionId = await ingestOneDriveFile(gdrive, runGws, file, monthName, {
-      ROOT, RECORDINGS_DIR, AUDIO_DIR, TENANT, calendarEvents, programYearFirstYear: CALENDAR_FIRST_YEAR,
-    });
+  const ingest = () => ingestOneDriveFile(gdrive, runGws, file, monthName, {
+    ROOT, RECORDINGS_DIR, AUDIO_DIR, TENANT, calendarEvents, programYearFirstYear: CALENDAR_FIRST_YEAR,
+  });
+  await withFailureRecorded((reason) => markDriveState(driveFileId, "failed", { failureReason: reason }), async () => {
+    let sessionId;
+    let counts = {};
+    if (oldSessionId && oldSessionId !== correctSessionId) {
+      // ISS-309/316: delete-then-rebuild with a pre-delete snapshot, restore on failure, and the old
+      // session's node pruned from tree_index on success. All access via scopedCollection.
+      const { scopedCollection } = await import("../../packages/db/src/lib/tenantScope.js");
+      const { regenerate, treeIndexRootFilter } = await import("../../packages/index/src/index.ts");
+      const oldDir = join(ROOT, "data", "toc-migrated", oldSessionId);
+      const r = await replaceSessionRows({
+        scoped: (name) => scopedCollection(db, name), tenant: TENANT, driveFileId, oldSessionId, correctSessionId, ingest,
+        rootFilter: treeIndexRootFilter(TENANT), regenerate, log: (m, c) => console.log(`--reingest: ${m}:`, c),
+        writeSnapshot: async (snap) => {
+          const dir = join(ROOT, "data", "reingest-snapshots");
+          mkdirSync(dir, { recursive: true });
+          const path = join(dir, `${driveFileId}-${Date.now()}.json`);
+          writeFileSync(path, JSON.stringify(snap)); // Dates become strings here; restore uses the in-memory copy
+          return path;
+        },
+        finish: async (snapshotPath) => {
+          // best effort: a leftover local dir/snapshot never turns a completed reingest into a failure
+          try { if (existsSync(oldDir)) { rmSync(oldDir, { recursive: true, force: true }); console.log(`--reingest: removed ${oldDir}`); } } catch (e) { console.error(`--reingest: could not remove ${oldDir}: ${e.message}`); }
+          try { rmSync(snapshotPath, { force: true }); } catch { /* keep it */ }
+        },
+      });
+      sessionId = r.sessionId;
+      counts = { before: r.before, after: r.after };
+    } else {
+      sessionId = await ingest();
+    }
     await markDriveState(driveFileId, "ingested", { sessionId, repairedFrom: oldSessionId });
     console.log(`--reingest: DONE. driveFileId=${driveFileId} oldSessionId=${oldSessionId ?? "(none)"} newSessionId=${sessionId}`);
-    console.log(`--reingest: before=${JSON.stringify(before)} after=${JSON.stringify(after)}`);
-  } catch (err) {
-    const reason = err instanceof Error ? err.message : String(err);
-    await markDriveState(driveFileId, "failed", { failureReason: reason });
-    throw err;
-  }
+    if (counts.before) console.log(`--reingest: before=${JSON.stringify(counts.before)} after=${JSON.stringify(counts.after)}`);
+  });
 }
