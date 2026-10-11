@@ -1,6 +1,6 @@
 # iss-jobqlost-004-lock-create-eperm-is-contention
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (open ledger issue ISS-JOBQLOST-004, medium; pulled because it makes the standing test `file-job-queue.lost-update.test.ts` "real processes" red-sometimes on main; touches a data-write path, so full ceremony). Does NOT wire the queue, not in `core/index.ts`.
 Lane: lane/jobqeperm. Ledger for this lane: qa/issues.jobqeperm.jsonl, ids ISS-JOBQEPERM-NNN (1 filed, low, open). Existing ledger rows untouched (the checker changes ISS-JOBQLOST-004's status).
