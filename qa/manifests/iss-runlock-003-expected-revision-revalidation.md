@@ -1,6 +1,6 @@
 # iss-runlock-003-expected-revision-revalidation
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3/2 (open ledger issue ISS-RUNLOCK-003, medium, flagged before-wiring; class data write: full ceremony). Does NOT wire the store.
 Lane: lane/runrev. Ledger for this lane: qa/issues.runrev.jsonl, ids ISS-RUNREV-NNN (1 filed, open). Existing ledger rows (qa/issues.runlock.jsonl) untouched.
