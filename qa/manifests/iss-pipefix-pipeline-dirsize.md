@@ -1,6 +1,6 @@
 # Manifest — iss-pipefix-pipeline-dirsize
 
-**Status:** ready-for-check
+**Status:** checked-PASS (Checked: qa/verdicts/iss-pipefix-pipeline-dirsize.md, cycle 0, 09b8267)
 **Fix cycle:** 0
 **Lane:** PIPEFIX (branch lane/pipefix, base 8520fa8). **Security class:** none. Ledger: `qa/issues.pipefix.jsonl`.
 **Backlog tier:** 2 (open high issue ISS-PIPEFIX-001: restores the dirsize stage of the CI structure lint, which this week's merges turned red; cause: second merge landed without a post-merge dirsize run).
