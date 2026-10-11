@@ -16,6 +16,8 @@ export interface UpcomingMeeting {
   endTime: string;
   /** Absent when the event has no joinable video-conference link. */
   meetingUrl?: string;
+  /** Set only when a description/location scan found no safe single join link (T-036): the scheduler/UI must not guess. */
+  meetingLinkIssue?: "ambiguous" | "registration-only";
   organizer?: string;
   cancelled?: boolean;
   recurringEventId?: string;

@@ -20,6 +20,7 @@
  * as a sanitized error; an unavailable calendar must never look like successful empty coverage.
  */
 import { execFile } from "node:child_process";
+import { resolveEventMeetingLink } from "./join-rules/calendar-link-extract.js";
 import type { UpcomingMeeting, CalendarAcquisition, CalendarReadDeps } from "./routes/calendar.js";
 
 interface GwsEventListResponse {
@@ -37,6 +38,9 @@ interface GwsCalendarEvent {
   start?: { dateTime?: string; date?: string };
   end?: { dateTime?: string; date?: string };
   hangoutLink?: string;
+  /** Untrusted organiser free text: INPUT to link extraction only; never mapped onto the returned meeting. */
+  description?: string;
+  location?: string;
   conferenceData?: { entryPoints?: { entryPointType: string; uri: string }[] };
   organizer?: { email?: string };
   recurringEventId?: string;
@@ -152,7 +156,8 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, cha
           (e.recurringEventId !== undefined && !text(e.recurringEventId, 1024)) ||
           (e.recurrence !== undefined && (!Array.isArray(e.recurrence) || e.recurrence.length === 0 || e.recurrence.length > 32 || e.recurrence.some(rule => !text(rule, 8192)))) ||
           (e.organizer !== undefined && (!e.organizer || typeof e.organizer !== "object" || Array.isArray(e.organizer) || (e.organizer.email !== undefined && !text(e.organizer.email, 320))))) throw new Error("Invalid calendar event");
-      const meetingUrl = meetingUrlOf(e);
+      const link = resolveEventMeetingLink({conferenceUrl: meetingUrlOf(e), location: e.location, description: e.description});
+      const meetingUrl = link.url;
       if (meetingUrl !== undefined && !text(meetingUrl, 8192)) throw new Error("Invalid calendar link");
       return {
       id: e.id,
@@ -160,6 +165,7 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, cha
       startTime: e.start?.dateTime ?? e.start?.date ?? "",
       endTime: e.end?.dateTime ?? e.end?.date ?? "",
       meetingUrl,
+      ...(link.issue ? {meetingLinkIssue: link.issue} : {}),
       organizer: e.organizer?.email,
       cancelled: e.status === "cancelled",
       recurringEventId: e.recurringEventId,

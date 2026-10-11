@@ -280,3 +280,39 @@ test("actual CLI error callback distinguishes structured provider410 from proces
     await assert.rejects(runGws([], execute(stdout, Object.assign(new Error("stderr410"), {code: "ETIMEDOUT"}))), (value: any) => value.statusCode === undefined);
   }
 });
+
+const linkEvent = (id: string, extra: Record<string, unknown>) =>
+  ({id, summary: id, start: {dateTime: "2026-10-01T12:00:00Z"}, end: {dateTime: "2026-10-01T13:00:00Z"}, ...extra});
+const listWith = (items: unknown[]) => listUpcomingGwsMeetings(14, async () => JSON.stringify({items}));
+
+test("T-036 description/location links: carried per event, never leaked across events, text never returned", async () => {
+  const zoom = "https://us02web.zoom.us/j/1234567890?pwd=SECRETPWD", meet = "https://meet.google.com/abc-defg-hij";
+  const rows = await listWith([
+    linkEvent("a", {description: `Passcode notes: private-note-xyz <a href="${zoom}">join</a>`}),
+    linkEvent("b", {location: "Hall 3"}),
+    linkEvent("c", {hangoutLink: meet, description: zoom}),
+    linkEvent("d", {description: `${zoom} ${meet}`}),
+    linkEvent("e", {description: "https://webinar.zoho.in/meeting/register?sessionId=12345"}),
+  ]);
+  assert.equal(rows[0]!.meetingUrl, zoom); assert.equal(rows[1]!.meetingUrl, undefined);
+  assert.equal(rows[2]!.meetingUrl, meet);
+  assert.equal(rows[3]!.meetingUrl, undefined); assert.equal(rows[3]!.meetingLinkIssue, "ambiguous");
+  assert.equal(rows[4]!.meetingLinkIssue, "registration-only"); assert.equal("meetingLinkIssue" in rows[1]!, false);
+  const json = JSON.stringify(rows);
+  assert.ok(!json.includes("private-note-xyz") && !json.includes("Hall 3") && !/"(description|location)"/.test(json));
+  const bad = await listUpcomingGwsMeetings(14, async () => JSON.stringify({items: [linkEvent("z", {description: "private-note-xyz", hangoutLink: 7})]})).catch((e: Error) => e);
+  assert.ok(bad instanceof Error && !bad.message.includes("private-note-xyz"));
+});
+
+test("T-036 default parity: event with conference link maps to exactly the pre-change shape, over HTTP too", async () => {
+  const meet = "https://meet.google.com/abc-defg-hij";
+  const [row] = await listWith([linkEvent("p", {hangoutLink: meet, organizer: {email: "o@x.org"}, description: "https://zoom.us/j/1234567890", location: "https://zoom.us/j/9999999999"})]);
+  assert.deepEqual(row, {id: "p", title: "p", startTime: "2026-10-01T12:00:00Z", endTime: "2026-10-01T13:00:00Z", meetingUrl: meet,
+    organizer: "o@x.org", cancelled: false, recurringEventId: undefined, originalStartTime: undefined, providerUpdated: undefined});
+  assert.deepEqual(Object.keys(row!), ["id", "title", "startTime", "endTime", "meetingUrl", "organizer", "cancelled", "recurringEventId", "originalStartTime", "providerUpdated"]);
+  const server = await startTestServer(buildTestDeps({calendar: {listUpcoming: async () => [row!]}, keyStore: fakeKeyStore({k: {tenantId: "tenant-1", scopes: ["calendar"]}})}));
+  try {
+    const body = await (await fetch(`${server.baseUrl}/calendar/upcoming`, {headers: {authorization: "Bearer k"}})).text();
+    assert.equal(body, JSON.stringify({meetings: [{id: "p", title: "p", startTime: "2026-10-01T12:00:00Z", endTime: "2026-10-01T13:00:00Z", meetingUrl: meet, organizer: "o@x.org", cancelled: false}]}));
+  } finally { await server.close(); }
+});
