@@ -46,3 +46,40 @@ ISSUES-WRITTEN: ISS-ALERTFIX-002 (medium, open).
 EXPLANATION: The formatter's design is right and the omit output is provably free of any title-derived byte, on both routes, across 1,298 titles. The unit asserts that anything but an own `"masked"` is `omit`, and an inherited `"masked"` breaks that, which is the exact failure the default exists to prevent (a one-line fix plus a test; security class, so it is not waived). The relocation, core reasons, masked whole-title hiding and the edited tests are sound.
 
 Merge conditions (for the cycle-1 check): (1) fix ISS-ALERTFIX-002 with own-property read and a both-routes test (Object.create and polluted Object.prototype); (2) pass `titlePolicy:"masked"` in the corpus echo-audit call; (3) qualify bare ISS refs in the unit manifest (G4); (4) do not wire anything (W8, W9 now in the contract); (5) on PASS keep -009 and -010 open as above. Unverified: real Gmail/Calendar titles, the wired path (none exists), the default test glob discovery (I ran each file by path).
+
+---
+
+# Cycle 1
+
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: a45088c (lane/alertfix, on top of the cycle-0 verdict a95f81e). node v24.19.0 per toolchain note. Working tree clean before and after my runs; temporary probes lived outside the repo (one temp copy of the old module inside the folder was deleted before the status check).
+
+Scope: the UNWIRED, pure alert formatter, default title policy `omit`. Nothing outside `calendar/alerts/` imports it (grep of the whole tree: only the alerts folder, qa/ and the contract mention it). PASS is for that scope only.
+
+## 1. ISS-ALERTFIX-002 by my own run (both routes: skipped, job): 44/44
+Ledger reproduction verbatim, `Object.create({titlePolicy:"masked"})`, class instance with policy on its prototype, null-prototype options without a policy, Proxy whose `get` says "masked" but `has`/`getOwnPropertyDescriptor` say absent, Proxy whose descriptor says present but `get` returns undefined, frozen and sealed options with no policy, a polluted `Object.prototype.titlePolicy` (deleted in a finally, absence asserted), non-object options (string, number, array, function, true, Symbol) with `String.prototype`/`Function.prototype` also polluted: every one is byte-identical to the explicit `omit` output and contains no title. Opt-in cases that must select masked all do: null-prototype options with own "masked", frozen with own "masked", own non-enumerable "masked", an own ACCESSOR returning "masked", and a Proxy that itself reports the property as own (its descriptor trap says present) and returns "masked". Rulings: an own getter and a self-declared-own Proxy are a deliberate opt-in (the caller wrote the property on the object it passed), so they count; an own THROWING getter on `titlePolicy` gives `omit` and the alert is still produced (readPolicy has its own try). A throwing getter on any OTHER option (or a throwing Proxy) drops to the pre-existing counted `unreadable-input` result; unchanged behaviour, not a regression.
+
+## 2. Own-checking the other options
+Behavioural change exists, only for inherited input: an inherited `skipped` or `jobs` (or timeZone, now, startTimes) is now ignored. My probe: `Object.assign(Object.create({skipped, jobs}), {timeZone, now})` used to yield 2 alerts and now yields `{alerts:[], ignored:{count:0,reasons:{}}}`: a SILENT loss of operator alerts with a zero ignore count. Callers: none exist (no importer outside the folder; no TASKS/doc caller), so no real or planned caller is affected today. Old module (a95f81e) vs new on 200 seeded ordinary plain-object inputs (mixed reasons, jobs, startTimes, zones, both policies): byte-identical, 200/200, 170 of them with at least one alert. Ruling: ACCEPTABLE, as a documented contract (options and the `skipped`/`jobs` containers must be own data properties of a plain object; the exported type is a plain interface and the only natural caller builds an object literal), and the same own-only reading was already applied to every per-item and per-row field. Wiring note for the wiring checker (not filed, low): the wiring unit must build the input as an object literal, and a test there should assert that a real batch yields the expected alert count, because this formatter will not report an inherited list.
+
+## 3. Echo audit
+`git show 9dae5d3:.../alert-text.corpus.test.ts` vs now: the same input and the same three assertions (alerts length 2, no `zmark` anywhere in the serialised result, ignored-reasons set), now run in a loop over `omit` and `masked` with the policy passed explicitly. The cycle-0 weakness is gone. My mutation: source mutant "masked body echoes the raw session key". With the audit reverted to omit-only the echo-audit test PASSES (survives that test; only the D-015 masked corpus test catches it); with the both-policy audit the echo-audit test FAILS. So the audit is now stricter, as claimed.
+
+## 4. G4
+`node scripts/tracker-audit.mjs --gate g4`: this manifest is no longer flagged. Gating findings now 6 (not this unit's): medium-fix-batch-2-2026-10-10, r1-attention-alerts, t-031-audio-watchdog, t-033-bot-tests, u3-notify-channels, u4b-heartbeat-collection. Advisory: this verdict file's cycle-0 block cites ISS-006/009 bare (checker-owned, not gating; not rewritten here).
+
+## 5. Cycle-0 findings still hold
+omit byte-identity: 300 of my own titles (mixed passcode/keyword/URL/Devanagari/CJK/Cyrillic/Hebrew/emoji/control/200-char), both routes, three ways (omit, absent policy, title removed), with and without start time: 600/600 identical. ISS-R1ALERTS-001..008 under both policies (the corpus test): 21/21, 1/1, 4/4, 2/2, 4/4, 37/37, 3/3, 2/2 under masked and under omit. -009/-010/-011: omit 15/15, 12/12, 5/5; masked 0/15, 0/12, 5/5. 14 skip reasons: test W10 passes. Nothing wired.
+
+## 6. Mutations (6 of my own; per-mutation byte backup; restore in finally; timeout 280 s; after each `git hash-object` equals `git rev-parse HEAD:<file>`, all true; git status clean): 6/6 killed
+M1 own-check removed on the job route only (killed by the inherited and polluted-prototype tests); M2 `in` instead of hasOwn (killed, incl. option audit); M3 plain read when the prototype is not null (killed); M4 default flipped to masked (killed, 8+ tests); M5 echo audit masked branch dropped plus a masked-only echo mutant (see item 3: the audit test catches it only with both policies); M6 `opt()` falls back to the inherited value when own is undefined (killed).
+
+## 7. Commands
+Tests: policy 12/12, attention 10/10, alert-text 15/15, corpus 9/9. `tsc --noEmit -p tsconfig.json` in packages/meeting-bot: exit 0. `lint-dirsize: OK (113 dir(s) within budget)`. Source non-blank lines within budget (attention-alerts.ts 213). Merge readiness: `git merge-tree --write-tree codex/machine-migration-2026-10-09 lane/alertfix` is clean (tree bcab34f, exit 0, no conflicts); the merged `calendar/` holds 25 direct files (main has 30) plus the `alerts/` folder with 6.
+
+ISSUES-WRITTEN: none
+
+EXPLANATION: The cycle-0 blocker is fixed at the single helper that every option read goes through, and the 44-case probe plus the unit's 6/6 and 2/2 show that only a genuine own "masked" selects the leaky policy. The stricter own-only reading of `skipped`/`jobs` is a contract, not a regression, with no caller today. Echo audit, G4 and the cross-checks hold.
+
+Merge conditions: (1) merge by the Approver's usual path; nothing else in the lane is waived. (2) Standing wiring gates, binding on the next unit: W8: no sender is attached, and `masked` is enabled for any sender only with the Approver's written acceptance (-009 and -010 stay OPEN: closed for `omit`, 0/15 and 0/12 for `masked`); W9: an operator-resolvable handle for the hashed id must ship in the same unit as any sender (ISS-ALERTFIX-001, open). (3) The wiring unit builds the options as an object literal with own properties and tests that a real batch yields alerts. Ledger: ISS-ALERTFIX-002 verified; ISS-R1ALERTS-011 verified for `masked` only; ISS-R1ALERTS-009/-010 annotated, still open. Manifest status not flipped (maker close-out).
