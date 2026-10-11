@@ -34,6 +34,7 @@ const EVENTS: CalendarEvent[] = [
   ev("evX7", "Webinar Cancelled", { meetingUrl: "https://zoom.us/j/33333333333", cancelled: true }),
   ev("evI9", "Webinar BadTime", { meetingUrl: "https://zoom.us/j/55555555555", endTime: "2026-10-10T10:01:00.000Z" }),
   ev("evP8", "Webinar Past", { meetingUrl: "https://zoom.us/j/44444444444", startTime: "2026-10-10T08:00:00.000Z", endTime: "2026-10-10T09:00:00.000Z" }),
+  ev("evF10", "Webinar FreeText", { meetingUrl: "https://zoom.us/j/88888888888", meetingUrlSource: "description" }),
 ];
 const cand = (id: string, o: Partial<AutoRecordCandidateInput>): AutoRecordCandidateInput => ({
   id, title: "Webinar Mail", senderEmail: "host@example.org", senderDomain: "example.org", senderAuthenticated: true, status: "pending",
@@ -70,7 +71,7 @@ async function build() {
 
 const sourceOf = (text: string) => /source:   (.*)/.exec(text)?.[1]?.replace(/; status .*/, "") ?? "";
 
-test("production-shaped state: the fixture covers all 14 skip reasons from core, none hand-picked", async () => {
+test("production-shaped state: the fixture covers all 15 skip reasons from core, none hand-picked", async () => {
   const b = await build();
   assert.deepEqual([...new Set(b.skipped.map((s) => s.reason))].sort(), [...SKIP_REASONS].sort());
   assert.equal(b.scheduled.length, 1, "the real tick scheduled exactly one session (evJ1)");
@@ -94,6 +95,7 @@ const EXPECTED: Record<string, [boolean, boolean, string]> = {
   "opted-out": [false, false, ""],
   "rule-denied": [false, false, ""],
   "rules-unevaluable": [false, false, ""],
+  "unverified-link-source": [false, false, ""],
 };
 
 test("per-kind table: every skip reason -> alert emitted? -> resolves? -> from which source (default and --include-untagged agree)", async () => {
