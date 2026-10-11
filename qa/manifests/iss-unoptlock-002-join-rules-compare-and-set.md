@@ -1,6 +1,6 @@
 # iss-unoptlock-002-join-rules-compare-and-set
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2/3 (open ledger issue ISS-UNOPTLOCK-002, medium; step 1 of 3 toward ISS-T037UI-001, medium). Class: data write deciding whether the bot joins a meeting: full ceremony. Verdict by the checker only.
 Lane: lane/rulescas. Lane ledger `qa/issues.rulescas.jsonl`: no findings filed (file not created). Existing ledger rows untouched.
