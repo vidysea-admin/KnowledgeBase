@@ -55,6 +55,8 @@ export function selectVerifiedCalendarMeetings(input, observationFor) {
     const observation = observationFor(event);
     let reason = event.cancelled ? 'cancelled' : !observation ? 'needs-review' : observation.approval !== 'accepted' ? observation.approval : undefined;
     reason ??= identity && barriers.get(identity);
+    // T-036: a link read from the invite's free text (any source but absent or "conference") is never attended automatically.
+    if (!reason && event.meetingUrlSource !== undefined && event.meetingUrlSource !== 'conference') reason = 'unverified-link-source';
     if (!reason && (!isDirectWebinarJoin(event.meetingUrl, event.startTime) || !identity)) reason = 'unsafe-join-link';
     const start = Date.parse(event.startTime), end = Date.parse(event.endTime);
     if (!reason && (!Number.isFinite(start) || !Number.isFinite(end) || end <= start)) reason = 'invalid-time';

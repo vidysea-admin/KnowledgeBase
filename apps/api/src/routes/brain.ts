@@ -28,7 +28,7 @@ export interface SessionDetail {
 const SKIP_REASON_KEYS: Record<SkipReason, true> = {
   "no-join-link": true, "past": true, "untrusted-sender": true, "needs-registration": true, "duplicate-session": true, "overlap-lost": true,
   "not-webinar": true, "needs-review": true, "cancelled": true, "invalid-time": true, "unsafe-join-link": true,
-  "opted-out": true, "rule-denied": true, "rules-unevaluable": true,
+  "opted-out": true, "rule-denied": true, "rules-unevaluable": true, "unverified-link-source": true,
 };
 /** Operation reasons that are not SkipReasons. Anything outside both lists is shown as the neutral "processing-failed". */
 const OPERATION_ONLY_REASONS = ["retry-limit", "interrupted-no-recording-artifact", "missed-while-processing", "missed-coverage", "controller-disconnected",

@@ -72,7 +72,7 @@ test("a rejecting transport's error has the token redacted before it leaves the 
 
 test("operation alerts name every SkipReason as-is and map an unknown reason to the neutral label (ISS-T037W1-003)", async () => {
   const SKIP_REASONS = Object.keys(SKIP_REASON_MEANING); // total Record<SkipReason,string>: one entry per SkipReason
-  assert.equal(SKIP_REASONS.length, 14);
+  assert.equal(SKIP_REASONS.length, 15);
   for (const r of ["opted-out", "rule-denied", "rules-unevaluable"]) assert.ok(SKIP_REASONS.includes(r), r);
   const sent: Array<{ reason?: string }> = [];
   const state: Record<string, any> = { operations: {} };

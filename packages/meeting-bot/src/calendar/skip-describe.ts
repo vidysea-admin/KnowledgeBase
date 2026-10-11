@@ -21,13 +21,16 @@ export const SKIP_REASON_MEANING: Record<SkipReason, string> = {
   "opted-out": "the owner opted out of this meeting, so the bot will not join it",
   "rule-denied": "a join rule denies this meeting, so the bot will not join it",
   "rules-unevaluable": "the join rules could not be read or evaluated, so the bot did not join (failing closed)",
+  "unverified-link-source": "link found in the invite text, not verified, so the bot will not join it automatically; if you trust the invite, send the bot to it manually (send-now)",
 };
 
 /** Reasons produced by the join-rules veto layer; only these get the explanatory sentence (older log lines unchanged). */
 export const VETO_SKIP_REASONS: readonly SkipReason[] = ["opted-out", "rule-denied", "rules-unevaluable"];
+/** Reasons whose log line also carries the operator sentence: the veto reasons plus the T-036 link-provenance reason. */
+const EXPLAINED_SKIP_REASONS: readonly SkipReason[] = [...VETO_SKIP_REASONS, "unverified-link-source"];
 
 export function describeSkip(s: SkippedItem): string {
   const detail = s.detail ? ` (${s.detail})` : "";
-  const meaning = VETO_SKIP_REASONS.includes(s.reason) ? ` — ${SKIP_REASON_MEANING[s.reason]}` : "";
+  const meaning = EXPLAINED_SKIP_REASONS.includes(s.reason) ? ` — ${SKIP_REASON_MEANING[s.reason]}` : "";
   return `  skip [${s.reason}]${detail} — ${s.source}:${s.sourceId} "${s.title}"${meaning}`;
 }

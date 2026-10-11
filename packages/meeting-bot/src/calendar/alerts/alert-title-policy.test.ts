@@ -152,7 +152,7 @@ test("omit: non-string and hostile title values change nothing", () => {
 });
 
 test("W10 / ISS-T037W1-003: every core SKIP_REASONS value is a known reason; an unknown one is `other`", () => {
-  assert.equal(SKIP_REASONS.length, 14);
+  assert.equal(SKIP_REASONS.length, 15);
   assert.equal(KNOWN_SKIP_REASONS.size, SKIP_REASONS.length);
   const mapped = new Set(["needs-registration", "overlap-lost", "untrusted-sender", "no-join-link", "unsafe-join-link"]);
   let passed = 0;

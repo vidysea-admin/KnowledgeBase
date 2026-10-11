@@ -154,3 +154,12 @@ test('accepted ordinary meeting reaches actual runner and downstream CLI backend
   assert.equal(existsSync(join(f.stateDir, 'poller.lock')), false); assert.deepEqual(f.sideEffects(), {registrations: 0, sends: 0});
   await runPipelineTick(f.deps, true); assert.equal(f.calls.length, 1, 'restart must not rejoin the failed occurrence without its explicit recovery flow');
 }, {proof: true}));
+
+test('T-036 (ISS-T036CAL-009): the attendance selector never attends a link whose source is not conference data', () => {
+  const observation = rawAttendanceObservation(raw({}));
+  const run = source => selectVerifiedCalendarMeetings(input([source === undefined ? observation.event : {...observation.event, meetingUrlSource: source}]), () => observation);
+  for (const source of [undefined, 'conference']) assert.equal(run(source).toSchedule.length, 1, String(source));
+  for (const source of ['description', 'location', 'Conference', '', 'x']) {
+    const r = run(source); assert.equal(r.toSchedule.length, 0, source); assert.deepEqual(r.skipped.map(s => s.reason), ['unverified-link-source'], source);
+  }
+});
