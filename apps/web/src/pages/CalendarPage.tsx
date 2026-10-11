@@ -230,7 +230,9 @@ export function CalendarPage(): React.ReactElement {
                   key={selectedMeeting.id}
                   apiKey={apiKey}
                   eventId={selectedMeeting.id}
+                  title={selectedMeeting.title}
                   meetingUrl={selectedMeeting.meetingUrl}
+                  linkCount={optedOut.linkCount}
                   optedOut={optedOut.ids?.has(selectedMeeting.id) ?? false}
                   onOptedOut={optedOut.add}
                 />

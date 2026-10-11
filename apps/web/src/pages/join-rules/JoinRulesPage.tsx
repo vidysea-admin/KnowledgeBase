@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../../auth/AuthContext.js";
 import { ApprovalsPanel } from "./ApprovalsPanel.js";
+import { JOIN_RULES_ENFORCED, pageCopy } from "./enforcement.js";
 import { RuleSetEditor } from "./RuleSetEditor.js";
 import { MESSAGES, classify, getJoinRules, postPending, putRuleSet, type Problem } from "./joinRulesClient.js";
 import {
@@ -32,6 +33,7 @@ function readText(p: Problem): string {
 }
 
 export function JoinRulesPage(): React.ReactElement {
+  const copy = pageCopy(JOIN_RULES_ENFORCED);
   const { apiKey } = useAuth();
   const [phase, setPhase] = useState<Phase>({ name: "loading" });
   const [loaded, setLoaded] = useState<Loaded | null>(null);
@@ -133,7 +135,7 @@ export function JoinRulesPage(): React.ReactElement {
   };
 
   return <>
-    <div className="page-header"><h1>Join rules</h1><p>Decide which meetings the bot may join without a human click.</p></div>
+    <div className="page-header"><h1>Join rules</h1><p>{copy.subtitle}</p></div>
     {!apiKey ? <p className="card empty-note">Sign in with an API key to view join rules.</p>
       : phase.name === "loading" ? <p role="status">Loading join rules…</p>
       : phase.name === "blocked" ? <div className="card">
@@ -142,7 +144,7 @@ export function JoinRulesPage(): React.ReactElement {
       </div>
       : loaded && <>
         {readOnly && <p role="alert" className="card error-note">{MESSAGES.readOnly}</p>}
-        {notice && <p role={notice.kind === "ok" ? "status" : "alert"} className={notice.kind === "ok" ? "card" : "card error-note"}>{notice.text}</p>}
+        {notice && <p role={notice.kind === "ok" ? "status" : "alert"} className={notice.kind === "ok" ? "card" : "card error-note"}>{notice.text}{notice.kind === "ok" && <span>{copy.noticeSuffix}</span>}</p>}
         <section className="card" aria-label="Rule set">
           <h2 className="section-title">Rules</h2>
           <RuleSetEditor draft={draft} disabled={readOnly || busy} onChange={next => { setDraft(next); setProblems([]); }} onAdd={addRule} />
@@ -163,7 +165,7 @@ export function JoinRulesPage(): React.ReactElement {
         </section>
         <section className="card" aria-label="Approvals and opt-outs">
           <h2 className="section-title">Approvals and opt-outs</h2>
-          <p className="row-meta">An approval makes the bot join future meetings from that sender or domain with no human click.</p>
+          <p className="row-meta">{copy.approvalsNote}</p>
           <ApprovalsPanel state={loaded.view.state} disabled={readOnly} busy={busy} onConfirm={p => void confirmPending(p)} />
         </section>
       </>}

@@ -141,7 +141,7 @@ describe("outcome states", () => {
 
   test("success shows the meeting as opted out and offers no undo", async () => {
     const user = userEvent.setup(); await open(); await ask(user); await user.click(confirmBtn());
-    expect((await screen.findByTestId("opt-out-done")).textContent).toMatch(/Opted out/);
+    expect((await screen.findByTestId("opt-out-done")).textContent).toMatch(/Opt-out recorded/);
     expect(screen.queryByRole("button", { name: /opt out|undo|remove/i })).toBeNull();
   });
 

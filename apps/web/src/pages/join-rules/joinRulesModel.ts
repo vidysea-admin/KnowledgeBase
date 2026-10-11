@@ -4,6 +4,7 @@
  * (join-rules-normalize.ts). apps/web may not import packages/meeting-bot, so the rules are re-stated here;
  * this is a CONVENIENCE for the form only. The server re-validates and stays the authority.
  */
+import { JOIN_RULES_ENFORCED } from "./enforcement.js";
 export const PLATFORMS = ["meet", "teams", "zoom", "webex", "zoho", "cloudonair", "unknown"] as const;
 export type Platform = typeof PLATFORMS[number];
 export type Effect = "allow" | "deny";
@@ -136,13 +137,19 @@ export function checkPendingValue(kind: PendingKind, raw: string): { value: stri
 }
 
 /** The plain-language consequence the user must confirm. Domain approval is deliberately stronger. */
-export function confirmationText(p: Pending): string {
+export function confirmationText(p: Pending, enforced: boolean = JOIN_RULES_ENFORCED): string {
+  const note = enforced ? "" : " Join rules are not enforced by the bot yet: this is recorded, and the bot may still join until enforcement is switched on.";
   if (p.kind === "sender") {
-    return `Approving ${p.value} means the bot will join future meetings from ${p.value} automatically, with no human click.`;
+    return enforced
+      ? `Approving ${p.value} means the bot will join future meetings from ${p.value} automatically, with no human click.`
+      : `Approving ${p.value} records that, once enforcement is switched on, the bot joins future meetings from ${p.value} automatically, with no human click.${note}`;
   }
   if (p.kind === "domain") {
-    return `Approving the domain ${p.value} means the bot will join future meetings from EVERY sender at ${p.value} automatically, with no human click. `
-      + `That includes addresses you have never seen and people who join that organisation later. Approve a whole domain only if you fully trust everyone who can send from it.`;
+    return (enforced ? `Approving the domain ${p.value} means the bot will join future meetings from EVERY sender at ${p.value} automatically, with no human click. `
+      : `Approving the domain ${p.value} records that, once enforcement is switched on, the bot joins future meetings from EVERY sender at ${p.value} automatically, with no human click. `)
+      + `That includes addresses you have never seen and people who join that organisation later. Approve a whole domain only if you fully trust everyone who can send from it.${note}`;
   }
-  return `Opting out of event ${p.value} means the bot will not join that meeting, even if a rule or an approval would otherwise allow it.`;
+  return enforced
+    ? `Opting out of event ${p.value} means the bot will not join that meeting, even if a rule or an approval would otherwise allow it.`
+    : `Opting out of event ${p.value} records an opt-out for that event.${note}`;
 }

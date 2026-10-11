@@ -1,3 +1,4 @@
+import { JOIN_RULES_ENFORCED, pageCopy } from "./enforcement.js";
 import { PLATFORMS, type DraftSet, type RuleDraft } from "./joinRulesModel.js";
 
 const row: React.CSSProperties = { display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center", marginBottom: "0.4rem" };
@@ -7,6 +8,7 @@ interface Props { draft: DraftSet; disabled: boolean; onChange: (next: DraftSet)
 
 /** Form mirroring the rule-set shape. Every value is controlled text; nothing is ever rendered as HTML. */
 export function RuleSetEditor({ draft, disabled, onChange, onAdd }: Props): React.ReactElement {
+  const copy = pageCopy(JOIN_RULES_ENFORCED);
   const patch = (key: number, p: Partial<RuleDraft>) => onChange({ ...draft, rules: draft.rules.map(r => r.key === key ? { ...r, ...p } : r) });
   const remove = (key: number) => onChange({ ...draft, rules: draft.rules.filter(r => r.key !== key) });
   return <>
@@ -16,7 +18,7 @@ export function RuleSetEditor({ draft, disabled, onChange, onAdd }: Props): Reac
     </label>
     <h3 className="section-title">Rules</h3>
     <p className="row-meta">Rules are checked top to bottom. A matching deny rule always wins over an allow rule. All matchers filled in on one rule must match together.</p>
-    {draft.rules.length === 0 && <p className="empty-note">There are no rules. Without a rule or an approval, the bot never joins on its own.</p>}
+    {draft.rules.length === 0 && <p className="empty-note">{copy.noRules}</p>}
     <ol style={{ listStyle: "none", padding: 0 }}>
       {draft.rules.map((r, i) => <li key={r.key} className="card" aria-label={`Rule ${i + 1}`}>
         <div style={row}>
@@ -25,8 +27,8 @@ export function RuleSetEditor({ draft, disabled, onChange, onAdd }: Props): Reac
           </label>
           <label>Effect
             <select aria-label={`Rule ${i + 1} effect`} disabled={disabled} value={r.effect} onChange={e => patch(r.key, { effect: e.target.value === "deny" ? "deny" : "allow" })}>
-              <option value="allow">allow (join with no click)</option>
-              <option value="deny">deny (never join)</option>
+              <option value="allow">{copy.allow}</option>
+              <option value="deny">{copy.deny}</option>
             </select>
           </label>
           <button type="button" disabled={disabled} aria-label={`Remove rule ${i + 1}`} onClick={() => remove(r.key)}>Remove</button>
