@@ -23,17 +23,18 @@ export interface QueueJob {
 }
 
 /** What a worker holds after a claim; every later call must present it (fences a stale handler of an older attempt). */
-export interface LeaseRef { id: string; workerId: string; attempt: number }
+/** `tenantId` is optional for compatibility: when present it MUST own the job or the call is refused as "not-found" (BEFORE WIRING: production callers must pass it). */
+export interface LeaseRef { id: string; workerId: string; attempt: number; tenantId?: string }
 
 export type QueueErrorCode =
-  | "invalid-input" | "corrupt" | "io-error" | "conflict" | "not-found" | "not-leased" | "stale-lease" | "terminal";
+  | "invalid-input" | "corrupt" | "io-error" | "conflict" | "id-conflict" | "payload-mismatch" | "not-found" | "not-leased" | "stale-lease" | "terminal";
 export interface QueueError { code: QueueErrorCode; message: string }
 export type QueueResult<T> = { ok: true; value: T } | { ok: false; error: QueueError };
 
 export interface EnqueueInput { id: string; tenantId: string; payload: unknown; maxAttempts?: number }
 
 export interface JobQueue {
-  /** Idempotent on `id`: a second enqueue of the same id changes nothing and reports "exists". */
+  /** Idempotent on `id`. Same id + same tenant + equal payload (canonical JSON): "exists". Same id, other tenant: error "id-conflict" (fixed message, same for every job state). Same tenant, different payload: error "payload-mismatch". Never overwrites. */
   enqueue(input: EnqueueInput): QueueResult<"enqueued" | "exists">;
   /** Oldest ready job (or leased job whose lease expired and attempts remain), restricted to `tenantId` when given. null = none. */
   claim(workerId: string, opts?: { tenantId?: string }): QueueResult<QueueJob | null>;

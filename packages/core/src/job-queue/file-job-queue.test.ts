@@ -21,7 +21,7 @@ test("enqueue is idempotent on the id and stores tenant and payload untouched", 
   const { q, fs } = setup();
   assert.deepEqual(q.enqueue({ id: "a", tenantId: "T1", payload: { x: 1 } }), { ok: true, value: "enqueued" });
   const before = fs.files.get(`/q/${QUEUE_FILE}`);
-  assert.deepEqual(q.enqueue({ id: "a", tenantId: "T2", payload: { x: 2 } }), { ok: true, value: "exists" });
+  assert.deepEqual(q.enqueue({ id: "a", tenantId: "T1", payload: { x: 1 } }), { ok: true, value: "exists" });
   assert.equal(fs.files.get(`/q/${QUEUE_FILE}`), before, "a duplicate enqueue writes nothing");
   assert.deepEqual([stored(fs)[0]?.tenantId, stored(fs)[0]?.payload], ["T1", { x: 1 }]);
 });

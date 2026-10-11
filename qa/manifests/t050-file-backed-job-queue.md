@@ -1,7 +1,7 @@
 # t050-file-backed-job-queue
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 3 (roadmap task T-050, slice 4a of "Proposed next slices" item 4 in qa/manifests/t050-resumable-pipeline-planner.md: "Job queue seam (interface + file-backed impl)"). T-050 stays open.
 Lane: lane/jobqueue. Class: data write (a queue file is written): full ceremony. Ledger for this lane: qa/issues.jobqueue.jsonl, ids ISS-JOBQUEUE-NNN (none filed).
 
@@ -52,3 +52,19 @@ Interface: `enqueue({id,tenantId,payload,maxAttempts?})` -> "enqueued"|"exists";
 
 ## Export decision (coordinator constraint: apps/web imports `@lkb/core`)
 Verified: apps/web/src/api/*.ts import `@lkb/core`; packages/core/package.json has `"main": "./src/index.ts"` and NO `exports` map (no subpaths exist), so everything in `index.ts` reaches the web graph. Option taken: NOTHING from `job-queue/` is exported from `packages/core/src/index.ts` (the file is unchanged; `queue-store.ts` imports `node:fs`/`node:crypto`/`node:path`). Adding a subpath `exports` map was rejected: it would change how every consumer resolves `@lkb/core`. A Node-side consumer imports by path, as for the planner: `import { FileJobQueue } from "<rel>/packages/core/src/job-queue/file-job-queue.js"` (types: `.../queue-types.js`, which is fs-free and could be re-exported later). Proof: `apps/web`: `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` -> exit 0; packages/core tsc exit 0.
+
+## Fix cycle 1 (checker FAIL cycle 0: ISS-JOBQUEUE-001 high, tenancy)
+Contract invariant 8 fixes the choice: a different tenantId "must yield a typed error, not `exists`". Chosen: job identity stays global (ids unique), the refusal is fixed and state-independent.
+- enqueue, same id, OTHER tenant -> `{ok:false,error:{code:"id-conflict",message:"job id is not available"}}`; byte-identical answer whether the other job is ready, leased, done or dead; no payload, tenant or state detail; nothing written. Residual, accepted by the contract: a caller can still learn that the id is taken (the refusal itself); it learns nothing else.
+- enqueue, same id, same tenant, DIFFERENT payload -> `{ok:false,error:{code:"payload-mismatch"}}`; the stored job is never overwritten.
+- enqueue, same id, same tenant, equal payload -> `{ok:true,value:"exists"}` (idempotent, writes nothing). Equality = `canonicalQueuePayload` (queue-payload.ts): object keys sorted recursively, array order kept, JSON scalars. `maxAttempts` is not part of equality.
+- `LeaseRef` gains optional `tenantId`. When present, heartbeat/complete/fail refuse a job owned by another tenant with `not-found` (deep-equal to the answer for a missing job id), writing nothing; it is validated like any id. Callers passing none behave exactly as before. BEFORE WIRING: production callers MUST pass `tenantId` on every ref.
+
+D-015 count: `ISS-JOBQUEUE-001: 2/2` recorded enqueue reproductions, parsed verbatim from the ledger row's `evidence` text in `qa/issues.jobqueue.jsonl` and replayed (first -> enqueued, second -> id-conflict, file unchanged), plus the row's implied claim for tenant tb returns null. The row's aggregate counts (4,741 tenant / 2,376 payload cases) are checker-model totals, not individually recorded cases; the payload variant is covered by the separate payload-mismatch test. Nothing from the row is left open.
+
+New tests (`file-job-queue.tenancy.test.ts`, 6): ledger replay; payload equality incl. key order; canonical unit; id-conflict identical across ready/leased/done/dead; ref-tenant; property of 1,000 seeded cases x 12 tenant-B operations (enqueue, claim, heartbeat, complete, fail against A's ids, real and forged refs): every result is the fixed id-conflict / null / a not-found deep-equal to the missing-id answer, A's file bytes unchanged, results never contain A's secret payload token, tenant, worker or lease fields.
+
+Evidence: 15/15, 4/4, 1/1, 6/6 (node --test per file); `tsc --noEmit` packages/core exit 0, apps/web exit 0; lint-dirsize OK; lint-dupes OK; max file 139 lines.
+Mutations on changed code: 14, 14 killed, 0 survived (tenant check removed/inverted/answers exists, message leaks holder, payload check removed, payload coded id-conflict, keys unsorted, arrays sorted, shallow canonical (first survived; array-nested key-order assertion added, then killed), ref tenant check removed/inverted/wrong code/unvalidated, not-found leaks tenant). Byte backup per mutation, finally-restore, hash equals staged blob each time.
+
+Not covered, unchanged: ISS-JOBQUEUE-002 (cross-process lost update between the pre-rename re-read and the rename) stays open as a BEFORE-WIRING condition (needs a lock or version CAS, plus pruning). Also not covered: existence of an id is still observable to other tenants via id-conflict (contract-mandated); an unrestricted `claim()` still sees every tenant (callers must pass tenantId).

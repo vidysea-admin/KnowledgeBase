@@ -8,11 +8,12 @@
 import {
   DEFAULT_LEASE_MS, DEFAULT_MAX_ATTEMPTS, validateQueueId, type EnqueueInput, type JobQueue, type LeaseRef, type QueueError, type QueueJob, type QueueResult,
 } from "./queue-types.js";
+import { canonicalQueuePayload } from "./queue-payload.js";
 import { loadQueue, realQueueFs, saveQueue, type QueueFileState, type QueueFs } from "./queue-store.js";
 
 export interface FileJobQueueOptions { dir: string; now: () => number; leaseMs?: number; fs?: QueueFs }
 const err = (code: QueueError["code"], message: string): { ok: false; error: QueueError } => ({ ok: false, error: { code, message } });
-const refError = (r: LeaseRef) => validateQueueId(r?.id, "job id") ?? validateQueueId(r?.workerId, "worker id");
+const refError = (r: LeaseRef) => validateQueueId(r?.id, "job id") ?? validateQueueId(r?.workerId, "worker id") ?? (r?.tenantId === undefined ? null : validateQueueId(r.tenantId, "tenant id"));
 const expired = (j: QueueJob, now: number) => j.status === "leased" && j.leaseExpiresAt !== null && now >= j.leaseExpiresAt;
 
 export class FileJobQueue implements JobQueue {
@@ -42,7 +43,12 @@ export class FileJobQueue implements JobQueue {
     if (!Number.isSafeInteger(max) || max < 1 || max > 100) return err("invalid-input", "maxAttempts must be an integer 1..100");
     let payload: unknown; try { payload = JSON.parse(JSON.stringify(input.payload ?? null)); } catch { return err("invalid-input", "payload is not JSON-serialisable"); }
     return this.run((s, now) => {
-      if (s.jobs.some(j => j.id === input.id)) return { ok: true, value: "exists" as const };
+      const prior = s.jobs.find(j => j.id === input.id);
+      if (prior) {
+        if (prior.tenantId !== input.tenantId) return err("id-conflict", "job id is not available"); // fixed text: nothing about the other job
+        if (canonicalQueuePayload(prior.payload) !== canonicalQueuePayload(payload)) return err("payload-mismatch", "job id exists with a different payload");
+        return { ok: true, value: "exists" as const };
+      }
       s.jobs.push({ id: input.id, tenantId: input.tenantId, payload, status: "ready", seq: s.nextSeq++, enqueuedAt: now, attempt: 0, maxAttempts: max, workerId: null, leaseExpiresAt: null, errorCode: null });
       return { ok: true, value: "enqueued" as const };
     });
@@ -64,7 +70,7 @@ export class FileJobQueue implements JobQueue {
   }
   private owned(s: QueueFileState, ref: LeaseRef): QueueResult<QueueJob> {
     const j = s.jobs.find(x => x.id === ref.id);
-    if (!j) return err("not-found", "no such job");
+    if (!j || (ref.tenantId !== undefined && j.tenantId !== ref.tenantId)) return err("not-found", "no such job"); // another tenant's job is indistinguishable from a missing one
     if (j.status === "done" || j.status === "dead") return err("terminal", `job is ${j.status}`);
     if (j.status !== "leased") return err("not-leased", "job is not leased");
     if (j.workerId !== ref.workerId || j.attempt !== ref.attempt) return err("stale-lease", "lease belongs to another worker or attempt");
