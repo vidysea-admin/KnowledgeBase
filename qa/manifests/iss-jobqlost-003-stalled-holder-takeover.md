@@ -1,6 +1,6 @@
 # iss-jobqlost-003-stalled-holder-takeover
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (open ledger issue ISS-JOBQLOST-003, medium, class data write: full ceremony). One of the conditions keeping ISS-JOBQUEUE-002 at `open-before-wiring`; does NOT wire the queue and does not change that row.
 Lane: lane/jobqstall (from dc42571). Ledger for this lane: qa/issues.jobqstall.jsonl, ids ISS-JOBQSTALL-NNN (1 filed, open). No existing ledger row touched.
