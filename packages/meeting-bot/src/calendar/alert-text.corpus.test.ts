@@ -7,12 +7,13 @@ const NOW = "2026-10-10T00:00:00.000Z";
 const u = (...cp: number[]) => String.fromCodePoint(...cp);
 const fw = (s: string) => Array.from(s).map((c) => (c === " " ? c : u(c.charCodeAt(0) + 0xfee0))).join("");
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+let POLICY: "masked" | "omit" = "masked"; // the D-015 test below runs the whole corpus under BOTH title policies
 type Res = ReturnType<typeof buildAttentionAlerts>;
 /** The two routes the verdict names. `start` rides in startTimes (skipped route) or the job row (job route). */
 const skipped = (title: unknown, start?: unknown, key = "cal:corpus"): Res =>
-  buildAttentionAlerts({ timeZone: "UTC", now: NOW, skipped: [{ sessionKey: key, title, reason: "overlap-lost" }], ...(start !== undefined ? { startTimes: { [key]: start } } : {}) } as never);
+  buildAttentionAlerts({ titlePolicy: POLICY, timeZone: "UTC", now: NOW, skipped: [{ sessionKey: key, title, reason: "overlap-lost" }], ...(start !== undefined ? { startTimes: { [key]: start } } : {}) } as never);
 const job = (title: unknown, start?: unknown, key = "job-corpus"): Res =>
-  buildAttentionAlerts({ timeZone: "UTC", now: NOW, jobs: { [key]: { status: "action_required", reason: "retry-limit", title, ...(start !== undefined ? { startTime: start } : {}) } } } as never);
+  buildAttentionAlerts({ titlePolicy: POLICY, timeZone: "UTC", now: NOW, jobs: { [key]: { status: "action_required", reason: "retry-limit", title, ...(start !== undefined ? { startTime: start } : {}) } } } as never);
 const ROUTES = [skipped, job];
 /** whole alert JSON (alert, key, id, ignored); the 20-hex id/key digest hashes an unrelated input so it is removed first */
 const blob = (r: Res) => JSON.stringify(r).replace(/[0-9a-f]{20}/g, "");
@@ -70,7 +71,9 @@ const CLOSURES: [string, string, () => boolean][] = [
   }],
 ];
 
-test("D-015 ledger corpus: every recorded reproduction of ISS-R1ALERTS-001..008, both routes, secret absent from the WHOLE alert JSON", () => {
+for (const policy of ["masked", "omit"] as const) test(`D-015 ledger corpus [${policy}]: every recorded reproduction of ISS-R1ALERTS-001..008, both routes, secret absent from the WHOLE alert JSON`, () => {
+  POLICY = policy;
+  try {
   const tally: Record<string, [number, number]> = {};
   const bump = (issue: string, ok: boolean) => { const t = (tally[issue] ??= [0, 0]); t[1]++; if (ok) t[0]++; };
   for (const x of LEAKS) {
@@ -87,14 +90,15 @@ test("D-015 ledger corpus: every recorded reproduction of ISS-R1ALERTS-001..008,
     bump(x.issue, ok);
   }
   for (const [issue, name, fn] of CLOSURES) { const ok = fn(); assert.ok(ok, `${issue} ${name}`); bump(issue, ok); }
-  for (let i = 1; i <= 8; i++) { const id = `ISS-R1ALERTS-00${i}`; const t = tally[id]!; assert.ok(t, id); assert.equal(t[0], t[1], id); console.log(`${id}: ${t[0]}/${t[1]}`); }
-  console.log(`verdict extras: ${tally.verdict![0]}/${tally.verdict![1]}`);
+  for (let i = 1; i <= 8; i++) { const id = `ISS-R1ALERTS-00${i}`; const t = tally[id]!; assert.ok(t, id); assert.equal(t[0], t[1], id); console.log(`[${policy}] ${id}: ${t[0]}/${t[1]}`); }
+  console.log(`[${policy}] verdict extras: ${tally.verdict![0]}/${tally.verdict![1]}`);
+  } finally { POLICY = "masked"; }
 });
 
-test("ISS-R1ALERTS-006 shape: the keyword hides everything from it to the END of the title; the topic before it stays", () => {
-  assert.equal(sanitize("UK visa webinar - passcode: a b c d"), "UK visa webinar - (hidden)");
-  assert.equal(sanitize("Study in Canada, Zoom password is correct horse battery staple"), "Study in Canada, Zoom (hidden)");
-  assert.equal(sanitize("Webinar OTP 42 17 and more"), "Webinar (hidden)");
+test("ISS-R1ALERTS-006/-011 shape (masked policy): a keyword ANYWHERE hides the WHOLE title", () => {
+  assert.equal(sanitize("UK visa webinar - passcode: a b c d"), "(hidden)");
+  assert.equal(sanitize("Study in Canada, Zoom password is correct horse battery staple"), "(hidden)");
+  assert.equal(sanitize("Webinar OTP 42 17 and more"), "(hidden)");
   assert.equal(sanitize("Passcode: 12 34"), "(hidden)");          // keyword at the very start: the whole title is hidden
   assert.equal(neutralizeText("Passcode: 12 34"), "(hidden)");
   const a = skipped("Passcode: 12 34", "2026-10-12T10:00:00Z").alerts[0]!;

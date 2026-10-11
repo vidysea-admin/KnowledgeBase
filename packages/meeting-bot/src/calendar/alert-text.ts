@@ -92,11 +92,11 @@ function segment(m: string): string {
 }
 
 /**
- * Secret keywords. SHAPE: once one is recognised, EVERYTHING from it to the end of the title is hidden
- * (a passcode follows the topic and may be several words or digit groups, so a one-token mask leaks).
- * A keyword at the very start therefore hides the whole title; the alert stays identifiable by its
- * headline, start time and hashed id. This is a deny-list: a secret with no keyword and no digit/shape
- * pattern ("Webinar tiger") is NOT caught (ISS-R1ALERTS-009, open by design).
+ * Secret keywords. SHAPE: once one is recognised ANYWHERE, the WHOLE title is hidden (a secret may sit on
+ * either side of it, and a passcode may be several words or digit groups). The alert stays identifiable by
+ * its headline, start time and hashed id. This is a deny-list: a secret with no keyword and no digit/shape
+ * pattern ("Webinar tiger") or a misspelt keyword is NOT caught (ISS-R1ALERTS-009/-010), so the alert
+ * formatter defaults to the `omit` title policy and uses this renderer only when `masked` is requested.
  */
 const SP = "[ .\\-_]"; // separators allowed inside a keyword: "pass code", "p i n", "P.I.N.", "pass_word"
 const lit = (w: string) => w.split(" ").join(`${SP}*`);
@@ -122,10 +122,10 @@ export function keywordIndex(s: string): number {
 
 /** Step 2: structural masking of normalised text. */
 export function maskText(s: string): string {
-  const cut = keywordIndex(s);
-  const head = cut < 0 ? s : s.slice(0, cut);
-  let t = maskTokens(head).replace(KEY_SHAPES, HIDDEN).replace(DIGIT_GROUP, digitGroup).replace(SEGMENT, segment);
-  if (cut >= 0) t = `${t.trimEnd()} ${HIDDEN}`.trimStart();
+  // A recognised credential keyword ANYWHERE hides the WHOLE title: the secret may sit on either side of it
+  // ("tiger is the password", ISS-R1ALERTS-011).
+  if (keywordIndex(s) >= 0) return HIDDEN;
+  const t = maskTokens(s).replace(KEY_SHAPES, HIDDEN).replace(DIGIT_GROUP, digitGroup).replace(SEGMENT, segment);
   return t.replace(REPEAT, "$1");
 }
 

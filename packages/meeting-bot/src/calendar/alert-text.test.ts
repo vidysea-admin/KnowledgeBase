@@ -7,9 +7,9 @@ const NOW = "2026-10-10T00:00:00.000Z";
 const u = (...cp: number[]) => String.fromCodePoint(...cp);
 const fw = (s: string) => Array.from(s).map((c) => (c === " " ? c : u(c.charCodeAt(0) + 0xfee0))).join("");
 const skippedAlert = (title: unknown, key = "cal:corpus") =>
-  buildAttentionAlerts({ timeZone: "UTC", now: NOW, skipped: [{ sessionKey: key, title, reason: "overlap-lost" }] } as never);
+  buildAttentionAlerts({ titlePolicy: "masked", timeZone: "UTC", now: NOW, skipped: [{ sessionKey: key, title, reason: "overlap-lost" }] } as never);
 const jobAlert = (title: unknown, id = "job-corpus") =>
-  buildAttentionAlerts({ timeZone: "UTC", now: NOW, jobs: { [id]: { status: "action_required", reason: "retry-limit", title } } } as never);
+  buildAttentionAlerts({ titlePolicy: "masked", timeZone: "UTC", now: NOW, jobs: { [id]: { status: "action_required", reason: "retry-limit", title } } } as never);
 /** the 20-hex id/key digest is of an unrelated input; drop it when matching random secrets */
 const noDigest = (s: string) => s.replace(/[0-9a-f]{20}/g, "");
 
@@ -201,13 +201,13 @@ test("throwing getters, Proxies and inherited fields are counted, never thrown",
   const getter = { get sessionKey(): string { throw new Error("boom"); }, reason: "overlap-lost" };
   const proxy = new Proxy({}, { get() { throw new Error("p"); }, has() { throw new Error("p"); }, ownKeys() { throw new Error("p"); }, getOwnPropertyDescriptor() { throw new Error("p"); } });
   const inherited = Object.create({ sessionKey: "cal:inh", reason: "overlap-lost", title: "t" });
-  const r = buildAttentionAlerts({ timeZone: "UTC", now: NOW, skipped: [getter, proxy, inherited, { sessionKey: "cal:ok", reason: "overlap-lost", title: "ok" }],
+  const r = buildAttentionAlerts({ titlePolicy: "masked", timeZone: "UTC", now: NOW, skipped: [getter, proxy, inherited, { sessionKey: "cal:ok", reason: "overlap-lost", title: "ok" }],
     jobs: { a: { get status(): string { throw new Error("x"); } }, b: proxy, c: Object.create({ status: "action_required" }) } } as never);
   assert.equal(r.alerts.length, 1);
   assert.equal(r.alerts[0]!.id, alertIdFor("cal:ok"));
   assert.equal(r.ignored.count, 6);
   assert.doesNotThrow(() => buildAttentionAlerts(proxy as never));
-  assert.doesNotThrow(() => buildAttentionAlerts({ timeZone: "UTC", now: NOW, skipped: proxy, jobs: proxy } as never));
+  assert.doesNotThrow(() => buildAttentionAlerts({ titlePolicy: "masked", timeZone: "UTC", now: NOW, skipped: proxy, jobs: proxy } as never));
   const cyc: Record<string, unknown> = { status: "action_required", reason: "retry-limit" }; cyc.title = cyc;
-  assert.equal(buildAttentionAlerts({ timeZone: "UTC", now: NOW, jobs: { cyc } } as never).alerts.length, 1);
+  assert.equal(buildAttentionAlerts({ titlePolicy: "masked", timeZone: "UTC", now: NOW, jobs: { cyc } } as never).alerts.length, 1);
 });

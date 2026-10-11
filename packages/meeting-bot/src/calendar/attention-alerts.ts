@@ -8,8 +8,20 @@
  * number run or markup survives), and the raw session key is never emitted: only its opaque hash id.
  */
 import { createHash } from "node:crypto";
-import type { SkippedItem } from "@lkb/core";
+import { SKIP_REASONS, type SkippedItem } from "@lkb/core";
 import { neutralizeText } from "./alert-text.js";
+
+/**
+ * How the event title may appear in an alert. `omit` (the DEFAULT, and the value for anything absent,
+ * invalid or unknown): no title text at all, nothing derived from it, not even its length. `masked`
+ * is the deny-list renderer (alert-text.ts); a caller must ask for it by name, and it cannot catch a
+ * secret with no recognised keyword (ISS-R1ALERTS-009) or a misspelt keyword (-010).
+ */
+export type TitlePolicy = "omit" | "masked";
+export const DEFAULT_TITLE_POLICY: TitlePolicy = "omit";
+export function resolveTitlePolicy(v: unknown): TitlePolicy {
+  return v === "masked" ? "masked" : DEFAULT_TITLE_POLICY;
+}
 
 export type AttentionCase = "needs-registration" | "overlap-lost" | "action-required" | "untrusted-sender" | "join-link";
 export type AttentionSeverity = "high" | "medium";
@@ -37,6 +49,8 @@ export interface AttentionInput {
   /** IANA zone used to render start times (e.g. "Asia/Kolkata"). Required, never implicit. */
   timeZone: string;
   now: string;
+  /** Title policy; absent, invalid or unknown means "omit". "masked" must be asked for explicitly. */
+  titlePolicy?: TitlePolicy;
 }
 
 export interface AttentionResult {
@@ -73,7 +87,8 @@ export function renderStart(iso: string | undefined, timeZone: string): string {
 export function alertIdFor(sessionKey: string): string {
   return createHash("sha256").update(Buffer.from(sessionKey, "utf16le")).digest("hex").slice(0, 20);
 }
-const SKIP_REASONS = new Set(["no-join-link", "past", "untrusted-sender", "needs-registration", "duplicate-session", "overlap-lost", "not-webinar", "needs-review", "cancelled", "invalid-time", "unsafe-join-link"]);
+/** Derived from the core list, so a new SkipReason cannot silently fall into `other` (W10 / ISS-T037W1-003). */
+export const KNOWN_SKIP_REASONS: ReadonlySet<string> = new Set<string>(SKIP_REASONS);
 /** Only a plain ISO-8601 date or date-time WITH an explicit zone is accepted; the output is FORMATTED from the parsed instant, so no caller byte is ever echoed. */
 const STRICT_ISO = /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?(?:Z|[+-]\d{2}:\d{2}))?$/;
 export function canonicalStart(v: unknown): string | undefined {
@@ -101,16 +116,25 @@ const SPECS: Record<AttentionCase, Spec> = {
 };
 
 function build(c: AttentionCase, sessionKey: string, title: unknown, startTime: string | undefined, tz: string,
-  source: "skipped" | "job", reason?: string): AttentionAlert {
+  source: "skipped" | "job", policy: TitlePolicy, reason?: string): AttentionAlert {
   const spec = SPECS[c];
-  const t = neutralizeText(title);
+  const id = alertIdFor(sessionKey);
+  const starts = renderStart(startTime, tz);
   const detail = c === "action-required" && reason ? ` Reason: ${reason}.` : "";
+  // omit: the title argument is never read. Headline, formatted start and the hashed id identify the alert.
+  const masked = policy === "masked";
+  const t = masked ? neutralizeText(title) : "";
   return {
-    key: `attn:${c}:${alertIdFor(sessionKey)}${c === "action-required" && reason ? `:${reason}` : ""}`,
-    case: c, severity: spec.severity, title: `${spec.headline}: ${t}`,
-    body: `${spec.what}${detail}\nEvent: ${t}\nStarts: ${renderStart(startTime, tz)}\nWhat to do: ${spec.todo}`,
-    id: alertIdFor(sessionKey), ...(startTime ? { startTime } : {}), source,
+    key: `attn:${c}:${id}${c === "action-required" && reason ? `:${reason}` : ""}`,
+    case: c, severity: spec.severity, title: masked ? `${spec.headline}: ${t}` : `${spec.headline}: ${starts} [${id}]`,
+    body: `${spec.what}${detail}\n${masked ? `Event: ${t}` : `Event ref: ${id} (title not shown)`}\nStarts: ${starts}\nWhat to do: ${spec.todo}`,
+    id, ...(startTime ? { startTime } : {}), source,
   };
+}
+
+/** Total: a throwing getter on the input cannot make the policy anything but "omit". */
+function readPolicy(input: unknown): TitlePolicy {
+  try { return resolveTitlePolicy((input as AttentionInput | undefined)?.titlePolicy); } catch { return DEFAULT_TITLE_POLICY; }
 }
 
 function caseForReason(reason: unknown): AttentionCase | undefined {
@@ -135,6 +159,7 @@ function buildInner(input: AttentionInput): AttentionResult {
   const alerts: AttentionAlert[] = [];
   const nowMs = Date.parse(typeof input?.now === "string" ? input.now : "");
   const tz = validZone(input?.timeZone);
+  const policy = readPolicy(input);
   const starts = input?.startTimes && typeof input.startTimes === "object" ? input.startTimes : {};
   const startOf = (id: string): string | undefined => {
     const v = Object.prototype.hasOwnProperty.call(starts, id) ? starts[id] : undefined;
@@ -152,8 +177,8 @@ function buildInner(input: AttentionInput): AttentionResult {
       if (typeof sessionKey !== "string" || !sessionKey) { ignore("malformed-skipped-item"); continue; }
       const reason = own(it as object, "reason");
       const c = caseForReason(reason);
-      if (!c) { ignore(`no-alert-for-reason:${typeof reason === "string" ? (SKIP_REASONS.has(reason) ? reason : "other") : "none"}`); continue; }
-      push(build(c, sessionKey, own(it as object, "title"), startOf(sessionKey), tz, "skipped"));
+      if (!c) { ignore(`no-alert-for-reason:${typeof reason === "string" ? (KNOWN_SKIP_REASONS.has(reason) ? reason : "other") : "none"}`); continue; }
+      push(build(c, sessionKey, own(it as object, "title"), startOf(sessionKey), tz, "skipped", policy));
     } catch { ignore("unreadable-skipped-item"); }
   }
 
@@ -170,7 +195,7 @@ function buildInner(input: AttentionInput): AttentionResult {
       const mapped = caseForReason(reason);
       const own0 = canonicalStart(st);
       const safeReason = reason && KNOWN_REASONS.has(reason) ? reason : "unspecified";
-      push(build(mapped ?? "action-required", id, own(row, "title"), startOf(id) ?? own0, tz, "job", safeReason));
+      push(build(mapped ?? "action-required", id, own(row, "title"), startOf(id) ?? own0, tz, "job", policy, safeReason));
     } catch { ignore("unreadable-job-row"); }
   }
 
