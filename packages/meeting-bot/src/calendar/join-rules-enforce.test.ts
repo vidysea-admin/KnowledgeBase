@@ -57,6 +57,7 @@ const MODES = ["fail-closed", "fail-open"] as const;
 
 // ---------- DEFAULT PARITY ----------
 const NOT_ENABLING: unknown[] = [undefined, "off", "", "OFF", "garbage", "true", "1", 1, true, null, " fail-closed", "Fail-Open", "fail-closed ", {}];
+const SILENT: unknown[] = NOT_ENABLING.filter((v) => typeof v !== "string" || v === "" || v === "off"); // unrecognised NON-EMPTY strings now warn (ISS-T037WIRE-002): see join-rules-enforce-preconditions.test.ts
 
 test("parse: only the exact strings fail-closed / fail-open enable enforcement", () => {
   for (const v of NOT_ENABLING) assert.equal(parseJoinRulesEnforce(v), "off", String(v));
@@ -97,7 +98,7 @@ test("DEFAULT PARITY: every non-enabling value gives the un-wired tick's exact o
     for (let seed = 1; seed <= 200; seed++) {
       const inp = genInputs(seed), ref = reference(inp, root), want = expectedLogs(inp, ref);
       scheduledTotal += ref.toSchedule.length;
-      for (const v of NOT_ENABLING) {
+      for (const v of SILENT) {
         const logs: string[] = [];
         const out = await runScheduleTickOnce(deps(root, { loadCalendarEvents: async () => inp.calendarEvents, loadCandidates: async () => inp.candidates,
           everyWebinar: inp.everyWebinar, joinRulesEnforce: v, joinRulesIo: io, logs }), true);
@@ -110,7 +111,7 @@ test("DEFAULT PARITY: every non-enabling value gives the un-wired tick's exact o
     assert.equal(evaluated, 0);
     assert.equal(existsSync(path.join(root, "join-rules")), false, "no join-rules directory touched");
     assert.ok(scheduledTotal >= 20, `seeds exercised real schedules (${scheduledTotal})`);
-    assert.equal(compared, 200 * NOT_ENABLING.length);
+    assert.equal(compared, 200 * SILENT.length);
   });
 });
 
@@ -123,7 +124,7 @@ test("DEFAULT PARITY (real run): scheduler calls, persisted dedup state and logs
   });
   const base = await run(undefined);
   assert.equal(base.out.toSchedule.length, 1, "un-wired tick still schedules the opted-out item");
-  for (const v of NOT_ENABLING) assert.deepEqual(await run(v), base, String(v));
+  for (const v of SILENT) assert.deepEqual(await run(v), base, String(v));
 });
 async function withRootResult<T>(fn: (root: string) => Promise<T>): Promise<T> {
   let out!: T; await withRoot(async (r) => { out = await fn(r); }); return out;

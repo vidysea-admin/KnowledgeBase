@@ -4,7 +4,8 @@
  *
  * Setting (read once, in schedule-tick.ts buildRealScheduleTickDeps, from env LKB_JOIN_RULES_ENFORCE; parsed only here):
  *   `off` (DEFAULT; also absent, empty, any other string, any non-string)  -> returns the selection UNTOUCHED (same reference);
- *        the store is never opened, `applyJoinRules` is never called, nothing is logged.
+ *        the store is never opened, `applyJoinRules` is never called. Nothing is logged for absent/empty/`off`; a non-empty STRING that is
+ *        not exactly one of the three accepted values logs ONE warning per process (ISS-T037WIRE-002) and stays off.
  *   `fail-closed` -> rules enforced; rules that cannot be evaluated => NONE of the tenant's meetings are scheduled (`rules-unevaluable`).
  *   `fail-open`   -> rules enforced when evaluable; otherwise the selection is left exactly as today's, with a loud warning.
  * Only the exact strings `fail-closed` / `fail-open` enable anything. Which one to use is the Approver's decision (W3).
@@ -27,6 +28,23 @@ export function parseJoinRulesEnforce(raw: unknown): JoinRulesEnforceMode {
   return raw === "fail-closed" || raw === "fail-open" ? raw : "off";
 }
 
+/**
+ * ISS-T037WIRE-002: strict parsing stays (only the two exact strings enable), but a non-empty value that is not exactly
+ * `off` / `fail-closed` / `fail-open` is made LOUD: one warning per process (per distinct value), echo bounded and sanitised.
+ */
+let warnedValues = new Set<string>();
+/** Test seam: forget which unrecognised values were already reported in this process. */
+export function resetJoinRulesEnforceWarnings(): void { warnedValues = new Set(); }
+function warnUnrecognised(raw: unknown, log: (msg: string) => void): void {
+  if (typeof raw !== "string" || raw === "" || raw === "off") return;
+  const shown = JSON.stringify(raw.slice(0, 40).replace(/[\x00-\x1f\x7f-\x9f]+|[\p{Zl}\p{Zp}]+/gu, " ")) +
+    (raw.length > 40 ? ` (+${raw.length - 40} more characters)` : "");
+  if (warnedValues.has(shown)) return;
+  warnedValues.add(shown);
+  log(`schedule-tick: JOIN RULES WARNING: ${JOIN_RULES_ENFORCE_ENV} has an unrecognised value ${shown} — enforcement is OFF, ` +
+    "join-rule opt-outs and deny rules are NOT being applied. Accepted values: off, fail-closed, fail-open (exact, case-sensitive; empty = off)");
+}
+
 /** Test seams; production passes none. */
 export interface JoinRulesEnforceIo {
   load?: (stateDir: string, tenantId: string) => StoredJoinRules;
@@ -35,10 +53,15 @@ export interface JoinRulesEnforceIo {
 }
 export interface JoinRulesEnforceConfig {
   mode: unknown; tenantId?: string; stateDir: string; log: (msg: string) => void; io?: JoinRulesEnforceIo;
+  /** The tenant of the API key whose candidates are filtered, WHEN KNOWN. Production passes none today: no response the tick already
+   * receives carries it and there is no whoami route (ISS-T037WIRE-001 stays open). If given and different from `tenantId` => `tenant-mismatch`. */
+  keyTenantId?: unknown;
 }
 
 const RETRY_WAITS_MS = [150, 300];
 const TRANSIENT_CODES = new Set(["locked", "lock-failed", "EBUSY", "EPERM", "EACCES"]);
+const REASON_TENANT_UNSET = "tenant-unset: LKB_TENANT_ID is absent or not a valid tenant id (no default tenant); join rules not evaluated";
+const REASON_TENANT_MISMATCH = "tenant-mismatch: the API key's tenant differs from LKB_TENANT_ID; join rules not applied";
 const DETAIL_FAIL_CLOSED = "join rules could not be read or evaluated; failing closed (see the JOIN RULES log line)";
 
 /** Message safe for a log: control characters removed, path-like text redacted, bounded. */
@@ -50,6 +73,7 @@ function clean(s: string): string {
 /** Only these codes carry a message worth showing (a validation/parse problem); the rest could embed a path or another tenant's name. */
 function describeFailure(e: unknown): string {
   if (e instanceof JoinRulesStoreError) {
+    if (e.code === "bad-tenant") return REASON_TENANT_UNSET; // the store's own tenant validator rejected it; its message echoes the raw value, so not used
     return ["invalid", "corrupt", "too-large"].includes(e.code) ? clean(e.message) : `join-rules store: ${e.code}`;
   }
   const code = (e as { code?: unknown })?.code;
@@ -79,14 +103,15 @@ const skipAll = (items: readonly AutoRecordItem[]): SkippedItem[] => items.map((
 
 export async function enforceJoinRules(selection: SelectAutoRecordItemsResult, c: JoinRulesEnforceConfig): Promise<SelectAutoRecordItemsResult> {
   const mode = parseJoinRulesEnforce(c.mode);
-  if (mode === "off") return selection;
+  if (mode === "off") { warnUnrecognised(c.mode, c.log); return selection; }
   const warn = (why: string, effect: string) =>
     c.log(`schedule-tick: JOIN RULES WARNING (${mode}): ${why} — ${effect}`);
   const items = Array.isArray(selection?.toSchedule) ? selection.toSchedule : [];
   const skipped = Array.isArray(selection?.skipped) ? selection.skipped : [];
 
-  const read = typeof c.tenantId === "string" && c.tenantId !== ""
-    ? await readRules(c) : { error: "join rules not evaluated: the tick has no tenant id (LKB_TENANT_ID)" };
+  const read = typeof c.tenantId !== "string" || c.tenantId === "" ? { error: REASON_TENANT_UNSET }
+    : c.keyTenantId !== undefined && c.keyTenantId !== c.tenantId ? { error: REASON_TENANT_MISMATCH }
+    : await readRules(c);
   if ("error" in read) {
     if (mode === "fail-open") { warn(read.error, "rules NOT applied, selection unchanged"); return selection; }
     warn(read.error, `${items.length} meeting(s) NOT scheduled this tick`);
