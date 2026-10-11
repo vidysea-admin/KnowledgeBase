@@ -66,6 +66,8 @@ qa/evidence/*/cdp-profile/
 # meeting-bot: logged-in bot browser profile (cookies!) + webinar recordings
 data/bot-profile/
 data/browser/
+# reingest snapshots hold transcript text + vectors; public remote, never commit (ISS-REINGESTSAFE-004)
+data/reingest-snapshots/
 .venv/
 .cache/
 .playwright-cli/
