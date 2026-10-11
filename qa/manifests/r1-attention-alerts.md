@@ -1,6 +1,6 @@
 # Manifest — r1-attention-alerts
 
-**Lane:** R1ALERTS (branch lane/r1alerts, base 7f352eb). **Fix cycle:** 1
+**Lane:** R1ALERTS (branch lane/r1alerts, base 7f352eb). **Fix cycle:** 2
 **Backlog tier:** 3 (roadmap, R1 "actual alert" for human-action cases). **Issues addressed:** none (new feature).
 **Round cap:** 0 prior PASSes name a scheduler-outcome alert-formatting seam (the watch alert seam u4a/u4b/u4c is a different seam and untouched).
 
@@ -78,5 +78,44 @@ No recorded reproduction is left open.
 ## Not delivered
 Nothing sends these alerts. The wiring unit (see the contract) must pass `startTimes` and a validated sender domain, suppress the existing generic line for the cases this module handles (to avoid double alerts), cap sends per tick, and keep an id-to-key map.
 
+## Fix cycle 2
+Fixes ISS-R1ALERTS-006 (high), -007, -008 (medium). Files: `alert-text.ts` (142 non-blank lines), `attention-alerts.ts` (187), `alert-text.test.ts` (205, ledger tests moved out), `alert-text.corpus.test.ts` (NEW, 217; the only new file in `calendar/`: 23 files here, 27 after merge, limit 30), `attention-alerts.test.ts` (unchanged). Ledger: ISS-R1ALERTS-009 appended (residual, below); no existing status edited.
+
+**What failed in cycle 1.** The keyword rule hid ONE token, so any multi-token secret leaked (`passcode: tiger seven blue` -> `seven blue`), keywords outside a short list were not recognised, Hindi keywords were absent (006); the fixed-point repeat had no test (007); `startTime` echoed the caller string (008).
+
+**New rule shape (006).** Once a secret keyword is found, EVERYTHING from the keyword to the END of the title becomes one `(hidden)`; the topic before it stays. Why: titles put the passcode after the topic and a secret can be any number of words or digit groups, so a longer word list with a one-token mask fails the next synonym the same way. Keyword at the very start: the whole title becomes `(hidden)`; the alert is still identifiable by its headline ("Session dropped: overlap", "Registration needed"...), `Starts:` line and hashed id (tested). Look-alike keywords (Latin+Cyrillic/Greek token, e.g. Cyrillic a in `passcode`) now also hide the rest of the title. Digit groups with 2+ parts reaching 5 digits (`1 2 3 4 5`, `12 34 5`, `12.34.5`) are masked even with no keyword (the three 006 rows previously "kept"; nothing is left open from the row).
+Recognition runs after normalisation (NFKC, percent-decode, then Latin diacritics and dotless i folded so `pın`, `kód`, `contraseña` match; format characters stripped; case-insensitive). JS `\b` is ASCII-only, so boundaries are explicit `(?<![\p{L}\p{M}])` / `(?![\p{L}\p{M}])`, which also work for Devanagari. Separators inside a keyword: space . - _ (`pass code`, `P.I.N.`, `Pass-Word`); single letters spaced out (`p i n`) need a separator between every letter. camelCase suffixes (`apiKey`) handled.
+Keywords and false-positive cost (end-of-title masking makes each false hit cost the rest of the title):
+- No word boundary (a substring hit anywhere): password, pass word, passcode, pass code, passphrase, passwd, passwrd, passwort, passkey, pwd, pswd, paasvard, paasword, paascode, passvard, kennwort, mot de passe, motdepasse, contrasena. Cost: near zero (real words rarely contain them).
+- Whole word only: pw, psw, pass ("Pass the GRE"), pin ("Pin code areas"), otp, code ("Code of conduct"), kood, kod, secret ("Secret scholarships"), key ("Key takeaways"), token ("Token economy"), tk, credential(s), auth, login ("Login help session"), clave. These are the readability losses: a title starting with one becomes `(hidden)`. Accepted: security wins, and `Keynote`, `pinned`, `codecs`, `monkey`, `Tokenize`, `Passover`, `decode` stay readable (tested).
+- Devanagari (whole word): पासकोड, पासवर्ड, पास कोड, पास वर्ड, पिन, कोड ("कोड ऑफ कंडक्ट" is hidden), ओटीपी, कुंजी, टोकन, सीक्रेट. `कोडिंग`, `पिनाक` stay readable.
+
+**Readability, 40 realistic titles** (the cycle-1 30 plus the checker's examples, Hindi and Hinglish): 24 unchanged, 10 partly kept, 6 fully hidden = 34/40 identifiable by title text. The 6 fully hidden (`Key takeaways ...`, `Code of conduct ...`, `Pin code areas ...`, `Token economy ...`, `Login help session ...`, the Hindi `कोड ऑफ कंडक्ट ...`) remain identifiable by headline, start time and id (asserted).
+
+**Residual left open: ISS-R1ALERTS-009 (medium).** A secret with no keyword and no digit/shape pattern (`Webinar tiger`) is echoed, and so are keywords in unlisted languages, leetspeak (`p4ss`), confusables from scripts other than Cyrillic/Greek, other interior punctuation (`p/i/n`), and keyword-free digit groups of 4 or fewer digits. A deny-list cannot close this. The complete fix is not to echo free-text titles at all (the wiring supplies a non-sensitive identifier). If the contract demands "no secret ever", this unit does NOT meet it; it meets it for every form on the ledger and for the generator. Decision for Umesh.
+
+**Fixed point (007).** `sanitize(input, rounds = 5)`. Non-convergence returns `(hidden)` (fail closed). Natural depth is at most 3 passes (two transforms plus a confirming pass); 400,000 fuzz strings over 31 fragments found none deeper, so the cap of 5 has slack. Tests: `Study 123456 tips` needs 2 passes; `Study 12_34_56 tips`, `Q 12[]34 and 5`, `Study 1#2#3#4 tips`, `a 12{}3{}4 b` need 3. Each is asserted to give the exact result at k passes and `(hidden)` at k-1 (fail closed, no partial text). The checker's `12_34_56` is asserted not to leak `123456`.
+
+**Echo audit (008), field by field** (test `echo audit` plants `ZMARK` in every caller field and searches the whole result JSON):
+- `key`: case (fixed) + 20-hex hash of sessionKey + reason only from the fixed 14-name KNOWN set, else `unspecified`.
+- `case`, `severity`, `source`: constants.
+- `id`: 20-hex hash. `title` and body `Event:` line: allowlist renderer. body `Reason:`: KNOWN set or `unspecified`.
+- `startTime`: NEW `canonicalStart`: strict shape `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM[:SS[.f]](Z|+HH:MM)`, parse, emit `new Date(ms).toISOString()`; anything else is dropped (field absent, body `Starts: start time unknown`).
+- body `Starts:`: formatted from the instant; zone printed only if it matches `[A-Za-z0-9_+:/-]{1,64}` and Intl accepts it, else `UTC`.
+- `ignored.reasons`: NEW: a skip reason is echoed only if it is one of the 11 `SkipReason` values, else `other` (previously any `[a-z0-9-]{1,40}` string was echoed, e.g. `pwd-secret`); other labels are constants.
+- Fields never read: detail, meetingUrl, registrationUrl, sender.
+
+**Mutations** (script in scratchpad, deleted; per-mutation byte backup, restore in `finally`, 150 s timeout per run; afterwards `git hash-object` of both files equalled the pre-run blobs, and after commit equals `git rev-parse HEAD:<file>`). All 12 killed:
+M1 mask one token instead of to end: `D-015 ledger corpus`, `ISS-R1ALERTS-006 shape`, `keyword recognition`. M2 drop Devanagari keywords: `keyword recognition`, `generator`, ledger corpus. M3 drop fixed-point repeat: `fixed point`, ledger corpus. M4 echo startTime raw: `startTime is parsed and FORMATTED`. M5 job route skips the sanitiser: ledger corpus, `echo audit`, `generator`. M6 skipped route skips the sanitiser: ledger corpus, `ISS-R1ALERTS-006 shape`, `echo audit`. M7 drop spaced-letter keywords: `keyword recognition`, `generator`, ledger corpus. M8 no diacritic fold: ledger corpus, `keyword recognition`. M9 non-convergence echoes text: `fixed point`. M10 mixed-script hides one token only: `ISS-R1ALERTS-006 shape`. M11 echo unknown skip reason: `echo audit`. M12 strong keywords off: ledger corpus, `ISS-R1ALERTS-006 shape`, `keyword recognition`.
+
+**D-015 counts** (verbatim recorded reproductions, skipped AND job route, secret absent from the whole alert JSON incl. key, id and ignored; counts are table entries, each run on both routes): ISS-R1ALERTS-001: 21/21 (+5/5 verdict extras). -002: 1/1 (recorded key, both routes). -003: 4/4. -004: 2/2. -005: 4/4 (NUL, U+0085, retention over maxKeys). -006: 37/37 (every string of the row, including the three 5-digit groups and the non-ASCII digit rows). -007: 3/3. -008: 2/2 (both recorded forms). No recorded reproduction is left open.
+**Seeded generator** (seed 20261011): 3000 cases, 25 keywords (English, Hinglish, French, Devanagari, spaced `p i n`) with random case, separators and interleaved format characters, then 1 to 5 secret tokens (ASCII, Devanagari, digits in 5 scripts): 0 leaks. Cycle-0/1 properties kept: 4-line bodies, unknown reasons not echoed, cap, ordering, retention, totality, purity, deterministic ids, zone handling, 4,000 cap before sanitising, the 2400-case property (0 leaks), timing (23 x 1 MB inputs, worst 294 ms, bound 1500 ms).
+
+**Evidence** (from packages/meeting-bot; node per toolchain note)
+- `timeout 170 node --test --import tsx src/calendar/alert-text.corpus.test.ts src/calendar/alert-text.test.ts src/calendar/attention-alerts.test.ts` -> `tests 33 / pass 33 / fail 0`
+- `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` (180 s timeout) -> exit 0, no output
+- `node scripts/lint-dirsize.mjs` -> `lint-dirsize: OK (111 dir(s) within budget)`
+- Non-blank lines: 142 / 187 (limit 300); tests 205 / 217 / 129 (limit 400).
+
 Status: ready-for-check
-Fix cycle: 1
+Fix cycle: 2

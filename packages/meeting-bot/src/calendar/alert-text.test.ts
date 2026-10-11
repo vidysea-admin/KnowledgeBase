@@ -13,90 +13,7 @@ const jobAlert = (title: unknown, id = "job-corpus") =>
 /** the 20-hex id/key digest is of an unrelated input; drop it when matching random secrets */
 const noDigest = (s: string) => s.replace(/[0-9a-f]{20}/g, "");
 
-interface Repro { issue: string; title: string; secrets: string[] }
 const ZW = [0x200b, 0x200d, 0x2060, 0x180e, 0xad, 0xfe0f];
-/** Every reproduction recorded in qa/issues.r1alerts.jsonl (ISS-R1ALERTS-001 evidence), verbatim, plus the verdict-table extras. */
-const LEDGER_001: Repro[] = [
-  { issue: "ISS-R1ALERTS-001", title: "Meeting ID: 987 6543 2100 Passcode 778899", secrets: ["987", "6543", "2100", "778899"] },
-  { issue: "ISS-R1ALERTS-001", title: "Meeting ID 987 6543 2100 pwd abc123", secrets: ["987", "6543", "2100", "abc123"] },
-  { issue: "ISS-R1ALERTS-001", title: "pwd abc123XYZ", secrets: ["abc123XYZ", "abc123"] },
-  { issue: "ISS-R1ALERTS-001", title: "meetingPassword=Sekret9", secrets: ["Sekret9"] },
-  { issue: "ISS-R1ALERTS-001", title: '"passcode":"Q123"', secrets: ["Q123"] },
-  ...ZW.map((cp, i) => ({ issue: "ISS-R1ALERTS-001", title: "pass" + u(cp) + "code=ZWS" + i, secrets: ["ZWS" + i] })),
-  { issue: "ISS-R1ALERTS-001", title: "https://zoom.us/j/1?pwd=\nSPLIT", secrets: ["SPLIT", "zoom.us"] },
-  { issue: "ISS-R1ALERTS-001", title: "https%3A%2F%2Fzoom.us%2Fj%2F1%3Fpwd%3DPCT", secrets: ["PCT", "zoom.us", "https"] },
-  { issue: "ISS-R1ALERTS-001", title: "zoom.us%2Fj%2F1%3Fpwd%3DPCT2", secrets: ["PCT2", "zoom.us"] },
-  { issue: "ISS-R1ALERTS-001", title: "zoom.us/j/123?pwd=abc", secrets: ["zoom.us", "123", "pwd=abc"] },
-  { issue: "ISS-R1ALERTS-001", title: fw("https://") + "zoom.us/j/1?pwd=FW", secrets: ["FW", "zoom.us"] },
-  { issue: "ISS-R1ALERTS-001", title: "https:" + u(0x2215, 0x2215) + "zoom.us" + u(0x2215) + "j" + u(0x2215) + "1?pwd=LOOK", secrets: ["LOOK", "zoom.us"] },
-  { issue: "ISS-R1ALERTS-001", title: "Dial in +1 555 123 4567 PIN 889900#", secrets: ["555", "123", "4567", "889900"] },
-  { issue: "ISS-R1ALERTS-001", title: "key sk-ant-api03-AAAAAAAAAAAAAAAAAAAA", secrets: ["sk-ant", "AAAAAAAA"] },
-  { issue: "ISS-R1ALERTS-001", title: "AKIAIOSFODNN7EXAMPLE", secrets: ["AKIA", "IOSFODNN7"] },
-  { issue: "ISS-R1ALERTS-001", title: "bob(at)evil.example", secrets: ["bob", "evil"] },
-];
-const EXTRAS: Repro[] = [ // checker leak-table rows that are not in the ledger row text
-  { issue: "verdict", title: "call +91 98765 43210", secrets: ["98765", "43210"] },
-  { issue: "verdict", title: "Your code is 482913", secrets: ["482913"] },
-  { issue: "verdict", title: "hxxps://zoom.us/j/1?pwd=HXX", secrets: ["HXX", "zoom.us"] },
-  { issue: "verdict", title: "x https://x.example/r?tk=REG1", secrets: ["REG1", "x.example"] },
-  { issue: "verdict", title: "Passcode: 123456", secrets: ["123456"] },
-  { issue: "verdict", title: "https://zoom.us/j/123?pwd=abc123", secrets: ["abc123", "zoom.us", "123"] },
-];
-
-test("ledger corpus: every recorded reproduction, both routes, secret absent from the full JSON", () => {
-  const tally: Record<string, [number, number]> = {};
-  for (const r of [...LEDGER_001, ...EXTRAS]) {
-    for (const route of [skippedAlert, jobAlert]) {
-      const json = JSON.stringify(route(r.title));
-      for (const s of r.secrets) assert.ok(!json.includes(s), `${r.issue} ${JSON.stringify(r.title)} leaked ${s}: ${json}`);
-      assert.equal(JSON.parse(json).alerts[0].body.split("\n").length, 4);
-    }
-    const t = (tally[r.issue] ??= [0, 0]); t[0]++; t[1]++;
-  }
-  console.log(`ISS-R1ALERTS-001: ${tally["ISS-R1ALERTS-001"]![0]}/${LEDGER_001.length} refused (+${EXTRAS.length}/${EXTRAS.length} verdict extras)`);
-  assert.equal(tally["ISS-R1ALERTS-001"]![0], LEDGER_001.length);
-});
-
-const KEY_002 = "cal:x https://zoom.us/j/1?pwd=SKEY bob@evil.example\nACTION";
-test("ISS-R1ALERTS-002 recorded sessionKey: not in the alert, the key or the id (skipped and job routes)", () => {
-  let n = 0;
-  for (const res of [skippedAlert("t", KEY_002), jobAlert("t", KEY_002)]) {
-    const json = JSON.stringify(res);
-    for (const bad of ["SKEY", "bob", "evil.example", "zoom.us", "ACTION", "cal:x"]) assert.ok(!json.includes(bad), bad + " in " + json);
-    const a = res.alerts[0]!;
-    assert.match(a.id, /^[0-9a-f]{20}$/);
-    assert.equal(a.key.includes(KEY_002), false);
-    n++;
-  }
-  console.log(`ISS-R1ALERTS-002: ${n}/2 refused (skipped route, job route)`);
-});
-
-test("ISS-R1ALERTS-003 recorded zone cases", () => {
-  const cases: [string, string | undefined, string][] = [
-    ["2026-03-08T07:30:00Z", "America/New_York", "2026-03-08 03:30 (America/New_York)"],
-    ["2026-03-08T07:30:00Z", "America/Los_Angeles", "2026-03-07 23:30 (America/Los_Angeles)"],
-    ["2026-03-08T07:30:00Z", "America/Argentina/Buenos_Aires", "2026-03-08 04:30 (America/Argentina/Buenos_Aires)"],
-    ["2026-10-10T19:00:00Z", undefined, "2026-10-10 19:00 (UTC)"],
-  ];
-  for (const [iso, tz, want] of cases) assert.equal(renderStart(iso, tz as never), want);
-  assert.equal(renderStart("2026-10-10T19:00:00Z", "Asia/Kolkata\nhttps://x.example/?pwd=Z9"), "2026-10-10 19:00 (UTC)");
-  assert.equal(renderStart("2026-10-10T19:00:00Z", "Not/AZone"), "2026-10-10 19:00 (UTC)");
-  assert.equal(neutralizeText(undefined), "(untitled)");
-  assert.equal(JSON.stringify(skippedAlert(undefined)).includes("((untitled))"), false);
-  console.log(`ISS-R1ALERTS-003: ${cases.length}/${cases.length} correct (+3 hostile/invalid zone checks)`);
-});
-
-test("ISS-R1ALERTS-004 recorded collisions: distinct keys give distinct dedupe keys", () => {
-  const keys = ["cal:a b", "cal:a/b", "cal:a_b"];
-  const alerts = keys.flatMap((k) => skippedAlert("t", k).alerts);
-  assert.equal(new Set(alerts.map((a) => a.key)).size, 3);
-  assert.equal(selectNewAlerts(alerts, []).fresh.length, 3);
-  const base = "p".repeat(200);
-  assert.notEqual(alertIdFor(base + "A"), alertIdFor(base + "B"));
-  assert.equal(skippedAlert("t", base + "A").alerts[0]!.key === skippedAlert("t", base + "B").alerts[0]!.key, false);
-  console.log("ISS-R1ALERTS-004: 2/2 recorded collisions separated (3-key set, 200-char shared prefix)");
-});
-
 test("ids: deterministic, case/space/normalisation/lone-surrogate sensitive, fixed digest pinned", () => {
   assert.equal(alertIdFor("cal:e1"), alertIdFor("cal:e1"));
   assert.equal(alertIdFor("cal:e1"), "69c86e49f0d76452a89a");
@@ -293,23 +210,4 @@ test("throwing getters, Proxies and inherited fields are counted, never thrown",
   assert.doesNotThrow(() => buildAttentionAlerts({ timeZone: "UTC", now: NOW, skipped: proxy, jobs: proxy } as never));
   const cyc: Record<string, unknown> = { status: "action_required", reason: "retry-limit" }; cyc.title = cyc;
   assert.equal(buildAttentionAlerts({ timeZone: "UTC", now: NOW, jobs: { cyc } } as never).alerts.length, 1);
-});
-
-test("readability: ordinary webinar titles mostly survive; years and long numbers are the price", () => {
-  assert.equal(sanitize("Study in Canada 2026 intake webinar"), "Study in Canada (hidden) intake webinar");
-  assert.equal(sanitize("Q3 results call"), "Q3 results call");
-  assert.equal(sanitize("IELTS 7.5 band strategy"), "IELTS 7.5 band strategy");
-  const titles = ["UK Universities Fair - Live Q&A with admissions officers", "Masters in Germany: Tuition-free options", "Weekly Webinar",
-    "Scholarships for Indian students: how to apply", "Australia Student Visa (subclass 500) explained", "Fall 2027 intake: deadlines and documents",
-    "SOP and LOR writing workshop", "GRE vs GMAT: which test is right for you?", "Meet the Dean - University of Toronto", "Career counselling session with Priya",
-    "Study MBBS abroad: Russia, Georgia, Philippines", "Free IELTS masterclass | Day 3", "Education loan webinar for abroad studies", "Ireland post-study work visa 2026",
-    "PhD funding opportunities in Europe", "How to choose the right course (Part 2)", "Open day: Monash University Melbourne", "Parents' session: safety and accommodation abroad",
-    "Python for beginners - Session 4 of 6", "Digital SAT strategy - 1500+ score plan", "Zoom Meeting - Admissions Team Sync", "Webinar: US F-1 visa interview tips",
-    "Study in New Zealand - Intake July 2026", "Engineering in USA: STEM OPT explained", "Vidysea partner onboarding call", "Statement of purpose clinic (limited seats)",
-    "Q&A: Is a Master's in Canada worth it in 2026?", "Study in Canada 2026 intake webinar", "Q3 results call", "IELTS 7.5 band strategy"];
-  assert.equal(titles.length, 30);
-  const readable = titles.filter((t) => sanitize(t).split(" ").filter((w) => !w.includes("(hidden)")).length >= t.split(" ").length - 2).length;
-  console.log(`readability: ${readable}/30 titles keep all but at most two words`);
-  assert.ok(readable >= 28);
-  assert.equal(titles.filter((t) => sanitize(t) === t).length >= 20, true);
 });

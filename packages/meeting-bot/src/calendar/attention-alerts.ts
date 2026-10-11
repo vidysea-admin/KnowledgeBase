@@ -73,7 +73,14 @@ export function renderStart(iso: string | undefined, timeZone: string): string {
 export function alertIdFor(sessionKey: string): string {
   return createHash("sha256").update(Buffer.from(sessionKey, "utf16le")).digest("hex").slice(0, 20);
 }
-const safeReasonKey = (r: unknown) => (typeof r === "string" && /^[a-z0-9-]{1,40}$/.test(r) ? r : "other");
+const SKIP_REASONS = new Set(["no-join-link", "past", "untrusted-sender", "needs-registration", "duplicate-session", "overlap-lost", "not-webinar", "needs-review", "cancelled", "invalid-time", "unsafe-join-link"]);
+/** Only a plain ISO-8601 date or date-time WITH an explicit zone is accepted; the output is FORMATTED from the parsed instant, so no caller byte is ever echoed. */
+const STRICT_ISO = /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?(?:Z|[+-]\d{2}:\d{2}))?$/;
+export function canonicalStart(v: unknown): string | undefined {
+  if (typeof v !== "string" || v.length > 40 || !STRICT_ISO.test(v)) return undefined;
+  const ms = Date.parse(v);
+  return Number.isFinite(ms) ? new Date(ms).toISOString() : undefined;
+}
 const own = (o: object, k: string): unknown => (Object.prototype.hasOwnProperty.call(o, k) ? (o as Record<string, unknown>)[k] : undefined);
 const KNOWN_REASONS = new Set(["retry-limit", "interrupted-no-recording-artifact", "missed-while-processing", "missed-coverage",
   "cancelled", "rescheduled", "controller-disconnected", "coverage-review", "needs-review", "invalid-time", "source-discontinuity",
@@ -131,7 +138,7 @@ function buildInner(input: AttentionInput): AttentionResult {
   const starts = input?.startTimes && typeof input.startTimes === "object" ? input.startTimes : {};
   const startOf = (id: string): string | undefined => {
     const v = Object.prototype.hasOwnProperty.call(starts, id) ? starts[id] : undefined;
-    return typeof v === "string" && Number.isFinite(Date.parse(v)) ? v : undefined;
+    return canonicalStart(v);
   };
   const stale = (s: string | undefined) => s !== undefined && Number.isFinite(nowMs) && Date.parse(s) < nowMs;
   const push = (a: AttentionAlert) => { if (stale(a.startTime)) ignore("already-started"); else alerts.push(a); };
@@ -145,7 +152,7 @@ function buildInner(input: AttentionInput): AttentionResult {
       if (typeof sessionKey !== "string" || !sessionKey) { ignore("malformed-skipped-item"); continue; }
       const reason = own(it as object, "reason");
       const c = caseForReason(reason);
-      if (!c) { ignore(`no-alert-for-reason:${typeof reason === "string" ? safeReasonKey(reason) : "none"}`); continue; }
+      if (!c) { ignore(`no-alert-for-reason:${typeof reason === "string" ? (SKIP_REASONS.has(reason) ? reason : "other") : "none"}`); continue; }
       push(build(c, sessionKey, own(it as object, "title"), startOf(sessionKey), tz, "skipped"));
     } catch { ignore("unreadable-skipped-item"); }
   }
@@ -161,7 +168,7 @@ function buildInner(input: AttentionInput): AttentionResult {
       const r = own(row, "reason"), st = own(row, "startTime");
       const reason = typeof r === "string" ? r : undefined;
       const mapped = caseForReason(reason);
-      const own0 = typeof st === "string" && Number.isFinite(Date.parse(st)) ? st : undefined;
+      const own0 = canonicalStart(st);
       const safeReason = reason && KNOWN_REASONS.has(reason) ? reason : "unspecified";
       push(build(mapped ?? "action-required", id, own(row, "title"), startOf(id) ?? own0, tz, "job", safeReason));
     } catch { ignore("unreadable-job-row"); }

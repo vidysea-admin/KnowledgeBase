@@ -30,6 +30,8 @@ export function normalise(raw: string): string {
     if (d === s) break;
     s = d;
   }
+  // fold Latin diacritics and dotless i / long s so "pın", "kód", "contraseña" meet the keyword list; other scripts keep their marks
+  s = s.normalize("NFKD").replace(/(\p{Script=Latin})\p{M}+/gu, "$1").replace(/\u{131}/gu, "i").replace(/\u{17f}/gu, "s").normalize("NFKC");
   s = s.replace(SLASHES, "/").replace(COLONS, ":").replace(DOTS, ".");
   s = s.replace(/[^\S\u{feff}]|\x85/gu, " ").replace(INVISIBLE, "").replace(DECORATIVE, "");
   return s.replace(/ {2,}/g, " ").trim();
@@ -68,7 +70,8 @@ function maskTokens(s: string): string {
       continue;
     }
     if (t.includes("@") || OBFUSCATED.test(t)) { out.push(EMAIL); carry = ENDS_AT.test(t); continue; }
-    if (MIXED_A.test(t) && MIXED_B.test(t)) { out.push(HIDDEN); carry = true; continue; }
+    // a Latin+Cyrillic/Greek token is a look-alike keyword ("pаsscode"): treat it as one, hide the rest of the title
+    if (MIXED_A.test(t) && MIXED_B.test(t)) { out.push(HIDDEN); break; }
     out.push(t);
   }
   return out.join(" ");
@@ -80,35 +83,56 @@ const SEGMENT = /[\p{L}\p{Nd}]{8,}/gu;
 function digitGroup(m: string): string {
   const digits = m.replace(/[^\p{Nd}]/gu, "");
   let longest = 0;
-  for (const run of m.split(/[^\p{Nd}]/u)) longest = Math.max(longest, run.length);
-  return digits.length >= 6 || longest >= 3 ? HIDDEN : m;
+  const runs = m.split(/[^\p{Nd}]/u);
+  for (const run of runs) longest = Math.max(longest, run.length);
+  return digits.length >= 6 || longest >= 3 || (runs.length >= 2 && digits.length >= 5) ? HIDDEN : m; // "1 2 3 4 5" is a code, "IELTS 7.5" is not
 }
 function segment(m: string): string {
   return (/\p{Nd}/u.test(m) && /\p{L}/u.test(m)) || m.length >= 24 ? HIDDEN : m;
 }
 
-const SEP = `[\\s:=,;"'()\\[\\]{}<>#_.\\-]*`;
-const FILL = `(?:(?:is|are|was|be|will|set|to|as|equals|the|your|my|our)[\\s:=,"']+){0,3}`;
-const TAIL = `${SEP}${FILL}\\S+`;
-const AFTER = `(?![A-Za-z])${TAIL}`; // short keywords need a right boundary ("keynote", "spin")
-const KEYWORDS: RegExp[] = [
-  new RegExp(`(?<![A-Za-z])(pass[ _-]?(?:code|word|phrase)|passwd|pwd|pin|otp|code|token|tk|key|secret|credentials?|auth)${AFTER}`, "gi"),
-  new RegExp(`(?<=[a-z])(Password|Passcode|Passphrase|Passwd|Pwd|Pin|Otp|Code|Token|Key|Secret|Auth)${AFTER}`, "g"),
-  new RegExp(`(password|passcode|passphrase|passwd|pwd)${TAIL}`, "gi"), // unambiguous: no boundary, so "passcodeHello" is caught
+/**
+ * Secret keywords. SHAPE: once one is recognised, EVERYTHING from it to the end of the title is hidden
+ * (a passcode follows the topic and may be several words or digit groups, so a one-token mask leaks).
+ * A keyword at the very start therefore hides the whole title; the alert stays identifiable by its
+ * headline, start time and hashed id. This is a deny-list: a secret with no keyword and no digit/shape
+ * pattern ("Webinar tiger") is NOT caught (ISS-R1ALERTS-009, open by design).
+ */
+const SP = "[ .\\-_]"; // separators allowed inside a keyword: "pass code", "p i n", "P.I.N.", "pass_word"
+const lit = (w: string) => w.split(" ").join(`${SP}*`);
+const spaced = (w: string) => Array.from(w).join(`${SP}+`);
+const STRONG = ["password", "pass word", "passcode", "pass code", "passphrase", "passwd", "passwrd", "passwort", "passkey", "pwd", "pswd", "paasvard",
+  "paasword", "paascode", "passvard", "kennwort", "mot de passe", "motdepasse", "contrasena"]; // no word boundary: "meetingPassword", "passcodeHello"
+const BOUNDED = ["pw", "psw", "pass", "pin", "otp", "code", "kood", "kod", "secret", "key", "token", "tk", "credential", "credentials", "auth", "login", "clave"];
+const DEVANAGARI = ["पासकोड", "पासवर्ड", "पास कोड", "पास वर्ड", "पिन", "कोड", "ओटीपी", "कुंजी", "टोकन", "सीक्रेट"];
+const EDGE = (body: string) => new RegExp(`(?<![\\p{L}\\p{M}])(?:${body})(?![\\p{L}\\p{M}])`, "iu"); // JS \b is ASCII-only; these also work for Devanagari
+const KEYWORD_RES: RegExp[] = [
+  new RegExp(STRONG.map(lit).join("|"), "iu"),
+  EDGE([...BOUNDED, ...DEVANAGARI].map(lit).concat([...BOUNDED, ...STRONG.filter((w) => !w.includes(" "))].map(spaced)).join("|")),
+  new RegExp(`(?<=\\p{Ll})(?:${["Pw", "Psw", "Pass", "Pin", "Otp", "Code", "Kood", "Secret", "Key", "Token", "Auth", "Login"].join("|")})(?![\\p{Ll}\\p{M}])`, "u"), // camelCase: "apiKey"
 ];
 const REPEAT = /(\((?:link|email|hidden)\))(?: ?\1)+/g;
 
+/** Index of the earliest secret keyword, or -1. */
+export function keywordIndex(s: string): number {
+  let best = -1;
+  for (const re of KEYWORD_RES) { const i = s.search(re); if (i >= 0 && (best < 0 || i < best)) best = i; }
+  return best;
+}
+
 /** Step 2: structural masking of normalised text. */
 export function maskText(s: string): string {
-  let t = maskTokens(s).replace(KEY_SHAPES, HIDDEN).replace(DIGIT_GROUP, digitGroup).replace(SEGMENT, segment);
-  for (const re of KEYWORDS) t = t.replace(re, `$1 ${HIDDEN}`);
+  const cut = keywordIndex(s);
+  const head = cut < 0 ? s : s.slice(0, cut);
+  let t = maskTokens(head).replace(KEY_SHAPES, HIDDEN).replace(DIGIT_GROUP, digitGroup).replace(SEGMENT, segment);
+  if (cut >= 0) t = `${t.trimEnd()} ${HIDDEN}`.trimStart();
   return t.replace(REPEAT, "$1");
 }
 
-/** Steps 1-3 without a length cap; unsliced, so tests can feed it megabytes. */
-export function sanitize(input: string): string {
+/** Steps 1-3 without a length cap; unsliced, so tests can feed it megabytes. `rounds` is the fixed-point cap. */
+export function sanitize(input: string, rounds = 5): string {
   let s = normalise(input);
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < rounds; i++) {
     const t = maskText(s).replace(ALLOWED_ONLY, "").replace(/ {2,}/g, " ").trim();
     if (t === s) return t;
     s = t;
