@@ -138,3 +138,9 @@ test("inputs are not mutated (deep-frozen)", () => {
   const seen = deepFreeze(["a"]);
   assert.doesNotThrow(() => selectNewAlerts(deepFreeze(r.alerts), seen, 3));
 });
+
+test("T-036: a free-text-link skip raises NO alert (an outsider cannot spam the operator); it is counted by name, not shown", () => {
+  const r = run({ skipped: [sk("unverified-link-source", "cal:a"), sk("unverified-link-source", "cal:b"), sk("unverified-link-source", "cal:c")] });
+  assert.equal(r.alerts.length, 0);
+  assert.deepEqual(r.ignored, { count: 3, reasons: { "no-alert-for-reason:unverified-link-source": 3 } }, "named as a known core reason, not folded into 'other'");
+});

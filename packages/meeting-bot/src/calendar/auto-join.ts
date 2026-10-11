@@ -26,6 +26,7 @@ export function selectEventsToAutoJoin(events: CalendarEvent[], now: string,
   return events
     .filter((e) => {
       if (!e.meetingUrl) return false;
+      if (e.meetingUrlSource !== undefined && e.meetingUrlSource !== "conference") return false; // T-036: free-text links are never auto-joined
       const startMs = new Date(e.startTime).getTime();
       const endMs = new Date(e.endTime).getTime();
       return nowMs >= startMs - leadMs && nowMs <= endMs;

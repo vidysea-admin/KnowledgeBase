@@ -174,11 +174,14 @@ test("ISS-T036CAL-005 recorded: Zoom host-start links are never returned; alone 
   const cases = [start, "https://zoom.us/s/12345678901", "https://us02web.zoom.us/s/12345678901?pwd=a", "https://zoom.us/j/12345678901?zak=TOKEN",
     "https://zoom.us/j/12345678901?ZAK=TOKEN", "https://zoom.us/j/12345678901?a=1&%7aak=T", "https://meet.google.com/abc-defg-hij?zak=T",
     "https://us02web.zoom.us/wc/join/12345678901?zak=x", "https://zoom.us/j/12345678901#zak=TOKEN", "https://zoom.us/j/12345678901?zak=%257A%2561k%253DT",
-    `https://www.google.com/url?q=${encodeURIComponent(start)}`, `<a href="${start}">join</a>`];
+    `https://www.google.com/url?q=${encodeURIComponent(start)}`, `<a href="${start}">join</a>`,
+    // cycle 2: the 12th recorded form (bare key, no value) and its siblings
+    "https://zoom.us/j/12345678901?zak", "https://zoom.us/j/12345678901?a=1&zak", "https://zoom.us/j/12345678901?zak&a=1", "https://zoom.us/j/12345678901?zak=", "https://zoom.us/j/12345678901#zak"];
   let refused = 0;
   for (const c of cases) { const out = d(c); assert.equal(out.url, undefined, c); assert.equal(/zak/i.test(JSON.stringify(out)), false, c); refused++; }
   assert.deepEqual(l(start), { issue: "host-start-link" });
   assert.equal(d(`${start} and https://zoom.us/j/12345678901`).url, "https://zoom.us/j/12345678901", "the join link of the same meeting is still returned, without the token");
+  for (const ok of ["https://zoom.us/j/12345678901?zakk=1", "https://zoom.us/j/12345678901?azak=1", "https://zoom.us/j/12345678901?pwd=a&zak2=b"]) assert.equal(d(ok).url, ok, "a key that merely contains zak is not the token");
   assert.equal(d("https://zoom.us/j/12345678901?pwd=abcZAKdef").url, "https://zoom.us/j/12345678901?pwd=abcZAKdef", "zak inside a passcode value is not a token");
   console.log(`ISS-T036CAL-005: ${refused}/${cases.length} host-start shapes refused (the recorded one included), none returned`);
   assert.equal(refused, cases.length);

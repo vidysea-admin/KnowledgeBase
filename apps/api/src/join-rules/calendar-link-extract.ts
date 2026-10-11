@@ -70,7 +70,7 @@ export function recognise(raw: string): Rec {
   const path = decodeAll(u.pathname).replace(/\/+/g, "/").replace(/\/+$/, "").toLowerCase();
   if (path.split("/").includes("..")) return undefined;
   const param = (name: string) => { for (const [k, v] of u.searchParams) if (k.toLowerCase() === name && v.trim()) return v.trim().toLowerCase(); return undefined; };
-  if ((platform === "zoom" && /^\/s\//.test(path)) || /(?:^|[?&#;])zak\s*=/i.test(decodeAll(u.search + u.hash))) return { kind: "host-start", platform };
+  if ((platform === "zoom" && /^\/s\//.test(path)) || /(?:^|[?&#;])zak\s*(?:[=&#;]|$)/i.test(decodeAll(u.search + u.hash))) return { kind: "host-start", platform };
   if (/regist/.test(path) || [...u.searchParams.keys()].some(k => /regist/i.test(k))) return { kind: "registration", platform };
   const m = (re: RegExp) => re.exec(path);
   let id: string | undefined;

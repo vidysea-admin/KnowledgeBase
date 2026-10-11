@@ -1,7 +1,7 @@
 # t036-calendar-description-link-scan
 
 Status: ready-for-check
-Fix cycle: 1
+Fix cycle: 2
 Priority tier: 3 - next unblocked roadmap task (T-036, slice: Calendar side of "find webinar links in Gmail and Calendar")
 Security class: changes which meetings can be auto-joined (a wrong link joins the wrong meeting) - FULL ceremony
 Lane: lane/t036cal (ledger shard qa/issues.t036cal.jsonl, ids ISS-T036CAL-NNN; none filed)
@@ -107,3 +107,68 @@ Harness untracked, in-worktree, absolute paths, per-mutation byte backup, 240 s 
 - meeting-bot: auto-join 39/39, schedule-tick 14/14, sender-authentication 5/5, webinar-policy 19/19, schedule-state 18/18, alert-title-policy 12/12, join-rules-optout-identity 22/22, telegram-channel 6/6.
 - `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json`: packages/core clean (5 s), packages/meeting-bot clean; apps/api clean with the `paths` tsconfig described above.
 - `node scripts/lint-dirsize.mjs`: only packages/index/src/pipeline (34 > 30, unrelated). packages/meeting-bot/src/calendar 26 files (none added), apps/api/src/join-rules 12 (limit 30). Non-blank lines: extractor 172, extractor test 184, differential test 97, calendar.test 318, auto-join 249, auto-join.test 352.
+
+
+## Fix cycle 2 (checker verdict FAIL cycle 1: ISS-T036CAL-006 high, -007 medium, -008 medium, -009 low; ISS-005 twelfth form)
+
+### What failed
+006: the mapper adds `meetingUrlSource: "conference"` to every link-bearing row, `semantic()` in calendar-client.ts compared it, so an event persisted before the unit and re-fetched unchanged was `contradictory-revision` and dropped (legacy scope: all starts blocked). 007: scripts/webinar/skip-reason-vocabulary.test.mjs hard-coded 14/15, and main's alert-who-production.test.ts (merged after this lane's base) enumerates the reasons. 008: no lane test pinned the allow-list seam. 009: the attendance selector and `selectEventsToAutoJoin` never read the source. 005: bare `?zak` (no `=`) was not refused.
+
+### 006 fix: provenance is not identity (calendar-client.ts, 248 non-blank lines)
+Option (a), generalised. `semantic()` (the function that defines a contradictory revision) now ignores `meetingUrlSource`; the url, times, title, cancelled flag etc. are still compared, so a changed url at an unchanged revision is still `contradictory-revision`. The accepted merge branch stores the FRESH snapshot, so after reconciliation the stored source always equals the fresh source: a legacy row is upgraded in place and no contradiction arises. Two guards keep trust from rising:
+- `keepSource`: a fresh copy that names NO source never relaxes a stored free-text source for the same url (only a pre-unit mapper omits the field; the current mapper always sets it when a url exists).
+- same-fetch tie-break: if two copies of one occurrence at one revision differ only by source, the least trusted sorts last and wins (`untrustedSource`).
+A copy with an OLDER revision is ignored as before (`next.revision < row.revision` -> continue), so a stale more-trusted copy never overwrites a fresher less-trusted one, and a stale less-trusted copy never downgrades a fresher conference one.
+
+Transition table (same url, same revision; stored source after reconciliation; tested in all 25 cells x 2 scopes = 50):
+| persisted -> fresh | absent | conference | location | description | other string |
+|---|---|---|---|---|---|
+| absent | absent (scheduled) | conference (scheduled; the legacy upgrade) | location (skipped) | description (skipped) | that string (skipped) |
+| conference | absent (scheduled) | conference | location (skipped) | description (skipped) | that string (skipped) |
+| location | location (kept, skipped) | conference (fresh Google data; scheduled) | location | description | that string |
+| description | description (kept, skipped) | conference (fresh; scheduled) | location | description | that string |
+| other string | that string (kept, skipped) | conference (fresh; scheduled) | location | description | that string |
+Never `unresolved`, never a transition, `newStartsBlocked` false in every cell. No cell makes a free-text link schedulable: a free-text source can only become `conference` when the freshest Google data for the SAME url and revision says so (conference data is not outsider-controlled text), and no cell turns a stored non-conference value into conference from absent information. Other rows of the table (separate tests): older-revision copies ignored in both directions; newer revision takes its own source; different url at the same revision stays `contradictory-revision`; the source survives a JSON round trip and a tick in which the event is absent.
+
+### Legacy-state proof (link-source/link-source-reconcile.test.ts)
+- ISS-T036CAL-006 recorded reproduction verbatim, through `prepareWebinarSourceState` (baseline tick with the pre-unit shape, then two sync ticks with `meetingUrlSource: "conference"` at the same `providerUpdated`): no inventory reason, `transitions` empty, event present and scheduled exactly as before, field added to the stored row. 1/1.
+- Legacy scope (no `scope`): `newStartsBlocked` false, 1 event, no transition.
+- 50 persisted legacy events (distinct Meet urls, no source) re-reconciled with the field, both scopes: 50 events, no transition, no inventory reason; the stored occurrences are deep-equal to the first state after stripping the field; 50/50 rows gained `conference`; the events handed to selection differ from the first state's only by the field; the same session keys are scheduled as before.
+
+### 007: vocabulary and alerts
+- scripts/webinar/run-pipeline.mjs already derives `OPERATION_REASONS` from `SKIP_REASON_MEANING` (skip-describe.ts, total over `SkipReason`), so no code change was needed there; the failing part was the TEST's literals. skip-reason-vocabulary.test.mjs now says 15, includes `unverified-link-source` in the named list, and derives the item counts from `SKIP_REASONS.length` instead of 15/16/index 14. 3/3 pass (was 1/3). It reads core's reason list from this lane's `packages/core/src/domain/webinar-types.ts` by file path and takes the rest from this lane's skip-describe, so it needed no node_modules change.
+- Alert decision: NO alert for a free-text-link skip. An outsider can send unlimited invites; an alert per invite is noise and a nuisance vector, while silence would lose a legitimate meeting whose organiser only used the description. The conservative answer is that the skipped item is listed with its truthful, URL-free operator text (skip-describe: "link found in the invite text, not verified ... send the bot to it manually (send-now)") in the tick's skipped list / operations view, and the formatter ignores it as `no-alert-for-reason:unverified-link-source` (counted by name, because the reason is in core's list). Tested in this lane: attention-alerts.test.ts "a free-text-link skip raises NO alert" (3 items -> 0 alerts, ignored reasons `{no-alert-for-reason:unverified-link-source: 3}`). Mutation M8 (alert raised) is killed by it.
+- Post-merge note for main's `packages/meeting-bot/src/alert-who-production.test.ts` (MERGE CONDITION for the orchestrator/checker; the lane cannot hold the file). With 15 reasons it fails 2 of 4 tests exactly as the checker reported: (1) the fixture never produces a skipped item with the new reason (the set equality with `SKIP_REASONS` fails); (2) `EXPECTED["unverified-link-source"]` is undefined. The lane's behaviour is right (no alert, nothing to resolve); the test needs data, not a code change. Required edit (3 lines):
+  1. in `EVENTS`, after the `evP8` line add: `  ev("evF10", "Webinar FreeText", { meetingUrl: "https://zoom.us/j/88888888888", meetingUrlSource: "description" }),`
+  2. in `EXPECTED`, after `"rules-unevaluable": [false, false, ""],` add: `  "unverified-link-source": [false, false, ""],`
+  3. (cosmetic) test title "covers all 14 skip reasons" -> "covers all 15 skip reasons".
+  Verified by simulation: main's three files it needs that the lane lacks (alert-who-command.ts, calendar/alerts/alert-resolve.ts, the test itself) were copied from `codex/machine-migration-2026-10-09` into the worktree as untracked temporary files (deleted afterwards), run against the lane's code with the tsx paths mapping: UNEDITED 2 pass / 2 fail (same two failures); WITH the three edits 4/4 pass, table line `unverified-link-source | no alert emitted by the formatter`. Caveat: main's schedule-tick.ts/join-rules-enforce.ts differ from the lane's; the run used the lane's schedule-tick.ts, so the post-merge result on the real merged tree is expected, not measured.
+
+### 008: the allow-list (no code change needed; pinned by tests in link-source/link-source-allowlist.test.ts)
+The code already keeps any string up to 32 chars without control characters and rejects non-strings, control characters and longer values closed; it never dropped a value. Tests pin that: valid values pass through; 12 invalid strings (`Description`, `desc`, empty, padded, cased, 32-char, accented, zero-width) are kept verbatim and end not scheduled, direct and after a persisted round trip, in both modes (48/48); 16 non-string/control/over-long values reject (16/16); unknown keys still rejected. A dropped value would read as "missing = conference", so mutations M4 (drop) and M14 (coerce to conference) are killed.
+
+### 009: other selection paths
+Both were a one-line guard, so both now honour the source: `selectEventsToAutoJoin` returns false for a non-conference source (auto-join.ts; allowlist test, 9 values); the attendance selector (`scripts/webinar/calendar-attendance-policy.mjs`) skips with `unverified-link-source` (calendar-attendance.test.mjs, 7 values; the reason is already in the script vocabulary). Absent or `conference` behave as before.
+
+### 005: twelfth form
+`zak` as a query/fragment key with or without a value (`?zak`, `?a=1&zak`, `?zak&a=1`, `?zak=`, `#zak`) is refused (regex `zak\s*(?:[=&#;]|$)`); keys that merely contain the letters (`zakk`, `azak`, `zak2`) and a passcode value containing `zak` are still returned. 17/17 host-start shapes refused (12 recorded + 5 siblings), none returned.
+
+### D-015 counts (the ledger's recorded reproductions, re-run in the lane suite)
+001: 4/4 recorded probes not scheduled (plus the mapper/HTTP and conference-twin tests). 002: 6/6 recorded URLs refused (the 38 of cycle 0 are not in the ledger; the generated family in the differential is unchanged). 003: 3/3. 004: 2/2 recorded mutants killed, differential 3/3. 005: 12/12 recorded forms (17/17 with siblings). 006: 1/1 verbatim (3 ticks) plus 50 legacy events, 50/50 transition-table cells. 007: vocabulary test 3/3 (was 1/3); main's alert-who production test 4/4 with the 3-line edit (2/4 without). 008: 48/48 kept-and-not-scheduled + 16/16 rejected. 009: attendance 7/7, selectEventsToAutoJoin 9/9. Reproductions deliberately left open: none.
+
+### Existing assertions changed (old -> new, why)
+skip-reason-vocabulary.test.mjs: 14 -> 15, 15 -> `SKIP_REASONS.length + 1`, `items[14]` -> `items[SKIP_REASONS.length]` (a derived count, so the next reason does not repeat this). calendar-link-extract.test.ts: the host-start case list gained 5 entries and a 3-entry "merely contains zak" control. No other assertion edited.
+
+### NOT DONE
+The Approver's policy on free-text links (may they ever be auto-joined, from whom); an approval path for calendar events; ISS-376 (record-every-webinar skips the sender check for Gmail candidates); a live Google Calendar run (field presence and real invite HTML unverified); moving the recognisers into packages/core; whether production actually holds a persisted state of the legacy shape (the fix is correct either way). The alert-who production test edit above is a merge condition, not applied here.
+
+### Mutations (15 run, 15 killed, all by tests in the lane's suite)
+Harness `.mut-t036cal-c2.cjs` untracked in the worktree, absolute paths, byte backup per mutation, restore in finally, 240 s timeout, deleted before commit; the working tree was identical (`git diff --stat`) before and after each full run, and after commit `git hash-object` equals `git rev-parse HEAD:` for every touched file. M1 legacy upgrade removed (provenance back in the comparison) <= 006 reproduction + legacy scope. M2 upgrade grants conference to a free-text source <= transition table. M3 stale conference wins over fresh description <= transition table + stale test. M4 allow-list drops invalid values <= allow-list test. M5 attendance selector ignores source <= attendance test. M6 `zak` without value accepted <= extractor 005 test. M7 new reason missing from the script vocabulary <= vocabulary tests (2). M8 alert raised per free-text skip <= attention-alerts test. M9 free text scheduled in every-webinar mode <= allow-list test. M10 source lost on persistence <= allow-list + reconcile. M11 absent fresh source relaxes stored free-text source <= transition table. M12 same-fetch tie-break reversed <= same-fetch test. M13 selectEventsToAutoJoin ignores source <= 009 test. M14 invalid string coerced to conference <= allow-list test. M15 older-revision guard removed <= stale-copy test.
+
+### Evidence (node from the codex runtime; no node_modules change: tests run with `TSX_TSCONFIG_PATH` pointing at a temporary untracked tsconfig whose `paths` maps `@lkb/core` to this worktree's packages/core/src/index.ts; type-check used the same mapping; the three tsconfig.lane-tmp.json files were deleted)
+- packages/meeting-bot: `node --test --import tsx src/calendar/link-source/link-source-reconcile.test.ts` 7/7; `.../link-source-allowlist.test.ts` 4/4; attention-alerts 11/11; alert-title-policy 12/12; auto-join 39/39; schedule-tick 14/14; schedule-state 18/18; webinar-policy 19/19; telegram-channel 6/6.
+- apps/api: calendar-link-extract 17/17; calendar-link-differential 3/3 (7258 URLs; both accept 461, canonical-only 92, copy-only 0); routes/calendar 15/15; gws-gmail 25/25; routes/brain 11/11.
+- scripts: `node --test scripts/webinar/skip-reason-vocabulary.test.mjs` 3/3; `scripts/webinar/calendar-attendance.test.mjs` 33/33.
+- `node <main>/node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.lane-tmp.json`: packages/core exit 0, packages/meeting-bot exit 0, apps/api exit 0.
+- `node scripts/lint-dirsize.mjs`: only packages/index/src/pipeline (34 > 30, unrelated). packages/meeting-bot/src/calendar gains NO file (new tests are in the subfolder link-source/, 2 files); apps/api/src gains none. Non-blank lines: calendar-client.ts 248, link-source-reconcile.test.ts 108, link-source-allowlist.test.ts 51.
+- `git merge-tree --write-tree HEAD codex/machine-migration-2026-10-09`: clean, tree c85dc990edb59533b026aaa64d581da255e0470a, no conflicts.

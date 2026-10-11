@@ -43,6 +43,10 @@ function stable(value: unknown): string {
 }
 function semantic(row: Occurrence): string {
   const snapshot = {...row.snapshot}; delete snapshot.providerUpdated;
+  // T-036 (ISS-T036CAL-006): provenance is not part of an event's identity or revision. A row persisted before the field existed
+  // must not conflict with the same event at the same revision; the accepted merge below stores the FRESH snapshot, so the
+  // stored source always equals the freshest Google data (and the url itself, still compared here, decides identity).
+  delete snapshot.meetingUrlSource;
   if (row.source === "gmail") { delete snapshot.status; delete snapshot.registrationOnly; }
   const key = identity(snapshot); if (key) snapshot.meetingUrl = key.slice(0, key.lastIndexOf("|"));
   return stable(snapshot);
@@ -116,8 +120,10 @@ function validateReconciliationState(previous: unknown, tenantId: string, checke
   }
   return JSON.parse(JSON.stringify(previous)) as WebinarReconciliationState;
 }
+/** 0 = absent or "conference"; 1 = any other source. Sorted last so, among same-revision copies, the LEAST trusted source wins. */
+const untrustedSource = (row: Occurrence): number => row.snapshot.meetingUrlSource !== undefined && row.snapshot.meetingUrlSource !== "conference" ? 1 : 0;
 function mergeOccurrence(prior: Occurrence | undefined, incoming: Occurrence[]): Occurrence {
-  incoming.sort((a, b) => (a.revision ?? "").localeCompare(b.revision ?? "") || semantic(a).localeCompare(semantic(b)) || stable(a.snapshot).localeCompare(stable(b.snapshot)));
+  incoming.sort((a, b) => (a.revision ?? "").localeCompare(b.revision ?? "") || semantic(a).localeCompare(semantic(b)) || untrustedSource(a) - untrustedSource(b) || stable(a.snapshot).localeCompare(stable(b.snapshot)));
   const revisions = new Map<string, Set<string>>();
   for (const next of incoming) revisions.set(next.revision ?? "", new Set([...(revisions.get(next.revision ?? "") ?? []), semantic(next)]));
   const disputed = new Set([...revisions].filter(([, values]) => values.size > 1).map(([revision]) => revision));
@@ -139,7 +145,10 @@ function mergeOccurrence(prior: Occurrence | undefined, incoming: Occurrence[]):
     else if (row.snapshot.cancelled && !next.snapshot.cancelled && !newer) row.unresolved ??= "missing-revision";
     else {
       accepted = true;
-      const snapshot = minimalCancel ? {...row.snapshot, cancelled: true, providerUpdated: next.snapshot.providerUpdated ?? row.snapshot.providerUpdated} : next.snapshot;
+      // A copy that names no source never relaxes a stored free-text source for the same url (only a pre-unit mapper omits it).
+      const keepSource = !minimalCancel && next.snapshot.meetingUrlSource === undefined && Boolean(next.snapshot.meetingUrl) && untrustedSource(row) === 1 && next.snapshot.meetingUrl === row.snapshot.meetingUrl;
+      const snapshot = minimalCancel ? {...row.snapshot, cancelled: true, providerUpdated: next.snapshot.providerUpdated ?? row.snapshot.providerUpdated}
+        : keepSource ? {...next.snapshot, meetingUrlSource: row.snapshot.meetingUrlSource} : next.snapshot;
       row = {...row, snapshot, accepted: row.accepted || next.accepted, reviewReason: minimalCancel ? undefined : next.reviewReason, revision: snapshot.providerUpdated};
       if (row.unresolved === "source-discontinuity" && !next.snapshot.cancelled && (same || newer)) delete row.unresolved;
       if (newer && row.unresolved !== "unknown-tombstone" && row.unresolved !== "ambiguous-provider") delete row.unresolved;
