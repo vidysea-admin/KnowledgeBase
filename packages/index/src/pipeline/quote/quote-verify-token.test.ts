@@ -14,7 +14,7 @@ const ok = (src: string, q: string) => { const v = verifyQuote(one(src), q); ass
 const cut = (src: string, q: string) => assert.equal(reason(verifyQuote(one(src), q)), "partial-word", `${q} | ${src}`);
 
 test("ISS-T040QUOTE-001: the ledger's own recorded reproductions are all refused (n/n by id)", () => {
-  const row = readFileSync(new URL("../../../../qa/issues.t040quote.jsonl", import.meta.url), "utf8").split("\n")
+  const row = readFileSync(new URL("../../../../../qa/issues.t040quote.jsonl", import.meta.url), "utf8").split("\n")
     .filter(Boolean).map((l) => JSON.parse(l) as { id: string; evidence: string }).find((r) => r.id === "ISS-T040QUOTE-001")!;
   const cases = [...row.evidence.matchAll(/verifyQuote\(\[\{id:'t',text:'([^']*)'\}\], '([^']*)'\)/g)].map((m) => [m[1]!, m[2]!] as const);
   assert.equal(cases.length, 3, "the row records three verbatim calls");
