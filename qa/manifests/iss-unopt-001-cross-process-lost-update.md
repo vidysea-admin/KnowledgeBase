@@ -1,6 +1,6 @@
 # iss-unopt-001-cross-process-lost-update
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2 (open ledger issue ISS-UNOPT-001, medium, but class data write deciding whether the bot joins a meeting: full ceremony). Verdict by the checker only.
 Lane: lane/unoptlock. Ledger for this lane: qa/issues.unoptlock.jsonl, ids ISS-UNOPTLOCK-NNN (1 filed, low, open). Existing ledger rows untouched (the checker changes ISS-UNOPT-001's status).
