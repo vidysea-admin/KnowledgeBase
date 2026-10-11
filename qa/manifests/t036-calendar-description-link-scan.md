@@ -1,6 +1,6 @@
 # t036-calendar-description-link-scan
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t036-calendar-description-link-scan.md, cycle 3, 8865a97; fixtures only; free-text links never auto-joined; post-merge alert-who test edit follows)
 Fix cycle: 3
 Priority tier: 3 - next unblocked roadmap task (T-036, slice: Calendar side of "find webinar links in Gmail and Calendar")
 Security class: changes which meetings can be auto-joined (a wrong link joins the wrong meeting) - FULL ceremony
