@@ -5,7 +5,8 @@
  *   GET  /calendar/join-rules              -> { ruleSet, state }
  *   PUT  /calendar/join-rules              body = a rule set; replaces rules ONLY, stored state is kept
  *   POST /calendar/join-rules/approvals    body { kind: "sender"|"domain", value }
- *   POST /calendar/join-rules/opt-outs     body { eventId }
+ *   POST /calendar/join-rules/opt-outs     body { eventId, meetingUrl?, sessionKey? } (the optional hints store the MEETING
+ *                                          identity with the opt-out; there is NO un-opt operation, for ids or identities)
  *
  * The tenant is ALWAYS `req.auth!.tenantId` (as routes/calendar.ts does); URL, query, headers and body
  * never name it, and a body field `tenantId` is rejected (400). Scopes: GET needs "calendar" (read); PUT and
@@ -135,12 +136,20 @@ export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
 
   router.post("/calendar/join-rules/opt-outs", requireScope(WRITE_SCOPE), (req: Request, res: Response) =>
     guarded(req, res, async tenantId => {
-      const body = bodyOf(req, ["eventId"]);
+      const body = bodyOf(req, ["eventId", "meetingUrl", "sessionKey"]);
       if (typeof body.eventId !== "string" || body.eventId === "" || body.eventId.length > 1024) {
-        throw new BadRequest("body must be { eventId: <non-empty string> }");
+        throw new BadRequest("body must be { eventId: <non-empty string>, meetingUrl?: string, sessionKey?: string }");
+      }
+      // Optional hints so the opt-out follows the MEETING (ISS-T037W1-001). Strings only, bounded; an empty string is "not given".
+      const hint: { meetingUrl?: string; sessionKey?: string } = {};
+      for (const [key, max] of [["meetingUrl", 2048], ["sessionKey", 256]] as const) {
+        const v = body[key];
+        if (v === undefined) continue;
+        if (typeof v !== "string" || v.length > max) throw new BadRequest(`${key} must be a string of at most ${max} characters`);
+        if (v.trim() !== "") hint[key] = v;
       }
       await deps.load(tenantId);
-      try { return { state: await deps.recordOptOut(tenantId, body.eventId) }; }
+      try { return { state: await (hint.meetingUrl || hint.sessionKey ? deps.recordOptOut(tenantId, body.eventId, hint) : deps.recordOptOut(tenantId, body.eventId)) }; }
       catch (e) {
         if (storeCode(e) === "invalid") throw new BadRequest("eventId is not valid");
         throw e;

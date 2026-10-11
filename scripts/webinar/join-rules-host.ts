@@ -23,7 +23,7 @@ export function createJoinRulesDeps({ stateDir }: { stateDir: string }): JoinRul
     save: (t, v) => saveJoinRules(stateDir, t, v),
     validateRuleSet: validateJoinRuleSet,
     recordApproval: (t, a) => recordTenantApproval(stateDir, t, a),
-    recordOptOut: (t, id) => recordTenantOptOut(stateDir, t, id),
+    recordOptOut: (t, id, meeting) => recordTenantOptOut(stateDir, t, id, {}, meeting),
   };
 }
 

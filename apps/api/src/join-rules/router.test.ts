@@ -21,6 +21,7 @@ function fakeStore(opts: { delayMs?: number; sizeCap?: number } = {}) {
   const files = new Map<string, StoredJoinRulesValue>();
   const corrupt = new Set<string>();
   const log: { op: string; tenantId: string }[] = [];
+  const hints: { tenantId: string; eventId: string; meeting: unknown }[] = [];
   const wait = () => new Promise(r => setTimeout(r, opts.delayMs ?? 0));
   const load = async (t: string): Promise<StoredJoinRulesValue> => {
     log.push({ op: "load", tenantId: t });
@@ -51,14 +52,15 @@ function fakeStore(opts: { delayMs?: number; sizeCap?: number } = {}) {
       await save(t, { ruleSet: cur.ruleSet, state });
       return state;
     },
-    async recordOptOut(t, id): Promise<JoinRuleStateValue> {
+    async recordOptOut(t, id, meeting): Promise<JoinRuleStateValue> {
+      hints.push({ tenantId: t, eventId: id, meeting });
       const cur = await load(t);
       const state = { ...cur.state, optedOutEventIds: [...cur.state.optedOutEventIds, id] };
       await save(t, { ruleSet: cur.ruleSet, state });
       return state;
     },
   };
-  return { deps, files, corrupt, log };
+  return { deps, files, corrupt, log, hints };
 }
 
 const KEYS = {
@@ -270,4 +272,24 @@ test("without the per-tenant lock this fake WOULD lose updates (non-vacuity of t
   const s = fakeStore({ delayMs: 5 });
   await Promise.all(Array.from({ length: 6 }, (_, i) => s.deps.recordApproval("tenant-a", { kind: "sender", value: `u${i}@x.example` })));
   assert.ok(s.files.get("tenant-a")!.state.approvedSenders.length < 6);
+});
+
+test("opt-outs: optional meetingUrl / sessionKey hints are passed to the store for the AUTH tenant only; bad hints -> 400, nothing written (ISS-T037W1-001)", async () => {
+  const s = fakeStore();
+  await withServer(s.deps, async (_srv, call) => {
+    const url = "https://zoom.us/j/123456789?pwd=a";
+    assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", { eventId: "calX", meetingUrl: url, sessionKey: "webinar-abc" })).status, 200);
+    assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "b-key", { eventId: "calY", meetingUrl: url })).status, 200);
+    assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", { eventId: "plain" })).status, 200);
+    assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", { eventId: "blank", meetingUrl: "  ", sessionKey: "" })).status, 200);
+    assert.deepEqual(s.hints.map(h => [h.tenantId, h.eventId, h.meeting]), [
+      ["tenant-a", "calX", { meetingUrl: url, sessionKey: "webinar-abc" }], ["tenant-b", "calY", { meetingUrl: url }],
+      ["tenant-a", "plain", undefined], ["tenant-a", "blank", undefined],
+    ], "no hint -> the store is called exactly as before (two arguments)");
+    const saves = s.log.filter(l => l.op === "save").length;
+    for (const bad of [{ eventId: "e", meetingUrl: 5 }, { eventId: "e", meetingUrl: "x".repeat(2049) }, { eventId: "e", sessionKey: ["k"] }, { eventId: "e", sessionKey: "k".repeat(257) }, { eventId: "e", meetingUrl: null }])
+      assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", bad)).status, 400, JSON.stringify(bad).slice(0, 60));
+    assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", { eventId: "e", meetingUrl: url, tenantId: "tenant-b" })).status, 400);
+    assert.equal(s.log.filter(l => l.op === "save").length, saves);
+  });
 });

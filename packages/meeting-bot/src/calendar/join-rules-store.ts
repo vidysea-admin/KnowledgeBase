@@ -26,6 +26,7 @@ import {
   EMPTY_JOIN_RULE_STATE, recordRuleApproval as applyApproval, recordOptOut as applyOptOut,
   validateJoinRuleSet, validateJoinRuleState, type JoinRuleSet, type JoinRuleState,
 } from "./join-rules.js";
+import type { OptOutMeeting } from "./join-rules-optout.js";
 import { acquireLock, releaseLock, sleep, LockFailure } from "./join-rules-store-lock.js";
 
 export const JOIN_RULES_MAX_BYTES = 1024 * 1024;
@@ -193,6 +194,6 @@ export function recordTenantApproval(stateDir: string, tenantId: string, approva
 }
 
 /** Per-meeting opt-out; same lock and load-first behaviour. */
-export function recordTenantOptOut(stateDir: string, tenantId: string, eventId: string, opts: Omit<StoreOptions, "overwriteInvalid"> = {}): JoinRuleState {
-  return mutateState(stateDir, tenantId, opts, s => applyOptOut(s, eventId));
+export function recordTenantOptOut(stateDir: string, tenantId: string, eventId: string, opts: Omit<StoreOptions, "overwriteInvalid"> = {}, meeting?: OptOutMeeting): JoinRuleState {
+  return mutateState(stateDir, tenantId, opts, s => applyOptOut(s, eventId, meeting));
 }
