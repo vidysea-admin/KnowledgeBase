@@ -1,6 +1,6 @@
 # iss-t057screen-001-status-counts-tenant-scope
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2-equivalent (security class: tenancy / cross-tenant read; fixes ISS-T057SCREEN-001, severity medium but security class so full ceremony).
 Lane: lane/statusscope. Ledger for this lane: qa/issues.statusscope.jsonl (ISS-STATUSSCOPE-001).
