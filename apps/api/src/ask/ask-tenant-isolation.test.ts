@@ -15,51 +15,13 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { Db } from "mongodb";
 import type { TreeIndexNode } from "@lkb/core";
-import { treeIndexRootFilter } from "@lkb/index";
 import { BoundedAskError } from "@lkb/ask";
 import { createAskArmsFor } from "../ask-arms.js";
 import { createSourceHydrator, createSourceRequestDepsFor } from "./source-context.js";
+import { BlindDb, realTreeStore, type Query, type Row } from "./tenant-test-kit.js";
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeAskDeps } from "../fixtures.js";
-import type { TreeStore } from "../routes/ask/ask.js";
-
-// ---------------------------------------------------------------- tenant-blind fake database
-type Row = Record<string, unknown>;
-interface Query { coll: string; op: "find" | "findOne"; filter: Record<string, unknown>; returned: number }
-
-function fieldMatches(actual: unknown, want: unknown): boolean {
-  if (want !== null && typeof want === "object" && "$in" in (want as object)) {
-    return ((want as { $in: unknown[] }).$in).some((w) => fieldMatches(actual, w));
-  }
-  if (want === undefined || want === null) return actual === undefined || actual === null; // Mongo: null matches missing
-  return actual === want;
-}
-const matches = (row: Row, filter: Record<string, unknown>): boolean =>
-  Object.entries(filter).every(([k, v]) => fieldMatches(row[k], v));
-
-class BlindDb {
-  readonly queries: Query[] = [];
-  constructor(private readonly data: Record<string, Row[]>) {}
-  /** Rows of a collection exactly as stored (test-side inspection only). */
-  all(coll: string): Row[] { return this.data[coll] ?? []; }
-  asDb(): Pick<Db, "collection"> {
-    const self = this;
-    return { collection: (coll: string) => ({
-      find: (filter: Record<string, unknown> = {}) => ({ toArray: async () => {
-        const rows = (self.data[coll] ?? []).filter((r) => matches(r, filter));
-        self.queries.push({ coll, op: "find", filter: structuredClone(filter), returned: rows.length });
-        return structuredClone(rows);
-      } }),
-      findOne: async (filter: Record<string, unknown> = {}) => {
-        const row = (self.data[coll] ?? []).find((r) => matches(r, filter)) ?? null;
-        self.queries.push({ coll, op: "findOne", filter: structuredClone(filter), returned: row ? 1 : 0 });
-        return row ? structuredClone(row) : null;
-      },
-    }) } as unknown as Pick<Db, "collection">;
-  }
-}
 
 // ---------------------------------------------------------------- synthetic two-tenant corpus
 const QUERY = "Visa October";
@@ -104,17 +66,6 @@ const leaks = (value: unknown): string[] => {
 /** Tenant-A tree as a node tree (what tree.load(A) must return). */
 const aTree = (): TreeIndexNode => ({ node_id: `tenant:${A}`, title: A, level: "tenant", summary: "", children: structuredClone(A_TREE_SESSIONS) });
 
-/** Replica of `createMongoTreeStore.load` (store.ts:55-62) bound to the blind db. The real store
- * calls the module-global `getDb()` which cannot be injected hermetically; the call site is
- * pinned by tree-index-root-filter-single-source.test.ts. What this exercises for real is
- * `treeIndexRootFilter` (the production filter function) against both tenants' roots. */
-const blindTreeStore = (db: BlindDb, loads: string[]): TreeStore => ({
-  load: async (tenantId: string) => {
-    loads.push(tenantId);
-    return (await db.asDb().collection("tree_index").findOne(treeIndexRootFilter(tenantId))) as unknown as TreeIndexNode | null;
-  },
-});
-
 const unscoped = (qs: Query[], tenant: string) => qs.filter((q) => q.filter.tenantId !== tenant);
 
 // ---------------------------------------------------------------- fixture sanity (fake is blind)
@@ -133,7 +84,7 @@ test("sanity: the fake is tenant-blind and the bait outscores the real row (a mi
 test("tree load: tenant A gets A's root, never B's, with every query carrying A's filter", async () => {
   const db = new BlindDb(corpus());
   const loads: string[] = [];
-  const store = blindTreeStore(db, loads);
+  const store = realTreeStore(db, loads);
   const tree = (await store.load(A)) as unknown as Row;
   assert.equal(tree.tenantId, A);
   assert.equal(tree.node_id, "tenant:tA");
@@ -147,7 +98,7 @@ test("tree load: tenant A gets A's root, never B's, with every query carrying A'
 test("tree load: empty / undefined tenant matches no root and returns null", async () => {
   for (const bad of ["", undefined as unknown as string]) {
     const db = new BlindDb(corpus());
-    assert.equal(await blindTreeStore(db, []).load(bad), null, `tenant ${JSON.stringify(bad)}`);
+    assert.equal(await realTreeStore(db, []).load(bad), null, `tenant ${JSON.stringify(bad)}`);
     assert.equal(db.queries[0]!.returned, 0);
   }
 });
@@ -259,7 +210,7 @@ async function runRoute(opts: { db: BlindDb; key?: string; tenantOfKey?: string 
   const loads: string[] = [], prompts: string[] = [], writes: unknown[] = [], logs: string[] = [], requestTenants: string[] = [];
   const keys = { "k": { tenantId: opts.tenantOfKey as string, scopes: ["ask"] } };
   const base = buildTestDeps({ keyStore: fakeKeyStore(keys) });
-  base.ask.tree = blindTreeStore(db, loads);
+  base.ask.tree = realTreeStore(db, loads);
   const factory = createSourceRequestDepsFor({
     db: db.asDb(), embed: embed as never, write: async (j) => { writes.push(j); },
     treeSearchFn: (rootNode, ids) => {
@@ -348,7 +299,7 @@ test("HTTP /ask legacy arms path (extraCandidateArmsFor): arms are built per req
   const db = new BlindDb(corpus());
   const base = buildTestDeps({ keyStore: fakeKeyStore({ k: { tenantId: A, scopes: ["ask"] } }) });
   const loads: string[] = [], bound: string[] = [];
-  base.ask.tree = blindTreeStore(db, loads);
+  base.ask.tree = realTreeStore(db, loads);
   base.ask.askDeps = fakeAskDeps();
   const arms = createAskArmsFor({ embed: embed as never, db: db.asDb() });
   base.ask.extraCandidateArmsFor = (tenantId) => { bound.push(tenantId); return arms(tenantId); };

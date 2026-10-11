@@ -1,5 +1,5 @@
 /**
- * apps/api/src/ask/ask-tenant-hostile.test.ts - auth-require-tenant-on-key, fix cycle 1 (ISS-AUTHTENANT-001).
+ * apps/api/src/ask/ask-tenant-hostile.test.ts - auth-require-tenant-on-key, fix cycles 1-2 (ISS-AUTHTENANT-001, -004, -005).
  *
  * Cycle 0 changed one assertion in ask-tenant-isolation.test.ts from 404 to 401 for an empty tenant, because
  * requireAuth now refuses first. That made the route/tree-store protection unasserted: with auth bypassed or
@@ -15,58 +15,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import express from "express";
-import type { Db } from "mongodb";
 import type { TreeIndexNode } from "@lkb/core";
-import { treeIndexRootFilter } from "@lkb/index";
 import { scopedCollection } from "@lkb/db";
 import { createAskArmsFor } from "../ask-arms.js";
 import { createSourceHydrator, createSourceRequestDepsFor } from "./source-context.js";
 import { createAskRouter, type TreeStore } from "../routes/ask/ask.js";
+import { BlindDb, realTreeStore, type Row } from "./tenant-test-kit.js";
 import { fakeAskDeps } from "../fixtures.js";
 import { assertValidTenantId } from "../../../../packages/db/src/lib/tenantScope.js";
-
-// ---------------------------------------------------------------- tenant-blind fake with Mongo operators
-type Row = Record<string, unknown>;
-interface Query { coll: string; filter: Record<string, unknown>; returned: number }
-const isObj = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v);
-
-function fieldMatches(actual: unknown, want: unknown): boolean {
-  if (isObj(want) && Object.keys(want).some((k) => k.startsWith("$"))) {
-    return Object.entries(want).every(([op, arg]) => {
-      switch (op) {
-        case "$ne": return arg === null ? actual !== undefined && actual !== null : actual !== arg;
-        case "$gt": return typeof actual === "string" && typeof arg === "string" && actual > arg;
-        case "$in": return (arg as unknown[]).some((w) => fieldMatches(actual, w));
-        case "$regex": return typeof actual === "string" && new RegExp(String(arg)).test(actual);
-        case "$exists": return (actual !== undefined) === Boolean(arg);
-        default: return false;
-      }
-    });
-  }
-  if (want === undefined || want === null) return actual === undefined || actual === null;
-  if (Array.isArray(want)) return JSON.stringify(actual) === JSON.stringify(want);
-  return actual === want;
-}
-const matches = (row: Row, filter: Record<string, unknown>) => Object.entries(filter).every(([k, v]) => fieldMatches(row[k], v));
-
-class BlindDb {
-  readonly queries: Query[] = [];
-  constructor(private readonly data: Record<string, Row[]>) {}
-  asDb(): Pick<Db, "collection"> {
-    const self = this;
-    const rec = (coll: string, filter: Record<string, unknown>, rows: Row[]) =>
-      self.queries.push({ coll, filter: structuredClone(filter), returned: rows.length });
-    return { collection: (coll: string) => ({
-      find: (filter: Record<string, unknown> = {}) => ({ toArray: async () => {
-        const rows = (self.data[coll] ?? []).filter((r) => matches(r, filter)); rec(coll, filter, rows); return structuredClone(rows);
-      } }),
-      findOne: async (filter: Record<string, unknown> = {}) => {
-        const row = (self.data[coll] ?? []).find((r) => matches(r, filter)); rec(coll, filter, row ? [row] : []);
-        return row ? structuredClone(row) : null;
-      },
-    }) } as unknown as Pick<Db, "collection">;
-  }
-}
 
 // ---------------------------------------------------------------- two real tenants with unique sentinels
 const QUERY = "Visa October";
@@ -93,19 +49,11 @@ const embed = async () => ({ vectors: [[1, 0]], dims: 2, provider: "offline", mo
 const aTree = (): TreeIndexNode => ({ node_id: `tenant:${A}`, title: A, level: "tenant", summary: "", children: structuredClone(A_KIDS) });
 const found = (value: unknown, needles = SENTINELS) => { const t = typeof value === "string" ? value : JSON.stringify(value) ?? ""; return needles.filter((n) => t.includes(n)); };
 
-/** Replica of `createMongoTreeStore.load` (store.ts) over the blind db: same `treeIndexRootFilter` call. `loads` records the raw argument. */
-const treeStore = (db: BlindDb, loads: unknown[]): TreeStore => ({
-  load: async (tenantId: string) => {
-    loads.push(tenantId);
-    return (await db.asDb().collection("tree_index").findOne(treeIndexRootFilter(tenantId))) as unknown as TreeIndexNode | null;
-  },
-});
-
 // ---------------------------------------------------------------- the shared hostile-tenant table
 const HOSTILE: ReadonlyArray<readonly [label: string, value: unknown]> = [
   ["empty string", ""], ["whitespace-only", "   "], ["undefined", undefined], ["null", null], ["number", 5],
   ["{$ne:null}", { $ne: null }], ["{$gt:''}", { $gt: "" }], ["{$in:[A,B]}", { $in: [A, B] }], ["{$regex:'.*'}", { $regex: ".*" }],
-  ["array [A]", [A]], ["valid tenant with NO data", NONE],
+  ["array [A]", [A]], ["\" tA\" (leading space)", " tA"], ["\"tA \" (trailing space)", "tA "], ["valid tenant with NO data", NONE],
 ];
 const label = (l: string) => `tenant ${l}`;
 const isOperatorShaped = (v: unknown) => v !== null && typeof v === "object";
@@ -138,7 +86,7 @@ async function runAskWithAuth(authTenant: unknown, opts: { treeFor?: (db: BlindD
   const app = express();
   app.use(express.json());
   app.use((req, _res, next) => { req.auth = { tenantId: authTenant as string, scopes: ["ask"] }; next(); }); // test-only stub: requireAuth is deliberately NOT mounted
-  app.use(createAskRouter({ tree: (opts.treeFor ?? treeStore)(db, loads), askDeps: fakeAskDeps(), requestDepsFor: (t) => factory(t) }));
+  app.use(createAskRouter({ tree: (opts.treeFor ?? realTreeStore)(db, loads), askDeps: fakeAskDeps(), requestDepsFor: (t) => factory(t) }));
   const server = app.listen(0, "127.0.0.1");
   await new Promise<void>((r) => server.once("listening", () => r()));
   const orig = { log: console.log, warn: console.warn, error: console.error };
@@ -161,13 +109,30 @@ test("hostile route harness, positive control: tenant A gets only A's sentinel, 
   assert.ok(a.db.queries.every((q) => q.filter.tenantId === A), "every query carries tA");
 });
 
-// ---------------------------------------------------------------- level 1: tree store
-for (const [name, value] of HOSTILE) {
-  test(`tree store: ${label(name)} loads nothing and matches no root of either tenant`, async () => {
+// ---------------------------------------------------------------- level 1: the PRODUCTION tree store (createMongoTreeStore().load) over the fake
+const rootFilterOf = (t: unknown) => ({ node_id: `tenant:${String(t)}`, level: "tenant", tenantId: t });
+for (const [tenant, mine, other] of [[A, SENT_A, SENT_B], [B, SENT_B, SENT_A]] as const) {
+  test(`real tree store: tenant ${tenant} gets exactly its own root (own sentinel only), one query with the exact id`, async () => {
     const db = new BlindDb(corpus());
-    assert.equal(await treeStore(db, []).load(value as string), null);
+    const tree = await realTreeStore(db, []).load(tenant) as unknown as Row;
+    assert.equal(tree.tenantId, tenant); assert.equal(tree.node_id, `tenant:${tenant}`);
+    assert.deepEqual(found(tree, [mine, other]), [mine], "own sentinel, never the other tenant's");
+    assert.deepEqual(db.queries.map((q) => [q.coll, q.op, q.returned]), [["tree_index", "findOne", 1]]);
+    assert.deepEqual(db.queries[0]!.filter, { node_id: `tenant:${tenant}`, level: "tenant", tenantId: tenant }, "filter carries exactly this tenant as plain strings");
+  });
+}
+for (const [name, value] of HOSTILE) {
+  test(`real tree store: ${label(name)} returns null; the filter is the plain-string root filter of exactly that value`, async () => {
+    const db = new BlindDb(corpus());
+    assert.equal(await realTreeStore(db, []).load(value as string), null);
     assert.equal(db.queries.length, 1);
-    assert.equal(db.queries[0]!.returned, 0, `filter ${JSON.stringify(db.queries[0]!.filter)} must match no row`);
+    const f = db.queries[0]!.filter;
+    assert.equal(db.queries[0]!.returned, 0, `filter ${JSON.stringify(f)} must match no row`);
+    assert.deepEqual(Object.keys(f), ["node_id", "level", "tenantId"], "no operator key spread in, none dropped");
+    assert.equal(typeof f.node_id, "string", "node_id is a plain string, never an operator object");
+    assert.deepEqual(f, rootFilterOf(value), "tenantId is the value passed in: not hard-coded, not coerced, not trimmed");
+    if (typeof value === "string" && value !== A && value !== B) assert.ok(f.node_id !== `tenant:${A}` && f.node_id !== `tenant:${B}`, "never another tenant's root id (an array [tA] stringifies to it but its tenantId conjunct matches no row)");
+    if (typeof value === "string") assert.ok(!JSON.stringify(f).includes(`"${A}"`) && !JSON.stringify(f).includes(B), "no other tenant's id inside the filter");
   });
 }
 
@@ -179,6 +144,7 @@ for (const [name, value] of HOSTILE) {
     assert.deepEqual(found(r.text), [], "neither tenant's sentinel in the body");
     assert.ok(noStack(r.text), `no stack in body: ${r.text}`);
     assert.deepEqual(r.loads, [value], "tree.load got exactly the hostile value (or was not reached)");
+    if (value === NONE) assert.deepEqual(r.db.queries.map((q) => [q.coll, q.filter.tenantId]), [["tree_index", NONE]], "valid tenant, no data: one scoped tree query carrying exactly its id, then the no-data 404");
     assert.deepEqual(r.db.queries.filter((q) => q.coll !== "tree_index"), [], "no turns/chunks query");
     assert.ok(r.db.queries.every((q) => q.returned === 0), "no row of any tenant returned");
     assert.deepEqual(r.prompts, [], "no model call");
@@ -192,6 +158,10 @@ for (const [name, value] of HOSTILE) {
     if (r.status === 200) assert.deepEqual((JSON.parse(r.text) as { sources: { internal: unknown[] } }).sources.internal, [], "a 200 may carry no internal source");
     else assert.ok(r.status >= 400 && r.status < 600, `status ${r.status}: ${r.text.slice(0, 200)}`);
     console.log(`# bypassed-tree ${JSON.stringify(String(value))}: status ${r.status}`);
+    if (value === NONE) { // a VALID tenant with no data legitimately queries (checker cycle 1, ISS-AUTHTENANT-005): scoped to exactly its id, nothing returned
+      assert.equal(r.status, 200, r.text); assert.ok(r.db.queries.length > 0, "non-vacuous: the valid tenant did query");
+      assert.ok(r.db.queries.every((q) => q.filter.tenantId === NONE), "every query carries exactly tNone"); return;
+    }
     assert.deepEqual(found(r.text), [], "no sentinel in body");
     assert.ok(noStack(r.text), `no stack/internal path in body: ${r.text.slice(0, 300)}`);
     assert.ok(r.db.queries.every((q) => q.returned === 0), "no row returned by any query");
@@ -207,6 +177,7 @@ for (const [name, value] of HOSTILE) {
     assert.deepEqual(found(res), [], "no sentinel in arms output");
     assert.ok(db.queries.every((q) => q.returned === 0), "no row returned");
     if (guardRefusesObjects || !isOperatorShaped(value)) assert.deepEqual(res.arms.flat().filter((n) => !n.node_id.startsWith("tenant:tA/")), []);
+    if (value === NONE) { assert.ok(db.queries.length > 0, "non-vacuous: the valid tenant did query"); assert.ok(db.queries.every((q) => q.filter.tenantId === NONE), "every query carries exactly tNone"); assert.ok(!res.degraded, "not degraded"); return; }
     if (guardRefusesObjects) { assert.equal(db.queries.length, 0); assert.match(res.degraded ?? "", /tenantId is required/); }
   });
 }
@@ -219,6 +190,7 @@ for (const [name, value] of HOSTILE) {
     const shown = "v" in out ? JSON.stringify(out.v) : String((out.e as Error).message);
     assert.deepEqual(found(shown), [], "no sentinel in result or error message");
     assert.ok(db.queries.every((q) => q.returned === 0), "no row returned");
+    if (value === NONE) { assert.ok("e" in out ? /no source/i.test(String((out.e as Error).message)) : true, "valid tenant with no data: refused for lack of source rows (or empty), after its own scoped queries"); assert.ok(db.queries.length > 0, "non-vacuous: the valid tenant did query"); assert.ok(db.queries.every((q) => q.filter.tenantId === NONE), "every query carries exactly tNone"); return; }
     if (guardRefusesObjects) { assert.ok("e" in out, "refused"); assert.equal(db.queries.length, 0); }
   });
 }
