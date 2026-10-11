@@ -16,6 +16,7 @@ import { MeetingBotPage } from "./pages/MeetingBotPage.js";
 import { WhatsAppPage } from "./pages/WhatsAppPage.js";
 import { WatchPage } from "./pages/WatchPage.js";
 import { JobsPage } from "./pages/jobs/JobsPage.js";
+import { ClaimsPage } from "./pages/claims/ClaimsPage.js";
 import { KnowledgeExplorerPage } from "./pages/explorer/KnowledgeExplorerPage.js";
 import { ConfidenceGraphPage } from "./pages/graph-confidence/ConfidenceGraphPage.js";
 import { KnowledgeGapsPage } from "./pages/gaps/KnowledgeGapsPage.js";
@@ -48,6 +49,7 @@ export function App(): React.ReactElement {
               <Route path="/sources" element={<SourcesPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/jobs" element={<JobsPage />} />
+              <Route path="/claims" element={<ClaimsPage />} />
               <Route path="/status" element={<SystemStatusPage />} />
               <Route path="/ingest" element={<IngestPage />} />
               <Route path="/meeting-bot" element={<MeetingBotPage />} />
