@@ -6,7 +6,7 @@
 **Fix cycle:** 0
 **Dual check:** no
 **Issues addressed:** ISS-SCOREFIX-001 (catalogue), ISS-SCOREFIX-002 (ledger-union fixture), ledger `qa/issues.scorefix.jsonl`.
-**Status:** ready-for-check
+**Status:** checked-PASS (Checked: qa/verdicts/iss-scorefix-catalogue-check-and-ledger-union-fixture.md, cycle 0, 931495e)
 
 ## Part A — `lint:score` (ISS-SCOREFIX-001)
 
