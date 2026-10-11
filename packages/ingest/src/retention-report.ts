@@ -20,7 +20,7 @@ import { parseArgs, USAGE, type ReportOptions } from "./retention-report-args.js
 import { gatherState, tenantSegment, type Gathered, type SessionInfo } from "./retention-report-state.js";
 import { cleanText } from "./retention-report-text.js";
 import { NOT_ASSESSABLE, QUIET_PERIOD_MS } from "./retention-report-guards.js";
-import { assess, type Row, type Scope, type Verdict } from "./retention-report/assess.js";
+import { assess, type Row, type Scope, type RowVerdict } from "./retention-report/assess.js";
 import { scanOtherTenants } from "./retention-report/crosstenant.js";
 import { checkClock, CLOCK_HORIZON_MS } from "./retention-report/clock.js";
 import { TERMINAL_STATUSES, loadOps, type OpsState } from "./retention-report/ops.js";
@@ -81,7 +81,7 @@ function section(g: Gathered, plan: RetentionPlan | null, opts: ReportOptions, m
   const a = assess(rows, g.infos.filter((i) => !printed.has(i)), now, clock, ops, scope);
   for (const row of rows) {
     const { info, item } = row;
-    const v = a.verdicts.get(row) as Verdict;
+    const v = a.verdicts.get(row) as RowVerdict;
     const reason = row.item === undefined ? `unreadable state, kept: ${info?.unreadable ?? "?"}` : row.item.reason;
     const size = info?.media.sizeBytes ?? null;
     lines.push(`RECORDING ${cleanText(item?.mediaId.startsWith("index:") ? info?.mediaId ?? item.mediaId : item?.mediaId ?? info?.dir ?? "?", 80)} => ${v.eligible ? "ELIGIBLE" : "KEEP"}`);

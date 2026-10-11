@@ -35,12 +35,12 @@ function dirBackend(dir: string): Backend {
   };
 }
 
-export interface Spec { frozen?: boolean; takers: number; holder: "dead" | "alive"; waitMs: number; aged: boolean; lying?: boolean; kill?: boolean; operator?: boolean }
+export interface LockSpec { frozen?: boolean; takers: number; holder: "dead" | "alive"; waitMs: number; aged: boolean; lying?: boolean; kill?: boolean; operator?: boolean }
 interface Actor { sig: string; id: string; token: string; pid: number; gen: Generator<string>; done: boolean; killed: boolean; wins: number; kind: "taker" | "holder" | "operator" }
 const tokOf = (raw: string | null) => (raw === null ? null : parseHolder(raw)?.token ?? null);
 
 /** Builds a world for `spec` over `be`; returns the actors and a `check` run after every step. */
-function build(spec: Spec, be: Backend, lockPath: string) {
+function build(spec: LockSpec, be: Backend, lockPath: string) {
   const clock = { t: T0 }, believers = new Set<string>(), violations: string[] = [], writes: string[] = [];
   const body = (token: string, pid: number, at: number) => JSON.stringify({ token, pid, host: HOST, at: new Date(at).toISOString() });
   const at0 = spec.aged ? T0 - 100000 : T0 - 1000;
@@ -109,7 +109,7 @@ function build(spec: Spec, be: Backend, lockPath: string) {
 
 type World = ReturnType<typeof build>;
 const runnableOf = (w: World) => w.actors.map((a, i) => (a.done || a.killed ? -1 : i)).filter(i => i >= 0);
-function advance(w: World, spec: Spec, a: Actor) {
+function advance(w: World, spec: LockSpec, a: Actor) {
   const r = a.gen.next(); a.sig += "|"; w.steps++; w.clock.t += spec.frozen ? 0 : 1;
   if (r.done) a.done = true; else if (r.value.startsWith("nap:")) w.clock.t += Number(r.value.slice(4));
   if (w.actors.some(x => x.kind === "taker" && x.wins > 0)) w.ever = true;
@@ -117,7 +117,7 @@ function advance(w: World, spec: Spec, a: Actor) {
 }
 type Pick = (runnable: number[], depth: number) => number;
 /** One complete run. `pick` chooses the index (into `runnable`) to advance. Returns the violations. */
-function run(spec: Spec, be: Backend, lockPath: string, pick: Pick, rnd?: () => number): { violations: string[]; steps: number } {
+function run(spec: LockSpec, be: Backend, lockPath: string, pick: Pick, rnd?: () => number): { violations: string[]; steps: number } {
   const w = build(spec, be, lockPath);
   for (;;) {
     const runnable = runnableOf(w);
@@ -136,7 +136,7 @@ function run(spec: Spec, be: Backend, lockPath: string, pick: Pick, rnd?: () => 
  * contents + each actor's observation history + who holds what; two prefixes reaching one state have identical futures, so the number of
  * complete orderings below a state is counted once (`orderings` = exact count of distinct full schedules, as plain enumeration would give).
  */
-function exhaustive(spec: Spec, be: Backend, lockPath: string, useMemo = true) {
+function exhaustive(spec: LockSpec, be: Backend, lockPath: string, useMemo = true) {
   const memo = new Map<string, number>(), bad: string[] = []; let maxSteps = 0;
   const visit = (prefix: number[]): number => {
     const w = build(spec, be, lockPath);
@@ -153,7 +153,7 @@ function exhaustive(spec: Spec, be: Backend, lockPath: string, useMemo = true) {
   return { orderings, states: memo.size, maxSteps, bad };
 }
 const mulberry = (a: number) => () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-function seeded(spec: Spec, be: Backend, lockPath: string, seed: number, n: number) {
+function seeded(spec: LockSpec, be: Backend, lockPath: string, seed: number, n: number) {
   let v = 0, steps = 0; const bad: string[] = [];
   for (let i = 0; i < n; i++) {
     const rnd = mulberry(seed + i); let last = -1;
@@ -167,7 +167,7 @@ function seeded(spec: Spec, be: Backend, lockPath: string, seed: number, n: numb
 
 const L = "/mem/acme.lock";
 const SEED = 20261011;
-const spec = (o: Partial<Spec> = {}): Spec => ({ takers: 3, holder: "dead", waitMs: 0, aged: true, ...o });
+const spec = (o: Partial<LockSpec> = {}): LockSpec => ({ takers: 3, holder: "dead", waitMs: 0, aged: true, ...o });
 const EXH = { frozen: true };
 
 for (const [name, s] of [

@@ -48,7 +48,7 @@ const str = (v: unknown): string | undefined => (typeof v === "string" ? v : und
 const isPlain = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v);
 
 /** Bare lower-case host of an https URL, or undefined. No path, query, fragment or userinfo is ever returned. */
-export function hostOnly(raw: unknown): string | undefined {
+export function alertWhoHostOnly(raw: unknown): string | undefined {
   if (typeof raw !== "string" || raw.length > 4096) return undefined;
   try {
     const u = new URL(raw);
@@ -113,7 +113,7 @@ export function loadCandidates(src: AlertWhoSources, deps: Pick<AlertWhoDeps, "r
           if (!isPlain(j) || typeof j.sessionId !== "string") throw new Error("shape");
           const url = str(j.url);
           U.add({ sessionKey: j.sessionId, title: str(j.title), end: str(j.until), source: "scheduled-job",
-            platform: url ? detectPlatform(url) : undefined, host: hostOnly(url) });
+            platform: url ? detectPlatform(url) : undefined, host: alertWhoHostOnly(url) });
         } catch { problems.push("a scheduled job file is unreadable or corrupt (skipped)"); }
       }
     } catch { problems.push("scheduled/ directory is unreadable (skipped)"); }

@@ -5,7 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { alertIdFor } from "./calendar/alerts/attention-alerts.js";
 import { readWebinarOperationState, writeWebinarOperationState } from "./calendar/schedule-state.js";
-import { hostOnly, loadCandidates, runAlertWho, type AlertWhoDeps } from "./alert-who-command.js";
+import { alertWhoHostOnly, loadCandidates, runAlertWho, type AlertWhoDeps } from "./alert-who-command.js";
 
 const NOW = new Date("2026-10-10T10:00:00.000Z");
 function snapshot(dir: string): string[] {
@@ -140,10 +140,10 @@ test("join URL: platform and bare host only; no query, path, fragment or userinf
     for (const s of secrets) assert.ok(!text.includes(s), `${s} leaked for ${i}`);
     assert.match(text, /platform: (zoom|teams|meet|webex) \([a-z.]+\)/);
   });
-  assert.equal(hostOnly("http://zoom.us/j/1"), undefined);
-  assert.equal(hostOnly("javascript:alert(1)"), undefined);
-  assert.equal(hostOnly(5), undefined);
-  assert.equal(hostOnly("https://user:p@Zoom.us:443/x?pwd=1"), "zoom.us");
+  assert.equal(alertWhoHostOnly("http://zoom.us/j/1"), undefined);
+  assert.equal(alertWhoHostOnly("javascript:alert(1)"), undefined);
+  assert.equal(alertWhoHostOnly(5), undefined);
+  assert.equal(alertWhoHostOnly("https://user:p@Zoom.us:443/x?pwd=1"), "zoom.us");
   w.done();
 });
 
