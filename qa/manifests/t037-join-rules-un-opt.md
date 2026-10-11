@@ -1,6 +1,6 @@
 # t037-join-rules-un-opt
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t037-join-rules-un-opt.md, cycle 0, 1329ab9)
 Fix cycle: 0
 Priority tier: 3 (the next unblocked roadmap step: W7 gate (d) of `qa/contracts/t037-join-rules-veto-select.md`, "an un-opt operation exists, or the Approver accepts its absence in writing"); it also closes two open medium ledger rows (ISS-T037OPT-001, ISS-T037OPT-003), tier 4. Tier 1 and 2 were not consulted by this brief.
 Security class: DATA-WRITE route (a new write route that changes which meetings are recorded for a tenant) - FULL ceremony, never capped.
