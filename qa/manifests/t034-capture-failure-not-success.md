@@ -1,7 +1,7 @@
 # Manifest — t034-capture-failure-not-success
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 
 **Goal task:** T-034 (in-browser tab capture). T-034 stays OPEN (no real-browser run yet).
 **Lane:** T034FIX, branch `lane/t034fix` from d27cf71. New issues: `qa/issues.t034fix.jsonl` (ISS-T034FIX-001, -002).
@@ -62,3 +62,19 @@ background.js git blob `37ec1ae52771296e09146fcef314297551a00d43`, manifest.json
 - The fakes are more permissive than Chrome: `track.stop()` never fires `ended`, MediaRecorder never errors by itself, `respond` works without `return true` (007 asserted separately).
 - Failed-stop handling is tested with a fake extension child process, not the real extension; the receiver half and recorder half are not joined end to end.
 - ISS-T034EXT-004 stays open. T034EXT row statuses were not changed (checker's job).
+
+## Fix cycle 1 (conditions from the cycle-0 PASS: ISS-T034FIX-003, -004; -005 checked)
+
+**1. ISS-T034FIX-003 (fail closed).** `tab-browser.ts`: a `capture-stopped` is a clean stop ONLY when `failed === false` (exact boolean). `true` gives "Recorder reported a failed stop; media is incomplete"; anything else (string, number, null, missing) gives "Malformed capture-stopped message (failed is not boolean false); media treated as incomplete". Both set status `failed`, keep the partial file, and make `stop()` reject. `record-commands.ts` onEvent uses the same predicate (`!== false`). The shipped recorder.js always sends a boolean, so nothing legitimate changes (all pre-existing clean-stop tests pass unmodified). DELIBERATE CHOICE: an OLD extension build that omits the field now gets a FAILURE (malformed stop), not a success; a clean stop needs an explicit `failed:false`.
+D-015: ISS-T034FIX-003 7/7 (recorded values false, true, "true", "false", 1, null, missing; table test, one real receiver run each: false -> stopped, the other six -> failed with the right reason).
+
+**2. ISS-T034FIX-004 (finalize unreachable on a failed stop).** Test seam: `runRecord(rest, inject?: RecordInject)` with optional `tab` factory, `finalize`, `recordDir`, `pollMs` (all default to production values; `RECORD_DIR` inside runRecord became a local `recordDir`). Four named tests in `record-commands.test.ts` (existing file) drive runRecord against the REAL tab receiver/deps with a fake extension child process:
+- "tab stop rejects (failed stop at end of recording)": runRecord rejects with the reason, finalize not called, partial file kept ("partial-media"), status.json `failed`.
+- "a capture-error ends the record loop promptly": < 3000 ms after capture-started, no finalize, partial kept, status failed.
+- "an early capture-stopped failed:true ends the record loop promptly": same assertions.
+- parity: a clean stop is not a capture failure (status `stopped`; the run then continues into normalizeCapture, which fails here only because ffmpeg/real WebM are absent, asserted to be a non-capture error).
+Mutants (per-mutation byte backup, restore in finally, hash equals pre-mutation blob, 250 s timeout, lane-private harness deleted): C1 rethrow `if (backend === "tab") throw e;` removed: KILLED by "tab stop rejects ..." and "early capture-stopped ..."; C2 loop `if (captureFailure) throw` removed: KILLED by the two "ends the record loop promptly" tests; C3 early-exit failed-stop line removed: KILLED by "early capture-stopped failed:true ends the record loop promptly". Extra: C4 receiver fails open again (`=== true`): KILLED by six ISS-T034FIX-003 table tests; C5 malformed reason not distinguished: KILLED by the same table. ISS-T034FIX-004: 3/3 mutants killed.
+
+**3. ISS-T034FIX-005 (alert/operation row): LEFT OPEN.** `record-commands.ts` has no operation/job-outcome recording for failures of any kind (grep for operation/job: none); its only failure outputs are the thrown error (non-zero exit), stderr and the status file. There is no existing path to reuse with one call, and alerting was out of scope.
+
+**Evidence (cycle 1).** tab-browser tests: 13 tests, 12 pass, 1 fail = the pre-existing symlink EPERM test (environmental, unchanged). record-commands tests: 23 tests, 22 pass, 0 fail (one earlier run under load showed 2 timing failures, a rerun was green). Extension tests: 44 tests, 43 pass, 1 todo (-004 of the T034EXT set). `tsc --noEmit -p tsconfig.json`: 0 errors. `lint-dirsize`: OK. Non-blank sizes: tab-browser.ts 268 (limit 300), record-commands.ts 278, record-commands.test.ts 397 (limit 400), tab-browser.test.ts 141. background.js and manifest.json untouched (blobs 37ec1ae..., 3c49a48...).

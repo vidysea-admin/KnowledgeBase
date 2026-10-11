@@ -97,9 +97,10 @@ const fakeExtension = [
   'await ev({event: "capture-started"}); await post("/chunk?seq=0", "partial-media");',
   'for (;;) { if ((await (await post("/control", "{}")).json()).stop) break; await new Promise((r) => setTimeout(r, 30)); }',
   'if (scenario === "error-then-clean-stop") await ev({event: "capture-error", error: "track lost"});',
-  'await ev({event: "capture-stopped", failed: scenario === "lost-error-failed-stop"});',
+  'await ev(process.env.FAKE_STOP ? JSON.parse(process.env.FAKE_STOP) : {event: "capture-stopped", failed: scenario === "lost-error-failed-stop"});',
 ].join("\n");
-async function runFake(scenario: string) {
+async function runFake(scenario: string, stopJson?: string) {
+  if (stopJson === undefined) delete process.env.FAKE_STOP; else process.env.FAKE_STOP = stopJson;
   const dir = mkdtempSync(path.join(tmpdir(), "lkb-tabfail-")), script = path.join(dir, "fake-extension.mjs");
   writeFileSync(script, fakeExtension); process.env.FAKE_SCENARIO = scenario;
   const tab = createTabBrowserDeps({python: process.execPath, joinScript: script, profileDir: path.join(dir, "profile"), recordDir: path.join(dir, "record"),
@@ -126,3 +127,21 @@ test("ISS-T034EXT-002: a capture-error seen earlier is sticky even when the late
   const r = await runFake("error-then-clean-stop");
   assert.match(String(r.outcome), /track lost/); assert.equal(r.status.state, "failed"); assert.equal(r.media, "partial-media");
 });
+
+// ISS-T034FIX-003: fail closed. The seven recorded values of the stop message's failed field.
+const STOP_TABLE: [string, string, "ok" | RegExp][] = [
+  ["false", '{"event":"capture-stopped","failed":false}', "ok"],
+  ["true", '{"event":"capture-stopped","failed":true}', /reported a failed stop/],
+  ['"true"', '{"event":"capture-stopped","failed":"true"}', /Malformed capture-stopped/],
+  ['"false"', '{"event":"capture-stopped","failed":"false"}', /Malformed capture-stopped/],
+  ["1", '{"event":"capture-stopped","failed":1}', /Malformed capture-stopped/],
+  ["null", '{"event":"capture-stopped","failed":null}', /Malformed capture-stopped/],
+  ["missing", '{"event":"capture-stopped"}', /Malformed capture-stopped/],
+];
+for (const [label, json, expected] of STOP_TABLE) {
+  test(`ISS-T034FIX-003: capture-stopped failed=${label} -> ${expected === "ok" ? "clean stop" : "failure"} (fail closed)`, {timeout: 60000}, async () => {
+    const r = await runFake("clean", json);
+    if (expected === "ok") { assert.equal(r.outcome, "resolved"); assert.equal(r.status.state, "stopped"); return; }
+    assert.match(String(r.outcome), expected); assert.equal(r.status.state, "failed"); assert.equal(r.media, "partial-media");
+  });
+}

@@ -13,12 +13,12 @@ import { createHash } from "node:crypto";
 import { test } from "node:test";
 import { execFileSync, spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { captureTenant, finalizeRecordingWith, isSilentCapture, runFinalize, shouldAutoClick, todayAt, validateIndexProof } from "./record-commands.js";
+import { captureTenant, finalizeRecordingWith, isSilentCapture, runFinalize, runRecord, shouldAutoClick, todayAt, validateIndexProof } from "./record-commands.js";
 import type { ObsClientLike } from "./obs-windows.js";
 import {finalizeControllerRecording} from "./controller-state.js";
 import {webinarCompletionState} from "../calendar/schedule-state.js";
@@ -367,4 +367,64 @@ test('finalizer binds source to configured tenant and refuses other-tenant overw
     await assert.rejects(finalizeRecordingWith({ ...overrides, tenantId: 'tenant-one' }, video, 'tenant-recording', 'Other', 'unknown', false), /different tenant/);
     assert.equal(readFileSync(file, 'utf8'), before);
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// --- ISS-T034FIX-004: a rejected tab stop must never reach finalize (drives runRecord with an injected tab backend) ---
+// The real tab receiver/deps run against a fake extension child process; only finalize and the loop poll are injected.
+const FAKE_RC = [
+  'import {readFileSync} from "node:fs";',
+  'const argv = process.argv, ext = argv[argv.indexOf("--capture-extension") + 1], scenario = process.env.FAKE_RC;',
+  'const cfg = JSON.parse(readFileSync(ext + "/config.json", "utf8"));',
+  'const post = (route, body) => fetch(cfg.endpoint + route, {method: "POST", body, headers: {Origin: "chrome-extension://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", Authorization: "Bearer " + cfg.token}});',
+  'const ev = (o) => post("/event", JSON.stringify(o));',
+  'const giveUp = Date.now() + 6000;',
+  'await ev({event: "capture-started"}); await post("/chunk?seq=0", "partial-media");',
+  'if (scenario.startsWith("early")) await new Promise((r) => setTimeout(r, 1000)); // let launch() resolve first: this must hit the RECORD LOOP, not startup',
+  'if (scenario === "early-error") await ev({event: "capture-error", error: "lost audio"});',
+  'if (scenario === "early-failed-stop") await ev({event: "capture-stopped", failed: true});',
+  'for (;;) { if (Date.now() > giveUp) process.exit(0); if ((await (await post("/control", "{}")).json()).stop) break; await new Promise((r) => setTimeout(r, 30)); }',
+  'if (scenario !== "early-failed-stop") await ev({event: "capture-stopped", failed: scenario !== "clean"});', 'process.exit(0);',
+].join("\n");
+async function driveRecord(scenario: string, untilMs: number) {
+  const dir = mkdtempSync(join(tmpdir(), "lkb-rc-")), script = join(dir, "fake-extension.mjs"), recordDir = join(dir, "record");
+  writeFileSync(script, FAKE_RC); process.env.FAKE_RC = scenario;
+  const finalizeCalls: unknown[][] = []; let startedAt = 0;
+  try {
+    const t0 = Date.now(); let error: unknown;
+    await runRecord(["https://meet.google.com/abc-defg-hij", "--until", new Date(t0 + untilMs).toISOString(), "--backend", "tab",
+      "--session-id", "t034-rc", "--tenant", "fixture", "--title", "fixture"], {
+      recordDir, pollMs: 20, finalize: async (...args) => { finalizeCalls.push(args); },
+      tab: (onEvent) => createTabBrowserDeps({python: process.execPath, joinScript: script, profileDir: join(dir, "profile"), recordDir,
+        extensionDir: join(REPO_ROOT, "packages/meeting-bot/py/tab-capture"), sessionId: "t034-rc", tenantId: "fixture", startupTimeoutMs: 15000, log: () => {},
+        onEvent: (h, e) => { if (e.event === "capture-started") startedAt = Date.now(); onEvent(h, e); }}),
+    }).catch((e) => { error = e; });
+    const elapsedAfterStart = Date.now() - startedAt;
+    const webm = existsSync(recordDir) ? readdirSync(recordDir).filter((n) => n.endsWith(".webm")) : [];
+    const status = webm.length ? JSON.parse(readFileSync(join(recordDir, webm[0]! + ".status.json"), "utf8")) : undefined;
+    const media = webm.length ? readFileSync(join(recordDir, webm[0]!), "utf8") : undefined;
+    return {error, finalizeCalls, elapsedAfterStart, status, media};
+  } finally { delete process.env.FAKE_RC; rmSync(dir, {recursive: true, force: true}); }
+}
+const T4 = {timeout: 60000};
+const expectFailed = (r: Awaited<ReturnType<typeof driveRecord>>, reason: RegExp) => {
+  assert.ok(r.error instanceof Error, "runRecord must reject (non-zero exit)"); assert.match((r.error as Error).message, reason);
+  assert.equal(r.finalizeCalls.length, 0, "finalize/promote must never be called"); assert.equal(r.media, "partial-media", "partial file left in place");
+  assert.equal(r.status?.state, "failed");
+};
+test("ISS-T034FIX-004: tab stop rejects (failed stop at end of recording) -> runRecord rejects with the reason, no finalize, partial kept, status failed", T4, async () => {
+  expectFailed(await driveRecord("stop-failed", 4000), /failed stop; media is incomplete/);
+});
+test("ISS-T034FIX-004: a capture-error ends the record loop promptly and the capture fails (no finalize)", T4, async () => {
+  const r = await driveRecord("early-error", 120000); expectFailed(r, /lost audio/);
+  assert.ok(r.elapsedAfterStart < 3000, `loop must end promptly, took ${r.elapsedAfterStart} ms`);
+});
+test("ISS-T034FIX-004: an early capture-stopped failed:true ends the record loop promptly and the capture fails (no finalize)", T4, async () => {
+  const r = await driveRecord("early-failed-stop", 120000); expectFailed(r, /failed stop; media is incomplete/);
+  assert.ok(r.elapsedAfterStart < 3000, `loop must end promptly, took ${r.elapsedAfterStart} ms`);
+});
+test("ISS-T034FIX-004 parity: a clean tab stop is not a capture failure (status stopped; proceeds past stop into normalize/finalize)", T4, async () => {
+  const r = await driveRecord("clean", 3000);
+  assert.equal(r.status?.state, "stopped"); assert.equal(r.media, "partial-media");
+  // normalizeCapture needs ffmpeg and a real WebM (absent here), so a later environmental error is expected; it must not be a capture failure.
+  if (r.error) assert.doesNotMatch((r.error as Error).message, /failed stop|lost audio|Malformed/);
 });

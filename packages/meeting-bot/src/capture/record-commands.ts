@@ -68,7 +68,13 @@ export function recordingBackend(rest: string[], env: NodeJS.ProcessEnv = proces
   if (value === "obs" && process.platform !== "win32") throw new Error("OBS fallback is Windows-only; use --backend tab");
   return value;
 }
-export async function runRecord(rest: string[]): Promise<void> {
+/** Test seam: inject the tab backend, finalize, record dir and loop poll interval (defaults are production). */
+export interface RecordInject {
+  tab?: (onEvent: (handle: string, event: any) => void) => ReturnType<typeof createTabBrowserDeps>;
+  finalize?: typeof finalizeRecording; recordDir?: string; pollMs?: number;
+}
+export async function runRecord(rest: string[], inject: RecordInject = {}): Promise<void> {
+  const recordDir = inject.recordDir ?? RECORD_DIR;
   const url = rest[0];
   const untilArg = flag(rest, "--until");
   if (!url || !untilArg) {
@@ -105,17 +111,17 @@ export async function runRecord(rest: string[]): Promise<void> {
   const onEvent = (_h: string, ev: Parameters<typeof collectGapEvent>[1]) => {
     if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
     if (ev.event === "capture-error") captureFailure = String(ev.error ?? "capture failed");
-    if (ev.event === "capture-stopped" && (ev as {failed?: unknown}).failed === true) captureFailure ??= "capture stopped with failure";
+    if (ev.event === "capture-stopped" && (ev as {failed?: unknown}).failed !== false) captureFailure ??= "capture stopped with failure";
     collectGapEvent(gaps, ev);
     telegram.onBotEvent(ev);
   };
-  const tab = backend === "tab" ? createTabBrowserDeps({
+  const tab = backend === "tab" ? (inject.tab ? inject.tab(onEvent) : createTabBrowserDeps({
     python: process.env.LKB_PYTHON ?? "python", joinScript: JOIN_SCRIPT,
-    profileDir: BOT_PROFILE_DIR, recordDir: RECORD_DIR, sessionId, tenantId,
+    profileDir: BOT_PROFILE_DIR, recordDir: recordDir, sessionId, tenantId,
     browserExecutable: process.env.LKB_BROWSER_EXECUTABLE,
     profileDirectory,
     autoClick: shouldAutoClick(platform), onEvent,
-  }) : undefined;
+  })) : undefined;
   const bot = tab ?? createObsBrowserDeps({
     obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455",
     obsPassword,
@@ -123,7 +129,7 @@ export async function runRecord(rest: string[]): Promise<void> {
     python: process.env.LKB_PYTHON ?? "python",
     joinScript: JOIN_SCRIPT,
     profileDir: BOT_PROFILE_DIR,
-    recordDir: RECORD_DIR,
+    recordDir: recordDir,
     browserExecutable: process.env.LKB_BROWSER_EXECUTABLE,
     profileDirectory,
     autoClick: shouldAutoClick(platform),
@@ -146,13 +152,13 @@ export async function runRecord(rest: string[]): Promise<void> {
     log: (m) => console.log(`[bot] ${m}`),
   });
   audioWatchdog.start();
-  writeControllerState(RECORD_DIR, {
+  writeControllerState(recordDir, {
     pid: process.pid,
     sessionId,
     title,
     platform,
     until: until.toISOString(),
-    obsOutputDir: RECORD_DIR,
+    obsOutputDir: recordDir,
     startedAt: new Date(startedAt).toISOString(),
     controllerStartedAt: getProcessStartTime(process.pid),
   });
@@ -169,7 +175,7 @@ export async function runRecord(rest: string[]): Promise<void> {
         if (endedAt !== undefined && now >= endNotBefore.getTime() && now - endedAt > 60_000) {
           console.log("[bot] webinar reported ended"); break;
         }
-        await new Promise((r) => setTimeout(r, 5000));
+        await new Promise((r) => setTimeout(r, inject.pollMs ?? 5000));
       }
     } finally {
       audioWatchdog.stop(); // T-031: before joiner.stop — recording is ending, no more reconnects
@@ -184,22 +190,22 @@ export async function runRecord(rest: string[]): Promise<void> {
     control.dispose();
     let video = bot.outputPath(sessionHandle);
     if (!video || !existsSync(video)) {
-      const newest = readdirSync(RECORD_DIR)
+      const newest = readdirSync(recordDir)
         .filter((f) => f.endsWith(backend === "tab" ? ".webm" : ".mkv"))
-        .map((f) => path.join(RECORD_DIR, f))
+        .map((f) => path.join(recordDir, f))
         .filter((f) => statSync(f).mtimeMs >= startedAt)
         .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs)[0];
-      if (newest) console.warn(`[bot] using newest recording in ${RECORD_DIR}: ${newest}`);
+      if (newest) console.warn(`[bot] using newest recording in ${recordDir}: ${newest}`);
       video = newest;
     }
     if (!video || !existsSync(video)) throw new Error(`no recording file produced (${video ?? "none"})`);
     video = normalizeCapture(video);
-    await finalizeRecording(video, sessionId, title, platform, rest.includes("--transcribe"), gaps,
+    await (inject.finalize ?? finalizeRecording)(video, sessionId, title, platform, rest.includes("--transcribe"), gaps,
       telegram, (Date.now() - startedAt) / 1000, tenantId);
     processRecordingArtifacts(video, sessionId, rest);
   } finally {
     audioWatchdog.stop(); // idempotent — belt-and-suspenders if the inner finally was never reached
-    removeControllerState(RECORD_DIR);
+    removeControllerState(recordDir);
   }
   } finally { control.dispose(); }
 }
