@@ -109,7 +109,8 @@ test("a corrupt queue file is a typed error on every operation and is never modi
     const results = [q.enqueue({ id: "n", tenantId: "t", payload: 1 }), q.claim("w"), q.heartbeat({ id: "a", workerId: "w", attempt: 1 }), q.complete({ id: "a", workerId: "w", attempt: 1 }), q.fail({ id: "a", workerId: "w", attempt: 1 }, "x")];
     for (const r of results) assert.equal((r as any).error.code, "corrupt", body);
     assert.equal(fs.files.get(`/q/${QUEUE_FILE}`), body); assert.equal(fs.files.size, 1);
-    assert.ok(fs.log.every(l => l.startsWith("read")), "only reads were issued: " + fs.log.join("|"));
+    assert.ok(fs.log.every(l => l.startsWith("read") || l === "mkdirp /q" || l.endsWith(" /q/job-queue.lock")), "only reads of the queue file (plus mkdirp and lock create/read/unlink) were issued: " + fs.log.join("|"));
+    assert.ok(fs.log.filter(l => l.includes("job-queue.json")).every(l => l.startsWith("read")), "the queue file itself was only read");
   }
 });
 test("tenant restriction: a claim for one tenant never returns another tenant's job", () => {

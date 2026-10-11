@@ -11,13 +11,14 @@ interface Held { ref: LeaseRef; expires: number }
 function runSequence(seed: number) {
   const r = seeded(seed), pick = <T>(a: T[]) => a[Math.floor(r() * a.length)]!;
   const fs = new MemQueueFs(); const clock = { t: 1000 };
-  const q = new FileJobQueue({ dir: "/q", now: () => clock.t, leaseMs: LEASE, fs });
+  const wall = { t: 5_000_000 }; fs.wall = () => wall.t;
+  const q = new FileJobQueue({ dir: "/q", now: () => clock.t, leaseMs: LEASE, fs, wallNow: () => wall.t });
   const enq = new Map<string, string>(), holder = new Map<string, Held>(), handles: LeaseRef[] = [], terminal = new Map<string, string>();
   let nextId = 0, claims = 0, crashes = 0;
   const state = () => { const raw = fs.files.get(`/q/${QUEUE_FILE}`); if (!raw) return []; const d = decodeQueue(raw); assert.ok(d.ok, "decodes"); return d.value.jobs; };
   for (let i = 0; i < OPS; i++) {
     const op = r(); const raw0 = fs.files.get(`/q/${QUEUE_FILE}`), pre = state();
-    const crash = r() < 0.05; fs.calls = 0; fs.crashAt = crash ? Math.floor(r() * 4) : null; fs.torn = r() < 0.5;
+    const crash = r() < 0.05; fs.calls = 0; fs.crashAt = crash ? Math.floor(r() * 9) : null; fs.torn = r() < 0.5;
     if (op < 0.25) {
       const dup = enq.size > 0 && r() < 0.3; const id = dup ? pick([...enq.keys()]) : `j${nextId++}`; const tenantId = dup ? enq.get(id)! : pick(TENANTS);
       const res = q.enqueue({ id, tenantId, payload: { id }, maxAttempts: 1 + Math.floor(r() * 3) });
@@ -46,8 +47,10 @@ function runSequence(seed: number) {
         else { holder.delete(ref.id); if (res.value.status === "done" || res.value.status === "dead") terminal.set(ref.id, res.value.status); }
       } else if (res.error.code !== "io-error") assert.ok(!current, `${kind} refused a current holder: ${res.error.code}`);
     } else clock.t += Math.floor(r() * LEASE * 1.5);
-    const crashedNow = fs.crashAt !== null && fs.calls > fs.crashAt; fs.restart();
-    if (crashedNow) { crashes++; assert.equal(fs.files.get(`/q/${QUEUE_FILE}`), raw0, "crash before rename must not change the queue file"); }
+    const crashedNow = fs.crashAt !== null && fs.calls > fs.crashAt;
+    const ri = fs.log.findIndex(l => l.startsWith("rename /q/job-queue.json.")), committed = ri !== -1 && ri !== fs.crashAt; /* a swallowed crash (lock release, stale-lock takeover) lets the operation commit */
+    fs.restart();
+    if (crashedNow) { wall.t += 31_000; /* the restarted process finds a dead holder's lock stale */ crashes++; if (!committed) assert.equal(fs.files.get(`/q/${QUEUE_FILE}`), raw0, "crash before rename must not change the queue file"); }
     // invariants after every step
     const jobs = state(); const ids = jobs.map(j => j.id);
     assert.equal(new Set(ids).size, ids.length, "duplicate job");

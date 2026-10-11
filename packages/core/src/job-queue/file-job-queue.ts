@@ -1,6 +1,6 @@
 /**
  * packages/core/src/job-queue/file-job-queue.ts — T-050 slice 4a. File-backed JobQueue. UNWIRED: nothing imports it.
- * Every operation is load -> pure transition -> atomic save, synchronous (so single-process operations cannot interleave).
+ * Every operation is lock -> load -> pure transition -> atomic save -> unlock (queue-lock.ts; serialises writers on one machine, ISS-JOBQUEUE-002).
  * The clock is injected; there is no timer, so a lease only expires when the injected `now` passes `leaseExpiresAt`.
  * FIFO key = `seq` (enqueue order, kept across retries). A leased job whose lease expired is claimable again (consuming an attempt) or,
  * when its attempts are exhausted, becomes dead at the next claim. Tenant id is stored verbatim and never altered.
@@ -9,9 +9,12 @@ import {
   DEFAULT_LEASE_MS, DEFAULT_MAX_ATTEMPTS, validateQueueId, type EnqueueInput, type JobQueue, type LeaseRef, type QueueError, type QueueJob, type QueueResult,
 } from "./queue-types.js";
 import { canonicalQueuePayload } from "./queue-payload.js";
+import { QUEUE_LOCK_STALE_MS, QUEUE_LOCK_WAIT_MS, withQueueLock } from "./queue-lock.js";
 import { loadQueue, realQueueFs, saveQueue, type QueueFileState, type QueueFs } from "./queue-store.js";
 
-export interface FileJobQueueOptions { dir: string; now: () => number; leaseMs?: number; fs?: QueueFs }
+export interface FileJobQueueOptions { dir: string; now: () => number; leaseMs?: number; fs?: QueueFs;
+  /** Lock wait budget / stale-takeover age (wall ms) and the wall clock used for them; defaults 2,000 / 30,000 / Date.now. */
+  lockWaitMs?: number; lockStaleMs?: number; wallNow?: () => number }
 const err = (code: QueueError["code"], message: string): { ok: false; error: QueueError } => ({ ok: false, error: { code, message } });
 const refError = (r: LeaseRef) => validateQueueId(r?.id, "job id") ?? validateQueueId(r?.workerId, "worker id") ?? (r?.tenantId === undefined ? null : validateQueueId(r.tenantId, "tenant id"));
 const expired = (j: QueueJob, now: number) => j.status === "leased" && j.leaseExpiresAt !== null && now >= j.leaseExpiresAt;
@@ -29,12 +32,15 @@ export class FileJobQueue implements JobQueue {
   /** load -> `change(state, now)` on a private copy -> save only if the copy changed (a failed/no-op change writes nothing). */
   private run<T>(change: (s: QueueFileState, now: number) => QueueResult<T>): QueueResult<T> {
     const t = this.time(); if (!t.ok) return t;
-    const l = loadQueue(this.fs, this.o.dir); if (!l.ok) return l;
-    const state: QueueFileState = structuredClone(l.value.state), before = JSON.stringify(state);
-    const r = change(state, t.value);
-    if (JSON.stringify(state) === before) return r;
-    const s = saveQueue(this.fs, this.o.dir, l.value, state);
-    return s.ok ? r : s;
+    const lk = { waitMs: this.o.lockWaitMs ?? QUEUE_LOCK_WAIT_MS, staleMs: this.o.lockStaleMs ?? QUEUE_LOCK_STALE_MS, wallNow: this.o.wallNow ?? Date.now };
+    return withQueueLock(this.fs, this.o.dir, lk, stillHeld => {
+      const l = loadQueue(this.fs, this.o.dir); if (!l.ok) return l;
+      const state: QueueFileState = structuredClone(l.value.state), before = JSON.stringify(state);
+      const r = change(state, t.value);
+      if (JSON.stringify(state) === before) return r;
+      const s = saveQueue(this.fs, this.o.dir, l.value, state, stillHeld);
+      return s.ok ? r : s;
+    });
   }
   enqueue(input: EnqueueInput): QueueResult<"enqueued" | "exists"> {
     const bad = validateQueueId(input?.id, "job id") ?? validateQueueId(input?.tenantId, "tenant id");
