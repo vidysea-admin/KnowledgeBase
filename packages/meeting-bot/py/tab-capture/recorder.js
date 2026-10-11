@@ -30,8 +30,12 @@ function validConfig(c) {
   return !!m && Number(m[1]) <= 65535 && typeof c.token === "string" && c.token.length > 0;
 }
 // Only this extension's own contexts (background worker, offscreen pages): never a content script (sender.tab) or another id.
-const ownSender = (s) => !!s && s.id === chrome.runtime.id && !s.tab
-  && (s.url === undefined || s.url.startsWith(`chrome-extension://${chrome.runtime.id}/`));
+// Fails closed: no sender, no runtime id of our own to compare with, a non-string id/url, or a tab all mean "not ours".
+const ownSender = (s) => {
+  const own = chrome.runtime?.id;
+  return !!s && typeof own === "string" && own.length > 0 && s.id === own && !s.tab
+    && (s.url === undefined || (typeof s.url === "string" && s.url.startsWith(`chrome-extension://${own}/`)));
+};
 async function start(message) {
   if (!validConfig(message.config)) throw new Error("Capture endpoint must be http://127.0.0.1:<port>; refusing to start");
   if (recorder || starting) throw new Error("A capture is already active");
@@ -95,7 +99,7 @@ async function open(message) {
   }, 1000);
 }
 chrome.runtime.onMessage.addListener((message, sender, respond) => {
-  if (message.target !== "recorder" || message.type !== "start") return;
+  if (message?.target !== "recorder" || message.type !== "start") return;
   if (!ownSender(sender)) { respond({ok: false, error: "Sender refused"}); return; }
   start(message).then(() => respond({ok: true})).catch(async (error) => {
     stream?.getTracks().forEach((track) => track.stop());
