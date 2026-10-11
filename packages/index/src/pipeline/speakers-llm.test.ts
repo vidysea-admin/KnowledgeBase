@@ -324,8 +324,6 @@ for (const [text, name] of [
   ["This side Nilesh Gotecha from CEPT.", "Nilesh Gotecha"],
   ["Hello, D'Souza here.", "D'Souza"],
   ["My name is Ruby-Anne Smith.", "Ruby-Anne Smith"],
-  ["Good morning Prasanti, please go ahead.", "Prasanti"],
-  ["Prasanti, what do you think about this?", "Prasanti"],
   ["This is Makrand Rajadhyaksha speaking.", "Makrand Rajadhyaksha"],
   ["Ruby speaking.", "Ruby"],
 ] as [string, string][]) {
@@ -370,6 +368,25 @@ for (const [text, name] of [
       { speakerRef: "spk:0", displayName: name, turnIds: ["t1"] },
     ]));
     assert.deepEqual(resolved, [], "handover evidence binds the FOLLOWING speaker, not the speaking label (ISS-255)");
+  });
+}
+
+/**
+ * ISS-282 SUPERSEDES the two address rows that stood in the ISS-094 corpus above, exactly as ISS-255
+ * superseded its handover rows: the phase-3 re-gate measured 0/8 accepted identities correct, every
+ * one an address/greeting of a THIRD party credited to the label speaking it. An address names the
+ * person ADDRESSED, so these now assert REFUSAL for the speaking label. The greeting-handover class
+ * ISS-094 protected still ships -- for the label whose block FOLLOWS the turn (speakers-windows.test.ts).
+ */
+for (const [text, name] of [
+  ["Good morning Prasanti, please go ahead.", "Prasanti"],
+  ["Prasanti, what do you think about this?", "Prasanti"],
+] as [string, string][]) {
+  test(`ISS-282 supersedes ISS-094: an address does NOT credit the speaking label — ${JSON.stringify(text)}`, async () => {
+    const { resolved } = await extractSpeakers([turn("t1", "spk:0", text)], replies([
+      { speakerRef: "spk:0", displayName: name, turnIds: ["t1"] },
+    ]));
+    assert.deepEqual(resolved, [], "addressing someone never identifies the speaker (ISS-282)");
   });
 }
 

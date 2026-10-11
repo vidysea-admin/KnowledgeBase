@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
+import { readFileSync } from "node:fs";
 
 import { buildSpeakerWindows, extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
 
@@ -191,4 +192,166 @@ test("ISS-255 (2): evidence merges across runs without duplication", async () =>
   ]));
   assert.equal(resolved.length, 1);
   assert.deepEqual(resolved[0]?.evidence, [{ turnId: "t1", sessionId: "s1" }], "3 runs proposing the same turns yield ONE evidence row");
+});
+/**
+ * ISS-282 (critical) — the U2.4 phase-3 re-gate measured 0/8 accepted identities correct. Every
+ * wrong one was a turn that NAMES A THIRD PARTY ("Thank you, Sonal", "Let me first introduce
+ * Shithij", "Hi, Jubin") credited to the label speaking it — or to a label that never spoke it —
+ * and every one was scored label-wide because its `blocks` came back empty.
+ *
+ * D-015: these are the ledger's own recorded reproductions, replayed VERBATIM against the real
+ * transcripts: same session, same label, same name, same cited turn, proposed in 3/3 runs (so the
+ * agreement vote cannot be what refuses them). Source: measurement-summary.json wrongLinkList.
+ */
+const ISS_282: [string, string, string, string][] = [
+  ["2026-05-23-uniaccess-atlas-skilltech", "spk:0", "Sonal", "t007"],
+  ["2026-07-15-creative-futures", "spk:0", "Priyanka Roy", "t267"],
+  ["2026-07-30-in-focus-3", "spk:1", "Shithij", "t022"],
+  ["2026-07-30-in-focus-3", "spk:2", "Anisha", "t094"],
+  ["2026-08-03-uk-beyond-offer-letters", "spk:4", "Bhavya", "t042"],
+  ["2026-08-24-uniaccess-leeds-arts-university", "spk:1", "Jubin", "t088"],
+  ["2026-08-24-uniaccess-leeds-arts-university", "spk:3", "Jubin", "t088"],
+  ["2026-05-23-uniaccess-atlas-skilltech", "spk:0", "Sonal", "t007"], // outer run 2 repeat
+];
+const corpus = (session: string): Turns[] =>
+  JSON.parse(readFileSync(new URL(`../../../../data/toc-migrated/${session}/turns.json`, import.meta.url), "utf8")) as Turns[];
+
+for (const [i, [session, ref, name, t]] of ISS_282.entries()) {
+  test(`ISS-282 #${i + 1}/${ISS_282.length}: ${session} ${ref} -> ${JSON.stringify(name)} via ${t} is refused`, async () => {
+    const { resolved } = await extractSpeakers(corpus(session), replies([
+      { speakerRef: ref, displayName: name, turnIds: [`${session}-${t}`] },
+    ]));
+    assert.deepEqual(resolved.map((r) => `${r.speakerRef}|${r.displayName}`), [], "a turn naming someone else never identifies its speaker");
+  });
+}
+
+test("ISS-282: the label's OWN self-identifying turn binds, scoped to that ONE block (never label-wide)", async () => {
+  const turns = [
+    turn("t1", "spk:0", "Okay, let us begin."),
+    turn("t2", "Anchor", "Next slide."),
+    turn("t3", "spk:0", "Hello, Ruby here."), // an LLM-only cue: the deterministic floor cannot scope it
+    turn("t4", "spk:0", "I lead admissions."),
+  ];
+  const { resolved } = await extractSpeakers(turns, replies([{ speakerRef: "spk:0", displayName: "Ruby", turnIds: ["t3"] }]));
+  assert.equal(resolved.length, 1);
+  assert.deepEqual(resolved[0]?.blocks, [{ startTurnIndex: 2, endTurnIndex: 3 }], "the block holding the evidence, not spk:0's first block");
+});
+
+test("fix cycle 3: a handover by ANOTHER speaker no longer binds the label whose block FOLLOWS it (route OFF, ISS-PH3-002)", async () => {
+  const turns = [
+    turn("t1", "Anchor", "Good morning Prasanti, please go ahead."),
+    turn("t2", "spk:1", "Thank you so much."),
+    turn("t3", "spk:1", "Let me share my screen."),
+  ];
+  const { resolved } = await extractSpeakers(turns, replies([{ speakerRef: "spk:1", displayName: "Prasanti", turnIds: ["t1"] }]));
+  assert.deepEqual(resolved, [], "the handover route is OFF until the live gate: it cannot tell a person from 'Over to you, India.'");
+  // Thanks look BACKWARD: "Thank you, Bhavya." before spk:4 names the previous speaker (ISS-282 #5 shape).
+  const thanks = [turn("t1", "Jasminder", "Thank you, Bhavya. Thank you, Bhakti."), turn("t2", "spk:4", "Thank you all.")];
+  const back = await extractSpeakers(thanks, replies([{ speakerRef: "spk:4", displayName: "Bhavya", turnIds: ["t1"] }]));
+  assert.deepEqual(back.resolved, [], "a thank-you is not a handover");
+});
+
+test("ISS-282: one evidence turn never binds two labels", async () => {
+  const turns = [turn("t1", "spk:1", "I'm Kshitij. Over to Ruby."), turn("t2", "spk:0", "Hello all.")];
+  const alone = await extractSpeakers(turns, replies([{ speakerRef: "spk:1", displayName: "Kshitij", turnIds: ["t1"] }]));
+  assert.deepEqual(alone.resolved.map((r) => r.displayName), ["Kshitij"], "on its own, t1 binds spk:1 by self-identification");
+  const both = await extractSpeakers(turns, replies([
+    { speakerRef: "spk:1", displayName: "Kshitij", turnIds: ["t1"] },
+    { speakerRef: "spk:0", displayName: "Ruby", turnIds: ["t1"] },
+  ]));
+  assert.deepEqual(both.resolved.map((r) => r.displayName), ["Kshitij"], "the handover (Ruby) route is off, so t1 binds only its own speaker");
+});
+
+/**
+ * Fix cycle 1b — the c1 live run accepted 0 identities in 2340 calls (precision null, 0 additions).
+ * Offline replay of raw-proposals.c1.jsonl: the model cites the turns a person SPOKE, never the turn
+ * that names them, so c1's "the cited turn must itself name the label" rule refused every true
+ * adjacent naming. These are real corpus proposals, recorded verbatim from that run.
+ */
+const VISA = "2026-04-21-visa-blueprint-part2-italy-france-nz";
+const LEEDS = "2026-08-24-uniaccess-leeds-arts-university";
+
+test("fix cycle 3 (recall loss, accepted): spk:0 -> Rashi, named only by its neighbours, is no longer shipped", async () => {
+  // Recorded 3/3 internal runs in outer run 1: the model cites spk:0's block t142-t144, none of which says "Rashi".
+  // t141 [spk:1] "Rashi, I'll pass it on back to you." hands over; t145 [Shagun] "Thank you so much, Rashi, for inviting me".
+  const { resolved } = await extractSpeakers(corpus(VISA), replies([
+    { speakerRef: "spk:0", displayName: "Rashi", turnIds: [`${VISA}-t142`, `${VISA}-t143`, `${VISA}-t144`] },
+  ]));
+  // The true positive of fix cycle 1b. Handover/thanks cannot be told from "Over to you, India." / "Thank you, Google.",
+  // so the routes are OFF and this correct name is a RECALL LOSS, by decision: a wrong name is the critical defect.
+  assert.deepEqual(resolved, []);
+});
+
+test("c1b: the model's copied [id:...] prefix still locates the real turn", async () => {
+  const turns = [turn("t1", "Anchor", "Next slide."), turn("t2", "spk:0", "Hello, Ruby here."), turn("t3", "spk:0", "I lead admissions.")];
+  const { resolved } = await extractSpeakers(turns, replies([{ speakerRef: "spk:0", displayName: "Ruby", turnIds: ["id:t3"] }]));
+  assert.deepEqual(resolved.map((r) => r.displayName), ["Ruby"]);
+});
+
+test("c1b: 'I do see Ankit here' is the host spotting a panelist, not Ankit naming himself (recorded 6x, gold Jubin Thakkar)", async () => {
+  const { resolved } = await extractSpeakers(corpus(LEEDS), replies([
+    { speakerRef: "spk:0", displayName: "Ankit", turnIds: [`${LEEDS}-t054`] },
+  ]));
+  assert.deepEqual(resolved, []);
+});
+
+test("c1b: a block that talks ABOUT the name is not that person, whatever its neighbours say", async () => {
+  // atlas: t005 [spk:0] "Sonal, do you have any questions?" / t006 [spk:1] "I think Sonal is not having any
+  // questions" / t007 [spk:0] "Thank you, Sonal, ..." -- a call before and a thanks after, and spk:1 is not Sonal.
+  const ATLAS = "2026-05-23-uniaccess-atlas-skilltech";
+  const { resolved } = await extractSpeakers(corpus(ATLAS), replies([
+    { speakerRef: "spk:1", displayName: "Sonal", turnIds: [`${ATLAS}-t006`] },
+  ]));
+  assert.deepEqual(resolved, []);
+});
+
+test("c1b: a mid-turn quoted call is not a handover; a turn thanking two people binds neither", async () => {
+  // leeds t035 [spk:0] ... everybody ask me, "Jubin, what is a good portfolio?" ... -> t036 [spk:2] (gold Poonam)
+  const quoted = await extractSpeakers(corpus(LEEDS), replies([{ speakerRef: "spk:2", displayName: "Jubin", turnIds: [`${LEEDS}-t036`] }]));
+  assert.deepEqual(quoted.resolved, []);
+  const turns = [turn("t1", "spk:3", "So that is the timeline."), turn("t2", "Host", "Perfect. Thank you, Kshitij. Thanks, Anisha, and now questions.")];
+  const two = await extractSpeakers(turns, replies([{ speakerRef: "spk:3", displayName: "Kshitij", turnIds: ["t1"] }]));
+  assert.deepEqual(two.resolved, [], "which of the two spoke last is not in the text");
+  const one = [turn("t1", "spk:3", "So that is the timeline."), turn("t2", "Host", "Thank you, Kshitij, for that.")];
+  const ok = await extractSpeakers(one, replies([{ speakerRef: "spk:3", displayName: "Kshitij", turnIds: ["t1"] }]));
+  assert.deepEqual(ok.resolved, [], "thanks route OFF (fix cycle 3): 'Thank you, Google.' is not distinguishable from a person");
+});
+
+test("c1b review: quoted or reported speech names nobody, even in a SHORT turn (no length accident)", async () => {
+  const quote = [turn("t1", "spk:0", 'Everybody keeps asking me, "Priya, what do you think about this?"'), turn("t2", "spk:1", "Well, the market is strong.")];
+  const q = await extractSpeakers(quote, replies([{ speakerRef: "spk:1", displayName: "Priya", turnIds: ["t1"] }]));
+  assert.deepEqual(q.resolved, [], "a quoted call is not a handover");
+  const said = [turn("t1", "spk:3", "Here is my final point."), turn("t2", "Host", "Thank you, Kshitij, said the intern earlier today.")];
+  const s = await extractSpeakers(said, replies([{ speakerRef: "spk:3", displayName: "Kshitij", turnIds: ["t1"] }]));
+  assert.deepEqual(s.resolved, [], "a narrated thank-you is not addressed to the previous speaker");
+  const ton = [turn("t1", "spk:3", "That is all."), turn("t2", "Host", "Thank you, Kshitij. Thanks a ton, Anisha, too.")];
+  const t = await extractSpeakers(ton, replies([{ speakerRef: "spk:3", displayName: "Kshitij", turnIds: ["t1"] }]));
+  assert.deepEqual(t.resolved, [], "'thanks a ton, X' is a second thanked person");
+});
+
+test("c1b review 2: an address must OPEN a clause -- no reporting-verb list to fall off", async () => {
+  // The reviewer's second-round PoCs against the verb/quote-parity denylist, all bypasses of it.
+  const next = (text: string) => [turn("t1", "spk:0", text), turn("t2", "spk:1", "Not much new today.")];
+  for (const text of ["People often go, Priya, what do you make of this?", 'He wears a 5" badge. Random folks always go, "Priya, any updates?"']) {
+    const r = await extractSpeakers(next(text), replies([{ speakerRef: "spk:1", displayName: "Priya", turnIds: ["t1"] }]));
+    assert.deepEqual(r.resolved, [], text);
+  }
+  const prev = [turn("t1", "spk:3", "Here is my final point."), turn("t2", "Host", "Thank you, Kshitij, someone mentioned earlier in the hallway.")];
+  const p = await extractSpeakers(prev, replies([{ speakerRef: "spk:3", displayName: "Kshitij", turnIds: ["t1"] }]));
+  assert.deepEqual(p.resolved, [], "a thank-you must close on punctuation, 'for' or 'and'");
+  // A clause-opening call INSIDE an open quotation passes the shape allowlist; only reported() refuses it.
+  const inQuote = next('She told me yesterday: "It was fine. Priya, what do you think?');
+  const q = await extractSpeakers(inQuote, replies([{ speakerRef: "spk:1", displayName: "Priya", turnIds: ["t1"] }]));
+  assert.deepEqual(q.resolved, [], "a call inside an open quote is reported speech");
+});
+
+test("c1b: an unquoted rhetorical call deep inside a long turn is not a handover (closing-stretch bound)", async () => {
+  // leeds t006 [spk:0], 11500 chars: "... Alka, Shweta, any more takers that we have? ..." at offset 7266,
+  // then t007 [spk:1] "That's a yes." (gold unnamed). No quote marks, so only the CLOSING bound refuses it.
+  const { resolved } = await extractSpeakers(corpus(LEEDS), replies([{ speakerRef: "spk:1", displayName: "Shweta", turnIds: [`${LEEDS}-t007`] }]));
+  assert.deepEqual(resolved, []);
+  // A clause-opening call early in a long turn is answered inside that turn, not by the next speaker.
+  const lecture = "Priya, what do you think? I think the answer is clear. " + "The deadlines move every year and students should plan early. ".repeat(5);
+  const long = await extractSpeakers([turn("t1", "Host", lecture), turn("t2", "spk:1", "Sure.")], replies([{ speakerRef: "spk:1", displayName: "Priya", turnIds: ["t2"] }]));
+  assert.deepEqual(long.resolved, [], "only the turn's closing stretch hands the floor on");
 });

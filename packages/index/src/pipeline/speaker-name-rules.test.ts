@@ -17,6 +17,7 @@ import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
 
 import { extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
+import { citesNameAsAnIntroduction } from "./speaker-name-rules.js";
 
 function turn(id: string, speakerRef: string, text: string): Turns {
   return { _id: id, tenantId: "t1", sessionId: "s1", speakerRef, tStart: 0, tEnd: 0, text };
@@ -73,11 +74,11 @@ const ISS_093_CORPUS: [string, string][] = [
 ];
 
 /**
- * The ISS-093 cases that remain open. Mumbai and Google left this set in cycle 5: neither was a
- * place-vs-person problem in the end -- "Coming up next, X from the west zone." is a handover and
- * "X here has an announcement." is a third-party deictic, both refused for ANY name (ISS-255).
+ * The ISS-093 cases that remain open. Mumbai and Google left this set in cycle 5 (handover / third-party
+ * deictic, ISS-255). ISS-282 c1b closed "India": "This is India speaking" -- "X speaking" binds only when
+ * X opens a clause, so nothing is left open through the LLM path.
  */
-const ISS_093_GAZETTEER = new Set(["India"]);
+const ISS_093_GAZETTEER = new Set<string>();
 
 for (const [text, name] of ISS_093_CORPUS) {
   const expectedRefusal = !ISS_093_GAZETTEER.has(name);
@@ -131,11 +132,12 @@ test("ISS-098: a bare noun after `speaking` declines the cue WITHOUT vetoing lat
   // The cycle-2 bug was an unconditional early return: the speaking branch refused the whole
   // predicate, so no later cue could fire. Here the participle declines but the address comma
   // still supplies a cue, which only works if the branch falls through.
-  const { resolved } = await extractSpeakers(
-    [turn("t1", "spk:0", "Prasanti, what do you think of English speaking students?")],
-    replies([{ speakerRef: "spk:0", displayName: "Prasanti", turnIds: ["t1"] }]),
-  );
-  assert.equal(resolved.length, 1, "a declining speaking branch must not veto the address cue");
+  // ISS-282 moved this assertion to the cue predicate it pins: the address names PRASANTI, so it
+  // can no longer identify the label SPEAKING it (spk:0) -- that refusal is asserted below.
+  const text = "Prasanti, what do you think of English speaking students?";
+  assert.equal(citesNameAsAnIntroduction(text, "Prasanti"), true, "a declining speaking branch must not veto the address cue");
+  const { resolved } = await extractSpeakers([turn("t1", "spk:0", text)], replies([{ speakerRef: "spk:0", displayName: "Prasanti", turnIds: ["t1"] }]));
+  assert.deepEqual(resolved, [], "ISS-282: addressing Prasanti does not make the speaker Prasanti");
 });
 
 /**
@@ -300,7 +302,7 @@ test("ISS-104 collision cost: a bare closed-class name is refused (accepted, doc
 
 for (const [text, name] of [
   ["My name is Will Smith and I lead admissions.", "Will Smith"],
-  ["Good morning Doris Day, please go ahead.", "Doris Day"],
+  ["Good morning everyone, Doris Day here.", "Doris Day"],
   ["This is Can Ozturk from the Istanbul office.", "Can Ozturk"],
 ] as [string, string][]) {
   test(`ISS-104 collision bound: multi-token ${JSON.stringify(name)} still resolves`, async () => {
@@ -347,14 +349,20 @@ for (const [text, name] of [
 
 /** The signal must not cost the strong cues: a real person named Paris still self-names. */
 for (const [text, name] of [
-  ["We met in Paris. My name is Paris.", "Paris"],
-  ["I am in Mumbai today. My name is Mumbai Sharma.", "Mumbai Sharma"],
+  ["Hi, my name is Paris.", "Paris"],
+  ["Hello, my name is Mumbai Sharma.", "Mumbai Sharma"],
   ["Paris here, from admissions.", "Paris"],
-  ["Our office is in Priya's building. Priya, what do you think?", "Priya"],
+  ["Hello everyone, I'm Priya.", "Priya"],
 ] as [string, string][]) {
   test(`ISS-104 place signal recall: still resolves ${JSON.stringify(name)} in ${JSON.stringify(text)}`, async () => {
     assert.equal(await shipped(text, name), true, "an explicit naming cue or a direct address survives the place signal");
   });
+}
+
+/** Cycle 5 recall cost (allow-list, ISS-PH3-006): a FREE sentence before the cue is no longer harmless, so these four former positives are refused. */
+for (const [text, name] of [["We met in Paris. My name is Paris.", "Paris"], ["I am in Mumbai today. My name is Mumbai Sharma.", "Mumbai Sharma"],
+  ["Our office is in Priya's building. My name is Priya.", "Priya"], ["Coming up next, I will share the slides. My name is Nilesh.", "Nilesh"]] as [string, string][]) {
+  test(`cycle 5 recall cost: refused, a free sentence precedes the cue: ${JSON.stringify(text)}`, async () => { assert.equal(await shipped(text, name), false); });
 }
 
 /**
@@ -412,6 +420,6 @@ test("ISS-104 handover: `coming up next` refuses the introduced name for the CUR
     "the announced speaker is not this turn's speaker");
 });
 test("ISS-104 handover: self-naming in the same turn still resolves", async () => {
-  assert.equal(await shipped("Coming up next, I will share the slides. My name is Nilesh.", "Nilesh"), true,
+  assert.equal(await shipped("Hello everyone, I would like to introduce myself, my name is Nilesh.", "Nilesh"), true,
     "a self-naming cue survives the handover gate");
 });
