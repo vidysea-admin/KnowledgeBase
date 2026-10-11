@@ -1,6 +1,7 @@
 # t037-join-rules-busy-status
 
-Status: ready-for-check
+Status: checked-PASS
+Checked: qa/verdicts/t037-join-rules-busy-status.md (cycle 0, f820221)
 Fix cycle: 0
 Priority tier: 3 (follow-up found by integration check; ISS-JRLOCK-001, medium)
 Security class: data-write route (join-rules PUT / approvals / opt-outs) - FULL ceremony
