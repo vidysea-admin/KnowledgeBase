@@ -72,10 +72,26 @@ export function buildLeanVideoSettings(input: LeanVideoInput = {}): LeanVideoSet
     if (i.audioChannels === 1 || i.audioChannels === 2) audioChannels = i.audioChannels;
     else adj.push("audioChannels: must be 1 or 2, default 1");
   }
+  // ISS-T035LEAN-001: in-range overrides may still blow the target. Report it, never rewrite the caller's values.
+  const mb = estimateSizeMbPerHour({ videoBitrateKbps, audioBitrateKbps });
+  if (!isWithinLeanTarget(mb)) adj.push(`estimate ${mb.toFixed(1)} MB/h is not under the ${LEAN_TARGET_MB_PER_HOUR} MB/h target, settings kept as given`);
   return {
     width, height, fps, videoBitrateKbps, videoCodec: "h264", keyframeIntervalSec: 2,
     audioCodec: "aac", audioBitrateKbps, audioChannels, audioSampleRate: 48000, contentHint: hint, adjustments: adj,
   };
+}
+
+/** "Under 400 MB per hour" (TASKS.md T-035): strictly below the target; exactly 400, NaN and Infinity are NOT within. */
+export function isWithinLeanTarget(mbPerHour: number): boolean {
+  return typeof mbPerHour === "number" && Number.isFinite(mbPerHour) && mbPerHour < LEAN_TARGET_MB_PER_HOUR;
+}
+
+export interface LeanVideoAssessment { settings: LeanVideoSettings; estimateMbPerHour: number; withinTarget: boolean; targetMbPerHour: number }
+/** Builder result plus the verdict on the target, from the same estimator and the FINAL (post-clamp) settings. */
+export function assessLeanVideoSettings(input: LeanVideoInput = {}): LeanVideoAssessment {
+  const settings = buildLeanVideoSettings(input);
+  const estimateMbPerHour = estimateSizeMbPerHour(settings);
+  return { settings, estimateMbPerHour, withinTarget: isWithinLeanTarget(estimateMbPerHour), targetMbPerHour: LEAN_TARGET_MB_PER_HOUR };
 }
 
 /** (video + audio kbps) * 1000 * overhead * 3600 s / 8 / 1e6. Monotonic in both bitrates. */
