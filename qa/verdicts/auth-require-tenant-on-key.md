@@ -61,3 +61,59 @@ ISSUES-WRITTEN: ISS-AUTHTENANT-001 (high, fix required), ISS-AUTHTENANT-002 (med
 Recommended change (orchestrator): flip ISS-AUTHSCOPE-001 to fixed-by auth-require-tenant-on-key only once cycle 1 passes; not on this verdict.
 
 EXPLANATION: Tenant validity at the auth and accessor layers is fixed and well mutation-tested; the operator-object hole was real but reachable only through a corrupted key record. The unit fails only because it turned the sole route-level empty-tenant test vacuous without replacing it. Cycle 1 needs one auth-bypassing route test; no source change.
+
+---
+
+# Cycle 1 verdict
+
+VERDICT: FAIL
+Cycle checked: 1
+Commit checked: 77b4652 (lane/authtenant). Independent checker, security class. `git diff 5a55653 77b4652`: only apps/api/src/ask/ask-tenant-hostile.test.ts (new) and the manifest; no production file changed.
+
+## Real or replica (point 1)
+The route-level tests run the REAL `createAskRouter`, `requireScope`, `createSourceRequestDepsFor`, `createSourceHydrator`, `createAskArmsFor`, and the real `treeIndexRootFilter` (main-tree `@lkb/index`) and `scopedCollection` (main-tree `@lkb/db`), over a hand-written tenant-blind fake Db. The ONE replaced piece is `createMongoTreeStore().load` in apps/api/src/store.ts: `treeStore()` in the test is a hand copy. The maker's claim that the real store cannot take an injected Db is false: `node:test` `mock.module("mongodb", ...)` (with `--experimental-test-module-mocks`) lets the real `@lkb/db` `connect()`/`getDb()` and the real `createMongoTreeStore().load("tB")` run against a fake client. I ran it (temp test, deleted) and the real filter was `{"node_id":"tenant:tB","level":"tenant","tenantId":"tB"}`. So a regression in the real `load` is catchable and is not caught.
+
+Production mutations (one at a time, per-mutation byte backup, finally-restore, 170 s timeout; test set = hostile + isolation + source-context + ask-arms + routes/ask + server + tree-index-root-filter-single-source tests):
+| M | mutation | result | killed by |
+|---|---|---|---|
+| M3 | ask router reads tenant from body | killed | isolation "tenant-like body fields, query string and headers cannot override the key-derived tenant"; C6 arms-per-request |
+| M4 | ask router reads tenant from x-tenant header | killed | same isolation test |
+| M5 | router passes fixed "tA" to requestDepsFor | killed | hostile positive control, bypassed-tree cases |
+| M6 | router passes String(tenant) to tree.load | killed | hostile route tests (undefined, null, number, operator objects) |
+| M7 | hydrator turns query unscoped | killed | hostile positive control, hydrator cases |
+| M8 | hydrator chunks query unscoped | killed | same |
+| M9 | hydrator validTurn tenant check removed | killed | source-context "refuses malicious returned source row" (pre-existing) |
+| M10, M11 | arms chunks / turns query unscoped | killed | C6 "tenant B arms return only tenant B session", hostile controls |
+| M12, M13 | arms / hydrator bound to fixed tA in request deps | killed | hostile + isolation tests |
+| M1 | real store.load filter drops node_id | killed ONLY by the source-text pin tree-index-root-filter-single-source.test.ts (counts `treeIndexRootFilter(` == 2) | text pin, not behaviour |
+| M2 | real store.load ignores tenant | killed ONLY by the same text pin | text pin |
+| **M14** | real store.load: `treeIndexRootFilter("tA")` (hard-coded tenant) | **SURVIVED** | none |
+| **M15** | real store.load: operator-spread filter, node_id replaced by `$exists` | **SURVIVED** | none |
+| **M16** | real store.load: `treeIndexRootFilter(String(tenantId).trim())` | **SURVIVED** | none |
+
+M14 is a cross-tenant tree read (every tenant gets tA tree summaries) in real tenant-filtering code on the Ask path with a green suite: the ISS-078 shape. Per the brief that is FAIL-level (ISS-AUTHTENANT-004). Restored hashes equal HEAD blobs: store.ts d0f92105829df03935ed4d3427fbefabacbd08e1, routes/ask/ask.ts f70309dda39b52b4f980864d57b76e6332e18fd1, ask-arms.ts 542cf757cbbc491f8aa67d6091761e5dde63567b, ask/source-context.ts 408152ac14e72bb136f4ffaffba1b9ef23b3ef68. The maker's own two mutations were on the replica, so they proved the replica only. Not mutated (resolve to the MAIN tree from this lane, off limits): packages/index treeIndexRootFilter and packages/db tenantScope.
+
+## The 15 skips and the post-merge run (point 2)
+The skip condition `guardRefusesObjects` is a sound runtime probe (calls the resolved `scopedCollection` with `{$ne:null}`; true only if it throws), so the cases un-skip automatically after merge. But they do NOT all pass un-skipped. Simulated post-merge state (temp wrapper using `mock.module("@lkb/db", {...real, scopedCollection/withTenant from this lane tenantScope.ts})` then importing the hostile test; wrapper deleted): `tests 58 / pass 55 / fail 3 / skipped 0`. The 3 failures are the `valid tenant with NO data` (tNone) rows of bypassed-tree, arms and hydrator: `if (guardRefusesObjects) assert.equal(db.queries.length, 0)` is applied to a VALID tenant that legitimately queries (2 !== 0). Test bug, not a product defect, but the manifest merge condition ("expect skipped 0, fail 0") would fail on the main tree (ISS-AUTHTENANT-005). Under the new guard, with the tree store bypassed, "", whitespace, undefined, null, 5 and all five operator/array tenants give a clean 503 (no data, no stack, no query); tNone gives 200 with empty sources. No unhandled 500.
+
+## 200 responses (point 3)
+Old guard (this lane resolved db): whitespace and 5 give 200 with empty `sources.internal`; arms/hydrator queries did run with the raw value and returned 0 rows (old `!tenantId` guard passes them). Acceptable for this lane: no data, no sentinel; contract clause 3 binds the NEW accessor, which I observed refuse both with a clean 503. Not a breach.
+
+## Vacuity (point 4)
+Fixtures hold both sentinels in tree titles, turns and chunks; positive controls show A and B each retrieve exactly their own sentinel through the same app and every A query carries tenantId tA; `found()` searches the whole body text (headers not searched: low note); `loads` is asserted with deepEqual against the exact hostile value. M5-M8 and M10-M13 show those assertions can fail. Vacuity is acceptable above the tree store; the weakness is the tree store itself (M14-M16).
+
+## D-015 (point 5), my own run
+ISS-AUTHTENANT-001 (stub auth; "", undefined, {$ne:null}; POST /ask): 3/3 refused 404, tree.load received the raw value, no turns/chunks query, no model call. ISS-AUTHSCOPE-001 recorded cases (missing, null, "", 5; `RECORDED` in require-scope.test.ts): 4/4 refused 401 on GET /keys and /calendar/join-rules.
+
+## Regression (point 6)
+apps/api hostile + isolation + join-rules/*.test + routes/keys + server + single-source pin: `tests 138 / pass 123 / fail 0 / skipped 15`. packages/db all tests: `29 / 29`. tsc --noEmit apps/api exit 0, packages/db exit 0. `lint-dirsize: OK (112 dir(s) within budget)`. Non-blank lines: hostile 222, isolation 338 (budget 400).
+
+## Required for cycle 2 (test-only)
+1. Drive the REAL `createMongoTreeStore().load` through a hermetic fake (e.g. `mock.module("mongodb")`) over a two-tenant corpus, use it as the tree store in the route-level hostile table, assert A/B/hostile get own root or null; M14, M15, M16 must die; name the killing test in the manifest.
+2. Fix the three tNone assertions so the un-skipped run is `skipped 0 / fail 0`, and verify with the post-merge simulation.
+
+ISSUES-WRITTEN: ISS-AUTHTENANT-004 (high), ISS-AUTHTENANT-005 (high), in qa/issues.authtenant.jsonl. ISS-AUTHTENANT-001 NOT marked verified (route level proven; store level still a replica).
+
+EXPLANATION: Route, hydrator and arms protections are now genuinely asserted and mutation-tested (all production mutations above the tree store killed). The unit still fails because the tree store, where a hostile tenant becomes a Mongo filter on the Ask path, is a test replica: a hard-coded tenant, operator-spread filter or String-coercion in the real `load` leaves the suite green, guarded only by a source-text pin. Separately the advertised post-merge check would itself fail 3 cases. Low notes: sentinel search skips headers; ask-tenant-isolation.test.ts is 338 lines.
+
+If cycle 2 passes, merge conditions on the main tree: `cd apps/api && node --test --import tsx src/ask/ask-tenant-hostile.test.ts` must show `skipped 0, fail 0`; then the whole apps/api suite (only the environmental activity-health Python failure acceptable); packages/db tests.
