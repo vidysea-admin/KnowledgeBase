@@ -10,7 +10,7 @@
 1. Replace the hand-kept 11-value skip-reason list in `attention-alerts.ts` with the core `SKIP_REASONS` (14 values) so `opted-out`, `rule-denied`, `rules-unevaluable` stop bucketing as `other` (W10, ISS-T037W1-003).
 2. An explicit, typed title policy on the alert formatter, with the safe value as the default, so the Approver's pending ruling on ISS-R1ALERTS-009 is a one-line choice.
 3. ISS-R1ALERTS-011: under the deny-list policy a recognised keyword anywhere hides the whole title.
-Files: `attention-alerts.ts` (210 non-blank lines), `alert-text.ts` (142), tests `alert-title-policy.test.ts` (new, 160), plus edits to `attention-alerts.test.ts`, `alert-text.test.ts`, `alert-text.corpus.test.ts` (all < 400). One new file in `calendar/` (a test), no new source file. `qa/issues.alertfix.jsonl` (new, one row).
+Files: `attention-alerts.ts` (210 non-blank lines), `alert-text.ts` (142), tests `alert-title-policy.test.ts` (new, 160), plus edits to `attention-alerts.test.ts`, `alert-text.test.ts`, `alert-text.corpus.test.ts` (all < 400). All six alert files now live in `packages/meeting-bot/src/calendar/alerts/` (see Relocation); no new source file. `qa/issues.alertfix.jsonl` (new, one row).
 
 ## The policy, as built
 `TitlePolicy = "omit" | "masked"`; `AttentionInput.titlePolicy?`; `DEFAULT_TITLE_POLICY = "omit"`; `resolveTitlePolicy(v)` returns `"masked"` only for the exact string `"masked"`, otherwise `"omit"` (absent, null, wrong case, wrong type, a throwing getter: all `omit`). Both routes (skipped, job) read the same resolved value.
@@ -28,18 +28,18 @@ Why `omit` is the default: a deny-list cannot be proven to catch a secret it has
 Other title-adjacent leak classes (ISS-001..008) hold under both policies (below).
 
 ## Not done
-- Nothing is wired to any sender (W8). `grep -rn buildAttentionAlerts` outside `packages/meeting-bot/src/calendar/` stays empty.
+- Nothing is wired to any sender (W8). `grep -rn buildAttentionAlerts` outside `packages/meeting-bot/src/calendar/alerts/` stays empty.
 - The Approver's ruling on ISS-R1ALERTS-009 is still pending. This unit does not pre-empt it: it only makes the safe option the default and the other an explicit opt-in.
 - No `contracts/` or verdict edits. Body line count is unchanged (4), so there is no conflict with the stated contract; W8(b) ("headline, hashed id, start time and a non-sensitive identifier supplied by the wiring") is what `omit` implements, minus the wiring-supplied identifier.
 - Platform text: the alert never carried a platform, so none is shown.
 
 ## W9 handle finding
-Under `omit` the handle is the hashed id (first 20 hex of SHA-256 over the UTF-16LE session key) in both title line and body, plus the formatted start. Two different meetings at the same start time get different keys and ids and therefore different title and body (tested, skipped and job routes). BUT no tool in the repo resolves an id to a meeting: `alertIdFor` / `buildAttentionAlerts` appear only in `packages/meeting-bot/src/calendar/` (grep over ts, tsx, mjs). So an operator can tell alerts apart but cannot find the meeting from the alert alone. Filed as ISS-ALERTFIX-001 (medium; wiring unit must supply an id-to-key map in the operations view or a W8(b) identifier). No lookup tool invented here.
+Under `omit` the handle is the hashed id (first 20 hex of SHA-256 over the UTF-16LE session key) in both title line and body, plus the formatted start. Two different meetings at the same start time get different keys and ids and therefore different title and body (tested, skipped and job routes). BUT no tool in the repo resolves an id to a meeting: `alertIdFor` / `buildAttentionAlerts` appear only in `packages/meeting-bot/src/calendar/alerts/` (grep over ts, tsx, mjs). So an operator can tell alerts apart but cannot find the meeting from the alert alone. Filed as ISS-ALERTFIX-001 (medium; wiring unit must supply an id-to-key map in the operations view or a W8(b) identifier). No lookup tool invented here.
 
 ## Evidence
 From `packages/meeting-bot` with node on PATH (toolchain note):
-- `node --test --import tsx src/calendar/alert-title-policy.test.ts` -> tests 8 / pass 8 / fail 0
-- `... attention-alerts.test.ts` -> tests 10 / pass 10 / fail 0; `... alert-text.test.ts` -> 15 / 15 / 0; `... alert-text.corpus.test.ts` -> 9 / 9 / 0
+- `node --test --import tsx src/calendar/alerts/alert-title-policy.test.ts` -> tests 8 / pass 8 / fail 0
+- `... alerts/attention-alerts.test.ts` -> tests 10 / pass 10 / fail 0; `... alert-text.test.ts` -> 15 / 15 / 0; `... alert-text.corpus.test.ts` -> 9 / 9 / 0
 - `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` -> exit 0 (meeting-bot) and exit 0 (core)
 - `node scripts/lint-dirsize.mjs` -> `lint-dirsize: OK (112 dir(s) within budget)`
 
@@ -76,4 +76,7 @@ An initial M3 (assign the first word to a variable that omit never reads) was an
 The three existing test files now pass `titlePolicy: "masked"` in their helpers (they test the deny-list renderer); three `006 shape` expectations changed from `<topic> (hidden)` to `(hidden)` (the documented -011 change). The corpus D-015 test now runs under both policies.
 
 ## Unverified
-Not run: full suite, wiring, anything outside `calendar/`. `@lkb/core` resolves to the main tree via junction; it already contains `SKIP_REASONS`, same blob as in this branch's base.
+Not run: full suite, wiring, anything outside `calendar/alerts/`. `@lkb/core` resolves to the main tree via junction; it already contains `SKIP_REASONS`, same blob as in this branch's base.
+
+## Relocation (evidence)
+`calendar/` would have exceeded its 30-file cap after merge, so the six alert files were `git mv`'d into `packages/meeting-bot/src/calendar/alerts/` (lint-dirsize counts files per directory, non-recursively, and `capture/browser` already nests; subfolders are allowed). The only path edit was the ledger URL in `alert-title-policy.test.ts` (one more `../`). No importer exists outside these six files (grep over packages, apps, scripts, ts/mjs/json), and no barrel, tsconfig (`src/**/*.ts`) or test glob (`src/**/*.test.ts`, matched the four test files at the new paths) names the old paths. Counts unchanged: policy 8, attention 10, alert-text 15, corpus 9. tsc exit 0; `lint-dirsize: OK (113 dir(s) within budget)`. `calendar/` now holds 24 files (main: 29; 29 - 5 moved = 24, since the new test file was never counted there); the other lane's +1 gives 25. `qa/contracts/`, `qa/verdicts/` and `qa/manifests/r1-attention-alerts.md` still cite the old `calendar/` paths and were not edited; the checker owns the contract.

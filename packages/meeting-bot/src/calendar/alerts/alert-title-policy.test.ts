@@ -18,7 +18,7 @@ const ROUTES: [string, typeof skipped][] = [["skipped", skipped], ["job", job]];
 const blob = (r: Res) => JSON.stringify(r);
 
 // ---- the ledger rows, read at test time so every case is verbatim ----
-const LEDGER = readFileSync(new URL("../../../../qa/issues.r1alerts.jsonl", import.meta.url), "utf8").trim().split("\n")
+const LEDGER = readFileSync(new URL("../../../../../qa/issues.r1alerts.jsonl", import.meta.url), "utf8").trim().split("\n")
   .map((l) => JSON.parse(l) as Record<string, string>);
 const rowText = (id: string) => { const x = LEDGER.find((r) => r.id === id)!; return `${x.evidence}\n${x.checker_evidence ?? ""}`; };
 interface Repro { title: string; secrets: string[] }
