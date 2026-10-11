@@ -1,6 +1,6 @@
 # iss-depfix-dependency-lint
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Issue: ISS-DEPFIX-001 (medium, pre-existing, introduced by 5fe97b9)
 
 ## Defect
@@ -21,3 +21,9 @@ Follow-up already named in the test header (unchanged): move recognisers to pack
 
 ## Process note
 Merges should be followed by the dependency stage (not only unit tests/tsc), or this class of break lands unseen.
+
+## Fix cycle 1
+Checker cycle 0 FAIL: moved test ran in no routine command. Fix: root package.json `test:lint` now runs `node --test --import tsx ...` (tsx resolves from root node_modules) and lists scripts/qa/calendar-link-differential.test.ts plus the two sibling cross-layer tests join-rules-edit-api.test.ts and calendar-optout-id-space.test.ts (unedited; hand runs 4/4 in 2.3 s and 5/5 in 2.1 s, both pass). CI step "Linter negative tests" runs `pnpm test:lint` (ci.yml untouched).
+- test:lint before: `ℹ tests 124 / pass 124 / fail 0`, 32 s. After: `ℹ tests 136 / pass 136 / fail 0`, 34 s (+2 s; 3+4+5 = 12 tests added).
+- Recorded as ISS-DEPFIX-002 (medium, fixed-pending-check).
+- Dependency stage, lint-dirsize, lint-dupes re-run: see commit message/final report (clean).
