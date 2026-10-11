@@ -73,3 +73,26 @@ ISS-T034FIX-003 verified (fixed, logic with fakes). ISS-T034FIX-004: chain now t
 ## Merge conditions
 1. ISS-T034FIX-006: deterministic record-commands tests (five consecutive green runs, M6/M7 killed by a non-timing assertion).
 2. ISS-T034FIX-001 / -005 decided after the live session; the live-session list in cycle 0 still applies.
+
+---
+
+# Cycle 2 check (commit 8ce1ad4, on d1e11cc)
+
+VERDICT: PASS
+Cycle checked: 2
+Commit checked: 8ce1ad4
+Scope: logic verified with fakes; NOT run in a real browser; one live tab-capture session is required before T-034 is called done.
+
+## EXPLANATION
+- (a) The diff removes `startedAt`/`Date.now()`/`elapsedAfterStart` from the new tests; the assertions are now `pollsAtEvent` defined and `pollsAtStop === pollsAtEvent` (a wait counter). No clock comparison remains in an assertion. The fake child still has its own 6 s give-up and a 1 s sleep, but nothing asserts on them.
+- (b) `inject.wait` default is `(ms) => new Promise(r => setTimeout(r, ms))` called with 5000: same delay and loop as the old `inject.pollMs ?? 5000`. No production caller passes `inject` (cli.ts, send-now-command.ts); it is a function parameter, not reachable from argv or env. No remaining `pollMs` use for runRecord (the only other hits are the unrelated scripts/upload queue).
+- (c) Mutants re-applied (per-mutation backup, 250 s timeout, finally restore, hashes equal HEAD): rethrow removed KILLED by the `/failed stop; media is incomplete/` assertion; loop throw removed KILLED by "loop waited again after the failure event"; early-exit line removed KILLED by the same assertion. None killed by a timeout or a clock bound.
+- (d) record-commands.test.ts ten consecutive runs: each 23 tests, 22 pass, 0 fail, 1 skipped (ffmpeg).
+- (e) Cycle-1 items hold: tab-browser table 7/7 (`false` clean, `true` failed-stop reason, "true", "false", 1, null, missing malformed-stop failure); tab-browser 12/13 (only the environmental symlink-EPERM test fails); extension tests 44 / 43 pass / 1 todo; `tsc --noEmit` exit 0; background.js and manifest.json diff vs d27cf71 empty; lint-dirsize OK; record-commands.test.ts 399 of 400 non-blank lines (the next unit must split it); `git merge-tree` against codex/machine-migration-2026-10-09 clean.
+
+## ISSUES
+Verified (logic with fakes): ISS-T034FIX-003, -004 (chain tested, three mutants killed by named assertions), -006 (ten green runs, no clock assertion). ISS-T034FIX-001 and -005 stay open. ISSUES-WRITTEN: none.
+
+## Merge conditions
+1. ISS-T034FIX-001 and -005 decided after the live session; the cycle-0 live-session list still applies and T-034 stays open until it is run.
+2. The next unit touching record-commands.test.ts splits it first (399 of 400).
