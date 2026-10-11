@@ -69,3 +69,7 @@ Commands (from `packages/meeting-bot`; node v24.19.0 from the codex runtime):
 
 ## For the checker
 Verify: the SILENT-subset edit to the two existing parity tests does not weaken them (absent/empty/off/non-string still compared exactly; unrecognised strings now covered by the new tests); the ISS-T037WIRE-003 decision; whether `keyTenantId` as a socket without a source is acceptable or should wait for ISS-WIREPRE-001; that W3 and the enabling decision remain the Approver's.
+
+## Close-out correction (2026-10-11, from the checker's verdict)
+The statement above that no existing response carries the key's tenant is wrong: `GET /webinar-operations` returns an `X-LKB-Tenant` header and `scripts/webinar/run-pipeline-deps.mjs` already uses it for this check (ISS-WIREPRE-002). ISS-T037WIRE-001 stays open; feeding that header to the tick's tenant check is the follow-up.
+
