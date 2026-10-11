@@ -1,6 +1,6 @@
 # iss-t034ext-005-recorder-message-sender-check
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2/3 (open ledger issue ISS-T034EXT-005, medium, class auth/credential handling: full ceremony). Lane: lane/recsender. Lane ledger: qa/issues.recsender.jsonl (0 findings filed). Existing ledger rows untouched (the checker changes ISS-T034EXT-005's status).
 
