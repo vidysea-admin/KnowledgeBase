@@ -11,7 +11,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { acquireSteps, releaseSteps, realFs, parseHolder, type LockFs, type Ctx } from "./join-rules-store-lock-steps.js";
+import { acquireSteps, releaseSteps, realFs, parseHolder, type LockFs, type Ctx } from "../join-rules-store-lock-steps.js";
 
 const HOST = "h1", DEAD_PID = 424242, T0 = 1_760_000_000_000, STALE = 30000;
 interface Backend { fs: LockFs; peek(p: string): string | null; list(): string[]; reset(seed: Record<string, string>): void }

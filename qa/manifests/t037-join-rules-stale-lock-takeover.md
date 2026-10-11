@@ -193,3 +193,6 @@ git merge-tree --write-tree --name-only HEAD codex/machine-migration-2026-10-09 
 node scripts/lint-dirsize.mjs (in the lane, whose base predates main's alerts/ move): calendar/ 32 files > 30. The MERGED tree has 30 (limit 30), so the budget holds once merged.
 Budgets (non-blank): lock 76, steps 149, store 190, lock test 287, guards test 126, explore test 227 (limits 300 / 400).
 ```
+
+## Relocation (after the cycle-1 PASS, ISS-LOCKTAKE-009)
+`join-rules-store-lock-explore.test.ts` and `join-rules-store-lock-guards.test.ts` moved (git mv) to `packages/meeting-bot/src/calendar/join-rules-lock/` so the calendar directory stays within its loose-file budget (main has 28; this lane's remaining loose addition is `join-rules-store-lock-steps.ts` = 29 <= 30). Only import lines changed (`./` -> `../`) plus the guards test's source-scan path (`path.join(here, "..", f)`). Counts unchanged: explorer 11, guards 16.
