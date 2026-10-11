@@ -55,3 +55,56 @@ Start command, files, differences, "not delivered" (scheduler does not read rule
 
 ISSUES-WRITTEN: ISS-T037HOST-001 (medium, qa/issues.t037host.jsonl)
 EXPLANATION: Fix cycle 1 needs only a stale-pid check in `acquireHostLock` plus two tests (stale replaced, live refused). Notes, not backlog: M3 survived (writability check untested); the entry point has no automated test; the container note could be more prominent; a lane-local run would double-load the db module only because node_modules link to the main tree.
+
+---
+
+# Cycle 1
+
+VERDICT: PASS
+Cycle checked: 1
+Scope: maker commit 467202d (diff against 7b830fb: join-rules-host.ts 156 lines, its test 248 lines / 9 tests, manifest). Nothing outside those three files changed in source. Ruling is conditional on MERGE ORDER: merge after unit t037-join-rules-store-lock (see point 1).
+
+## Commands and results (portable node, every run under `timeout`; no DB, no fixed-port server, host entry never launched)
+- `node --test --import tsx scripts/webinar/join-rules-host.test.ts` x4: each `ISS-T037HOST-001: 3/3`, `race rounds: 4, winners per round: 1,1,1,1`; last run `tests 9 / pass 9 / fail 0`.
+- `node --check scripts/webinar/join-rules-api-host.ts`: rc 0. Scratch-tsconfig tsc over the three files: rc 0.
+- Budgets (non-blank): 156 / 41 / 248 (limits 300 / 300 / 400); scripts/webinar 23 files (unchanged).
+- Binder/auth/tenancy spot-check: the unit tests 1-3 (GET not 503, calendar-only key 403, corrupt file 500 with bytes unchanged) pass; the non-lock host code is unchanged from cycle 0.
+
+## Decision table
+| Rule | Finding |
+|---|---|
+| (1) boot differs by >120 s: take over without pid | DEMONSTRATED UNSAFE (below); accepted as residual risk, conditional on the store lock |
+| (2) same boot, ESRCH: take over | OK (probe + test) |
+| (3) same boot, alive / EPERM / other error: refuse | OK, message names file and pid |
+| (4) unparseable, mtime <=60 s: refuse | OK |
+| (5) unparseable, >60 s: take over | OK for crashes. Normal path is `openSync(file,"wx")` then `writeSync` then close: two steps, so a starter stalled 60 s between them could be taken over while alive; negligible (adjacent syscalls). A legacy bare-pid file left by a LIVE old-version host older than 60 s would be taken over by the new version: only if old and new hosts overlap during an upgrade; operational note |
+
+## Point 1 probe (boot rule vs a live holder)
+Host A = this process acquires normally (real boot). B = `acquireHostLock(dir, pid+1, { bootTimeMs: () => currentBootTimeMs() + 121_000 })` while A is alive. Output: `took over stale lock ... (reboot detected since the lock was written; old pid 29820)` then `B ALSO ACQUIRED while A alive`. The unit test itself asserts this behaviour (live pid, boot 10 min off). So a wall-clock step over 120 s (or VM resume/migration, bad first NTP sync) plus a second start while the first is alive gives two live hosts holding the lock. Whether os.uptime() includes sleep on Windows was not measured (unverified, not relied on).
+Realism: rare (needs a step over 2 min AND a second start while the first runs). Severity as a defect of the pid lock's own property: medium-low. Mitigations that make it acceptable: (a) the store-level cross-process lock (t037-join-rules-store-lock) has PASSED and been merged to main, so two concurrent hosts can no longer lose an update including opt-outs; the pid lock becomes a convenience guard; (b) both hosts would bind the same PORT, so the second normally fails with EADDRINUSE (stated, not run). Recommended refinement (not required): on a boot mismatch take over only if the pid is also not alive. Merge order: this unit MUST merge after t037-join-rules-store-lock; without it rule (1) is a lost-opt-out path and I would FAIL.
+
+## Race and failure windows (real processes)
+- 20 rounds against one stale lock (10 x 2 starters, 10 x 4 starters, synchronized start): exactly 1 winner every round, pid file held the winner pid every round, nothing left on disk. Plus the unit 4 rounds x 3 runs.
+- 25 rounds x 4 starters against a stale lock plus a 60 s-old stale `.takeover` mutex: 1 winner every round, no leftovers.
+- On-disk failure windows (states constructed; real kill points are not injectable): killed after creating the mutex: next start refused ("another host is taking over") until the mutex is 31 s old, then acquired, nothing left. Killed after writing temp: mutex + tmp left; after 31 s acquired; the `join-rules-host.pid.<token>.tmp` file stays as litter (harmless). Killed after rename before mutex removal: pid file holds a dead host record, mutex left; refused until 31 s, then acquired. No window produced two holders. Recovery is unattended only if something restarts the process: the entry exits with code 1 and has no retry; docker-compose services use `restart: unless-stopped`, a Windows service manager must be configured likewise. Operational note.
+- Theoretical flaw, NOT reproduced: stale-mutex removal is unlink-then-create; two starters that both see an aged mutex can each unlink the other fresh one and both proceed, and could each rename and read back their own token inside a few-ms window. Needs a crashed take-over AND simultaneous starters; 25 rounds never hit it. Residual.
+
+## Release
+Removes the file only when it holds our token (M6 killed), idempotent, runs on exit/SIGINT/SIGTERM/startup failure. A host whose lock was taken over while alive never notices (no periodic re-check): the two-host condition persists silently; covered by the store lock. Note only.
+
+## D-015
+ISS-T037HOST-001 recorded repro `999999\n`: taken over when aged (over 60 s) and logged; refused when fresh, by design. Unit replay 3/3 (`999999\n`, bare dead pid, full record of dead pid). A fresh legacy file after crash-plus-restart is refused up to 60 s; recovery on a later start needs a restarting service manager.
+
+## Mutations (join-rules-host.ts; per-mutation byte backup, trap restore, 200 s timeout; hash after every run = HEAD blob 01d33ca703879234408698614dea74778b19587e)
+| Mutation | Result |
+|---|---|
+| M1 take over even when the pid is alive | KILLED (3 fail) |
+| M2 skip re-read-and-compare before rename | SURVIVED |
+| M3 skip post-rename token check | SURVIVED |
+| M4 EPERM treated as dead | KILLED (1) |
+| M5 mutex created with "w" instead of "wx" | KILLED (1) |
+| M6 release deletes without token check | KILLED (1) |
+M2/M3 survive because the tests cannot interleave inside the take-over; the guards are untested. Note, not backlog.
+
+ISSUES-WRITTEN: none
+EXPLANATION: The cycle-0 defect is fixed: crash, kill, service stop and reboot recover without a human, take-over is serialized, and every constructed failure state recovers. The boot-time rule can displace a live host after a clock step over 120 s (demonstrated); accepted only because the store-level lock now protects data and a second host would also collide on the port, so merge strictly after t037-join-rules-store-lock. Residuals recorded in the contract.
