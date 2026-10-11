@@ -108,7 +108,7 @@ test("sender approval: confirmation names the sender and says no human click; ca
   fireEvent.change(screen.getByLabelText("Sender to approve"), { target: { value: " New@Example.com " } });
   fireEvent.click(screen.getByRole("button", { name: "Approve sender…" }));
   const dialog = screen.getByRole("alertdialog", { name: "Confirm change" });
-  expect(dialog).toHaveTextContent("Approving New@Example.com means the bot will join future meetings from New@Example.com automatically, with no human click.");
+  expect(dialog).toHaveTextContent("Approving New@Example.com records that, once enforcement is switched on, the bot joins future meetings from New@Example.com automatically, with no human click.");
   expect(writes()).toHaveLength(0);
   fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
   expect(screen.queryByRole("alertdialog")).toBeNull(); expect(writes()).toHaveLength(0);
@@ -140,7 +140,7 @@ test("opt-out goes through confirmation and posts { eventId }", async () => {
   await ready();
   fireEvent.change(screen.getByLabelText("Event id to opt out of"), { target: { value: "evt-99" } });
   fireEvent.click(screen.getByRole("button", { name: "Opt out of event…" }));
-  expect(screen.getByRole("alertdialog")).toHaveTextContent("the bot will not join that meeting");
+  expect(screen.getByRole("alertdialog")).toHaveTextContent("records an opt-out for that event");
   expect(writes()).toHaveLength(0);
   fireEvent.click(screen.getByRole("button", { name: "Confirm opt-out" }));
   await screen.findByText("Opted out of event evt-99.");

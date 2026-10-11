@@ -104,7 +104,7 @@ describe("approval / opt-out inputs and confirmation text", () => {
   test("sender and domain wording say no human click, name the value, and the domain one is stronger", () => {
     const s = confirmationText({ kind: "sender", value: "asha@example.com" });
     const d = confirmationText({ kind: "domain", value: "example.com" });
-    expect(s).toBe("Approving asha@example.com means the bot will join future meetings from asha@example.com automatically, with no human click.");
+    expect(s).toBe("Approving asha@example.com records that, once enforcement is switched on, the bot joins future meetings from asha@example.com automatically, with no human click. Join rules are not enforced by the bot yet: this is recorded, and the bot may still join until enforcement is switched on.");
     expect(d).toContain("EVERY sender at example.com");
     expect(d).toContain("with no human click");
     expect(d.length).toBeGreaterThan(s.length);
