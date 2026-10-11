@@ -1,6 +1,6 @@
 # t037-join-rules-stale-lock-takeover
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t037-join-rules-stale-lock-takeover.md, cycle 1, 9e9aa02; merge condition ISS-LOCKTAKE-009 met by relocation 4dfc56e (pure move))
 Fix cycle: 1
 Priority tier: dispatched by the orchestrator for ISS-T037LOCK-001 (severity **medium**, so tier 4 by the ledger; pulled early because the row is a stated precondition for wiring the store into the unattended host)
 Security class: **data-write class** (a lock on a data-write path: a wrong takeover of a live lock can interleave read-modify-write and lose a tenant's rules/opt-outs). FULL ceremony, never round-capped.
