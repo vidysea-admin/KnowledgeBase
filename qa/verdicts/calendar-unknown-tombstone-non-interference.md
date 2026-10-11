@@ -38,3 +38,31 @@ Closed: trusted Calendar rows, linked pairs and `newStartsBlocked` are no longer
 4. Approver-recorded amendment of the D-060 floor for the changed webinar-policy assertion.
 5. Live confirmation of Google's cancelled-resource shape (id-only vs start/conferenceData).
 Contract: qa/contracts/calendar-unknown-tombstone.md.
+
+---
+
+# Cycle 1 (re-check of fix commit bf6da56, lane/tombstone)
+
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: bf6da56 (base 01635f6; the lane is behind main and imports resolve through shared junctions; no failure was traced to that)
+Scope: fixtures only. No network, browser or database. Google's cancelled-resource shape is still assumed.
+
+## EXPLANATION
+
+Contract items 1-5 hold for the stated criteria. This is the unit's PASS only; it cannot merge on this verdict alone (merge conditions below).
+
+Counts re-derived (real recon() + selectAutoRecordItems, 2 scopes x 2 modes): ISS-T036CAL-011 12/12 (maker 12/12); ISS-TOMBSTONE-001 2/2; -002 16/16 (4 recorded probes x 4 cells, ledger shapes replayed verbatim); -003 20/20 (5 probes x 4); -004/001 6/6 (5-tick, 40-day and fresh-state cases), plus my own: an old-dated tombstone holds nothing, and the first-seen stamp survives refetch and a JSON round trip of state; -006 fixed (lint-dupes 5 violations, none for Row, all pre-existing; the rename touches only the tombstone folder). P1 3200 runs and P2 1076 runs: 0 violations. Not replayed as a refusal: ISS-TOMBSTONE-005 (left open, see below). Tests: non-interference 12/12, property 2/2, webinar-policy 19/19, schedule-state 18/18, auto-join 39/39; tsc exit 0.
+
+FAIL-OPEN (a cancelled meeting's Gmail copy still joined; checked with the selector at the meeting's own tick, tombstone no longer fetched): start-carrying tombstone, copy +23h held, +25h and -25h NOT held, +30h joined; id-only, copy +13d held, +15d/+16d joined; recurring-instance tombstone (originalStartTime only) with copy +30d joined; cancelled master with the series first start, later instance +21d joined; rescheduled copy +3d joined. Held: all-day, different id and title with start within 24h, EST misread. These gaps are the price of contract item 4 (expiry); they were previously covered by a permanent blanket. Filed as ISS-TOMBSTONE-008 (medium).
+
+SUPPRESSION BY AN OUTSIDER. Calendar rows, linked pairs and newStartsBlocked are never affected. Unlinked Gmail rows: a start-less cancelled invite holds EVERY unlinked Gmail row starting in [T-24h, T+14d] regardless of title, organiser or sender (organiser evil@attacker.example, title "spam", unrelated meeting +3d: held); a start-carrying one holds everything within +-24h of its start. A held row is lost for good (the hold depends on the row start, not on current time). Expiry is real: the stamp is set only for a key absent from stored state, is stored in the persisted occurrence (snapshot.providerUpdated and revision), is not moved by refetch (days 1/5/13, 20-day refetch, JSON round trip), and an old Google `updated` holds nothing. But it is renewable: each NEW cancelled id gets its own T, so one send-then-cancel every 14 days or less suppresses all email-only meetings continuously (day 13 new id re-held a day-20 row; still held at day 14.5 and day 30). Bounded in time per invite, not removed. Not FAIL-level: the contract's boundedness criterion (a stored tombstone must not hold forever) is met, and binding the hold to the sender is an Approver decision the maker flagged (005, 007). Sharper form filed as ISS-TOMBSTONE-008.
+
+Mutations (7 own, harness tombstone-chk-mut, per-mutation byte backup, finally-restore; every touched file hash equals HEAD, git status clean): 6/7 killed: drop expiry (Infinity), start window 24h to 1 min, drop first-seen stamp, invert span comparison, re-stamp every tick, horizon 14d to 365d. SURVIVED: lead slack 24h to 0 (rows starting just before the cancellation time no longer held; the maker reported a lead-slack mutation killed, mine or its test scope differs). Low, note only: no test pins the pre-cancellation lead.
+
+ISSUES-WRITTEN: ISS-TOMBSTONE-008 (medium). Verified fixed: ISS-TOMBSTONE-002, 003, 004, 006. ISS-TOMBSTONE-001 stays open (reduced to the windowed hold; covered by 005/007/008). ISS-T036CAL-011 stays OPEN (not verified: residuals above plus the merge conditions).
+
+## Merge conditions (carried from cycle 0, quoted)
+- "4. Approver-recorded amendment of the D-060 floor for the changed webinar-policy assertion." NOT done (no DECISIONS entry; the maker says so). This BLOCKS merging: the changed assertion is the D-060 acceptance floor text and needs an Approver entry (Umesh). Not waived.
+- "5. Live confirmation of Google's cancelled-resource shape (id-only vs start/conferenceData)." NOT done. It BLOCKS merging as written, and decides how reachable the start-less blanket (008) is.
+Conditions 1, 2 (expiry; the "documented operator release" is not added, a state reset clears) and 3 are met. Open for the Approver: constants (14d / 24h) and whether to bind the hold to the sender (008).
