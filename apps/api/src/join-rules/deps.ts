@@ -40,4 +40,8 @@ export interface JoinRulesDeps {
   recordApproval(tenantId: string, approval: { kind: "sender" | "domain"; value: string }): MaybePromise<JoinRuleStateValue>;
   /** `meeting` is passed ONLY when the client sent a hint; without it the opt-out is by id alone, as before. */
   recordOptOut(tenantId: string, eventId: string, meeting?: OptOutMeetingHint): MaybePromise<JoinRuleStateValue>;
+  /** Un-opt: removes exactly `eventId` and exactly the identities the hints derive. Absent = no-op, nothing written. */
+  removeOptOut(tenantId: string, eventId: string, meeting?: OptOutMeetingHint): MaybePromise<OptOutRemovalValue>;
 }
+/** What an un-opt did: `removed` is `{ eventId: false, meetings: [] }` for a no-op. */
+export interface OptOutRemovalValue { state: JoinRuleStateValue; removed: { eventId: boolean; meetings: string[] } }

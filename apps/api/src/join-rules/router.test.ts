@@ -8,7 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startTestServer, type TestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore } from "../fixtures.js";
-import type { JoinRulesDeps, JoinRuleSetValue, JoinRuleStateValue, StoredJoinRulesValue } from "./deps.js";
+import type { JoinRulesDeps, OptOutRemovalValue, JoinRuleSetValue, JoinRuleStateValue, StoredJoinRulesValue } from "./deps.js";
 
 class JoinRulesStoreError extends Error {
   constructor(public readonly code: string, detail: string) { super(`join-rules store: ${code}: ${detail}`); this.name = "JoinRulesStoreError"; }
@@ -58,6 +58,13 @@ function fakeStore(opts: { delayMs?: number; sizeCap?: number } = {}) {
       const state = { ...cur.state, optedOutEventIds: [...cur.state.optedOutEventIds, id] };
       await save(t, { ruleSet: cur.ruleSet, state });
       return state;
+    },
+    async removeOptOut(t, id): Promise<OptOutRemovalValue> {
+      const cur = await load(t);
+      const had = cur.state.optedOutEventIds.includes(id);
+      const state = { ...cur.state, optedOutEventIds: cur.state.optedOutEventIds.filter(x => x !== id) };
+      if (had) await save(t, { ruleSet: cur.ruleSet, state });
+      return { state, removed: { eventId: had, meetings: [] } };
     },
   };
   return { deps, files, corrupt, log, hints };

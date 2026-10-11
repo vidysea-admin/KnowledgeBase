@@ -3,7 +3,7 @@
  * in-memory join-rules store that records the tenant argument of EVERY dep call (the spy), so a test can
  * assert WHICH tenant's data was read or changed rather than only the HTTP status.
  */
-import type { JoinRulesDeps, JoinRuleSetValue, JoinRuleStateValue, StoredJoinRulesValue } from "./deps.js";
+import type { JoinRulesDeps, OptOutRemovalValue, JoinRuleSetValue, JoinRuleStateValue, StoredJoinRulesValue } from "./deps.js";
 
 export class StoreError extends Error {
   constructor(public readonly code: string) { super(`join-rules store: ${code}`); this.name = "JoinRulesStoreError"; }
@@ -47,6 +47,18 @@ export function spyStore() {
       const state = { ...cur.state, optedOutEventIds: [...cur.state.optedOutEventIds, id] };
       await save(t, { ruleSet: cur.ruleSet, state });
       return state;
+    },
+    /** Independent fake: exact filtering only, so the router tests assert the router, not the pure helper. */
+    async removeOptOut(t, id, meeting): Promise<OptOutRemovalValue> {
+      calls.push({ op: "removeOptOut", tenantId: t });
+      const cur = await load(t);
+      const drop = [meeting?.meetingUrl ? `url:${meeting.meetingUrl}` : "", meeting?.sessionKey ? `key:${meeting.sessionKey}` : ""];
+      const had = cur.state.optedOutEventIds.includes(id);
+      const gone = (cur.state.optedOutMeetings ?? []).filter(e => drop.includes(e));
+      const state: JoinRuleStateValue = { ...cur.state, optedOutEventIds: cur.state.optedOutEventIds.filter(x => x !== id) };
+      if (cur.state.optedOutMeetings) state.optedOutMeetings = cur.state.optedOutMeetings.filter(e => !drop.includes(e));
+      if (had || gone.length) await save(t, { ruleSet: cur.ruleSet, state });
+      return { state, removed: { eventId: had, meetings: gone } };
     },
   };
   return { deps, bytes, calls, put, failNextSave: () => { failNextSave = true; } };

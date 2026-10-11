@@ -290,3 +290,76 @@ test("ISS-T037OPT-004 end to end: a hinted opt-out via the real router and adapt
     assert.equal(hinted, total);
   } finally { await s.close(); }
 }));
+
+// t037-join-rules-un-opt: the un-opt through production-shaped wiring (real router + real host adapter + real store, two real tenant directories).
+test("un-opt end to end: opt out with a hint -> sibling vetoed; un-opt with the same hint -> sibling free; other tenant, rules and approvals untouched; no-op idempotent; GET shows only own identities", () => withDir(async dir => {
+  const ROOM = "https://zoom.us/my/room.name";
+  const sibling = () => ({ sessionKey: "gmail:g1", source: "gmail", sourceId: "g1", title: "g1", startTime: "2026-10-10T10:00:00Z", endTime: "2026-10-10T11:00:00Z", meetingUrl: `${ROOM}?pwd=zz`, sender: "a@x.com" }) as never;
+  const vetoed = (tenant: string) => { const l = loadJoinRules(dir, tenant); return applyJoinRules({ toSchedule: [sibling()], skipped: [] }, l.ruleSet, { state: l.state }).toSchedule.length === 0; };
+  const s = await serve(dir);
+  try {
+    assert.equal((await s.call("PUT", P, "a-key", RULES)).status, 200);
+    assert.equal((await s.call("POST", `${P}/approvals`, "a-key", { kind: "domain", value: "ok.example" })).status, 200);
+    for (const k of ["a-key", "b-key"]) assert.equal((await s.call("POST", `${P}/opt-outs`, k, { eventId: "calX", meetingUrl: ROOM, sessionKey: "k1" })).status, 200);
+    assert.equal((await s.call("POST", `${P}/opt-outs`, "a-key", { eventId: "calY" })).status, 200);
+    assert.ok(vetoed("tenant-a") && vetoed("tenant-b"), "opted out: the sibling is vetoed in both tenants");
+    const bBytes = readFileSync(joinRulesFilePath(dir, "tenant-b"), "utf8");
+    const before = loadJoinRules(dir, "tenant-a");
+    // wrong scope / other tenant's key
+    assert.equal((await s.call("POST", `${P}/opt-outs/remove`, "noscope-key", { eventId: "calX", meetingUrl: ROOM })).status, 403);
+    assert.ok(vetoed("tenant-a"));
+    // un-opt: id + the URL identity only; the sessionKey identity and calY stay
+    const r = await s.call("POST", `${P}/opt-outs/remove`, "a-key", { eventId: "calX", meetingUrl: ROOM });
+    assert.equal(r.status, 200);
+    assert.deepEqual(r.json.removed, { eventId: true, meetings: ["url:zoom:my:room.name"] });
+    assert.ok(!vetoed("tenant-a"), "same hint un-opts: the sibling is no longer vetoed");
+    assert.ok(vetoed("tenant-b") && readFileSync(joinRulesFilePath(dir, "tenant-b"), "utf8") === bBytes, "tenant B untouched, byte for byte");
+    const after = loadJoinRules(dir, "tenant-a");
+    assert.deepEqual(after.ruleSet, before.ruleSet);
+    assert.deepEqual([after.state.approvedSenders, after.state.approvedDomains], [before.state.approvedSenders, before.state.approvedDomains]);
+    assert.deepEqual(after.state.optedOutEventIds, ["calY"]);
+    assert.deepEqual(after.state.optedOutMeetings, ["key:k1"]);
+    // idempotent no-op: nothing reported, bytes identical
+    const aBytes = readFileSync(joinRulesFilePath(dir, "tenant-a"), "utf8");
+    const again = await s.call("POST", `${P}/opt-outs/remove`, "a-key", { eventId: "calX", meetingUrl: ROOM });
+    assert.deepEqual([again.status, again.json.removed], [200, { eventId: false, meetings: [] }]);
+    assert.equal(readFileSync(joinRulesFilePath(dir, "tenant-a"), "utf8"), aBytes);
+    // an id-only un-opt does not guess the key identity
+    await s.call("POST", `${P}/opt-outs/remove`, "a-key", { eventId: "calY" });
+    assert.deepEqual(loadJoinRules(dir, "tenant-a").state.optedOutMeetings, ["key:k1"]);
+    // GET shows own identities only
+    assert.deepEqual((await s.call("GET", P, "a-key")).json.state.optedOutMeetings, ["key:k1"]);
+    assert.deepEqual((await s.call("GET", P, "b-key")).json.state.optedOutMeetings, ["url:zoom:my:room.name", "key:k1"]);
+    // an operator can clear the remaining stale identity with an unrelated eventId + the key hint
+    assert.equal((await s.call("POST", `${P}/opt-outs/remove`, "a-key", { eventId: "x", sessionKey: "k1" })).json.removed.meetings[0], "key:k1");
+  } finally { await s.close(); }
+}));
+
+test("un-opt while the tenant lock is held: 503 join_rules_busy, the document is byte-identical; after the lock clears it succeeds", () => withDir(async dir => {
+  const s = await serve(dir);
+  try {
+    await s.call("POST", `${P}/opt-outs`, "a-key", { eventId: "calX", sessionKey: "k1" });
+    const f = joinRulesFilePath(dir, "tenant-a"); const bytes = readFileSync(f, "utf8"); const lock = f.replace(/\.json$/, ".lock");
+    writeFileSync(lock, JSON.stringify({ token: "held", pid: 1, at: "2020-01-01T00:00:00.000Z" })); // a stale lock is reported as `locked`, never stolen
+    const busy = await s.call("POST", `${P}/opt-outs/remove`, "a-key", { eventId: "calX", sessionKey: "k1" });
+    assert.deepEqual([busy.status, busy.json.error], [503, "join_rules_busy"]);
+    assert.equal(readFileSync(f, "utf8"), bytes);
+    assert.deepEqual(readdirSync(path.dirname(f)).filter(n => n.endsWith(".tmp")), []);
+    rmSync(lock);
+    assert.deepEqual((await s.call("POST", `${P}/opt-outs/remove`, "a-key", { eventId: "calX", sessionKey: "k1" })).json.removed, { eventId: true, meetings: ["key:k1"] });
+  } finally { await s.close(); }
+}));
+
+test("un-opt on a corrupt stored file is a 500 and the bytes are unchanged; an old document is never given an optedOutMeetings field", () => withDir(async dir => {
+  const s = await serve(dir);
+  try {
+    await s.call("POST", `${P}/opt-outs`, "b-key", { eventId: "old" });
+    assert.ok(!("optedOutMeetings" in JSON.parse(readFileSync(joinRulesFilePath(dir, "tenant-b"), "utf8")).state));
+    await s.call("POST", `${P}/opt-outs/remove`, "b-key", { eventId: "old", meetingUrl: "https://zoom.us/j/123456789" });
+    assert.ok(!("optedOutMeetings" in JSON.parse(readFileSync(joinRulesFilePath(dir, "tenant-b"), "utf8")).state));
+    writeFileSync(joinRulesFilePath(dir, "tenant-a"), "{not json");
+    const r = await s.call("POST", `${P}/opt-outs/remove`, "a-key", { eventId: "x" });
+    assert.equal(r.status, 500);
+    assert.equal(readFileSync(joinRulesFilePath(dir, "tenant-a"), "utf8"), "{not json");
+  } finally { await s.close(); }
+}));
