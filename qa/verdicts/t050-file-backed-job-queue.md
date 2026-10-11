@@ -34,3 +34,32 @@ Fix ISS-JOBQUEUE-001 (typed error on tenant mismatch; distinguishable payload mi
 3. A tenant-scoped worker must always pass `tenantId` to claim; unrestricted claim sees every tenant. The API layer must never accept a `LeaseRef` from a tenant caller without checking the job's tenant.
 4. Decide whether post-expiry heartbeat/complete by the original holder is wanted.
 5. Retry backoff, retryable-code classification and power-loss durability (no directory fsync) remain open.
+
+---
+
+# Cycle 1 (re-check of fix commit 36ecfa7, lane/jobqueue)
+
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: 36ecfa7 (diff eedbce8..36ecfa7)
+Scope: unwired; single process; local filesystem; durability across power loss unverified.
+
+## EXPLANATION
+
+- ISS-JOBQUEUE-001: my recorded reproductions (the two enqueue calls in the ledger row, parsed from its evidence text and replayed verbatim) 2/2 fixed: first `enqueued`, second `id-conflict` "job id is not available", file bytes unchanged, tb claim returns null. My cycle-0 generator re-run (1,000 seeds, same counts): 4,741 other-tenant enqueues now all `id-conflict`, 2,376 same-tenant different-payload all `payload-mismatch`, zero violations on every other invariant, file byte-identical after every refusal.
+- State independence: id-conflict is deep-equal and has the same fs call sequence (one read, no create/rename) for ready, leased, done, dead stored jobs; nothing in the code path inspects state.
+- Residual (an id is known to be taken): ACCEPTABLE with a before-wiring condition, and it is not a contract change. Contract invariant 8 already required a typed error with global ids; per-tenant id spaces would be a different design. Condition: callers must use unguessable ids or ids namespaced by tenant (or a tenant-scoped hash); never an id that embeds guessable cross-tenant content such as a session id.
+- Payload: canonical equality verified: key order ignored (nested too), array order significant, `1.0`/`-0` equal 1/0 (payload is JSON-normalised first), `undefined` equals missing and `null`, Dates and NaN normalise as JSON does, cycles and BigInt give `invalid-input`; mismatch never overwrites. `maxAttempts` is ignored in equality: acceptable (idempotent re-enqueue keeps the stored limit, tested); note only, a caller wanting a changed limit gets no signal.
+- Ref tenant: wrong tenant gives `not-found` deep-equal to the missing-id answer for heartbeat, complete, fail, in ready/leased/done/dead/expired states (real and forged refs), nothing written; absent tenant behaves as cycle 0 (re-run property: zero violations); a malformed ref tenant is `invalid-input`.
+- Cross-tenant knowledge property (1,000 seeds x 12 tenant-B operations, two worlds differing in A's job states and payloads): every B result identical. Observation (low, note): a tenant-restricted claim by B also runs the global dead-marking sweep, so it can write A's file by moving an expired exhausted A job to `dead`; a correct lazy transition, no content or state is returned to B.
+- Mutations on the changed code (11 own: tenant comparison removed, state-dependent conflict, mismatch reported as exists, overwrite on mismatch, ref tenant check removed, ignored in each of heartbeat/complete/fail, shallow canonical, unsorted keys, tenant leaked in not-found): 11/11 killed (all by my c1 test), restored and hash-verified each time.
+- Gates: tests 15/15, 4/4, 1/1, 6/6; tsc core 0, web 0; lint-dirsize OK; lint-dupes OK; dependency-cruiser (`.dependency-cruiser.cjs`, packages/core): no violations, 68 modules; max file 139 lines. `git merge-tree` against codex/machine-migration-2026-10-09 (f2a44c4, includes run-state-store): clean (tree d4f46bf); no exported name shared with run-state-store or domain (26 vs 136 names compared). The sibling's test kit is separate (`run-state-fake-fs.ts` vs `mem-queue-fs.testkit.ts`).
+
+ISSUES-WRITTEN: none new. ISS-JOBQUEUE-001 set verified-fixed; ISS-JOBQUEUE-002 stays open-before-wiring.
+
+## BEFORE-WIRING (updated)
+1. Single process only; a second writer needs a lock or CAS first (ISS-JOBQUEUE-002).
+2. Prune done/dead jobs (about 60 ms per op at 5,000 jobs, linear).
+3. Production callers MUST pass `tenantId` on every LeaseRef and on every claim; the API layer derives it from the session, never from the request body.
+4. Job ids must be unguessable or tenant-namespaced by the caller (existence of an id is visible to other tenants).
+5. Decide post-expiry holder semantics; backoff, retryable codes and power-loss durability remain open.
