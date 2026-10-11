@@ -12,7 +12,8 @@ import os from "node:os";
 import path from "node:path";
 import { startTestServer } from "../../apps/api/src/testUtils.js";
 import { buildTestDeps, fakeKeyStore } from "../../apps/api/src/fixtures.js";
-import { joinRulesFilePath } from "../../packages/meeting-bot/src/calendar/join-rules-store.js";
+import { joinRulesFilePath, loadJoinRules } from "../../packages/meeting-bot/src/calendar/join-rules-store.js";
+import { applyJoinRules } from "../../packages/meeting-bot/src/calendar/join-rules-select.js";
 import { acquireHostLock, BOOT_JITTER_MS, createJoinRulesDeps, currentBootTimeMs, HOST_PID_FILE, prepareStateDir, resolveStateDir } from "./join-rules-host.js";
 
 const KEYS: Record<string, { tenantId: string; scopes: string[] }> = {
@@ -257,4 +258,35 @@ test("two real starters race for one stale lock: exactly one wins every round", 
     assert.ok(!existsSync(lockFile(dir)) && !existsSync(`${lockFile(dir)}.takeover`));
   }
   console.log(`race rounds: ${winners.length}, winners per round: ${winners.join(",")}`);
+}));
+
+// ISS-T037W1-001 / ISS-T037OPT-004: the recorded scenario through production-shaped wiring (real router + real host adapter + real store).
+test("ISS-T037OPT-004 end to end: a hinted opt-out via the real router and adapter stores the meeting identity; a sibling alone is vetoed opted-out", () => withDir(async dir => {
+  const item = (sourceId: string, over: Record<string, unknown> = {}) => ({ sessionKey: `cal:${sourceId}`, source: "calendar", sourceId, title: sourceId,
+    startTime: "2026-10-10T10:00:00Z", endTime: "2026-10-10T11:00:00Z", meetingUrl: "https://zoom.us/j/123456789", sender: "a@x.com", ...over });
+  const g1 = () => item("g1", { source: "gmail", sessionKey: "gmail:g1", meetingUrl: "https://zoom.us/j/123456789?pwd=zz" }) as never;
+  const apply = (tenant: string) => { const l = loadJoinRules(dir, tenant); return applyJoinRules({ toSchedule: [g1()], skipped: [] }, l.ruleSet, { state: l.state }); };
+  const s = await serve(dir);
+  let hinted = 0; const total = 5;
+  try {
+    // hinted: the meeting URL of calX is forwarded; only the sibling g1 is later selected
+    assert.equal((await s.call("POST", `${P}/opt-outs`, "a-key", { eventId: "calX", meetingUrl: "https://us02web.zoom.us/j/123456789?pwd=a" })).status, 200);
+    const stored = JSON.parse(readFileSync(joinRulesFilePath(dir, "tenant-a"), "utf8")).state;
+    if (JSON.stringify(stored.optedOutMeetings) === '["url:zoom:123456789"]') hinted++;
+    const out = apply("tenant-a");
+    if (out.toSchedule.length === 0) hinted++;
+    if (out.skipped[0]?.reason === "opted-out" && out.skipped[0].sourceId === "g1") hinted++;
+    // sessionKey hint likewise
+    assert.equal((await s.call("POST", `${P}/opt-outs`, "a-key", { eventId: "calY", sessionKey: "gmail:g1" })).status, 200);
+    if (loadJoinRules(dir, "tenant-a").state.optedOutMeetings?.includes("key:gmail:g1")) hinted++;
+    // other tenant is untouched
+    if (apply("tenant-b").toSchedule.length === 1) hinted++;
+    // recorded id-only state (no hint) still lets the sibling through: open by design
+    assert.equal((await s.call("POST", `${P}/opt-outs`, "b-key", { eventId: "calX" })).status, 200);
+    assert.ok(!("optedOutMeetings" in loadJoinRules(dir, "tenant-b").state));
+    const idOnly = apply("tenant-b").toSchedule.length;
+    console.log(`ISS-T037OPT-004: ${hinted}/${total}; ISS-T037W1-001: ${hinted}/${total} hinted, ${idOnly === 0 ? 1 : 0}/1 id-only (open by design)`);
+    assert.equal(idOnly, 1, "id-only opt-out still does not veto the sibling (needs a client that sends hints)");
+    assert.equal(hinted, total);
+  } finally { await s.close(); }
 }));

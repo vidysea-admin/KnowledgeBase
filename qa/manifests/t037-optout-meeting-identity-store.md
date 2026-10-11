@@ -4,7 +4,7 @@ Task: T-037 (scheduler switch-over; precondition W7 of qa/contracts/t037-join-ru
 Tier: 2, open HIGH issue ISS-T037W1-001. Full ceremony.
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 
 ## Scope
 Close ISS-T037W1-001 with design (ii): the opt-out stores the MEETING identity, so the veto no longer needs the opted-out record to be in the current selection. Library, store and API only. NOT wired into schedule-tick.ts (Approver ruling pending); `qa/contracts/`, `qa/verdicts/`, enforcement paths and ledger statuses untouched.
@@ -70,3 +70,31 @@ Survivors: none.
 
 ## Ledger
 New lane shard qa/issues.t037opt.jsonl: ISS-T037OPT-001 (medium, no un-opt), -002 (medium, clients must send hints), -003 (low, recurring room). ISS-T037W1-001 / -002 statuses not edited (checker's call).
+
+## Fix cycle 1 (checker cycle 0: PASS at stated scope, merge conditions 1 and 3, ISS-T037OPT-004 / -005)
+Note: references above to `join-rules-optout-meeting.test.ts` now refer to the tail of `join-rules-optout-identity.test.ts` (item 1). Every assertion kept; no test title was changed.
+
+1. DIRECTORY BUDGET. `join-rules-optout-meeting.test.ts` (10 tests, 190 non-blank lines) was folded into the existing `join-rules-optout-identity.test.ts` (already on main) and deleted; duplicate helper definitions (`ZOOM`, `sel`, `it`, `ids`, identical text) were dropped, imports merged. The new source module `join-rules-optout.ts` stays a separate file (join-rules.ts is 295/300). Arithmetic: calendar files on codex/machine-migration-2026-10-09 = 29; this lane's net addition = +1 (`join-rules-optout.ts`; the test file is folded, nothing moved or renamed) -> 29 + 1 = 30 <= 30. Lane tree now holds 25 (was 26). Non-blank lines: join-rules-optout-identity.test.ts 381/400 (was 179 + 190 = 369 before the two pins, +12 for the pins).
+2. PIN TESTS (ISS-T037OPT-005). Two named tests appended: `pin ISS-T037OPT-005 (M2, exact match)` and `pin ISS-T037OPT-005 (M6, tag separation)`. They cover stored url/key entries against longer, shorter, embedded and prefixed identities, `key:X` vs URL identity X, `url:X` vs sessionKey/id X, each with exact-match controls (the same identity IS vetoed), through both `applyJoinRules` and `evaluateJoinRules`.
+   Mutants re-run on `join-rules-optout.ts` (`optedOutMeetingMatch`), byte backup per mutation, 150 s timeout, restore after each, `git hash-object` == `git rev-parse HEAD:` blob (true both times):
+   - M2 prefix match (`startsWith` either way): KILLED by the M2 pin (pass 21, fail 1).
+   - M6 `key:`/`url:` interchangeable (compare after the tag): KILLED by the M6 pin (pass 21, fail 1).
+   The other 13 mutants were not re-run: no production code they mutate changed (join-rules-optout.ts untouched; only tests were moved/added there).
+3. PRODUCTION ADAPTER (ISS-T037OPT-004, W7 gate a). `scripts/webinar/join-rules-host.ts`: `recordOptOut: (t, id) => recordTenantOptOut(stateDir, t, id)` became `(t, id, meeting) => recordTenantOptOut(stateDir, t, id, {}, meeting)`. deps.ts types and the router already carried the hint; validation stays in the store/normaliser. New test in `scripts/webinar/join-rules-host.test.ts` ("ISS-T037OPT-004 end to end"): real `createServer` + real router + real `createJoinRulesDeps` + real store in a temp dir. A POST with `meetingUrl` (regional host, pwd query) stores `url:zoom:123456789`; a later selection with only the sibling g1 is vetoed `opted-out`; a `sessionKey` hint stores `key:gmail:g1`; tenant-b unaffected; an id-only POST stores no identity and the sibling still joins (0/1, open by design). Reverting the adapter line makes the test fail (1/5, run), restored afterwards (cmp equal).
+
+## Fix cycle 1: what stays open
+W7 gate (b) (no client sends hints; ISS-T037OPT-002) and gate (d) (no un-opt operation; ISS-T037OPT-001, ISS-T037OPT-003). ISS-T037W1-001 remains OPEN until a client sends hints; the recorded id-only state still reproduces. No schedule-tick wiring, no web, no contracts/verdicts/enforcement/ledger-status edits.
+
+## Fix cycle 1: D-015
+- `ISS-T037OPT-004: 5/5` (adapter end to end; 1/5 with the adapter line reverted)
+- `ISS-T037OPT-005: 2/2 mutants killed`
+- `ISS-T037W1-001: 5/5 hinted, 0/1 id-only (open by design)`
+
+## Fix cycle 1: Evidence (node 24 prepended; from the worktree)
+- Test counts for this unit: before 20 (identity 10 + meeting 10) + host 9 = 29; after 22 (identity file: 10 + 10 folded + 2 pins) + host 10 = 32. No test or assertion removed.
+- `cd packages/meeting-bot && node --test --import tsx src/calendar/{auto-join,join-rules-optout-identity,join-rules-select,join-rules-store-lock,join-rules-store,join-rules,schedule-tick}.test.ts src/send-now-command.test.ts src/send-now.test.ts` -> tests 164, pass 164, fail 0 (cycle 0: 162 with 20 in the two files; now 22 in one).
+- `cd apps/api && node --test --import tsx src/join-rules/*.test.ts` -> 48/48.
+- `node --test --import tsx scripts/webinar/join-rules-host.test.ts` -> 10/10, printing `ISS-T037OPT-004: 5/5; ISS-T037W1-001: 5/5 hinted, 0/1 id-only (open by design)`. `scripts/qa/join-rules-edit-api.test.ts` 4/4.
+- `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` in packages/meeting-bot: exit 0; in apps/api: exit 0.
+- `node scripts/lint-dirsize.mjs` -> `lint-dirsize: OK (112 dir(s) within budget)` (lane tree). `node scripts/lint-loc.mjs` -> only the two pre-existing violations (speakers-llm.ts:313, sb_join.py:1142). Touched files non-blank: identity test 381, host test 279, host 156.
+- Not verified: lint-dirsize on the actual merged tree (computed arithmetically: 29 + 1 = 30).
