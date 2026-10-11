@@ -1,8 +1,8 @@
 /**
- * T-057 System status / setup check. Built only on the existing `GET /health` endpoint (no API
- * change). Everything from the API is rendered as React text. There are no URLs in this payload,
+ * T-057 System status / setup check. Counts come from the authenticated, tenant-scoped
+ * `GET /system-status` (ISS-STATUSSCOPE-001); the public `/health` counts are never used or shown. Everything from the API is rendered as React text. There are no URLs in this payload,
  * so no href is built. Long collection names are truncated in CSS, never sliced.
- * States: no key (no request), loading, error (401 / 403 / other, with a manual Retry), empty (db
+ * States: no key (no request), loading, "counts unavailable" error (401 / 403 / 503 / other, with a manual Retry), empty (db
  * ok but no collections reported), loaded. A failed load is never shown as the empty state.
  */
 import { useEffect, useState } from "react";
@@ -14,13 +14,14 @@ interface Loaded {
   key: string;
   generation: number;
   data: SystemStatus | null;
-  error: { kind: "unauthorised" | "forbidden" | "failed"; message: string } | null;
+  error: { kind: "unauthorised" | "forbidden" | "unavailable" | "failed"; message: string } | null;
 }
 
 function toError(error: unknown): NonNullable<Loaded["error"]> {
-  if (error instanceof ApiError && error.status === 401) return { kind: "unauthorised", message: "Your API key was not accepted. Sign in again to view system status." };
-  if (error instanceof ApiError && error.status === 403) return { kind: "forbidden", message: "This API key lacks the scope needed to read system status." };
-  return { kind: "failed", message: "Unable to load system status. The service may be down or unreachable." };
+  if (error instanceof ApiError && error.status === 401) return { kind: "unauthorised", message: "Your API key was not accepted. Sign in again to view system status. Counts unavailable." };
+  if (error instanceof ApiError && error.status === 403) return { kind: "forbidden", message: "Counts unavailable: this API key is not permitted to read system status." };
+  if (error instanceof ApiError && error.status === 503) return { kind: "unavailable", message: "Counts unavailable: the system status reader is not available right now." };
+  return { kind: "failed", message: "Counts unavailable: unable to load system status. The service may be down or unreachable." };
 }
 
 const truncate: React.CSSProperties = { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%" };
@@ -48,7 +49,7 @@ export function SystemStatusPage(): React.ReactElement {
     <>
       <div className="page-header">
         <h1>System status</h1>
-        <p>Setup check from the service health probe. Counts are aggregate document totals for the whole service, not scoped to your tenant.</p>
+        <p>Setup check for your tenant. Counts are document totals for your own tenant only.</p>
       </div>
       {!apiKey && <div className="card empty-note">Sign in with an API key to view system status.</div>}
       {apiKey && !current && <div className="card empty-note" role="status">Loading system status&hellip;</div>}
@@ -66,8 +67,8 @@ export function SystemStatusPage(): React.ReactElement {
             <h2 id="status-checks">Checks</h2>
             <ul>
               <li>Database: {data.db === "ok" ? "reachable" : "NOT reachable"}</li>
-              <li>Watchers silent: {data.watchSilent === null ? "not reported" : data.watchSilent}</li>
-              <li>Watchers unreadable: {data.watchUnreadable === null ? "not reported" : data.watchUnreadable}</li>
+              <li>Watchers silent: unavailable (no tenant-scoped source)</li>
+              <li>Watchers unreadable: unavailable (no tenant-scoped source)</li>
               <li>Collections with no documents: {emptyNames.length === 0 ? "none" : emptyNames.length}</li>
             </ul>
             <button type="button" onClick={() => setGeneration((value) => value + 1)}>Refresh</button>

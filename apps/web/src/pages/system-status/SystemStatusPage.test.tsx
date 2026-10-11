@@ -8,7 +8,8 @@ import { SystemStatusPage } from "./SystemStatusPage.js";
 
 const fetchMock = vi.fn();
 const response = (body: unknown, status = 200) => ({ ok: status < 400, status, json: async () => body });
-const healthy = { db: "ok", collections: { sessions: 3, claims: 0 }, watchSilent: 0, watchUnreadable: 0 };
+const healthy = { db: "ok", collections: { sessions: 3, claims: 0 } };
+const ALL_TENANT = { db: "ok", collections: { sessions: 987654, claims: 123456 }, watchSilent: 7, watchUnreadable: 5 };
 
 function Controls() {
   const { setApiKey } = useAuth();
@@ -35,7 +36,7 @@ describe("System status page: states", () => {
     fetchMock.mockResolvedValue(response({ db: "ok", collections: {} }));
     renderPage();
     await screen.findByText("The service reported no collections.");
-    expect(screen.getByText("Watchers silent: not reported")).toBeInTheDocument();
+    expect(screen.getByText(/Watchers silent: unavailable/)).toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
@@ -54,10 +55,11 @@ describe("System status page: states", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  test("403 names the missing scope and is not an empty state", async () => {
+  test("403 is a counts-unavailable state and not an empty state", async () => {
     fetchMock.mockResolvedValueOnce(response({ message: "x" }, 403));
     renderPage();
-    await screen.findByText(/lacks the scope/);
+    await screen.findByText(/Counts unavailable: this API key is not permitted/);
+    expect(screen.queryByRole("table")).toBeNull();
     expect(screen.queryByText("The service reported no collections.")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
   });
@@ -65,7 +67,7 @@ describe("System status page: states", () => {
   test("5xx shows an error not an empty state; Retry re-fetches exactly once per click, no auto-retry", async () => {
     fetchMock.mockResolvedValue(response({ db: "error" }, 503));
     renderPage();
-    await screen.findByText(/Unable to load system status/);
+    await screen.findByText(/Counts unavailable/);
     await new Promise((r) => setTimeout(r, 60));
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(screen.queryByText("The service reported no collections.")).not.toBeInTheDocument();
@@ -75,10 +77,19 @@ describe("System status page: states", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  test("network failure is an error state", async () => {
+  test("network failure is a counts-unavailable error state", async () => {
     fetchMock.mockRejectedValue(new TypeError("offline"));
     renderPage();
-    await screen.findByRole("alert");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Counts unavailable");
+    expect(screen.queryByRole("table")).toBeNull();
+  });
+
+  test("503 (no reader wired / db error) is a counts-unavailable state", async () => {
+    fetchMock.mockResolvedValueOnce(response({ db: "error", collections: {} }, 503));
+    renderPage();
+    expect(await screen.findByRole("alert")).toHaveTextContent("Counts unavailable: the system status reader is not available");
+    expect(screen.queryByRole("table")).toBeNull();
+    expect(screen.queryByText("The service reported no collections.")).toBeNull();
   });
 });
 
@@ -90,12 +101,12 @@ describe("System status page: requests and auth", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  test("request is a GET to /health carrying the bearer key, with no key or tenant in the URL", async () => {
+  test("request is a GET to /system-status carrying the bearer key, with no key or tenant in the URL", async () => {
     fetchMock.mockResolvedValue(response(healthy));
     renderPage();
     await screen.findByRole("heading", { name: "Collections" });
     const [url, init] = fetchMock.mock.calls[0]!;
-    expect(String(url)).toMatch(/\/health$/);
+    expect(String(url)).toMatch(/\/system-status$/);
     expect(init.method).toBe("GET");
     expect(init.headers.authorization).toBe("Bearer k1");
     expect(String(url)).not.toMatch(/k1|tenant/i);
@@ -108,6 +119,55 @@ describe("System status page: requests and auth", () => {
     fireEvent.click(screen.getByText("Switch key"));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(fetchMock.mock.calls[1]![1].headers.authorization).toBe("Bearer new-key");
+  });
+});
+
+describe("System status page: tenant scope (ISS-T057SCREEN-001 / ISS-STATUSSCOPE-001)", () => {
+  // URL-routing mock: /health answers with LARGE all-tenant counts, /system-status per the case.
+  function route(systemStatus: () => unknown) {
+    fetchMock.mockImplementation(async (url: string) =>
+      String(url).endsWith("/health") ? response(ALL_TENANT) : (systemStatus() as ReturnType<typeof response>));
+  }
+  const requested = () => fetchMock.mock.calls.map(([u]) => String(u));
+
+  test("counts come from /system-status; /health is never requested and its all-tenant numbers never render", async () => {
+    route(() => response(healthy));
+    const { container } = renderPage();
+    await screen.findByRole("heading", { name: "Collections" });
+    expect(requested().every((u) => u.endsWith("/system-status"))).toBe(true);
+    expect(requested().some((u) => u.includes("/health"))).toBe(false);
+    expect(container.textContent).toContain("3 documents in total");
+    for (const leaked of ["987654", "123456"]) expect(container.textContent).not.toContain(leaked);
+  });
+
+  test("watchSilent/watchUnreadable are shown as unavailable, even if /system-status ever carried them", async () => {
+    route(() => response({ ...healthy, watchSilent: 42, watchUnreadable: 43 }));
+    const { container } = renderPage();
+    await screen.findByRole("heading", { name: "Collections" });
+    expect(screen.getByText("Watchers silent: unavailable (no tenant-scoped source)")).toBeInTheDocument();
+    expect(screen.getByText("Watchers unreadable: unavailable (no tenant-scoped source)")).toBeInTheDocument();
+    expect(container.textContent).not.toMatch(/42|43/);
+  });
+
+  test.each([[401], [403], [503], [500]])("status %i: counts unavailable, no table, /health counts never shown, /health never fetched", async (status) => {
+    route(() => response({ db: "ok", collections: {} }, status));
+    const { container } = renderPage();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    await new Promise((r) => setTimeout(r, 30));
+    expect(container.querySelector("table")).toBeNull();
+    for (const leaked of ["987654", "123456"]) expect(container.textContent).not.toContain(leaked);
+    expect(requested().some((u) => u.includes("/health"))).toBe(false);
+    if (status !== 401) expect(screen.getByRole("alert")).toHaveTextContent("Counts unavailable");
+    else expect(screen.getByText("Sign in with an API key to view system status.")).toBeInTheDocument();
+  });
+
+  test("network failure on /system-status never falls back to /health", async () => {
+    route(() => { throw new TypeError("offline"); });
+    const { container } = renderPage();
+    expect(await screen.findByRole("alert")).toHaveTextContent("Counts unavailable");
+    expect(container.querySelector("table")).toBeNull();
+    expect(container.textContent).not.toContain("987654");
+    expect(requested().some((u) => u.includes("/health"))).toBe(false);
   });
 });
 
@@ -139,8 +199,6 @@ describe("System status page: hostile payloads", () => {
     ["count is string", { db: "ok", collections: { a: "5" } }],
     ["count negative", { db: "ok", collections: { a: -1 } }],
     ["count float", { db: "ok", collections: { a: 1.5 } }],
-    ["watchSilent null", { db: "ok", collections: {}, watchSilent: null }],
-    ["watchUnreadable string", { db: "ok", collections: {}, watchUnreadable: "<b>1</b>" }],
   ])("malformed response (%s) is an error state, never rendered as data", async (_name, body) => {
     fetchMock.mockResolvedValue(response(body));
     const { container } = renderPage();

@@ -1,8 +1,10 @@
 /**
- * T-057 System status client. Reads the EXISTING `GET /health` (apps/api/src/routes/health.ts):
- * db ping, aggregate per-collection document counts, and (when wired) watcher-silence counts.
- * The response is validated strictly; any other shape is refused as an invalid response rather
- * than rendered. The API key is only ever passed through to `apiFetch`, never stored here.
+ * T-057 System status client (ISS-STATUSSCOPE-001). Reads the authenticated, tenant-scoped
+ * `GET /system-status` ({ db, collections } counted for the caller's own tenant). It deliberately
+ * does NOT call the public `/health` probe, whose counts are service-wide (all tenants), and there
+ * is no fallback to it. `/system-status` has no watchSilent/watchUnreadable and there is no
+ * tenant-safe source for them, so they are always null here (shown as unavailable). Any other
+ * response shape is refused as invalid. The API key is only passed through to `apiFetch`.
  */
 import { apiFetch, ApiError } from "../../api/client.js";
 
@@ -22,12 +24,9 @@ function count(value: unknown): value is number {
 }
 
 export async function getSystemStatus(apiKey: string | null): Promise<SystemStatus> {
-  const raw = await apiFetch<unknown>("/health", apiKey);
+  const raw = await apiFetch<unknown>("/system-status", apiKey);
   const invalid = () => new ApiError(503, "Invalid system status response.");
   if (!isObject(raw) || (raw.db !== "ok" && raw.db !== "error") || !isObject(raw.collections)) throw invalid();
-  for (const optional of ["watchSilent", "watchUnreadable"]) {
-    if (Object.hasOwn(raw, optional) && !count(raw[optional])) throw invalid();
-  }
   const collections: SystemStatus["collections"] = [];
   for (const [name, value] of Object.entries(raw.collections)) {
     if (!count(value)) throw invalid();
@@ -37,7 +36,7 @@ export async function getSystemStatus(apiKey: string | null): Promise<SystemStat
   return {
     db: raw.db,
     collections,
-    watchSilent: Object.hasOwn(raw, "watchSilent") ? (raw.watchSilent as number) : null,
-    watchUnreadable: Object.hasOwn(raw, "watchUnreadable") ? (raw.watchUnreadable as number) : null,
+    watchSilent: null,
+    watchUnreadable: null,
   };
 }
