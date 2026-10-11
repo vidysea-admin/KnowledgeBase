@@ -2,10 +2,10 @@
  * packages/core/src/job-queue/queue-store.ts — T-050 slice 4a. File store for the queue: one JSON file, strict decode, atomic write.
  * Write = temp file in the SAME directory + fsync + rename (pattern of meeting-bot join-rules-store `writeAtomic`/`renameReplacing`,
  * re-implemented here: core must not import from meeting-bot). Immediately before the rename the file is re-read and must still
- * equal what this operation read ("conflict" otherwise): that narrows, but does not close, the window against another process.
+ * equal what this operation read ("conflict" otherwise) and the caller's lock (queue-lock.ts, held across load..save) must still be ours: a second writer on this machine is serialised by that lock (ISS-JOBQUEUE-002).
  * A read never writes, renames or deletes. A file that fails strict decode is the typed error "corrupt" and is left untouched.
  */
-import { closeSync, fsyncSync, mkdirSync, openSync, readFileSync, renameSync, unlinkSync, writeSync } from "node:fs";
+import { closeSync, fsyncSync, mkdirSync, openSync, readFileSync, renameSync, statSync, unlinkSync, writeSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import type { QueueError, QueueJob, QueueResult } from "./queue-types.js";
@@ -17,6 +17,8 @@ export interface QueueFs {
   create(path: string, data: string): void;
   rename(from: string, to: string): void;
   unlink(path: string): void;
+  /** Optional: last-modified wall time (ms) of a file, null if missing. Used only to age a lock file whose content is unreadable. */
+  mtimeMs?(path: string): number | null;
 }
 export const QUEUE_FILE = "job-queue.json";
 export interface QueueFileState { version: 1; nextSeq: number; jobs: QueueJob[] }
@@ -33,6 +35,7 @@ export const realQueueFs: QueueFs = {
     }
   },
   unlink: p => { unlinkSync(p); },
+  mtimeMs: p => { try { return statSync(p).mtimeMs; } catch (e: any) { if (e?.code === "ENOENT") return null; throw e; } },
 };
 
 const isInt = (v: unknown): v is number => Number.isSafeInteger(v) && (v as number) >= 0;
@@ -70,12 +73,13 @@ export function loadQueue(fs: QueueFs, dir: string): QueueResult<QueueLoaded> {
 }
 
 /** Atomic replace; `loaded.raw` is the content this operation read. Never leaves a half-written queue file. */
-export function saveQueue(fs: QueueFs, dir: string, loaded: QueueLoaded, next: QueueFileState): QueueResult<true> {
+export function saveQueue(fs: QueueFs, dir: string, loaded: QueueLoaded, next: QueueFileState, stillHeld: () => boolean = () => true): QueueResult<true> {
   const file = join(dir, QUEUE_FILE), tmp = join(dir, `${QUEUE_FILE}.${randomUUID()}.tmp`);
   let created = false;
   try {
     fs.mkdirp(dir);
     fs.create(tmp, JSON.stringify(next)); created = true;
+    if (!stillHeld()) return fail("conflict", "queue lock was lost before the rename");
     if (fs.read(file) !== loaded.raw) return fail("conflict", "queue file changed since it was read");
     fs.rename(tmp, file); created = false;
     return { ok: true, value: true };
