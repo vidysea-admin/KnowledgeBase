@@ -9,6 +9,7 @@ import {
   type AutoRecordCandidateInput, type AutoRecordItem,
 } from "./auto-join.js";
 import { describeSkip } from "./skip-describe.js";
+import { enforceJoinRules, type JoinRulesEnforceIo } from "./join-rules-enforce.js";
 import { readScheduledKeys, recordScheduled, writeScheduledJob, validateWebinarCalendarAcquisition, type WebinarCalendarAcquisition } from "./schedule-state.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
 
@@ -46,6 +47,11 @@ export interface ScheduleTickDeps {
   scheduler: TaskScheduler;
   log: (msg: string) => void;
   everyWebinar?: boolean;
+  /** RAW value of LKB_JOIN_RULES_ENFORCE (parsed only in join-rules-enforce.ts; absent/unknown = `off` = today's behaviour). */
+  joinRulesEnforce?: unknown;
+  /** This tick's own tenant (LKB_TENANT_ID); join rules are loaded for this tenant only. */
+  joinRulesTenantId?: string;
+  joinRulesIo?: JoinRulesEnforceIo;
 }
 
 function toCandidateInput(row: MeetingCandidateApiRow): AutoRecordCandidateInput {
@@ -201,6 +207,8 @@ export function buildRealScheduleTickDeps(): ScheduleTickDeps {
     loadCalendarEvents: createHttpCalendarLoader(apiUrl, process.env.LKB_API_KEY),
     loadCandidates: createHttpCandidateLoader(apiUrl, process.env.LKB_API_KEY, log, true),
     everyWebinar: true,
+    joinRulesEnforce: process.env.LKB_JOIN_RULES_ENFORCE,
+    joinRulesTenantId: process.env.LKB_TENANT_ID,
     now: () => new Date().toISOString(),
     stateDir: DEFAULT_STATE_DIR,
     scheduler: createWindowsTaskScheduler(),
@@ -228,9 +236,13 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
   const trustedSenders = loadTrustedSenderConfig();
   const alreadyScheduled = readScheduledKeys(deps.stateDir);
 
-  const result = selectAutoRecordItems({
+  const selected = selectAutoRecordItems({
     calendarEvents, candidates, now, leadMinutes: DEFAULT_LEAD_MINUTES, trustedSenders, alreadyScheduled,
     everyWebinar: deps.everyWebinar,
+  });
+  // Veto-only join rules (T-037); `off` (the default) returns `selected` itself without opening the store.
+  const result = await enforceJoinRules(selected, {
+    mode: deps.joinRulesEnforce, tenantId: deps.joinRulesTenantId, stateDir: deps.stateDir, log: deps.log, io: deps.joinRulesIo,
   });
 
   deps.log(`schedule-tick: ${result.toSchedule.length} to schedule, ${result.skipped.length} skipped ` +
