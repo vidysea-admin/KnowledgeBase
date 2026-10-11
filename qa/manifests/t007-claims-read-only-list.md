@@ -1,7 +1,7 @@
 # Manifest — t007-claims-read-only-list
 **Task:** T-007 (WhatsApp -> claims ingestion review), READ-ONLY slice only. Backlog tier 3 (next unblocked roadmap task; T-007 dep T-020 is done; Q4 consent is closed by D-002 -> D-008).
 **Lane:** lane/claims (ledger shard qa/issues.claims.jsonl; no issue filed this cycle).
-**Status:** ready-for-check
+**Status:** checked-PASS (Checked: qa/verdicts/t007-claims-read-only-list.md, cycle 0, 2a7fa08; source scope; neutral to ISS-250)
 **Fix cycle:** 0
 
 ## Scope
