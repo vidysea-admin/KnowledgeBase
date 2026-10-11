@@ -1,6 +1,6 @@
 # t037-tick-verifies-key-tenant
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t037-tick-verifies-key-tenant.md, cycle 0, 176f68d; enforcement remains DISABLED; stale test retitled in c9a2ef5)
 Fix cycle: 0
 Priority tier: 2 (closes ISS-T037WIRE-001 / ISS-WIREPRE-002, HIGH at enablement, security class: decides which meetings the bot records). FULL ceremony, never round-capped.
 Lane: `lane/tenantsig` (worktree `KnowledgeBase-lanes/tenantsig`, from 3055de9); new issues in `qa/issues.tenantsig.jsonl` (ISS-TENANTSIG-NNN).
