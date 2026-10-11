@@ -1,17 +1,16 @@
 /**
  * packages/ingest/src/sources/zoom-recording.ts — T-045 (Zoom half), cloud-recording URL recognition ONLY.
- * Pure: no fetch, no download, no HTML parsing, no process. Accepted forms:
- *   https://zoom.us/rec/share/<token>   grounded in apps/api/src/gws-gmail.ts:63 (`zoom\.us\/rec`) and
- *                                       qa/contracts/gmail-meeting-candidates-approval.md:128 (`zoom.us/rec/share/...`)
- *   https://zoom.us/rec/play/<token>    path kind UNVERIFIED against the live site (only the `/rec` prefix is grounded)
- *   https://<one-label>.zoom.us/rec/... host subdomains: grounded in packages/meeting-bot/src/platform.ts:29
- *                                       (`.zoom.us`); the canonical URL is rebuilt on bare `zoom.us` (UNVERIFIED that the
- *                                       bare host serves every subdomain's recording)
- * PASSCODES / TOKENS: the query allow-list is EMPTY. `pwd`, `startTime`, `componentName`, any query and the
- * fragment are dropped, never carried into the canonical URL or the id. A recording that REQUIRES a passcode
- * therefore cannot be played from the canonical URL alone; the passcode must travel through a separate
- * secret-handling path that does not exist yet (follow-up). The path token itself is a bearer capability:
- * never log it beyond the id field.
+ * Pure: no fetch, no download, no HTML parsing, no process. The ONLY accepted form is the one the repo evidences:
+ *   https://zoom.us/rec/share/<token>   apps/api/src/gws-gmail.ts:63 (`zoom\.us\/rec`) and
+ *                                       qa/contracts/gmail-meeting-candidates-approval.md:128 (a real `zoom.us/rec/share/...`
+ *                                       link extracted live from Gmail: bare host `zoom.us`)
+ * Every other Zoom-recording-looking shape (`/rec/play/`, any `<label>.zoom.us` host, vanity hosts) is REFUSED with
+ * `unverified-shape` ("we do not handle this yet"), distinct from the generic refusals ("this is not ours"). The host is
+ * never rewritten: the canonical URL carries the validated (lower-cased) host, which is always `zoom.us`. One accepted
+ * host, so the id is the token alone.
+ * PASSCODES / TOKENS: the query allow-list is EMPTY. `pwd`, `startTime`, any query and the fragment are dropped, never
+ * carried into the canonical URL or the id. A passcode-protected recording needs a separate secret path (does not exist).
+ * The share token is a BEARER SECRET present in BOTH recordingId and canonicalUrl: never log or display either.
  */
 
 export type ZoomRecordingRefusal =
@@ -25,9 +24,10 @@ export type ZoomRecordingRefusal =
   | "unparseable"
   | "host-not-allowed"
   | "path-not-supported"
-  | "bad-recording-id";
+  | "bad-recording-id"
+  | "unverified-shape";
 
-export type ZoomRecordingKind = "share" | "play";
+export type ZoomRecordingKind = "share";
 
 export type ZoomRecordingParse =
   | { ok: true; platform: "zoom-recording"; kind: ZoomRecordingKind; recordingId: string; canonicalUrl: string }
@@ -85,10 +85,11 @@ export function parseZoomRecordingUrl(input: unknown): ZoomRecordingParse {
   if (rawPath.includes("%")) return refuse("bad-recording-id");
   const pm = /^\/rec\/(share|play)\/([^/]+)\/?$/.exec(rawPath);
   if (!pm) return refuse("path-not-supported");
-  const kind = pm[1] as ZoomRecordingKind;
   const recordingId = pm[2]!;
   if (!validId(recordingId)) return refuse("bad-recording-id");
-  return { ok: true, platform: "zoom-recording", kind, recordingId, canonicalUrl: canonicalZoomRecordingUrl(kind, recordingId) };
+  // Only `share` on the bare host is evidenced; play/subdomain/vanity shapes need an owner-supplied sample.
+  if (pm[1] !== "share" || url.hostname !== ZOOM_HOST) return refuse("unverified-shape");
+  return { ok: true, platform: "zoom-recording", kind: "share", recordingId, canonicalUrl: canonicalZoomRecordingUrl("share", recordingId) };
 }
 
 /** Returns the validated recording id, or undefined. Never throws. */
@@ -97,9 +98,9 @@ export function extractZoomRecordingId(input: unknown): string | undefined {
   return r.ok ? r.recordingId : undefined;
 }
 
-/** The only URL ever passed onward: rebuilt from a validated kind and id; no query, no fragment. */
+/** The only URL ever passed onward: the single accepted host (never rewritten), a validated id; no query, no fragment. */
 export function canonicalZoomRecordingUrl(kind: ZoomRecordingKind, recordingId: string): string {
-  if ((kind !== "share" && kind !== "play") || !validId(recordingId)) {
+  if (kind !== "share" || !validId(recordingId)) {
     throw new Error("zoom-recording adapter [bad-recording-id]: not a valid recording kind or id");
   }
   return `https://${ZOOM_HOST}/rec/${kind}/${recordingId}`;

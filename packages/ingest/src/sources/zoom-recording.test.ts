@@ -18,12 +18,10 @@ import { parseOnairUrl } from "./onair.js";
 
 const H = ZOOM_HOST;
 const TOK = "aB3dE5gH7jK9_mN-pQ.sT";
-const ACCEPT: Array<[string, "share" | "play", string]> = [
+const ACCEPT: Array<[string, "share", string]> = [
   [`https://${H}/rec/share/${TOK}`, "share", TOK],
   [`https://${H}/rec/share/${TOK}/`, "share", TOK],
-  [`https://${H}/rec/play/${TOK}`, "play", TOK],
-  [`https://us02web.${H}/rec/share/${TOK}`, "share", TOK],
-  [`https://vidysea.${H}/rec/share/${TOK}?pwd=secret123`, "share", TOK],
+  [`https://${H}/rec/share/${TOK}?pwd=secret123`, "share", TOK],
   [`https://${H}/rec/share/${TOK}?pwd=secret&startTime=1700000000000#frag`, "share", TOK],
   [`HTTPS://ZOOM.US/rec/share/${TOK}`, "share", TOK],
   [`https://${H}/rec/share/${TOK}?utm_a=1&token=zz`, "share", TOK],
@@ -45,6 +43,80 @@ test("accepts supported forms: kind, id (case kept) and canonical URL, query/fra
     }
     assert.equal(extractZoomRecordingId(u), id);
     assert.equal(zoomRecordingAdapter.detect(u), true);
+  }
+});
+
+const UNVERIFIED = [
+  `https://acme.${H}/rec/share/AbCdEfGh12345678`, // ISS-T045NEXT-001 recorded reproduction 1 (verbatim)
+  `https://acme.${H}/rec/play/AbCdEfGh12345678`, // ISS-T045NEXT-001 recorded reproduction 2 (verbatim)
+];
+
+test("ISS-T045NEXT-001 recorded reproductions are refused unverified-shape (n/n)", () => {
+  let refused = 0;
+  for (const u of UNVERIFIED) {
+    assert.deepEqual(parseZoomRecordingUrl(u), { ok: false, reason: "unverified-shape" }, u);
+    refused++;
+  }
+  assert.equal(refused, UNVERIFIED.length);
+  console.log(`ISS-T045NEXT-001: ${refused}/${UNVERIFIED.length} refused`);
+});
+
+test("unverified shapes (play kind, any subdomain, vanity host) are refused with the typed reason, not the generic ones", () => {
+  const T8 = "AbCdEfGh12345678";
+  for (const u of [
+    `https://${H}/rec/play/${T8}`,
+    `https://${H}/rec/play/${T8}/`,
+    `https://us02web.${H}/rec/share/${T8}`,
+    `https://US06WEB.${H.toUpperCase()}/rec/share/${T8}`,
+    `https://vidysea.${H}/rec/share/${T8}?pwd=zz`,
+    `https://a-b.${H}/rec/play/${T8}`,
+  ]) {
+    assert.deepEqual(parseZoomRecordingUrl(u), { ok: false, reason: "unverified-shape" }, u);
+    assert.equal(extractZoomRecordingId(u), undefined, u);
+    assert.equal(zoomRecordingAdapter.detect(u), false, u);
+  }
+  // distinct from "not ours": an unrelated host and an unknown kind keep their own reasons
+  assert.equal(parseZoomRecordingUrl(`https://zoom.com/rec/share/${T8}`).ok, false);
+  assert.deepEqual(parseZoomRecordingUrl(`https://zoom.com/rec/share/${T8}`), { ok: false, reason: "host-not-allowed" });
+  assert.deepEqual(parseZoomRecordingUrl(`https://acme.${H}/rec/download/${T8}`), { ok: false, reason: "path-not-supported" });
+  assert.deepEqual(parseZoomRecordingUrl(`https://acme.${H}/j/12345678901`), { ok: false, reason: "path-not-supported" });
+  assert.deepEqual(parseZoomRecordingUrl(`https://a.b.${H}/rec/share/${T8}`), { ok: false, reason: "host-not-allowed" });
+  assert.deepEqual(parseZoomRecordingUrl(`https://acme.${H}/rec/share/short`), { ok: false, reason: "bad-recording-id" });
+});
+
+test("host is never rewritten: hosts differing only by case normalise to the same canonical host and id", () => {
+  const a = parseZoomRecordingUrl(`https://${H}/rec/share/${TOK}`);
+  const b = parseZoomRecordingUrl(`HTTPS://ZOOM.US/rec/share/${TOK}`);
+  const c = parseZoomRecordingUrl(`https://Zoom.Us/rec/share/${TOK}`);
+  for (const r of [a, b, c]) {
+    assert.ok(r.ok);
+    if (r.ok) {
+      assert.equal(new URL(r.canonicalUrl).hostname, "zoom.us");
+      assert.equal(r.canonicalUrl, `https://zoom.us/rec/share/${TOK}`);
+      assert.equal(r.recordingId, TOK); // one accepted host, so the id is the token alone
+    }
+  }
+});
+
+test("harmless query/fragment is dropped: canonical has no search or hash and equals the bare form", () => {
+  for (const suffix of ["?x=1", "?", "#frag", "#", "?utm_source=a&b=c#d", "?a=%2F"]) {
+    const r = parseZoomRecordingUrl(`https://${H}/rec/share/${TOK}${suffix}`);
+    assert.ok(r.ok, suffix);
+    if (r.ok) {
+      assert.equal(r.canonicalUrl, `https://${H}/rec/share/${TOK}`, suffix);
+      const u = new URL(r.canonicalUrl);
+      assert.equal(u.search, "", suffix);
+      assert.equal(u.hash, "", suffix);
+    }
+  }
+});
+
+test("join paths /j/ /my/ /wc/ /s/ and zoomgov.com / zoom.com.cn are refused by name", () => {
+  for (const p of ["/j/12345678901", "/my/someroom", "/wc/12345678901/join", "/s/12345678901"]) {
+    assert.deepEqual(parseZoomRecordingUrl(`https://${H}${p}`), { ok: false, reason: "path-not-supported" }, p);
+  }
+  for (const h of ["zoomgov.com", "us02web.zoomgov.com", "zoom.com.cn"]) {
+    assert.deepEqual(parseZoomRecordingUrl(`https://${h}/rec/share/AbCdEfGh12345678`), { ok: false, reason: "host-not-allowed" }, h);
   }
 });
 
@@ -155,6 +227,7 @@ test("canonical URL is idempotent and refuses a bad kind or id", () => {
       assert.equal(b.canonicalUrl, a.canonicalUrl);
     }
   }
+  assert.throws(() => canonicalZoomRecordingUrl("play" as "share", TOK), /bad-recording-id/);
   for (const bad of ["", "-xxxxxxxx", "a/bbbbbbb", "a?bbbbbbb", "a bbbbbbb", "x", "x".repeat(257), 5 as unknown as string]) {
     assert.throws(() => canonicalZoomRecordingUrl("share", bad), /bad-recording-id/);
   }
@@ -191,7 +264,7 @@ test("property (seeded): any accepted input has allow-listed host, https, no str
   for (let i = 0; i < 4000; i++) {
     const input =
       pick(["https", "http", "HTTPS"]) + "://" +
-      pick([H, H.toUpperCase(), `x.${H}`, `us02web.${H}`, `x.y.${H}`, `${H}:1`, `u@${H}`, `evil${H}`]) +
+      pick([H, H, H.toUpperCase(), `x.${H}`, `us02web.${H}`, `x.y.${H}`, `${H}:1`, `u@${H}`, `evil${H}`]) +
       pick(["/rec/share/", "/rec/play/", "/rec/", "/x/"]) +
       pick(["aB3dE5gH7j", "aB3dE5gH7j", "tok", ""]) + rs(Math.floor(rand() * 8)) +
       pick(["", "?pwd=zz", "?token=zz&" + rs(4), "#f" + rs(3)]);
@@ -201,6 +274,7 @@ test("property (seeded): any accepted input has allow-listed host, https, no str
     const u = new URL(r.canonicalUrl);
     assert.equal(u.protocol, "https:");
     assert.equal(u.hostname, ZOOM_HOST);
+    assert.equal(u.hostname, /^https:\/\/([^/?#]*)/i.exec(input)![1]!.toLowerCase(), input); // host never rewritten
     assert.equal(u.username + u.password, "");
     assert.equal(u.port, "");
     for (const k of u.searchParams.keys()) assert.ok(ZOOM_RECORDING_QUERY_ALLOW.includes(k), k);

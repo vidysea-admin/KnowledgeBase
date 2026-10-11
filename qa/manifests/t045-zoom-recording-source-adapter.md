@@ -76,5 +76,41 @@ Each mutation removes every redundant guard for that class (host: one shared reg
 - Zoom: a real `rec/share` URL with a real token (charset/length), and one with `pwd`, to verify the token bounds, the `play` kind, and subdomain/bare-host behaviour.
 - All: the browser-bot "one successful run per source" runs and adapter registration.
 
+## Fix cycle 1
+
+### SENSITIVE: share tokens are bearer secrets (requirement on the future registration/wiring unit)
+For this platform BOTH `recordingId` AND `canonicalUrl` contain the share token, which is a bearer secret: anyone holding it can view the recording. Neither may be logged, shown in alerts or UI, or stored in places with wider access than the recording itself. The registration/wiring unit must enforce this (redact on log/display, restrict storage). Passcode (`pwd`) values are never kept by the adapter, and passcode-protected recordings need a separate secret path that does not exist yet.
+
+### What failed (ISS-T045NEXT-001, medium)
+Cycle 0 accepted `https://acme.zoom.us/rec/share/T` as ok and rewrote the canonical URL to bare `zoom.us` (possibly a dead link, host dropped from the id) and accepted the ungrounded `/rec/play/` kind.
+
+### Now accepted: exactly one shape
+`https://zoom.us/rec/share/<token>` (optional trailing `/`, scheme/host case-insensitive). Evidence for the host: `qa/contracts/gmail-meeting-candidates-approval.md:128` ("a real `zoom.us/rec/share/...` link", bare host `zoom.us`) and `apps/api/src/gws-gmail.ts:63` (`zoom\.us\/rec`). `packages/meeting-bot/src/platform.ts:29` (`.zoom.us` suffix) is evidence for JOIN-link hosts only, not for recording hosts, so subdomains are not grounded.
+- Refused with new reason `unverified-shape`: `/rec/play/<token>`, any `<label>.zoom.us` host (e.g. `acme.`, `us02web.`), vanity hosts, each with a valid token. A caller can now tell "not handled yet" from "not ours" (`host-not-allowed`, `path-not-supported`, ...). Refusal rather than `verified:false`: it cannot be misused.
+- Order of checks: scheme/credentials/port/host family, then path shape (`path-not-supported`), then token validity (`bad-recording-id`), then `unverified-shape`.
+- Canonical/id rule: the canonical URL carries the validated lower-cased host (always `zoom.us`, never rewritten; test asserts accepted canonical host equals input host lower-cased). One accepted host, so the id is the token alone (host qualification is not applicable; if a second host is ever accepted the id MUST become host-qualified).
+- Kept: https only; no query/fragment kept; exclusivity with youtube/onair; `/j/ /my/ /wc/ /s/` refused (`path-not-supported`); `zoomgov.com`, `us02web.zoomgov.com`, `zoom.com.cn` refused (`host-not-allowed`); never throws; bounded (400 chars).
+- Hostile table: every previous entry keeps its reason (all used the bare host). Changed behaviour only for formerly accepted inputs (`/rec/play/`, subdomains), now `unverified-shape`. The `ZoomRecordingKind` type is now `"share"` and `canonicalZoomRecordingUrl("play", ...)` throws.
+
+### D-015 measurement
+`ISS-T045NEXT-001: 2/2 refused unverified-shape` (the row's two recorded reproductions, `https://acme.zoom.us/rec/share/AbCdEfGh12345678` and `.../rec/play/AbCdEfGh12345678`, run verbatim in test "ISS-T045NEXT-001 recorded reproductions ..."). No recorded reproduction left open.
+
+### Mutations (harness untracked, lane-unique, inside this worktree, byte backup per mutation, restore in `finally`, 200 s SIGKILL timeout, deleted before commit; `git hash-object zoom-recording.ts` = `49e1d6c57e0e9aa0dba40bd118093029df73230c` before and after, equal to the committed blob checked after commit)
+| Mutation | Result | Named killers |
+|---|---|---|
+| unverified subdomain accepted | KILLED | "ISS-T045NEXT-001 recorded reproductions..."; "unverified shapes (play kind, any subdomain...)"; property |
+| `/rec/play` accepted | KILLED | "unverified shapes (play kind, any subdomain...)" |
+| host check removed (subdomain accepted, canonical on constant host) | KILLED | ISS-T045NEXT-001 test; unverified shapes test; property (host equals input host) |
+| canonical host rewritten to `www.zoom.us` | KILLED | "host is never rewritten..."; accepts supported forms; idempotence; property |
+| unverified reason collapsed into `path-not-supported` | KILLED | ISS-T045NEXT-001 test; "unverified shapes..." |
+| query kept in canonical | KILLED | "harmless query/fragment is dropped..." (new focused test); accepts supported forms; passcode test; property |
+Not applicable: "id not host-qualified when two hosts accepted" (one host accepted). `/j/` accepted is now covered by the focused test "join paths /j/ /my/ /wc/ /s/ and zoomgov.com / zoom.com.cn are refused by name".
+
+### Evidence (from `packages/ingest`, node = codex runtime)
+`node --test --import tsx src/sources/zoom-recording.test.ts` -> `ℹ tests 13 / pass 13 / fail 0` (includes `ISS-T045NEXT-001: 2/2 refused`); `youtube.test.ts` -> `tests 10 / pass 10 / fail 0`; `onair.test.ts` -> `tests 6 / pass 6 / fail 0`; `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` -> no output, `tsc-exit=0`. Budgets: source 107 non-blank lines (<= 300), test 295 (<= 400); no file added.
+
+### What the owner must supply to widen acceptance
+One real link per shape, with the real token: a `/rec/play/` link; a recording link on a regional/tenant subdomain (e.g. `us06web.zoom.us/rec/share/...`); any vanity-host link; and one passcode-bearing link (`?pwd=`). Until then these stay `unverified-shape`.
+
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
