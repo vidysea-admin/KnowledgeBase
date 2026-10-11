@@ -27,6 +27,14 @@ declare global {
 }
 
 const BEARER = /^Bearer\s+(.+)$/i;
+// eslint-disable-next-line no-control-regex
+const CONTROL_CHARS = /[\u0000-\u001f\u007f-\u009f\u2028\u2029]/;
+
+/** A tenant id a key may carry: a string, non-empty (schema/api_keys.schema.json: minLength 1), no leading or
+ * trailing whitespace, no control characters. No stricter pattern: real ids include "toc", "tenant-1", "tA". */
+export function isValidTenantId(v: unknown): v is string {
+  return typeof v === "string" && v.length > 0 && v === v.trim() && !CONTROL_CHARS.test(v);
+}
 
 export function requireAuth(store: ApiKeyStore): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -37,7 +45,9 @@ export function requireAuth(store: ApiKeyStore): RequestHandler {
       return;
     }
     const verified = await store.verify(match[1]!);
-    if (!verified) {
+    // A record with no usable tenant is refused with the SAME 401 as an unknown key (ISS-AUTHSCOPE-001): there
+    // is no tenant to scope to, and the body must not reveal that the key exists.
+    if (!verified || typeof verified !== "object" || !isValidTenantId(verified.tenantId)) {
       res.status(401).json({ error: "unauthorized", message: "invalid or revoked API key" });
       return;
     }

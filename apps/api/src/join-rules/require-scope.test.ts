@@ -8,6 +8,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { NextFunction, Request, Response } from "express";
 import { requireAuth, requireScope, type ApiKeyStore, type VerifiedKey } from "../auth.js";
+import { startTestServer } from "../testUtils.js";
+import { buildTestDeps, fakeKeyStore } from "../fixtures.js";
+import { spyStore } from "./test-store.js";
 
 interface Out { status: number | null; body: unknown; nextCalls: number }
 function harness(): { out: Out; res: Response; next: NextFunction } {
@@ -189,4 +192,80 @@ test("requireAuth: a well-formed record is passed through untouched (same object
   const o = await driveAuth(store(v), "Bearer k");
   assert.equal(o.req.auth, v);
   assert.equal((await drive("keys", o.req.auth)).nextCalls, 1);
+});
+
+// ---- auth-require-tenant-on-key (ISS-AUTHSCOPE-001): a key record without a valid tenant never authenticates ----
+const UNKNOWN_KEY_401 = { error: "unauthorized", message: "invalid or revoked API key" };
+// ISS-AUTHSCOPE-001 recorded reproductions, verbatim: tenantId missing, null, "" and 5 (scopes ["keys"] / ["calendar"])
+const RECORDED: Array<[string, Record<string, unknown>]> = [["missing", {}], ["null", { tenantId: null }], ["empty", { tenantId: "" }], ["number", { tenantId: 5 }]];
+const MORE: Array<[string, unknown]> = [
+  ["whitespace-only", "   "], ["object", { $ne: null }], ["array", ["t"]], ["boolean", true], ["trailing newline", "t\n"], ["leading space", " t"],
+  ["NUL", `t${NUL}`], ["tab inside", "a\tb"], ["undefined", undefined], ["NaN", NaN],
+];
+const FIXTURE_TENANTS = ["toc", "tenant-1", "tenant-a", "tenant-b", "fixture", "t", "t1", "tA", "tB", "synthetic-capture", "cli-tenant", "system"];
+
+test("requireAuth: a record whose tenantId is not a valid tenant id is refused with the unknown-key 401, next never called, nothing thrown", async () => {
+  for (const [label, t] of MORE.concat(RECORDED.map(([l, r]): [string, unknown] => [l, r.tenantId]))) {
+    const o = await driveAuth(store({ tenantId: t, scopes: ["keys", "calendar"] } as VerifiedKey), "Bearer secret-presented-key");
+    assert.equal(o.status, 401, label);
+    assert.equal(o.nextCalls, 0, label);
+    assert.equal(o.req.auth, undefined, label);
+    assert.deepEqual(o.body, UNKNOWN_KEY_401, `${label}: body identical to the unknown-key 401`);
+    assert.ok(!JSON.stringify(o.body).includes("secret-presented-key"), label);
+  }
+  for (const odd of [{ scopes: ["keys"] } as unknown as VerifiedKey, "x" as unknown as VerifiedKey, 7 as unknown as VerifiedKey]) {
+    const o = await driveAuth(store(odd), "Bearer k");
+    assert.equal(o.status, 401);
+    assert.deepEqual(o.body, UNKNOWN_KEY_401);
+  }
+});
+
+test("requireAuth: the refusal logs nothing (no presented key, no record contents)", async () => {
+  const logged: unknown[] = [];
+  const orig = { log: console.log, warn: console.warn, error: console.error };
+  console.log = console.warn = console.error = (...a: unknown[]) => { logged.push(a); };
+  try { await driveAuth(store({ tenantId: "", scopes: ["keys"] }), "Bearer secret-presented-key"); } finally { Object.assign(console, orig); }
+  assert.deepEqual(logged, []);
+});
+
+test("requireAuth: every tenant id found in fixtures, seeds and tests still authenticates", async () => {
+  for (const t of FIXTURE_TENANTS) {
+    const v = { tenantId: t, scopes: ["ask"] };
+    const o = await driveAuth(store(v), "Bearer k");
+    assert.equal(o.nextCalls, 1, t);
+    assert.deepEqual(o.req.auth, v);
+  }
+});
+
+test("ISS-AUTHSCOPE-001 over HTTP, recorded reproductions verbatim: GET /keys and GET /calendar/join-rules are 401 and no handler runs", async () => {
+  let handlerCalls = 0;
+  const keys = { listKeys: async () => { handlerCalls++; return []; }, createKey: async () => { handlerCalls++; return { id: "i", rawKey: "r" }; }, revokeKey: async () => { handlerCalls++; return true; } };
+  const rules = spyStore();
+  let refused = 0;
+  for (const [label, rec] of RECORDED) {
+    const server = await startTestServer(buildTestDeps({ keyStore: fakeKeyStore({ k: { scopes: ["keys", "calendar"], ...rec } as VerifiedKey, unknown: undefined }), keys, joinRules: rules.deps }));
+    try {
+      const probes = [fetch(`${server.baseUrl}/keys`, { headers: { authorization: "Bearer k" } }), fetch(`${server.baseUrl}/calendar/join-rules`, { headers: { authorization: "Bearer k" } })];
+      const unknown = await fetch(`${server.baseUrl}/keys`, { headers: { authorization: "Bearer unknown" } });
+      const expectedBody = await unknown.text();
+      for (const p of probes) { const r = await p; assert.equal(r.status, 401, label); assert.equal(await r.text(), expectedBody, `${label}: same body as unknown key`); }
+      refused++;
+    } finally { await server.close(); }
+  }
+  assert.equal(refused, RECORDED.length); // reported as ISS-AUTHSCOPE-001: 4/4
+  assert.equal(handlerCalls, 0);
+  assert.equal(rules.calls.length, 0);
+});
+
+test("POST /keys derives the tenant from the authenticated caller, never the body, and a tenantless caller cannot mint", async () => {
+  const created: string[] = [];
+  const keys = { listKeys: async () => [], createKey: async (t: string) => { created.push(t); return { id: "i", rawKey: "r" }; }, revokeKey: async () => true };
+  const server = await startTestServer(buildTestDeps({ keyStore: fakeKeyStore({ good: { tenantId: "tenant-a", scopes: ["keys"] }, bad: { tenantId: "", scopes: ["keys"] } as VerifiedKey }), keys }));
+  try {
+    const post = (key: string) => fetch(`${server.baseUrl}/keys`, { method: "POST", headers: { authorization: `Bearer ${key}`, "content-type": "application/json" }, body: JSON.stringify({ label: "l", scopes: ["ask"], tenantId: "tenant-b" }) });
+    assert.equal((await post("good")).status, 201);
+    assert.deepEqual(created, ["tenant-a"]);
+    assert.equal((await post("bad")).status, 401);
+    assert.deepEqual(created, ["tenant-a"]);
+  } finally { await server.close(); }
 });

@@ -147,3 +147,15 @@ test("updateOne's UPSERT still merges the tenantId into the filter (ISS-118)", a
     options: { upsert: true },
   });
 });
+
+test("an invalid tenantId (undefined, null, non-string, whitespace, control chars) is refused and nothing reaches the driver", async () => {
+  // A truthy non-string such as { $ne: null } used to pass `!tenantId` and become a match-every-tenant filter.
+  const { db, calls } = fakeDb();
+  const bad: unknown[] = [undefined, null, "", 0, 5, true, ["t1"], { $ne: null }, { $exists: true }, "  ", " t1", "t1 ", "t1\n", "t\u0000", "a\tb"];
+  for (const t of bad) {
+    assert.throws(() => coll(db)(t as string), /tenantId is required/, JSON.stringify(t));
+    assert.throws(() => withTenant<Row>(t as string, {}), /tenantId is required/, JSON.stringify(t));
+  }
+  assert.equal(calls.length, 0);
+  for (const ok of ["toc", "tenant-1", "tA", "synthetic-capture", "system", "t"]) assert.deepEqual(withTenant<Row>(ok, {}), { tenantId: ok });
+});

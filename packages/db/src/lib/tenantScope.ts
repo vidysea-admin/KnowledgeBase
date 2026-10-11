@@ -10,11 +10,24 @@ import type { Collection, Db, Filter, OptionalUnlessRequiredId, UpdateFilter, Up
 
 export type TenantId = string;
 
+// eslint-disable-next-line no-control-regex
+const CONTROL_CHARS = /[\u0000-\u001f\u007f-\u009f\u2028\u2029]/;
+
+/** Throws unless `tenantId` is a non-empty string with no surrounding whitespace or control characters. A
+ * truthy non-string (an object such as `{ $ne: null }`) would otherwise become a filter operator that matches
+ * EVERY tenant; a number or array would match none. A query must never run without a valid tenant. */
+export function assertValidTenantId(tenantId: unknown, where: string): asserts tenantId is TenantId {
+  if (typeof tenantId !== "string" || tenantId.length === 0 || tenantId !== tenantId.trim() || CONTROL_CHARS.test(tenantId)) {
+    throw new Error(`${where}: tenantId is required (a non-empty string without surrounding whitespace or control characters)`);
+  }
+}
+
 /** Merges `{ tenantId }` into a filter so a caller can never omit it, even by accident. */
 export function withTenant<T extends { tenantId: string }>(
   tenantId: TenantId,
   filter: Filter<T> = {},
 ): Filter<T> {
+  assertValidTenantId(tenantId, "withTenant");
   return { ...filter, tenantId } as Filter<T>;
 }
 
@@ -34,7 +47,7 @@ export function scopedCollection<T extends { tenantId: string; _id: string }>(
   const raw: Collection<T> = db.collection<T>(name);
 
   return function coll(tenantId: TenantId) {
-    if (!tenantId) throw new Error(`scopedCollection(${name}): tenantId is required`);
+    assertValidTenantId(tenantId, `scopedCollection(${name})`);
     return {
       find: (filter: Filter<T> = {}) => raw.find(withTenant<T>(tenantId, filter)),
       findOne: (filter: Filter<T> = {}) => raw.findOne(withTenant<T>(tenantId, filter)),
