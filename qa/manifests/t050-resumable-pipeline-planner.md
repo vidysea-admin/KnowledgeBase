@@ -1,6 +1,6 @@
 # t050-resumable-pipeline-planner
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t050-resumable-pipeline-planner.md, cycle 0, 43db8de; pure planner, provisional stage list, unwired)
 Fix cycle: 0
 Tier: 3 (roadmap task T-050, FIRST SLICE ONLY). T-050 stays open.
 Lane: lane/t050flow (from 5f8eb75). Touches no auth, tenancy or data write: pure functions, no I/O.
