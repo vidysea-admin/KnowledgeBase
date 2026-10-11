@@ -43,7 +43,7 @@ For an allowed `Origin` only (a disallowed or missing origin still receives no C
 ## Evidence (node off PATH; each run under `timeout`; temp dirs; localhost only; no browser, OBS, MongoDB, network)
 - `scripts/webinar/join-rules-etag.test.ts` -> `tests 10, pass 10, fail 0`; includes real second processes (the ISS-UNOPTLOCK-002 replay, the HTTP-vs-process CAS race, opt-out between GET and PUT). Repeated 15 times: `15/15` runs `pass 10, fail 0`.
 - `apps/api/src/cors.test.ts` -> `tests 3, pass 3`.
-- apps/api join-rules: router.test.ts `14/14`, busy-status `21/21`, scope-write `7/7`, tenant-source `6/6`, un-opt `9/9`, require-scope `21/21` (before the new busy-status test: 20/20).
+- apps/api join-rules: router.test.ts `14/14`, busy-status `20/20` (includes the new 412 test), scope-write `7/7`, tenant-source `6/6`, un-opt `9/9`, require-scope `21/21`.
 - `scripts/webinar/join-rules-host.test.ts` -> `tests 14, pass 14` (spawns plain node processes only); `scripts/qa/join-rules-edit-api.test.ts` -> `tests 4, pass 4`.
 - Typecheck `tsc --noEmit -p tsconfig.json` in apps/api -> exit 0 (run once, at the end). `scripts/webinar/join-rules-host.ts` checked ad hoc with `--strict --module nodenext` -> no errors (scripts have no tsconfig).
 - Not run: packages/meeting-bot tests (not touched), apps/web (not touched, parallel lane). Nothing refused.
