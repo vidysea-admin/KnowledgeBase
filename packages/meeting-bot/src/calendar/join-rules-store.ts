@@ -23,7 +23,7 @@
  * `saveJoinRules` refuses to replace an unreadable / corrupt / wrong-tenant file unless `overwriteInvalid: true` (the repair path).
  */
 import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync, unlinkSync, openSync, closeSync, fsyncSync, lstatSync } from "node:fs";
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHash } from "node:crypto";
 import path from "node:path";
 import {
   EMPTY_JOIN_RULE_STATE, recordRuleApproval as applyApproval, recordOptOut as applyOptOut,
@@ -40,8 +40,11 @@ const WINDOWS_DEVICE = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/;
 export interface StoredJoinRules { ruleSet: JoinRuleSet; state: JoinRuleState }
 
 export class JoinRulesStoreError extends Error {
-  constructor(public readonly code: "bad-tenant" | "corrupt" | "too-large" | "invalid" | "tenant-mismatch" | "not-a-file" | "write-failed" | "locked" | "lock-failed", detail: string) {
+  /** Set only for `precondition-failed`: the validator of the rule set currently stored (`JOIN_RULES_ABSENT` when none is). */
+  public readonly currentValidator?: string;
+  constructor(public readonly code: "bad-tenant" | "corrupt" | "too-large" | "invalid" | "tenant-mismatch" | "not-a-file" | "write-failed" | "locked" | "lock-failed" | "precondition-failed", detail: string, currentValidator?: string) {
     super(`join-rules store: ${code}: ${detail}`);
+    this.currentValidator = currentValidator;
     this.name = "JoinRulesStoreError";
   }
 }
@@ -169,6 +172,12 @@ function writeAtomic(file: string, bytes: string, rename: typeof renameSync | un
 }
 
 /**
+ * LEGACY / UNCONDITIONAL. Full replace of the whole stored value (rule set AND opt-out / approval state), taking the CALLER's
+ * snapshot. The lock covers only this write, not the caller's earlier load, so a caller that loaded, then lets another process
+ * opt a meeting out, then saves its stale `state`, ERASES that opt-out (ISS-UNOPTLOCK-002), and two editors silently overwrite
+ * each other (ISS-T037UI-001). Kept unchanged because callers and tests rely on it replacing state (seeding / repair).
+ * Editors of the rule set must use `saveJoinRulesIf` (compare-and-set, state preserved under the lock).
+ *
  * Full replace of a tenant's rules, under the tenant lock. By default an existing file that is unreadable, corrupt, oversized,
  * schema-invalid or embeds another tenant is REFUSED with the load error (nothing written), so a caller saving
  * `{newRules, emptyState}` cannot silently discard approvals / opt-outs. `{ overwriteInvalid: true }` is the explicit repair.
@@ -226,5 +235,60 @@ export function recordTenantUnOptOut(stateDir: string, tenantId: string, eventId
     wrapInvalid(() => { r = removeOptOutEntries(cur.state, eventId, meeting); });
     if (r.state !== cur.state) writeAtomic(file, encode(tenantId, { ruleSet: cur.ruleSet, state: r.state }), opts.rename, owns);
     return { state: r.state, removedEventId: r.removedEventId, removedMeetings: r.removedMeetings };
+  });
+}
+
+/** `expected` / validator value meaning "no rule set is stored for this tenant yet". Cannot collide with a sha256 hex digest. */
+export const JOIN_RULES_ABSENT = "absent";
+
+function canonicalJson(v: unknown): string {
+  if (v === null || typeof v !== "object") return JSON.stringify(v) ?? "null";
+  if (Array.isArray(v)) return "[" + v.map(canonicalJson).join(",") + "]";
+  const o = v as Record<string, unknown>;
+  return "{" + Object.keys(o).filter(k => o[k] !== undefined).sort().map(k => JSON.stringify(k) + ":" + canonicalJson(o[k])).join(",") + "}";
+}
+
+/**
+ * Validator (ETag-like) of a rule set: sha256 hex over the canonical (recursively key-sorted, whitespace-free) JSON of the
+ * VALIDATED rule set only. Opt-out / approval state is not part of it, so a state change never invalidates an editor's validator.
+ * Array order is significant (rule order is meaningful). Throws `JoinRulesStoreError("invalid")` for an invalid rule set.
+ */
+export function joinRulesValidator(ruleSet: JoinRuleSet): string {
+  let clean!: JoinRuleSet;
+  wrapInvalid(() => { clean = validateJoinRuleSet(ruleSet); });
+  return createHash("sha256").update(canonicalJson(clean)).digest("hex");
+}
+
+/** Loads (no lock; a single read of one atomically-replaced file, so rule set, state and validator are mutually consistent). */
+export function loadJoinRulesWithValidator(stateDir: string, tenantId: string): StoredJoinRules & { validator: string } {
+  const file = joinRulesFilePath(stateDir, tenantId);
+  const exists = entryExists(file);
+  const cur = loadJoinRules(stateDir, tenantId);
+  return { ...cur, validator: exists ? joinRulesValidator(cur.ruleSet) : JOIN_RULES_ABSENT };
+}
+
+/**
+ * Compare-and-set of the RULE SET (unit `iss-unoptlock-002-join-rules-compare-and-set`). Inside the tenant lock: load the stored
+ * file, compute its validator, and only if it equals `expected` (`JOIN_RULES_ABSENT` = nothing stored yet) write `ruleSet`
+ * together with the stored approval / opt-out state AS LOADED UNDER THE LOCK (never a caller copy). Mismatch -> throws
+ * `JoinRulesStoreError("precondition-failed")` with `.currentValidator`, nothing written. `locked`, corrupt / invalid / non-regular
+ * stored file, failed rename or lost lock -> throws, nothing written, existing opt-outs stay in force.
+ * Returns the new validator and the written value.
+ */
+export function saveJoinRulesIf(stateDir: string, tenantId: string, expected: string, ruleSet: JoinRuleSet, io: Omit<StoreOptions, "overwriteInvalid"> = {}):
+  StoredJoinRules & { validator: string } {
+  const file = joinRulesFilePath(stateDir, tenantId);
+  if (typeof expected !== "string" || expected.length === 0) throw new JoinRulesStoreError("invalid", "expected validator must be a non-empty string");
+  const next = joinRulesValidator(ruleSet);
+  return withTenantLock(file, io, owns => {
+    const exists = entryExists(file);
+    const cur = loadJoinRules(stateDir, tenantId);
+    io.afterRead?.();
+    const currentValidator = exists ? joinRulesValidator(cur.ruleSet) : JOIN_RULES_ABSENT;
+    if (currentValidator !== expected) throw new JoinRulesStoreError("precondition-failed", "the stored rule set changed since it was read; nothing written", currentValidator);
+    const value = { ruleSet, state: cur.state };
+    writeAtomic(file, encode(tenantId, value), io.rename, owns);
+    const clean = checkedCopy(value);
+    return { ruleSet: clean.ruleSet, state: clean.state, validator: next };
   });
 }
