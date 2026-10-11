@@ -1,6 +1,6 @@
 # t050-run-state-file-store
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t050-run-state-file-store.md, cycle 0, 570c7a5; unwired; ISS-RUNSTORE-001 high open as before-wiring condition)
 Fix cycle: 0
 Tier: 3 (roadmap task T-050, SLICE 2: persistence adapter, item 2 of "Proposed next slices" in t050-resumable-pipeline-planner.md). T-050 stays open.
 Lane: lane/runstore (from 3f4e213). Data-write class: full ceremony.
