@@ -18,13 +18,15 @@ export function postPending(apiKey: string, kind: PendingKind, value: string): P
     : apiFetch(`${BASE}/approvals`, apiKey, { method: "POST", body: { kind, value } });
 }
 
-export type Failure = "unauthorized" | "forbidden" | "bad-request" | "unavailable" | "failed";
+export type Failure = "unauthorized" | "forbidden" | "bad-request" | "unavailable" | "busy" | "failed";
+/** The API's fixed body message for 503 `join_rules_busy` (apps/api/src/join-rules/router.ts); the only way to tell it from the 503 "not configured". */
+export const BUSY_SERVER_MESSAGE = "join rules are busy; try again in a few seconds";
 export interface Problem { failure: Failure; status: number; serverMessage: string }
 
 export function classify(error: unknown): Problem {
   const status = error instanceof ApiError ? error.status : 0;
   const serverMessage = error instanceof ApiError ? error.message : "";
-  const failure: Failure = status === 401 ? "unauthorized" : status === 403 ? "forbidden" : status === 400 ? "bad-request" : status === 503 ? "unavailable" : "failed";
+  const failure: Failure = status === 401 ? "unauthorized" : status === 403 ? "forbidden" : status === 400 ? "bad-request" : status === 503 ? (serverMessage === BUSY_SERVER_MESSAGE ? "busy" : "unavailable") : "failed";
   return { failure, status, serverMessage };
 }
 
@@ -33,6 +35,7 @@ export const MESSAGES = {
   readForbidden: "This API key lacks permission to read join rules.",
   readOnly: "This key can view rules but cannot change them. Use a key with the join-rules scope to edit.",
   unavailable: "Rule editing is not available on this server yet.",
+  busy: "Join rules are busy (another change is in progress). Wait a few seconds and try again.",
   loadFailed: "Unable to load join rules.",
   writeFailed: "The change could not be saved. Your edits are still in the form; try again.",
 } as const;

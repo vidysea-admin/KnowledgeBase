@@ -16,6 +16,9 @@ export interface JoinRuleStateValue {
 }
 export interface StoredJoinRulesValue { ruleSet: JoinRuleSetValue; state: JoinRuleStateValue }
 
+/** Mirrors `JoinRulesStoreError.code` in packages/meeting-bot (structural: apps/* may not import it). The router's status table is total over this. */
+export type JoinRulesStoreCode = "bad-tenant" | "corrupt" | "too-large" | "invalid" | "tenant-mismatch" | "not-a-file" | "write-failed" | "locked" | "lock-failed";
+
 type MaybePromise<T> = T | Promise<T>;
 
 /**

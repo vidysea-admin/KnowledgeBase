@@ -14,7 +14,7 @@ type Notice = { kind: "error" | "ok"; text: string } | null;
 
 /** Text for a failed READ (GET, also the fresh GET before a save). */
 function readText(p: Problem): string {
-  return p.failure === "unauthorized" ? MESSAGES.unauthorized : p.failure === "forbidden" ? MESSAGES.readForbidden : p.failure === "unavailable" ? MESSAGES.unavailable : MESSAGES.loadFailed;
+  return p.failure === "unauthorized" ? MESSAGES.unauthorized : p.failure === "forbidden" ? MESSAGES.readForbidden : p.failure === "unavailable" ? MESSAGES.unavailable : p.failure === "busy" ? MESSAGES.busy : MESSAGES.loadFailed;
 }
 
 export function JoinRulesPage(): React.ReactElement {
@@ -48,7 +48,7 @@ export function JoinRulesPage(): React.ReactElement {
     } catch (e) {
       if (keyRef.current !== apiKey) return;
       const p = classify(e);
-      setLoaded(null); setPhase({ name: "blocked", text: readText(p), retry: p.failure === "failed" });
+      setLoaded(null); setPhase({ name: "blocked", text: readText(p), retry: p.failure === "failed" || p.failure === "busy" });
     }
   }, [apiKey, adopt]);
   useEffect(() => { void load(); }, [load]);
@@ -62,6 +62,7 @@ export function JoinRulesPage(): React.ReactElement {
     else if (p.failure === "bad-request") setNotice({ kind: "error", text: `The server rejected this change: ${p.serverMessage}` });
     else if (p.failure === "unauthorized") setNotice({ kind: "error", text: MESSAGES.unauthorized });
     else if (p.failure === "unavailable") setNotice({ kind: "error", text: MESSAGES.unavailable });
+    else if (p.failure === "busy") setNotice({ kind: "error", text: MESSAGES.busy });
     else setNotice({ kind: "error", text: `${MESSAGES.writeFailed} (${p.status === 0 ? "network error" : `HTTP ${p.status}`})` });
   };
 
