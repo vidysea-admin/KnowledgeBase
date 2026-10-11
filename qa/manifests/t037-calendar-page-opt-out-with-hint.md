@@ -1,6 +1,6 @@
 # t037-calendar-page-opt-out-with-hint
 
-Status: ready-for-check
+Status: checked-PASS (Checked: qa/verdicts/t037-calendar-page-opt-out-with-hint.md, cycle 1, e638c01; SOURCE SCOPE ONLY per D-024)
 Fix cycle: 1
 Priority tier: 3 (roadmap follow-up). It closes W7 gate (b) of qa/contracts/t037-join-rules-veto-select.md ("a client sends the meeting hints with an opt-out") from the web side, via ISS-WEBHINTS-001 / ISS-T037OPT-002 (both medium, open).
 Security class: data-write action from the UI (changes which meetings get recorded). Full ceremony.
