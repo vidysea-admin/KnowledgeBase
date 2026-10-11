@@ -11,7 +11,7 @@ import { isWhitespace, quoteMayEnd, quoteMayStart } from "./quote-token-rule.js"
 
 const one = (text: string): QuoteSourceTurn[] => [{ id: "t", text }];
 const reason = (v: QuoteVerdict) => (v.ok ? "ok" : v.reason);
-const ledger = readFileSync(new URL("../../../../qa/issues.t040quote.jsonl", import.meta.url), "utf8").split("\n")
+const ledger = readFileSync(new URL("../../../../../qa/issues.t040quote.jsonl", import.meta.url), "utf8").split("\n")
   .filter(Boolean).map((l) => JSON.parse(l) as { id: string; evidence: string });
 const row = (id: string) => ledger.find((r) => r.id === id)!;
 
