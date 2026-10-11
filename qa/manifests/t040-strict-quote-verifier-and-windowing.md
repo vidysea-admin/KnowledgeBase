@@ -1,6 +1,6 @@
 # Manifest — t040-strict-quote-verifier-and-windowing
 
-**Lane:** T040QUOTE (branch lane/t040quote, base c08a431). **Status:** ready-for-check. **Fix cycle:** 0
+**Lane:** T040QUOTE (branch lane/t040quote, base c08a431). **Status:** ready-for-check. **Fix cycle:** 1
 **Backlog tier:** 3 (roadmap slice of T-040; T-040 stays `open`/`in_progress`, TASKS.md and goal.json NOT edited).
 **Severity gate:** no auth, no tenancy, no data write, no stored schema, no model call, no DB. Pure functions only, not called by any stage. Issue ids for this lane would be `ISS-T040QUOTE-NNN` in `qa/issues.t040quote.jsonl` (none filed).
 **Round cap:** 0 prior PASSes name this seam.
@@ -70,3 +70,75 @@ No wiring into summarize.ts or any stage; no schema/collection/contract change; 
 | M13 limit 16001 | killed | `defaults are 16000 chars ...`, `exactly 16000 characters fits ...` |
 | M14 cut inside surrogate/mark | killed | `oversized turn: no whitespace, surrogate pairs and combining marks are not cut apart` |
 M11 was not re-run after the test edit to name the killing test; unverified at test-name level.
+
+---
+
+# Fix cycle 1 (answers verdict `qa/verdicts/t040-strict-quote-verifier-and-windowing.md`, FAIL cycle 0, ISS-T040QUOTE-001)
+**Status:** ready-for-check. **Fix cycle:** 1. Code commit 5f507cf (quote-verify.ts, new quote-token-rule.ts, transcript-windows.ts progress guard, tests); the following commit adds only this manifest.
+
+## READ THIS FIRST: limits of substring verification (for any consumer or wiring unit)
+1. **It proves the words appear contiguously in ONE turn by that speaker. It does NOT prove the quote keeps the speaker's meaning.** A negation or qualifier just outside the quoted span is invisible to it: "I do not think it is safe" -> the quote "think it is safe" VERIFIES; "it is not up" -> "is not up" verifies, but so does a cut that drops the "not" at the start. The token rule below closes cuts inside numbers/identifiers only; it cannot and does not try to detect a dropped negation, a dropped "only/never/not yet", or a hedge left outside the span.
+2. **A wiring unit must add** (the verifier alone is not enough): require the quote to span a whole sentence or clause (start at turn start or after sentence punctuation, end at sentence punctuation or turn end), OR display the full surrounding sentence/turn next to the quote, linked to the turn id and offsets returned in `locations`; and drop or flag quotes that fail. Do not render a verified quote without its surrounding sentence when that sentence contains a negation.
+3. **Wrapper policy (decided): strip ONE matching pair of wrapping quotation marks and report it** (below). Nothing else is stripped: a model that adds a trailing full stop, leading/trailing ellipsis or "(sic)" still gets a refusal.
+4. **Window numbers (16000 chars, 2-turn overlap) come from an UNAPPROVED repair plan** (`qa/manifests/webinar-release-repair-plan.md` line 59); they are options with defaults, not decided parameters.
+
+## What failed
+`verifyQuote` verified a quote cut at a punctuation joint inside a number or token ("the price is 3" of "3.5", "our margin is 5" of "5-10", "e-mail me at bob" of "bob@x.com") while "1,0" was refused. Also from the verdict: truncation limit stated only for sentence ends (now above), wrappers undocumented, cap applied before the speaker filter, survivors min-length 11 and cap 19, and the off-by-one window mutant killed only by a ~33 s file hang.
+
+## Token-boundary rule (quote-token-rule.ts: one predicate `cutInsideToken(s,p)` applied to BOTH ends)
+L = character before the cut, R = after (code points, surrogate pairs whole; Cf format characters such as zero-width and soft hyphen are skipped so they cannot hide a joint). Whitespace or a text edge on either side is a boundary.
+- **C1** alnum|alnum is inside a token (words, "3rd", "5k", "1,0|00").
+- **C2** alnum | joiner (`. , - / : @ _ ' %`, fullwidth and Arabic-separator forms) is inside iff the character after the joiner is alnum or a currency symbol ("3|.5", "5|-10", "24|/7", "10|:30", "bob|@x.com", "e|-mail", "don|'t", "x|.com/path"); digit|percent sign ("50|%") is always inside. A joiner followed by whitespace, punctuation or the end is SENTENCE punctuation: "is 3" of "is 3. Next", "is 3, and", "is 3" at turn end and "is 3..." verify; "is 3" of "is 3.5" and of "is 3.5. Then" do not.
+- **C3** joiner | alnum where the joiner is glued to a previous alnum is inside ("3.|5", "10:|30", "24/|7", "a_|b", "don'|t").
+- **C4** prefix | alnum, prefix = any currency symbol or `+ - . , @ #`, is inside ("$|5", "₹|500", "-|5", "+|91").
+Scripts without spaces: ideographs, kana and Thai are letters, so C1 still refuses a cut between two of them (unchanged from cycle 0); an unspaced CJK quote is `too-short` because the 2-token minimum counts spaces (pre-existing limit, pinned by a test). The Devanagari danda U+0964 is punctuation, not a joiner: a quote may still end before it (unchanged, tested). Devanagari and fullwidth digits count as digits (tested). Refuse when in doubt.
+Consequences worth knowing: a quote starting right after a hyphen/comma/dot glued to a letter ("...but") is refused, and a dash used as punctuation without spaces ("wait-what") is treated as a hyphenated word.
+
+## Location cap
+The speaker filter now runs BEFORE the cap: locations by the claimed speaker are collected (all hits scanned, linear), the first `MAX_LOCATIONS` (20) are returned, and `truncated: true` only if more by that speaker exist. `wrong-speaker` is returned only when valid hits exist and none is by the claimed speaker. The old 1000-raw-hit scan limit is gone (a hit past it could be hidden).
+
+## Wrapper policy
+Verdict `ok:true` gains `unwrapped: boolean`. If the quote as given does not verify and its normalised form starts and ends with the SAME mark (`"` or `'`; curly forms normalise to these) with no further such mark inside, the trimmed inside is verified instead and the minimum length applies to the inside. A quote that is verbatim WITH its marks in the source verifies as given (`unwrapped:false`). Never stripped: mismatched pairs, a lone mark, `*..*`, `(..)`, a full stop (inside or outside the marks), ellipses, inner marks. The `wrappers:` tests prove each stays refused; stripping only ever tries a substring of the original quote, so a verified inside is always a real, token-aligned, contiguous substring.
+
+## Existing assertions changed
+None. The 31 cycle-0 tests and the 10 `summarize.test.ts` tests pass unmodified. `transcript-windows.ts` gained a one-line progress guard (`if (end === start) end = start + 1`) so a regressed limit comparison produces a failing assertion instead of an infinite loop; behaviour for valid input is unchanged.
+
+## D-015 count (the ledger's own recorded reproductions, parsed from `qa/issues.t040quote.jsonl` by the test, not retyped)
+`ISS-T040QUOTE-001: 3/3 refused` (the three verbatim calls in the row's evidence), plus the row's "same for 1,000" remark ("the fee is 1" of "the fee is 1,000 rupees today") refused. None left open.
+
+## Property test (seeded, `quote-verify-token.test.ts`)
+160 turns built from 23 token kinds (prices, ranges, e-mail, URL path, handle, hyphenated, apostrophe, versions, dates, percent, ordinal) with random trailing `. , ;`. Quotes ending or starting strictly inside a token: 1392/1392 refused as `partial-word`. Token-aligned quotes (4 variants per turn, incl. trailing punctuation): 640/640 verified with `turn.text.slice(start,end) === quote`.
+
+## Boundary tests added (kill the cycle-0 survivors)
+11 vs 12 code points (an astral character counts once), 19/20/21 locations, a speaker-B hit behind 25 speaker-A hits, and in `transcript-windows.test.ts` three named fast tests with `{ timeout: 5000 }` for the window limit (exact fit, +1, -1; two-entry exact fit; slices of exactly maxChars).
+
+## Mutations (18; script in the scratchpad: 120 s `timeout` on the test command, byte backup PER mutation, restore in `finally`, then `git hash-object` == `git rev-parse HEAD:<file>`: all `HEAD-fidelity=true`)
+Tests run per mutation: quote-verify.test.ts, quote-verify-token.test.ts, transcript-windows.test.ts. ALL 18 killed by named tests:
+| # | Mutation | Killed by (first) |
+|---|---|---|
+| M1 | C1 removed | `token rule C1 ...` |
+| M2 | C2 joiner removed | `ISS-T040QUOTE-001 ...`, `token rule C2 joiner ...` |
+| M3 | C2 percent removed | `token rule C2 percent ...` |
+| M4 | C3 removed | `token rule C3 ...` |
+| M5 | C4 removed | `token rule C4 ...` |
+| M6 | joiner always inside (no sentence punctuation) | `token rule: sentence punctuation ...` (+8) |
+| M7 | format characters not skipped | `token rule: invisible characters ...` |
+| M8 | cap before speaker filter restored | `speaker filter runs BEFORE the location cap ...` |
+| M9 | wrapper stripped from a non-matching pair | `wrappers: stripping can never turn ...` |
+| M10 | wrapper stripped for any first/last char | same |
+| M11 | wrapper stripped with marks inside | same |
+| M12 | minimum length 11 | `minimum length: exactly 11 ...` |
+| M13 | MAX_LOCATIONS 19 | `location cap is exactly 20 ...`, `speaker filter ...` |
+| M14 | length in UTF-16 units | `minimum length: exactly 11 ...` |
+| M15 | length checked before stripping only | `wrappers: minimum length applies AFTER stripping` |
+| M16 | window `<` for `<=` | `exactly 16000 characters fits ...`, `window limit off-by-one: two entries ...` (fast, no hang) |
+| M17 | window limit +1 | same two |
+| M18 | window limit -1 | same two |
+Notes: M3's first run used a pattern that did not match (PATTERN-MISSING, nothing mutated) and was fixed and re-run. M8's first form did not model cap-before-filter and SURVIVED; it was replaced by a faithful form (cap on all valid hits, filter afterwards), which is killed.
+
+## Evidence (node from the toolchain note; from packages/index)
+- `timeout 170 node --test --import tsx src/pipeline/quote-verify.test.ts src/pipeline/quote-verify-token.test.ts src/pipeline/transcript-windows.test.ts src/pipeline/summarize.test.ts` -> `tests 59 / pass 59 / fail 0` (31 cycle-0 + 18 new + 10 summarize); it printed `ISS-T040QUOTE-001: 3/3 refused (recorded verbatim)` and `property: 1392 interior cuts refused, 640 token-aligned quotes verified with exact offsets`.
+- `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` -> exit 0 (`tsc=0`), no output.
+- `node scripts/lint-dirsize.mjs` (repo root) -> `lint-dirsize: OK (112 dir(s) within budget)`.
+- Non-blank lines: quote-verify.ts 239, quote-token-rule.ts 70, transcript-windows.ts 113, quote-verify.test.ts 177, quote-verify-token.test.ts 175, transcript-windows.test.ts 146.
+- Unverified: no real model quotes or live ASR text were run; only the seeded corpora and hand-built cases.
