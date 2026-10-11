@@ -1,6 +1,6 @@
 # iss-309-316-reingest-delete-safety
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3-equivalent unit pulled by the Approver's dispatch (open ledger issues ISS-309 and ISS-316, both medium but data-write class: full ceremony).
 Lane: lane/reingestsafe. Ledger for this lane: qa/issues.reingestsafe.jsonl, ids ISS-REINGESTSAFE-NNN (3 filed, all open). Existing ledger rows untouched (the checker changes ISS-309/316 status).
