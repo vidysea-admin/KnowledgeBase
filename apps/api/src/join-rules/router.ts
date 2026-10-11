@@ -3,7 +3,13 @@
  * editable"; no web UI, no scheduler switch-over).
  *
  *   GET  /calendar/join-rules              -> { ruleSet, state }
- *   PUT  /calendar/join-rules              body = a rule set; replaces rules ONLY, stored state is kept
+ *                                          GET carries `ETag: "<sha256 hex of the stored rule set>"` when a rule set is stored (none otherwise).
+ *   PUT  /calendar/join-rules              body = a rule set; replaces rules ONLY, stored state is kept. REQUIRES exactly one precondition:
+ *                                          `If-Match: "<etag>"` (replace) or `If-None-Match: *` (create the first one). Neither -> 428
+ *                                          { error: "precondition-required" }; stale / wrong / unsupported form -> 412
+ *                                          { error: "precondition-failed", currentEtag } + current ETag header. The compare-and-write is the
+ *                                          store's atomic saveJoinRulesIf (never load-compare-save here); an opt-out/approval landing between
+ *                                          the editor's GET and PUT is preserved and does NOT invalidate the ETag (validator excludes state).
  *   POST /calendar/join-rules/approvals    body { kind: "sender"|"domain", value }
  *   POST /calendar/join-rules/opt-outs     body { eventId, meetingUrl?, sessionKey? } (the optional hints store the MEETING
  *                                          identity with the opt-out)
@@ -28,6 +34,12 @@ export const WRITE_SCOPE = "join-rules";
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 
 class BadRequest extends Error {}
+/** 412: carries the stored validator ("absent" or hex) so the response can tell the client the current ETag. */
+class PreconditionFailed extends Error {
+  constructor(public readonly currentValidator: string) { super("precondition failed"); }
+}
+/** 428: the PUT named no precondition at all. */
+class PreconditionRequired extends Error {}
 class StatusError extends Error {
   constructor(public readonly status: number, public readonly error: string, message: string) { super(message); }
 }
@@ -38,8 +50,17 @@ function storeCode(e: unknown): string | undefined {
   return typeof code === "string" ? code : undefined;
 }
 
+/**
+ * JSON via `end`, NOT `res.json`: Express's `res.send` adds a WEAK content-hash `ETag` (and answers 304 on a matching If-None-Match) to
+ * any response that has none. The join-rules ETag is a strong validator of the stored RULE SET (state excluded) that this router sets
+ * itself, so a response without one (no rule set stored, 412/428, POSTs) must carry NO ETag and a 200 must never be turned into a 304.
+ */
+function sendJson(res: Response, status: number, body: unknown): void {
+  res.status(status).type("application/json").end(JSON.stringify(body));
+}
+
 function fail(res: Response, status: number, error: string, message: string): void {
-  res.status(status).json({ error, message });
+  sendJson(res, status, { error, message });
 }
 
 interface Mapped { status: number; error: string; message: string; retryAfterSeconds?: number }
@@ -56,7 +77,21 @@ const BUSY: Mapped = { status: 503, error: "join_rules_busy", message: "join rul
 export const STORE_FAILURE: Record<JoinRulesStoreCode, Mapped> = {
   "bad-tenant": UNAVAILABLE, corrupt: UNAVAILABLE, "too-large": UNAVAILABLE, invalid: UNAVAILABLE, "tenant-mismatch": UNAVAILABLE,
   "not-a-file": UNAVAILABLE, "write-failed": UNAVAILABLE, "lock-failed": UNAVAILABLE, locked: BUSY,
+  // PUT answers this itself (with currentEtag, see PreconditionFailed); the entry keeps the table total and the status 412 anywhere else.
+  "precondition-failed": { status: 412, error: "precondition-failed", message: "the rule set changed since it was loaded" },
 };
+
+/** The store's "nothing stored" validator (JOIN_RULES_ABSENT in packages/meeting-bot; apps/* may not import it). */
+const ABSENT = "absent";
+const etagOf = (validator: string): string | null => (validator === ABSENT ? null : `"${validator}"`);
+/** Strong entity-tag with a sha256 hex validator, quoted, no `W/` and no list: the only If-Match form accepted. */
+const STRONG_ETAG = /^"([0-9a-f]{64})"$/;
+
+function preconditionFailed(res: Response, currentValidator: string): void {
+  const current = etagOf(currentValidator);
+  if (current !== null) res.setHeader("ETag", current);
+  sendJson(res, 412, { error: "precondition-failed", currentEtag: current });
+}
 
 /** Non-leaking: never echoes the stored file, its path, or the store's own message. Unknown errors -> 500. */
 function storeFailure(res: Response, e?: unknown): void {
@@ -108,8 +143,14 @@ export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
   async function guarded(req: Request, res: Response, work: (tenantId: string) => Promise<unknown>): Promise<void> {
     const tenantId = req.auth!.tenantId;
     try {
-      res.status(200).json(await withTenantLock(tenantId, () => work(tenantId)));
+      sendJson(res, 200, await withTenantLock(tenantId, () => work(tenantId)));
     } catch (e) {
+      if (e instanceof PreconditionRequired) return void sendJson(res, 428, { error: "precondition-required" });
+      if (e instanceof PreconditionFailed) return preconditionFailed(res, e.currentValidator);
+      if (storeCode(e) === "precondition-failed") {
+        const cv = (e as { currentValidator?: unknown }).currentValidator;
+        return preconditionFailed(res, typeof cv === "string" ? cv : ABSENT);
+      }
       if (e instanceof BadRequest) return fail(res, 400, "bad_request", e.message);
       if (e instanceof StatusError) return fail(res, e.status, e.error, e.message);
       storeFailure(res, e);
@@ -118,25 +159,50 @@ export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
 
   router.get("/calendar/join-rules", requireScope("calendar"), async (req: Request, res: Response) => {
     try {
-      res.status(200).json(await deps.load(req.auth!.tenantId));
+      const { validator, ...stored } = await deps.loadWithValidator(req.auth!.tenantId);
+      const etag = etagOf(validator);
+      if (etag !== null) res.setHeader("ETag", etag);
+      sendJson(res, 200, stored);
     } catch (e) { storeFailure(res, e); }
   });
+
+  /**
+   * The precondition of a PUT: `{ expected }` is what the store compares against ("absent" for If-None-Match: *); `unsupported` is a
+   * header that is present but not an accepted form (a list, `If-Match: *`, a weak or unquoted tag, `If-None-Match` other than `*`):
+   * answered 412 without writing. Both headers at once is ambiguous -> 400. Neither -> null (428).
+   */
+  function preconditionOf(req: Request): { expected: string } | { unsupported: true } | null {
+    const ifMatch = req.header("if-match");
+    const ifNoneMatch = req.header("if-none-match");
+    if (ifMatch === undefined && ifNoneMatch === undefined) return null;
+    if (ifMatch !== undefined && ifNoneMatch !== undefined) throw new BadRequest("send exactly one of If-Match and If-None-Match");
+    if (ifNoneMatch !== undefined) return ifNoneMatch.trim() === "*" ? { expected: ABSENT } : { unsupported: true };
+    const m = STRONG_ETAG.exec((ifMatch as string).trim());
+    return m ? { expected: m[1]! } : { unsupported: true };
+  }
 
   router.put("/calendar/join-rules", requireScope(WRITE_SCOPE), (req: Request, res: Response) =>
     guarded(req, res, async tenantId => {
       const input: unknown = req.body;
+      const pre = preconditionOf(req);
+      if (pre === null) throw new PreconditionRequired();
       if (!isObj(input)) throw new BadRequest("body must be a JSON object");
-      // Load FIRST: a corrupt / wrong-tenant stored file refuses the write, and its state is preserved.
-      const existing = await deps.load(tenantId);
+      // Read-only look FIRST (as before): a corrupt / wrong-tenant stored file refuses the request with a 5xx before any 400. It is NOT the
+      // compare: the compare-and-write below is the store's atomic saveIf. It also names the current validator for an unsupported-form 412.
+      const current = await deps.loadWithValidator(tenantId);
       let ruleSet;
       try { ruleSet = deps.validateRuleSet(input); }
       catch (e) { throw new BadRequest(e instanceof Error ? e.message.slice(0, 300) : "invalid rule set"); }
-      try { await deps.save(tenantId, { ruleSet, state: existing.state }); }
+      if ("unsupported" in pre) throw new PreconditionFailed(current.validator);
+      let saved;
+      // ONE atomic store call: compare + write under the store's per-tenant lock; state is the CURRENT state, not a snapshot of ours.
+      try { saved = await deps.saveIf(tenantId, pre.expected, ruleSet); }
       catch (e) {
         if (storeCode(e) === "too-large") throw new StatusError(413, "payload_too_large", "rule set exceeds the size cap");
         throw e;
       }
-      return { ruleSet, state: existing.state };
+      res.setHeader("ETag", `"${saved.validator}"`);
+      return { ruleSet: saved.ruleSet, state: saved.state };
     }));
 
   router.post("/calendar/join-rules/approvals", requireScope(WRITE_SCOPE), (req: Request, res: Response) =>

@@ -26,7 +26,8 @@ function thrower(code: string, where: "load" | "write"): JoinRulesDeps {
   const boom = async (): Promise<never> => { throw new StoreError(code); };
   return {
     load: where === "load" ? boom : async () => empty(),
-    save: boom, recordApproval: boom, recordOptOut: boom, removeOptOut: boom,
+    loadWithValidator: where === "load" ? boom : async () => ({ ...empty(), validator: "absent" }),
+    saveIf: boom, save: boom, recordApproval: boom, recordOptOut: boom, removeOptOut: boom,
     validateRuleSet: i => i as ReturnType<JoinRulesDeps["validateRuleSet"]>,
   };
 }
@@ -39,7 +40,7 @@ async function hit(deps: JoinRulesDeps | undefined, method: string, path: string
   const server = await startTestServer(buildTestDeps({ keyStore: fakeKeyStore(KEYS), ...(deps ? { joinRules: deps } : {}) }));
   try {
     const res = await fetch(`${server.baseUrl}${path}`, {
-      method, headers: { authorization: "Bearer a-key", ...(body !== undefined ? { "content-type": "application/json" } : {}) },
+      method, headers: { authorization: "Bearer a-key", ...(method === "PUT" ? { "if-none-match": "*" } : {}), ...(body !== undefined ? { "content-type": "application/json" } : {}) },
       ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     });
     const text = await res.text();
@@ -75,13 +76,13 @@ for (const [name, method, path, body] of ROUTES) {
       noLeak(r, `${name}/${code}`);
     }
     const plain = thrower("x", where); const boom = async (): Promise<never> => { throw new Error(`EACCES ${SECRET}`); };
-    const r = await hit({ ...plain, load: where === "load" ? boom : plain.load, save: boom, recordApproval: boom, recordOptOut: boom }, method, path, body);
+    const r = await hit({ ...plain, load: where === "load" ? boom : plain.load, loadWithValidator: where === "load" ? boom : plain.loadWithValidator, saveIf: boom, save: boom, recordApproval: boom, recordOptOut: boom }, method, path, body);
     assert.equal(r.status, 500); assert.equal(r.json.error, "join_rules_unavailable"); noLeak(r, name);
   });
 }
 
 test("every other store code (corrupt, not-a-file, write-failed, ...) keeps the fixed 500 on every route", async () => {
-  const codes = (Object.keys(STORE_FAILURE) as JoinRulesStoreCode[]).filter(c => c !== "locked" && c !== "too-large" && c !== "invalid");
+  const codes = (Object.keys(STORE_FAILURE) as JoinRulesStoreCode[]).filter(c => c !== "locked" && c !== "too-large" && c !== "invalid" && c !== "precondition-failed");
   for (const code of codes) for (const [name, method, path, body] of ROUTES) {
     const r = await hit(thrower(code, name === "GET" ? "load" : "write"), method, path, body);
     assert.equal(r.status, 500, `${code} ${name}`); assert.equal(r.json.error, "join_rules_unavailable", `${code} ${name}`);
@@ -97,6 +98,12 @@ test("too-large stays 413 on PUT save and invalid stays 400 on approvals / opt-o
   assert.equal(a.status, 400); assert.equal(o.status, 400); noLeak(a, "400a"); noLeak(o, "400o");
 });
 
+test("precondition-failed from the store is 412 with the exact contract body on PUT (never the generic 500), no leak", async () => {
+  const r = await hit(thrower("precondition-failed", "write"), "PUT", URL_PATH, RULES);
+  assert.equal(r.status, 412); assert.deepEqual(r.json, { error: "precondition-failed", currentEtag: null }); noLeak(r, "412");
+  assert.equal(STORE_FAILURE["precondition-failed"].status, 412);
+});
+
 test("503 'no store configured' stays distinguishable from 503 busy by its error code", async () => {
   const none = await hit(undefined, "GET", URL_PATH, undefined);
   const busy = await hit(thrower("locked", "load"), "GET", URL_PATH, undefined);
@@ -106,7 +113,7 @@ test("503 'no store configured' stays distinguishable from 503 busy by its error
 });
 
 test("the status table is total over the store's code union and only `locked` is 503", () => {
-  const all: JoinRulesStoreCode[] = ["bad-tenant", "corrupt", "too-large", "invalid", "tenant-mismatch", "not-a-file", "write-failed", "locked", "lock-failed"];
+  const all: JoinRulesStoreCode[] = ["bad-tenant", "corrupt", "too-large", "invalid", "tenant-mismatch", "not-a-file", "write-failed", "locked", "lock-failed", "precondition-failed"];
   assert.deepEqual(Object.keys(STORE_FAILURE).sort(), [...all].sort());
   assert.deepEqual(all.filter(c => STORE_FAILURE[c].status === 503), ["locked"]);
 });
