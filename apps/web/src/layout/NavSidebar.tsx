@@ -38,6 +38,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/jobs", label: "Provider jobs", icon: <DocsIcon /> },
   { to: "/claims", label: "Claims", icon: <DocsIcon /> },
   { to: "/status", label: "System status", icon: <SettingsIcon /> },
+  { to: "/setup", label: "Setup wizard", icon: <SettingsIcon /> },
   { to: "/ops-health", label: "Operations health", icon: <SettingsIcon /> },
   { to: "/notifications", label: "Notifications", icon: <SettingsIcon /> },
 ];

@@ -16,6 +16,7 @@ import { createWatchedSourcesRouter, type WatchedSourceDeps } from "./routes/wat
 import { createCitationsRouter, type CitationsDeps } from "./routes/citations.js";
 import { createClaimsListRouter, unavailableClaimsListDeps, type ClaimsListDeps } from "./claims/router.js";
 import { createHealthRouter, type HealthDeps } from "./routes/health.js";
+import { createSetupStatusRouter } from "./activity-health/setup-status.js";
 import { createSystemStatusRouter, unavailableSystemStatusDeps, type SystemStatusDeps } from "./routes/system-status.js";
 import { createSearchRouter, type SearchDeps } from "./routes/search.js";
 import { createGraphRouter, type GraphReadDeps } from "./routes/graph.js";
@@ -94,6 +95,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(requireAuth(deps.keyStore));
   app.use(createRateLimiter(deps.rateLimit));
   app.use(createSystemStatusRouter(deps.systemStatus ?? unavailableSystemStatusDeps));
+  app.use(createSetupStatusRouter()); // T-057 E4: booleans only, authenticated
   app.use(createAskRouter(deps.ask));
   app.use(createCompeteRouter({ ...deps.ask, evalRuns: deps.evalRuns }));
   app.use(createBrainRouter(deps.brain));
