@@ -70,37 +70,39 @@ function withTempDir(fn: (dir: string) => void): void {
   }
 }
 
+const TEN = "ten-t";
+
 test("readScheduleState: no file yet -> {}", () => {
   withTempDir((dir) => {
-    assert.deepEqual(readScheduleState(dir), {});
-    assert.deepEqual([...readScheduledKeys(dir)], []);
+    assert.deepEqual(readScheduleState(dir, TEN), {});
+    assert.deepEqual([...readScheduledKeys(dir, TEN)], []);
   });
 });
 
 test("recordScheduled then readScheduleState round-trips", () => {
   withTempDir((dir) => {
-    recordScheduled(dir, { sessionKey: "gmail:c1", title: "TOC webinar", scheduledAt: "2026-09-28T12:26:00Z" });
-    const state = readScheduleState(dir);
+    recordScheduled(dir, { sessionKey: "gmail:c1", title: "TOC webinar", scheduledAt: "2026-09-28T12:26:00Z" }, TEN);
+    const state = readScheduleState(dir, TEN);
     assert.deepEqual(state, {
       "gmail:c1": { sessionKey: "gmail:c1", title: "TOC webinar", scheduledAt: "2026-09-28T12:26:00Z" },
     });
-    assert.deepEqual([...readScheduledKeys(dir)], ["gmail:c1"]);
+    assert.deepEqual([...readScheduledKeys(dir, TEN)], ["gmail:c1"]);
   });
 });
 
 test("recordScheduled twice for different sessions accumulates, doesn't clobber", () => {
   withTempDir((dir) => {
-    recordScheduled(dir, { sessionKey: "gmail:c1", title: "A", scheduledAt: "2026-09-28T12:00:00Z" });
-    recordScheduled(dir, { sessionKey: "cal:e1", title: "B", scheduledAt: "2026-09-28T12:05:00Z" });
-    assert.deepEqual([...readScheduledKeys(dir)].sort(), ["cal:e1", "gmail:c1"]);
+    recordScheduled(dir, { sessionKey: "gmail:c1", title: "A", scheduledAt: "2026-09-28T12:00:00Z" }, TEN);
+    recordScheduled(dir, { sessionKey: "cal:e1", title: "B", scheduledAt: "2026-09-28T12:05:00Z" }, TEN);
+    assert.deepEqual([...readScheduledKeys(dir, TEN)].sort(), ["cal:e1", "gmail:c1"]);
   });
 });
 
 test("recordScheduled creates the state dir if it doesn't exist yet", () => {
   withTempDir((parent) => {
     const dir = path.join(parent, "nested", "does-not-exist-yet");
-    recordScheduled(dir, { sessionKey: "gmail:c9", title: "C", scheduledAt: "2026-09-28T12:00:00Z" });
-    assert.deepEqual([...readScheduledKeys(dir)], ["gmail:c9"]);
+    recordScheduled(dir, { sessionKey: "gmail:c9", title: "C", scheduledAt: "2026-09-28T12:00:00Z" }, TEN);
+    assert.deepEqual([...readScheduledKeys(dir, TEN)], ["gmail:c9"]);
   });
 });
 
@@ -108,7 +110,7 @@ test("readScheduleState on a corrupt file never throws — treated as {}", () =>
   withTempDir((dir) => {
     mkdirSync(dir, { recursive: true });
     writeFileSync(scheduleStateFilePath(dir), "{ not valid json");
-    assert.deepEqual(readScheduleState(dir), {});
+    assert.deepEqual(readScheduleState(dir, TEN), {});
   });
 });
 
@@ -123,8 +125,8 @@ test("writeScheduledJob: first write for a jobKey succeeds and round-trips", () 
     writeScheduledJob(dir, "gmail-c1-abc123", {
       url: "https://zoho.com/meeting/abc", until: "2026-09-28T13:30:00Z",
       title: "TOC webinar", sessionId: "gmail:c1",
-    });
-    const job = readScheduledJob(dir, "gmail-c1-abc123");
+    }, TEN);
+    const job = readScheduledJob(dir, "gmail-c1-abc123", TEN);
     assert.ok(job);
     assert.equal(job!.sessionId, "gmail:c1");
     assert.equal(job!.title, "TOC webinar");
@@ -137,12 +139,12 @@ test("writeScheduledJob: rewriting the SAME sessionId under the same jobKey succ
     writeScheduledJob(dir, "gmail-c1-abc123", {
       url: "https://zoho.com/meeting/abc", until: "2026-09-28T13:30:00Z",
       title: "Old title", sessionId: "gmail:c1",
-    });
+    }, TEN);
     writeScheduledJob(dir, "gmail-c1-abc123", {
       url: "https://zoho.com/meeting/abc", until: "2026-09-28T14:00:00Z",
       title: "New title", sessionId: "gmail:c1",
-    });
-    const job = readScheduledJob(dir, "gmail-c1-abc123");
+    }, TEN);
+    const job = readScheduledJob(dir, "gmail-c1-abc123", TEN);
     assert.equal(job!.title, "New title", "the second write for the same session must go through");
     assert.equal(job!.until, "2026-09-28T14:00:00Z");
   });
@@ -154,17 +156,17 @@ test("writeScheduledJob: a DIFFERENT sessionId at the same jobKey (a genuine col
     writeScheduledJob(dir, "gmail-c1-abc123", {
       url: "https://zoho.com/meeting/abc", until: "2026-09-28T13:30:00Z",
       title: "Session A", sessionId: "gmail:c1",
-    });
+    }, TEN);
     assert.throws(
       () => writeScheduledJob(dir, "gmail-c1-abc123", {
         url: "https://zoho.com/meeting/xyz", until: "2026-09-28T15:00:00Z",
         title: "Session B", sessionId: "gmail:c2",
-      }),
+      }, TEN),
       /refusing to schedule.*ISS-321/,
       "a different sessionId at the same jobKey must be refused, not silently overwritten",
     );
     // The original job file must be completely untouched by the refused write.
-    const job = readScheduledJob(dir, "gmail-c1-abc123");
+    const job = readScheduledJob(dir, "gmail-c1-abc123", TEN);
     assert.equal(job!.sessionId, "gmail:c1");
     assert.equal(job!.title, "Session A");
     assert.equal(job!.url, "https://zoho.com/meeting/abc");

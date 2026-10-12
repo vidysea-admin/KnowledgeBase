@@ -11,6 +11,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { planSendNow, type SendNowJob, type SendNowRefusal } from "./send-now.js";
+import { assertTenantTag } from "./calendar/state-tenant-tag.js";
 
 export interface SendNowDeps {
   /** Live jobs for the duplicate check. MUST THROW when the state cannot be read: that is "cannot tell", never "no jobs". */
@@ -103,6 +104,7 @@ export function readLiveJobs(
     if (!job || typeof job !== "object" || typeof job.url !== "string" || typeof job.sessionId !== "string") {
       throw new Error(`scheduled job file ${name} has an unexpected shape`);
     }
+    assertTenantTag(job, src.tenantId, `scheduled/${name}`); // ISS-ALERTID-006: untagged / other-tenant job file = cannot tell (throws)
     const row = Object.hasOwn(ops, job.sessionId) ? ops[job.sessionId] : undefined;
     // No operations row: still queued while `until` is ahead (or unparseable: fail closed); past `until` it has ended.
     const until = typeof job.until === "string" ? Date.parse(job.until) : NaN;

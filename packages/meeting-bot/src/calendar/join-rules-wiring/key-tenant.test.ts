@@ -109,7 +109,7 @@ test("ISS-T037WIRE-001 recorded repro (A's rules opt out g1; run configured as B
       assert.ok(!/ten-a|ten-b/.test(w[0]!), "no tenant ids in the warning");
       assert.equal(api.opsCount(), 1, "exactly one verification request");
       if (mode === "fail-closed") {
-        assert.deepEqual(t.ids, [], "fail-closed: nothing scheduled"); assert.deepEqual(t.scheduled, []); assert.deepEqual([...readScheduledKeys(root)], [], "nothing recorded");
+        assert.deepEqual(t.ids, [], "fail-closed: nothing scheduled"); assert.deepEqual(t.scheduled, []); assert.deepEqual([...readScheduledKeys(root, A)], [], "nothing recorded");
         assert.deepEqual(t.result.skipped.map((s) => [s.sourceId, s.reason]), [["g1", "rules-unevaluable"]]);
       } else { assert.deepEqual(t.ids, ["g1"], "fail-open: selection unchanged (loud warning), B's rules not applied"); assert.equal(t.scheduled.length, 1); }
       n++;
@@ -127,7 +127,7 @@ test("unverified (header missing / 403 / 500 / network / invalid / uppercase var
       const t = await tick(root, { LKB_TENANT_ID: A, LKB_JOIN_RULES_ENFORCE: mode }, api, false);
       assert.ok(warns(t.logs).some((w) => /tenant-unverified/.test(w)), `${name}/${mode}: tenant-unverified warning`);
       assert.equal(api.opsCount(), 1);
-      if (mode === "fail-closed") { assert.deepEqual(t.ids, [], name); assert.deepEqual(t.scheduled, [], name); assert.deepEqual([...readScheduledKeys(root)], [], name); }
+      if (mode === "fail-closed") { assert.deepEqual(t.ids, [], name); assert.deepEqual(t.scheduled, [], name); assert.deepEqual([...readScheduledKeys(root, A)], [], name); }
       else { assert.deepEqual(t.ids, ["g1"], `${name}: fail-open leaves the selection unchanged (A's opt-out NOT applied: rules are not attributable)`); }
   });
 });

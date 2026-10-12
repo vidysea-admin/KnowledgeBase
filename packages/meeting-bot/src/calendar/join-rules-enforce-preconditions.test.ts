@@ -34,7 +34,7 @@ async function withRoot<T>(fn: (root: string) => Promise<T>): Promise<T> {
 }
 function deps(root: string, o: Partial<ScheduleTickDeps> & { logs?: string[] } = {}): ScheduleTickDeps {
   const { logs, ...rest } = o;
-  return { loadCalendarEvents: async () => [], loadCandidates: async () => [cand("g1")], now: () => NOW, stateDir: root,
+  return { loadCalendarEvents: async () => [], loadCandidates: async () => [cand("g1")], now: () => NOW, stateDir: root, stateTenantId: A,
     scheduler: { scheduleOnce: async () => {} }, log: (m) => { logs?.push(m); }, everyWebinar: true, joinRulesTenantId: A, ...rest };
 }
 const save = (root: string, tenant: string, state: Partial<{ optedOutEventIds: string[] }> = {}) =>
@@ -62,7 +62,7 @@ function genInputs(seed: number) {
   return { candidates, calendarEvents, everyWebinar: r() < 0.5 };
 }
 const reference = (i: ReturnType<typeof genInputs>, root: string) => selectAutoRecordItems({ calendarEvents: i.calendarEvents, candidates: i.candidates, now: NOW,
-  leadMinutes: 5, trustedSenders: loadTrustedSenderConfig(), alreadyScheduled: readScheduledKeys(root), everyWebinar: i.everyWebinar });
+  leadMinutes: 5, trustedSenders: loadTrustedSenderConfig(), alreadyScheduled: readScheduledKeys(root, A), everyWebinar: i.everyWebinar });
 const expectedLogs = (i: ReturnType<typeof genInputs>, ref: SelectAutoRecordItemsResult) => [
   `schedule-tick: ${ref.toSchedule.length} to schedule, ${ref.skipped.length} skipped (${i.calendarEvents.length} calendar event(s), ${i.candidates.length} candidate(s), now=${NOW})`,
   ...ref.toSchedule.map((x) => `  schedule — ${x.source}:${x.sourceId} "${x.title}" ${x.startTime} -> ${x.endTime} join: ${redactJoinLink(x.meetingUrl)}`),

@@ -2,6 +2,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, statSync, renameSync, unlinkSync, openSync, closeSync, fsyncSync, lstatSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
+import { assertTenantTag, requireStateTenant } from "./state-tenant-tag.js";
 import { reconcileWebinarSources, type CalendarEvent, type WebinarReconciliationState } from "./calendar-client.js";
 import type { AutoRecordCandidateInput } from "./auto-join.js";
 import { projectWebinarInventory, projectWebinarRegistrations, webinarSessionKey, isDirectWebinarJoin, type WebinarRegistrationAttempt } from "./auto-record-policy.js";
@@ -226,29 +227,42 @@ export function scheduleStateFilePath(stateDir: string): string {
   return path.join(stateDir, "schedule-state.json");
 }
 
+/** On-disk shape (ISS-ALERTID-006): tagged with the tenant that wrote it. An untagged legacy file is a bare map and is refused. */
+const STATE_FILE_VERSION = 2;
 
-export function readScheduleState(stateDir: string): ScheduleState {
+/**
+ * Reads the dedup state for ONE tenant. Missing file -> {}. A file with no tenant tag, another tenant's tag, or a non-object
+ * body is REFUSED (throws StateTenantRefusal) and never read; an unparseable file is {} as before (it carries no data to leak,
+ * and the next write replaces it). The tenant is required: there is no untagged read path.
+ */
+export function readScheduleState(stateDir: string, tenantId: string): ScheduleState {
+  requireStateTenant(tenantId);
   const p = scheduleStateFilePath(stateDir);
   if (!existsSync(p)) return {};
-  try {
-    const parsed = JSON.parse(readFileSync(p, "utf8"));
-    return typeof parsed === "object" && parsed !== null ? (parsed as ScheduleState) : {};
-  } catch {
-    return {};
+  let parsed: unknown;
+  try { parsed = JSON.parse(readFileSync(p, "utf8")); } catch { return {}; }
+  if (typeof parsed !== "object" || parsed === null) return {};
+  const tagged = assertTenantTag(parsed, tenantId, "schedule-state.json");
+  const entries = tagged.entries;
+  const out: ScheduleState = {};
+  if (entries !== null && typeof entries === "object" && !Array.isArray(entries)) {
+    for (const [k, v] of Object.entries(entries)) if (k !== "__proto__") Object.defineProperty(out, k, { value: v as ScheduledEntry, enumerable: true, writable: true, configurable: true });
   }
+  return out;
 }
 
 
-export function readScheduledKeys(stateDir: string): Set<string> {
-  return new Set(Object.keys(readScheduleState(stateDir)));
+export function readScheduledKeys(stateDir: string, tenantId: string): Set<string> {
+  return new Set(Object.keys(readScheduleState(stateDir, tenantId)));
 }
 
 
-export function recordScheduled(stateDir: string, entry: ScheduledEntry): void {
+export function recordScheduled(stateDir: string, entry: ScheduledEntry, tenantId: string): void {
+  const entries = readScheduleState(stateDir, tenantId); // refuses a foreign/untagged file BEFORE anything is written
   mkdirSync(stateDir, { recursive: true });
-  const state = readScheduleState(stateDir);
-  state[entry.sessionKey] = entry;
-  writeFileSync(scheduleStateFilePath(stateDir), JSON.stringify(state, null, 2) + "\n");
+  entries[entry.sessionKey] = entry;
+  writeFileSync(scheduleStateFilePath(stateDir),
+    JSON.stringify({ version: STATE_FILE_VERSION, tenantId, entries }, null, 2) + "\n");
 }
 
 export interface ScheduledJob {
@@ -270,8 +284,8 @@ export function scheduledJobFilePath(stateDir: string, jobKey: string): string {
 }
 
 
-export function writeScheduledJob(stateDir: string, jobKey: string, job: ScheduledJob): void {
-  const existing = readScheduledJob(stateDir, jobKey);
+export function writeScheduledJob(stateDir: string, jobKey: string, job: ScheduledJob, tenantId: string): void {
+  const existing = readScheduledJob(stateDir, jobKey, tenantId); // throws on an untagged / other-tenant file at this key
   if (existing && existing.sessionId !== job.sessionId) {
     throw new Error(
       `refusing to schedule '${job.sessionId}': jobKey '${jobKey}' is already scheduled for a ` +
@@ -280,17 +294,18 @@ export function writeScheduledJob(stateDir: string, jobKey: string, job: Schedul
     );
   }
   mkdirSync(scheduledJobDir(stateDir), { recursive: true });
-  writeFileSync(scheduledJobFilePath(stateDir, jobKey), JSON.stringify(job, null, 2) + "\n");
+  writeFileSync(scheduledJobFilePath(stateDir, jobKey), JSON.stringify({ ...job, tenantId }, null, 2) + "\n");
 }
 
 
-export function readScheduledJob(stateDir: string, jobKey: string): ScheduledJob | null {
+/** Null when absent or unparseable (as before). Throws StateTenantRefusal for a job file that is untagged or tagged for another tenant. */
+export function readScheduledJob(stateDir: string, jobKey: string, tenantId: string): ScheduledJob | null {
+  requireStateTenant(tenantId);
   const p = scheduledJobFilePath(stateDir, jobKey);
   if (!existsSync(p)) return null;
-  try {
-    const parsed = JSON.parse(readFileSync(p, "utf8"));
-    return parsed && typeof parsed === "object" ? (parsed as ScheduledJob) : null;
-  } catch {
-    return null;
-  }
+  let parsed: unknown;
+  try { parsed = JSON.parse(readFileSync(p, "utf8")); } catch { return null; }
+  if (!parsed || typeof parsed !== "object") return null;
+  const { tenantId: _tag, ...job } = assertTenantTag(parsed, tenantId, `scheduled/${jobKey}.json`);
+  return job as unknown as ScheduledJob;
 }

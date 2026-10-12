@@ -42,7 +42,7 @@ function fakeScheduler() {
 }
 function deps(root: string, o: Partial<ScheduleTickDeps> & { logs?: string[] } = {}): ScheduleTickDeps {
   const { logs, ...rest } = o;
-  return { loadCalendarEvents: async () => [], loadCandidates: async () => [cand("g1")], now: () => NOW, stateDir: root,
+  return { loadCalendarEvents: async () => [], loadCandidates: async () => [cand("g1")], now: () => NOW, stateDir: root, stateTenantId: A,
     scheduler: fakeScheduler().scheduler, log: (m) => { logs?.push(m); }, everyWebinar: true, joinRulesTenantId: A, ...rest };
 }
 const save = (root: string, tenant: string, ruleSet: JoinRuleSet, state: Partial<StoredJoinRules["state"]> = {}) =>
@@ -83,7 +83,7 @@ function genInputs(seed: number) {
   return { candidates, calendarEvents, everyWebinar: r() < 0.5 };
 }
 const reference = (i: ReturnType<typeof genInputs>, root: string) => selectAutoRecordItems({ calendarEvents: i.calendarEvents, candidates: i.candidates, now: NOW,
-  leadMinutes: 5, trustedSenders: loadTrustedSenderConfig(), alreadyScheduled: readScheduledKeys(root), everyWebinar: i.everyWebinar });
+  leadMinutes: 5, trustedSenders: loadTrustedSenderConfig(), alreadyScheduled: readScheduledKeys(root, A), everyWebinar: i.everyWebinar });
 const expectedLogs = (i: ReturnType<typeof genInputs>, ref: SelectAutoRecordItemsResult) => [
   `schedule-tick: ${ref.toSchedule.length} to schedule, ${ref.skipped.length} skipped (${i.calendarEvents.length} calendar event(s), ${i.candidates.length} candidate(s), now=${NOW})`,
   ...ref.toSchedule.map((x) => `  schedule — ${x.source}:${x.sourceId} "${x.title}" ${x.startTime} -> ${x.endTime} join: ${redactJoinLink(x.meetingUrl)}`),
@@ -120,7 +120,7 @@ test("DEFAULT PARITY (real run): scheduler calls, persisted dedup state and logs
     const { scheduler, calls } = fakeScheduler(); const logs: string[] = [];
     save(root, A, EMPTY, { optedOutEventIds: ["g1"] }); // a rules file that WOULD remove g1 if it were read
     const out = await runScheduleTickOnce(deps(root, { scheduler, logs, joinRulesEnforce: v }), false);
-    return { out, calls, logs, keys: [...readScheduledKeys(root)] };
+    return { out, calls, logs, keys: [...readScheduledKeys(root, A)] };
   });
   const base = await run(undefined);
   assert.equal(base.out.toSchedule.length, 1, "un-wired tick still schedules the opted-out item");
@@ -346,6 +346,6 @@ test("a real (non-dry) enforced run schedules only what the veto leaves", async 
     await runScheduleTickOnce(deps(root, { scheduler, loadCandidates: async () => [cand("g1"), g2()], joinRulesEnforce: "fail-closed" }), false);
     const two = async () => [cand("g1"), g2()];
     const g2Key = (await runScheduleTickOnce(deps("x", { loadCandidates: two }), true)).toSchedule.find((i) => i.sourceId === "g2")!.sessionKey;
-    assert.equal(calls.length, 1); assert.deepEqual([...readScheduledKeys(root)], [g2Key]);
+    assert.equal(calls.length, 1); assert.deepEqual([...readScheduledKeys(root, A)], [g2Key]);
   });
 });

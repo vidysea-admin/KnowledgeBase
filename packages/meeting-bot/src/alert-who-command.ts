@@ -1,17 +1,14 @@
 /**
  * packages/meeting-bot/src/alert-who-command.ts - r1-alert-id-resolver (W9).
- * `lkb alert-who <id> [--tenant T] [--tz ZONE] [--include-untagged]`: tells a LOCAL operator which meeting an attention-alert id names.
+ * `lkb alert-who <id> [--tenant T] [--tz ZONE]`: tells a LOCAL operator which meeting an attention-alert id names.
  * READ-ONLY: it opens files for reading and prints to the terminal; it creates, writes and sends nothing.
  *
- * Sources, and what each can honestly claim about tenancy (established from the writers: schedule-state.ts recordScheduled /
- * writeScheduledJob, both under ONE shared dir <repo>/raw/webinars, neither writing any tenant field):
- *   - <data/webinar-release>/operations.json   TENANT-TAGGED: read through `readWebinarOperationState`, which refuses another tenant's file.
- *   - <raw/webinars>/schedule-state.json       UNTAGGED, shared by every tenant on this machine ({sessionKey,title,scheduledAt})
- *   - <raw/webinars>/scheduled/*.json          UNTAGGED, shared                                  ({url,until,title,sessionId})
- * Untagged records cannot be shown to belong to the requested tenant, so by default they are NOT searched (only counted, and the
- * count is printed). `--include-untagged` searches them and labels every such match "tenant unknown (shared schedule file)".
- * No message claims a tenant scope the data does not have. The tenant is chosen as every lkb command does (`captureTenant`),
- * NEVER from the id.
+ * Sources (ISS-ALERTID-006: every one is now TENANT-TAGGED and read only for the requested tenant):
+ *   - <data/webinar-release>/operations.json   read through `readWebinarOperationState`, which refuses another tenant's file.
+ *   - <raw/webinars>/schedule-state.json       {version,tenantId,entries}; a missing / different tag is REFUSED (not read).
+ *   - <raw/webinars>/scheduled/*.json          {...job,tenantId}; each file with a missing / different tag is REFUSED (not read).
+ * Files written by older versions carry no tag: they are refused with an operator message, never read, migrated or deleted.
+ * The tenant is chosen as every lkb command does (`captureTenant`), NEVER from the id.
  * SKIPPED sessions: webinar-identity keys (overlap-lost, untrusted-sender) resolve through operations.json rows; `cal:<id>` and
  * `gmail:<id>` keys (no-join-link, unsafe-join-link, needs-registration) resolve through operations.json `source.reconciliation`
  * (the provider ids the poller has seen). All tenant-tagged.
@@ -25,9 +22,9 @@ import { fileURLToPath } from "node:url";
 import { resolveAlertId, type AlertCandidate } from "./calendar/alerts/alert-resolve.js";
 import { canonicalStart, renderStart, neutralizeText } from "./calendar/alerts/attention-alerts.js";
 import { detectPlatform } from "./platform.js";
+import { assertTenantTag, StateTenantRefusal } from "./calendar/state-tenant-tag.js";
 
-const USAGE = "usage: lkb alert-who <alert-id> [--tenant T] [--tz ZONE] [--include-untagged]";
-export const UNTAGGED_LABEL = "tenant unknown (shared schedule file)";
+const USAGE = "usage: lkb alert-who <alert-id> [--tenant T] [--tz ZONE]";
 export const LIMITS = { fileBytes: 5 * 1024 * 1024, jobBytes: 64 * 1024, jobFiles: 5000, rows: 20000 } as const;
 
 export interface AlertWhoSources { dataRoot: string; stateDir: string; operationsFile: string; tenantId: string }
@@ -42,7 +39,7 @@ export interface AlertWhoDeps {
   now: () => Date;
   write: (line: string) => void;
 }
-export interface Loaded { tagged: AlertCandidate[]; untagged: AlertCandidate[]; problems: string[] }
+export interface Loaded { tagged: AlertCandidate[]; problems: string[] }
 
 const str = (v: unknown): string | undefined => (typeof v === "string" ? v : undefined);
 const isPlain = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v);
@@ -82,12 +79,13 @@ function bucket() {
 }
 
 /**
- * Merges rows that name the same sessionKey (first non-empty field wins). Total: never throws. Tenant-tagged and untagged
- * candidates are kept in SEPARATE lists and are never merged with each other.
+ * Merges rows that name the same sessionKey (first non-empty field wins). Total: never throws. Every source is tenant-checked;
+ * a file with a missing or different tenant tag contributes nothing and yields a `problems` line.
  */
 export function loadCandidates(src: AlertWhoSources, deps: Pick<AlertWhoDeps, "readOperations" | "now">): Loaded {
   const problems: string[] = [];
-  const T = bucket(), U = bucket();
+  const T = bucket();
+  const refusal = (e: unknown, fallback: string): string => (e instanceof StateTenantRefusal ? e.message : fallback);
 
   const stateFile = path.join(src.stateDir, "schedule-state.json");
   if (existsSync(stateFile)) {
@@ -95,10 +93,12 @@ export function loadCandidates(src: AlertWhoSources, deps: Pick<AlertWhoDeps, "r
     else try {
       const v = readJsonCapped(stateFile, LIMITS.fileBytes);
       if (!isPlain(v)) throw new Error("not an object");
-      for (const e of Object.values(v).slice(0, LIMITS.rows)) {
-        if (isPlain(e) && typeof e.sessionKey === "string") U.add({ sessionKey: e.sessionKey, title: str(e.title), source: "schedule-state" });
+      const tagged = assertTenantTag(v, src.tenantId, "schedule-state.json");
+      const entries = isPlain(tagged.entries) ? tagged.entries : {};
+      for (const e of Object.values(entries).slice(0, LIMITS.rows)) {
+        if (isPlain(e) && typeof e.sessionKey === "string") T.add({ sessionKey: e.sessionKey, title: str(e.title), source: "schedule-state" });
       }
-    } catch { problems.push("schedule-state.json is unreadable or corrupt (skipped)"); }
+    } catch (e) { problems.push(refusal(e, "schedule-state.json is unreadable or corrupt (skipped)")); }
   }
 
   const jobDir = path.join(src.stateDir, "scheduled");
@@ -107,15 +107,22 @@ export function loadCandidates(src: AlertWhoSources, deps: Pick<AlertWhoDeps, "r
     else try {
       const names = readdirSync(jobDir).filter((n) => n.endsWith(".json")).sort();
       if (names.length > LIMITS.jobFiles) problems.push(`scheduled/ has more than ${LIMITS.jobFiles} job files (only the first ${LIMITS.jobFiles} read)`);
+      const refused = { untagged: 0, "other-tenant": 0, "invalid-tenant": 0 };
       for (const n of names.slice(0, LIMITS.jobFiles)) {
         try {
           const j = readJsonCapped(path.join(jobDir, n), LIMITS.jobBytes);
           if (!isPlain(j) || typeof j.sessionId !== "string") throw new Error("shape");
+          assertTenantTag(j, src.tenantId, n);
           const url = str(j.url);
-          U.add({ sessionKey: j.sessionId, title: str(j.title), end: str(j.until), source: "scheduled-job",
+          T.add({ sessionKey: j.sessionId, title: str(j.title), end: str(j.until), source: "scheduled-job",
             platform: url ? detectPlatform(url) : undefined, host: alertWhoHostOnly(url) });
-        } catch { problems.push("a scheduled job file is unreadable or corrupt (skipped)"); }
+        } catch (e) {
+          if (e instanceof StateTenantRefusal) refused[e.reason]++;
+          else problems.push("a scheduled job file is unreadable or corrupt (skipped)");
+        }
       }
+      if (refused.untagged) problems.push(`${refused.untagged} file(s) in scheduled/ have no tenant tag (written by an older version; the directory is shared by every tenant on this machine) and were refused: not read, changed or deleted. Review them and move them aside yourself; no automatic migration is done.`);
+      if (refused["other-tenant"]) problems.push(`${refused["other-tenant"]} file(s) in scheduled/ are tagged for a different tenant and were not read.`);
     } catch { problems.push("scheduled/ directory is unreadable (skipped)"); }
   }
 
@@ -141,18 +148,17 @@ export function loadCandidates(src: AlertWhoSources, deps: Pick<AlertWhoDeps, "r
       }
     } catch { problems.push("operations.json is unreadable, corrupt, or belongs to a different tenant (not used)"); }
   }
-  return { tagged: [...T.by.values()], untagged: [...U.by.values()], problems };
+  return { tagged: [...T.by.values()], problems };
 }
 
 const plain = (v: string | undefined, max = 120): string => (v ? v.replace(/[^A-Za-z0-9:._ ,;-]/g, "?").slice(0, max) : "unknown");
 
-function parse(rest: string[]): { id: string; tz: string; tenantArgs: string[]; includeUntagged: boolean } {
+function parse(rest: string[]): { id: string; tz: string; tenantArgs: string[] } {
   const pos: string[] = [], tenantArgs: string[] = [];
-  let tz = "UTC", includeUntagged = false;
+  let tz = "UTC";
   for (let i = 0; i < rest.length; i++) {
     const a = rest[i]!;
-    if (a === "--include-untagged") includeUntagged = true;
-    else if (a === "--tenant" || a === "--tz") {
+    if (a === "--tenant" || a === "--tz") {
       const v = rest[++i];
       if (v === undefined || v.startsWith("--")) throw new Error(USAGE);
       if (a === "--tz") tz = v; else tenantArgs.push(a, v);
@@ -160,7 +166,7 @@ function parse(rest: string[]): { id: string; tz: string; tenantArgs: string[]; 
     else pos.push(a);
   }
   if (pos.length !== 1) throw new Error(USAGE);
-  return { id: pos[0]!, tz, tenantArgs, includeUntagged };
+  return { id: pos[0]!, tz, tenantArgs };
 }
 
 const REFUSALS = { "not-text": "not text", empty: "empty", "wrong-length": "not 20 characters long", "not-hex": "not lower-case hex" } as const;
@@ -169,23 +175,15 @@ export const LIMIT_NOTE = "Calendar and Gmail items are resolved from the source
 
 /** Exit code: 0 = at least one meeting found, 1 = refused or nothing found. Usage errors THROW (as runSendNow does). */
 export function runAlertWho(rest: string[], deps: AlertWhoDeps): number {
-  const { id, tz, tenantArgs, includeUntagged } = parse(rest);
+  const { id, tz, tenantArgs } = parse(rest);
   const tenantId = deps.resolveTenant(tenantArgs); // from --tenant / the host's env rule only, never from the id
-  const { tagged, untagged, problems } = loadCandidates({ ...deps.sources, tenantId }, deps);
+  const { tagged, problems } = loadCandidates({ ...deps.sources, tenantId }, deps);
   const r = resolveAlertId(id, tagged);
   if (!r.ok) { deps.write(`alert-who refused: the id is ${REFUSALS[r.reason]} (expected the 20 hex characters printed in the alert, optionally in [ ])`); return 1; }
-  const seen = new Set(r.matches.map((m) => m.sessionKey));
-  const u = includeUntagged ? resolveAlertId(id, untagged) : undefined;
-  const loose = (u && u.ok ? u.matches : []).filter((m) => !seen.has(m.sessionKey));
-  const all = [...r.matches, ...loose];
+  const all = r.matches;
   for (const p of problems) deps.write(`warning: ${p}`);
-  if (!includeUntagged && untagged.length > 0) {
-    deps.write(`notice: ${untagged.length} candidate${untagged.length > 1 ? "s" : ""} in schedule-state.json and scheduled/ were NOT searched: those files are shared ` +
-      `by every tenant on this machine and carry no tenant tag, so a match cannot be shown to belong to the tenant you asked for. ` +
-      `Add --include-untagged to search them; every such match is labelled "${UNTAGGED_LABEL}".`);
-  }
   if (all.length === 0) {
-    deps.write(`no record in operations.json matches alert id ${r.id}${includeUntagged ? " (the shared schedule files were searched too: no match)" : ""}.`);
+    deps.write(`no record matches alert id ${r.id} (searched operations.json, schedule-state.json and scheduled/ job files, each only if tagged for the requested tenant).`);
     deps.write(LIMIT_NOTE);
     if (problems.length) deps.write("Some state could not be read, so a missing match is not proof the meeting is absent.");
     return 1;
@@ -197,7 +195,7 @@ export function runAlertWho(rest: string[], deps: AlertWhoDeps): number {
     deps.write(`  title:    ${neutralizeText(m.title)}`);
     deps.write(`  time:     ${iso ? renderStart(iso, tz) : endIso ? `ends ${renderStart(endIso, tz)}` : "unknown"}`);
     deps.write(`  platform: ${plain(m.platform)}${m.host ? ` (${plain(m.host, 100)})` : ""}`);
-    deps.write(`  source:   ${loose.includes(m) ? `${UNTAGGED_LABEL}: ` : ""}${plain(m.source, 120)}${m.status ? `; status ${plain(m.status, 40)}` : ""}`);
+    deps.write(`  source:   ${plain(m.source, 120)}${m.status ? `; status ${plain(m.status, 40)}` : ""}`);
   }
   return 0;
 }

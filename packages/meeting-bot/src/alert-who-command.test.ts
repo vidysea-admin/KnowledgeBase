@@ -38,21 +38,27 @@ function putOps(w: W, tenant: string, rows: Record<string, Record<string, unknow
   for (const [k, v] of Object.entries(rows)) operations[k] = { tenantId: tenant, status: "queued", ...v };
   writeWebinarOperationState(w.opsFile, { version: 1, tenantId: tenant, operations } as never);
 }
-const putJob = (w: W, name: string, job: unknown) => writeFileSync(path.join(w.stateDir, "scheduled", name), JSON.stringify(job));
-const putState = (w: W, entries: Record<string, unknown>) => writeFileSync(path.join(w.stateDir, "schedule-state.json"), JSON.stringify(entries));
+// ISS-ALERTID-006: the scheduler's files are tenant-tagged. putJob/putState write the CURRENT format for `tenant`; the *Legacy helpers write the
+// old untagged shapes exactly as recorded in the ledger (bare map / bare job).
+const putJob = (w: W, name: string, job: unknown, tenant = "A") =>
+  writeFileSync(path.join(w.stateDir, "scheduled", name), JSON.stringify(Array.isArray(job) ? job : { tenantId: tenant, ...(job as object) }));
+const putState = (w: W, entries: Record<string, unknown>, tenant = "A") =>
+  writeFileSync(path.join(w.stateDir, "schedule-state.json"), JSON.stringify({ version: 2, tenantId: tenant, entries }));
+const putJobLegacy = (w: W, name: string, job: unknown) => writeFileSync(path.join(w.stateDir, "scheduled", name), JSON.stringify(job));
+const putStateLegacy = (w: W, entries: Record<string, unknown>) => writeFileSync(path.join(w.stateDir, "schedule-state.json"), JSON.stringify(entries));
 
 test("resolves a scheduled meeting from all three sources and merges them; prints title, time, platform, host, record", () => {
   const w = world();
   putState(w, { "cal:e1": { sessionKey: "cal:e1", title: "Team Sync", scheduledAt: "2026-10-10T09:00:00.000Z" } });
   putJob(w, "j1.json", { sessionId: "cal:e1", url: "https://zoom.us/j/12345678901?pwd=SECRETPASS", until: "2026-10-12T10:30:00Z", title: "Team Sync" });
   putOps(w, "A", { "webinar-0123456789abcdef01234567": { title: "Quarterly Webinar", startTime: "2026-10-12T10:00:00.000Z", status: "queued" } });
-  assert.equal(runAlertWho([`[${alertIdFor("cal:e1")}]`, "--tz", "Asia/Kolkata", "--include-untagged"], w.deps), 0);
+  assert.equal(runAlertWho([`[${alertIdFor("cal:e1")}]`, "--tz", "Asia/Kolkata"], w.deps), 0);
   const text = w.out.join("\n");
   assert.match(text, /record:   cal:e1/);
   assert.match(text, /title:    Team Sync/);
   assert.match(text, /time:     ends 2026-10-12 16:00 \(Asia\/Kolkata\)/);
   assert.match(text, /platform: zoom \(zoom\.us\)/);
-  assert.match(text, /source:   tenant unknown \(shared schedule file\): schedule-state, scheduled-job/);
+  assert.match(text, /source:   schedule-state, scheduled-job/);
   w.out.length = 0;
   assert.equal(runAlertWho([alertIdFor("webinar-0123456789abcdef01234567")], w.deps), 0);
   assert.match(w.out.join("\n"), /Quarterly Webinar[\s\S]*status queued/);
@@ -62,7 +68,7 @@ test("resolves a scheduled meeting from all three sources and merges them; print
 test("no match: exit 1, says skipped sessions are not saved; unreadable state is flagged, not hidden", () => {
   const w = world();
   assert.equal(runAlertWho([alertIdFor("cal:nothing")], w.deps), 1);
-  assert.match(w.out.join("\n"), /no record in operations\.json matches/);
+  assert.match(w.out.join("\n"), /no record matches alert id/);
   assert.match(w.out.join("\n"), /source inventory in operations\.json/);
   assert.ok(!/for tenant/i.test(w.out.join("\n")));
   writeFileSync(path.join(w.stateDir, "schedule-state.json"), "{not json");
@@ -91,9 +97,8 @@ test("duplicate rows for one session merge into one candidate; distinct sessions
   const w = world();
   putState(w, { a: { sessionKey: "cal:one", title: "One" }, b: { sessionKey: "cal:two", title: "Two" } });
   putJob(w, "j.json", { sessionId: "cal:one", url: "https://zoom.us/j/1", until: "2026-10-12T10:00:00Z", title: "One" });
-  const { untagged, tagged } = loadCandidates({ ...w.deps.sources, tenantId: "A" }, w.deps);
-  assert.equal(untagged.length, 2);
-  assert.equal(tagged.length, 0);
+  const { tagged } = loadCandidates({ ...w.deps.sources, tenantId: "A" }, w.deps);
+  assert.equal(tagged.length, 2);
   w.done();
 });
 
@@ -105,7 +110,7 @@ test("hostile titles come out inert: one output line per field, no control/escap
   for (const t of HOSTILE) {
     const w = world();
     putState(w, { k: { sessionKey: "cal:h", title: t } });
-    assert.equal(runAlertWho([alertIdFor("cal:h"), "--include-untagged"], w.deps), 0);
+    assert.equal(runAlertWho([alertIdFor("cal:h")], w.deps), 0);
     assert.equal(w.out.length, 6, JSON.stringify(t).slice(0, 30)); // header + 5 fields, nothing injected
     for (const line of w.out) {
       assert.ok(!/[\u0000-\u001f\u007f-\u009f\u2028\u2029\u200e\u200f\u202a-\u202e\u2066-\u2069]/.test(line), JSON.stringify(line).slice(0, 60));
@@ -121,7 +126,7 @@ test("hostile session key and host values are reduced to a plain charset on one 
   const w = world();
   const key = "cal:\u001b[31mX\r\nrecord: forged";
   putJob(w, "x.json", { sessionId: key, url: "https://exa\u202emple.com/a", until: "2026-10-12T10:00:00Z", title: "t" });
-  assert.equal(runAlertWho([alertIdFor(key), "--include-untagged"], w.deps), 0);
+  assert.equal(runAlertWho([alertIdFor(key)], w.deps), 0);
   assert.equal(w.out.length, 6);
   assert.ok(!/[\u0000-\u001f\u007f\u202e]/.test(w.out.join("")));
   w.done();
@@ -135,7 +140,7 @@ test("join URL: platform and bare host only; no query, path, fragment or userinf
   urls.forEach((u, i) => putJob(w, `j${i}.json`, { sessionId: `cal:u${i}`, url: u, until: "2026-10-12T10:00:00Z", title: "t" }));
   urls.forEach((_u, i) => {
     w.out.length = 0;
-    assert.equal(runAlertWho([alertIdFor(`cal:u${i}`), "--include-untagged"], w.deps), 0);
+    assert.equal(runAlertWho([alertIdFor(`cal:u${i}`)], w.deps), 0);
     const text = w.out.join("\n");
     for (const s of secrets) assert.ok(!text.includes(s), `${s} leaked for ${i}`);
     assert.match(text, /platform: (zoom|teams|meet|webex) \([a-z.]+\)/);
@@ -202,8 +207,8 @@ test("row cap: only the first 20000 state rows are read", () => {
   const e: Record<string, unknown> = {};
   for (let i = 0; i < 20005; i++) e[`k${i}`] = { sessionKey: `cal:${i}`, title: "t" };
   putState(w, e);
-  const { untagged } = loadCandidates({ ...w.deps.sources, tenantId: "A" }, w.deps);
-  assert.equal(untagged.length, 20000);
+  const { tagged } = loadCandidates({ ...w.deps.sources, tenantId: "A" }, w.deps);
+  assert.equal(tagged.length, 20000);
   w.done();
 });
 
@@ -220,53 +225,69 @@ test("the command writes nothing anywhere: temp tree is byte-identical before an
   w.done();
 });
 
-const LABEL = "tenant unknown (shared schedule file)";
-
-test("ISS-ALERTID-003 recorded reproduction, verbatim: tenant B's job id under --tenant A discloses nothing", () => {
+test("ISS-ALERTID-003 recorded reproduction, verbatim: tenant B's job id under --tenant A discloses nothing (untagged job file as recorded)", () => {
   const w = world();
-  putJob(w, "b.json", { sessionId: "cal:tenantB", title: "TENANT-B Board Review" });
+  putJobLegacy(w, "b.json", { sessionId: "cal:tenantB", title: "TENANT-B Board Review" });
   putOps(w, "B", { "webinar-bbbbbbbbbbbbbbbbbbbbbbbb": { title: "B ops row" } });
   const id = alertIdFor("cal:tenantB");
   assert.equal(runAlertWho([id, "--tenant", "A"], w.deps), 1);
   const text = w.out.join("\n");
   assert.ok(!/TENANT-B|Board Review/.test(text), text);
   assert.ok(!/for tenant/i.test(text), "no tenant claim the data cannot back");
-  assert.match(text, /1 candidate in schedule-state\.json and scheduled\/ were NOT searched/);
-  assert.match(text, /no tenant tag/);
-  assert.match(text, /no record in operations\.json matches alert id/);
+  assert.match(text, /1 file\(s\) in scheduled\/ have no tenant tag/);
+  assert.match(text, /no record matches alert id/);
+  // the same untagged file is refused for tenant B as well: it cannot be shown to belong to anyone
+  w.out.length = 0;
+  assert.equal(runAlertWho([id, "--tenant", "B"], w.deps), 1);
+  assert.ok(!w.out.join("\n").includes("Board Review"));
   w.done();
 });
 
-test("untagged sources are opt-in and every match from them is labelled; tagged matches are not", () => {
+test("ISS-ALERTID-006: tagged state is found by its own tenant only (jobs and schedule-state); the old --include-untagged flag is now a usage error", () => {
   const w = world();
-  putJob(w, "b.json", { sessionId: "cal:tenantB", title: "TENANT-B Board Review" });
-  assert.equal(runAlertWho([alertIdFor("cal:tenantB"), "--tenant", "A", "--include-untagged"], w.deps), 0);
-  const text = w.out.join("\n");
-  assert.ok(text.includes(`source:   ${LABEL}: scheduled-job`), text);
-  assert.ok(!/NOT searched/.test(text));
-  // a tenant-tagged hit is never labelled, and the same key from a shared file is not listed twice
-  const w2 = world();
-  putOps(w2, "A", { "webinar-aaaaaaaaaaaaaaaaaaaaaaaa": { title: "A row" } });
-  putState(w2, { k: { sessionKey: "webinar-aaaaaaaaaaaaaaaaaaaaaaaa", title: "shared copy" } });
-  assert.equal(runAlertWho([alertIdFor("webinar-aaaaaaaaaaaaaaaaaaaaaaaa"), "--include-untagged"], w2.deps), 0);
-  assert.ok(!w2.out.join("\n").includes(LABEL));
-  assert.match(w2.out[0]!, /: 1 match$/);
-  w.done(); w2.done();
+  putJob(w, "b.json", { sessionId: "cal:tenantB", title: "TENANT-B Board Review" }, "B");
+  putState(w, { k: { sessionKey: "cal:stateB", title: "STATE-B Offsite" } }, "B");
+  assert.equal(runAlertWho([alertIdFor("cal:tenantB"), "--tenant", "B"], w.deps), 0);
+  assert.match(w.out.join("\n"), /title:    TENANT-B Board Review/);
+  assert.ok(!w.out.join("\n").includes("tenant unknown"));
+  w.out.length = 0;
+  assert.equal(runAlertWho([alertIdFor("cal:stateB"), "--tenant", "B"], w.deps), 0);
+  for (const id of ["cal:tenantB", "cal:stateB"]) {
+    w.out.length = 0;
+    assert.equal(runAlertWho([alertIdFor(id), "--tenant", "A"], w.deps), 1);
+    const text = w.out.join("\n");
+    assert.ok(!/TENANT-B|STATE-B|Board Review|Offsite/.test(text), text);
+    assert.match(text, /different tenant/);
+  }
+  assert.throws(() => runAlertWho([alertIdFor("cal:tenantB"), "--include-untagged"], w.deps), /usage/);
+  w.done();
 });
 
-test("two tenants' operations plus shared untagged files: A and B each see only their tagged rows; shared files are only counted", () => {
+test("legacy untagged schedule-state.json is refused with an operator message and is left on disk byte-for-byte", () => {
+  const w = world();
+  putStateLegacy(w, { "cal:old": { sessionKey: "cal:old", title: "OLD UNTAGGED TITLE", scheduledAt: "2026-10-10T09:00:00.000Z" } });
+  const before = snapshot(w.root);
+  assert.equal(runAlertWho([alertIdFor("cal:old")], w.deps), 1);
+  const text = w.out.join("\n");
+  assert.ok(!text.includes("OLD UNTAGGED TITLE"));
+  assert.match(text, /warning: refusing schedule-state\.json: it has no tenant tag/);
+  assert.match(text, /not read, changed or deleted/);
+  assert.deepEqual(snapshot(w.root), before);
+  w.done();
+});
+
+test("two tenants' operations plus tagged schedule files: A and B each see only their own rows", () => {
   const w = world();
   putOps(w, "B", { "webinar-bbbbbbbbbbbbbbbbbbbbbbbb": { title: "Tenant B Board Review" } });
-  putJob(w, "a.json", { sessionId: "cal:ownerA", title: "OWNER-A Offsite" });
-  putState(w, { x: { sessionKey: "cal:ownerB", title: "OWNER-B Offsite" } });
-  for (const [t, other] of [["A", "OWNER-B"], ["B", "OWNER-A"]] as const) {
+  putJob(w, "a.json", { sessionId: "cal:ownerA", title: "OWNER-A Offsite" }, "A");
+  putJob(w, "b.json", { sessionId: "cal:ownerB", title: "OWNER-B Offsite" }, "B");
+  for (const [t, own, other] of [["A", "cal:ownerA", "cal:ownerB"], ["B", "cal:ownerB", "cal:ownerA"]] as const) {
     w.out.length = 0;
-    runAlertWho([alertIdFor("cal:ownerA"), "--tenant", t], w.deps);
-    runAlertWho([alertIdFor("cal:ownerB"), "--tenant", t], w.deps);
-    const text = w.out.join("\n");
-    assert.ok(!/OWNER-/.test(text) && !/Offsite/.test(text), `${t}: ${text}`);
-    assert.match(text, /2 candidates in schedule-state\.json and scheduled\/ were NOT searched/);
-    assert.ok(!text.includes(other));
+    assert.equal(runAlertWho([alertIdFor(own), "--tenant", t], w.deps), 0);
+    assert.match(w.out.join("\n"), new RegExp(`OWNER-${t} Offsite`));
+    w.out.length = 0;
+    assert.equal(runAlertWho([alertIdFor(other), "--tenant", t], w.deps), 1);
+    assert.ok(!/OWNER-/.test(w.out.join("\n")), `${t}: ${w.out.join("\n")}`);
   }
   w.out.length = 0;
   assert.equal(runAlertWho([alertIdFor("webinar-bbbbbbbbbbbbbbbbbbbbbbbb"), "--tenant", "B"], w.deps), 0);
@@ -274,9 +295,9 @@ test("two tenants' operations plus shared untagged files: A and B each see only 
   w.done();
 });
 
-test("a miss never claims a tenant scope: no 'for tenant' in any output, with or without the opt-in flag", () => {
+test("a miss never claims a tenant scope it cannot back: no 'for tenant' in any output", () => {
   const w = world();
-  for (const flags of [[], ["--include-untagged"], ["--tenant", "ZED"], ["--tenant", "ZED", "--include-untagged"]]) {
+  for (const flags of [[], ["--tenant", "ZED"]]) {
     w.out.length = 0;
     assert.equal(runAlertWho([alertIdFor("cal:nothing"), ...flags], w.deps), 1);
     assert.ok(!/for tenant/i.test(w.out.join("\n")), flags.join(" "));
@@ -293,7 +314,7 @@ test("ISS-ALERTID-005: a junction at scheduled/ or in front of operations.json i
   writeFileSync(path.join(outside, "j.json"), JSON.stringify({ sessionId: "cal:escape", title: "OUTSIDE TITLE" }));
   rmSync(path.join(w.stateDir, "scheduled"), { recursive: true });
   if (!junction(outside, path.join(w.stateDir, "scheduled"))) { t.skip("cannot create a junction here"); rmSync(outside, { recursive: true, force: true }); w.done(); return; }
-  assert.equal(runAlertWho([alertIdFor("cal:escape"), "--include-untagged"], w.deps), 1);
+  assert.equal(runAlertWho([alertIdFor("cal:escape")], w.deps), 1);
   assert.ok(!w.out.join("\n").includes("OUTSIDE TITLE"));
   assert.match(w.out.join("\n"), /warning: scheduled\/ resolves outside the data root \(link not followed; skipped\)/);
   // operations.json behind a junctioned directory
@@ -312,11 +333,11 @@ test("ISS-ALERTID-005: the per-job size cap is pinned at 64 KiB with valid JSON 
   const w = world();
   putJob(w, "big.json", { sessionId: "cal:big", title: "BIG", pad: "x".repeat(70 * 1024) });
   putJob(w, "ok.json", { sessionId: "cal:ok", title: "OK", pad: "x".repeat(60 * 1024) });
-  assert.equal(runAlertWho([alertIdFor("cal:big"), "--include-untagged"], w.deps), 1);
+  assert.equal(runAlertWho([alertIdFor("cal:big")], w.deps), 1);
   assert.match(w.out.join("\n"), /warning: a scheduled job file is unreadable or corrupt/);
   assert.ok(!w.out.join("\n").includes("BIG"));
   w.out.length = 0;
-  assert.equal(runAlertWho([alertIdFor("cal:ok"), "--include-untagged"], w.deps), 0);
+  assert.equal(runAlertWho([alertIdFor("cal:ok")], w.deps), 0);
   assert.match(w.out.join("\n"), /title:    OK/);
   w.done();
 });

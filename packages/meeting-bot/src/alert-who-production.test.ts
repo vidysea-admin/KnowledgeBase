@@ -53,7 +53,7 @@ async function build() {
   mkdirSync(path.dirname(opsFile), { recursive: true });
   const scheduled: string[] = [];
   const result = await runScheduleTickOnce({
-    loadCalendarEvents: async () => EVENTS, loadCandidates: async () => CANDS, everyWebinar: true, now: () => NOW, stateDir,
+    loadCalendarEvents: async () => EVENTS, loadCandidates: async () => CANDS, everyWebinar: true, now: () => NOW, stateDir, stateTenantId: "A",
     scheduler: { scheduleOnce: async (o) => { scheduled.push(o.jobKey); } }, log: () => {},
   }, false);
   const acquisition: WebinarCalendarAcquisition = { version: 1, tenantId: "A", scope: "available-connected-source-state", complete: true, mode: "baseline",
@@ -98,7 +98,7 @@ const EXPECTED: Record<string, [boolean, boolean, string]> = {
   "unverified-link-source": [false, false, ""],
 };
 
-test("per-kind table: every skip reason -> alert emitted? -> resolves? -> from which source (default and --include-untagged agree)", async () => {
+test("per-kind table: every skip reason -> alert emitted? -> resolves? -> from which source (tagged schedule files are searched too)", async () => {
   const b = await build();
   const table: string[] = [];
   for (const reason of SKIP_REASONS) {
@@ -109,7 +109,7 @@ test("per-kind table: every skip reason -> alert emitted? -> resolves? -> from w
       const alert = b.alerts.find((a) => a.source === "skipped" && a.id === alertIdFor(it.sessionKey));
       assert.equal(alert !== undefined, emits, `${reason}: alert emitted`);
       if (!alert) continue;
-      for (const flags of [[], ["--include-untagged"]]) {
+      for (const flags of [[]] as string[][]) {
         const r = b.ask(alert.id, ...flags);
         assert.equal(r.code === 0, resolves, `${reason} ${it.sessionKey} ${flags.join(" ")}\n${r.text}`);
         if (resolves) assert.equal(sourceOf(r.text), source, reason);
@@ -137,11 +137,11 @@ test("job alerts (operations rows at action_required) resolve end to end from op
   b.done();
 });
 
-test("the scheduled webinar (no alert) is findable only through operations; its untagged job file is not searched by default", async () => {
+test("the scheduled webinar (no alert) is found through operations AND its tenant-tagged job and state files (ISS-ALERTID-006)", async () => {
   const b = await build();
   const key = webinarSessionKey(`https://zoom.us/j/11111111111|2026-10-10T10:02:00.000Z`);
   const r = b.ask(alertIdFor(key));
   assert.equal(r.code, 0, r.text);
-  assert.match(r.text, /source:   operations/);
+  assert.match(r.text, /source:   schedule-state, scheduled-job, operations/);
   b.done();
 });
