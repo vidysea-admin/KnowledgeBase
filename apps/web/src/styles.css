@@ -249,6 +249,9 @@ body {
 /* Responsive: phones. Desktop (>640px) is untouched by everything below. */
 .app-main { min-width: 0; }
 .app-main pre { max-width: 100%; overflow-x: auto; }
+/* A select sizes to its longest option; cap it at its container (ISS-WEBRESPONSIVE-001). No effect unless it would overflow. */
+.app-main label { max-width: 100%; }
+.app-main select { max-width: min(100%, 40rem); min-width: 0; text-overflow: ellipsis; }
 
 @media (max-width: 640px) {
   .app-shell { grid-template-columns: minmax(0, 1fr); min-height: 0; }
@@ -281,6 +284,14 @@ body {
   .login-card { max-width: calc(100% - 32px); }
   .brain-split { flex-direction: column; gap: 0; }
   .brain-panel { width: auto; border-left: none; border-top: 1px solid var(--line); max-height: none; }
+  /* Form controls and long text never widen the page (ISS-WEBRESPONSIVE-001). */
+  .app-main { overflow-wrap: anywhere; }
+  .app-main select, .app-main input:not([type="checkbox"]):not([type="radio"]), .app-main textarea {
+    max-width: 100%; min-width: 0; text-overflow: ellipsis;
+  }
+  .app-main label { max-width: 100%; }
+  .app-main button, .app-main a { max-width: 100%; }
+  .app-main button { white-space: normal; }
   /* Wide tables scroll inside their own box, not the page. */
   .app-main table { display: block; max-width: 100%; overflow-x: auto; }
 }

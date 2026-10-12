@@ -13,7 +13,7 @@ os.makedirs(OUT, exist_ok=True)
 PAGES = ["/", "/sessions", "/ask", "/search", "/brain", "/explorer", "/graph-confidence", "/gaps",
          "/activity-health", "/analytics", "/join-rules", "/calendar", "/watch", "/sources", "/settings",
          "/jobs", "/claims", "/status", "/setup", "/ops-health", "/notifications", "/ingest",
-         "/meeting-bot", "/whatsapp", "/sessions/x"]
+         "/meeting-bot", "/whatsapp", "/sessions/s0"]
 fails = 0
 results = []
 def check(ok, msg):
@@ -21,18 +21,30 @@ def check(ok, msg):
     if not ok: fails += 1
     results.append({"ok": ok, "msg": msg}); print(("PASS " if ok else "FAIL ") + msg)
 
-GRAPH = {"nodes": [{"id": "session:s1", "label": "Study in Hungary", "kind": "session", "ref": "s1", "sources": ["tree_index"]},
-  {"id": "topic:sch", "label": "Scholarships", "kind": "topic", "ref": "sch", "sources": ["tree_index"]},
-  {"id": "person:a", "label": "Anita", "kind": "person", "ref": "a", "sources": ["graph_edges"]}],
-  "edges": [{"source": "session:s1", "target": "topic:sch", "type": "session-topic", "inferred": False, "origin": "tree_index"},
-            {"source": "person:a", "target": "session:s1", "type": "spoke_in", "inferred": False, "confidence": 1, "origin": "graph_edges"}],
-  "stats": {"sessionsTotal": 1, "sessionsInGraph": 1, "sessionsMissing": [], "edgeSources": {"treeIndex": 1, "entityEdges": 1}}}
-MOCKS = {"/graph": GRAPH, "/calendar/upcoming": {"meetings": []}, "/watch-state": {"state": [], "heartbeats": []},
-         "/sessions": {"sessions": []}, "/watched-sources": {"sources": []}, "/meeting-candidates": {"candidates": []}}
+LONG = "Admissions strategy for international undergraduate applicants to German and Hungarian universities: scholarships, visa timelines, accommodation and part-time work rules (2026 intake, extended session)"
+URL = "https://example.com/" + "very-long-path-segment-" * 8 + "?utm_source=newsletter&utm_campaign=" + "x" * 80
+SPK = "Dr. Anita Bhattacharyya-Venkataraghavan of the Department of International Admissions"
+SESS = [{"_id": f"s{i}", "title": f"{LONG} part {i}", "date": "2026-10-1%d" % i, "org": SPK, "participants": [SPK, "Bob"],
+         "status": {"transcribe": "done", "index": "done"}} for i in range(4)]
+def node(i, kind): return {"id": f"{kind}:{i}", "label": f"{LONG[:60]} {i}", "kind": kind, "ref": str(i), "sources": ["tree_index"]}
+NODES = [{"id": f"session:s{i}", "label": SESS[i]["title"], "kind": "session", "ref": f"s{i}", "sources": ["tree_index"]} for i in range(4)] +         [node(i, "topic") for i in range(3)] + [{"id": "person:a", "label": SPK, "kind": "person", "ref": "a", "sources": ["graph_edges"]}]
+EDGES = [{"source": f"session:s{i}", "target": f"topic:{i % 3}", "type": "session-topic", "inferred": False, "origin": "tree_index"} for i in range(4)] +         [{"source": "person:a", "target": f"session:s{i}", "type": "spoke_in", "inferred": False, "confidence": 1, "origin": "graph_edges"} for i in range(4)]
+GRAPH = {"nodes": NODES, "edges": EDGES, "stats": {"sessionsTotal": 4, "sessionsInGraph": 4, "sessionsMissing": [], "edgeSources": {"treeIndex": 4, "entityEdges": 4}}}
+DETAIL = {"session": SESS[0], "page": {"summary": LONG * 2}, "claims": [{"_id": "c1", "text": LONG + " " + URL, "status": "verified"}],
+          "turns": [{"_id": "t1", "speakerRef": "spk:1", "speakerLabel": SPK, "tStart": 0, "tEnd": 5, "text": LONG + " " + URL}],
+          "notes": [{"text": LONG, "kind": "note", "tStart": 1}], "frames": []}
+WATCHED = {"sources": [{"_id": "w1", "url": URL, "label": LONG, "reputationTier": "official", "checkIntervalHours": 6, "active": True,
+                        "lastFetch": {"fetchedAt": "2026-10-12T10:00:00Z", "hash": "a" * 64, "diffFrom": None}}]}
+MEET = {"meetings": [{"id": "m1", "title": LONG, "startTime": "2026-10-14T10:00:00Z", "endTime": "2026-10-14T11:00:00Z", "meetingUrl": URL, "organizer": SPK + "@example-university-admissions-office.example.com"}]}
+CAND = {"candidates": [{"_id": "k1", "messageId": "m", "subject": LONG, "senderEmail": "a" * 60 + "@" + "b" * 60 + ".example.com", "senderDomain": "b" * 60 + ".example.com",
+                        "meetingUrl": URL, "status": "pending", "detectedAt": "2026-10-12T10:00:00Z"}]}
+OPS = {"operations": [{"id": "o1", "title": LONG, "status": "failed", "attempts": 2, "reason": LONG + URL}], "discovery": {"status": "healthy", "checkedAt": "2026-10-12T10:00:00Z"}}
+MOCKS = {"/graph": GRAPH, "/calendar/upcoming": MEET, "/watch-state": {"state": [], "heartbeats": []},
+         "/sessions": {"sessions": SESS}, "/watched-sources": WATCHED, "/meeting-candidates": CAND, "/webinar-operations": OPS}
 def mock(route):
     path = route.request.url.split("3399", 1)[1].split("?")[0]
-    if path.startswith("/sessions/"):
-        return route.fulfill(status=404, content_type="application/json", body='{"error":"not_found"}')
+    if path.startswith("/sessions/") and path.count("/") == 2:
+        return route.fulfill(status=200, content_type="application/json", body=json.dumps(DETAIL))
     route.fulfill(status=200, content_type="application/json", body=json.dumps(MOCKS.get(path, {})))
 
 INJECT = """() => {

@@ -62,4 +62,11 @@ describe("responsive app shell", () => {
     expect(desktop).toContain("--sidebar-w: 220px");
     expect(desktop).toMatch(/\.app-main\s*{\s*padding:\s*2rem 2\.5rem/);
   });
+
+  test("ISS-WEBRESPONSIVE-001: selects/inputs are capped at their container so long options cannot widen the page", () => {
+    expect(css).toMatch(/\.app-main select\s*{[^}]*max-width:\s*min\(100%, 40rem\)[^}]*min-width:\s*0/);
+    expect(css).toMatch(/\.app-main label\s*{\s*max-width:\s*100%/);
+    expect(mobileBlock()).toMatch(/\.app-main input:not\(\[type="checkbox"\]\)[^{]*{[^}]*max-width:\s*100%/);
+    expect(mobileBlock()).toMatch(/\.app-main\s*{\s*overflow-wrap:\s*anywhere/);
+  });
 });

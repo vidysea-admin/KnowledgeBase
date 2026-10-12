@@ -1,7 +1,7 @@
 # iss-bc3746-001-responsive-shell
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 2-adjacent (open medium issue ISS-BC3746-001, filed on lane bc3746 at 8d3f21b0 in qa/issues.bc3746.jsonl; row copied to qa/issues.webresponsive.jsonl). Class: UI layout only, no auth/tenancy/data write. Lane: lane/webresponsive. Touches apps/web only (plus qa files).
 
 ## What was wrong
@@ -22,3 +22,11 @@ Live Chrome (system Chrome, headless, 1 browser, sequential contexts), Vite dev 
 - vitest apps/web: 707 pass / 2 fail (SearchPage x2, identical failures on main, pre-existing); new `src/layout/responsive.test.tsx` 6/6. tsc --noEmit clean.
 - Caveats: API mocked, so data-bearing tables on real payloads were only exercised via injected content. BrainPage graph itself rendered with a 3-node mock.
 - Servers: Vite stopped (5399 refuses connections); 0 Chrome processes remain.
+
+## Cycle 1 (fix of ISS-WEBRESPONSIVE-001; main 43b1a6a3 merged first)
+- Cause: a `select` sizes to its longest option and had no max-width (/explorer 418 vs 375; at 1280 /brain and /explorer also overflowed with long titles, 1606 and 1527). Fix in `styles.css`: `.app-main select { max-width: min(100%, 40rem); min-width: 0; text-overflow: ellipsis }`, `.app-main label { max-width: 100% }`; at <=640px also inputs/textarea capped, buttons wrap, `overflow-wrap: anywhere` on main. All 36 select/input/textarea sites are covered by these element rules, not per page.
+- Live script now uses realistic mocks on every page (180-char session titles, long speaker names, 100+ char URLs, long graph labels, long senders/emails, claims, turns, ops): `browsercheck_responsive.py`, evidence `qa/evidence/webresponsive-iss-bc3746-001-c1/` (results.json + screenshots).
+- Live Chrome (1 browser), Vite :5399, mocked API: 25 routes x {375, 1280}: 179 checks PASS, 0 FAIL; every page scrollWidth <= viewport (375/375, 1280/1280), incl. /explorer, /brain, /join-rules, /meeting-bot, /sessions/s0. Before the fix this run showed FAIL on 1280 /brain and /explorer (and 375 /explorer in the checker's run).
+- ISS-BC3746-001 reproductions: 2/3 refused live (join-rules, meeting-bot at 375); C11/phone-confirm dialog not exercised (needs real write flow). ISS-WEBRESPONSIVE-001: /explorer 375 and 1280 now fit.
+- Full apps/web vitest: 67 files, 710/710 pass (SearchPage fixed by merge); tsc clean.
+- Vite stopped; 0 Chrome processes.
