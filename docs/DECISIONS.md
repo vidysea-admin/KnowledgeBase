@@ -1948,3 +1948,11 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Supersedes:** D-060 -- amends only the one webinar-policy cancelled-tombstone assertion for proven pairs; every other D-060 acceptance floor item stands and D-060 stays otherwise in force.
 **Approved-by:** Umesh
 **Links:** T-057; T-036; ISS-T057SCREEN-001; ISS-T036CAL-011; ISS-TOMBSTONE-008; D-060; D-128
+
+## D-130 | 2026-10-12 | type: fix | status: ACTIVE
+
+**What:** Corrective clarification of D-129's `**Supersedes:** D-060` field, which was over-broad. D-060 remains in force IN FULL except the single assertion D-129 amended: in webinar-policy.test.ts "known actual-wire and id-only cancellations ...", the old expectation (blocked, empty feeds, replay blocked beside a proven pair), i.e. the D-060 floor text "unknown tombstone empty effective feeds/gate" (repair plan line 210), relaxed for a proven pair only. Every other D-060 assertion and acceptance-floor item stands unchanged.
+**Why:** The computed-status resolver (.claude/hooks/lab-session-start.ps1) treats any D-ids before ' -- ' in a Supersedes field as a full supersession and offers no partial/amends relation, so D-129 made D-060 compute as SUPERSEDED (by D-129) although D-129's own reasoning text says it "amends only the one webinar-policy cancelled-tombstone assertion for proven pairs; ... D-060 stays otherwise in force." Umesh's 2026-10-12 ruling "Amend + live check allow" authorised only that one amendment, not retirement of D-060.
+**Result:** Record only; no code or enforcement path changed. No partial-supersession syntax exists in append_decision.ps1 or the resolver, and a later entry cannot un-supersede, so the computed index may still print D-060 as SUPERSEDED (by D-129); readers must apply this entry: D-060 is ACTIVE except the one amended assertion. Adding an amends relation to the resolver would be an enforcement-path change needing its own Approved-by entry.
+**Approved-by:** Umesh (ruling 2026-10-12 "Amend + live check allow", which authorised only the single D-060 webinar-policy tombstone assertion amendment and one read-only live Google Calendar check)
+**Links:** D-060; D-129; T-051; T-036; ISS-TOMBSTONE-008
