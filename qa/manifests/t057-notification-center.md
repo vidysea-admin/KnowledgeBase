@@ -1,6 +1,6 @@
 # t057-notification-center
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap task T-057, feature D5, in-app notification list only). Lane: lane/notifcenter, base 9e24d1f. Read-only: no write path, no schema/ or migrations/ change, no dependency added, no new collection. UI-touching (D-024): jsdom source scope only, live-browser check owed. No qa/contracts file exists; the checker supplies one. Lane ledger `qa/issues.notifcenter.jsonl` (ISS-NOTIFCENTER-001..003).
 
