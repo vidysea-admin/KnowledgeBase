@@ -1,6 +1,6 @@
 # iss-authtenant2-001-scoped-replace-bulkwrite
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: tenancy / data writes (open ledger issue ISS-AUTHTENANT2-001, medium; parent ISS-AUTHTENANT-002). Class: security (tenancy) + data write: FULL ceremony. Verdict by the checker only.
 Lane: lane/scopedwrite (base 50508fa8). Ledger rows ISS-AUTHTENANT2-001 and ISS-AUTHTENANT-002 status NOT changed here. No new issues filed.
