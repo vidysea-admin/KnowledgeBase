@@ -1,6 +1,6 @@
 # iss-jobqprune-001-retention-30-days
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS (cycle 0)
 Fix cycle: 0
 Tier: Approver ruling (D-128, "Approver ruling 2026-10-12 (2)": job-queue retention 30 days). Data-write class: full ceremony.
 Lane: lane/jobqretain (from 15015cf). No new ledger file; no existing ledger row edited (ISS-JOBQPRUNE-001 is answered by this unit; ISS-JOBQLOST-001 closes on checker PASS).
