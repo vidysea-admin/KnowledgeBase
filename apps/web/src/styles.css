@@ -243,6 +243,9 @@ body {
 .global-search label { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
 .global-search input { flex: 1; min-width: 0; }
 
+.brain-split { display: flex; gap: 1rem; padding: 0; overflow: hidden; }
+.brain-panel { width: 340px; flex-shrink: 0; border-left: 1px solid var(--line); padding: 1rem; overflow-y: auto; max-height: 560px; }
+
 /* Responsive: phones. Desktop (>640px) is untouched by everything below. */
 .app-main { min-width: 0; }
 .app-main pre { max-width: 100%; overflow-x: auto; }
@@ -276,6 +279,8 @@ body {
   .card { padding: 1rem; }
   .global-search { flex-wrap: wrap; }
   .login-card { max-width: calc(100% - 32px); }
+  .brain-split { flex-direction: column; gap: 0; }
+  .brain-panel { width: auto; border-left: none; border-top: 1px solid var(--line); max-height: none; }
   /* Wide tables scroll inside their own box, not the page. */
   .app-main table { display: block; max-width: 100%; overflow-x: auto; }
 }
