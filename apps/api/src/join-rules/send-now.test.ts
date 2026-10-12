@@ -178,14 +178,14 @@ test("no launcher injected: scoped key gets a fail-closed 503, an unscoped key 4
 test("minting: send-now is never in a default key; it is issued only when asked for by name; typos and other names are refused", async () => {
   const { DEFAULT_SCOPES, WRITE_SCOPES, scopesFromArgv } = await import("../../../../scripts/lib/mint-scopes.mjs");
   assert.equal(SEND_NOW_SCOPE, "send-now");
-  assert.deepEqual(WRITE_SCOPES, [SEND_NOW_SCOPE]);
+  assert.deepEqual(WRITE_SCOPES, [SEND_NOW_SCOPE, "join-rules"]);
   assert.ok(!DEFAULT_SCOPES.includes(SEND_NOW_SCOPE));
   assert.deepEqual(scopesFromArgv([]), DEFAULT_SCOPES);
   assert.deepEqual(scopesFromArgv(["--tenant", "toc", "--label", "live-verify"]), DEFAULT_SCOPES);
   assert.deepEqual(DEFAULT_SCOPES, ["ask", "compete", "sources", "sessions", "search", "citations", "webhooks", "gaps", "graph", "calendar", "gmail", "whatsapp", "keys", "ingest"]); // the pre-T-039 set, unchanged
   assert.deepEqual(scopesFromArgv(["--with-scope", "send-now"]), [...DEFAULT_SCOPES, "send-now"]);
   assert.deepEqual(scopesFromArgv(["--with-scope", "send-now", "--with-scope", "send-now"]), [...DEFAULT_SCOPES, "send-now"]);
-  for (const bad of [["--with-scope"], ["--with-scope", "--tenant"], ["--with-scope", "send-nowx"], ["--with-scope", "keys"], ["--with-scope", "join-rules"], ["--with-scope", "send-now,admin"]]) {
+  for (const bad of [["--with-scope"], ["--with-scope", "--tenant"], ["--with-scope", "send-nowx"], ["--with-scope", "keys"], ["--with-scope", "send-now,admin"]]) {
     assert.throws(() => scopesFromArgv(bad), /with-scope/, bad.join(" "));
   }
   const src = readFileSync(new URL("../../../../scripts/mint-key.mjs", import.meta.url), "utf8");

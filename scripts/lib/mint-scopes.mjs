@@ -2,13 +2,13 @@
  * scripts/lib/mint-scopes.mjs - which scopes scripts/mint-key.mjs puts on a key. Pure (no Mongo), so it is unit-tested.
  * DEFAULT_SCOPES is the set every minted key has always carried. Dedicated WRITE scopes are never in it: a key holds one only
  * when it was asked for by name (`--with-scope send-now`), the t037 contract's rule "no key holds a dedicated write scope unless issued deliberately".
- * (join-rules is not mintable by this script at all today; send-now is the first write scope it can issue.)
+ * Both dedicated write scopes (send-now, join-rules) are issuable this way; --with-scope is repeatable and accepts a comma list.
  */
 export const DEFAULT_SCOPES = [
   "ask", "compete", "sources", "sessions", "search", "citations", "webhooks",
   "gaps", "graph", "calendar", "gmail", "whatsapp", "keys", "ingest",
 ];
-export const WRITE_SCOPES = ["send-now"];
+export const WRITE_SCOPES = ["send-now", "join-rules"];
 
 /** argv -> scopes. Throws on an unknown or non-write name (a typo must not silently mint a weaker or stronger key). */
 export function scopesFromArgv(argv) {
