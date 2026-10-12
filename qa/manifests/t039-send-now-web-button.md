@@ -1,6 +1,6 @@
 # t039-send-now-web-button
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (next unblocked roadmap task, T-039, web half). Lane: lane/sendnowweb (base 9e24d1f). Class: operator action that launches a bot (data write via API): FULL ceremony. Ledger shard `qa/issues.sendnowweb.jsonl` (ISS-SENDNOWWEB-001).
 Depends on: `POST /calendar/send-now` (t039-send-now-api-endpoint, merged 2504e81). apps/web only.
