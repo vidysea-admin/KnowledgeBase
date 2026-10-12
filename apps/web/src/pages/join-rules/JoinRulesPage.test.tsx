@@ -11,8 +11,9 @@ import editorSource from "./RuleSetEditor.tsx?raw";
 vi.mock("../../api/client.js", async orig => ({ ...(await orig<typeof import("../../api/client.js")>()), apiFetch: vi.fn() }));
 const api = vi.mocked(apiFetch);
 
-interface Server { ruleSet: unknown; state: { approvedSenders: string[]; approvedDomains: string[]; optedOutEventIds: string[] } }
+interface Server { etag: string | null; ruleSet: unknown; state: { approvedSenders: string[]; approvedDomains: string[]; optedOutEventIds: string[] } }
 const initial = (): Server => ({
+  etag: '"e1"',
   ruleSet: { version: 1, ownDomains: ["corp.example.com"], rules: [
     { id: "allow-asha", effect: "allow", match: { email: "asha@example.com" } },
     { id: "deny-zoom-external", effect: "deny", match: { platform: "zoom", scope: "external" } },
@@ -20,22 +21,32 @@ const initial = (): Server => ({
   state: { approvedSenders: ["trusted@example.org"], approvedDomains: ["partner.example.net"], optedOutEventIds: ["evt-42"] },
 });
 let server: Server;
+let version = 1;
 /** Per "METHOD path" failures: a status number (ApiError) or consumed once per entry. */
 let failures: Record<string, { status: number; message?: string; code?: string }[]>;
 const calls = () => api.mock.calls.map(c => ({ path: c[0], method: c[2]?.method ?? "GET", body: c[2]?.body }));
+const putHeaders = () => api.mock.calls.filter(c => c[2]?.method === "PUT").map(c => c[2]?.headers);
 const writes = () => calls().filter(c => c.method !== "GET");
 
 beforeEach(() => {
-  server = initial(); failures = {};
+  server = initial(); failures = {}; version = 1;
   api.mockReset();
-  api.mockImplementation((async (path: string, _key: string | null, opts?: { method?: string; body?: unknown }) => {
+  api.mockImplementation((async (path: string, _key: string | null, opts?: { method?: string; body?: unknown; headers?: Record<string, string>; onResponseHeaders?: (h: Headers) => void }) => {
     const id = `${opts?.method ?? "GET"} ${path}`;
     const fail = failures[id]?.shift();
     if (fail) throw new ApiError(fail.status, fail.message ?? `HTTP ${fail.status}`, { code: fail.code });
     const body = opts?.body as Record<string, string> | undefined;
-    if (id === "PUT /calendar/join-rules") { server.ruleSet = body; return structuredClone(server); }
+    if (id === "PUT /calendar/join-rules") {
+      const ifMatch = opts?.headers?.["If-Match"], ifNone = opts?.headers?.["If-None-Match"];
+      if (ifMatch === undefined && ifNone === undefined) throw new ApiError(428, "precondition required", { code: "precondition-required" });
+      if (ifMatch !== undefined ? ifMatch !== server.etag : server.etag !== null) throw new ApiError(412, "precondition failed", { code: "precondition-failed" });
+      server.ruleSet = body; server.etag = `"e${++version}"`;
+      opts?.onResponseHeaders?.(new Headers({ etag: server.etag }));
+      return structuredClone(server);
+    }
     if (id === "POST /calendar/join-rules/approvals") { server.state[body!.kind === "sender" ? "approvedSenders" : "approvedDomains"].push(body!.value!); return { state: server.state }; }
     if (id === "POST /calendar/join-rules/opt-outs") { server.state.optedOutEventIds.push(body!.eventId!); return { state: server.state }; }
+    if (server.etag !== null) opts?.onResponseHeaders?.(new Headers({ etag: server.etag }));
     return structuredClone(server);
   }) as never);
   localStorage.setItem("lkbApiKey", "sample-key");
@@ -60,12 +71,12 @@ test("loads and renders rules, approved senders and domains, and opted-out event
 });
 
 test("empty tenant shows explicit empty states", async () => {
-  server.ruleSet = { version: 1, ownDomains: [], rules: [] }; server.state = { approvedSenders: [], approvedDomains: [], optedOutEventIds: [] };
+  server.etag = null; server.ruleSet = { version: 1, ownDomains: [], rules: [] }; server.state = { approvedSenders: [], approvedDomains: [], optedOutEventIds: [] };
   mount(); await screen.findByText(/There are no rules/);
   expect(screen.getByText("No sender is approved.")).toBeInTheDocument(); expect(screen.getByText("No domain is approved.")).toBeInTheDocument(); expect(screen.getByText("No event is opted out.")).toBeInTheDocument();
 });
 
-test("edit and save sends ONLY the rule set (no state, no tenant), fresh-GETs first, then re-fetches and shows the server's answer", async () => {
+test("edit and save sends ONLY the rule set (no state, no tenant), sends a precondition, then re-fetches and shows the server's answer", async () => {
   await ready();
   fireEvent.change(screen.getByLabelText("Rule 1 name"), { target: { value: "allow-asha-renamed" } });
   fireEvent.change(screen.getByLabelText("Rule 1 domain"), { target: { value: "Example.com" } });
@@ -75,7 +86,7 @@ test("edit and save sends ONLY the rule set (no state, no tenant), fresh-GETs fi
   fireEvent.click(screen.getByRole("button", { name: "Remove rule 2" }));
   fireEvent.click(screen.getByRole("button", { name: "Save rules" }));
   await screen.findByText(/Saved\. The rules shown are the server's current answer/);
-  expect(calls().map(c => `${c.method} ${c.path}`)).toEqual(["GET /calendar/join-rules", "GET /calendar/join-rules", "PUT /calendar/join-rules", "GET /calendar/join-rules"]);
+  expect(calls().map(c => `${c.method} ${c.path}`)).toEqual(["GET /calendar/join-rules", "PUT /calendar/join-rules", "GET /calendar/join-rules"]);
   const expected = { version: 1, ownDomains: ["corp.example.com"], rules: [
     { id: "allow-asha-renamed", effect: "allow", match: { email: "asha@example.com", domain: "Example.com", subdomains: false } },
     { id: "rule-3", effect: "allow", match: { platform: "teams" } },
@@ -233,33 +244,47 @@ test.each([[413, "HTTP 413"], [500, "HTTP 500"], [0, "network error"], [503, ""]
   expect(screen.getByRole("button", { name: "Save rules" })).toBeEnabled();
 });
 
-test("stale data: if the rules changed on the server since load, saving warns and sends nothing until the user chooses", async () => {
+const someoneElse = () => { server.ruleSet = { version: 1, ownDomains: [], rules: [{ id: "someone-else", effect: "deny", match: { platform: "zoom" } }] }; server.etag = '"theirs"'; };
+
+test("412: someone else saved first. No automatic retry, the edits stay, the message is shown, nothing was overwritten", async () => {
   await ready();
   fireEvent.change(screen.getByLabelText("Rule 1 name"), { target: { value: "my-edit" } });
-  server.ruleSet = { version: 1, ownDomains: [], rules: [{ id: "someone-else", effect: "deny", match: { platform: "zoom" } }] };
+  someoneElse();
   fireEvent.click(screen.getByRole("button", { name: "Save rules" }));
   const dialog = await screen.findByRole("alertdialog", { name: "Rules changed on the server" });
-  expect(dialog).toHaveTextContent("The rules changed on the server after you loaded them.");
-  expect(dialog).toHaveTextContent("best effort");
-  expect(writes()).toHaveLength(0);
+  expect(dialog).toHaveTextContent("changed by someone else since you opened them");
+  expect(writes()).toHaveLength(1); // exactly the one refused PUT
+  expect(putHeaders()).toEqual([{ "If-Match": '"e1"' }]);
   expect(screen.getByLabelText("Rule 1 name")).toHaveValue("my-edit");
-  fireEvent.click(within(dialog).getByRole("button", { name: "Overwrite with my version" }));
-  await screen.findByText(/Saved\./);
-  expect(writes()).toHaveLength(1); expect((writes()[0]!.body as { rules: { id: string }[] }).rules[0]!.id).toBe("my-edit");
-  expect(screen.queryByRole("alertdialog")).toBeNull();
+  expect((server.ruleSet as { rules: { id: string }[] }).rules[0]!.id).toBe("someone-else");
+  await new Promise(r => setTimeout(r, 50));
+  expect(writes()).toHaveLength(1);
 });
 
-test("stale data: discard loads the server's rules; cancel keeps the draft and sends nothing", async () => {
+test("412: the reload action fetches again, shows the server's rules and adopts the new ETag, so the next save sends it", async () => {
   await ready();
   fireEvent.change(screen.getByLabelText("Rule 1 name"), { target: { value: "my-edit" } });
-  server.ruleSet = { version: 1, ownDomains: [], rules: [{ id: "someone-else", effect: "deny", match: { platform: "zoom" } }] };
+  someoneElse();
   fireEvent.click(screen.getByRole("button", { name: "Save rules" }));
-  fireEvent.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Cancel" }));
-  expect(screen.getByLabelText("Rule 1 name")).toHaveValue("my-edit");
-  fireEvent.click(screen.getByRole("button", { name: "Save rules" }));
-  fireEvent.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Discard my edits and load the server's rules" }));
+  fireEvent.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: /Reload latest rules/ }));
   await waitFor(() => expect(screen.getByLabelText("Rule 1 name")).toHaveValue("someone-else"));
-  expect(writes()).toHaveLength(0);
+  expect(screen.queryByRole("alertdialog")).toBeNull();
+  expect(calls().filter(c => c.method === "GET")).toHaveLength(2);
+  fireEvent.change(screen.getByLabelText("Rule 1 name"), { target: { value: "after-reload" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save rules" }));
+  await screen.findByText(/Saved./);
+  expect(putHeaders()).toEqual([{ "If-Match": '"e1"' }, { "If-Match": '"theirs"' }]);
+});
+
+test("412: 'Keep editing' dismisses the message and sends nothing", async () => {
+  await ready();
+  fireEvent.change(screen.getByLabelText("Rule 1 name"), { target: { value: "my-edit" } });
+  someoneElse();
+  fireEvent.click(screen.getByRole("button", { name: "Save rules" }));
+  fireEvent.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Keep editing" }));
+  expect(screen.queryByRole("alertdialog")).toBeNull();
+  expect(screen.getByLabelText("Rule 1 name")).toHaveValue("my-edit");
+  expect(writes()).toHaveLength(1);
 });
 
 test("a change to approvals only (not the rules) does not trigger the stale warning, and the PUT still omits state", async () => {

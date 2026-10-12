@@ -77,6 +77,10 @@ function parseRetryAfter(raw: string | null | undefined): number | undefined {
 export interface ApiFetchOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE";
   body?: unknown;
+  /** Extra request headers (e.g. If-Match). Never overrides authorization or content-type. */
+  headers?: Record<string, string>;
+  /** Called with the response headers of a 2xx response, before the body is parsed. Lets a caller read ETag without the wrapper changing its return type. */
+  onResponseHeaders?: (headers: Headers) => void;
 }
 
 export async function apiFetch<T>(path: string, apiKey: string | null, options: ApiFetchOptions = {}): Promise<T> {
@@ -87,6 +91,7 @@ export async function apiFetch<T>(path: string, apiKey: string | null, options: 
     res = await fetch(`${API_BASE_URL}${path}`, {
       method: options.method ?? "GET",
       headers: {
+        ...options.headers,
         authorization: `Bearer ${apiKey}`,
         ...(options.body !== undefined ? { "content-type": "application/json" } : {}),
       },
@@ -111,5 +116,6 @@ export async function apiFetch<T>(path: string, apiKey: string | null, options: 
     }
     throw new ApiError(res.status, message, { code, retryAfterSeconds: parseRetryAfter(res.headers?.get?.("retry-after")) });
   }
+  options.onResponseHeaders?.(res.headers);
   return res.json() as Promise<T>;
 }

@@ -3,9 +3,9 @@ import { useAuth } from "../../auth/AuthContext.js";
 import { ApprovalsPanel } from "./ApprovalsPanel.js";
 import { JOIN_RULES_ENFORCED, pageCopy } from "./enforcement.js";
 import { RuleSetEditor } from "./RuleSetEditor.js";
-import { MESSAGES, classify, getJoinRules, postPending, putRuleSet, type Problem } from "./joinRulesClient.js";
+import { MESSAGES, classify, getJoinRules, looksStored, postPending, putRuleSet, type Problem } from "./joinRulesClient.js";
 import {
-  canonicalRuleSet, draftFromRuleSet, newRuleDraft, ruleSetFromDraft, validateRuleSetClient,
+  draftFromRuleSet, newRuleDraft, ruleSetFromDraft, validateRuleSetClient,
   type DraftSet, type JoinRulesView, type Pending, type RuleSet,
 } from "./joinRulesModel.js";
 
@@ -24,7 +24,8 @@ function RetryButton({ waitSeconds, onRetry }: { waitSeconds: number; onRetry: (
   }, [waitSeconds]);
   return <button type="button" disabled={waiting} onClick={onRetry}>Retry</button>;
 }
-interface Loaded { view: JoinRulesView; raw: string; draftJson: string }
+/** `etag` is the validator the server sent with the rule set, kept exactly as received (quotes included); null when none was sent. */
+interface Loaded { view: JoinRulesView; etag: string | null; draftJson: string }
 type Notice = { kind: "error" | "ok"; text: string } | null;
 
 /** Text for a failed READ (GET, also the fresh GET before a save). */
@@ -42,25 +43,27 @@ export function JoinRulesPage(): React.ReactElement {
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
   const [problems, setProblems] = useState<string[]>([]);
-  const [conflict, setConflict] = useState<JoinRulesView | null>(null);
+  /** True after a 412: someone else changed the rules since this editor loaded them. The draft is kept; nothing is retried. */
+  const [stale, setStale] = useState(false);
   const nextKey = useRef(0);
   const keyRef = useRef(apiKey);
   keyRef.current = apiKey;
 
-  const adopt = useCallback((view: JoinRulesView, resetDraft: boolean) => {
+  /** Adopting the rule set also adopts its ETag. When the draft is kept (approvals changed only) the old ETag stays with the old rule set. */
+  const adopt = useCallback((view: JoinRulesView, etag: string | null, resetDraft: boolean) => {
     const d = draftFromRuleSet(view.ruleSet);
 
-    setLoaded(prev => resetDraft || !prev ? { view, raw: canonicalRuleSet(view.ruleSet), draftJson: JSON.stringify(d) } : { ...prev, view: { ...prev.view, state: view.state } });
+    setLoaded(prev => resetDraft || !prev ? { view, etag, draftJson: JSON.stringify(d) } : { ...prev, view: { ...prev.view, state: view.state } });
     if (resetDraft) { nextKey.current = d.rules.length; setDraft(d); }
   }, []);
 
   const load = useCallback(async () => {
     if (!apiKey) return;
-    setPhase({ name: "loading" }); setNotice(null); setProblems([]); setConflict(null); setReadOnly(false);
+    setPhase({ name: "loading" }); setNotice(null); setProblems([]); setStale(false); setReadOnly(false);
     try {
-      const view = await getJoinRules(apiKey);
+      const { view, etag } = await getJoinRules(apiKey);
       if (keyRef.current !== apiKey) return;
-      adopt(view, true); setPhase({ name: "ready" });
+      adopt(view, etag, true); setPhase({ name: "ready" });
     } catch (e) {
       if (keyRef.current !== apiKey) return;
       const p = classify(e);
@@ -69,6 +72,8 @@ export function JoinRulesPage(): React.ReactElement {
   }, [apiKey, adopt]);
   useEffect(() => { void load(); }, [load]);
 
+  /** A stored rule set whose load carried no ETag: saving would have to be unconditional, so it is refused instead. */
+  const saveUnavailable = loaded !== null && loaded.etag === null && looksStored(loaded.view);
   const dirty = loaded !== null && JSON.stringify(draft) !== loaded.draftJson;
 
   /** A failed WRITE: 403 means a key without the join-rules scope, so the page becomes read-only. */
@@ -76,20 +81,25 @@ export function JoinRulesPage(): React.ReactElement {
     const p = classify(e);
     if (p.failure === "forbidden") { setReadOnly(true); setNotice({ kind: "error", text: MESSAGES.readOnly }); }
     else if (p.failure === "bad-request") setNotice({ kind: "error", text: `The server rejected this change: ${p.serverMessage}` });
+    else if (p.status === 412) { setStale(true); setNotice(null); }
+    else if (p.status === 428) setNotice({ kind: "error", text: MESSAGES.preconditionRequired });
     else if (p.failure === "unauthorized") setNotice({ kind: "error", text: MESSAGES.unauthorized });
     else if (p.failure === "unavailable") setNotice({ kind: "error", text: MESSAGES.unavailable });
     else if (p.failure === "busy") setNotice({ kind: "error", text: MESSAGES.busy });
     else setNotice({ kind: "error", text: `${MESSAGES.writeFailed} (${p.status === 0 ? "network error" : `HTTP ${p.status}`})` });
   };
 
-  async function doPut(ruleSet: RuleSet) {
+  async function doPut(ruleSet: RuleSet, etag: string | null) {
     if (!apiKey) return;
-    setBusy(true); setNotice(null); setConflict(null);
+    setBusy(true); setNotice(null); setStale(false);
+    let putEtag: string | null;
     try {
-      await putRuleSet(apiKey, ruleSet);
+      putEtag = await putRuleSet(apiKey, ruleSet, etag);
     } catch (e) { writeProblem(e); setBusy(false); return; }
     try {
-      adopt(await getJoinRules(apiKey), true);
+      // Re-fetch to show the server's answer. The PUT response's ETag is the one adopted; only when it carried none is the re-fetched one used.
+      const fresh = await getJoinRules(apiKey);
+      adopt(fresh.view, putEtag ?? fresh.etag, true);
       setNotice({ kind: "ok", text: "Saved. The rules shown are the server's current answer." });
     } catch {
       setNotice({ kind: "error", text: "The rules were sent, but reloading the server's answer failed. What is shown may be out of date; reload the page before editing further." });
@@ -98,19 +108,23 @@ export function JoinRulesPage(): React.ReactElement {
   }
 
   async function save() {
-    if (!apiKey || !loaded) return;
+    if (!apiKey || !loaded || saveUnavailable) return;
     const ruleSet = ruleSetFromDraft(draft);
     const errors = validateRuleSetClient(ruleSet);
     setProblems(errors); setNotice(null);
     if (errors.length > 0) return;
-    setBusy(true);
-    let fresh: JoinRulesView;
-    try { fresh = await getJoinRules(apiKey); }
-    catch (e) { setNotice({ kind: "error", text: readText(classify(e)) }); setBusy(false); return; }
+    await doPut(ruleSet, loaded.etag);
+  }
+
+  /** The explicit way out of a 412: fetch the latest rules and ETag, discarding the unsaved edits. Never automatic. */
+  async function reloadLatest() {
+    if (!apiKey) return;
+    setBusy(true); setNotice(null);
+    try {
+      const fresh = await getJoinRules(apiKey);
+      adopt(fresh.view, fresh.etag, true); setStale(false); setProblems([]);
+    } catch (e) { setNotice({ kind: "error", text: readText(classify(e)) }); }
     setBusy(false);
-    // Best-effort and racy: the API has no version/ETag, so a change landing between this GET and the PUT is not caught.
-    if (canonicalRuleSet(fresh.ruleSet) !== loaded.raw) { setConflict(fresh); return; }
-    await doPut(ruleSet);
   }
 
   async function confirmPending(p: Pending) {
@@ -119,7 +133,8 @@ export function JoinRulesPage(): React.ReactElement {
     try { await postPending(apiKey, p.kind, p.value, p.hints); }
     catch (e) { writeProblem(e); setBusy(false); return; }
     try {
-      adopt(await getJoinRules(apiKey), !dirty);
+      const fresh = await getJoinRules(apiKey);
+      adopt(fresh.view, fresh.etag, !dirty);
       setNotice({ kind: "ok", text: p.kind === "optout" ? `Opted out of event ${p.value}.` : `Approved ${p.value}.` });
     } catch {
       setNotice({ kind: "error", text: "The change was sent, but reloading the server's answer failed. What is shown may be out of date." });
@@ -149,17 +164,16 @@ export function JoinRulesPage(): React.ReactElement {
           <h2 className="section-title">Rules</h2>
           <RuleSetEditor draft={draft} disabled={readOnly || busy} onChange={next => { setDraft(next); setProblems([]); }} onAdd={addRule} />
           {problems.length > 0 && <ul role="alert" className="error-note" aria-label="Problems with the rules">{problems.map(m => <li key={m}>{m}</li>)}</ul>}
-          {conflict && <div role="alertdialog" aria-label="Rules changed on the server" className="card" style={{ borderLeft: "4px solid var(--warn)" }}>
-            <p><strong>The rules changed on the server after you loaded them.</strong> Saving now replaces those newer rules with your version.</p>
-            <p className="row-meta">This check is best effort: a change made at the same moment as your save can still be overwritten.</p>
+          {stale && <div role="alertdialog" aria-label="Rules changed on the server" className="card" style={{ borderLeft: "4px solid var(--warn)" }}>
+            <p><strong>{MESSAGES.stale}</strong></p>
             <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-              <button type="button" disabled={busy} onClick={() => void doPut(ruleSetFromDraft(draft))}>Overwrite with my version</button>
-              <button type="button" disabled={busy} onClick={() => { adopt(conflict, true); setConflict(null); setProblems([]); }}>Discard my edits and load the server's rules</button>
-              <button type="button" onClick={() => setConflict(null)}>Cancel</button>
+              <button type="button" disabled={busy} onClick={() => void reloadLatest()}>Reload latest rules (discards my edits)</button>
+              <button type="button" onClick={() => setStale(false)}>Keep editing</button>
             </div>
           </div>}
+          {saveUnavailable && <p role="alert" className="error-note">{MESSAGES.noEtag}</p>}
           <div style={{ marginTop: "0.75rem" }}>
-            <button type="button" disabled={readOnly || busy || !dirty} onClick={() => void save()}>Save rules</button>
+            <button type="button" disabled={readOnly || busy || !dirty || saveUnavailable} onClick={() => void save()}>Save rules</button>
             <span className="row-meta"> {dirty ? "You have unsaved changes. Saving replaces the rules only; approvals and opt-outs are kept." : "No unsaved changes."}</span>
           </div>
         </section>
