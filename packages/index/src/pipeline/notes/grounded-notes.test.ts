@@ -401,11 +401,62 @@ test("curly n’t is a negation marker exactly like the straight one", async () 
   assert.equal(await spanOf(`We do tnot think so, apply in March today.`, q), null);
 });
 test("ISS-T040GEN-007b: a quote followed in the same turn by a short negating reply is dropped", async () => {
-  for (const [text, q] of [["Apply in March? Absolutely not.", "Apply in March?"], ["Should we apply in March? Definitely not!", "Should we apply in March?"], ["Apply in March? No.", "Apply in March?"], ["Apply in March? Never.", "Apply in March?"], ["Apply in March? Nahi.", "Apply in March?"], ["Fees are 1000 rupees. I don’t think so.", "Fees are 1000 rupees."], ["Apply in March? \"Absolutely not.\"", "Apply in March?"]] as const) {
+  for (const [text, q] of [["Fees are 1000 rupees. Absolutely not.", "Fees are 1000 rupees."], ["Fees are 1000 rupees. No.", "Fees are 1000 rupees."], ["Fees are 1000 rupees. Never.", "Fees are 1000 rupees."], ["Fees are 1000 rupees. Nahi.", "Fees are 1000 rupees."], ["Fees are 1000 rupees. I don’t think so.", "Fees are 1000 rupees."], ["Fees are 1000 rupees. \"Absolutely not.\"", "Fees are 1000 rupees."]] as const) {
     assert.equal(await spanOf(text, q), "negated-by-reply", text);
     assert.equal((await emitted(text, q)).kept, false, text);
   }
-  for (const [text, q] of [["Apply in March? Yes, apply early.", "Apply in March?"], ["Apply in March? Absolutely, apply early and carefully today now.", "Apply in March?"], ["Apply in March? Sure.", "Apply in March?"], ["Apply in March? We do not recommend April for anyone here today.", "Apply in March?"]] as const)
+  for (const [text, q] of [["Fees are 1000 rupees. Yes, apply early.", "Fees are 1000 rupees."], ["Fees are 1000 rupees. Absolutely, apply early and carefully today now.", "Fees are 1000 rupees."], ["Fees are 1000 rupees. Sure.", "Fees are 1000 rupees."], ["Fees are 1000 rupees. We do not recommend April for anyone here today.", "Fees are 1000 rupees."]] as const)
     assert.equal(await spanOf(text, q), null, text);
-  const kept = await emitted("Apply in March? Yes, absolutely.", "Apply in March?"); assert.equal(kept.kept, true);
+  const kept = await emitted("Fees are 1000 rupees. Yes, absolutely.", "Fees are 1000 rupees."); assert.equal(kept.kept, true);
+});
+// ---- cycle 3: structural fixes (ISS-T040GEN-008, -009) ----
+test("ISS-T040GEN-008 replay: the checker's six unlisted-abbreviation cases are dropped (every word-aligned quote)", async () => {
+  const { sentenceSpanProblem } = await import("./sentence-span.js");
+  const cases: [string, string][] = [
+    ["We do not accept Pvt. Colleges applications after March first.", "Colleges applications after March first."],
+    ["I do not recommend Univ. Admissions in March for everyone.", "Admissions in March for everyone."],
+    ["We never take Asst. Professors in March for this program.", "Professors in March for this program."],
+    ["I do not think Ave. Road students apply in March.", "Road students apply in March."],
+    ["I do not think the Pkwy. Campus works for everyone in March.", "Campus works for everyone in March."],
+    ["We do not apply in the Q1. March works for everyone else.", "March works for everyone else."],
+  ];
+  for (const [text, q] of cases) {
+    const i = text.indexOf(q); assert.ok(i >= 0, q);
+    assert.notEqual(sentenceSpanProblem(text, i, i + q.length), null, q);
+    assert.equal((await emitted(text, q)).kept, false, q);
+    // the whole sentence still ships (its own negation is inside it)
+    assert.equal(sentenceSpanProblem(text, 0, text.length), null, text);
+  }
+});
+test("boundary rule: a period breaks only after an ordinary lowercase word or a sentence-final number; every other token fails closed", async () => {
+  const { sentenceSpanProblem } = await import("./sentence-span.js");
+  const span = (text: string, q: string) => sentenceSpanProblem(text, text.indexOf(q), text.indexOf(q) + q.length);
+  // breaks (second sentence stands alone, first sentence's cut is a clean edge)
+  for (const [t, a, b] of [["Apply in march. We do not recommend April for anyone.", "Apply in march.", "We do not recommend April for anyone."], ["Fees are 1000 rupees. We do not recommend April for anyone.", "Fees are 1000 rupees.", "We do not recommend April for anyone."], ["I don't know. Apply in March please.", "Apply in March please.", ""]] as const) {
+    assert.equal(span(t, a), null, t);
+    if (b) assert.equal(span(t, b), null, t);
+  }
+  // never breaks: capitalised, mixed-case, digit-bearing, single-letter, unlisted abbreviation tokens, even before a capital word
+  for (const tok of ["Pvt", "Univ", "Asst", "Ave", "Pkwy", "Q1", "PhD", "iPhone", "Xyz", "J", "A1", "UNIV", "Mar", "x", "i"]) {
+    const t = `We do not accept ${tok}. Colleges applications after March first.`, q = "Colleges applications after March first.";
+    assert.notEqual(span(t, q), null, tok);
+  }
+  // a plain number ending a sentence is a break, a list number opening one is not
+  assert.equal(span("The fee is 1000. We do not recommend April for anyone.", "We do not recommend April for anyone."), null);
+  assert.equal(span("1. Apply early for the March intake.", "Apply early for the March intake."), "starts-mid-sentence");
+  // an ordinary lowercase word, apostrophes inside it, is a break
+  assert.equal(span("We do not apply, it's done. Colleges applications open in March.", "Colleges applications open in March."), null);
+  // known lowercase abbreviation does not break even when typed in lower case
+  assert.notEqual(span("We do not accept govt. Colleges applications after March first.", "Colleges applications after March first."), null);
+});
+test("ISS-T040GEN-009: a quote inside a question sentence is never evidence for a statement item (any reply), but still is for a question", async () => {
+  const { sentenceSpanProblem } = await import("./sentence-span.js");
+  for (const [text, q] of [["Apply in March? Wrong.", "Apply in March?"], ["Apply in March? Incorrect.", "Apply in March?"], ["Apply in March? I disagree.", "Apply in March?"], ["Apply in March? Bad idea.", "Apply in March?"], ["Apply in March? That is false.", "Apply in March?"], ["Should we apply, or wait? Sure.", "Should we apply,"], ["Should we apply in March?", "Should we apply in March?"], ["so ok. Should we apply in March? \"Yes.\"", "Should we apply in March?"]] as const) {
+    const i = text.indexOf(q);
+    assert.equal(sentenceSpanProblem(text, i, i + q.length), "is-question", text);
+    assert.equal((await emitted(text, q)).kept, false, text);
+    assert.equal(sentenceSpanProblem(text, i, i + q.length, { allowQuestion: true }) === "is-question", false, text);
+  }
+  // a statement before or after the question is untouched
+  assert.equal(await spanOf("Fees are 1000 rupees. Should we apply in March? Yes.", "Fees are 1000 rupees."), null);
 });

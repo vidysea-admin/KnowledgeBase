@@ -23,26 +23,37 @@ const MARKER = /(?<![\p{L}\p{N}_])(?:not|never|no|none|nobody|nothing|nowhere|ne
 const NEG_REPLY = /(?<![\p{L}\p{N}_])(?:not|no|never|nope|nah|none|nothing|nowhere|neither|nor|cannot|nahi|nahin)(?![\p{L}\p{N}_])|n['’]t(?![\p{L}\p{N}_])/iu;
 const MAX_REPLY_WORDS = 5;
 
-/** Abbreviations whose period is never a sentence break (lower case, no dot). Anything ambiguous merges sentences (fail closed). */
-const ABBREVIATIONS = new Set([
-  "e.g", "i.e", "etc", "vs", "viz", "cf", "approx", "est", "dept", "govt", "inc", "ltd", "co", "corp", "jr", "sr", "dr", "mr", "mrs", "ms", "mx", "prof", "st", "mt", "fig", "eq",
-  "ph.d", "min", "max", "avg", "sec", "hrs", "yrs", "rs", "u.s", "u.k", "a.m", "p.m", "jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "sept", "oct", "nov", "dec", "mon", "tue", "wed", "thu", "fri", "sat", "sun",
+/**
+ * Known LOWER-CASE abbreviations (no dot). This list is NOT the safety mechanism any more (cycle 3, ISS-T040GEN-008): a "." breaks a sentence only
+ * after an ordinary lower-case word or a sentence-final number, so every capitalised, mixed-case, digit-bearing, single-letter or dotted token
+ * ("Pvt.", "Univ.", "Q1.", "U.S.", "J.") is a non-break by construction. The list only catches abbreviations that are typed in lower case.
+ */
+const LOWER_ABBREVIATIONS = new Set([
+  "etc", "vs", "viz", "cf", "approx", "est", "dept", "govt", "inc", "ltd", "co", "corp", "jr", "sr", "dr", "mr", "mrs", "ms", "mx", "prof", "st", "mt", "fig", "eq",
+  "min", "max", "avg", "sec", "hrs", "yrs", "rs", "jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "sept", "oct", "nov", "dec", "mon", "tue", "wed", "thu", "fri", "sat", "sun",
 ]);
 const LOWER = /\p{Ll}/u;
+const APOS = new Set(["'", "’"]);
 const OPEN_OR_WS = (c: string) => WS.test(c) || OPENERS.has(c);
 
 /**
- * Is the mark at t[i] a real sentence break? ! ? … danda: yes (when followed by whitespace or the end).
- * "." only if followed by whitespace/end AND not after an abbreviation (e.g., vs., Dr., U.S., a.m., single initial "J.", list number such as "1." opening a sentence, "No." before a digit) AND the next word does not start in lower case. Doubt = no break, so the negation floor sees more text.
+ * Is the mark at t[i] a real sentence break? ! ? ... danda: yes (when followed by whitespace or the end).
+ * "." is a break ONLY IF followed by whitespace/end AND the token before it is
+ *   (a) an ordinary lower-case word: all lower-case letters (inner apostrophes allowed), length >= 2, not a known lower-case abbreviation; or
+ *   (b) a plain number (digits only) that is not a list number opening a sentence ("1. Apply"),
+ * AND the next word does not start in lower case. Anything else (capitalised, mixed case, digits with letters, single letter, dotted) NEVER breaks:
+ * an unknown token fails closed, the sentence just gets longer and the negation floor sees more of it.
  */
 function isBoundary(t: string, i: number): boolean {
   if (!STRONG.has(t[i]!) || !(i + 1 >= t.length || WS.test(t[i + 1]!))) return false;
   if (t[i] !== ".") return true;
-  let s = i; while (s > 0 && /[\p{L}\p{N}.]/u.test(t[s - 1]!)) s--;
-  const word = t.slice(s, i).toLowerCase();
-  if (word.includes(".") || ABBREVIATIONS.has(word)) return false;
-  if ([...word].length === 1 && /\p{L}/u.test(word)) return false;
-  if (/^\p{N}{1,2}$/u.test(word)) { // "1. Apply" / "2. Fees": a list number opening a sentence; a number ending one ("detail 3. Next") is a real break
+  let s = i; while (s > 0 && (/[\p{L}\p{N}.]/u.test(t[s - 1]!) || (APOS.has(t[s - 1]!) && s > 1 && /\p{L}/u.test(t[s - 2]!) && /\p{L}/u.test(t[s]!)))) s--;
+  const word = t.slice(s, i);
+  const letters = [...word].filter((c) => !APOS.has(c)).join("");
+  const ordinary = [...letters].length >= 2 && !word.includes(".") && [...letters].every((c) => LOWER.test(c)) && !LOWER_ABBREVIATIONS.has(word);
+  const number = /^\p{Nd}+$/u.test(word);
+  if (!ordinary && !number) return false;
+  if (number && /^\p{Nd}{1,2}$/u.test(word)) { // "1. Apply" / "2. Fees": a list number opening a sentence; a number ending one ("detail 3. Next") is a real break
     let p = s - 1; while (p >= 0 && WS.test(t[p]!)) p--;
     if (p < 0 || STRONG.has(t[p]!) || OPENERS.has(t[p]!)) return false;
   }
@@ -64,10 +75,10 @@ function sentenceEnd(t: string, at: number): number {
 /** Is the mark at t[i] acceptable as a quote edge? Clause marks and real boundaries yes; a "." after an abbreviation no. */
 const isEdgeMark = (t: string, i: number) => MARKS.has(t[i]!) && (t[i] !== "." || i + 1 >= t.length || !WS.test(t[i + 1]!) || isBoundary(t, i));
 
-export type SpanProblem = "starts-mid-sentence" | "ends-mid-sentence" | "omits-qualifier" | "negated-by-reply";
+export type SpanProblem = "starts-mid-sentence" | "ends-mid-sentence" | "omits-qualifier" | "negated-by-reply" | "is-question";
 
 /** `null` = the slice text[start,end) is a whole sentence/clause and its sentence has no omitted marker. */
-export function sentenceSpanProblem(text: string, start: number, end: number): SpanProblem | null {
+export function sentenceSpanProblem(text: string, start: number, end: number, opts: { allowQuestion?: boolean } = {}): SpanProblem | null {
   let i = start - 1;
   while (i >= 0 && (WS.test(text[i]!) || OPENERS.has(text[i]!))) i--;
   if (i >= 0 && !isEdgeMark(text, i)) return "starts-mid-sentence";
@@ -76,6 +87,8 @@ export function sentenceSpanProblem(text: string, start: number, end: number): S
     while (j < text.length && (WS.test(text[j]!) || CLOSERS.has(text[j]!))) j++;
     if (j < text.length && !isEdgeMark(text, j)) return "ends-mid-sentence";
   }
+  // ISS-T040GEN-009: a question is not a statement of fact. A quote inside a sentence that contains a "?" can be evidence only for a question item.
+  if (!opts.allowQuestion && text.slice(sentenceStart(text, start), sentenceEnd(text, Math.max(start, end - 1))).includes("?")) return "is-question";
   const endsSentence = end > 0 && isBoundary(text, end - 1);
   const before = text.slice(sentenceStart(text, start), start), after = endsSentence ? "" : text.slice(end, sentenceEnd(text, end));
   if (MARKER.test(before) || MARKER.test(after)) return "omits-qualifier";

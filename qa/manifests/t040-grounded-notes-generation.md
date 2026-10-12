@@ -1,7 +1,7 @@
 # t040-grounded-notes-generation
 
-**Handshake status:** ready-for-check (cycle 2; cycle-0 and cycle-1 text below is history, FAIL verdicts `qa/verdicts/t040-grounded-notes-generation.md`)
-Fix cycle: 2
+**Handshake status:** ready-for-check (cycle 3; cycle-0, -1 and -2 text below is history, FAIL verdicts `qa/verdicts/t040-grounded-notes-generation.md`)
+Fix cycle: 3
 Tier: 3 (next unblocked roadmap task: T-040; the schema blocker was lifted by D-126 / merge c99c44d). Class: data write (session_pages, claims persisted through indexSession): full ceremony. Verdict by the checker only.
 Lane: lane/t040gen (base 9e24d1f). Lane ledger `qa/issues.t040gen.jsonl`: ISS-T040GEN-001..005 (2 medium, 3 low; all open, none fixed here).
 
@@ -100,3 +100,23 @@ abbreviation list ignored, inner-dot words ignored, single initial ignored, lowe
 
 ## Not covered / limits
 Abbreviation list is a judgement, not an approved parameter; a mid-sentence number followed by a period ("item 3. March") is treated as a real break; an abbreviation at a true sentence end followed by a capital word ("...and so on etc. We do not...") merges two sentences (safe, costs recall); non-English abbreviations beyond Hinglish markers are unlisted.
+
+# Fix cycle 3 (answers the cycle-2 FAIL: ISS-T040GEN-008 high, ISS-T040GEN-009 medium; both stay open, only the checker changes ledger status)
+**Handshake status:** ready-for-check. **Fix cycle:** 3. Lane lane/t040gen. Files: `notes/sentence-span.ts`, `notes/evidence.ts` (one `opts` argument), `notes/drop-mode.ts` (question evidence passes `allowQuestion`), `notes/grounded-notes.test.ts`. Cycles 1 and 2 grew an abbreviation list and a negation list and each time the next missing entry was found, so this cycle changes the rule instead of the list.
+
+## ISS-T040GEN-008: the unknown token fails closed
+A `.` followed by whitespace is a sentence boundary ONLY IF the token before it is (a) an ordinary lower-case word (all lower-case letters, inner apostrophes allowed, length >= 2, no inner dot, not in the small lower-case abbreviation list), or (b) a plain digits-only number that is not a 1-2 digit list number opening a sentence; and the next word does not start in lower case. Every capitalised, mixed-case, digit-bearing ("Q1"), single-letter or dotted token ("Pvt", "Univ", "Asst", "Ave", "Pkwy", "PhD", "U.S", "J") NEVER breaks, so an abbreviation nobody listed merges the sentences and the negation floor sees all of it. `! ? … danda ॥`, full-width period and newline handling are unchanged. The old list shrank to lower-case forms only and is no longer the safety mechanism. Cost: a sentence that ends in a capitalised word ("...in London. We...") now merges with the next one (recall cost, never a wrong citation); a quote ending there is `ends-mid-sentence`.
+Replay: the checker's six -008 strings (test "ISS-T040GEN-008 replay"), every one now returns a problem and is dropped through the page path while the whole sentence (negation included) still ships. Tests for ISS-T040GEN-002 and -006 (all five cycle-1 reproductions plus the cycle-1 table) and -007 are unchanged and pass. Boundary test also pins 13 token shapes that must not break.
+
+## ISS-T040GEN-009: a question is not a statement of fact
+`sentenceSpanProblem(text, start, end, { allowQuestion })` returns `is-question` when the sentence(s) holding the quote contain a `?`, unless the caller passes `allowQuestion` (Q&A question evidence in drop-mode, and the audit of `qa ... question`). So a quote from a question sentence can never be evidence for a non-question item, whatever follows it ("Wrong.", "Incorrect.", "I disagree.", "Bad idea.", "That is false."; test replays them). `negated-by-reply` stays for statements. No reply word list was extended.
+
+## Evidence (node = codex runtime)
+- grounded-notes.test.ts 26/26 (23 -> 26 tests; the 007b test now uses statements, its question cases moved to the -009 test). All `packages/index/src/pipeline` tests 421/421 (incl. quote/*). `tsc --noEmit` packages/index exit 0. No LLM/Mongo/network. (apps/api not re-run: no change to its call paths; `resolveEvidence` gained an optional 4th argument.)
+- Recall on data/toc-migrated, same script shape as cycle 2 (3427 turns, naive splitter, pieces of 12+ chars; baseline reproduced exactly: n 15157 / 33751, before 97.1% / 73.5%): whole sentence 97.1% (14712/15157) -> 71.9% (10901/15157): refusals starts-mid 1643, ends-mid 972, is-question 1589, negated-by-reply 52. Comma/semicolon clause 73.5% (24812/33751) -> 60.5% (20413/33751): omits-qualifier 7574, is-question 3980, starts-mid 921, ends-mid 823, negated-by-reply 40. That is the cost: about 10.5 points of sentence recall is the question rule (questions are no longer usable as facts) and about 15 points is the capital-word merge. Quote option stays off by default (unchanged).
+
+## Mutations (11; harness `t040gen-c3/` inside the worktree, 120 s SIGKILL timeout, byte backup per mutation restored in `finally`, restored == backup verified each time; folder deleted afterwards): 11/11 killed
+every token breaks, capitalised words break, single letters break, digit-bearing tokens break, lower-case abbreviation list ignored, list-number rule removed, question rule removed, question rule applied even when allowed, Q&A question evidence not allowed, question check looks at the quote only, `resolveEvidence` drops opts. (The sentence-span.ts number branch was edited once more after the run and restored to the measured form; test and tsc re-run.)
+
+## Not covered / limits
+A statement followed by a one-word rejection not in the reply list ("Fees are 1000 rupees. Wrong.") still ships; only the question case is structural. A clause quote after "He is wrong;" ships (not a marker). 1-2 digit sentence-final numbers still break before a capital word ("detail 3. Next"). Non-Latin lower-case words (Devanagari letters) do not count as ordinary words, so a "." after them never breaks (danda is the break there).

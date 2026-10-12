@@ -20,7 +20,7 @@ export const MAX_EVIDENCE_PER_ITEM = 8;
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 
 /** Resolve model-claimed evidence against the source turns; never throws. */
-export function resolveEvidence(value: unknown, turns: Turns[], spans?: RuntimeSpan[]): Resolved {
+export function resolveEvidence(value: unknown, turns: Turns[], spans?: RuntimeSpan[], opts: { allowQuestion?: boolean } = {}): Resolved {
   if (!Array.isArray(value) || value.length === 0) return { ok: false, reason: "no evidence" };
   if (value.length > MAX_EVIDENCE_PER_ITEM) return { ok: false, reason: "too many evidence entries" };
   const evidence: QuotedEvidence[] = [], claimed: string[] = [], seen = new Set<string>();
@@ -33,7 +33,7 @@ export function resolveEvidence(value: unknown, turns: Turns[], spans?: RuntimeS
     const inSpan = verdict.locations.filter((l) => l.turnId === turn._id && (!spans || spans.some((s) => s.turnId === turn._id && s.from <= l.start && l.end <= s.to)));
     if (!inSpan.length) return { ok: false, reason: "quote lies outside the submitted spans" };
     // ISS-T040GEN-002: sentence/clause-span rule (manifest t040-strict-quote-verifier-and-windowing.md:82) + omitted-qualifier floor.
-    const problems = inSpan.map((l) => sentenceSpanProblem(turn.text, l.start, l.end));
+    const problems = inSpan.map((l) => sentenceSpanProblem(turn.text, l.start, l.end, opts));
     const where = inSpan[problems.indexOf(null)];
     if (!where) return { ok: false, reason: `quote is not a whole sentence or clause: ${problems[0]}` };
     const quote = turn.text.slice(where.start, where.end);
@@ -65,8 +65,8 @@ export function citationTimes(evidence: ReadonlyArray<QuotedEvidence>, turns: Tu
  */
 export function auditGroundedNotes(page: { citedItems?: CitedItem[]; qa?: QaEntry[] }, turns: Turns[]): string[] {
   const problems: string[] = [], ids = new Set<string>();
-  const check = (label: string, text: string, ev: ReadonlyArray<QuotedEvidence>) => {
-    const r = resolveEvidence(ev, turns);
+  const check = (label: string, text: string, ev: ReadonlyArray<QuotedEvidence>, allowQuestion = false) => {
+    const r = resolveEvidence(ev, turns, undefined, { allowQuestion });
     if (!r.ok) return void problems.push(`${label}: ${r.reason}`);
     if (r.evidence.some((e, i) => e.quote !== ev[i]!.quote) || r.evidence.length !== ev.length) problems.push(`${label}: quote is not the verbatim source slice`);
     if (extractiveText(text, r) !== text) problems.push(`${label}: text is not the joined quotes`);
@@ -81,7 +81,7 @@ export function auditGroundedNotes(page: { citedItems?: CitedItem[]; qa?: QaEntr
   }
   for (const q of page.qa ?? []) {
     if (ids.has(q.id)) problems.push(`${q.id}: duplicate id`); ids.add(q.id);
-    check(`qa ${q.id} question`, q.question, q.questionEvidence);
+    check(`qa ${q.id} question`, q.question, q.questionEvidence, true);
     if (q.status === "unanswered") { if (q.answer !== null || q.answerEvidence.length) problems.push(`qa ${q.id}: unanswered carries an answer`); }
     else if (q.answer === null) problems.push(`qa ${q.id}: answered without answer`);
     else check(`qa ${q.id} answer`, q.answer, q.answerEvidence);

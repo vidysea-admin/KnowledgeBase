@@ -34,7 +34,7 @@ export function tryItem(raw: unknown, turns: Turns[], spans: RuntimeSpan[] | und
 export function tryQA(raw: unknown, turns: Turns[], questionSpans: RuntimeSpan[] | undefined, answerSpans: RuntimeSpan[] | undefined, log: DroppedNote[]): QaEntry | undefined {
   const r = rec(raw), drop = (what: DroppedNote["what"], reason: string) => (log.push({ what, reason, excerpt: excerpt(r?.question) }), undefined);
   if (!r) return drop("qa", "not an object");
-  const q = resolveEvidence(r.questionEvidence, turns, questionSpans);
+  const q = resolveEvidence(r.questionEvidence, turns, questionSpans, { allowQuestion: true });
   if (!q.ok) return drop("qa", `question: ${q.reason}`);
   const question = extractiveText(r.question, q);
   if (question === undefined) return drop("qa", "question text is not the verified quotes");
