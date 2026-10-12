@@ -37,6 +37,8 @@ export interface SessionInfo {
   transcribed: boolean;
   indexed: boolean;
   processedAt?: unknown;
+  /** source.json `createdAt` (the upload/capture instant written by scripts/upload/submit.mjs); raw, validated by the purge executor */
+  capturedAt?: unknown;
   turnIds: Set<string>;
   unreadable?: string;
 }
@@ -123,6 +125,7 @@ export function gatherState(opts: ReportOptions, io: MediaIo = REAL_IO): GatherR
     info.title = ownStr(ses.value, "title");
     info.mediaId = ownStr(src.value, "_id");
     info.mediaTenant = ownStr(src.value, "tenantId");
+    info.capturedAt = own(src.value, "createdAt");
     info.media = probeMedia(opts.mediaRoot, ownStr(src.value, "path") ?? ownStr(src.value, "audioPath"), io);
     const rec = own(src.value, "sizeBytes");
     info.recordedBytes = typeof rec === "number" && Number.isSafeInteger(rec) && rec >= 0 ? rec : null;
