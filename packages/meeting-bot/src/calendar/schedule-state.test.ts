@@ -11,7 +11,7 @@ import path from "node:path";
 import {createHash} from "node:crypto";
 
 import {
-  readScheduleState, readScheduledKeys, recordScheduled, scheduleStateFilePath,
+  readScheduleState, ScheduleStateCorrupt, readScheduledKeys, recordScheduled, scheduleStateFilePath,
   writeScheduledJob, readScheduledJob,
   prepareWebinarSourceState, readWebinarOperationState, writeWebinarOperationState, validateWebinarCalendarAcquisition,
   webinarCompletionState,
@@ -106,11 +106,11 @@ test("recordScheduled creates the state dir if it doesn't exist yet", () => {
   });
 });
 
-test("readScheduleState on a corrupt file never throws — treated as {}", () => {
+test("readScheduleState on a corrupt file throws ScheduleStateCorrupt and leaves it untouched (ISS-ALERTWHOFIX-001)", () => {
   withTempDir((dir) => {
     mkdirSync(dir, { recursive: true });
     writeFileSync(scheduleStateFilePath(dir), "{ not valid json");
-    assert.deepEqual(readScheduleState(dir, TEN), {});
+    assert.throws(() => readScheduleState(dir, TEN), ScheduleStateCorrupt); assert.equal(readFileSync(scheduleStateFilePath(dir), "utf8"), "{ not valid json");
   });
 });
 

@@ -2012,3 +2012,41 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** Bounded retry with backoff, then optional injected fallback, then omit and report in ocrErrors with attempt count.
 **Approved-by:** Umesh
 **Links:** T-041; A5 (qa/manifests/t041-ocr-stage-alignment.md)
+
+## D-138 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** A WhatsApp owner may be mapped to exactly ONE tenant. Owner configuration that maps the same owner to two or more tenants is rejected at load with a clear error. WhatsApp session and turn ids stay as they are: no id change and no migration. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** The only way the bare WhatsApp session id (hash of groupJid and ownerUserId) can collide across tenants is one owner under two tenants; forbidding that closes the collision without rewriting citation-bearing ids.
+**Result:** Owner-to-tenant is one-to-one at config load; session and turn ids and stored data are untouched.
+**Approved-by:** Umesh
+**Links:** ISS-TENANTSRCID-001; D-136
+
+## D-139 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** When a pipeline run fails terminally (retries exhausted), its queue job is marked FAILED, not done, so /system-status and notifications see it. A resubmit of the same runKey creates a new attempt. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** Marking an exhausted run done would hide the failure from status and notifications; failed must be visible, and a resubmit must be able to retry without reusing the dead attempt.
+**Result:** Terminal failure maps to a FAILED queue job; resubmitting the same runKey starts a new attempt.
+**Approved-by:** Umesh
+**Links:** T-050; ISS-T050ADAPTER; qa/manifests/t050-runner-adapter.md
+
+## D-140 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Umesh (Approver) approves amending the job-queue contract (qa/contracts/t050-job-queue.md) criterion 13 to: "13. `LeaseRef.tenantId` and `claim` `opts.tenantId` are REQUIRED. A missing, empty or malformed tenant returns `invalid-input` and writes nothing. A well-formed tenant that differs from the job's tenant makes heartbeat/complete/fail return `not-found`, deep-equal to the answer for a missing id, in every job state, writing nothing. A claim returns only the named tenant's jobs. (ISS-JOBQTENANT-001)". A tenant outside the queue charset (ASCII letters, digits, dot, underscore, hyphen) gets invalid-input. Decided in chat 2026-10-12.
+**Why:** The old wording made the tenant optional and let an omitted tenant match any tenant's job; the checker PASSed the fix that enforces it, so the contract must match.
+**Result:** Criterion 13 now requires the tenant on every owner-checked queue operation; no wildcard.
+**Approved-by:** Umesh
+**Links:** ISS-JOBQTENANT-001
+
+## D-141 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 direction after the cycle-2 live gate. Model-proposed speaker names that pass deterministic grounding (verbatim quote containing the name, multi-name abstain, floor not contradicted), plus a verifier "yes" with single evidence, are shown as SUGGESTED. Each carries its quote and is never final until a human confirms it in the UI. Confirmed names become final with provenance "human-confirmed". Auto-final naming (no human) stays limited to the deterministic floor plus the independent-pair rule. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** The live gate (lane u24gate2, 2e621ece) showed 0 wrong and 0 additions in pair mode, so model proposals are useful as suggestions but not safe to finalize without a human.
+**Result:** Suggested names carry their quote and need human confirmation; auto-final stays at floor plus independent-pair.
+**Links:** U2.4; D-132; ISS-U24SMART-005
+
+## D-142 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-050 /ask graph shape. The /ask graph uses 4 coarse nodes: retrieve (selectNodes, candidate arms, rrfMerge, tree resolve, source hydrate) -> evaluate (ask() evaluation + web/tavily fallback + score audit) -> refine -> answer. It must be output-identical to runAskV2, unexported and off by default. Nodes may be split later. Umesh (Approver) delegated the choice in chat 2026-10-12 ("whatever is the best one").
+**Why:** Coarse nodes keep the graph a thin wrapper that can be proven output-identical to runAskV2; finer splits can follow once that is shown.
+**Result:** 4-node graph, unexported, off by default, output-identical to runAskV2.
+**Links:** T-050

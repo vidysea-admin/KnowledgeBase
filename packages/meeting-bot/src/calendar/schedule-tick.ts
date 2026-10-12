@@ -13,7 +13,7 @@ import { requireStateTenant } from "./state-tenant-tag.js";
 import { recordSkipped } from "./skipped-state.js";
 import { createKeyTenantLoader } from "./join-rules-wiring/key-tenant.js";
 import { enforceJoinRules, parseJoinRulesEnforce, type JoinRulesEnforceIo } from "./join-rules-enforce.js";
-import { readScheduledKeys, recordScheduled, writeScheduledJob, validateWebinarCalendarAcquisition, type WebinarCalendarAcquisition } from "./schedule-state.js";
+import { loadScheduledKeysForTick, recordScheduled, writeScheduledJob, validateWebinarCalendarAcquisition, type WebinarCalendarAcquisition } from "./schedule-state.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -247,7 +247,12 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
   const trustedSenders = loadTrustedSenderConfig();
   // Fail closed (ISS-ALERTID-006): no valid tenant, or an untagged / other-tenant state file, stops the tick before anything is scheduled.
   const stateTenant = requireStateTenant(deps.stateTenantId);
-  const alreadyScheduled = readScheduledKeys(deps.stateDir, stateTenant);
+  // ISS-ALERTWHOFIX-001: a corrupt dedup file must not stop joining. Quarantine it (kept), warn loudly, proceed with an empty set.
+  const alreadyScheduled = loadScheduledKeysForTick(deps.stateDir, stateTenant, {
+    readOnly: dryRun,
+    onQuarantine: (name) => deps.log(`  WARNING: schedule-state.json was corrupt; moved aside as ${name} (dedup history in it is NOT merged back; sessions still in the join window may be re-scheduled, which is idempotent; inspect it)`),
+    onCorruptUnmoved: (why) => deps.log(`  WARNING: schedule-state.json is corrupt and could not be moved aside (${why}); proceeding with EMPTY dedup state so meetings are still joined`),
+  });
 
   const selected = selectAutoRecordItems({
     calendarEvents, candidates, now, leadMinutes: DEFAULT_LEAD_MINUTES, trustedSenders, alreadyScheduled,
@@ -314,7 +319,13 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
       launcherPath: RECORD_LAUNCHER,
       runAtIso: item.startTime,
     });
-    recordScheduled(deps.stateDir, { sessionKey: item.sessionKey, title: item.title, scheduledAt: now }, stateTenant);
+    try {
+      recordScheduled(deps.stateDir, { sessionKey: item.sessionKey, title: item.title, scheduledAt: now }, stateTenant,
+        { onQuarantine: (name) => deps.log(`  WARNING: schedule-state.json was corrupt; moved aside as ${name} (dedup history in it is NOT merged back; inspect it)`) });
+    } catch (err) {
+      // The one-off task is already created; a failed dedup write must not abort the remaining items' scheduling.
+      deps.log(`  WARNING: scheduled ${item.sessionKey} but could not record it in schedule-state.json: ${err instanceof Error ? err.message : String(err)}`);
+    }
     deps.log(`  scheduled: ${item.sessionKey} via one-off Windows task (job ${jobKey})`);
   }
 

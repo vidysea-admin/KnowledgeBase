@@ -49,23 +49,78 @@ const repliesFor = (json) => async () => completion("", json);
  * how `NEVER_A_PERSON` itself is cased (`isDiscourseOnly` lowercases before the membership test),
  * so capitalising only the candidate here, not the list, matches both guards' real casing.
  */
-async function shipsAsPerson(extractSpeakers, word) {
+/** Legacy reply shape (rule-gated extractor, kept as extractSpeakersRuleBased). */
+async function shipsAsPersonLegacy(extractFn, word) {
   const candidate = word.charAt(0).toUpperCase() + word.slice(1);
-  const text = `I am ${candidate} sure about that.`;
-  const { resolved } = await extractSpeakers(
-    [turn("t1", "spk:0", text)],
+  const { resolved } = await extractFn(
+    [turn("t1", "spk:0", `I am ${candidate} sure about that.`)],
     repliesFor([{ speakerRef: "spk:0", displayName: candidate, turnIds: ["t1"] }]),
   );
   return resolved.length > 0;
 }
 
-async function probeCurrent(words) {
-  const { extractSpeakers } = await import(pathToFileURL(join(PIPELINE_DIR, "speakers-llm.ts")).href);
+/**
+ * Reply shape the probe speaks. "new" is the production contract {label, name, evidenceQuote, evidenceKind}. "legacy" exists ONLY
+ * so the audit can prove it notices a broken probe (--mutate-probe, and the second half of --self-test): ISS-U24SMART-004.
+ */
+let PROBE_SHAPE = "new";
+function replyFor(candidate, sentence) {
+  return PROBE_SHAPE === "legacy"
+    ? [{ speakerRef: "spk:0", displayName: candidate, turnIds: ["t1"] }]
+    : [{ label: "spk:0", name: candidate, evidenceQuote: sentence, evidenceKind: "self-intro" }];
+}
+
+/**
+ * ISS-U24SMART-002/-004: the PRODUCTION extractor (extractSpeakers = the grounded gate, D-132) reads the new contract shape and
+ * silently drops the legacy one, so a legacy-shaped probe can never report a bypass. The recorded ISS-104 sentence is the default;
+ * the control passes its own sentence builder but goes through THIS function, so a broken probe breaks the control too.
+ */
+async function shipsAsPerson(extractFn, word, sentenceOf = (c) => `I am ${c} sure about that`) {
+  const candidate = word.charAt(0).toUpperCase() + word.slice(1);
+  const sentence = sentenceOf(candidate);
+  const { resolved } = await extractFn([turn("t1", "spk:0", sentence + ".")], repliesFor(replyFor(candidate, sentence)));
+  return resolved.length > 0;
+}
+
+/** Non-vacuity control: a genuine self-introduction MUST ship through shipsAsPerson itself, or the audit is blind. */
+async function controlShips(extractFn) {
+  return shipsAsPerson(extractFn, "Priya Nair", (c) => `My name is ${c}`);
+}
+
+async function probeCurrent(words, extractors) {
+  const mod = extractors ?? await import(pathToFileURL(join(PIPELINE_DIR, "speakers-llm.ts")).href);
+  if (!(await controlShips(mod.extractSpeakers))) throw new Error("audit-closed-class: probe is vacuous (a genuine self-introduction did not ship through the probe)");
   const bypasses = [];
   for (const { word } of words) {
-    if (await shipsAsPerson(extractSpeakers, word)) bypasses.push(word);
+    if ((await shipsAsPerson(mod.extractSpeakers, word)) || (mod.extractSpeakersRuleBased && (await shipsAsPersonLegacy(mod.extractSpeakersRuleBased, word)))) bypasses.push(word);
   }
   return bypasses;
+}
+
+/**
+ * Prove the audit can FAIL. (1) An extractor seeded with one bypass that only plants it when the REPLY SHAPE is the new contract
+ * must be caught. (2) With the probe mutated back to the legacy shape the audit must notice it is blind (the control throws).
+ */
+async function selfTest() {
+  const real = await import(pathToFileURL(join(PIPELINE_DIR, "speakers-llm.ts")).href);
+  const seeded = async (turns, complete) => {
+    const out = await real.extractSpeakers(turns, complete);
+    const reply = await complete({ kind: "speakers", messages: [] });
+    const newShape = Array.isArray(reply.json) && reply.json.some((e) => typeof e?.evidenceQuote === "string");
+    if (newShape && turns.some((t) => /\bSeeded\b/.test(t.text))) return { ...out, resolved: [{ speakerRef: "spk:0", displayName: "Seeded", personId: "person:seeded", evidence: [], blocks: [] }] };
+    return out;
+  };
+  const words = [{ word: "seeded" }, { word: "to" }];
+  const caught = await probeCurrent(words, { extractSpeakers: seeded });
+  const ok1 = caught.length === 1 && caught[0] === "seeded";
+  console.log(`self-test 1: seeded bypass ${ok1 ? "CAUGHT" : "MISSED"} (reported: ${caught.join(", ") || "none"})`);
+  const saved = PROBE_SHAPE;
+  PROBE_SHAPE = "legacy";
+  let ok2 = false;
+  try { await probeCurrent(words, { extractSpeakers: seeded }); } catch (e) { ok2 = /vacuous/.test(String(e?.message)); }
+  PROBE_SHAPE = saved;
+  console.log(`self-test 2: probe mutated to the legacy shape ${ok2 ? "DETECTED as blind" : "NOT DETECTED (audit would pass vacuously)"}`);
+  return ok1 && ok2;
 }
 
 /**
@@ -86,13 +141,14 @@ async function probeBase(words, ref) {
     });
     writeFileSync(join(scratchDir, "speaker-name-rules.ts"), baseRules, "utf8");
     const harness = readFileSync(join(PIPELINE_DIR, "speakers-llm.ts"), "utf8")
-      .replace('from "./speakers.js"', 'from "../speakers.js"');
+      .replace('from "./speakers.js"', 'from "../speakers.js"')
+      .replace(/^export \{ extractSpeakersGrounded as extractSpeakers \} from .*$/m, "");   // scratch copy is the legacy harness only
     writeFileSync(join(scratchDir, "speakers-llm.ts"), harness, "utf8");
 
-    const { extractSpeakers } = await import(pathToFileURL(join(scratchDir, "speakers-llm.ts")).href);
+    const { extractSpeakersRuleBased } = await import(pathToFileURL(join(scratchDir, "speakers-llm.ts")).href);
     const bypasses = [];
     for (const { word } of words) {
-      if (await shipsAsPerson(extractSpeakers, word)) bypasses.push(word);
+      if (await shipsAsPersonLegacy(extractSpeakersRuleBased, word)) bypasses.push(word);
     }
     return bypasses;
   } finally {
@@ -101,6 +157,8 @@ async function probeBase(words, ref) {
 }
 
 async function main() {
+  if (process.argv.includes("--mutate-probe")) PROBE_SHAPE = "legacy";   // test hook: the audit must FAIL with a broken probe
+  if (process.argv.includes("--self-test")) { process.exitCode = (await selfTest()) ? 0 : 1; return; }
   const baseRef = process.argv.includes("--base") ? process.argv[process.argv.indexOf("--base") + 1] : null;
   if (!existsSync(WORDLIST_PATH)) throw new Error(`audit-closed-class: missing ${WORDLIST_PATH}`);
   const { words, totals } = JSON.parse(readFileSync(WORDLIST_PATH, "utf8"));

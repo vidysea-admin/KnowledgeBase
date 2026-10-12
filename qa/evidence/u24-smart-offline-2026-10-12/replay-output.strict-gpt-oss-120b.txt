@@ -1,0 +1,1 @@
+strict-gpt-oss-120b: recorded entries=924, given a synthetic quote=0; score with: node qa/evidence/u24-smart-offline-2026-10-12/05-score.mjs --tag strict-gpt-oss-120b --raw-tag oc-gpt-oss-120b

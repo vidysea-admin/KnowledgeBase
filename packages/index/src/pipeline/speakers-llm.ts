@@ -162,13 +162,16 @@ export function buildSpeakerWindows(turns: Turns[]): SpeakerWindow[] {
 }
 
 /**
+ * LEGACY rule-gated extractor (self-naming evidence only), kept as the measurable baseline (D-132, pending append:
+ * production `extractSpeakers` is the model-judged grounding gate in speakers-grounded.ts).
+ *
  * Speaker identities for one session's positional labels, via the injected LLM `complete`.
  *
  * Never throws. Every returned `displayName` is verbatim-present in every turn it cites, every
  * cited turn id is real, and a label the model names two different ways is left unresolved rather
  * than settled by a coin flip.
  */
-export async function extractSpeakers(turns: Turns[], complete: SpeakersCompleteFn): Promise<SpeakerExtractionResult> {
+export async function extractSpeakersRuleBased(turns: Turns[], complete: SpeakersCompleteFn): Promise<SpeakerExtractionResult> {
   if (turns.length === 0) return { resolved: [], unresolved: [], degraded: null };
 
   const labels = new Set(positionalLabels(turns));
@@ -327,3 +330,4 @@ export async function extractSpeakers(turns: Turns[], complete: SpeakersComplete
   };
 }
 
+export { extractSpeakersGrounded as extractSpeakers } from "./speakers-grounded.js";

@@ -1,7 +1,7 @@
 # d139-failed-run-marks-job-failed
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 3 (owner decision D-139, T-050 runner adapter "open design call" in qa/manifests/t050-runner-adapter.md). Class: data write (queue job state): FULL ceremony. Verdict by the checker only.
 Lane: lane/failedjob (base 6be0570c). No ledger issue; no new issue filed.
 
@@ -29,3 +29,8 @@ Tests: terminal failure -> dead (even with attempts left; step then queue:termin
 
 ## Not delivered
 apps/api reader for the file queue (above). A queue job that went dead by lease expiry while the run state is still mid-stage is not detected as failed by submit (state-based check). Generation cap 10 000.
+
+## Cycle 1 (merge of main 2d262d39 into lane/failedjob; lane/t050fix landed meanwhile)
+Conflict hunks: (1) `pipeline-runner.ts` submit tail: kept main's `sv.warning` passthrough on "created" together with this lane's `generation` on both results. (2) `pipeline-runner.test.ts`: both sides appended tests at EOF; kept all D-139 tests and all of main's ISS-T050ADAPTER-001 tests and its stricter spy `claim: (w, o: { tenantId })`.
+Test change (required by D-139, commented in the test): "ISS-T050ADAPTER-001: queue.complete ..." failed-terminal case now asserts `fail` with code `bad-media`, tenantId tA, runId, `terminal === true`, and no `complete` call; the complete-run case still asserts `complete` carries tenantId. Spy records the terminal flag. No tenant assertion removed or loosened.
+Evidence: tsc clean; job-queue + pipeline-runner + pipeline-graph + run-state-store suites x5: 218/218 each run. Mutations on the updated test (per-mutation backup, hash-verified restore): terminal fail drops tenantId, wrong tenant, terminal flag dropped, failed run completes: 4/4 killed.

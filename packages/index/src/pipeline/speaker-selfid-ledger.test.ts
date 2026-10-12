@@ -14,7 +14,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
-import { extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
+import { extractSpeakersRuleBased as extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
 import { looksLikeAName, isDiscourseOnly, nameOccurrences } from "./speaker-name-rules.js";
 import { citesNameAsSelfIdentification, citesNameAsHandover, citesNameAsThanks, occurrenceAccepted, relationGate, RELATION_ROUTES, type RelationRoute } from "./speaker-relation-rules.js";
 

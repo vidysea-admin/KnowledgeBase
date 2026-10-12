@@ -6,6 +6,7 @@ import {createHash} from 'node:crypto';
 import ts from 'typescript';
 import {ObjectId,type Db} from 'mongodb';
 import {createWhatsAppSource} from '@lkb/ingest';
+import {scopedCollection} from '@lkb/db';
 import type {createMongoWhatsAppDeps as StoreFactory} from './store.js';
 
 test('actual owner-qualified Mongo reader captures one ID/payload snapshot before archive mutation',async()=>{
@@ -25,7 +26,7 @@ test('actual owner-qualified Mongo reader captures one ID/payload snapshot befor
   if(!mutated){mutated=true;messages.reverse();for(const message of messages){message.messageId='changed-'+message.messageId;message.text='changed archive payload';message.ts.setUTCFullYear(2030)}people[0]!.displayName='changed archive label';}
  },bulkWrite:async(ops:any[])=>{for(const op of ops)writes.push({name,filter:op.replaceOne.filter,row:op.replaceOne.replacement})}})}) as unknown as Db;
  const exports:Record<string,unknown>={};
- const modules:Record<string,unknown>={mongodb:{ObjectId,MongoClient:class {async connect(){connections++}db(){return archive}}},'@lkb/db':{getDb:()=>{throw new Error('Real app DB forbidden')},assertValidTenantId:(t:unknown)=>{if(typeof t!=='string'||!t)throw new Error('tenantId is required')}},'@lkb/ingest':{createWhatsAppSource},'../hash.js':{sha256Hex:hash}};
+ const modules:Record<string,unknown>={mongodb:{ObjectId,MongoClient:class {async connect(){connections++}db(){return archive}}},'@lkb/db':{scopedCollection,getDb:()=>{throw new Error('Real app DB forbidden')},assertValidTenantId:(t:unknown)=>{if(typeof t!=='string'||!t)throw new Error('tenantId is required')}},'@lkb/ingest':{createWhatsAppSource},'../hash.js':{sha256Hex:hash}};
  const code=ts.transpileModule(readFileSync(new URL('./store.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
  vm.runInNewContext(code,{exports,require:(name:string)=>{assert(Object.hasOwn(modules,name),'Unexpected dependency '+name);return modules[name]},Date,Map,Set,console,process:{env:{}}});
  const createStore=exports.createMongoWhatsAppDeps as typeof StoreFactory;

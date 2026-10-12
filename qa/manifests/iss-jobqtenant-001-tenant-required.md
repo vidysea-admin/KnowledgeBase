@@ -1,6 +1,6 @@
 # iss-jobqtenant-001-tenant-required
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2-adjacent (tenancy class, never capped; raised by the t050fix checker). Class: tenancy: FULL ceremony. Verdict by the checker only.
 Lane: lane/jobqtenant. Ledger shard `qa/issues.jobqtenant.jsonl` (ISS-JOBQTENANT-001, severity high, latent because the queue is unwired).
