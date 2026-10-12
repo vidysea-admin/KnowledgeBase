@@ -14,6 +14,8 @@ Files (packages/core/src/keyframes, 4 -> 6 files):
 ## Decision flagged for the checker (assumption A5 of t041-slide-turn-alignment)
 OcrFn throw/reject/non-string text/bad confidence => frame OMITTED (previous slide keeps the screen) + `{frameId, code}` in `ocrErrors`; only blank text returned by OcrFn means "no slide". Errors never carry slide text. Frames OCR'd sequentially.
 
+RESOLVED by D-137 and lane ocrretry (checker PASS cycle 0): the owner question on A5 is answered; OCR failures are retried with backoff plus one fallback attempt, and failed frames are omitted and reported with attempts.
+
 ## NOT done
 No real OCR/vision adapter, no model/cost choice, no storage/retention/redaction of slide text (still an OWNER DECISION), no search indexing, no barrel export, no PNG retention (D-008).
 

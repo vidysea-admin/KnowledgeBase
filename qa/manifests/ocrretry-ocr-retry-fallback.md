@@ -1,5 +1,5 @@
 # Manifest: ocrretry-ocr-retry-fallback
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 **Authority:** D-137 (pending append) - Umesh: "there must be a fallback or retry mechanism". Amends assumption A5 of t041-ocr-stage-alignment.
 
