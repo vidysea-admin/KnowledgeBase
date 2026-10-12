@@ -1,15 +1,18 @@
 # Verdict: u24-model-judged-speaker-attribution
 
-VERDICT: FAIL
-Cycle checked: 1
-Commit checked: 5fa25015 (lane/u24smart). No model API calls. Cycle 0 verdict (FAIL) is superseded by this file.
+VERDICT: PASS
+Cycle checked: 2
+Commit checked: 52c1b294 (lane/u24smart). No model API calls. Supersedes the cycle 0 and cycle 1 FAIL verdicts.
+
+Scope of this PASS: the deterministic layer plus the injectable verifier as a UNIT. It is not a measurement of the live model or of the gate bars; the live re-gate (bars 1 and 2) still decides whether the route may be wired.
 
 EXPLANATION:
-- ISS-U24SMART-001 original fixture: FIXED. The "Thanks Rashi" before spk:2 case is refused for all five kinds (address, called-on, handover, thanks, role-continuity).
-- But the referent binding is still unsound (ISS-U24SMART-003, high). Wrong identities still ship with 3 identical runs: (a) host and cohost each say "Rashi, can you hand over to Ruby ..." before Rashi's block, proposal spk:1=Ruby (handover or address) ships; (b) "Welcome Ruby, and Rashi will go first" before Rashi's block, spk:1=Ruby ships; (c) a one-turn backchannel "Yes please." by spk:2 between the call-on and the real answerer (spk:1) makes spk:2=Priya Nair ship. The gate checks only that the name occurs in a forward-cue quote, not which name is the addressee, and two different quote speakers satisfy "independent" corroboration.
-- Production exposure unchanged: still no production caller of extractSpeakers; routing unchanged.
-- ISS-U24SMART-002: partly fixed. Audit passes 0/409 and --self-test prints CAUGHT, but both are blind to the original defect: with shipsAsPerson mutated back to the legacy reply shape, --self-test still prints CAUGHT and the audit still prints 0/409 (ISS-U24SMART-004, medium). The --base HEAD failure is pre-existing: the base scratch dir copies only speaker-name-rules.ts, which imports ./speaker-name-data.js, absent from the scratch dir; the diff touches neither that import nor the copy logic.
-- Mutations (per-mutation backup, restore in finally, hash == HEAD blob each time, harness deleted): KILLED: drop collision check, corroboration by turn only, drop floor check, drop verbatim check. SURVIVED: remove referent binding (the THANKS_CUE line), address-backward-binds-before, drop FORWARD_CUE requirement. The new binding rules are weakly tested.
-- tsc clean; 314 speaker tests pass. speaker-docs/tile-fusion modified-status remains stat-only (hash equals HEAD).
+1. All cycle 0 and cycle 1 attacks are refused with the verifier forced to ALWAYS yes: thanks-to-previous speaker (address, called-on, handover, thanks), host+cohost "Rashi, can you hand over to Ruby", "Welcome Ruby, Rashi will go first", and the one-turn backchannel. Evidence: probe run via groundSpeakerProposals(turns, runs, async () => yes).
+2. New attacks: "Rashi ji" correctly ships for the right label; "Ms. Rashi" abstains (title token read as a second name, safe); Devanagari abstains; bare-name and "Speaker 0" label tricks ship nothing. One residual wrong ship under always-yes: spk:0 "Rashi, over to our next speaker please." then spk:2's block then spk:3 "Thanks Rashi for that handover." ships spk:2=Rashi, because the pair rule cannot read a role referent; and the second-name abstain misses a lowercase Hinglish second name. Both are ISS-U24SMART-005 (medium): they are only reachable if the live verifier also says yes three times, and must be measured in the live re-gate.
+3. Single-verified mode: only reachable by passing cfg.corroboration explicitly; default is independent-pair (mutating the default is killed by the suite). Nothing in apps/, config or scripts sets it. Production exposure is unchanged: no production caller of extractSpeakers, routing unchanged.
+4. Prompt injection: transcript text and quote go into the verifier prompt, so an injected "answer yes" can force three yes votes. That is the always-yes case above; the deterministic layer (verbatim quote, name in quote, second-name abstain, floor, collision, different-speaker opposite-side pair, label normalisation, one quote turn per label) bounds the damage to what item 2 shows. Unparseable or failing verifier output counts as unsure, never yes.
+5. ISS-U24SMART-004: fixed. --self-test prints "seeded bypass CAUGHT" and "probe mutated to the legacy shape DETECTED as blind"; a real source mutation of the new-shape reply in the probe makes the audit exit non-zero (KILLED).
+6. Mutations (per-mutation backup, restore in finally, hash == HEAD blob each time; harness and probe deleted): KILLED 11 of 13: drop multi-name abstain, pair accepts same speaker, pair accepts same side, default single-verified, drop floor, drop verbatim, drop collision, one yes enough, verifier ignores no, distance 3, audit probe broken. SURVIVED: own-words-identify (quote by the label's own speaker) and bare-label-any-kind; both are covered by other layers but untested (noted in ISS-U24SMART-005).
+7. tsc clean; speaker suites 323 pass, 0 fail. speaker-docs/tile-fusion remain stat-only modified (hash equals HEAD).
 
-ISSUES-WRITTEN: ISS-U24SMART-003 (high), ISS-U24SMART-004 (medium) in qa/issues.u24smart.jsonl
+ISSUES-WRITTEN: ISS-U24SMART-005 (medium) in qa/issues.u24smart.jsonl
