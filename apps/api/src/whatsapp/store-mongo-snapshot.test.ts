@@ -20,7 +20,7 @@ test('actual owner-qualified Mongo reader captures one ID/payload snapshot befor
  const queries:Array<{name:string;filter:any}>=[],writes:Array<{name:string;filter:any;row:any}>=[];let connections=0,mutated=false;
  const eq=(a:any,b:any)=>a?.toString()===b?.toString();
  const archive={collection(name:string){return {find(filter:any){queries.push({name,filter});let ordering:any;return {sort(order:any){ordering=order;return this},async toArray(){const selected=(rows[name]??[]).filter(row=>Object.entries(filter).every(([k,v]:[string,any])=>v&&typeof v==='object'&&'$in'in v?v.$in.some((id:any)=>eq(row[k],id)):v&&typeof v==='object'&&'$ne'in v?row[k]!==v.$ne:eq(row[k],v)));if(ordering)selected.sort((a,b)=>a.ts.getTime()-b.ts.getTime()||a._id.toString().localeCompare(b._id.toString()));return selected;}}}}}};
- const appDb=()=>({collection:(name:string)=>({replaceOne:async(filter:any,row:any)=>{
+ const appDb=()=>({collection:(name:string)=>({findOne:async()=>null,replaceOne:async(filter:any,row:any)=>{
   writes.push({name,filter,row});
   if(!mutated){mutated=true;messages.reverse();for(const message of messages){message.messageId='changed-'+message.messageId;message.text='changed archive payload';message.ts.setUTCFullYear(2030)}people[0]!.displayName='changed archive label';}
  },bulkWrite:async(ops:any[])=>{for(const op of ops)writes.push({name,filter:op.replaceOne.filter,row:op.replaceOne.replacement})}})}) as unknown as Db;
