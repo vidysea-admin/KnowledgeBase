@@ -8,7 +8,8 @@ import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
 import { createAudioWatchdog, createRealLevelSource } from "./audio-watchdog.js";
 import { type ControllerRecoveryActions, type ControllerRecoveryContext, cleanupOwnedBrowserProfile, finalizeControllerRecording, getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
-import { AUDIO_INPUT, createObsBrowserDeps, type ObsClientLike } from "./obs-windows.js";
+import { AUDIO_INPUT, createObsBrowserDeps, type ObsBrowserConfig, type ObsBrowserDepsOverrides, type ObsClientLike } from "./obs-windows.js";
+import { leanRestorePath, restoreLeanVideoInObs } from "../lean-video-obs.js";
 import { collectGapEvent, installCaptureControl, type GapWindow } from "./reconnect-gaps.js";
 import { createTelegramNotifier, type TelegramNotifier } from "./telegram-alerts.js";
 import { finalizeRecordingWith, normalizeCapture, processRecordingArtifacts } from "./record-finalize.js";
@@ -72,6 +73,9 @@ export function recordingBackend(rest: string[], env: NodeJS.ProcessEnv = proces
 export interface RecordInject {
   tab?: (onEvent: (handle: string, event: any) => void) => ReturnType<typeof createTabBrowserDeps>;
   finalize?: typeof finalizeRecording; recordDir?: string; wait?: (ms: number) => Promise<void>;
+  /** ISS-LEANWIRE-002: OBS-backend seams (fake client, join child, level source) and a notifier; defaults are production. */
+  obs?: ObsBrowserDepsOverrides & { config?: Partial<ObsBrowserConfig>; subscribeLevel?: Parameters<typeof createAudioWatchdog>[0]["subscribeLevel"] };
+  telegram?: TelegramNotifier;
 }
 export async function runRecord(rest: string[], inject: RecordInject = {}): Promise<void> {
   const recordDir = inject.recordDir ?? RECORD_DIR;
@@ -106,7 +110,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   try {
   let endedAt: number | undefined;
   const gaps: GapWindow[] = []; // T-029: filled from "gap" events on sb_join.py's stdout stream
-  const telegram = createTelegramNotifier();
+  const telegram = inject.telegram ?? createTelegramNotifier();
   let captureFailure: string | undefined;
   const onEvent = (_h: string, ev: Parameters<typeof collectGapEvent>[1]) => {
     if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
@@ -134,8 +138,10 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     profileDirectory,
     autoClick: shouldAutoClick(platform),
     leanVideo: {}, // T-035: lean defaults (720p, 5 fps, 500+64 kbps) for every OBS recording
+    onRestoreFailure: (m) => telegram.notifyObsRestoreFailed?.(m), // ISS-LEANWIRE-003
     onEvent,
-  });
+    ...inject.obs?.config,
+  }, inject.obs);
   const joiner = createBrowserJoiner(bot.deps);
   const { sessionHandle } = await joiner.join(url, { tenantId, consentNote: title });
   telegram.notifyJoined(title, platform); // T-030
@@ -143,7 +149,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   void bot.browserExited(sessionHandle)?.then(() => (gone = true));
   const audioWatchdog = createAudioWatchdog({
     now: () => Date.now(),
-    subscribeLevel: tab ? tab.subscribeLevel : createRealLevelSource({ obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455", obsPassword, inputName: AUDIO_INPUT }),
+    subscribeLevel: tab ? tab.subscribeLevel : inject.obs?.subscribeLevel ?? createRealLevelSource({ obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455", obsPassword, inputName: AUDIO_INPUT }),
     scheduleTick: (fn, ms) => {
       const id = setInterval(fn, ms);
       return () => clearInterval(id);
@@ -225,6 +231,7 @@ export async function finalizeRecording(
 export interface RunFinalizeOverrides extends Partial<Pick<ControllerRecoveryContext, "repoRoot" | "recordDir" | "profileDir">>, Partial<Omit<ControllerRecoveryActions, "finalize" | "processArtifacts">> {
   obs?: ObsClientLike;
   finalize?: typeof finalizeRecording;
+  telegram?: TelegramNotifier; // restore-failure alert sink; defaults to the env-configured notifier
 }
 
 export async function runFinalize(rest: string[], overrides: RunFinalizeOverrides = {}): Promise<void> {
@@ -267,6 +274,9 @@ export async function runFinalize(rest: string[], overrides: RunFinalizeOverride
         await obs.call("SetInputMute", { inputName: name, inputMuted: false }).catch(() => {});
       }
     }
+    // ISS-LEANWIRE-003: the crashed run may have left lean video values in the OBS profile; put them back now that recording is stopped.
+    await restoreLeanVideoInObs(obs, leanRestorePath(context.recordDir), (m) => console.log(`[bot] ${m}`),
+      (m) => (overrides.telegram ?? createTelegramNotifier()).notifyObsRestoreFailed?.(m));
     } finally { await obs.disconnect(); }
     const cleaned = cleanupOwnedBrowserProfile(path.resolve(context.profileDir), {...context, stopFile: path.join(RECORD_DIR, ".stop-obs-cleanup")}, overrides.cleanup);
     console.log(cleaned ? "[bot] OBS inputs unmuted, exact owned browser profile cleaned" : "[bot] OBS inputs unmuted; browser profile absent, cleanup skipped");

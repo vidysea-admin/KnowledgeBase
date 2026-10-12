@@ -23,7 +23,7 @@ import type { BrowserJoinerDeps } from "../joiners/browser-joiner.js";
 import { ensureObsReady, type ObsGuardProbes } from "./obs-guard.js";
 import { browserProfileArgs } from "./browser/browser-profile.js";
 import { startBotChild, type BotEvent } from "./browser/bot-child.js";
-import { applyLeanVideoToObs } from "../lean-video-obs.js";
+import { applyLeanVideoToObs, leanRestorePath, restoreLeanVideoInObs } from "../lean-video-obs.js";
 import type { LeanVideoInput } from "@lkb/core/src/domain/lean-video.js";
 
 export type { BotEvent };
@@ -52,6 +52,8 @@ export interface ObsBrowserConfig {
   /** T-035: lean video (720p, low fps/bitrate) applied to OBS before each recording. `{}` = defaults,
    * an object = overrides; undefined or false = OBS's own video settings untouched (today's behaviour). */
   leanVideo?: LeanVideoInput | false;
+  /** ISS-LEANWIRE-003: called (never throws out) when the operator's OBS video settings could not be put back. */
+  onRestoreFailure?: (message: string) => void;
   /** Called for every JSON line sb_join.py prints. */
   onEvent?: (handle: string, ev: BotEvent) => void;
   log?: (msg: string) => void;
@@ -207,7 +209,7 @@ export function createObsBrowserDeps(cfg: ObsBrowserConfig, overrides: ObsBrowse
     await obs.call("SetInputMute", { inputName: AUDIO_INPUT, inputMuted: false });
 
     // T-035: lean video settings go in BEFORE the canvas is read, so the transform below fits the lean size.
-    if (cfg.leanVideo !== undefined && cfg.leanVideo !== false) await applyLeanVideoToObs(obs, cfg.leanVideo, log);
+    if (cfg.leanVideo !== undefined && cfg.leanVideo !== false) await applyLeanVideoToObs(obs, cfg.leanVideo, log, { stateFile: leanRestorePath(cfg.recordDir) });
     // Fit the window capture to the canvas.
     const video = await obs.call("GetVideoSettings");
     const { sceneItemId } = await obs.call("GetSceneItemId", { sceneName: SCENE, sourceName: VIDEO_INPUT });
@@ -237,6 +239,9 @@ export function createObsBrowserDeps(cfg: ObsBrowserConfig, overrides: ObsBrowse
       log(`SetRecordDirectory unsupported, using OBS default dir (${String(e)})`);
     }
   }
+
+  // ISS-LEANWIRE-003: put the operator's previous video settings back (no-op when nothing was applied). Never throws.
+  const restoreLean = (): Promise<void> => restoreLeanVideoInObs(obs, leanRestorePath(cfg.recordDir), log, cfg.onRestoreFailure).then(() => undefined, (e) => log(`lean video: restore crashed (${String(e)})`));
 
   async function unmute(names: string[]): Promise<void> {
     for (const name of names) {
@@ -273,6 +278,7 @@ export function createObsBrowserDeps(cfg: ObsBrowserConfig, overrides: ObsBrowse
     } catch (e) {
       // Restore any desktop/mic inputs muted before the failure — nothing else ever would.
       await unmute(mutedByUs);
+      await restoreLean(); // lean settings may already be in OBS even though StartRecord never ran
       // Never leave an orphan bot Chrome holding the profile lock (its pipes also keep node alive).
       writeFileSync(stopFile, "stop");
       await Promise.race([exited, sleep(15_000)]);
@@ -301,6 +307,7 @@ export function createObsBrowserDeps(cfg: ObsBrowserConfig, overrides: ObsBrowse
       }
       log(`recording stopped → ${res.outputPath} (${last} bytes)`);
     } finally {
+      await restoreLean(); // after StopRecord (skipped by the helper if OBS still reports an active output)
       await unmute(run.mutedByUs);
       writeFileSync(run.stopFile, "stop");
       const code = await Promise.race([run.exited, sleep(20_000).then(() => "timeout" as const)]);

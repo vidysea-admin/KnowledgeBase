@@ -72,6 +72,8 @@ export interface TelegramNotifier {
   notifyFinished(summary: FinishedSummary): void;
   /** T-035: a finished recording whose measured size is NOT under the lean-video target. */
   notifyOverTarget(info: OverTargetInfo): void;
+  /** ISS-LEANWIRE-003: the operator's OBS video settings could not be restored after a lean recording. */
+  notifyObsRestoreFailed(message: string): void;
   /** R1 (u4a-watch-failure-alerts, D-046, spec.md R1): fires when a watch run records
    * `status: "failed"` for one watched source. Names the source (`sourceType`/`sourceId`), the
    * time, and `failureReason` VERBATIM — no rewording, no truncation — so a reader can match it
@@ -177,6 +179,9 @@ export function createTelegramNotifier(deps: TelegramNotifierDeps = {}): Telegra
         `overTarget:${info.sessionId}`,
         `📦 Recording over size target: ${info.title} — ${info.mbPerHour.toFixed(1)} MB/h (target under ${info.targetMbPerHour} MB/h; ${info.sizeMb.toFixed(1)} MB over ${formatDuration(info.durationSec)})`,
       );
+    },
+    notifyObsRestoreFailed(message) {
+      fireAndForget("obsRestoreFailed", `⚠️ ${message}`);
     },
     notifyPollFailed(tenantId, sourceType, sourceId, failedAt, failureReason) {
       fireAndForget(
