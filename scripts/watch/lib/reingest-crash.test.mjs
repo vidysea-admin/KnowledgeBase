@@ -5,11 +5,11 @@
 // Proven only against the in-memory BSON-bytes fake; never against a real MongoDB.
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { SESSION_COLLECTIONS, ownedNewSessionIds, replaceSessionRows } from "./reingest-swap.mjs";
-import { recoverAll, recoverSnapshot, snapshotHooks, withReingestLock } from "./reingest-recover.mjs";
+import { recoverAll, recoverSnapshot, snapshotHooks, withReingestLock, withWatchLock } from "./reingest-recover.mjs";
 import { BSON, listSnapshots, snapshotPaths } from "./reingest-snapshot.mjs";
 import { Kill, fakeStore } from "./reingest-fake.mjs";
 import { buildTree, treeIndexRootFilter } from "../../../packages/index/src/tree/build.ts";
@@ -314,6 +314,7 @@ test("recovery never removes a session that already existed under the NEW id bef
 
 // ---- ISS-REINGESTEJSON-004: a pre-existing sibling fork of the same Drive file must survive every failure path ----
 const SIB = "dup-fork";
+const FORK = `${NEW}-${DRIVE.slice(0, 6).toLowerCase()}`;
 /** seedOld plus a sibling fork: sourceId gdrive-<same file>, with a turn, page, claim and chunk. NOT in the snapshot rows. */
 function seedWithSibling() {
   const seed = seedOld();
@@ -369,7 +370,7 @@ test("ISS-REINGESTEJSON-004: the manifest records the pre-run linked sessions an
   await replaceSessionRows(deps(store, dir, { writeSnapshot: async (x) => { const f = await hooks.writeSnapshot(x); atSnapshot = { calls: store.calls.length, m: JSON.parse(readFileSync(f, "utf8")).manifest }; return f; } }));
   assert.equal(atSnapshot.calls, 0, "manifest was complete before the first mutating call");
   assert.deepEqual([...atSnapshot.m.preexistingSessionIds].sort(), [OLD, SIB].sort());
-  assert.deepEqual(atSnapshot.m.plannedNewSessionIds, [NEW]);
+  assert.deepEqual(atSnapshot.m.plannedNewSessionIds, [NEW, FORK], "the planned correct id AND its deterministic fork id, nothing discovered");
 });
 
 test("ISS-REINGESTEJSON-004: a partial new session (turns written, session row never written) is removed; the sibling is not", async () => {
@@ -382,7 +383,7 @@ test("ISS-REINGESTEJSON-004: a partial new session (turns written, session row n
   assert.deepEqual(store.bytes(COLLS), refSib());
 });
 
-test("ISS-REINGESTEJSON-004: an ingest that creates an UNPLANNED id is cleaned up by the pre-run-set difference; the sibling still survives", async () => {
+test("ISS-REINGESTEJSON-004: an ingest that writes under an UNPLANNED id is NOT cleaned up (only planned ids are owned); the sibling still survives and the restore is still verified", async () => {
   const dir = freshDir();
   const store = fakeStore(seedWithSibling());
   const other = async () => {
@@ -392,27 +393,119 @@ test("ISS-REINGESTEJSON-004: an ingest that creates an UNPLANNED id is cleaned u
   };
   const err = await replaceSessionRows(deps(store, dir, { ingest: other })).catch((e) => e);
   assert.equal(err.restored, true);
-  assert.deepEqual(store.bytes(COLLS), refSib());
+  assert.deepEqual(sibRows(store), ALL_SIB);
+  assert.equal(store.docs("sessions").some((x) => x._id === "surprise-id"), true, "an id this run did not plan is never deleted");
 });
 
-test("ISS-REINGESTEJSON-004: ownedNewSessionIds never returns a pre-run id; a legacy manifest (no pre-run set) removes only the planned id", () => {
-  assert.deepEqual(ownedNewSessionIds({ linkedNow: [SIB, "x"], preexistingSessionIds: [SIB, OLD], plannedNewSessionIds: [NEW] }).sort(), ["x", NEW].sort());
-  assert.deepEqual(ownedNewSessionIds({ linkedNow: [SIB, "x"], preexistingSessionIds: [SIB, NEW], plannedNewSessionIds: [NEW] }), ["x"]);
-  assert.deepEqual(ownedNewSessionIds({ linkedNow: [SIB, "x"], plannedNewSessionIds: [NEW] }), [NEW]);
+test("ISS-REINGESTEJSON-006: ownedNewSessionIds is exactly the planned ids minus the pre-run set; no manifest field -> nothing", () => {
+  assert.deepEqual(ownedNewSessionIds({ preexistingSessionIds: [SIB, OLD], plannedNewSessionIds: [NEW, FORK] }), [NEW, FORK]);
+  assert.deepEqual(ownedNewSessionIds({ preexistingSessionIds: [SIB, NEW], plannedNewSessionIds: [NEW, FORK] }), [FORK]);
+  assert.deepEqual(ownedNewSessionIds({ preexistingSessionIds: [SIB] }), [], "cycle-0-shaped manifest (pre-run set, no planned ids)");
+  assert.deepEqual(ownedNewSessionIds({}), [], "manifest with neither field");
 });
 
-test("ISS-REINGESTEJSON-004: a recovery manifest without the new fields (written by the cycle-0 code) deletes nothing but the correct id", async () => {
+/** The checker's construction: another writer (run-watch --ingest) creates a session for the same Drive file + a turn mid-run. */
+const concurrent = (store) => async () => {
+  await store.scoped("sessions")(T).insertMany([session("concurrent-ingest", "2026-09-26")]);
+  await store.scoped("turns")(T).insertMany([{ _id: "ci-t1", sessionId: "concurrent-ingest", text: "other writer", tenantId: T }]);
+};
+const hasConcurrent = (store) => store.docs("sessions").some((x) => x._id === "concurrent-ingest") && store.docs("turns").some((x) => x._id === "ci-t1");
+
+test("ISS-REINGESTEJSON-006 checker replay A1 verbatim: another writer's session+turn appears mid-run, ingest then fails -> restored AND the other writer's session survives", async () => {
+  const dir = freshDir();
+  const store = fakeStore(seedWithSibling());
+  const ingest = async () => { await concurrent(store)(); throw new Error("boom after the other writer wrote"); };
+  const err = await replaceSessionRows(deps(store, dir, { ingest })).catch((e) => e);
+  assert.equal(err.restored, true);
+  assert.equal(hasConcurrent(store), true, "concurrent session and its turn survive");
+  assert.deepEqual(sibRows(store), ALL_SIB);
+  assert.deepEqual(leftover(dir), []);
+});
+
+test("ISS-REINGESTEJSON-006 checker replay A2 verbatim: kill at step 8, another writer's session lands before startup recovery -> recovery keeps it", async () => {
   const dir = freshDir();
   const dead = fakeStore(seedWithSibling(), () => false, { killAt: 9 });
   await replaceSessionRows(deps(dead, dir)).catch(() => {});
+  assert.equal(dead.state.dead, true);
+  const fresh = fakeStore(dead.dump());
+  await concurrent(fresh)();
+  assert.deepEqual((await recoverAll(recoverDeps(fresh, dir))).map((x) => x.action), ["restored"]);
+  assert.equal(hasConcurrent(fresh), true);
+  assert.deepEqual(sibRows(fresh), ALL_SIB);
+});
+
+for (const [what, id] of [["the planned correct id", NEW], ["the deterministic fork id", FORK]]) {
+  test(`ISS-REINGESTEJSON-006: a partial write under ${what} is removed on failure, other-writer and sibling sessions are kept`, async () => {
+    const dir = freshDir();
+    const store = fakeStore(seedWithSibling());
+    const half = async () => {
+      await concurrent(store)();
+      await store.scoped("sessions")(T).insertMany([session(id, "2026-09-25")]);
+      await store.scoped("turns")(T).insertMany([{ _id: "p1", sessionId: id }]);
+      throw new Error("died mid-ingest");
+    };
+    const err = await replaceSessionRows(deps(store, dir, { ingest: half })).catch((e) => e);
+    assert.equal(err.restored, true);
+    assert.equal(store.docs("sessions").some((x) => x._id === id) || store.docs("turns").some((x) => x.sessionId === id), false);
+    assert.equal(hasConcurrent(store), true);
+    assert.deepEqual(sibRows(store), ALL_SIB);
+  });
+}
+
+test("ISS-REINGESTEJSON-006/-007: a manifest without the planned ids (legacy or cycle-0-shaped) deletes no session by discovery; the sibling and the other writer survive", async () => {
+  for (const strip of [["plannedNewSessionIds", "preexistingSessionIds"], ["plannedNewSessionIds"]]) {
+    const dir = freshDir();
+    const dead = fakeStore(seedWithSibling(), () => false, { killAt: 9 });
+    await replaceSessionRows(deps(dead, dir)).catch(() => {});
+    const file = snapFile(dir);
+    const doc = JSON.parse(readFileSync(file, "utf8"));
+    for (const k of strip) delete doc.manifest[k];
+    writeFileSync(file, JSON.stringify(doc));
+    const fresh = fakeStore(dead.dump());
+    await concurrent(fresh)();
+    await recoverAll(recoverDeps(fresh, dir));
+    assert.deepEqual(sibRows(fresh), ALL_SIB, `sibling survives (stripped: ${strip})`);
+    assert.equal(hasConcurrent(fresh), true);
+  }
+});
+
+test("ISS-REINGESTEJSON-007: a manifest with neither field whose correct id pre-existed with a turn: nothing of it is deleted", async () => {
+  const dir = freshDir();
+  const seed = seedWithSibling();
+  seed.sessions.push(session(NEW, "2026-09-25"));
+  seed.turns.push({ _id: "pre-new-t", sessionId: NEW, tenantId: T });
+  const store = fakeStore(seed);
+  const ref = store.bytes(COLLS);
+  await replaceSessionRows(deps(store, dir, { ingest: async () => { store.state.dead = true; throw new Kill("killed"); } })).catch(() => {});
   const file = snapFile(dir);
   const doc = JSON.parse(readFileSync(file, "utf8"));
   delete doc.manifest.plannedNewSessionIds;
   delete doc.manifest.preexistingSessionIds;
-  writeFileSync(file, JSON.stringify(doc)); // hash covers rows only, so the file still verifies
-  const fresh = fakeStore(dead.dump());
+  writeFileSync(file, JSON.stringify(doc));
+  const fresh = fakeStore(store.dump());
   await recoverAll(recoverDeps(fresh, dir));
-  assert.deepEqual(sibRows(fresh), ALL_SIB);
+  assert.deepEqual(fresh.bytes(COLLS), ref);
+});
+
+test("ISS-REINGESTEJSON-006: withWatchLock holds data/.watch.lock (the --ingest lock) for the run, refuses while another holder has it, and releases on success and on throw", async () => {
+  const lockDir = freshDir();
+  mkdirSync(lockDir, { recursive: true });
+  const lockPath = join(lockDir, ".watch.lock");
+  const { acquireLock, releaseLock } = await import("./lock.mjs");
+  let inside;
+  await withWatchLock({ lockPath }, async () => {
+    inside = acquireLock(lockPath); // what run-watch --ingest does
+    assert.equal(inside.acquired, false, "an --ingest cannot take the lock while a reingest runs");
+  });
+  assert.equal(existsSync(lockPath), false, "released");
+  assert.equal(acquireLock(lockPath).acquired, true); // --ingest running now
+  let ran = false;
+  await assert.rejects(withWatchLock({ lockPath }, async () => { ran = true; }), /holds .*not starting --reingest/);
+  assert.equal(ran, false, "a reingest does not start while --ingest runs");
+  assert.equal(existsSync(lockPath), true, "the refused reingest did not release the other holder's lock");
+  releaseLock(lockPath);
+  await assert.rejects(withWatchLock({ lockPath }, async () => { throw new Error("x"); }), /x/);
+  assert.equal(existsSync(lockPath), false, "released after a throw");
 });
 
 // ---- ISS-REINGESTEJSON-005: the snapshot is READ BACK and verified before the first delete ----
@@ -443,4 +536,14 @@ test("ISS-REINGESTEJSON-004: kill after turns of the planned new id were written
   const fresh = fakeStore(store.dump());
   assert.deepEqual((await recoverAll(recoverDeps(fresh, dir))).map((x) => x.action), ["restored"]);
   assert.deepEqual(fresh.bytes(COLLS), refSib());
+});
+
+test("ISS-REINGESTEJSON-006: runReingest takes data/.watch.lock (withWatchLock) BEFORE connecting or recovering, and the per-file lock only inside it", () => {
+  const src = readFileSync(new URL("../watch-reingest.mjs", import.meta.url), "utf8");
+  const run = src.slice(src.indexOf("export async function runReingest("), src.indexOf("async function reingestLocked("));
+  const iWatch = run.indexOf("withWatchLock({ lockPath: LOCK_PATH }");
+  assert.ok(iWatch > 0, "runReingest wraps its body in withWatchLock(LOCK_PATH)");
+  assert.ok(iWatch < run.indexOf("connect(process.env"), "watch lock before any db connection");
+  assert.ok(iWatch < run.indexOf("recoverAll("), "watch lock before startup recovery");
+  assert.ok(run.indexOf("recoverAll(") < run.indexOf("withReingestLock("), "fixed order: watch lock -> recovery -> per-file lock");
 });

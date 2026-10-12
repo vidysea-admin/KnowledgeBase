@@ -3,12 +3,12 @@
 import { existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { decideReingestAction, assertIndexed, ingestOneDriveFile } from "./lib/ingest-chain.mjs";
-import { ROOT, TENANT, RECORDINGS_DIR, AUDIO_DIR, CALENDAR_FIRST_YEAR, MONTHS, MONGODB_DB } from "./watch-config.mjs";
+import { ROOT, TENANT, LOCK_PATH, RECORDINGS_DIR, AUDIO_DIR, CALENDAR_FIRST_YEAR, MONTHS, MONGODB_DB } from "./watch-config.mjs";
 import { runGws, findCurrentMonthFolder } from "./watch-sources.mjs";
 import { markDriveState } from "./watch-store.mjs";
 import { replaceSessionRows, withFailureRecorded } from "./lib/reingest-swap.mjs";
 import { defaultSnapshotDir } from "./lib/reingest-snapshot.mjs";
-import { recoverAll, snapshotHooks, withReingestLock } from "./lib/reingest-recover.mjs";
+import { recoverAll, snapshotHooks, withReingestLock, withWatchLock } from "./lib/reingest-recover.mjs";
 
 /**
  * `--reingest <driveFileId>` — the u2-fix1 live repair for ISS-304/305/306. NOT the normal
@@ -28,6 +28,11 @@ import { recoverAll, snapshotHooks, withReingestLock } from "./lib/reingest-reco
 export async function runReingest(gdrive, driveFileId, calendarEvents, now) {
   const { connect } = await import("../../packages/db/src/client.js");
   const { findWatchState } = await import("../../packages/db/src/collections/watch-state.js");
+  // ISS-REINGESTEJSON-006: exclude run-watch --ingest for the whole run (recovery included), BEFORE any db write.
+  return withWatchLock({ lockPath: LOCK_PATH }, () => runReingestUnderWatchLock(gdrive, driveFileId, calendarEvents, now, connect, findWatchState));
+}
+
+async function runReingestUnderWatchLock(gdrive, driveFileId, calendarEvents, now, connect, findWatchState) {
   const db = await connect(process.env.MONGODB_URL, MONGODB_DB);
   console.log(`--reingest ${driveFileId}: connected to Mongo db "${db.databaseName}"`);
 

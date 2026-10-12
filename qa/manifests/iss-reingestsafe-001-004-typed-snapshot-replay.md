@@ -1,7 +1,7 @@
 # iss-reingestsafe-001-004-typed-snapshot-replay
 
 **Handshake status:** ready-for-check
-Fix cycle: 1
+Fix cycle: 2
 Tier: 2-equivalent (open medium ledger issues ISS-REINGESTSAFE-001 and -004, data-write class: full ceremony), pulled by the Approver's dispatch.
 Lane: lane/reingestejson. Ledger for this lane: qa/issues.reingestejson.jsonl, ids ISS-REINGESTEJSON-NNN (3 filed, all low). Existing ledger rows in qa/issues.reingestsafe.jsonl untouched (the checker changes their status).
 
@@ -84,3 +84,20 @@ Reusing an OS process start time for the lock is not trivial here (needs a per-O
 
 ### Not proven
 Still only the in-memory BSON-bytes fake and the real filesystem; never a real MongoDB, Drive, or `watch-reingest.mjs`/`run-watch.mjs` (never run). Concurrent writers other than this lock-protected run creating a session linked to the same file during the window are out of scope.
+
+## Fix cycle 2 (maker, responding to the cycle-1 section of qa/verdicts/iss-reingestsafe-001-004-typed-snapshot-replay.md, FAIL; ISS-REINGESTEJSON-006 medium, ISS-REINGESTEJSON-007 low)
+Cycles 0 and 1 above are kept unchanged. No ledger status is changed by the maker.
+
+- **ISS-REINGESTEJSON-006 (a), deletion scope.** `restoreOldRows`/`recoverSnapshot` delete ONLY the ids in the manifest's `plannedNewSessionIds` minus `preexistingSessionIds`. Discovery of linked sessions by sourceId is gone. `plannedNewSessionIds` is computed before the first write by `plannedSessionIds`: the corrected id and the deterministic fork id `<correct>-<first 6 of the Drive file id, lower-cased>` (the only other id `resolveSessionIdForIngest` can give). Any other session, including one created by another writer, is never deleted.
+- **ISS-REINGESTEJSON-006 (b), mutual exclusion.** `runReingest` now takes `data/.watch.lock` (`LOCK_PATH`, the lock `run-watch --ingest` takes, via `withWatchLock` in `reingest-recover.mjs` using `lock.mjs`) as the OUTERMOST lock, before connecting, before startup recovery. Fixed order: watch lock -> recovery -> per-file reingest lock. `--ingest` takes only the watch lock, so no cycle exists; a reingest refuses to start while `--ingest` runs and the reverse (existing skip). Released in `finally`.
+- **ISS-REINGESTEJSON-007.** A manifest without `plannedNewSessionIds` (neither field, or cycle-0-shaped with only `preexistingSessionIds`) deletes no session by id; only the snapshotted rows are restored. The recover fallback to `correctSessionId` was removed.
+- Checker constructions replayed verbatim in `reingest-crash.test.mjs`: A1 (other writer's session `concurrent-ingest` + turn appear mid-run, ingest then fails) -> restored and the session and turn survive; A2 (kill at step 8, the other writer's session lands before startup recovery) -> recovery `restored`, session and turn survive; B1 (cycle-0-shaped manifest + sibling) and B2 (no-field manifest, correct id pre-existing with a turn) -> nothing deleted, rows byte-identical to the pre-run state.
+- Kept: cycle-1 sibling replay, kill at every step 1..11 (with and without sibling), the four corrupted-snapshot tests, content-hash verify.
+
+### Evidence (node v24.19.0, `--test --import tsx`, fake store and temp dirs only; no Mongo, Drive, Gmail, .env; watch-reingest.mjs and run-watch.mjs never run)
+- reingest-crash 56/56 (was 49), reingest-snapshot 14/14, reingest-swap 23/23, ingest-chain 22/22, lock 6/6; combined 121 pass, 0 fail.
+- Mutations (8; harness `reingestejson-c2-harness.mjs` inside the worktree, untracked, deleted; per-mutation byte backup restored in `finally`; hash after each equal to the pre-mutation hash): fork id dropped from plan (killed, 2 red); pre-run filter removed (killed, 1); old sourceId discovery re-added (killed, 7); recover fallback to correctSessionId (killed, 1); legacy ownedNew returns an id (killed, 3); watch lock never released (killed, 1); watch lock not enforced (killed, 1); runReingest not wrapped by withWatchLock (killed, 1). 8/8 killed, 0 survivors.
+- Final hashes of the four changed source files equal the committed blobs.
+
+### NOT proven
+- The lock wiring in `watch-reingest.mjs` is asserted by a source-order test, not by running it (it needs live Mongo/Drive). A stale `.watch.lock` is stolen after 6 h by `lock.mjs`. Proven only against the in-memory BSON-bytes fake; never real MongoDB.

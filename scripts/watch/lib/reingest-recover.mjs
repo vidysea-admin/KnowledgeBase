@@ -18,6 +18,20 @@ export function snapshotHooks({ dir, hook }) {
   };
 }
 
+/** Run `fn` while holding data/.watch.lock — the lock `run-watch --ingest` takes — so a reingest and an ingest never
+ * write at the same time (ISS-REINGESTEJSON-006). LOCK ORDER (fixed, no deadlock): watch lock FIRST, then the per-file
+ * reingest lock; `--ingest` takes only the watch lock. */
+export async function withWatchLock({ lockPath, lockOpts }, fn) {
+  const { acquireLock, releaseLock } = await import("./lock.mjs");
+  const lock = acquireLock(lockPath, lockOpts);
+  if (!lock.acquired) throw new Error(`a watch run (--ingest or another --reingest) holds ${lockPath} (since ${lock.heldSince}); not starting --reingest`);
+  try {
+    return await fn();
+  } finally {
+    releaseLock(lockPath);
+  }
+}
+
 /** Run `fn` while holding the per-tenant, per-file lock; a live holder is refused, a dead one is taken over (ISS-REINGESTSAFE-005). */
 export async function withReingestLock({ dir, tenant, driveFileId, lockOpts }, fn) {
   const lock = acquireReingestLock(snapshotPaths(dir, tenant, driveFileId).lock, lockOpts);
@@ -50,7 +64,7 @@ export async function recoverSnapshot({ scoped, tenant, path, rootFilter, regene
     }
     const r = await restoreOldRows({
       scoped, tenant, driveFileId: manifest.driveFileId, oldSessionId: manifest.oldSessionId, snapshot: rows,
-      preexistingSessionIds: manifest.preexistingSessionIds, plannedNewSessionIds: manifest.plannedNewSessionIds ?? [manifest.correctSessionId], treeRoot, rootFilter,
+      preexistingSessionIds: manifest.preexistingSessionIds, plannedNewSessionIds: manifest.plannedNewSessionIds, treeRoot, rootFilter,
     });
     if (!r.ok) throw new Error(r.errors.join("; "));
     removeSnapshot(path);
