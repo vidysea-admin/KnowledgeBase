@@ -44,7 +44,7 @@ export interface IndexSessionDeps {
 
 
 async function loadTreeRoot(tenantId: string, db: Pick<Db, "collection">): Promise<TreeIndexRootDocument | null> {
-  return db.collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
+  return scopedCollection<TreeIndexRootDocument & { _id: string }>(db as never, "tree_index")(tenantId).findOne(treeIndexRootFilter(tenantId));
 }
 
 

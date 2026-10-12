@@ -9,7 +9,7 @@
  * no second "ingested content" view is built, the existing one is reused.
  */
 import { randomUUID } from "node:crypto";
-import { getDb, assertValidTenantId } from "@lkb/db";
+import { assertValidTenantId, sources as sourcesColl, sessions as sessionsColl, turns as turnsColl } from "@lkb/db";
 import type { Sources, Sessions, Turns } from "@lkb/core";
 import { createUrlSource, type ConsentContext, type Turn } from "@lkb/ingest";
 import type { IngestDeps, IngestResult } from "./routes/ingest.js";
@@ -40,7 +40,7 @@ export function createMongoIngestDeps(indexSession?: BoundIndexer): IngestDeps {
       // D-008 "silent" last-resort mode -- the caller explicitly handed us this URL to fetch.
       const consent: ConsentContext = { captureMode: "public", given: true, recordedBy: "web-ingest" };
       const { source } = await urlSource.fetch({ kind: "url", url, tenantId }, consent);
-      await getDb().collection<Sources>("sources").insertOne(source);
+      await sourcesColl(tenantId).insertOne(source);
 
       const turns = await urlSource.toTurns(source);
 
@@ -53,7 +53,7 @@ export function createMongoIngestDeps(indexSession?: BoundIndexer): IngestDeps {
         date: new Date().toISOString().slice(0, 10),
         status: { transcribe: "done", index: "pending" },
       };
-      await getDb().collection<Sessions>("sessions").insertOne(session);
+      await sessionsColl(tenantId).insertOne(session);
 
       const turnDocs: Turns[] = turns.map((t: Turn, i: number) => ({
         _id: `${sessionId}-t${String(i + 1).padStart(3, "0")}`,
@@ -64,7 +64,7 @@ export function createMongoIngestDeps(indexSession?: BoundIndexer): IngestDeps {
         tEnd: t.tEnd,
         text: t.text,
       }));
-      if (turnDocs.length > 0) await getDb().collection<Turns>("turns").insertMany(turnDocs);
+      if (turnDocs.length > 0) await turnsColl(tenantId).insertMany(turnDocs);
 
       if (indexSession) {
         try {

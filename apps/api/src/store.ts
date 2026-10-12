@@ -6,7 +6,7 @@
  */
 import { randomUUID, randomBytes } from "node:crypto";
 import {
-  getDb, assertValidTenantId, createEvalRun, recordScore as recordEvalRunScore,
+  getDb, assertValidTenantId, scopedCollection, jobs as jobsColl, createEvalRun, recordScore as recordEvalRunScore,
   sessions as sessionsColl, sources as sourcesColl, gaps as gapsColl,
   claims as claimsColl, turns as turnsColl, sessionPages as sessionPagesColl, graphEdges as graphEdgesColl,
   listAll as listAllMeetingCandidates, createIfNew as createMeetingCandidateIfNew,
@@ -36,6 +36,12 @@ import { sha256Hex } from "./hash.js";
  * own comment excludes `features_event` deliberately — a JSONL-file schema, not a collection) —
  * reused here instead of a second hand-maintained list that could drift from it. */
 
+/** `tree_index` roots through the shared tenant scope (ISS-AUTHTENANT-002): the accessor validates the
+ * tenant and merges it into every filter, so a root can no longer be read for an unvalidated or missing tenant. */
+type TreeRoot = TreeIndexRootDocument & { _id: string };
+const treeIndexColl = (tenantId: string) => scopedCollection<TreeRoot>(getDb(), "tree_index")(tenantId);
+const apiKeysColl = (tenantId: string) => scopedCollection<ApiKeys>(getDb(), "api_keys")(tenantId);
+
 export function createMongoApiKeyStore(): ApiKeyStore {
   return {
     async verify(key: string): Promise<VerifiedKey | null> {
@@ -56,7 +62,7 @@ export function createMongoTreeStore(): TreeStore {
       // actually produces. It now also matches on the real `tenantId` field (ISS-062) --
       // TreeIndexRootDocument satisfies TreeStore's TreeIndexNode return type (it's a superset).
       try { assertValidTenantId(tenantId, "treeStore.load"); } catch { return null; } // invalid tenant: no tree and NO query (ISS-AUTHTENANT-002); the route answers its 404
-      return getDb().collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
+      return treeIndexColl(tenantId).findOne(treeIndexRootFilter(tenantId));
     },
   };
 }
@@ -75,7 +81,7 @@ export function createMongoEvalRunStore(): EvalRunStore {
 export function createMongoJobWriter(): WriteJobFn {
   return async (entry) => {
     assertValidTenantId(entry?.tenantId, "jobWriter");
-    await getDb().collection<Jobs>("jobs").insertOne({ _id: randomUUID(), ...entry });
+    await jobsColl(entry.tenantId).insertOne({ _id: randomUUID(), ...entry });
   };
 }
 
@@ -138,7 +144,7 @@ export function createMongoGraphReadDeps(): GraphReadDeps {
   return {
     async loadGraph(tenantId): Promise<KnowledgeGraph | null> {
       assertValidTenantId(tenantId, "graph.load"); // before the hand-built tree_index query (the accessors below only throw after it was issued)
-      const treeRootP = getDb().collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
+      const treeRootP = treeIndexColl(tenantId).findOne(treeIndexRootFilter(tenantId));
       const [treeRoot, entityEdges, sessionDocs] = await Promise.all([treeRootP, graphEdgesColl(tenantId).find({}).toArray(), sessionsColl(tenantId).find({}).toArray()]);
       if (!treeRoot && entityEdges.length === 0) return null;
       return buildKnowledgeGraph({ treeRoot, entityEdges, sessions: sessionDocs });
@@ -203,12 +209,10 @@ export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, s
  * relies on the caller to remember not to serialize it) so a masked list can never accidentally
  * leak the one thing that must never leave this function. */
 export function createMongoKeysDeps(): KeysDeps {
-  const coll = () => getDb().collection<ApiKeys>("api_keys");
-
   return {
     async listKeys(tenantId): Promise<ApiKeySummary[]> {
       assertValidTenantId(tenantId, "apiKeys.list");
-      const docs = await coll().find({ tenantId }).toArray();
+      const docs = await apiKeysColl(tenantId).find({}).toArray();
       return docs.map((d) => ({
         _id: d._id,
         label: d.label ?? "(unlabeled)",
@@ -221,9 +225,8 @@ export function createMongoKeysDeps(): KeysDeps {
       assertValidTenantId(tenantId, "apiKeys.create");
       const id = randomUUID();
       const rawKey = `lkb_${randomBytes(24).toString("hex")}`;
-      await coll().insertOne({
+      await apiKeysColl(tenantId).insertOne({
         _id: id,
-        tenantId,
         keyHash: sha256Hex(rawKey),
         label,
         scopes,
@@ -234,8 +237,8 @@ export function createMongoKeysDeps(): KeysDeps {
     },
     async revokeKey(tenantId, id) {
       assertValidTenantId(tenantId, "apiKeys.revoke");
-      const result = await coll().updateOne(
-        { _id: id, tenantId, revokedAt: null },
+      const result = await apiKeysColl(tenantId).updateOne(
+        { _id: id, revokedAt: null },
         { $set: { revokedAt: new Date().toISOString() } },
       );
       return result.matchedCount > 0;
