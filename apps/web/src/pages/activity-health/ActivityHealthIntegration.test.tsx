@@ -1,4 +1,6 @@
 import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import { App } from "../../App.js";
@@ -6,7 +8,7 @@ import { readActivitySnapshot } from "./activityHealthModel.js";
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); localStorage.clear(); window.history.replaceState(null, "", "/"); });
 test("actual producer/worker/current production HTTP output -> actual public client -> protected App/navigation -> health DOM", async () => {
-  const evidence = JSON.parse(readFileSync(new URL("../../../../../.cache/coordination/t057-d2-runtime-output.json", import.meta.url), "utf8")) as { response: unknown; httpStatus: number; selectedDatabase: string; producerWorkerProof: { firstAttempts: number; reclaimedAttempts: number; staleOwnerFenced: boolean; terminalDeadlineCancelExhaustionFenced: boolean } };
+  const evidence = JSON.parse(readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../../../../.cache/coordination/t057-d2-runtime-output.json"), "utf8")) as { response: unknown; httpStatus: number; selectedDatabase: string; producerWorkerProof: { firstAttempts: number; reclaimedAttempts: number; staleOwnerFenced: boolean; terminalDeadlineCancelExhaustionFenced: boolean } };
   expect(evidence.httpStatus).toBe(200); expect(evidence.selectedDatabase).toBe("upload_queue_fixture01");
   expect(evidence.producerWorkerProof).toEqual({ firstAttempts: 1, reclaimedAttempts: 2, staleOwnerFenced: true, terminalDeadlineCancelExhaustionFenced: true });
   const snapshot = readActivitySnapshot(evidence.response); expect(snapshot.jobs.some(job => job.automaticRetryCount === 1)).toBe(true);
