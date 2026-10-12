@@ -5,8 +5,8 @@
  * apps/* may not import packages/meeting-bot; a script is the lawful place that may import both (as join-rules-host.ts).
  * Wired in scripts/webinar/join-rules-api-host.ts. Pure helpers: no listen, no Mongo.
  *
- * LIMITS (ISS-T039CMD-001/-002 stay OPEN): `readLiveJobs` sees task-scheduler jobs only. A manual `lkb record` or a
- * poller launch is invisible, so a duplicate of those is NOT detected here (the tab-capture lock is the only guard).
+ * Duplicate view (ISS-T039CMD-001/-002): `readAllLiveJobs` = task-scheduler jobs PLUS the live-recording view that every `cli.ts record`
+ * (manual, poller, scheduler, this adapter's own child) claims. Reading the new view is why this adapter is edited. Unreadable = 503.
  * One host serves ONE capture tenant (LKB_TENANT_ID, default "vidysea"): any other caller tenant is refused (403).
  */
 import { spawn } from "node:child_process";
@@ -15,8 +15,9 @@ import { randomBytes } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { SendNowDeps, SendNowPlanValue } from "../../apps/api/src/join-rules/send-now.js";
+import { liveRecordingDir } from "../../packages/meeting-bot/src/live-recording/live-recording.js";
 import { planSendNow, type SendNowJob } from "../../packages/meeting-bot/src/send-now.js";
-import { hostOnly, readLiveJobs, REFUSAL_MESSAGES } from "../../packages/meeting-bot/src/send-now-command.js";
+import { hostOnly, readAllLiveJobs, REFUSAL_MESSAGES } from "../../packages/meeting-bot/src/send-now-command.js";
 
 export interface SendNowHostOptions {
   root?: string;
@@ -83,7 +84,7 @@ export function createSendNowDeps(opts: SendNowHostOptions = {}): SendNowDeps {
         if (opts.readLiveJobs) jobs = await opts.readLiveJobs();
         else {
           const { readWebinarOperationState } = await import("../../packages/meeting-bot/src/calendar/schedule-state.js");
-          jobs = readLiveJobs({ operationsFile: path.join(root, "data", "webinar-release", "operations.json"), scheduledDir: path.join(root, "raw", "webinars", "scheduled"), tenantId: tenant }, now(), readWebinarOperationState);
+          jobs = readAllLiveJobs({ operationsFile: path.join(root, "data", "webinar-release", "operations.json"), scheduledDir: path.join(root, "raw", "webinars", "scheduled"), recordingsDir: liveRecordingDir(root), tenantId: tenant }, now(), readWebinarOperationState);
         }
       } catch (e) {
         return { ok: false, kind: "unreadable", reason: "live-jobs-unreadable", message: `cannot tell whether a bot is already in this meeting (${e instanceof Error ? e.message.slice(0, 200) : "unreadable"}); nothing was launched` };
