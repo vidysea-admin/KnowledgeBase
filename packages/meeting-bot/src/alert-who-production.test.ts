@@ -79,14 +79,14 @@ test("production-shaped state: the fixture covers all 15 skip reasons from core,
 });
 
 /** [kind] -> [alert emitted by the REAL formatter?, resolves from disk?, from which source]. Pinned: a change fails this test. */
-const INV = "operations source inventory";
+const INV = "skipped-sessions, operations source inventory"; // ISS-ALERTID-001: skipped keys now also resolve from skipped-sessions.json
 const EXPECTED: Record<string, [boolean, boolean, string]> = {
   "no-join-link": [true, true, INV],
   past: [false, false, ""],
-  "untrusted-sender": [true, true, "operations"],
+  "untrusted-sender": [true, true, "skipped-sessions, operations"],
   "needs-registration": [true, true, INV],
   "duplicate-session": [false, false, ""],
-  "overlap-lost": [true, true, "operations"],
+  "overlap-lost": [true, true, "skipped-sessions, operations"],
   "not-webinar": [false, false, ""],
   "needs-review": [false, false, ""],
   cancelled: [false, false, ""],
@@ -131,7 +131,7 @@ test("job alerts (operations rows at action_required) resolve end to end from op
   for (const a of jobs) {
     const r = b.ask(a.id);
     assert.equal(r.code, 0, r.text);
-    assert.equal(sourceOf(r.text), "operations");
+    assert.match(sourceOf(r.text), /(^|, )operations$/);
   }
   console.log(`JOB ALERTS: ${jobs.filter((a) => b.ask(a.id).code === 0).length}/${jobs.length} resolve (operations)`);
   b.done();
@@ -142,6 +142,6 @@ test("the scheduled webinar (no alert) is found through operations AND its tenan
   const key = webinarSessionKey(`https://zoom.us/j/11111111111|2026-10-10T10:02:00.000Z`);
   const r = b.ask(alertIdFor(key));
   assert.equal(r.code, 0, r.text);
-  assert.match(r.text, /source:   schedule-state, scheduled-job, operations/);
+  assert.match(r.text, /source:   schedule-state, skipped-sessions, scheduled-job, operations/);
   b.done();
 });
