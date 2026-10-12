@@ -66,3 +66,31 @@ ISSUES-WRITTEN: ISS-TOMBSTONE-008 (medium). Verified fixed: ISS-TOMBSTONE-002, 0
 - "4. Approver-recorded amendment of the D-060 floor for the changed webinar-policy assertion." NOT done (no DECISIONS entry; the maker says so). This BLOCKS merging: the changed assertion is the D-060 acceptance floor text and needs an Approver entry (Umesh). Not waived.
 - "5. Live confirmation of Google's cancelled-resource shape (id-only vs start/conferenceData)." NOT done. It BLOCKS merging as written, and decides how reachable the start-less blanket (008) is.
 Conditions 1, 2 (expiry; the "documented operator release" is not added, a state reset clears) and 3 are met. Open for the Approver: constants (14d / 24h) and whether to bind the hold to the sender (008).
+
+---
+
+# Cycle 2 (re-check of fix commit 7fc113f, lane/tombstone)
+
+VERDICT: PASS
+Cycle checked: 2
+Commit checked: 7fc113f (parent 9e0450a). Fixtures only; no network, browser, database or Google call.
+
+## EXPLANATION
+
+Re-derived through real recon() + selectAutoRecordItems. Replays: ISS-T036CAL-011 12/12; TOMBSTONE-001 2/2; -002 16/16; -003 20/20; -004 6/6; -008 outsider suppression 30/30 none; -008 matched shapes 44/44 held, bare/id-only 36/36 not held (nothing to match). Tests: matched-hold 10/10, non-interference 11/11, property 2/2, webinar-policy 19/19, schedule-state 18/18, auto-join 39/39; tsc 0.
+
+(1) Organiser and host+title (own probes). Outsider organiser + different title + victim's start: NOT held. Outsider organiser + copied public title + start 10 days away + no link: NOT held (title alone never matches; host is needed). Host as organiser with another title, row +3d: NOT held. So an outsider cannot hold a legitimate meeting by start alone WHEN Google sends an organiser. Weaknesses: (a) a bare-start tombstone has no organiser (11/15 live), so START applies to any sender: a bare start equal to the victim's start, or 23h off, holds the row (ISS-TOMBSTONE-005, unchanged, named by the maker); (b) a copied title cancels the other-party guard, so outsider organiser + copied title + victim's start is held (no more reach than the bare form); (c) HOST compares Google's organizer with row.senderEmail and does not require senderAuthenticated; an iCal ORGANIZER spoofed to equal the host plus a copied title would hold the host's same-title rows for up to 30 days. Gmail/Google sender checks are the barrier; not reproducible offline. Filed in ISS-TOMBSTONE-010.
+
+(2) Id-only residual. Measured: any unlinked Gmail row starting in [T-24h, T+48h] is held whatever its title or sender (T-23h..T+47h held; T-30h, T+49h, T+60h free); one fresh id-only cancelled invite every <=72h holds email-only meetings continuously. Reachability: the live check was baseline only (0/15 id-only), but production uses syncToken incremental sync (gws-calendar.ts), whose documented deleted-entry form is id plus status; an outsider invite created and cancelled between two ticks would arrive so. Not observed live. Rating MEDIUM (bounded to 72h windows, needs repeated sends and an unconfirmed shape; HIGH if an id-only outsider tombstone is confirmed in sync mode). The deviation is forced by the unamended D-060 assertion 'available-source coverage'; NEAR constants to 0 removes it but needs a further Approver amendment. Left to the Approver.
+
+(3) Changed -004 expectation: legitimate. It used to assert a row six days out is held by an id-only tombstone (14-day blanket); it now asserts it is free. That narrows an outsider-exploitable hold; the imminent [T-24h, T+48h] hold, the 40-day expiry and the first-seen pins are still asserted. Cost: a fail-open for a genuinely cancelled meeting whose unlinked copy is more than 48h away (ISS-TOMBSTONE-009), accepted and named.
+
+(4) ISS-TOMBSTONE-009 likelihood: moderate-low. With start always present live, a cancelled meeting's copy at the same time (or within a 20h timezone misread) is held. Not held: rescheduled copies, later instances of a cancelled series, id-only tombstones with a copy beyond 48h; each also needs the calendar event never stored live and the Gmail copy unlinked. Rare, not common.
+
+(5) Merge conditions. 4: satisfied as written: D-129 (scope corrected by D-130) records the Approver amendment of exactly the changed assertion ('known actual-wire and id-only cancellations ...', the only webinar-policy edit in the lane diff). 5: satisfied as written for the baseline shape (summary.md: 15/15 carry start/end/iCalUID/updated; 4/15 organiser/title/conference data; none id-only). Not covered: never-accepted outsider invites and the syncToken deletion form (ISS-TOMBSTONE-010). Conditions 1-3 met in cycle 1.
+
+(6) Merge prediction: git merge-tree --write-tree --name-only lane/tombstone 70b7b0ef (main checkout HEAD): clean, no conflicting files (tree 0f6d12e2).
+
+(7) Mutations (own, per-mutation byte backup, restore after each, git hash-object == HEAD:file 89810236 after each; harness deleted; status clean): drop organiser check -> matched-hold red; widen start window 24h to 7d -> both suites red; id-only hold forever (NEAR_AHEAD huge) -> both suites red. 3/3 killed (organiser-drop killed by one test only).
+
+ISSUES-WRITTEN: ISS-TOMBSTONE-010 (medium). Verified fixed: ISS-TOMBSTONE-008 (blanket and renewable hold removed for organiser/link/title-bearing shapes; residuals in -009/-010). ISS-T036CAL-011 stays OPEN (bare-start 005, id-only NEAR, -009, -010). ISS-TOMBSTONE-005 remains open.
