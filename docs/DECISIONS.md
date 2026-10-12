@@ -1923,3 +1923,11 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Changes-authorized:** qa/contracts/t037-join-rules-editor-page.md C1; qa/contracts/t037-join-rules-edit-api.md criterion 11
 **Approved-by:** Umesh
 **Links:** U2.4; U3.1; U3.2; T-046; T-037; T-043; T-039; T-052; T-040; T-051; ISS-T037UI-001; ISS-UNOPTLOCK-002; ISS-373; ISS-374; ISS-ALERTID-006; D-024; D-125; qa/manifests/webinar-portable-release.md
+
+## D-127 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 phase-3 gate model: API model instead of local qwen3:8b. The documented model (qwen3:8b via local Ollama) is not installed (Ollama runs with no models). Asked whether to download it, Umesh answered verbatim: "kyu download krna hai use api keys . api wale models se kaam nhi ho skta hai kyaa, ollama models? if not gemini models". Ruling: do not download any model; run the U2.4 phase-3 live precision gate on an API model, preferring the model production routes speaker resolution to per config/ai-routing.yaml, else another Gemini model.
+**Why:** Avoids a large local model download on a CPU-constrained shared machine; an API model that matches production routing is arguably the more meaningful measurement.
+**Result:** The gate's five bars, prompts, windows, 2-of-3 voting and scoring are UNCHANGED; only the model changes. Results are recorded as measured on the API model (model id stated in the evidence) and are not claimed as qwen3:8b results. A checker, not the runner, rules on ISS-104 / ISS-282. Nothing has been run by this entry.
+**Approved-by:** Umesh
+**Links:** U2.4; ISS-104; ISS-282; D-126
