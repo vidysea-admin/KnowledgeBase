@@ -20,3 +20,23 @@ The agreement logic and the reuse of the PH3 guards are sound. The unit fails on
 Fix needed for PASS: gate tile-only on a person-shape check (or default `allowTileOnly` false), add the junk names as must-refuse tests, and pin Raj/Rajesh Kumar and Priya Nair/Priya Sharma.
 
 ISSUES-WRITTEN: ISS-T042FUSION-001 (high), ISS-T042FUSION-002 (medium), ISS-T042FUSION-003 (low)
+
+---
+
+# Cycle 1
+
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: ecb94ee (code) + 25a5521 (manifest), lane/t042fusion
+
+## EXPLANATION
+
+- Junk tiles (real aligner, 60 s single label, no introduction): the colleague's 12 and 27 of my own ("Vidysea Admissions", "Counsellor", "Host", "Presenter", "Zoom User", "Galaxy A52", "Mumbai Office", "Team Lead", "Panelist 2", "rahul", "RAHUL", "Rahul's iPhone", "Dr.", "राहुल शर्मा", an emoji, "Rahul 😀", Moderator, Guest, Speaker 1, Unknown, Co-host, "Priya Nair Admissions", Sales, "Rahul_123", "Rahul S", Mumbai, "Delhi Branch"). Default OFF: 39/39 none. Tile-only ON: 35 of 39 none; named only "Rahul" (from "Rahul | Vidysea") and "Priya" (from "Priya (Vidysea)") as claimed, plus "Mumbai" and "Delhi Branch" (place names, single letters-only capitalised tokens; opt-in only, ISS-T042FUSION-004 low).
+- Non-Latin: Devanagari "राहुल शर्मा" is refused (fail closed, `no-evidence`), so a real Devanagari name can never be named from a tile; a self-introduction path is unaffected. Note, low (-004).
+- Intro path: a junk tile is no evidence, so a clean intro names the label (`intro-only`, Meera Rao in all 39 cases, ON and OFF), always through `acceptedIntroNames` (selfIntroductionCandidates + citesNameAsSelfIdentification); PH3-004 98/98, PH3-006 85/85, Makrand case unchanged in the test run. A junk tile cannot supply the name: it is dropped before agreement. A person-shaped tile plus a different intro -> `tile-intro-conflict`.
+- Word list `NOT_A_PERSON_WORDS` lives only in speaker-tile-fusion.ts; it overlaps in part with the self-id ORG_LOWER (speaker-selfid-rules.ts: team, office, department, university, admissions, marketing, sales ...) and NEVER_A_PERSON; duplication is additive, a note only.
+- Counts: 18/18 tests; `tsc --noEmit` exit 0; depcruise "no dependency violations found (554 modules, 2001 dependencies cruised)".
+- Mutations (harness in the worktree, untracked, per-mutation backup in `finally`, hash == HEAD after each): default `allowTileOnly: true` KILLED (3 fail); substring agreement KILLED (3 fail); allow digits/@ inside a token SURVIVED but is equivalent: `cleanTileName("Rahul2"/"Rahul@vidysea"/"Rahul99 Sharma")` is null with and without the mutation (looksLikeAName/nonPerson also refuse them); defence in depth, not a gap.
+- After: harness and probes deleted; source blobs equal HEAD; worktree clean apart from this verdict and the issue file.
+
+ISSUES-WRITTEN: ISS-T042FUSION-004 (low); ISS-T042FUSION-001, -002, -003 set to verified
