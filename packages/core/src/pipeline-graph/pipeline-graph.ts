@@ -4,6 +4,14 @@
  * graph cannot drift from the planner). runGraph drives one claimed run: step -> handler -> succeed/fail/skip, until the planner
  * says complete / failed-terminal / waiting, or the runner refuses (stale lease, store/queue error).
  * Resume and idempotency are the planner's: a restarted run re-plans from persisted RunState, so done stages are not re-run.
+ * Skip rule (ISS-T050GRAPH-001): mirrors packages/meeting-bot/src/capture/record-commands.ts:90,
+ *   `if (rest.includes("--index") && !rest.includes("--process-video")) throw new Error("--index requires --process-video");`
+ * i.e. a stage that still runs (index) may not depend on a skipped stage (screen). buildGraph refuses such a skip. A screen that FAILS
+ * already blocks index (failed-terminal, record-finalize.ts:246-262), so only the skip-by-config case needed a guard.
+ * Delivery is AT-LEAST-ONCE (ISS-T050GRAPH-002): a worker that crashes (or loses its lease) after a handler's side effect but before
+ * succeed() is recorded leaves the node unrecorded; the next worker re-runs that node (cause lease-expired). So EVERY node handler
+ * (capture, media, transcript, screen, index) must be idempotent: re-running with the same inputFingerprint must be safe and must
+ * return the same outputFingerprint. A superseded lease mid-node leaves the side effect done but unrecorded.
  * Open owner question (not depended on): whether a terminally failed run should finish its queue job as done. The runner currently
  * completes the job; this module only reports the outcome and never touches the queue.
  */
@@ -15,6 +23,11 @@ export function buildGraph(def: WorkflowDef, handlers: Record<string, NodeHandle
   for (const k of Object.keys(handlers)) if (!names.has(k)) return { ok: false, error: `handler for unknown stage: ${k}` };
   const skip = new Set(opts.skip ?? []);
   for (const k of skip) { const d = def.stages.find((x) => x.name === k); if (!d || d.optional !== true) return { ok: false, error: `cannot skip a stage that is not optional: ${k}` }; }
+  // Mirrors record-commands.ts:90 ("--index requires --process-video"): a skipped stage may not have a dependent that still runs.
+  for (const d of def.stages) {
+    if (skip.has(d.name)) continue;
+    for (const dep of d.deps) if (skip.has(dep)) return { ok: false, error: `cannot skip stage ${dep}: stage ${d.name} requires it (record-commands.ts:90, --index requires --process-video)` };
+  }
   const nodes: GraphNode[] = [];
   for (const s of def.stages) {
     const handler = Object.prototype.hasOwnProperty.call(handlers, s.name) ? handlers[s.name] : undefined;

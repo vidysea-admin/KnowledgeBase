@@ -6,6 +6,7 @@
 import type { WorkflowDef } from "../domain/pipeline-workflow.js";
 import type { PipelineRunner, RunnerError, RunnerLease } from "../pipeline-runner/runner-types.js";
 
+/** AT-LEAST-ONCE: a handler may be re-run after a crash or lost lease (side effect done, succeed() not recorded). Every handler must be idempotent. See pipeline-graph.ts header. */
 /** What a handler is given. Everything is derived by the runner; a handler never sees another tenant's data. */
 export interface NodeContext { tenantId: string; runKey: string; stage: string; inputFingerprint: string; attemptNumber: number; cause: string }
 /** ok -> output fingerprint (a deterministic digest of the node's output, so a re-run is idempotent); fail -> an error code the stage's retry list may name. An optional stage is skipped by configuration (GraphNode.skip), because the runner can only skip a stage that is READY, not one already started. */
