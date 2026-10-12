@@ -8,8 +8,10 @@
  * exact bypass that made an earlier 'verified live' claim misleading). Minting a credential is
  * not seeding content, so this script exists to make `live-verify.mjs` runnable without it.
  *
- * Usage: node scripts/mint-key.mjs [--tenant toc] [--label live-verify] [--with-scope send-now]
- *   Default keys never hold the dedicated write scope send-now (it can launch a recording bot); ask for it by name.
+ * Usage: node scripts/mint-key.mjs [--tenant toc] [--label live-verify] [--with-scope send-now] [--with-scope join-rules]
+ *   Default keys never hold a dedicated write scope; ask for it by name (repeatable, or comma list). Unknown names exit 1.
+ *   send-now can launch a recording bot; join-rules lets a key edit the join rules (PUT/POST). Without it /join-rules opens read-only.
+ *   Editor key:  node scripts/mint-key.mjs --tenant toc --label join-rules-editor --with-scope join-rules
  */
 import { randomUUID, randomBytes, createHash } from "node:crypto";
 import "dotenv/config";
