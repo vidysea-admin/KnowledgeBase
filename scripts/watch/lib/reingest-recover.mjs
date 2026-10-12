@@ -34,7 +34,7 @@ export async function withReingestLock({ dir, tenant, driveFileId, lockOpts }, f
 /**
  * Recover ONE leftover snapshot.
  *  - marked committed (ingest had finished): never restore over the new data; retry the tree prune, then remove.
- *  - otherwise: remove partial new rows linked to this Drive file, re-insert the snapshot rows, restore the
+ *  - otherwise: remove rows of the sessions this run created (ids recorded in the manifest; never by sourceId), re-insert the snapshot rows, restore the
  *    tree_index node, verify counts + content hash against the snapshot, and only then remove the snapshot.
  * Any failure throws an error naming the snapshot path and leaves the snapshot untouched.
  */
@@ -50,7 +50,7 @@ export async function recoverSnapshot({ scoped, tenant, path, rootFilter, regene
     }
     const r = await restoreOldRows({
       scoped, tenant, driveFileId: manifest.driveFileId, oldSessionId: manifest.oldSessionId, snapshot: rows,
-      preexistingSessionIds: manifest.preexistingSessionIds, treeRoot, rootFilter,
+      preexistingSessionIds: manifest.preexistingSessionIds, plannedNewSessionIds: manifest.plannedNewSessionIds ?? [manifest.correctSessionId], treeRoot, rootFilter,
     });
     if (!r.ok) throw new Error(r.errors.join("; "));
     removeSnapshot(path);

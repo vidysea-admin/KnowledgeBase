@@ -78,6 +78,7 @@ export function atomicWrite(path, text, hook = () => {}) {
     fd = undefined;
     hook("before-rename");
     renameSync(tmp, path);
+    hook("after-rename", path); // fault-injection point: lets a test corrupt the stored file before the read-back
   } catch (err) {
     if (fd !== undefined) try { closeSync(fd); } catch { /* already closing on error */ }
     rmSync(tmp, { force: true });
@@ -104,13 +105,13 @@ export function readSnapshotFile(path) {
 }
 
 /** Write the snapshot (atomic), then read it back and verify it BEFORE returning, so the caller may delete. */
-export function writeSnapshotFile({ dir, tenant, driveFileId, oldSessionId, correctSessionId, preexistingSessionIds, rows, treeRoot, now = () => new Date(), hook }) {
+export function writeSnapshotFile({ dir, tenant, driveFileId, oldSessionId, correctSessionId, preexistingSessionIds, plannedNewSessionIds = [], rows, treeRoot, now = () => new Date(), hook }) {
   const p = snapshotPaths(dir, tenant, driveFileId);
   if (existsSync(p.file)) throw new Error(`an unrecovered snapshot already exists at ${p.file}; restore it (start watch-reingest) before reingesting this file`);
   rmSync(p.committed, { force: true }); // orphan marker of an earlier, fully cleaned run: must not mark THIS snapshot committed
   const collections = Object.keys(rows);
   const counts = Object.fromEntries(collections.map((c) => [c, rows[c].length]));
-  const manifest = { format: FORMAT, tenant, driveFileId, oldSessionId, correctSessionId, preexistingSessionIds, collections, counts, sha256: contentHash(rows), createdAt: now().toISOString(), pid: process.pid };
+  const manifest = { format: FORMAT, tenant, driveFileId, oldSessionId, correctSessionId, preexistingSessionIds, plannedNewSessionIds, collections, counts, sha256: contentHash(rows), createdAt: now().toISOString(), pid: process.pid };
   atomicWrite(p.file, EJSON.stringify({ manifest, treeRoot: typed(treeRoot ?? null), rows: Object.fromEntries(collections.map((c) => [c, rows[c].map(typed)])) }, { relaxed: false }), hook);
   try {
     readSnapshotFile(p.file);

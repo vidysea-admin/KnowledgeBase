@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { SESSION_COLLECTIONS, replaceSessionRows } from "./reingest-swap.mjs";
+import { SESSION_COLLECTIONS, ownedNewSessionIds, replaceSessionRows } from "./reingest-swap.mjs";
 import { recoverAll, recoverSnapshot, snapshotHooks, withReingestLock } from "./reingest-recover.mjs";
 import { BSON, listSnapshots, snapshotPaths } from "./reingest-snapshot.mjs";
 import { Kill, fakeStore } from "./reingest-fake.mjs";
@@ -310,4 +310,137 @@ test("recovery never removes a session that already existed under the NEW id bef
   const fresh = fakeStore(store.dump());
   await recoverAll(recoverDeps(fresh, dir));
   assert.deepEqual(fresh.bytes(COLLS), ref);
+});
+
+// ---- ISS-REINGESTEJSON-004: a pre-existing sibling fork of the same Drive file must survive every failure path ----
+const SIB = "dup-fork";
+/** seedOld plus a sibling fork: sourceId gdrive-<same file>, with a turn, page, claim and chunk. NOT in the snapshot rows. */
+function seedWithSibling() {
+  const seed = seedOld();
+  seed.sessions.push(session(SIB, "2026-02-02", { ingestedAt: new Date("2026-02-03T00:00:00.5Z") }));
+  seed.turns.push({ _id: "sib-t1", sessionId: SIB, text: "sibling turn", tenantId: T });
+  seed.session_pages.push({ _id: "sib-p1", sessionId: SIB, tenantId: T });
+  seed.claims.push({ _id: "sib-c1", evidence: [{ sessionId: SIB }], tenantId: T });
+  seed.chunks.push({ _id: "sib-k1", sourceRef: SIB, vector: [0.25, 0.5], tenantId: T });
+  return seed;
+}
+const sibRows = (store) => ({
+  sessions: store.docs("sessions").filter((s) => s._id === SIB).length,
+  turns: store.docs("turns").filter((s) => s.sessionId === SIB).length,
+  session_pages: store.docs("session_pages").filter((s) => s.sessionId === SIB).length,
+  claims: store.docs("claims").filter((s) => s.evidence?.[0]?.sessionId === SIB).length,
+  chunks: store.docs("chunks").filter((s) => s.sourceRef === SIB).length,
+});
+const ALL_SIB = { sessions: 1, turns: 1, session_pages: 1, claims: 1, chunks: 1 };
+const refSib = () => fakeStore(seedWithSibling()).bytes(COLLS);
+
+test("ISS-REINGESTEJSON-004 checker replay verbatim: sibling session+turn+chunk, ingest fails at step 8 -> restored AND the sibling survives", async () => {
+  const dir = freshDir();
+  const store = fakeStore(seedWithSibling(), (op, coll, n) => n === 8);
+  const err = await replaceSessionRows(deps(store, dir)).catch((e) => e);
+  assert.match(err.message, /RESTORED from the pre-delete snapshot and verified/);
+  assert.equal(err.restored, true);
+  assert.deepEqual(sibRows(store), ALL_SIB, "sibling session, turn, page, claim and chunk all still there");
+  assert.deepEqual(store.bytes(COLLS), refSib(), "every collection byte-identical to the pre-reingest state, sibling included");
+  assert.deepEqual(leftover(dir), []);
+});
+
+for (let n = 1; n <= STEPS; n += 1) {
+  test(`ISS-REINGESTEJSON-004: kill -9 before mutating step #${n}/${STEPS} with a sibling fork present -> startup recovery leaves the sibling intact`, async () => {
+    const dir = freshDir();
+    const dead = fakeStore(seedWithSibling(), () => false, { killAt: n });
+    await replaceSessionRows(deps(dead, dir)).catch(() => {});
+    assert.equal(dead.state.dead, true);
+    assert.deepEqual(sibRows(dead), ALL_SIB, "the dead run itself never touched the sibling");
+    const fresh = fakeStore(dead.dump());
+    const res = await recoverAll(recoverDeps(fresh, dir));
+    assert.deepEqual(res.map((x) => x.action), [n < STEPS ? "restored" : "finished-committed"]);
+    assert.deepEqual(sibRows(fresh), ALL_SIB, "sibling session, turn, page, claim and chunk survive recovery");
+    if (n < STEPS) assert.deepEqual(fresh.bytes(COLLS), refSib(), "everything else restored byte-exact");
+    assert.deepEqual(leftover(dir), []);
+  });
+}
+
+test("ISS-REINGESTEJSON-004: the manifest records the pre-run linked sessions and the planned new id BEFORE any delete", async () => {
+  const dir = freshDir();
+  const store = fakeStore(seedWithSibling());
+  let atSnapshot;
+  const hooks = snapshotHooks({ dir });
+  await replaceSessionRows(deps(store, dir, { writeSnapshot: async (x) => { const f = await hooks.writeSnapshot(x); atSnapshot = { calls: store.calls.length, m: JSON.parse(readFileSync(f, "utf8")).manifest }; return f; } }));
+  assert.equal(atSnapshot.calls, 0, "manifest was complete before the first mutating call");
+  assert.deepEqual([...atSnapshot.m.preexistingSessionIds].sort(), [OLD, SIB].sort());
+  assert.deepEqual(atSnapshot.m.plannedNewSessionIds, [NEW]);
+});
+
+test("ISS-REINGESTEJSON-004: a partial new session (turns written, session row never written) is removed; the sibling is not", async () => {
+  const dir = freshDir();
+  const store = fakeStore(seedWithSibling());
+  const half = async () => { await store.scoped("turns")(T).insertMany([{ _id: "n1", sessionId: NEW }]); throw new Error("died before the session row"); };
+  const err = await replaceSessionRows(deps(store, dir, { ingest: half })).catch((e) => e);
+  assert.equal(err.restored, true);
+  assert.equal(store.docs("turns").some((t) => t.sessionId === NEW), false);
+  assert.deepEqual(store.bytes(COLLS), refSib());
+});
+
+test("ISS-REINGESTEJSON-004: an ingest that creates an UNPLANNED id is cleaned up by the pre-run-set difference; the sibling still survives", async () => {
+  const dir = freshDir();
+  const store = fakeStore(seedWithSibling());
+  const other = async () => {
+    await store.scoped("sessions")(T).insertMany([session("surprise-id", "2026-09-25")]);
+    await store.scoped("turns")(T).insertMany([{ _id: "s1", sessionId: "surprise-id" }]);
+    throw new Error("boom after writing under another id");
+  };
+  const err = await replaceSessionRows(deps(store, dir, { ingest: other })).catch((e) => e);
+  assert.equal(err.restored, true);
+  assert.deepEqual(store.bytes(COLLS), refSib());
+});
+
+test("ISS-REINGESTEJSON-004: ownedNewSessionIds never returns a pre-run id; a legacy manifest (no pre-run set) removes only the planned id", () => {
+  assert.deepEqual(ownedNewSessionIds({ linkedNow: [SIB, "x"], preexistingSessionIds: [SIB, OLD], plannedNewSessionIds: [NEW] }).sort(), ["x", NEW].sort());
+  assert.deepEqual(ownedNewSessionIds({ linkedNow: [SIB, "x"], preexistingSessionIds: [SIB, NEW], plannedNewSessionIds: [NEW] }), ["x"]);
+  assert.deepEqual(ownedNewSessionIds({ linkedNow: [SIB, "x"], plannedNewSessionIds: [NEW] }), [NEW]);
+});
+
+test("ISS-REINGESTEJSON-004: a recovery manifest without the new fields (written by the cycle-0 code) deletes nothing but the correct id", async () => {
+  const dir = freshDir();
+  const dead = fakeStore(seedWithSibling(), () => false, { killAt: 9 });
+  await replaceSessionRows(deps(dead, dir)).catch(() => {});
+  const file = snapFile(dir);
+  const doc = JSON.parse(readFileSync(file, "utf8"));
+  delete doc.manifest.plannedNewSessionIds;
+  delete doc.manifest.preexistingSessionIds;
+  writeFileSync(file, JSON.stringify(doc)); // hash covers rows only, so the file still verifies
+  const fresh = fakeStore(dead.dump());
+  await recoverAll(recoverDeps(fresh, dir));
+  assert.deepEqual(sibRows(fresh), ALL_SIB);
+});
+
+// ---- ISS-REINGESTEJSON-005: the snapshot is READ BACK and verified before the first delete ----
+const corruptions = {
+  "truncated to 500 bytes": (p) => writeFileSync(p, readFileSync(p, "utf8").slice(0, 500)),
+  "emptied": (p) => writeFileSync(p, ""),
+  "one row's text changed (valid JSON, hash no longer matches)": (p) => writeFileSync(p, readFileSync(p, "utf8").replace("नमस्ते", "XXXXXX")),
+  "a row dropped (count no longer matches)": (p) => { const d = JSON.parse(readFileSync(p, "utf8")); d.rows.turns.pop(); writeFileSync(p, JSON.stringify(d)); },
+};
+for (const [what, corrupt] of Object.entries(corruptions)) {
+  test(`ISS-REINGESTEJSON-005: snapshot ${what} right after the write -> the run aborts with ZERO mutating calls and no snapshot is left`, async () => {
+    const dir = freshDir();
+    const store = fakeStore(seedWithSibling());
+    const hook = (point, path) => { if (point === "after-rename") corrupt(path); };
+    const err = await replaceSessionRows(deps(store, dir, snapshotHooks({ dir, hook }))).catch((e) => e);
+    assert.ok(err instanceof Error && /snapshot .* (is unreadable|is corrupt|has an unknown format)/.test(err.message), `got: ${err?.message}`);
+    assert.deepEqual(store.calls, [], "not a single delete/insert/update happened");
+    assert.deepEqual(store.bytes(COLLS), refSib());
+    assert.deepEqual(leftover(dir), [], "the bad snapshot is removed so the next run is not blocked by it");
+  });
+}
+
+test("ISS-REINGESTEJSON-004: kill after turns of the planned new id were written but BEFORE its session row -> recovery removes them via the manifest's planned id; sibling intact", async () => {
+  const dir = freshDir();
+  const store = fakeStore(seedWithSibling());
+  const dies = async () => { await store.scoped("turns")(T).insertMany([{ _id: "n1", sessionId: NEW }]); store.state.dead = true; throw new Kill("killed before the session row"); };
+  await replaceSessionRows(deps(store, dir, { ingest: dies })).catch(() => {});
+  const fresh = fakeStore(store.dump());
+  assert.deepEqual((await recoverAll(recoverDeps(fresh, dir))).map((x) => x.action), ["restored"]);
+  assert.deepEqual(fresh.bytes(COLLS), refSib());
 });

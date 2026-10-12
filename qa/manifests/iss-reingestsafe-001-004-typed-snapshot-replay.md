@@ -1,7 +1,7 @@
 # iss-reingestsafe-001-004-typed-snapshot-replay
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 2-equivalent (open medium ledger issues ISS-REINGESTSAFE-001 and -004, data-write class: full ceremony), pulled by the Approver's dispatch.
 Lane: lane/reingestejson. Ledger for this lane: qa/issues.reingestejson.jsonl, ids ISS-REINGESTEJSON-NNN (3 filed, all low). Existing ledger rows in qa/issues.reingestsafe.jsonl untouched (the checker changes their status).
 
@@ -49,3 +49,38 @@ N = 1..11, each: snapshot present at the kill; the killed process really left th
 
 ## Mutations (29; harness `.reingestejson-mut-harness.mjs`, untracked, deleted; byte backup per mutation restored in `finally`; sha1 of the file checked equal to its pre-mutation hash after each; 240 s timeout per run)
 28 KILLED, 1 SURVIVED as an equivalent mutant: removing the row-count comparison in the `restoreOldRows` verify step (the content-hash comparison right after it fails whenever the count differs, so the count line only sharpens the message). One initial survivor (tree-prune error dropping `e.snapshotRef`) was killed by a new assertion, re-run: KILLED. Killed: untyped numbers, relaxed EJSON, plain JSON file, constant hash, no rename hook, snapshot overwrite allowed, orphan marker kept, live lock stolen, dead lock never stolen, orphan markers kept, unsafe names, count check off on read, recovery ignoring the marker, prune skipped, failed restore tolerated, snapshot not removed after restore, recovery without lock, second run not refused, tenant check removed, no commit marker, snapshot kept after ok restore, snapshot kept after success, snapshot discarded after failed restore, content verification off, tree node not restored, preexisting ids forgotten, tree root not snapshotted, tree-prune error without ref. After the run the three changed lib modules are byte-identical (`cmp`) to backups taken before it.
+
+---
+
+## Fix cycle 1 (maker, responding to qa/verdicts/iss-reingestsafe-001-004-typed-snapshot-replay.md, FAIL cycle 0)
+
+Cycle-0 sections above are kept as history. Ledger statuses unchanged (the checker flips them).
+
+### ISS-REINGESTEJSON-004 (high, the FAIL): restore/recovery no longer deletes by sourceId
+**Design.** Deletion scope is now the set of sessions THIS run created, decided from ids recorded in the snapshot manifest BEFORE the first delete (`replaceSessionRows`, `reingest-swap.mjs`):
+- `manifest.preexistingSessionIds` = every session already linked to `gdrive-<file>` (the old one AND any sibling fork) plus the correct id when it already exists.
+- `manifest.plannedNewSessionIds` = `[correctSessionId]` when it did not exist (the id the ingest is about to create).
+- `ownedNewSessionIds()` (new, exported): deletion set = planned ids not pre-existing, plus sessions linked now whose id is NOT in the recorded pre-run set (catches an ingest that writes under another id). A recorded pre-run id is never returned. A legacy manifest without the new fields deletes only `correctSessionId` (no discovery). Recovery passes `manifest.plannedNewSessionIds` (`reingest-recover.mjs`). Partial rows of a planned id are removed even when its session row was never written. The snapshot is written (and read back) before any delete, so the manifest is complete before the first mutating call (asserted).
+- Sibling rows are never in the snapshot and are never deleted; the shared `sources` row is still re-created from the snapshot/ingest as before.
+- Changed files: `lib/reingest-swap.mjs`, `lib/reingest-recover.mjs`, `lib/reingest-snapshot.mjs` (manifest field; `hook("after-rename", path)` fault-injection point), `lib/reingest-crash.test.mjs`.
+
+**Replay of the checker's reproduction, verbatim** (sibling `dup-fork` with sourceId `gdrive-<same file>`, turn, page, claim, chunk; ingest fails at step 8): result "RESTORED ... and verified", sibling session/turn/page/claim/chunk all still present, all 7 collections byte-identical to the pre-reingest state. Before the fix this same case lost all three rows (cycle-0 verdict).
+**Kill at every step with the sibling present** (kill -9 before mutating step N = 1..11, fresh process runs `recoverAll`): 11/11 leave the sibling's five rows intact; N=1..10 restore everything byte-exact, N=11 keeps the new data. Plus: partial new session with turns but no session row (in-process failure and kill + recovery) removed, sibling kept; ingest writing an unplanned id is cleaned up, sibling kept; legacy manifest keeps the sibling; manifest content asserted before the first mutating call.
+
+### ISS-REINGESTEJSON-005 (medium): read-back is now tested
+`atomicWrite` calls `hook("after-rename", path)` right after the rename (fault-injection point, no-op in production). Four tests corrupt the stored file at that point (truncated to 500 bytes, emptied, a row's text changed so JSON stays valid but the hash differs, a row dropped so the count differs) and assert: `replaceSessionRows` rejects with "snapshot ... is unreadable/corrupt", `store.calls` is `[]` (zero mutating calls), the DB is byte-identical to the original, no snapshot or temp file is left.
+
+### ISS-REINGESTEJSON-003 (low): NOT changed
+Reusing an OS process start time for the lock is not trivial here (needs a per-OS lookup and a lock-file format change); left open as filed.
+
+### Evidence (node v24.19.0, `timeout` around each, `node --test --import tsx <file>` from the worktree root)
+- `reingest-crash.test.mjs` -> tests 49, pass 49, fail 0 (27 -> 49: +11 sibling kill steps, +checker replay, +manifest, +partial session, +unplanned id, +owned ids, +legacy manifest, +planned-id kill, +4 read-back corruptions)
+- `reingest-snapshot.test.mjs` -> tests 14, pass 14; `reingest-swap.test.mjs` -> tests 23, pass 23
+- neighbours `ingest-chain.test.mjs` 22/22 and `lock.test.mjs` 6/6
+- `node --check` on all `lib/reingest-*.mjs`: ok. No `data/reingest-snapshots` in the worktree afterwards.
+
+### Mutations (harness "reingestejson-c1", untracked in the scratchpad, not in the repo; per-mutation byte backup restored in `finally`; sha1 equal after each; 240 s timeout; all three reingest suites run per mutation)
+8 mutations, 8 KILLED (one initial survivor, "recovery drops planned ids", killed by the added kill-before-session-row recovery test): read-back skipped (4 failing), delete-by-sourceId = cycle-0 behaviour (16), owned ids ignore the pre-run set (16), planned ids ignored (2), pre-run set only the correct id (14), unplanned discovery off (2), recovery drops planned ids (1 after the new test), after-rename hook removed (4).
+
+### Not proven
+Still only the in-memory BSON-bytes fake and the real filesystem; never a real MongoDB, Drive, or `watch-reingest.mjs`/`run-watch.mjs` (never run). Concurrent writers other than this lock-protected run creating a session linked to the same file during the window are out of scope.
