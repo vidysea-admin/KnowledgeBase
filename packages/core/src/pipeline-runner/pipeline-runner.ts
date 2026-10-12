@@ -15,7 +15,7 @@ import type { RunStateStore } from "../run-state-store/run-state-store.js";
 import type { ClaimedRun, PipelineRunner, RunnerError, RunnerLease, RunnerResult, StageAttempt, Step, SubmitInput, Submitted } from "./runner-types.js";
 
 export interface PipelineRunnerOptions { def: WorkflowDef; queue: JobQueue; store: RunStateStore; now: () => number; mintAttemptId?: () => string; maxConflictRetries?: number }
-const ok = <T>(value: T): RunnerResult<T> => ({ ok: true, value });
+const ok = <T>(value: T, warning?: string): RunnerResult<T> => (warning ? { ok: true, value, warnings: [warning] } : { ok: true, value });
 const bad = (source: RunnerError["source"], code: string, message: string): { ok: false; error: RunnerError } => ({ ok: false, error: { source, code, message } });
 const qerr = (e: { code: string; message: string }) => bad("queue", e.code, e.message);
 const idOf = (tenantId: string, runKey: string) => `r-${createHash("sha256").update(`${tenantId}\0${runKey}`).digest("hex").slice(0, 32)}`;
@@ -41,7 +41,7 @@ export function createPipelineRunner(o: PipelineRunnerOptions): PipelineRunner {
       if ("done" in b) return b.done;
       const next = applyEvent(o.def, ld.state, b.event); if (!next.ok) return bad("workflow", next.error.code, next.error.message);
       const sv = o.store.save(runId, ld.state, next.state);
-      if (sv.ok) return ok(b.value);
+      if (sv.ok) return ok(b.value, sv.warning);
       if (sv.code !== "conflict") return bad("store", sv.code, sv.message);
     }
     return bad("store", "conflict", "state kept changing; reload and retry");
@@ -59,7 +59,7 @@ export function createPipelineRunner(o: PipelineRunnerOptions): PipelineRunner {
       const ld = o.store.load(runId); if (!ld.ok) return bad("store", ld.code, ld.message);
       if (ld.state !== null) return ok({ runId, queue: q.value, state: "exists" });
       const sv = o.store.save(runId, null, initialState(o.def, i.sourceFingerprint));
-      if (sv.ok) return ok({ runId, queue: q.value, state: "created" });
+      if (sv.ok) return ok({ runId, queue: q.value, state: "created" }, sv.warning);
       if (sv.code === "conflict") return ok({ runId, queue: q.value, state: "exists" }); // another submit won the race
       return bad("store", sv.code, sv.message);
     },

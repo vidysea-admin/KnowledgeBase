@@ -4,7 +4,7 @@
  * (domain/pipeline-workflow.ts), the queue (job-queue/) and the run-state store (run-state-store/).
  */
 export interface RunnerError { source: "runner" | "queue" | "store" | "workflow"; code: string; message: string }
-export type RunnerResult<T> = { ok: true; value: T } | { ok: false; error: RunnerError };
+export type RunnerResult<T> = { ok: true; value: T; /** Store save warnings (run-state B8: a saved run whose lock file could not be removed). Present only when there is one; callers/graph wiring should log it. */ warnings?: string[] } | { ok: false; error: RunnerError };
 
 /** What a worker holds after `claim`. It is a handle, not an authority: every call re-derives the job and run ids from tenantId + runKey and is fenced by the queue lease. */
 export interface RunnerLease { tenantId: string; runKey: string; workerId: string; attempt: number }
