@@ -2012,3 +2012,19 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** Bounded retry with backoff, then optional injected fallback, then omit and report in ocrErrors with attempt count.
 **Approved-by:** Umesh
 **Links:** T-041; A5 (qa/manifests/t041-ocr-stage-alignment.md)
+
+## D-138 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** A WhatsApp owner may be mapped to exactly ONE tenant. Owner configuration that maps the same owner to two or more tenants is rejected at load with a clear error. WhatsApp session and turn ids stay as they are: no id change and no migration. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** The only way the bare WhatsApp session id (hash of groupJid and ownerUserId) can collide across tenants is one owner under two tenants; forbidding that closes the collision without rewriting citation-bearing ids.
+**Result:** Owner-to-tenant is one-to-one at config load; session and turn ids and stored data are untouched.
+**Approved-by:** Umesh
+**Links:** ISS-TENANTSRCID-001; D-136
+
+## D-139 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** When a pipeline run fails terminally (retries exhausted), its queue job is marked FAILED, not done, so /system-status and notifications see it. A resubmit of the same runKey creates a new attempt. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** Marking an exhausted run done would hide the failure from status and notifications; failed must be visible, and a resubmit must be able to retry without reusing the dead attempt.
+**Result:** Terminal failure maps to a FAILED queue job; resubmitting the same runKey starts a new attempt.
+**Approved-by:** Umesh
+**Links:** T-050; ISS-T050ADAPTER; qa/manifests/t050-runner-adapter.md
