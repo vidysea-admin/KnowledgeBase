@@ -1,6 +1,6 @@
 # iss-t045intake-001-tenant-scoped-source-id
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: security class (tenancy, data write), never capped. Lane: lane/t045tenantid (branched from lane/t045intake 095dd312). Fixes ISS-T045INTAKE-001 (high).
 Authority: D-135 (same content hash within a tenant stays idempotent; behaviour unchanged). D-135 prose says "content-hash source _id": the _id is now derived from (tenantId, content hash); flagged for the Approver as wording only.
