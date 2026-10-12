@@ -1,6 +1,6 @@
 # iss-t045tenantid-001-tenant-scoped-source-ids
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2 (open high issue ISS-T045TENANTID-001, security class: tenancy). Full ceremony. Lane: lane/tenantsrcid, ledger shard qa/issues.tenantsrcid.jsonl. Authority: D-136 (pending append). Verdict by the checker only; ISS-T045TENANTID-001 ledger row status NOT changed here.
 
