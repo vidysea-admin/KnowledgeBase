@@ -407,7 +407,7 @@ def test_registration_actual_local_form_and_safety_exceptions(tmp_path):
                 outcome = sb_join.register_form(browser, instructions, script_isolated=True, policy_check=policy_check)
                 assert outcome["status"] in ("submitted", "uncertain")
                 time.sleep(.2)
-                paths = ["/submit"] if host == "localhost" else ["/submit", "/redirected"]
+                paths = ["/submit"]  # ISS-374: redirect:'error' - no 3xx is ever followed, even to an approved host
                 assert posts == [{"path": path, "values": expected_values} for path in paths], (code, host, posts)
                 assert cookies == ["auth=fixture"] * len(paths) and resources_seen == []
         posts.clear(); browser.get(url)
