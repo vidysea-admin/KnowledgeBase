@@ -1,6 +1,6 @@
 # iss-t037ui-001-join-rules-api-etag
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3/3 (step 2 of 3: ISS-UNOPTLOCK-002, medium, and the API half of ISS-T037UI-001, medium). Class: data write deciding whether the bot joins a meeting: full ceremony. Verdict by the checker only.
 Lane: lane/rulesapi. Lane ledger `qa/issues.rulesapi.jsonl`: ISS-RULESAPI-001 (low, filed, not a unit). Existing ledger rows untouched.
