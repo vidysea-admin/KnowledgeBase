@@ -7,12 +7,12 @@
   "updated": "2026-10-09T12:46:22",
   "progress": {
     "total": 95,
-    "done": 51,
+    "done": 52,
     "in_progress": 24,
     "blocked": 0,
-    "pending": 20,
+    "pending": 19,
     "current": "U2.2",
-    "percent": 54
+    "percent": 55
   },
   "tasks": [
     {
@@ -696,12 +696,12 @@
     },
     {
       "id": "U3.1",
-      "title": "Ask page in apps/web (POST /ask is unreachable from the UI today)",
+      "title": "Ask page in apps/web (POST /ask reachable from the UI at /ask)",
       "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "IN FLIGHT in a concurrent maker session: apps/web/src/pages/AskPage.tsx + api/ask.ts exist",
+      "note": "Shipped + checker PASS 8/8 (qa/verdicts/web-ask-page.md); live-browser proof 2026-09-21 (qa/evidence/u31-ask-proof-20260921/summary.md). Stays in_progress ONLY because the plan section 10 U3.1 exit wording requires a literal Playwright pass, which has not been run (docs/PROGRESS.md:97). Reconciled 2026-10-12, ISS-349.",
       "delivery_group": "G5"
     },
     {
@@ -719,11 +719,12 @@
     {
       "id": "U4.1",
       "title": "Recording/file upload wired to a real transcribe worker",
-      "status": "pending",
+      "status": "done",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "workers/transcribe is a 3-line placeholder; packages/ingest recording adapter is real but unwired",
+      "note": "Standalone file-upload producer -> queue-backed Python transcribe worker (workers/transcribe) -> recording adapter -> atomic turns.json published and consumed. Checker PASS cycle 3, criteria C1-C10 of qa/contracts/upload-transcribe-worker.md (verdict qa/verdicts/u4.1-recording-upload-worker.md, commit 0206595; manifest qa/manifests/u4.1-recording-upload-worker.md checked-PASS, D-119). Real 12.650958 s file -> one turn [0,12.650958]. Scope limit stated by the verdict: Meet/RDP capture, index/Ask and T-051/T-052 remain separate and unachieved. Reconciled 2026-10-12.",
+      "completed": "2026-10-09T15:25:08",
       "delivery_group": "G2"
     },
     {
@@ -735,7 +736,7 @@
         "U4.1"
       ],
       "criticality": "low",
-      "note": "three stubs + a package imported by nothing is negative-value inventory | 2026-09-24: live evidence D-027/D-028; awaiting checker (webinar-bot-live) — ISS-288",
+      "note": "three stubs + a package imported by nothing is negative-value inventory | 2026-09-24: live evidence D-027/D-028; awaiting checker (webinar-bot-live) — ISS-288 | 2026-10-12: dependency U4.1 now done (checker PASS cycle 3, 0206595); U4.2 was marked done before U4.1 passed",
       "completed": "2026-09-25T02:21:20",
       "delivery_group": "G2"
     },

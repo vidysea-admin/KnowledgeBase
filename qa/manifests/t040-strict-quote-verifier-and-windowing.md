@@ -75,7 +75,7 @@ M11 was not re-run after the test edit to name the killing test; unverified at t
 ---
 
 # Fix cycle 1 (answers verdict `qa/verdicts/t040-strict-quote-verifier-and-windowing.md`, FAIL cycle 0, ISS-T040QUOTE-001)
-**Status:** ready-for-check. **Fix cycle:** 1. Code commit 5f507cf (quote-verify.ts, new quote-token-rule.ts, transcript-windows.ts progress guard, tests); the following commit adds only this manifest.
+**Historical status at Fix cycle 1 (superseded by cycle-2 close-out):** ready-for-check. **Fix cycle:** 1. Code commit 5f507cf (quote-verify.ts, new quote-token-rule.ts, transcript-windows.ts progress guard, tests); the following commit adds only this manifest.
 
 ## READ THIS FIRST: limits of substring verification (for any consumer or wiring unit)
 1. **It proves the words appear contiguously in ONE turn by that speaker. It does NOT prove the quote keeps the speaker's meaning.** A negation or qualifier just outside the quoted span is invisible to it: "I do not think it is safe" -> the quote "think it is safe" VERIFIES; "it is not up" -> "is not up" verifies, but so does a cut that drops the "not" at the start. The boundary rule (cycle 2, below) refuses a cut that lands next to any character that is not whitespace and not listed punctuation, so it closes cuts glued to a symbol, number, identifier or word; it does NOT close a cut inside a space-separated number ("1 000": quoting "1" verifies; documented limit) and it cannot and does not try to detect a dropped negation, a dropped "only/never/not yet", or a hedge left outside the span.
