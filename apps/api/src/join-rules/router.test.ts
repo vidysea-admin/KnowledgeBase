@@ -8,6 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startTestServer, type TestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore } from "../fixtures.js";
+import { fakeValidator, PreconditionError } from "./test-store.js";
 import type { JoinRulesDeps, OptOutRemovalValue, JoinRuleSetValue, JoinRuleStateValue, StoredJoinRulesValue } from "./deps.js";
 
 class JoinRulesStoreError extends Error {
@@ -35,8 +36,22 @@ function fakeStore(opts: { delayMs?: number; sizeCap?: number } = {}) {
     if (opts.sizeCap !== undefined && JSON.stringify(v).length > opts.sizeCap) throw new JoinRulesStoreError("too-large", "cap");
     files.set(t, structuredClone(v));
   };
+  const loadWithValidator = async (t: string) => ({ ...(await load(t)), validator: files.has(t) ? fakeValidator(files.get(t)!.ruleSet) : "absent" });
+  /** Compare and write with no await in between (the real store holds a lock); an injected delay models I/O before it. */
+  const saveIf = async (t: string, expected: string, ruleSet: JoinRuleSetValue) => {
+    log.push({ op: "saveIf-attempt", tenantId: t });
+    if (opts.delayMs) await wait();
+    if (corrupt.has(t)) throw new JoinRulesStoreError("corrupt", `SECRET-PATH C:\state\join-rules\${t}.json`);
+    const cur = structuredClone(files.get(t) ?? EMPTY());
+    const stored = files.has(t) ? fakeValidator(cur.ruleSet) : "absent";
+    if (stored !== expected) throw new PreconditionError(stored);
+    if (opts.sizeCap !== undefined && JSON.stringify({ ruleSet, state: cur.state }).length > opts.sizeCap) throw new JoinRulesStoreError("too-large", "cap");
+    log.push({ op: "saveIf", tenantId: t }); // logged only when it writes
+    files.set(t, structuredClone({ ruleSet, state: cur.state }));
+    return { ruleSet, state: cur.state, validator: fakeValidator(ruleSet) };
+  };
   const deps: JoinRulesDeps = {
-    load, save,
+    load, save, loadWithValidator, saveIf,
     validateRuleSet(input: unknown): JoinRuleSetValue {
       const o = input as Record<string, unknown>;
       const extra = Object.keys(o).filter(k => !["version", "ownDomains", "rules"].includes(k));
@@ -78,7 +93,7 @@ const KEYS = {
 const RULES = { version: 1, ownDomains: ["own.example"], rules: [{ id: "r1", effect: "allow", match: { domain: "trusted.example" } }] };
 const URL_PATH = "/calendar/join-rules";
 
-async function withServer(joinRules: JoinRulesDeps | undefined, fn: (s: TestServer, call: (method: string, path: string, key?: string, body?: unknown, headers?: Record<string, string>) => Promise<{ status: number; json: any }>) => Promise<void>) {
+async function withServer(joinRules: JoinRulesDeps | undefined, fn: (s: TestServer, call: (method: string, path: string, key?: string, body?: unknown, headers?: Record<string, string>) => Promise<{ status: number; json: any; etag: string | null }>) => Promise<void>) {
   const server = await startTestServer(buildTestDeps({ keyStore: fakeKeyStore(KEYS), ...(joinRules ? { joinRules } : {}) }));
   const call = async (method: string, path: string, key?: string, body?: unknown, headers: Record<string, string> = {}) => {
     const res = await fetch(`${server.baseUrl}${path}`, {
@@ -88,10 +103,15 @@ async function withServer(joinRules: JoinRulesDeps | undefined, fn: (s: TestServ
     });
     const text = await res.text();
     let json: any; try { json = JSON.parse(text); } catch { json = text; }
-    return { status: res.status, json };
+    return { status: res.status, json, etag: res.headers.get("etag") };
   };
   try { await fn(server, call); } finally { await server.close(); }
 }
+
+/** Preconditions for PUT (the contract: If-Match "<etag>" to replace, If-None-Match * to create). */
+const NONE = { "if-none-match": "*" };
+const ifMatch = (rs: JoinRuleSetValue | typeof RULES) => ({ "if-match": `"${fakeValidator(rs as JoinRuleSetValue)}"` });
+const isWrite = (l: { op: string }) => l.op === "save" || l.op === "saveIf";
 
 const ALL: [string, string, unknown][] = [
   ["GET", URL_PATH, undefined], ["PUT", URL_PATH, RULES],
@@ -132,7 +152,7 @@ test("two tenants: A cannot read or write B's rules, state, approvals or opt-out
     const a = await call("GET", URL_PATH, "a-key");
     assert.deepEqual(a.json, EMPTY());
     assert.ok(!JSON.stringify(a.json).includes("bob@b.example"));
-    assert.equal((await call("PUT", URL_PATH, "a-key", RULES)).status, 200);
+    assert.equal((await call("PUT", URL_PATH, "a-key", RULES, NONE)).status, 200);
     assert.equal((await call("POST", `${URL_PATH}/approvals`, "a-key", { kind: "domain", value: "a.example" })).status, 200);
     assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", { eventId: "a-event" })).status, 200);
     // B untouched by every A write.
@@ -143,7 +163,7 @@ test("two tenants: A cannot read or write B's rules, state, approvals or opt-out
     assert.deepEqual(b.json.ruleSet, bRules);
     assert.ok(!JSON.stringify(b.json).includes("a-event") && !JSON.stringify(b.json).includes("a.example"));
   });
-  assert.ok(s.log.filter(l => l.op === "save").every(l => l.tenantId === "tenant-a"));
+  assert.ok(s.log.filter(isWrite).every(l => l.tenantId === "tenant-a"));
 });
 
 test("a client-supplied tenant (body, query, path, header) never selects the tenant", async () => {
@@ -151,10 +171,10 @@ test("a client-supplied tenant (body, query, path, header) never selects the ten
   s.files.set("tenant-b", { ruleSet: RULES as any, state: { approvedSenders: ["bob@b.example"], approvedDomains: [], optedOutEventIds: [] } });
   await withServer(s.deps, async (_srv, call) => {
     // body naming a tenant is REJECTED on every write route, nothing written
-    assert.equal((await call("PUT", URL_PATH, "a-key", { ...RULES, tenantId: "tenant-b" })).status, 400);
+    assert.equal((await call("PUT", URL_PATH, "a-key", { ...RULES, tenantId: "tenant-b" }, NONE)).status, 400);
     assert.equal((await call("POST", `${URL_PATH}/approvals`, "a-key", { kind: "sender", value: "x@y.example", tenantId: "tenant-b" })).status, 400);
     assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", { eventId: "e", tenantId: "tenant-b" })).status, 400);
-    assert.equal(s.log.filter(l => l.op === "save").length, 0);
+    assert.equal(s.log.filter(isWrite).length, 0);
     // query / header / path variants are ignored: reads still return A's (empty) data
     for (const [p, h] of [[`${URL_PATH}?tenantId=tenant-b`, {}], [`${URL_PATH}?tenant=tenant-b`, {}], [URL_PATH, { "x-tenant-id": "tenant-b", "x-tenant": "tenant-b" }]] as const) {
       const r = await call("GET", p, "a-key", undefined, { ...h });
@@ -170,12 +190,13 @@ test("PUT replaces the rules and PRESERVES stored approvals and opt-outs", async
   const state = { approvedSenders: ["ann@x.example"], approvedDomains: ["d.example"], optedOutEventIds: ["e1", "e2"] };
   s.files.set("tenant-a", { ruleSet: EMPTY().ruleSet, state });
   await withServer(s.deps, async (_srv, call) => {
-    const put = await call("PUT", URL_PATH, "a-key", RULES);
+    const put = await call("PUT", URL_PATH, "a-key", RULES, ifMatch(EMPTY().ruleSet));
     assert.equal(put.status, 200);
+    assert.equal(put.etag, `"${fakeValidator(RULES as JoinRuleSetValue)}"`);
     assert.deepEqual(put.json, { ruleSet: RULES, state });
     assert.deepEqual(s.files.get("tenant-a"), { ruleSet: RULES, state });
     // a second replace with an empty rule set still keeps state
-    assert.equal((await call("PUT", URL_PATH, "a-key", { version: 1, ownDomains: [], rules: [] })).status, 200);
+    assert.equal((await call("PUT", URL_PATH, "a-key", { version: 1, ownDomains: [], rules: [] }, { "if-match": put.etag! })).status, 200);
     assert.deepEqual(s.files.get("tenant-a")!.state, state);
     assert.deepEqual((await call("GET", URL_PATH, "a-key")).json.state, state);
   });
@@ -186,7 +207,7 @@ test("PUT cannot smuggle state: a `state` field in the body is rejected, stored 
   const before = { ruleSet: RULES as any, state: { approvedSenders: ["ann@x.example"], approvedDomains: [], optedOutEventIds: [] } };
   s.files.set("tenant-a", structuredClone(before));
   await withServer(s.deps, async (_srv, call) => {
-    const r = await call("PUT", URL_PATH, "a-key", { ...RULES, state: { approvedSenders: [], approvedDomains: [], optedOutEventIds: [] } });
+    const r = await call("PUT", URL_PATH, "a-key", { ...RULES, state: { approvedSenders: [], approvedDomains: [], optedOutEventIds: [] } }, ifMatch(RULES));
     assert.equal(r.status, 400);
   });
   assert.deepEqual(s.files.get("tenant-a"), before);
@@ -198,21 +219,21 @@ test("invalid, unknown-field, non-object and oversized bodies are refused 4xx; s
   s.files.set("tenant-a", structuredClone(before));
   await withServer(s.deps, async (srv, call) => {
     for (const bad of [{ version: 2, ownDomains: [], rules: [] }, { ...RULES, extra: 1 }, { version: 1, ownDomains: "x", rules: [] }, [], "str", null, 7]) {
-      const r = await call("PUT", URL_PATH, "a-key", bad);
+      const r = await call("PUT", URL_PATH, "a-key", bad, ifMatch(RULES));
       assert.ok(r.status >= 400 && r.status < 500, `${JSON.stringify(bad)} -> ${r.status}`);
     }
     // no body at all
-    const noBody = await fetch(`${srv.baseUrl}${URL_PATH}`, { method: "PUT", headers: { authorization: "Bearer a-key" } });
+    const noBody = await fetch(`${srv.baseUrl}${URL_PATH}`, { method: "PUT", headers: { authorization: "Bearer a-key", ...ifMatch(RULES) } });
     assert.equal(noBody.status, 400);
     // malformed JSON
-    const malformed = await fetch(`${srv.baseUrl}${URL_PATH}`, { method: "PUT", headers: { authorization: "Bearer a-key", "content-type": "application/json" }, body: "{not json" });
+    const malformed = await fetch(`${srv.baseUrl}${URL_PATH}`, { method: "PUT", headers: { authorization: "Bearer a-key", "content-type": "application/json", ...ifMatch(RULES) }, body: "{not json" });
     assert.ok(malformed.status >= 400 && malformed.status < 500);
     // oversized (> express.json 100kb default)
-    const huge = await call("PUT", URL_PATH, "a-key", { ...RULES, pad: "x".repeat(300_000) });
+    const huge = await call("PUT", URL_PATH, "a-key", { ...RULES, pad: "x".repeat(300_000) }, ifMatch(RULES));
     assert.equal(huge.status, 413);
   });
   assert.deepEqual(s.files.get("tenant-a"), before);
-  assert.equal(s.log.filter(l => l.op === "save").length, 0);
+  assert.equal(s.log.filter(isWrite).length, 0);
 });
 
 test("a store-level size refusal on save maps to 413 and leaves the stored value unchanged", async () => {
@@ -220,7 +241,7 @@ test("a store-level size refusal on save maps to 413 and leaves the stored value
   const before = { ruleSet: EMPTY().ruleSet, state: { approvedSenders: ["ann@x.example"], approvedDomains: [], optedOutEventIds: [] } };
   s.files.set("tenant-a", structuredClone(before));
   const big = { version: 1, ownDomains: [], rules: Array.from({ length: 20 }, (_, i) => ({ id: `r${i}`, effect: "allow", match: { domain: `d${i}.example` } })) };
-  await withServer(s.deps, async (_srv, call) => { assert.equal((await call("PUT", URL_PATH, "a-key", big)).status, 413); });
+  await withServer(s.deps, async (_srv, call) => { assert.equal((await call("PUT", URL_PATH, "a-key", big, ifMatch(EMPTY().ruleSet))).status, 413); });
   assert.deepEqual(s.files.get("tenant-a"), before);
 });
 
@@ -230,12 +251,12 @@ test("approvals / opt-outs: valid -> 200 with state; bad bodies -> 400 and nothi
     const ok = await call("POST", `${URL_PATH}/approvals`, "a-key", { kind: "sender", value: "Ann@X.example" });
     assert.equal(ok.status, 200); assert.deepEqual(ok.json.state.approvedSenders, ["ann@x.example"]);
     assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", { eventId: "e1" })).json.state.optedOutEventIds[0], "e1");
-    const saves = s.log.filter(l => l.op === "save").length;
+    const saves = s.log.filter(isWrite).length;
     for (const bad of [{}, { kind: "other", value: "a" }, { kind: "sender" }, { kind: "sender", value: 5 }, { kind: "sender", value: "has space" }, { kind: "sender", value: "" }, []])
       assert.equal((await call("POST", `${URL_PATH}/approvals`, "a-key", bad)).status, 400, JSON.stringify(bad));
     for (const bad of [{}, { eventId: "" }, { eventId: 3 }, { eventId: "e", more: 1 }, []])
       assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", bad)).status, 400, JSON.stringify(bad));
-    assert.equal(s.log.filter(l => l.op === "save").length, saves);
+    assert.equal(s.log.filter(isWrite).length, saves);
   });
 });
 
@@ -245,25 +266,26 @@ test("a corrupt stored file is a non-leaking 5xx on every route and is never ove
   s.files.set("tenant-a", structuredClone(original)); s.corrupt.add("tenant-a");
   await withServer(s.deps, async (_srv, call) => {
     for (const [m, p, b] of ALL) {
-      const r = await call(m, p, "a-key", b);
+      const r = await call(m, p, "a-key", b, m === "PUT" ? ifMatch(RULES) : {});
       assert.equal(r.status, 500, `${m} ${p}`);
       assert.ok(!JSON.stringify(r.json).includes("SECRET-PATH") && !JSON.stringify(r.json).includes("corrupt"), JSON.stringify(r.json));
     }
     // another tenant is unaffected
     assert.equal((await call("GET", URL_PATH, "b-key")).status, 200);
   });
-  assert.equal(s.log.filter(l => l.op === "save").length, 0);
+  assert.equal(s.log.filter(isWrite).length, 0);
   assert.deepEqual(s.files.get("tenant-a"), original);
 });
 
 test("concurrent approvals for one tenant (and concurrent PUT + approvals) all survive", async () => {
   const s = fakeStore({ delayMs: 5 });
+  s.files.set("tenant-a", EMPTY()); // a stored (empty) rule set, so the PUT below replaces it with If-Match, whatever order the writes run in
   await withServer(s.deps, async (_srv, call) => {
     const emails = Array.from({ length: 12 }, (_, i) => `u${i}@x.example`);
     const results = await Promise.all([
       ...emails.map(value => call("POST", `${URL_PATH}/approvals`, "a-key", { kind: "sender", value })),
       call("POST", `${URL_PATH}/opt-outs`, "a-key", { eventId: "ev-1" }),
-      call("PUT", URL_PATH, "a-key", RULES),
+      call("PUT", URL_PATH, "a-key", RULES, ifMatch(EMPTY().ruleSet)),
       call("POST", `${URL_PATH}/approvals`, "b-key", { kind: "sender", value: "only-b@x.example" }),
     ]);
     for (const r of results) assert.equal(r.status, 200);
@@ -293,10 +315,10 @@ test("opt-outs: optional meetingUrl / sessionKey hints are passed to the store f
       ["tenant-a", "calX", { meetingUrl: url, sessionKey: "webinar-abc" }], ["tenant-b", "calY", { meetingUrl: url }],
       ["tenant-a", "plain", undefined], ["tenant-a", "blank", undefined],
     ], "no hint -> the store is called exactly as before (two arguments)");
-    const saves = s.log.filter(l => l.op === "save").length;
+    const saves = s.log.filter(isWrite).length;
     for (const bad of [{ eventId: "e", meetingUrl: 5 }, { eventId: "e", meetingUrl: "x".repeat(2049) }, { eventId: "e", sessionKey: ["k"] }, { eventId: "e", sessionKey: "k".repeat(257) }, { eventId: "e", meetingUrl: null }])
       assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", bad)).status, 400, JSON.stringify(bad).slice(0, 60));
     assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", { eventId: "e", meetingUrl: url, tenantId: "tenant-b" })).status, 400);
-    assert.equal(s.log.filter(l => l.op === "save").length, saves);
+    assert.equal(s.log.filter(isWrite).length, saves);
   });
 });

@@ -23,16 +23,18 @@ const KEYS: Record<string, { tenantId: string; scopes: string[] }> = {
 };
 const RULES = { version: 1, ownDomains: ["own.example"], rules: [{ id: "r1", effect: "allow", match: { domain: "Trusted.Example" } }] };
 const P = "/calendar/join-rules";
-type Call = (method: string, p: string, key: string, body?: unknown) => Promise<{ status: number; json: any }>;
+type Call = (method: string, p: string, key: string, body?: unknown, headers?: Record<string, string>) => Promise<{ status: number; json: any; etag: string | null }>;
+/** PUT needs a precondition (428 otherwise): create the first rule set with If-None-Match: *. */
+const NONE = { "if-none-match": "*" };
 
 async function serve(dir: string) {
   const server = await startTestServer(buildTestDeps({ keyStore: fakeKeyStore(KEYS), joinRules: createJoinRulesDeps({ stateDir: dir }) }));
-  const call: Call = async (method, p, key, body) => {
+  const call: Call = async (method, p, key, body, headers = {}) => {
     const res = await fetch(`${server.baseUrl}${p}`, {
-      method, headers: { authorization: `Bearer ${key}`, ...(body !== undefined ? { "content-type": "application/json" } : {}) },
+      method, headers: { authorization: `Bearer ${key}`, ...(body !== undefined ? { "content-type": "application/json" } : {}), ...headers },
       ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     });
-    return { status: res.status, json: await res.json().catch(() => undefined) };
+    return { status: res.status, json: await res.json().catch(() => undefined), etag: res.headers.get("etag") };
   };
   return { call, close: server.close };
 }
@@ -47,7 +49,7 @@ test("GET is no longer 503; PUT/GET round trip; approvals and opt-outs persist a
     const first = await s.call("GET", P, "a-key");
     assert.equal(first.status, 200);
     assert.deepEqual(first.json, { ruleSet: { version: 1, ownDomains: [], rules: [] }, state: { approvedSenders: [], approvedDomains: [], optedOutEventIds: [] } });
-    const put = await s.call("PUT", P, "a-key", RULES);
+    const put = await s.call("PUT", P, "a-key", RULES, NONE);
     assert.equal(put.status, 200);
     assert.equal(put.json.ruleSet.rules[0].match.domain, "trusted.example");
     assert.equal((await s.call("POST", `${P}/approvals`, "a-key", { kind: "sender", value: "Ann@X.example" })).status, 200);
@@ -67,7 +69,7 @@ test("GET is no longer 503; PUT/GET round trip; approvals and opt-outs persist a
 test("two tenants are isolated on disk; without the join-rules scope writes are 403 (reads stay calendar-scoped) and nothing is written", () => withDir(async dir => {
   const s = await serve(dir);
   try {
-    assert.equal((await s.call("PUT", P, "a-key", RULES)).status, 200);
+    assert.equal((await s.call("PUT", P, "a-key", RULES, NONE)).status, 200);
     assert.equal((await s.call("POST", `${P}/approvals`, "b-key", { kind: "domain", value: "b-only.example" })).status, 200);
     assert.deepEqual((await s.call("GET", P, "b-key")).json.ruleSet.rules, []);
     assert.deepEqual((await s.call("GET", P, "a-key")).json.state.approvedDomains, []);
@@ -88,7 +90,7 @@ test("a corrupt stored file answers 500 (store error passes through) and the byt
     writeFileSync(file, "{ this is not json");
     const before = readFileSync(file);
     for (const [m, p, b] of [["GET", P, undefined], ["PUT", P, RULES], ["POST", `${P}/approvals`, { kind: "sender", value: "x@y.example" }], ["POST", `${P}/opt-outs`, { eventId: "e" }]] as const)
-      assert.equal((await s.call(m, p, "a-key", b)).status, 500, `${m} ${p}`);
+      assert.equal((await s.call(m, p, "a-key", b, m === "PUT" ? { "if-match": `"${"0".repeat(64)}"` } : {})).status, 500, `${m} ${p}`);
     assert.ok(readFileSync(file).equals(before));
     assert.deepEqual(readdirSync(path.dirname(file)).filter(f => f.endsWith(".tmp")), []);
   } finally { await s.close(); }
@@ -298,7 +300,7 @@ test("un-opt end to end: opt out with a hint -> sibling vetoed; un-opt with the 
   const vetoed = (tenant: string) => { const l = loadJoinRules(dir, tenant); return applyJoinRules({ toSchedule: [sibling()], skipped: [] }, l.ruleSet, { state: l.state }).toSchedule.length === 0; };
   const s = await serve(dir);
   try {
-    assert.equal((await s.call("PUT", P, "a-key", RULES)).status, 200);
+    assert.equal((await s.call("PUT", P, "a-key", RULES, NONE)).status, 200);
     assert.equal((await s.call("POST", `${P}/approvals`, "a-key", { kind: "domain", value: "ok.example" })).status, 200);
     for (const k of ["a-key", "b-key"]) assert.equal((await s.call("POST", `${P}/opt-outs`, k, { eventId: "calX", meetingUrl: ROOM, sessionKey: "k1" })).status, 200);
     assert.equal((await s.call("POST", `${P}/opt-outs`, "a-key", { eventId: "calY" })).status, 200);

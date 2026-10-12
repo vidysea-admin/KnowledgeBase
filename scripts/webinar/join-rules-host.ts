@@ -11,7 +11,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { JoinRulesDeps } from "../../apps/api/src/join-rules/deps.js";
-import { loadJoinRules, saveJoinRules, recordTenantApproval, recordTenantOptOut, recordTenantUnOptOut } from "../../packages/meeting-bot/src/calendar/join-rules-store.js";
+import { loadJoinRules, saveJoinRules, loadJoinRulesWithValidator, saveJoinRulesIf, recordTenantApproval, recordTenantOptOut, recordTenantUnOptOut } from "../../packages/meeting-bot/src/calendar/join-rules-store.js";
 import { validateJoinRuleSet } from "../../packages/meeting-bot/src/calendar/join-rules.js";
 
 export const HOST_PID_FILE = "join-rules-host.pid";
@@ -20,7 +20,10 @@ export const HOST_PID_FILE = "join-rules-host.pid";
 export function createJoinRulesDeps({ stateDir }: { stateDir: string }): JoinRulesDeps {
   return {
     load: t => loadJoinRules(stateDir, t),
-    save: (t, v) => saveJoinRules(stateDir, t, v),
+    save: (t, v) => saveJoinRules(stateDir, t, v), // legacy unconditional replace: NOT used by the PUT route any more
+    loadWithValidator: t => loadJoinRulesWithValidator(stateDir, t),
+    // The PUT route's only write path: the store's atomic compare-and-set (per-tenant lock, state taken under the lock).
+    saveIf: (t, expected, ruleSet) => saveJoinRulesIf(stateDir, t, expected, ruleSet),
     validateRuleSet: validateJoinRuleSet,
     recordApproval: (t, a) => recordTenantApproval(stateDir, t, a),
     recordOptOut: (t, id, meeting) => recordTenantOptOut(stateDir, t, id, {}, meeting),

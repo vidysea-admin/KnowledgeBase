@@ -10,7 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore } from "../fixtures.js";
-import { spyStore, empty } from "./test-store.js";
+import { spyStore, empty, fakeValidator } from "./test-store.js";
 
 const P = "/calendar/join-rules";
 const KEYS = { "a-key": { tenantId: "tenant-a", scopes: ["calendar", "join-rules"] } };
@@ -21,6 +21,8 @@ const HEADERS = ["x-tenant-id", "x-tenant", "tenant-id", "x-forwarded-tenant", "
 const QUERIES = ["?tenantId=tenant-b", "?tenant=tenant-b", "?tenant_id=tenant-b", "?x-tenant-id=tenant-b", "?tenantId=tenant-b&tenant=tenant-b&tenantId=tenant-b"];
 const HOSTILE_FIELDS = ["tenantId", "tenant", "tenant_id", "__proto__", "constructor", "prototype"];
 
+/** PUT's precondition: tenant-a is seeded, so a replace carries If-Match of the seeded rule set's ETag. */
+const A_MATCH = { "if-match": `"${fakeValidator(A_SEED.ruleSet)}"` };
 type Spy = ReturnType<typeof spyStore>;
 type Raw = (method: string, path: string, body?: string, headers?: Record<string, string>) => Promise<{ status: number; text: string }>;
 
@@ -54,7 +56,7 @@ test("every tenant-naming HEADER is ignored: reads return tenant-a's data, write
       const get = await raw("GET", P, undefined, hdr);
       assert.equal(get.status, 200, h);
       assert.deepEqual(JSON.parse(get.text), A_SEED, `${h}: GET must return tenant-a's stored value`);
-      assert.equal((await raw("PUT", P, JSON.stringify(RULES), hdr)).status, 200, h);
+      assert.equal((await raw("PUT", P, JSON.stringify(RULES), { ...hdr, ...A_MATCH })).status, 200, h);
       assert.equal((await raw("POST", `${P}/approvals`, JSON.stringify({ kind: "domain", value: "ok.example" }), hdr)).status, 200, h);
       assert.equal((await raw("POST", `${P}/opt-outs`, JSON.stringify({ eventId: "ev-new" }), hdr)).status, 200, h);
       assertOnlyA(s, bBefore, `header ${h}`);
@@ -69,7 +71,7 @@ test("every tenant-naming QUERY string is ignored on all four routes", async () 
   for (const q of QUERIES) {
     await harness(async ({ s, bBefore, raw }) => {
       assert.deepEqual(JSON.parse((await raw("GET", `${P}${q}`)).text), A_SEED, q);
-      assert.equal((await raw("PUT", `${P}${q}`, JSON.stringify(RULES))).status, 200, q);
+      assert.equal((await raw("PUT", `${P}${q}`, JSON.stringify(RULES), A_MATCH)).status, 200, q);
       assert.equal((await raw("POST", `${P}/approvals${q}`, JSON.stringify({ kind: "sender", value: "n@a.example" }))).status, 200, q);
       assert.equal((await raw("POST", `${P}/opt-outs${q}`, JSON.stringify({ eventId: "ev-q" }))).status, 200, q);
       assertOnlyA(s, bBefore, `query ${q}`);
@@ -105,14 +107,14 @@ test("a tenant named in the BODY (top level, nested, __proto__, constructor) nev
         // raw JSON so `__proto__` / `constructor` stay OWN keys exactly as an attacker would send them
         for (const hostile of [`"tenant-b"`, `{"tenantId":"tenant-b","tenant":"tenant-b"}`, `["tenant-b"]`]) {
           const body = JSON.stringify(base).replace(/\}$/, `,${JSON.stringify(f)}:${hostile}}`);
-          const r = await raw(m, p, body);
+          const r = await raw(m, p, body, m === "PUT" ? A_MATCH : {});
           assert.ok(r.status === 400 || r.status === 200, `${m} ${p} ${f} -> ${r.status}`);
           assert.deepEqual(otherTenants(s), [], `${m} ${p} body.${f}=${hostile}: a dep call named another tenant`);
           assert.equal(s.bytes.get("tenant-b"), bBefore, `${m} ${p} body.${f}=${hostile}: tenant-b changed`);
         }
       }
       const nested = JSON.stringify(base).replace(/\}$/, `,"meta":{"tenantId":"tenant-b"},"state":{"tenantId":"tenant-b"}}`);
-      const r = await raw(m, p, nested);
+      const r = await raw(m, p, nested, m === "PUT" ? A_MATCH : {});
       assert.ok(r.status === 400 || r.status === 200);
     }
     assertOnlyA(s, bBefore, "body");
@@ -125,9 +127,9 @@ test("a valid approval/opt-out/PUT body carrying `tenant` or `tenantId` is refus
     for (const f of ["tenant", "tenantId"]) {
       assert.equal((await raw("POST", `${P}/approvals`, JSON.stringify({ kind: "domain", value: "ok.example", [f]: "tenant-b" }))).status, 400, f);
       assert.equal((await raw("POST", `${P}/opt-outs`, JSON.stringify({ eventId: "ev", [f]: "tenant-b" }))).status, 400, f);
-      assert.equal((await raw("PUT", P, JSON.stringify({ ...RULES, [f]: "tenant-b" }))).status, 400, f);
+      assert.equal((await raw("PUT", P, JSON.stringify({ ...RULES, [f]: "tenant-b" }), A_MATCH)).status, 400, f);
     }
-    assert.equal(s.calls.filter(c => c.op === "save").length, 0);
+    assert.equal(s.calls.filter(c => c.op === "save" || c.op === "saveIf").length, 0);
     assert.equal(s.bytes.get("tenant-a"), aBefore);
     assert.equal(s.bytes.get("tenant-b"), bBefore);
   });
