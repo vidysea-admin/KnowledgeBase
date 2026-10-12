@@ -1,6 +1,6 @@
 # t034-tab-capture-tests-in-suite-and-receiver
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap T-034 in-browser tab capture; follows merged t034-capture-failure-not-success and t034-tab-capture-extension-logic-tests). Class: data write path (receiver), test-only unit: no production source changed.
 Lane: lane/tabcapture. Lane ledger `qa/issues.tabcapture.jsonl`: ISS-TABCAPTURE-001 (low), -002 (low). Existing ledger row statuses untouched.
