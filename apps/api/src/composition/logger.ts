@@ -29,6 +29,8 @@ export interface LoggerOptions {
   /** Fixed level; default reads LOG_LEVEL per call. */
   level?: LogLevel | "silent";
   base?: LogFields;
+  /** Environment used for level resolution (LOG_LEVEL, NODE_TEST_CONTEXT); default process.env. Lets tests pin it. */
+  env?: Record<string, string | undefined>;
 }
 
 const RANK: Record<LogLevel | "silent", number> = { debug: 10, info: 20, warn: 30, error: 40, silent: 99 };
@@ -37,10 +39,10 @@ const MAX_DEPTH = 6;
 const MAX_STRING = 8192;
 const SENSITIVE_KEY = /^(authorization|proxy-authorization|cookie|set-cookie|x-api-key|api[-_]?key|apikey|key|keys|token|access[-_]?token|refresh[-_]?token|secret|client[-_]?secret|password|passwd|credentials?|mongodb[-_]?url|mongo[-_]?url|connection[-_]?string|headers?|body|req|res|request|response|query|querystring|search|payload|data)$/i;
 
-export function resolveLevel(raw: string | undefined = process.env.LOG_LEVEL): LogLevel | "silent" {
+export function resolveLevel(raw: string | undefined = process.env.LOG_LEVEL, env: Record<string, string | undefined> = process.env): LogLevel | "silent" {
   const v = raw?.trim().toLowerCase();
   if (v && v in RANK) return v as LogLevel | "silent";
-  if (!v && process.env.NODE_TEST_CONTEXT) return "silent";
+  if (!v && env.NODE_TEST_CONTEXT) return "silent";
   return "info";
 }
 
@@ -94,7 +96,7 @@ export function createLogger(opts: LoggerOptions = {}): Logger {
   const write = opts.write ?? ((line: string) => { process.stdout.write(line); });
   const build = (base: LogFields): Logger => {
     const emit = (level: LogLevel) => (msg: string, fields?: LogFields): void => {
-      if (RANK[level] < RANK[opts.level ?? resolveLevel()]) return;
+      if (RANK[level] < RANK[opts.level ?? (opts.env ? resolveLevel(opts.env.LOG_LEVEL, opts.env) : resolveLevel())]) return;
       try { write(formatLine(level, msg, base, fields)); } catch { /* logging must never break a request */ }
     };
     return { debug: emit("debug"), info: emit("info"), warn: emit("warn"), error: emit("error"), child: (b) => build({ ...base, ...b }) };

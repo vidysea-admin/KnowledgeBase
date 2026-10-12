@@ -36,6 +36,7 @@ import { createActivityHealthRouter, unavailableActivityHealthDeps } from "./act
 import type { ActivityHealthDeps } from "./activity-health/types.js";
 import { logger as defaultLogger, type Logger } from "./composition/logger.js";
 import { requestLogger } from "./composition/request-log.js";
+import { bodyParserErrorHandler } from "./composition/body-parser-error.js";
 
 export interface ServerDeps {
   keyStore: ApiKeyStore;
@@ -106,6 +107,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createKeysRouter(deps.keys));
   app.use(createIngestRouter(deps.ingest));
   app.use(createStubsRouter());
+  app.use(bodyParserErrorHandler(log)); // ISS-APILOGGER-001: body-parser errors: structured log, no body echo, production-identical response
   // Terminal handler (ISS-AUTHTENANT-002): an error with no HTTP status (e.g. a tenant guard throwing in a store) gets a fixed 500 body, never
   // Express's default stack page. Errors that carry a 4xx/5xx status (body-parser) still go to the default handler, unchanged.
   app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {

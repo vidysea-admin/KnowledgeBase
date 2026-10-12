@@ -1,7 +1,7 @@
 # api-structured-logging-request-id
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: deployment readiness D7 (structured logging + request id). Class: security-adjacent (secret redaction in logs): full ceremony. Verdict by the checker only.
 Lane: lane/apilogger. Lane ledger `qa/issues.apilogger.jsonl`: ISS-APILOGGER-001 (medium), ISS-APILOGGER-002 (low).
 
@@ -29,3 +29,13 @@ All 9 KILLED: query kept in path; unsafe id accepted; header not echoed; tenantI
 - ISS-APILOGGER-001: Express's default final handler still prints body-parser (status) errors to stderr unstructured; message may echo a body snippet. Not fixed: changing it would change the client response.
 - ISS-APILOGGER-002: remaining console use in other files.
 - Access log is written per request at info (including /health probes); no sampling. Request id is not propagated to async work outside req.log (no AsyncLocalStorage).
+
+## Fix cycle 1 (responds to verdict FAIL cycle 0, commit dc91bc6)
+Changed (apps/api/src/composition only, plus 2 lines in server.ts): `logger.ts` (`resolveLevel(raw, env = process.env)` and `LoggerOptions.env`, so tests pin the environment), new `body-parser-error.ts`, new `log-level-and-body-errors.test.ts` (5 tests). `server.ts` mounts `bodyParserErrorHandler(log)` before the terminal handler.
+
+- **ISS-APILOGGER-003 (fixed):** tests for LOG_LEVEL unset + NODE_TEST_CONTEXT unset -> info (info/warn/error written, also with NODE_ENV=production); NODE_TEST_CONTEXT set -> silent; explicit LOG_LEVEL wins in both cases (info/debug/error/silent). Checker's M6 (`!v && ctx` -> `!v`) replayed: applied (hash 1ee3e8e -> fefb8be), **KILLED** (exit 1). Also M8 (explicit level ignored under test context) KILLED. (My M5 pattern missed the source text, not run.)
+- **ISS-APILOGGER-001 (fixed):** handler for body-parser `err.type` (entity.parse.failed, entity.too.large, entity.verify.failed, encoding/charset.unsupported, request.aborted, request.size.invalid, stream.encoding.set, parameters.too.many). Logs `request body rejected` at warn with `{errType, status, requestId}` only (no err, message, stack or body); answers with the exact status, headers (CSP, nosniff, content-type, content-length) and HTML of Express's production final handler, in every NODE_ENV. Baseline captured from unchanged code in production mode before the change: 400 -> `<pre>Bad Request</pre>` length 138; 413 -> `<pre>Payload Too Large</pre>` length 144; the test asserts equality with those literals in production and development.
+- Reproduction by id: **ISS-APILOGGER-001: 0/4 leak** (ZZSECRETZZ raw body, truncated JSON, not-json, 200KB oversize) in both NODE_ENV=production and development: secret absent from response, stdout log and captured stderr; stderr empty. Before: raw body ZZSECRETZZ reached stderr and (development) the client page (reproduced at HEAD this cycle).
+- Mutations (harness `.mut-harness-apilogger-c1.mjs`, untracked, deleted; per-mutation backup restored in `finally`, applied by hash, restored hash equal): M6, M8, handler unmounted (M9), log err.message (M10), page text changed (M11), CSP header dropped (M12): 6/6 KILLED.
+- Tests: new file 5/5; request-log 8/8; server 8/8; health-probe 3/3; routes/health 19/19; health-alert-sink 2/2. `tsc --noEmit -p tsconfig.json` exit 0.
+- Still open: ISS-APILOGGER-004 (low, redaction hardening, not reachable via current wiring; checker said may remain filed) and ISS-APILOGGER-002 (low, console.* in other lanes' files). Ledger statuses unchanged.
