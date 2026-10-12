@@ -34,6 +34,8 @@ import { createJobsRouter, type JobsReadDeps } from "./jobs/router.js";
 import { unavailableJobsReadDeps } from "./jobs/fixture-store.js";
 import { createActivityHealthRouter, unavailableActivityHealthDeps } from "./activity-health/router.js";
 import type { ActivityHealthDeps } from "./activity-health/types.js";
+import { logger as defaultLogger, type Logger } from "./composition/logger.js";
+import { requestLogger } from "./composition/request-log.js";
 
 export interface ServerDeps {
   keyStore: ApiKeyStore;
@@ -63,10 +65,14 @@ export interface ServerDeps {
    * empty list means no cross-origin browser call succeeds, which is the safe default until a
    * caller explicitly opts a frontend origin in. */
   corsOrigins?: string[];
+  /** D7 structured logger (JSON lines on stdout, redacted). Default: the process-wide logger; tests inject a capturing one. */
+  logger?: Logger;
 }
 
 export function createServer(deps: ServerDeps): Express {
   const app = express();
+  const log = deps.logger ?? defaultLogger;
+  app.use(requestLogger(log)); // first: every response (incl. body-parser/auth failures) gets X-Request-Id + an access line
   app.use(express.json());
   app.use(createCors(deps.corsOrigins ?? []));
   // Every *-page.ts route is static markup carrying no data of its own (its own JS/server-side
@@ -102,10 +108,10 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createStubsRouter());
   // Terminal handler (ISS-AUTHTENANT-002): an error with no HTTP status (e.g. a tenant guard throwing in a store) gets a fixed 500 body, never
   // Express's default stack page. Errors that carry a 4xx/5xx status (body-parser) still go to the default handler, unchanged.
-  app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
+  app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
     const e = err as { status?: unknown; statusCode?: unknown } | null, s = e?.status ?? e?.statusCode;
     if (res.headersSent || (typeof s === "number" && s >= 400 && s < 600)) { next(err); return; }
-    console.error(err); // server log only
+    (req.log ?? log).error("unhandled error", { err }); // server log only (stack stays out of the response)
     res.status(500).json({ error: "internal_error", message: "internal error" });
   });
   return app;

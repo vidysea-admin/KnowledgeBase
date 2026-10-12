@@ -6,6 +6,7 @@ import { config as loadEnv } from "dotenv";
 import { connect } from "@lkb/db";
 import { startServer } from "./server.js";
 import { buildProductionDeps } from "./composition/production.js";
+import { logger } from "./composition/logger.js";
 
 export { createServer, startServer, type ServerDeps } from "./server.js";
 
@@ -22,7 +23,7 @@ async function main(): Promise<void> {
   server.on("listening", () => {
     const addr = server.address();
     const port = typeof addr === "object" && addr ? addr.port : addr;
-    console.log(`@lkb/api listening on :${port}`);
+    logger.info("listening", { port });
   });
 }
 
@@ -34,7 +35,7 @@ async function main(): Promise<void> {
 // on every platform.
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
-    console.error("@lkb/api failed to start:", err);
+    logger.error("failed to start", { err });
     process.exitCode = 1;
   });
 }
