@@ -11,7 +11,8 @@
  *    revision is checked after the lock is taken AND again right before the data rename (ISS-RUNLOCK-003).
  *  - The read-check-rename window runs under an exclusive `<id>.run-state.lock` file; a held lock is `locked`.
  *    The lock records its owner; a lock left by a dead process is taken over (rule and limits: run-state-lock.ts),
- *    the dead owner's orphan temp files are then reaped, and the token is re-checked right before the data rename.
+ *    the previous owner's orphan temp files are reaped on every acquisition (a failed reap refuses the save: `conflict` for a file
+ *    still in use, `io-error` for one that will not clear; ISS-RUNLOCK-003), and the token is re-checked right before the data rename.
  *  - A load never writes. A corrupt or schema-invalid file is a typed error and is never overwritten or deleted,
  *    by load OR by save (`corrupt-existing`).
  */
@@ -154,10 +155,14 @@ export function createRunStateStore(root: string, fs: RunStateFsOps = realRunSta
         const got = acquireRunStateLock(lockCtx, lock);
         if ("locked" in got) return { ok: false, code: "locked", message: got.locked };
         token = got.token;
-        if (got.takeover) reapRunStateTemps(lockCtx, root, runId);
-        const cur = read(runId);
-        if (cur.kind === "error") result = { ok: false, code: cur.code === "io-error" ? "io-error" : "corrupt-existing", message: cur.message };
-        else if (!matches(cur, expected)) result = CONFLICT;
+        // ISS-RUNLOCK-003: whoever holds the lock reaps the previous holder's orphan temp files, and REFUSES to write when one cannot
+        // be removed: a displaced writer's stalled rename could still land on it. Done on every acquisition, not only after a takeover,
+        // so a refusing taker that released its lock cannot be followed by a writer that skips the reap.
+        const reap = reapRunStateTemps(lockCtx, root, runId);
+        const cur: Read | null = reap.failure ? null : read(runId);
+        if (reap.failure) result = { ok: false, code: reap.failure.busy ? "conflict" : "io-error", message: reap.failure.message };
+        else if (cur!.kind === "error") result = { ok: false, code: cur!.code === "io-error" ? "io-error" : "corrupt-existing", message: cur!.message };
+        else if (!matches(cur!, expected)) result = CONFLICT;
         else {
           writeAtomic(runId, next, () => runStateLockOwned(lockCtx, lock, token!), expected);
           result = { ok: true };
