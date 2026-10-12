@@ -1,6 +1,6 @@
 # fix-apps-api-typecheck-after-grounded-schema
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Lane: lane/schemaapifix. Class: type-only fix to restore a red typecheck on main (c99c44d); no schema/generated-type change. Tier: critical build break.
 
