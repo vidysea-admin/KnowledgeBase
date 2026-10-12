@@ -4,7 +4,7 @@
  * `apps/api/src/ingest-store.ts` `ingestUrl` builds it. Pure apart from the injected `IntakeSink`: no database,
  * no network. API wiring is a separate unit.
  *
- * Re-ingest policy (D-135, pending append): the source `_id` is the content hash, so the same media ingested again
+ * Re-ingest policy (D-135, pending append): the source `_id` is derived from (tenantId, content hash) so identical media is idempotent within a tenant and never shared across tenants, so the same media ingested again
  * is idempotent. The existing session id is returned with `status: "already-ingested"` and NOTHING is created or
  * deleted: no `toTurns` call (no second transcription), no `save`.
  *
@@ -13,9 +13,9 @@
  */
 import type { Sessions, Turns } from "@lkb/core";
 import { detectSource } from "./registry.js";
-import type { ConsentContext, MediaDoc, Source, SourceDoc, Turn } from "./source.js";
+import { tenantSourceId, type ConsentContext, type MediaDoc, type Source, type SourceDoc, type Turn } from "./source.js";
 
-export type IntakeErrorCode = "invalid-input" | "tenant-mismatch" | "no-turns" | "sink-failed";
+export type IntakeErrorCode = "invalid-input" | "tenant-mismatch" | "unscoped-source" | "no-turns" | "sink-failed";
 
 export class IntakeError extends Error {
   readonly code: IntakeErrorCode;
@@ -35,7 +35,7 @@ export interface IntakePlan {
 
 /** Injected persistence. `save` must be all-or-nothing; the planner never calls it twice for one input. */
 export interface IntakeSink {
-  /** The session already created for this source in this tenant, if any. Must be tenant-confined. */
+  /** The session already created for this source, if any. `sourceId` embeds the tenant, so even a tenant-ignoring sink cannot return another tenant's session; still keep it confined. */
   findSessionBySource(tenantId: string, sourceId: string): Promise<{ sessionId: string } | undefined>;
   save(plan: IntakePlan): Promise<void>;
 }
@@ -72,6 +72,12 @@ export async function intakeFromSource(
     throw new IntakeError("tenant-mismatch", "adapter returned a source for a different tenant");
   }
 
+  // ISS-T045INTAKE-001: the dedupe key is tenant-scoped by construction. It must equal tenantSourceId(tenant, hash), so
+  // it embeds the tenant: even a sink that ignores `tenantId` cannot match another tenant's source. A source whose
+  // _id is not so scoped (bare content hash) is refused rather than stored under a globally colliding id.
+  if (typeof source.hash !== "string" || source._id !== tenantSourceId(tenantId, source.hash)) {
+    throw new IntakeError("unscoped-source", "adapter source _id is not tenant-scoped; refusing to plan");
+  }
   const existing = await deps.sink.findSessionBySource(tenantId, source._id);
   if (existing) return { status: "already-ingested", sessionId: existing.sessionId, sourceId: source._id };
 

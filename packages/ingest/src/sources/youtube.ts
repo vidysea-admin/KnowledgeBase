@@ -12,7 +12,7 @@
 import { spawn } from "node:child_process";
 import { posix, win32 } from "node:path";
 import type { Transcribe } from "@lkb/ai";
-import type { Source, SourceDoc, MediaDoc, ConsentContext, Turn } from "../source.js";
+import { tenantSourceId, type Source, type SourceDoc, type MediaDoc, type ConsentContext, type Turn } from "../source.js";
 import type { RecordingHasher, RecordingReader } from "./recording.js";
 
 export type YoutubeErrorCode =
@@ -306,9 +306,10 @@ export function createYoutubeSource(deps: YoutubeAdapterDeps): Source {
       if (!bytes || bytes.byteLength === 0) throw new YoutubeSourceError("empty-output", "audio file is empty");
       const hash = await deps.hasher(bytes);
       const retrievedAt = now();
+      const sourceId = tenantSourceId(tenantId, hash);
 
       const source = {
-        _id: hash,
+        _id: sourceId,
         tenantId,
         kind: "url",
         captureMode: consent.captureMode,
@@ -322,9 +323,9 @@ export function createYoutubeSource(deps: YoutubeAdapterDeps): Source {
       } as SourceDoc;
       const media = [
         {
-          _id: `${hash}-media`,
+          _id: `${sourceId}-media`,
           tenantId,
-          sourceRef: hash,
+          sourceRef: sourceId,
           kind: "audio",
           path: audioPath,
           retention: { purgeAfterVerified: false },
