@@ -1,7 +1,7 @@
 # deploy-compose-web-migrate-secrets
 
 **Handshake status:** ready-for-check
-Fix cycle: 1
+Fix cycle: 2
 Tier: roadmap (deployment readiness D3 + D5 + D6). Class: deployment config, no application code; no data writes executed. Verdict by the checker only.
 Lane: lane/deploycompose. Lane ledger `qa/issues.deploycompose.jsonl`: ISS-DEPLOYCOMPOSE-001, -002 (both medium).
 
@@ -39,3 +39,20 @@ docker is NOT installed here (`which docker` -> not found), so `docker compose c
 - **-005 (medium):** `migrate` has `profiles: ["migrate"]`; api's `depends_on: migrate` is removed. A plain `docker compose up` neither builds nor runs migrate. Explicit command: `docker compose --profile migrate run --rm migrate`. Running it against production needs the owner's approval (D-117: production DB writes are not authorized); it migrates the database named by MONGODB_URL / MONGODB_DB in .env. Documented in the compose file comment.
 - **Evidence** (js-yaml 4.3.2, structural only; docker not installed, `docker compose config` not run): Dockerfile stages `base,manifests,build,prod-deps,runtime`; `migrate profiles ["migrate"] target build EXISTS`; `api profiles [] depends_on null`; `web depends_on ["api"]`; `local-mongo profiles ["local-dev"]`. Every `target:` in the file exists in 643c096.
 - **Still open / not covered:** no image built, no migration run; ISS-001 (coupling to stage name `build`, bind mounts) and -002 stay open; ledger statuses untouched; re-verify after both lanes merge.
+
+## Fix cycle 2 (responds to verdict cycle 1: ISS-DEPLOYCOMPOSE-006, high)
+- **-006:** added `./schema:/app/schema:ro` to the `migrate` service volumes (Dockerfiles untouched). Four migrations (baseline, meeting-candidates, source-watcher, watch-heartbeat) do `readFileSync(join(__dirname,"..","schema","index.json"))`; with `./migrations` at /app/migrations that is /app/schema/index.json, which the `build` stage lacks (`COPY schema` is runtime-only in the merged Dockerfile).
+- **Runtime-file audit** (grep of `require|readFileSync|__dirname|join(|import(|process.env` in migrations/*.cjs and migrate-mongo-config.cjs; merged Dockerfile read from main HEAD):
+
+| File read at runtime | Needed by | Resolved in migrate container by |
+|---|---|---|
+| /app/migrate-mongo-config.cjs | migrate-mongo `-f` | bind mount (ro) |
+| /app/migrations/*.cjs (5 files) | migrate-mongo `migrationsDir: "migrations"` (cwd /app) | bind mount (ro) |
+| /app/schema/index.json | 4 migrations (tenant-id migration reads nothing) | NEW bind mount `./schema:/app/schema:ro` |
+| `dotenv/config` | config | /app/node_modules (build stage root install; dotenv 17.4.2) |
+| `migrate-mongo` CLI (npx) | command | /app/node_modules/.bin (migrate-mongo 14.0.7) |
+| `fs`, `path` | migrations | node builtins |
+| MONGODB_URL / MONGODB_DB (env) | config | compose `environment` |
+No other `require`/file reads found; schema/index.json contains no `$ref` or further file paths (grep count 0), and the whole schema/ directory is mounted anyway. A `.env` file is not needed (env is passed by compose).
+- **Evidence** (js-yaml, structural only; docker not installed): services migrate,api,web,local-mongo   migrate volumes ["./migrations:/app/migrations:ro","./migrate-mongo-config.cjs:/app/migrate-mongo-config.cjs:ro","./schema:/app/schema:ro"]   profiles ["migrate"]   target build schema/index.json exists: true 
+- NOT covered: no image built, no migration run, `docker compose config` never executed.

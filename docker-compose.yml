@@ -30,6 +30,9 @@ services:
     volumes:
       - ./migrations:/app/migrations:ro
       - ./migrate-mongo-config.cjs:/app/migrate-mongo-config.cjs:ro
+      # Four of the five migrations read <__dirname>/../schema/index.json (= /app/schema/index.json);
+      # the `build` stage does not copy schema/ (only the runtime stage does) (ISS-DEPLOYCOMPOSE-006).
+      - ./schema:/app/schema:ro
     restart: "no"
 
   api:
