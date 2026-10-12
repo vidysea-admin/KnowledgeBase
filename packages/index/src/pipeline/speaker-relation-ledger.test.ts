@@ -10,7 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
-import { extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
+import { extractSpeakersRuleBased as extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
 import { looksLikeAName, isDiscourseOnly, citesNameAsAnIntroduction, nameOccurrences } from "./speaker-name-rules.js";
 import { citesNameAsSelfIdentification, citesNameAsHandover, citesNameAsThanks } from "./speaker-relation-rules.js";
 

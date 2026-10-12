@@ -61,6 +61,8 @@ export interface ResolvedSpeaker {
    * whole. Turn indexes are positions in the `turns` array passed to `resolveSpeakers`.
    */
   blocks: { startTurnIndex: number; endTurnIndex: number }[];
+  /** Model-judged identities only (D-132, pending append): verbatim quote + kind per grounding turn. */
+  provenance?: { turnId: string; evidenceQuote: string; evidenceKind: string }[];
 }
 
 export interface SpeakerResolution {

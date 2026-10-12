@@ -26,7 +26,8 @@ export type { DroppedNote } from "./pipeline/notes/drop-mode.js";
 export { summarizeSession, type SessionSummaryResult, type SummarizeResult, type SummarizeCompleteFn } from "./pipeline/summarize.js";
 export { extractClaims, type ExtractedClaim, type ClaimsCompleteFn } from "./pipeline/claims.js";
 export { resolveSpeakers, personIdFor, type ResolvedSpeaker, type SpeakerResolution } from "./pipeline/speakers.js";
-export { extractSpeakers, type SpeakersCompleteFn, type SpeakerExtractionResult } from "./pipeline/speakers-llm.js";
+export { extractSpeakers, extractSpeakersRuleBased, type SpeakersCompleteFn, type SpeakerExtractionResult } from "./pipeline/speakers-llm.js";
+export { groundSpeakerProposals, type EvidenceKind } from "./pipeline/speakers-grounded.js";
 export { looksLikeAName, isDiscourseOnly, containsNameVerbatim, citesNameAsAnIntroduction } from "./pipeline/speaker-name-rules.js";
 export { buildSpeakerDocs, type SessionResolution, type SpeakerCollision, type SpeakerDocsResult } from "./pipeline/speaker-docs.js";
 
