@@ -2082,3 +2082,11 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** Agents may run the listed live checks, writing only to lkb_staging (D-143); the T-034/T-035 capture waits for a meeting link from Umesh.
 **Approved-by:** Umesh
 **Links:** D-024; T-043; T-049; T-034; T-035; U3.1; U3.2; T-046; T-037
+
+## D-147 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Umesh approved raising the lint-dirsize budget for schema/ from 30 to 40 (2026-10-12). Schema files are one per collection and all tooling (gen-types, validate.py, kb:// resolver, CI) reads schema/ flat; relocation was rejected.
+**Why:** Splitting or relocating schema/ would break every tool that reads it flat, so the directory-size budget is raised instead.
+**Result:** lint-dirsize budget for schema/ is 40.
+**Approved-by:** Umesh
+**Links:** U2.4; D-141; lane u24suggest
