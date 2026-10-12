@@ -14,3 +14,17 @@ EXPLANATION:
 Residual notes (low, no ledger): a run state already failed-terminal whose job has not yet been stepped lets a resubmit start the next generation while the old job is still live (it will only finish dead, no stage runs); a job dead by lease expiry mid-stage is not detected by submit (maker declared this).
 
 ISSUES-WRITTEN: ISS-FAILEDJOB-001 (medium, status gap, not a defect in this unit)
+
+---
+# Cycle 1 (commit fd6b34cb, main 2d262d39 merged)
+
+VERDICT: PASS
+Cycle checked: 1
+
+EXPLANATION:
+1. ISS-T050ADAPTER-001 test vs main: only change is the failed-terminal case, which now asserts op fail, tenantId tA, runId, code bad-media, terminal===true, exactly one call, and no complete call. The tenant assertion is kept (same helper, same tenant, same id); the complete-run case is unchanged. Nothing loosened.
+2. Merge: diff against main (2d262d39) shows only the lane's changes; diff against the previous lane head (ad434090) shows only main's. sv.warning passthrough, generation, and main's stricter claim spy are all present. Nothing lost from either side.
+3. Merged tree: tsc clean; job-queue, runner, pipeline-graph and run-state-store suites 5/5 runs at 218/218.
+4. Mutations on the terminal fail call (per-mutation backup in finally, timeout, hash==HEAD verified, harness deleted): drop flag KILLED (7); drop tenant KILLED (12); wrong tenant KILLED (12); fail->complete KILLED (7).
+
+ISSUES-WRITTEN: none
