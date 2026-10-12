@@ -46,3 +46,24 @@ ISS-T039DUPES-004 and ISS-T039DUPES-005 are verified (rows flipped in qa/issues.
 - After: live-recording.ts blob equals `git rev-parse HEAD:<file>`; harness deleted; tree clean apart from the ledger flip.
 
 ISSUES-WRITTEN: none
+
+---
+
+# Cycle 2
+
+VERDICT: PASS
+Cycle checked: 2
+Commit checked: 1baa3adc (lane/t039dupes; af73f3b8 + 1baa3adc over 37838d3)
+Scope: one machine, local filesystem, live Chrome worker load present; real `cli.ts record`/Chrome/OBS never run.
+
+## EXPLANATION
+
+- Diff since 37838d3: tests (`live-recording-stale-race.test.ts`, `live-recording.test.ts`), the test worker `stale-race-worker.ts`, ledger and manifest only. `live-recording.ts` untouched.
+- Race test 10x at 8 processes (`STALE_RACE_PROCS=8 STALE_RACE_RUNS=10`): stale-seeded 10/10 and fresh 10/10 single winner (about 52 s each). Earlier 20-run probes under mutation also green for the unmutated shape; no late-starter takeover seen.
+- Never-reap mutant (`&& false` on the dead-taker reap) KILLED by the new deterministic test (`live-recording.test.ts`, exit 1). That is the cycle-1 survivor, now closed.
+- Mutants against the race test, 8 procs: check-then-plain-write on the PRIMARY claim (`existsSync` then `writeFileSync`): survived at 5 runs, KILLED at 20 runs (exit 1). Detection is probabilistic and weak at the default 5 runs. Check-then-plain-write on the TAKEOVER claim and skip-the-takeover-claim: both SURVIVED 20 runs and also the 14 unit tests (including the deterministic interleaving test). The first is equivalent for exclusivity (cycle 1 reasoning: only the claim holder reaches the rename). Skip-claim is not formally equivalent but the `again === raw` re-read narrows the window to where no process race or the existing interleaving test reaches it. This is not a cycle-2 regression (test-only change; cycle 1 had the same coverage). Recommendation, file-don't-fix: a deterministic test that injects a second contender between the re-read and the rename; and raise `STALE_RACE_RUNS` default for the primary-claim mutant.
+- STOP-file cleanup: killed the test runner mid-run. Workers exited within seconds (0 `stale-race-worker` processes remained); one temp dir `stale-race-*` is left by a SIGKILLed parent (its `finally` cannot run) and holds no STOP/claim state of consequence. Normal and failing runs remove their dirs. The 60 s worker cap bounds orphans.
+- `tsc --noEmit -p packages/meeting-bot` clean. `live-recording.test.ts` + `send-now*.test.ts` 52/52, plus the 2 race tests = 54.
+- After: live-recording.ts blob equals `git rev-parse HEAD:<file>` after every mutation; harness dir deleted; stray temp dir and processes removed.
+
+ISSUES-WRITTEN: none
