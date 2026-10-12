@@ -21,6 +21,7 @@ import { dedupeKeyframes, type Keyframe, type KeyframeDedupeOptions } from "../d
 import type { KeyframeFrame } from "../domain/keyframe-dedupe-validate.js";
 import { alignSlidesToTurns, type AlignResult, type AlignTurn, type SlideObservation } from "../domain/slide-turn-alignment.js";
 import { FFMPEG_ENV, framePassArgs, hashPassArgs, KeyframeExtractError, resolveFfmpeg } from "./ffmpeg-args.js";
+import { ocrKeyframes, type OcrFn, type OcrStageError } from "./ocr-stage.js";
 import { dHashRawStream, HASH_FRAME_BYTES } from "./perceptual-hash.js";
 
 export const DEFAULT_INTERVAL_SEC = 2;
@@ -97,6 +98,8 @@ export async function extractFrameHashes(input: string, options: ExtractOptions 
 export interface KeyframeFile extends Keyframe { framePath: string }
 export interface SlideAlignmentRun {
   keyframes: KeyframeFile[]; slides: SlideObservation[]; alignment: AlignResult; sampledFrames: number; intervalSec: number;
+  /** Per-frame OCR failures (frame id + code only); always [] when no `ocr` option was given. */
+  ocrErrors: OcrStageError[];
 }
 export interface PipelineOptions extends ExtractOptions {
   /** Directory the keyframe PNGs (`kf-0000.png`, ...) are written to; created if absent. */
@@ -106,6 +109,8 @@ export interface PipelineOptions extends ExtractOptions {
   dedupe?: KeyframeDedupeOptions;
   /** End of the session in seconds; default = last sampled time + intervalSec. */
   endSec?: number;
+  /** Optional injected OCR (fake in tests). When given, alignment uses its text instead of the `keyframe:<hash>` stand-in; `slides` keeps the stand-in and no OCR text is returned. */
+  ocr?: OcrFn;
 }
 
 /** recording -> keyframes (timestamp, hash, PNG path) -> merged dedupe -> slide/turn alignment. */
@@ -128,6 +133,13 @@ export async function extractSlideTurnAlignment(input: string, options: Pipeline
     keyframes.push({ ...kf, framePath });
   }
   const slides: SlideObservation[] = dd.keyframes.map((k) => ({ id: k.id, tSec: k.tSec, text: `keyframe:${k.hash}` }));
-  const alignment = alignSlidesToTurns(slides, options.turns ?? [], end === undefined ? undefined : { sessionEndSec: end });
-  return { keyframes, slides, alignment, sampledFrames: frames.length, intervalSec: interval };
+  let alignSlides = slides;
+  let ocrErrors: OcrStageError[] = [];
+  if (options.ocr) {
+    const o = await ocrKeyframes(keyframes, options.ocr);
+    alignSlides = o.observations;
+    ocrErrors = o.errors;
+  }
+  const alignment = alignSlidesToTurns(alignSlides, options.turns ?? [], end === undefined ? undefined : { sessionEndSec: end });
+  return { keyframes, slides, alignment, sampledFrames: frames.length, intervalSec: interval, ocrErrors };
 }
