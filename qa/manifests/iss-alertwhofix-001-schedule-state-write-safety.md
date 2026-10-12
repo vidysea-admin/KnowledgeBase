@@ -1,6 +1,6 @@
 # iss-alertwhofix-001-schedule-state-write-safety
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2 (ISS-ALERTWHOFIX-001, medium, data-write class). Full ceremony. Verdict by the checker only.
 Lane: lane/schedstatesafe (branched from lane/alertwhofix 52cc01bd).
