@@ -1,19 +1,19 @@
-# apps/api/Dockerfile — production image for @lkb/api.
+# apps/api/Dockerfile -- production image for @lkb/api.
 #
-# The whole pnpm workspace is copied in (not just apps/api) because every route ultimately
-# imports sibling `workspace:*` packages (@lkb/core, @lkb/ai, @lkb/db, @lkb/ask, @lkb/index) by
-# TypeScript source, run directly via tsx at request time -- there is no compiled `dist/` step
-# yet, so tsx has to stay a runtime dependency, not just a dev one. This keeps the image simple
-# and correct for now; compiling to plain JS ahead of time (dropping tsx + full source from the
-# final image) is a real follow-up once the app is closer to a stable release, not before.
+# Multi-stage: `build` bundles apps/api/src/index.ts (+ every @lkb/* workspace source it imports)
+# into one plain-JS file, apps/api/dist/server.js, with esbuild (apps/api/scripts/build.mjs).
+# The runtime stage ships only that bundle, the two repo directories read at runtime (schema/,
+# config/) and PRODUCTION node_modules -- no tsx, no TypeScript, no workspace source tree.
+#
+# The bundle must sit at <root>/apps/api/dist/server.js with <root>/schema and <root>/config beside
+# it: build.mjs rewrites each module's import.meta.url so those lookups resolve from that layout.
 FROM node:24-slim AS base
 RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 WORKDIR /app
 
-# Separate stage so `pnpm install` only reruns when a package.json or the lockfile actually
-# changes, not on every source edit -- every pnpm-workspace.yaml member needs its package.json
-# present here or `pnpm install` fails with a missing-workspace-member error.
-FROM base AS deps
+# Manifests only, so `pnpm install` reruns only when a package.json or the lockfile changes.
+# Every pnpm-workspace.yaml member needs its package.json here or install fails.
+FROM base AS manifests
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY packages/core/package.json packages/core/package.json
 COPY packages/ai/package.json packages/ai/package.json
@@ -24,21 +24,35 @@ COPY packages/ingest/package.json packages/ingest/package.json
 COPY packages/meeting-bot/package.json packages/meeting-bot/package.json
 COPY workers/transcribe/package.json workers/transcribe/package.json
 COPY apps/api/package.json apps/api/package.json
-RUN pnpm install --frozen-lockfile
 
-FROM base AS runtime
-ENV NODE_ENV=production
-# `deps`'s pnpm install created node_modules not just at /app/node_modules but nested inside
-# every workspace member too (packages/db/node_modules/@lkb -> ../../core, etc. -- pnpm's normal
-# non-hoisted symlink layout). Copying only the root node_modules and then overwriting
-# packages/apps from the build context (which has no node_modules, .dockerignore excludes it)
-# wiped those nested symlinks out -- real bug hit live (2026-09-04) as ERR_MODULE_NOT_FOUND for
-# @lkb/db at container start. Copying the whole deps output FIRST, then overlaying real source
-# on top, keeps every nested node_modules intact while still getting current source in.
-COPY --from=deps /app ./
+# Full install (devDependencies included: esbuild) -> bundle.
+FROM manifests AS build
+RUN pnpm install --frozen-lockfile
 COPY packages ./packages
 COPY apps/api ./apps/api
-COPY config ./config
+RUN pnpm --filter @lkb/api build
 
+# Production-only install for @lkb/api and what it depends on. The bundle keeps real npm packages
+# (express, mongodb, dotenv, express-rate-limit) external, so they are resolved from here.
+FROM manifests AS prod-deps
+RUN pnpm install --frozen-lockfile --prod --filter "@lkb/api..."
+
+FROM node:24-slim AS runtime
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=prod-deps /app/node_modules ./node_modules
+COPY --from=prod-deps /app/apps/api/node_modules ./apps/api/node_modules
+COPY --from=build /app/apps/api/dist ./apps/api/dist
+COPY schema ./schema
+COPY config ./config
+# Runtime file dependencies of the bundle: schema/index.json, config/ai-routing.yaml (both baked in
+# above). The brain routes also read <root>/data/** and <root>/raw/** when present; those are
+# DATA, not code, and are not in the image -- mount them (e.g. at /app/data) if /brain is needed.
+
+USER node
 EXPOSE 3300
-CMD ["npx", "tsx", "apps/api/src/index.ts"]
+# /health is unauthenticated and returns 503 when the db ping fails or a watcher heartbeat is
+# unreadable. node:slim has no curl, so probe with node itself.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+  CMD ["node", "-e", "fetch('http://127.0.0.1:'+(process.env.PORT||3300)+'/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+CMD ["node", "apps/api/dist/server.js"]
