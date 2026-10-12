@@ -1,6 +1,6 @@
 # t057-d4-usage-events
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS (cycle 0)
 Fix cycle: 0
 Tier: 3 (next roadmap task, T-057 D4). Lane: lane/usageevents (base 15015cf). Class: schema change + data write (new collection, written on /ask and /search): FULL ceremony. Ledger shard `qa/issues.usageevents.jsonl` (ISS-USAGEEVENTS-001..005).
 Authorized by: Approver ruling 2026-10-12 (2) ("usage_events: Haan, banao"); its D- id had not landed in this tree when written (DECISIONS entry being appended in parallel) - cite it once it does. Addresses ISS-T057OPS-001 (no usage events recorded) in code only; nothing is deployed or migrated.
