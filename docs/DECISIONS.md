@@ -1964,3 +1964,19 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** The gate's five bars, prompts, windows, 2-of-3 voting and scoring are UNCHANGED. Production config/ai-routing.yaml speakers routing is switched ONLY after a model passes the gate, in a separate unit. Results are recorded as measured on the named cloud model. A checker, not the runner, rules on ISS-104 / ISS-282. D-127 stays as history (no Supersedes field).
 **Approved-by:** Umesh
 **Links:** U2.4; ISS-104; ISS-282; D-127
+
+## D-132 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 direction: speaker naming moves from rule-only evidence to model-judged attribution. Umesh ruled in chat 2026-10-12, verbatim: "use model intelligence. like agar vo khud nhi btaynge tho ... vo voice tho phchaan legaa and overall session record hoga tho khi naa khi se mil hi jayega. make it intelligent instead of rule based". The model reads the whole session per diarized voice label (diarization already clusters voices) and may name a label from any contextual evidence: being called on, address-adjacent, handover, thanks, role continuity, or self-introduction. Each accepted name must carry a verbatim transcript quote that is verified to exist in the transcript (grounding), and that quote is stored as provenance.
+**Why:** The phase-3 Ollama Cloud gate (D-131) failed bar 5 because acceptance requires self-naming evidence (speakers-llm.ts evidence gate, namingTurns; handover and thanks routes are OFF), and only 2 of 144 gold named blocks are self-naming. A rule-only evidence gate cannot reach the gold set.
+**Result:** Gate bars 1 (100% accepted-identity precision) and 2 (0 wrong links) stay unchanged as the safety floor; the floor is not contradicted. Next: a maker unit implements this, it is scored offline on the recorded D-131 proposals first, then re-gated on deepseek-v4-pro within the existing Ollama Cloud budget. D-131 stays as history (no Supersedes field).
+**Approved-by:** Umesh
+**Links:** U2.4; D-131
+
+## D-133 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** ISS-REGCDP-004: Umesh approves updating the D-110/D-111 protected positive-alias control from 2 POSTs to 1 POST (approved-alias 307 no longer re-sends the body to a second POST). The owner-approved positive behaviour "alias 307 re-sends body, 2 POSTs" is retired; the same-host-only 307/308 rule of T-052 is ratified.
+**Why:** regsafe 87df0d1f had already made the 2-POST path unreachable (redirect:'error'), and the checker (lane regcdp, cycle 1 verdict) judged the 1-POST expectation stricter, not a leak.
+**Result:** The protected positive-alias fixture asserts ONE POST and uncertain. No Supersedes field is used: D-110/D-111 remain in force in full except this single positive-alias 2-POST assertion, and the session-start resolver offers no partial relation (see D-130). ISS-REGCDP-004 is closed as resolved by this decision.
+**Approved-by:** Umesh
+**Links:** ISS-REGCDP-004; T-052; D-110; D-111
