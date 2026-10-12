@@ -355,3 +355,57 @@ test("a quote that occurs twice is judged per occurrence: one clean occurrence i
   assert.equal(kept, true);
   assert.equal((await emitted("Not good, apply early today. Then apply early today.", "apply early today")).kept, false);
 });
+
+// ---- Fix cycle 2: ISS-T040GEN-006 (abbreviation periods) and ISS-T040GEN-007 ----
+const spanOf = async (text: string, q: string) => { const { sentenceSpanProblem } = await import("./sentence-span.js"); const i = text.indexOf(q); assert.ok(i >= 0, q); return sentenceSpanProblem(text, i, i + q.length); };
+test("ISS-T040GEN-006 replay: the checker's 5 abbreviation reproductions are dropped (verbatim)", async () => {
+  const cases: [string, string][] = [
+    ["I do not think e.g. March works for everyone.", "March works for everyone."],
+    ["We do not accept applications from the U.S. after March first.", "after March first."],
+    ["We do not recommend it vs. applying in March works.", "applying in March works."],
+    ["We do not recommend this approx. 3.5 lakh fee.", "3.5 lakh fee."],
+    ["He said we do not recommend it, Dr. Rao recommends applying in March.", "Rao recommends applying in March."],
+  ];
+  for (const [text, q] of cases) {
+    assert.notEqual(await spanOf(text, q), null, q);
+    const { r, kept } = await emitted(text, q);
+    assert.equal(kept, false, q); assert.equal(r.degraded, null);
+  }
+});
+test("abbreviation-aware sentence splitting: more abbreviations, fail-closed when ambiguous, real sentences still pass", async () => {
+  const bad: [string, string][] = [
+    ["We do not do this i.e. the March one works.", "the March one works."], ["We do not apply etc. and then March works.", "and then March works."],
+    ["We do not meet Mr. Rao on Monday.", "Rao on Monday."], ["We do not meet Mrs. Rao on Monday.", "Rao on Monday."], ["We do not meet Ms. Rao on Monday.", "Rao on Monday."],
+    ["We do not meet Prof. Rao on Monday.", "Rao on Monday."], ["We do not go to St. Xavier campus tomorrow.", "Xavier campus tomorrow."],
+    ["We do not go to the U.K. campus tomorrow.", "campus tomorrow."], ["We do not meet at 5 p.m. tomorrow afternoon.", "tomorrow afternoon."],
+    ["We do not meet at 5 a.m. tomorrow morning.", "tomorrow morning."], ["We do not ask J. Rao for March approval.", "Rao for March approval."],
+    ["We do not like No. 5 on the March list.", "5 on the March list."], ["1. We do not want April. 2. March works fine here.", "March works fine here."],
+    ["We do not accept the B.Tech. Rao route works.", "Rao route works."], ["We do not recommend it. e.g. apply in March works.", "apply in March works."],
+    ["We do not recommend it. maybe apply in March works.", "maybe apply in March works."],
+  ];
+  for (const [text, q] of bad) assert.notEqual(await spanOf(text, q), null, q);
+  // a real boundary still splits: the next sentence is judged on its own
+  for (const [text, q] of [["We do not recommend it. Apply in March works.", "Apply in March works."], ["Dr. Rao said March works. We do not recommend April for anyone.", "Dr. Rao said March works."], ["Cost is 3.5 lakh. We do not recommend April for anyone.", "Cost is 3.5 lakh."], ["We do not want item 3. March works fine here.", "March works fine here."], ["No. 5 is good. Apply in March works.", "Apply in March works."], ["I said no. Apply in March works.", "Apply in March works."]] as const)
+    assert.equal(await spanOf(text, q), null, q);
+});
+test("MARKER is a real unicode regex: each \p class blocks glued letters, digits and underscore, and braces do not block", async () => {
+  const tail = ", apply in March today."; const q = "apply in March today.";
+  for (const glued of ["Wenot", "Ünot", "नnot", "2not", "٣not", "_not", "notx", "not_", "notü", "not2", "pnot", "lnot", "notp", "notl"]) assert.equal(await spanOf(`We ${glued} sure${tail}`, q), null, glued);
+  for (const open of ["{not}", "}not{", "(not)", "[not]", "-not-", "'not'", "\"not\""]) assert.equal(await spanOf(`We ${open} sure${tail}`, q), "omits-qualifier", open);
+  assert.equal(await spanOf(`We do नहीं, but not${tail}`, q), "omits-qualifier");
+});
+test("curly n’t is a negation marker exactly like the straight one", async () => {
+  const q = "apply in March today.";
+  for (const w of ["don’t", "won’t", "isn’t", "can’t", "don't", "won't"]) assert.equal(await spanOf(`We ${w} think so, apply in March today.`, q), "omits-qualifier", w);
+  assert.equal(await spanOf(`We don’t think so, apply in March today.`, q), "omits-qualifier");
+  assert.equal(await spanOf(`We do tnot think so, apply in March today.`, q), null);
+});
+test("ISS-T040GEN-007b: a quote followed in the same turn by a short negating reply is dropped", async () => {
+  for (const [text, q] of [["Apply in March? Absolutely not.", "Apply in March?"], ["Should we apply in March? Definitely not!", "Should we apply in March?"], ["Apply in March? No.", "Apply in March?"], ["Apply in March? Never.", "Apply in March?"], ["Apply in March? Nahi.", "Apply in March?"], ["Fees are 1000 rupees. I don’t think so.", "Fees are 1000 rupees."], ["Apply in March? \"Absolutely not.\"", "Apply in March?"]] as const) {
+    assert.equal(await spanOf(text, q), "negated-by-reply", text);
+    assert.equal((await emitted(text, q)).kept, false, text);
+  }
+  for (const [text, q] of [["Apply in March? Yes, apply early.", "Apply in March?"], ["Apply in March? Absolutely, apply early and carefully today now.", "Apply in March?"], ["Apply in March? Sure.", "Apply in March?"], ["Apply in March? We do not recommend April for anyone here today.", "Apply in March?"]] as const)
+    assert.equal(await spanOf(text, q), null, text);
+  const kept = await emitted("Apply in March? Yes, absolutely.", "Apply in March?"); assert.equal(kept.kept, true);
+});

@@ -1,7 +1,7 @@
 # t040-grounded-notes-generation
 
-**Handshake status:** ready-for-check (cycle 1; cycle-0 text below is history, FAIL verdict `qa/verdicts/t040-grounded-notes-generation.md`)
-Fix cycle: 1
+**Handshake status:** ready-for-check (cycle 2; cycle-0 and cycle-1 text below is history, FAIL verdicts `qa/verdicts/t040-grounded-notes-generation.md`)
+Fix cycle: 2
 Tier: 3 (next unblocked roadmap task: T-040; the schema blocker was lifted by D-126 / merge c99c44d). Class: data write (session_pages, claims persisted through indexSession): full ceremony. Verdict by the checker only.
 Lane: lane/t040gen (base 9e24d1f). Lane ledger `qa/issues.t040gen.jsonl`: ISS-T040GEN-001..005 (2 medium, 3 low; all open, none fixed here).
 
@@ -76,3 +76,27 @@ C1 start rule off, C2 end rule off, C3 floor off, C4 trailing text ignored, C5 l
 - The display-the-sentence alternative of :82 is not built. Judge (a model) remains the only check on semantic reversal that has no lexical marker (e.g. "low"/"high", "approve"/"reject" swaps inside a whole sentence cannot occur since the whole sentence is quoted).
 - ISS-T040GEN-001 (12-char minimum), -003, -004, -005 remain open owner decisions; unchanged.
 - No live model; not wired to production (D-119).
+
+# Fix cycle 2 (answers the cycle-1 FAIL: ISS-T040GEN-006 high, ISS-T040GEN-007 medium; both ids stay open, only the checker changes ledger status)
+
+Only `notes/sentence-span.ts` and `notes/grounded-notes.test.ts` changed.
+
+## ISS-T040GEN-006: abbreviation-aware sentence splitting, fail closed
+- A `.` followed by whitespace is a sentence break only if ALL hold: (1) the word before it is not in the abbreviation list (e.g, i.e, etc, vs, viz, cf, approx, est, dr, mr, mrs, ms, prof, st, mt, jr, sr, no. before a digit, inc, ltd, co, month and weekday short forms, u.s, u.k, a.m, p.m, ph.d ...); (2) it contains no inner dot (U.S., B.Tech., a.m.); (3) it is not a single letter ("J."); (4) it is not a 1-2 digit list number that opens a sentence ("1. Apply"); (5) the next word does not start in lower case. `! ? ... danda` stay unconditional breaks.
+- Fail closed: any doubt means NO break, so the sentence is longer and the negation floor sees all of it. Edge rule: a quote that starts right after, or ends right at, a non-break abbreviation period is `starts-mid-sentence` / `ends-mid-sentence`.
+- Replay of the checker's 5 cases verbatim (test "ISS-T040GEN-006 replay"): all five now return a problem and are dropped through `indexSession`-level `emitted()` (kept=false, page not degraded): e.g. -> `starts-mid-sentence`/`omits-qualifier` per case. Plus 16 further abbreviation cases and 6 positive controls (real boundaries still split: "Dr. Rao said March works. We do not recommend April for anyone." keeps sentence 1).
+
+## ISS-T040GEN-007
+- (a) MARKER is now a regex literal with the `u` flag (no string escaping). Test proves each class: a marker glued to a Latin letter, accented letter, Devanagari letter, ASCII digit, Arabic-Indic digit or underscore does NOT match (null), and `{not}`, `}not{`, `(not)`, `[not]`, `-not-` quotes DO match. Mutant "unicode classes lost" is killed.
+- (b) New `negated-by-reply`: if the quote ends a sentence and the very next sentence in the same turn is <= 5 words and contains a negator (not, no, never, nope, nah, none, nothing, nowhere, neither, nor, cannot, nahi, nahin, n't), the quote is dropped. "Apply in March? Absolutely not." and "Should we apply in March? Definitely not!" now drop, with no, never, nahi, curly "I don’t think so." and a quoted-reply variant; "Yes, absolutely." / "Sure." / a long reply do not. Cost: a sentence followed by a short "No ..." sentence also drops.
+- (c) The curly `n’t` branch is pinned (don’t/won’t/isn’t/can’t and straight variants); the mutant that turns it straight-only is killed.
+
+## Evidence (node = codex runtime)
+- `notes/grounded-notes.test.ts` 23/23 (18 -> 23); packages/index pipeline tests incl. quote/* 418/418; apps/api `session-grounded-notes.test.ts` 3/3 (run with `TSX_TSCONFIG_PATH` mapping `@lkb/index` to this lane); packages/index `tsc --noEmit` exit 0. No LLM/Mongo/network.
+- Recall on data/toc-migrated (3427 turns; one script, naive independent splitter, pieces of 12+ chars; script deleted after the run; same shape as cycle 1 but my own splitter so absolute numbers differ from the cycle-1 98.7%/51.6%): whole sentence before 15157/15157 (100%) -> after 14712/15157 (97.1%); comma/semicolon clause before 18704/33751 (55.4%) -> after 24812/33751 (73.5%). After-refusals: omits-qualifier 8655 (clause), starts/ends-mid-sentence ~580, negated-by-reply 151. Clause recall RISES because the old string-built regex matched markers inside words ("different" -> "if"); sentence recall falls 2.9% from the abbreviation merging, the reply rule and the stricter edges. Quote option stays off by default (unchanged).
+
+## Mutations (10; harness `t040gen-c2/` inside the worktree, byte backup PER mutation restored in `finally`, 120 s timeout, `git hash-object` equal before/after each; folder deleted afterwards): 10/10 killed
+abbreviation list ignored, inner-dot words ignored, single initial ignored, lower-case-next rule removed, abbreviation period accepted as quote edge, negating-reply check removed, curly n't branch -> straight, MARKER unicode classes lost, list-number rule removed, "No." before digit removed.
+
+## Not covered / limits
+Abbreviation list is a judgement, not an approved parameter; a mid-sentence number followed by a period ("item 3. March") is treated as a real break; an abbreviation at a true sentence end followed by a capital word ("...and so on etc. We do not...") merges two sentences (safe, costs recall); non-English abbreviations beyond Hinglish markers are unlisted.
