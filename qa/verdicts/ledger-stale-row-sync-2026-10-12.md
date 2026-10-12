@@ -1,6 +1,6 @@
 # Ledger stale-row sync - 2026-10-12
 
-VERDICT: PASS (4 rows flipped to `verified`; 18 left `open` as claimed-not-verified; 107 genuinely open)
+VERDICT: PASS (3 rows flipped to `verified`; 19 left `open` as claimed-not-verified; 107 genuinely open)
 Checked on: lane/ledgersync2 from a25154f. Checker re-read each verdict and manifest itself; no source, contract, manifest, decision or hook file touched; no tests, builds or browsers run (rows flipped on existing PASS verdicts only). Follows qa/verdicts/ledger-stale-row-sync-2026-10-11.md.
 
 Rule applied to each flip: (1) latest cycle of the verdict is PASS and states the id fixed / verified / closed / satisfied with the row's full reproduction count; (2) manifest `checked-PASS`; (3) fix commit is an ancestor of HEAD (`git merge-base --is-ancestor`, all true); (4) nothing later reopens it (`git log --all --grep`, grep of qa/verdicts and qa/issues*.jsonl). Ids were searched case-insensitively, including slug-named verdicts and manifests, and by key file or function name for fixes that landed under another slug.
@@ -10,12 +10,12 @@ Rule applied to each flip: (1) latest cycle of the verdict is PASS and states th
 | bucket | critical | high | medium | total |
 |---|---|---|---|---|
 | EXCLUDED (other lanes; reported only, not judged) | 2 | 8 | 18 | 28 |
-| STALE-FIXED (flipped) | 0 | 1 | 3 | 4 |
-| CLAIMED-NOT-VERIFIED | 0 | 7 | 11 | 18 |
+| STALE-FIXED (flipped) | 0 | 0 | 3 | 3 |
+| CLAIMED-NOT-VERIFIED | 0 | 8 | 11 | 19 |
 | GENUINELY-OPEN | 2 | 32 | 73 | 107 |
 | audited (non-excluded) | 2 | 40 | 87 | 129 |
 
-Open rows before: critical 4, high 48, medium 105, low 91. On this branch: critical 4, high 47, medium 102, low 91 (low rows not audited).
+Open rows before: critical 4, high 48, medium 105, low 91. On this branch: critical 4, high 48, medium 102, low 91 (low rows not audited).
 
 ## Flipped to verified
 
@@ -24,7 +24,6 @@ Open rows before: critical 4, high 48, medium 105, low 91. On this branch: criti
 | ISS-T034EXT-002 | medium | t034-capture-failure-not-success.md:41-42 (cycle 0 PASS "Verified ... -002"; not retracted by cycle 1 FAIL / cycle 2 PASS; manifest checked-PASS cycle 2) | 709038c |
 | ISS-T034EXT-006 | medium | same :41-42 "-006" | 709038c |
 | ISS-STATUSSCOPE-001 | medium | iss-statusscope-001-web-status-uses-tenant-counts.md:11,15-16 (PASS cycle 0: no /health request in apps/web/src, 5/5 mutations killed; names the row by slug, jsdom only); manifest checked-PASS | c98b4fc (merge b97b3c3) |
-| ISS-229 | high | delivery-gate-stamp-adoption.md:25-26,249,276 (PASS cycle 2 "ISS-229 (D-015) satisfied", ISS-205 3/3 verbatim); manifest checked-PASS cycle 2. Judgement call: the 2026-10-11 sync left it open because the D:/ai_os hook is unreadable, but this row is a measurement-discipline defect, not a hook defect | 2bf1a49 |
 
 Each row now carries `status: verified`, `verified_date: 2026-10-12`, `fixed_date` (fix commit date, where it was null) and a `verified_evidence` string citing verdict path:line and the commit, as the 2026-10-11 sync did. The ISS-T034EXT and ISS-STATUSSCOPE rows keep the logic-with-fakes / jsdom-only scope caveats their verdicts state. Also stale but out of scope (low severity, not flipped): ISS-T034EXT-001, -003, -007 (same cycle-0 PASS line, fixed by 709038c).
 
@@ -32,6 +31,7 @@ Each row now carries `status: verified`, `verified_date: 2026-10-12`, `fixed_dat
 
 | id | sev | missing piece |
 |---|---|---|
+| ISS-229 | high | delivery-gate-stamp-adoption c2 PASS says "ISS-229 satisfied" (a judgement, not a stated fix with full reproductions); the 2026-10-11 sync deliberately left it open because the fix lives in the unreadable D:/ai_os hook |
 | ISS-274 | high | unit iss-274-wire-web-fallback PASS (Mode D re-dispatch) wired the seam per D-041, but no verdict states ISS-274 closed; no recorded reproductions; a real fallback needs TAVILY_API_KEY in production |
 | ISS-ALERTID-001 | high | r1-alert-id-resolver cycle 1 PASS: 11/11 alerts resolve, W9 "MET for a single-tenant operator machine", not validated against the real poller; wiring unit must re-verify; ISS-ALERTFIX-001 stays open |
 | ISS-346 | high | iss-346-round-cap-mechanical-check cycle 1 PASS, 3/3 reproductions, but the H1+H2 diff is a packaged patch not yet applied to the D:/ai_os hook (live sha unchanged); checker left it open |
