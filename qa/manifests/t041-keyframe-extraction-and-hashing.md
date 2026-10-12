@@ -1,6 +1,6 @@
 # t041-keyframe-extraction-and-hashing
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap task T-041, third slice). T-041 stays OPEN. No auth, tenancy or data write beyond PNG files in a caller-given directory. Verdict by the checker only.
 Lane: lane/keyframes. Lane ledger `qa/issues.keyframes.jsonl`: no findings filed (file not created).
