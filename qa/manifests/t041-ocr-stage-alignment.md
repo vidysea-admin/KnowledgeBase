@@ -1,5 +1,5 @@
 # Manifest — t041-ocr-stage-alignment
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Tier:** 3 (roadmap task). Slice 4 of T-041. T-041 stays OPEN.
 **Severity / ceremony:** no auth, tenancy or data write; no schema; nothing persisted. Not blocked by D-119 (that hold covers U4.1/T-051/T-052 upload/STT files; none touched).

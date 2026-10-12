@@ -1980,3 +1980,19 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** The protected positive-alias fixture asserts ONE POST and uncertain. No Supersedes field is used: D-110/D-111 remain in force in full except this single positive-alias 2-POST assertion, and the session-start resolver offers no partial relation (see D-130). ISS-REGCDP-004 is closed as resolved by this decision.
 **Approved-by:** Umesh
 **Links:** ISS-REGCDP-004; T-052; D-110; D-111
+
+## D-134 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** ISS-ALERTID-001: skipped-session records for `lkb alert-who` resolution are persisted as one tenant-tagged record per skipped item: {sessionKey, startTime, source, tenantId}, with NO join URL. Records accumulate keyed by sessionKey, and rows whose start time is older than 30 days are dropped (the same window as job-queue retention, D-128). Alert-id computation is unchanged; ISS-ALERTID-002 remains a separate open item. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** alert-who needs to resolve an alert id back to a skipped session without storing join URLs, and the record store must stay tenant-scoped and bounded.
+**Result:** One record per skipped item, keyed by sessionKey, pruned at 30 days by start time. No change to alert-id computation.
+**Approved-by:** Umesh
+**Links:** ISS-ALERTID-001; ISS-ALERTID-007; D-128
+
+## D-135 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-045 re-ingest policy: re-ingesting media that is already ingested (same content-hash source _id) is idempotent. It returns the existing session id with an "already ingested" indication, and creates and deletes nothing. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** A content-hash source _id identifies the media, so a repeat ingest must not duplicate or destroy existing data.
+**Result:** Re-ingest of the same content hash is a no-op that reports the existing session id as already ingested.
+**Approved-by:** Umesh
+**Links:** T-045
