@@ -19,6 +19,8 @@ register();
 const ALL_SCOPES = [
   "ask", "compete", "sources", "sessions", "search", "citations", "webhooks",
   "gaps", "graph", "calendar", "gmail", "whatsapp", "keys", "ingest",
+  // T-039 dedicated write scope for POST /calendar/send-now (Approver ruling 2026-10-12). Not in any default key; a key must be minted with it.
+  "send-now",
 ];
 
 function argOf(name, fallback) {
