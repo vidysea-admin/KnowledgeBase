@@ -86,3 +86,15 @@ export const speakerWriteSurface = () => {
   void _delete;
   void _insert;
 };
+
+/** T-057 D4. Same pin for `usage_events`: a tenant-less call must not compile. */
+export const usageEventsTenantPin = async () => {
+  const { usageEvents } = await import("./usage-events.js");
+  // @ts-expect-error - tenantId is required; calling coll() with no argument must not compile.
+  usageEvents();
+  const coll = usageEvents("toc");
+  const _find = coll.find;
+  const _insert = coll.insertOne;
+  void _find;
+  void _insert;
+};
