@@ -1,6 +1,6 @@
 # deploy-compose-web-migrate-secrets
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 2
 Tier: roadmap (deployment readiness D3 + D5 + D6). Class: deployment config, no application code; no data writes executed. Verdict by the checker only.
 Lane: lane/deploycompose. Lane ledger `qa/issues.deploycompose.jsonl`: ISS-DEPLOYCOMPOSE-001, -002 (both medium).
