@@ -1,6 +1,6 @@
 # iss-jobqlost-001-pruning-and-iss-jobqpid-003-flake
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3-equivalent (open ledger issues ISS-JOBQLOST-001 and ISS-JOBQPID-003, both medium; data-write class: full ceremony). ISS-JOBQLOST-001 is one of the conditions keeping ISS-JOBQUEUE-002 at `open-before-wiring`; this unit does NOT wire the queue and changes no existing ledger row.
 Lane: lane/jobqprune (from d14128e). Ledger for this lane: qa/issues.jobqprune.jsonl, ids ISS-JOBQPRUNE-NNN (3 filed: 1 medium before-wiring, 2 low).
