@@ -1,6 +1,6 @@
 # t037-join-rules-enable-preconditions
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap T-037; closes what can be closed of the BEFORE-ENABLE LIST in `qa/contracts/t037-join-rules-veto-select.md` without an owner decision).
 Security class: decides which meetings the bot records - FULL ceremony, never round-capped.
