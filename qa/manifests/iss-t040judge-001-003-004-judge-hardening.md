@@ -1,6 +1,6 @@
 # iss-t040judge-001-003-004-judge-hardening
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: open medium issues ISS-T040JUDGE-001/-003/-004 (lane/t040judgefix, base lane/t040judge 42f9399e). Class: no auth/tenancy/data-write; unit is opt-in and unwired. ISS-T040JUDGE-002 deliberately NOT touched (open owner question).
 Lane: lane/t040judgefix. Ledger rows in qa/issues.t040judge.jsonl NOT edited here.
