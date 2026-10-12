@@ -1,6 +1,6 @@
 # t050-ask-graph
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap task T-050, slice 7: /ask graph, after runner adapter and pipeline graph). T-050 stays in_progress.
 Lane: lane/t050askgraph (from bea0272a). Touches the /ask path (tenant scoping, citations): full ceremony.
