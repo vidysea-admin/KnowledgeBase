@@ -1,5 +1,5 @@
 /**
- * packages/ingest/src/retention-purge.ts - T-046 / D-145 (pending append). The raw-media purge
+ * packages/ingest/src/retention/retention-purge.ts - T-046 / D-145 (pending append). The raw-media purge
  * EXECUTOR. D-145: raw media (recordings, audio, video) is purged 90 days after capture; transcripts,
  * notes, claims and citations are kept forever.
  *
@@ -24,7 +24,7 @@
 import { unlinkSync } from "node:fs";
 import { extname, resolve } from "node:path";
 import { planRetentionSweep } from "./retention-sweep.js";
-import { parseIsoInstant } from "./strict-record.js";
+import { parseIsoInstant } from "../strict-record.js";
 import { parseArgs, USAGE, type ReportOptions } from "./retention-report-args.js";
 import { gatherState, tenantSegment, type SessionInfo } from "./retention-report-state.js";
 import { cleanText } from "./retention-report-text.js";

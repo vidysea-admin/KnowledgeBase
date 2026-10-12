@@ -1,5 +1,5 @@
 /**
- * packages/ingest/src/retention-report-media.ts - T-046 dry-run report. READ-ONLY media probe:
+ * packages/ingest/src/retention/retention-report-media.ts - T-046 dry-run report. READ-ONLY media probe:
  * locates one recording's media file under the given media root, reads its size and mtime, derives
  * the file's physical IDENTITY (device + file index, plus the case-folded real path) and proves the
  * file can be opened and read. Only realpathSync, statSync, lstatSync and a literal read-only

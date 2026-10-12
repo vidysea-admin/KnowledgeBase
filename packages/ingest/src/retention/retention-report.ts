@@ -1,5 +1,5 @@
 /**
- * packages/ingest/src/retention-report.ts - T-046. REPORT-ONLY operator command: "what would the
+ * packages/ingest/src/retention/retention-report.ts - T-046. REPORT-ONLY operator command: "what would the
  * retention sweep purge, and why". A dry run by construction: it gathers one tenant's state
  * read-only (./retention-report-state.ts), calls the existing pure planner (`planRetentionSweep`;
  * eligibility is not re-implemented here) and prints. It imports no write, delete, rename or
@@ -14,7 +14,7 @@
  * Exit codes: 0 report produced, 2 usage error or invalid planner input, 3 unreadable state or media root.
  */
 import { planRetentionSweep, type PlanItem, type RetentionPlan } from "./retention-sweep.js";
-import { parseIsoInstant } from "./strict-record.js";
+import { parseIsoInstant } from "../strict-record.js";
 import type { ClockCheck } from "./retention-report/clock.js";
 import { parseArgs, USAGE, type ReportOptions } from "./retention-report-args.js";
 import { gatherState, tenantSegment, type Gathered, type SessionInfo } from "./retention-report-state.js";

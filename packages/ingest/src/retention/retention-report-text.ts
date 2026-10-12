@@ -1,5 +1,5 @@
 /**
- * packages/ingest/src/retention-report-text.ts - T-046 dry-run report. Terminal-safe text for
+ * packages/ingest/src/retention/retention-report-text.ts - T-046 dry-run report. Terminal-safe text for
  * strings that come from DATA (titles, ids, planner reasons that embed ids, argv echoes).
  * Join URLs and their queries are replaced, control / format / bidi / surrogate / private-use
  * characters become a visible \u{..} escape, and length is bounded. Pure; no I/O.

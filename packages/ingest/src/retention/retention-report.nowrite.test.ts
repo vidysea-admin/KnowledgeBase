@@ -10,7 +10,7 @@ const ENTRY = ["retention-report.ts", "retention-report-args.ts", "retention-rep
   "retention-report/assess.ts", "retention-report/ops.ts", "retention-report/clock.ts", "retention-report/crosstenant.ts"];
 // The @lkb/core barrel also re-exports an https alert sink; the report only uses these pure names, so the scan pins
 // the names imported from the barrel and follows the one file that defines them.
-const CORE_PURGE_POLICY = resolve(HERE, "..", "..", "core", "src", "domain", "purge-policy.ts");
+const CORE_PURGE_POLICY = resolve(HERE, "..", "..", "..", "core", "src", "domain", "purge-policy.ts");
 const CORE_NAMES = new Set(["deriveEvidenceClipWindows", "isPurgeEligible", "Claims", "EvidenceClipWindow", "Media", "Turns"]);
 const ALLOWED_BARE = new Set(["node:fs", "node:path", "node:crypto", "node:util", "@lkb/core"]);
 const READ_ONLY_FS = new Set(["lstatSync", "readdirSync", "readFileSync", "statSync", "realpathSync", "openSync", "readSync", "closeSync"]);

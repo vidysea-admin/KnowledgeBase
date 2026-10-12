@@ -1,10 +1,10 @@
 /**
- * packages/ingest/src/retention-report-args.ts - T-046 dry-run report. Strict argv parser.
+ * packages/ingest/src/retention/retention-report-args.ts - T-046 dry-run report. Strict argv parser.
  * Every option takes a value; there is NO flag that changes behaviour beyond reporting (no
  * --apply, --force, --yes ...): anything not listed below is a usage error. The two retention
  * thresholds are an owner decision (ARCHITECTURE Q6) and have NO default.
  */
-import { parseIsoInstant } from "./strict-record.js";
+import { parseIsoInstant } from "../strict-record.js";
 import { cleanText } from "./retention-report-text.js";
 
 export interface ReportOptions {
