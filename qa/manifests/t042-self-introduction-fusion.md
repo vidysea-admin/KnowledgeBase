@@ -1,6 +1,6 @@
 # Manifest — t042-self-introduction-fusion
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 **Fix cycle:** 1
 **Goal task:** T-042 "Speaker naming for webinar turns", slice 2 of 3 remaining (self-introduction fusion). Tier 3 (roadmap) pull. NOT claimed: T-042 stays open.
 **Lane:** T042FUSION (no issues filed; `qa/issues.t042fusion.jsonl` not created)
