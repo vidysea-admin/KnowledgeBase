@@ -12,6 +12,12 @@
 import { joinRulesFilePath } from "../join-rules-store.js";
 
 export const KEY_TENANT_PATH = "/webinar-operations";
+/** Operator-facing cause for the statuses whose meaning is known (ISS-TENANTSIG-001 / -002). Fixed text only; the response is never echoed. */
+const STATUS_HINT: Readonly<Record<number, string>> = {
+  401: "the API rejected the key",
+  403: "the key lacks the `sessions` scope (ISS-TENANTSIG-001)",
+  503: "the API's operations state is unavailable: an API-side fault, not a tenant mismatch (ISS-TENANTSIG-002)",
+};
 const TIMEOUT_MS = 15_000;
 
 /** The store's own tenant validator (no second regex): joinRulesFilePath throws for any id the store would refuse. */
@@ -29,7 +35,10 @@ export function createKeyTenantLoader(apiUrl: string, apiKey: string | undefined
         headers: { authorization: `Bearer ${apiKey}` }, redirect: "error", signal: AbortSignal.timeout(TIMEOUT_MS),
       });
       try {
-        if (!res.ok) return unknown(`GET ${KEY_TENANT_PATH} -> ${Number(res.status) || "?"}`);
+        if (!res.ok) {
+          const status = Number(res.status) || 0;
+          return unknown(`GET ${KEY_TENANT_PATH} -> ${status || "?"}${STATUS_HINT[status] ? `; ${STATUS_HINT[status]}` : ""}`);
+        }
         const tenant = validTenant(res.headers.get("x-lkb-tenant"));
         return tenant ?? unknown("X-LKB-Tenant header missing or invalid");
       } finally { await res.body?.cancel().catch(() => {}); }
