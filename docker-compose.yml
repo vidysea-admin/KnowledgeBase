@@ -1,22 +1,63 @@
-# docker-compose.yml — local/production packaging for @lkb/api.
+# docker-compose.yml — local/production packaging for @lkb/api and @lkb/web.
 #
 # Mongo is NOT containerized here on purpose: production data lives in the real shared cluster
 # (`MONGODB_URL` in .env, database `lkb` only — see ARCHITECTURE.md / D-003 on why this repo
 # never touches any other database on that cluster). `local-mongo` below is an OPT-IN profile for
 # a fully offline dev loop against empty local data, never started by a plain `docker compose up`.
 services:
+  # One-shot schema migration (migrate-mongo up), run to completion before api starts.
+  # A production run needs the owner's approval (D-117: production DB writes are not authorized).
+  # Same MONGODB_URL / MONGODB_DB as api, so it migrates exactly the database api will use.
+  # Built from the api Dockerfile's `deps` stage (workspace node_modules incl. migrate-mongo and
+  # dotenv); the runtime stage ships neither migrations/ nor the config, so they are bind-mounted
+  # read-only. NOTE: this relies on the stage name `deps` in apps/api/Dockerfile.
+  migrate:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: deps
+    working_dir: /app
+    command: ["npx", "migrate-mongo", "up", "-f", "migrate-mongo-config.cjs"]
+    environment:
+      MONGODB_URL: ${MONGODB_URL:?set MONGODB_URL (see .env's MONGODB_URL)}
+      MONGODB_DB: ${MONGODB_DB:-lkb}
+    volumes:
+      - ./migrations:/app/migrations:ro
+      - ./migrate-mongo-config.cjs:/app/migrate-mongo-config.cjs:ro
+    restart: "no"
+
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     ports:
       - "3300:3300"
     environment:
       MONGODB_URL: ${MONGODB_URL:?set MONGODB_URL (see .env's MONGODB_URL)}
       MONGODB_DB: ${MONGODB_DB:-lkb}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+      # The web origin (WEB_PORT) must be listed here: nginx has no /api proxy, so the browser
+      # calls api directly (cross-origin).
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080}
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       PORT: 3300
+    restart: unless-stopped
+
+  # Static SPA behind nginx (apps/web/Dockerfile). VITE_API_BASE_URL is BAKED INTO THE BUNDLE at
+  # build time, so it must be the URL the BROWSER uses to reach api (not the compose-internal name).
+  # OWNER DECISIONS (placeholders, not decided here): public hostnames, exposed ports, TLS.
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3300}
+    depends_on:
+      - api
+    ports:
+      - "${WEB_PORT:-8080}:80"
     restart: unless-stopped
 
   local-mongo:
