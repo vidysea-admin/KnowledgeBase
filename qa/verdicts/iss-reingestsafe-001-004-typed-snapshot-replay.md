@@ -18,3 +18,24 @@ Scope: typed EJSON snapshot, startup crash recovery, per-tenant per-file lock fo
 - Proven only against a fake: every recovery, restore and tenant check ran against an in-memory BSON-bytes stand-in for scopedCollection, never real MongoDB, the real driver, or the real watch-reingest.mjs.
 
 ISSUES-WRITTEN: ISS-REINGESTEJSON-004 (high), ISS-REINGESTEJSON-005 (medium), in qa/issues.reingestejson.jsonl
+
+---
+
+# Cycle 1
+
+VERDICT: FAIL
+Cycle checked: 1
+Commit checked: bbf7ff2 (lane/reingestejson)
+Cycle-0 history above is kept unchanged.
+
+## EXPLANATION
+
+- Cycle-0 findings are fixed. ISS-REINGESTEJSON-004 (sibling deletion by sourceId): I replayed it myself. Sibling session + turn + page + claim + chunk, injected failure at every mutating step 1..10: restore ok, sibling intact, all 7 collections byte-identical. Kill at every step 1..11 with the sibling, fresh process runs `recoverAll`: 11/11 sibling intact. ISS-REINGESTEJSON-005 (read-back untested): I replaced the read-back call in `writeSnapshotFile` with a no-op, so the check was off; 4 tests went red (truncated, emptied, content-altered, row-dropped, each asserting zero mutating calls). Removing the hash check: 2 red. Removing only the count check: 0 red, an equivalent mutant (the hash covers it). Restored; hash equal to HEAD each time.
+- Tests re-run (fake plus temp dirs only): crash 49/49, snapshot 14/14, swap 23/23, ingest-chain 22/22, lock 6/6. Imports read: only `node:` modules, the fake, `packages/index` tree code; no Mongo, Drive or `.env`; `watch-reingest.mjs` and `run-watch.mjs` never run.
+- FAIL reason (check 1, data write class, ISS-REINGESTEJSON-006, medium): the per-file lock is taken only by `--reingest`. `run-watch --ingest` uses `data/.watch.lock` and `--reingest` does not take that, so the two run concurrently by design. `ownedNewSessionIds` deletes every linked session outside the recorded pre-run set, so a session another writer creates after the manifest was written is judged "owned" and deleted. I built it twice: in-process (A1) and kill at step 8 plus recovery (A2): the concurrent session and its turn are gone, restore reported ok. Reachable when the watcher sees the file as new (no watch_state row or not in the month manifest; the code comments say the first live run hit exactly a missing row), and the window is the whole ingest (transcription up to 2 h). Narrower than cycle 0 but a live data-loss path in a data-write unit, and the discovery is avoidable: `resolveSessionIdForIngest` makes the only other id deterministic (`<correct>-<first 6 of file id>`), so planning that id instead of discovering would close it. Fix direction is in the ledger row.
+- Check 2 (legacy manifest): a manifest with neither field deletes the correct id even when it pre-existed with data (B2: session and turn gone). A cycle-0-shaped manifest (preexistingSessionIds present, no plannedNewSessionIds, which is exactly what ed28168 wrote) keeps discovery enabled and deletes the sibling (B1). The maker's legacy test covers only the no-field shape. No such manifest exists outside tests (branch unmerged), so low: ISS-REINGESTEJSON-007.
+- Harness/scratchpad check: no mutation harness or stray script in the worktree or main tree (`git status` clean, no `*harness*` file, no `*.snapshot.json`, no `data/reingest-snapshots`); every `reingest-*.mjs` and `watch-reingest.mjs` equals its HEAD blob (`git hash-object` vs `rev-parse HEAD:`). The maker's scratchpad harness is outside the repo (the session scratchpad); I could not confirm its content from inside the repo and did not execute anything from there. My own harness `reingestejson-c1-chk-harness.mjs` and test were inside the worktree, untracked, and deleted.
+- Ledger rows NOT flipped (FAIL): ISS-REINGESTSAFE-001, -004, -005 stay open; ISS-REINGESTEJSON-004 and -005 are fixed in code but left open until the unit passes.
+- Proven only against the in-memory BSON-bytes fake; never real MongoDB.
+
+ISSUES-WRITTEN: ISS-REINGESTEJSON-006 (medium), ISS-REINGESTEJSON-007 (low), in qa/issues.reingestejson.jsonl
