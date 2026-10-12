@@ -278,7 +278,7 @@ export async function indexSession(
     // Setting it here, once, at the write boundary, is what actually closes ISS-062: every root
     // this function ever persists from this point on carries the field, migrated or not.
     const rootDoc: TreeIndexRootDocument = { ...newRoot, tenantId };
-    await db.collection<TreeIndexRootDocument>("tree_index")
+    await scopedCollection<TreeIndexRootDocument & { _id: string }>(db as never, "tree_index")(tenantId)
       .replaceOne(treeIndexRootFilter(tenantId), rootDoc, { upsert: true });
 
     // U2.1: the tree already holds topic and org nodes, so promoting them to entity rows needs no
