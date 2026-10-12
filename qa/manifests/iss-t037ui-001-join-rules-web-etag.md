@@ -1,6 +1,6 @@
 # iss-t037ui-001-join-rules-web-etag
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Status: ready-for-check
 Fix cycle: 0
 Tier: 3/roadmap-adjacent (open medium ledger issue ISS-T037UI-001, web half; step 3 of 3 after store CAS and the API lane). Lane: lane/rulesweb (base b9e6f80). Class: data write (rule-set PUT). Ledger for this lane: qa/issues.rulesweb.jsonl (ISS-RULESWEB-001 filed).
