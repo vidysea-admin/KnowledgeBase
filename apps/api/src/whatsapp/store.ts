@@ -7,7 +7,7 @@
  * its documented collection shapes (`src/db/types.ts` there: `PersonDoc`/`MessageDoc`/`GroupDoc`).
  */
 import { MongoClient, ObjectId, type Db } from "mongodb";
-import { getDb as getAppDb, assertValidTenantId } from "@lkb/db";
+import { getDb as getAppDb, assertValidTenantId, scopedCollection } from "@lkb/db";
 import type { Sources, Sessions, Turns } from "@lkb/core";
 import { createWhatsAppSource, type WhatsAppFetcher, type WhatsAppMessage, type ConsentContext, type Turn } from "@lkb/ingest";
 import type { WhatsAppRouteDeps, WhatsAppGroup, WhatsAppIngestResult } from "../routes/whatsapp.js";
@@ -123,7 +123,7 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: Wh
       // from the request body (routes/whatsapp.ts), letting any `whatsapp`-scoped key ingest any
       // archiver owner's private groups. It is now ALWAYS resolved here, from the live trackable-
       // groups list, by the groupJid the caller actually asked to ingest -- never client-supplied.
-      assertValidTenantId(tenantId, "whatsapp.ingestGroup"); // before owner resolution and the raw replaceOne/bulkWrite filters (ISS-AUTHTENANT-002)
+      assertValidTenantId(tenantId, "whatsapp.ingestGroup"); // before owner resolution; the scoped accessor re-asserts it on every write (ISS-AUTHTENANT-002)
       const ownerUserId = await ownerFor(tenantId);
       const groups = await listGroups(ownerUserId);
       const group = groups.find((g) => g.groupJid === groupJid && g.ownerUserId === ownerUserId);
@@ -148,10 +148,10 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: Wh
       // 20261012150000-tenant-scoped-source-ids has run, this tenant's row may still sit under the
       // legacy bare-hash _id; a write under the new id would then trip the unique {tenantId, hash}
       // index, so the legacy row is reused (both forms are read) and rewritten in place.
-      const sourcesColl = appDb().collection<Sources>("sources");
-      const legacy = await sourcesColl.findOne({ _id: source.hash, tenantId } as never);
+      const sourcesColl = scopedCollection<Sources>(appDb(), "sources")(tenantId);
+      const legacy = await sourcesColl.findOne({ _id: source.hash });
       const storedSource: Sources = legacy ? { ...source, _id: source.hash } : source;
-      await sourcesColl.replaceOne({ _id: storedSource._id, tenantId }, storedSource, { upsert: true });
+      await sourcesColl.replaceOne({ _id: storedSource._id }, storedSource, { upsert: true });
 
       // IDs, session date and turns consume the same frozen authorized message snapshot.
       const turns = await whatsAppSource.toTurns(source);
@@ -167,8 +167,8 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: Wh
         date: (messages[0]?.ts ?? new Date().toISOString()).slice(0, 10),
         status: { transcribe: "done", index: "pending" },
       };
-      await appDb().collection<Sessions>("sessions")
-        .replaceOne({ _id: sessionId, tenantId }, session, { upsert: true });
+      await scopedCollection<Sessions>(appDb(), "sessions")(tenantId)
+        .replaceOne({ _id: sessionId }, session, { upsert: true });
 
       const turnDocs: Turns[] = turns.map((t: Turn, i: number) => ({
         _id: sha256Hex(`${sessionId}:${messages[i]!.messageId}`),
@@ -185,9 +185,9 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: Wh
         ...(t.occurredAt ? { occurredAt: t.occurredAt } : {}),
       }));
       if (turnDocs.length > 0) {
-        await appDb().collection<Turns>("turns").bulkWrite(
+        await scopedCollection<Turns>(appDb(), "turns")(tenantId).bulkWrite(
           turnDocs.map((doc) => ({
-            replaceOne: { filter: { _id: doc._id, tenantId }, replacement: doc, upsert: true },
+            replaceOne: { filter: { _id: doc._id }, replacement: doc, upsert: true },
           })),
         );
       }
