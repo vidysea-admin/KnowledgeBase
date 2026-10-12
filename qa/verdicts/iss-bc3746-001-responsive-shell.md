@@ -15,3 +15,21 @@ Reason for FAIL: acceptance not fully met on a realistic page (/explorer). Every
 Side note: Vite run from the lane via the node_modules symlink writes its .vite cache into the main tree's node_modules; this checker used a scratchpad cacheDir for the final runs, but the first start touched that cache.
 
 ISSUES-WRITTEN: ISS-WEBRESPONSIVE-001 (medium) in qa/issues.webresponsive.jsonl
+
+---
+
+# Cycle 1 re-check (commit fd86cbed, main 43b1a6a3 merged)
+
+VERDICT: PASS
+Cycle checked: 1
+Evidence: qa/evidence/webresponsive-checker-iss-bc3746-001-cycle1/ (own script chkL.mjs, node Playwright + system Chrome headless, 1 browser at a time, API mocked, no DB; servers and Chrome stopped).
+
+EXPLANATION:
+1. Live sweep, 25 routes x {375, 1280}, realistic mock (3 long-titled sessions, 3-node graph): 50/50 pass (scrollWidth and body.scrollWidth <= viewport, scrollX stays 0). Cycle-0 failure /explorer 375 is fixed. The same sweep against main src (43b1a6a3): 27/50 fail (all 25 at 375; /brain 1320 and /graph-confidence 1360 at 1280).
+2. Stress variant with a 324-char unbroken token plus 40 words in each title: wt passes 49/50 and the one failure is /sessions at 1280 (3369), which main also has (main additionally fails /explorer 4121 at 1280). Pre-existing, absurd input on desktop, not part of ISS-BC3746-001: noted as low, not filed (low never becomes a unit). At 375 it passes thanks to overflow-wrap.
+3. ISS reproductions 3/3: /join-rules and /meeting-bot fit 375; the /join-rules confirm dialog at 375 re-run, 15/15 (dialog inside viewport, Confirm and Cancel inside, one POST approvals, domain-warning and opt-out dialogs and Cancel fit, menu open fits, calendar with event selected and its opt-out confirm fit). Menu a11y 9/9 (native button, Tab, Enter, Space, aria-expanded, aria-controls).
+4. 1280 pixel comparison vs main, 25 pages: 20 identical; calendar (46 px), meeting-bot (211 px), sessions (830 px) differ only in timestamp text strips; /brain and /graph-confidence differ because main is broken there (squashed sidebar, overflow) and wt is the cycle-0 layout. The always-on select cap (max-width min(100%, 40rem)) changes nothing unless a select would exceed 640px. No regression; the differences are the intended fix.
+5. tsc --noEmit exit 0. vitest 710/710 (67 files), including responsive.test.tsx 7/7 and the SearchPage tests now fixed.
+6. Mutations on styles.css (per-mutation backup and trap, restored with hash equal to HEAD blob, harness deleted): M1 desktop select cap removed -> vitest 1 fail, live /explorer 4121 and /sessions at 1280; M2 overflow-wrap removed -> vitest 1 fail, live 3 fails; M3 media query disabled -> vitest 3 fail, live 25+ fails at 375. 3/3 caught.
+
+ISSUES-WRITTEN: none (ISS-WEBRESPONSIVE-001 verified fixed; ISS-BC3746-001 reproductions 3/3 refused)
