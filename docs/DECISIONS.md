@@ -1931,3 +1931,11 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** The gate's five bars, prompts, windows, 2-of-3 voting and scoring are UNCHANGED; only the model changes. Results are recorded as measured on the API model (model id stated in the evidence) and are not claimed as qwen3:8b results. A checker, not the runner, rules on ISS-104 / ISS-282. Nothing has been run by this entry.
 **Approved-by:** Umesh
 **Links:** U2.4; ISS-104; ISS-282; D-126
+
+## D-128 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Approver rulings 2026-10-12 (2): job-queue retention 30 d, usage_events collection, send-now cap and lean default. Umesh answered in-session with these selections. (1) Job-queue retention: "30 din" - terminal jobs in the T-050 file job queue are pruned after 30 days; this resolves ISS-JOBQPRUNE-001 (the pruneTerminalAfterMs option exists and is currently off by default). (2) usage_events: "Haan, banao" - create a new tenant-scoped `usage_events` collection (schema + migration) recording /ask and /search usage for T-057 D4 usage analytics; no query text is stored. (3) Defaults: "Dono rakho" - keep the send-now `until` cap at 24 h ahead, and keep lean video (720p, 5 fps) ON by default for OBS recordings.
+**Why:** These were open Approver questions: the queue retention period blocked enabling pruning, the usage analytics needed a sanctioned collection, and the two defaults needed confirmation.
+**Result:** Rulings recorded only. Nothing has been built, enabled or changed by this entry; the 30-day pruning default, the usage_events schema/migration and any schema edit must still be made through their own units, with the exact edit named when made. No query text may be stored in usage_events.
+**Approved-by:** Umesh
+**Links:** T-050; T-057; T-039; T-035; ISS-JOBQPRUNE-001; ISS-JOBQLOST-001; ISS-T057OPS-001; ISS-SENDNOWAPI-005; ISS-LEANWIRE; D-126
