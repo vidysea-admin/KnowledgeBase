@@ -1,0 +1,19 @@
+# Verdict: t057-e4-setup-wizard
+
+VERDICT: PASS
+Cycle checked: 0
+Commit checked: 39d889c (lane/setupwizard)
+Scope: read-only first slice of T-057 E4; no browser run; T-057 stays open. No issue rows to flip (the lane's ISS-SETUPWIZARD-001/-002 medium and -003 low are new filings, none claimed fixed).
+
+## EXPLANATION
+
+- Response shape (read in source and re-run): `readSetupStatus` rebuilds the body from literal `present()` booleans, so the 200 body is exactly `{"configured":{"gemini":b,"tavily":b,"langfuse":b}}` with `Cache-Control: private, no-store`. The route never reads `req.query/body/params/headers` (source-shape test). With fake secrets in all five env vars the unit test asserts deepEqual on the parsed body and no secret substring in body or headers. Blank/whitespace counts as false; Langfuse needs all three variables (same three the trace sink requires).
+- Scope question: `/system-status` is mounted right above it, after `requireAuth` and the rate limiter, with no `requireScope`; it returns tenant-own counts. `/setup/status` follows that precedent exactly. Exposing "is Gemini/Tavily/Langfuse configured" (deployment-wide, one bit each) to any valid key is acceptable: no value, prefix or length, no tenant data, nothing an attacker with a key can use beyond learning which optional integrations exist, which the same key already infers from Ask/search behaviour. Rating: LOW, consistent with precedent, not filed. If the project later wants setup facts limited to admin keys, that is a one-line `requireScope` and a D-entry, not a defect here. Unauthenticated callers get 401 with no configuration data (tested for no key and bad key).
+- Mount: one import and one `app.use(createSetupStatusRouter())` after `requireAuth` and the rate limiter, before the ask router; ordering asserted by a source test. The router also carries its own 401 guard (defence in depth).
+- Web page: `loadProbes` re-reads `/setup/status` into three booleans (hostile extra fields are discarded; typeof boolean required), `/system-status` into `db`, join rules via `parseView`, sources as a count. Only booleans, counts and HTTP statuses reach `buildItems`; all text is static strings rendered as React text, so no secret can be displayed. The API key is not rendered (test asserts it is absent from the text).
+- Honest unknowns: scopes and Google (gws) are always "unknown" with the stated reason and command (no endpoint exists, filed as -001/-002); 404 (older API), malformed body, 403 (names the missing scope), 0 (unreachable), 401 and 503 each map to distinct text; DB and key items are "unknown" when the status call itself failed rather than guessed. Gemini missing is "problem", Tavily/Langfuse missing "to do" (optional). Nothing reports "ok" without a successful read.
+- Re-run by me: api `setup-status.test.ts` + `system-status.test.ts` + `server.test.ts`: tests 21, pass 21, fail 0. web vitest `setup-wizard system-status App.routes`: 3 files, 49 tests passed. `tsc --noEmit -p .` in apps/api and apps/web: exit 0. Imports read: node:test, test server helpers, fetch against an in-process server; vitest with mocked fetch; no browser, no network, no real CLI.
+- Mutations (own harness inside the worktree, per-mutation byte backup restored in `finally`, SIGKILL timeout; application verified by hash change; hash == HEAD blob after each): A Langfuse `&&` -> `||` KILLED (1 fail); B add `geminiPrefix` (secret prefix leak) KILLED (2 fail); D drop `.trim()` KILLED (1 fail); C remove the router's own 401 guard SURVIVED, equivalent in the full server because `requireAuth` already rejects first (the mount-order source test is what guards that layer). 3/3 non-equivalent killed. Harness deleted; worktree clean.
+- Notes (not issues): the Gemini "problem" wording assumes Gemini is required for all features; a deployment that only uses a subset would see a Problem it can ignore.
+
+ISSUES-WRITTEN: none
