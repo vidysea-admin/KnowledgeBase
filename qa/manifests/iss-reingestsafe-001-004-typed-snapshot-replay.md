@@ -1,6 +1,6 @@
 # iss-reingestsafe-001-004-typed-snapshot-replay
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 2
 Tier: 2-equivalent (open medium ledger issues ISS-REINGESTSAFE-001 and -004, data-write class: full ceremony), pulled by the Approver's dispatch.
 Lane: lane/reingestejson. Ledger for this lane: qa/issues.reingestejson.jsonl, ids ISS-REINGESTEJSON-NNN (3 filed, all low). Existing ledger rows in qa/issues.reingestsafe.jsonl untouched (the checker changes their status).
