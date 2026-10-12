@@ -9,7 +9,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { FileJobQueue, type FileJobQueueOptions } from "./file-job-queue.js";
 import { QUEUE_FILE, decodeQueue, realQueueFs, type QueueFs } from "./queue-store.js";
-import { QUEUE_LOCK_FILE, QUEUE_LOCK_LIVE_CEILING_MS, QUEUE_LOCK_STALE_MS } from "./queue-lock.js";
+import { QUEUE_LOCK_FILE, QUEUE_LOCK_LIVE_CEILING_MS, QUEUE_LOCK_STALE_MS, QUEUE_LOCK_THREAD_LEASE_MS } from "./queue-lock.js";
 import { MemQueueFs } from "./mem-queue-fs.testkit.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -73,9 +73,9 @@ test("live holder on this host (another pid) is never displaced below the ceilin
   assert.deepEqual(q().enqueue(job("a")), { ok: true, value: "enqueued" });
   assert.deepEqual([...fs.files.keys()], [`/q/${QUEUE_FILE}`], "taken over, used, released, no claim or lock debris");
 });
-test("another THREAD of this process (same pid, other thread id) is a live holder too; the holder's own thread leftover (not held) is taken over after staleMs", () => {
+test("another THREAD of this process (same pid, other thread id) is a live holder too, within the worker-thread lease (ISS-JOBQSTALL-002: 60 s); the holder's own thread leftover (not held) is taken over after staleMs", () => {
   const { fs, q, hold } = mem();
-  hold({ pid: 100, host: "h1", thread: 3 }, 10 * STALE);
+  hold({ pid: 100, host: "h1", thread: 3 }, QUEUE_LOCK_THREAD_LEASE_MS - 1);
   assert.equal((q().enqueue(job("a")) as any).error.code, "conflict");
   hold({ pid: 100, host: "h1", thread: 0 }, STALE - 1);
   assert.equal((q().enqueue(job("a")) as any).error.code, "conflict", "own leftover, still young");

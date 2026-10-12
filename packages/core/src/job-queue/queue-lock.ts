@@ -5,7 +5,14 @@
  * TAKEOVER RULE (mirrors run-state-store/run-state-lock.ts, which is not imported: the small judge, claim-then-rename and constants are
  * duplicated here on purpose; `at` is wall ms here, ISO there):
  *   - owner on THIS host whose pid does not exist (ESRCH)                      -> dead: taken over at once, any age;
- *   - owner on this host, pid alive (another process OR another thread of this process) -> NEVER taken over until `liveCeilingMs` (1 h);
+ *   - owner on this host, pid alive (another process OR another thread of this process) -> NEVER taken over until `liveCeilingMs` (1 h),
+ *     EXCEPT the two cases below (ISS-JOBQSTALL-002), both only for a lock at least `staleMs` old (a healthy holder keeps it for milliseconds):
+ *       (i)  PID REUSE: the process now owning that pid STARTED AFTER the lock was written (start time from the OS, `startTime` seam), so it
+ *            cannot be the holder, which died: taken over at once. Looked up lazily, once per call and pid, only for such an old lock
+ *            (Windows: one PowerShell spawn, ~0.3 s measured); an unavailable start time = "unknown" = no displacement by this rule.
+ *       (ii) DEAD WORKER THREAD: the holder recorded a worker-thread id (> 0) and has held the lock `threadLeaseMs` (60 s): lease expired, taken
+ *            over. Threads share the pid, so nothing can tell a terminated worker from one blocked inside the critical section; the lease is the
+ *            bound. The main thread (id 0) cannot die while its pid lives, so a main-thread holder keeps the full 1 h protection.
  *   - owner is a leftover of THIS thread (token not held right now, e.g. a failed unlink)  -> taken over once older than `staleMs`;
  *   - owner unverifiable (other host, no pid in the body = legacy lock, probe says "unknown", unparsable body) -> taken over once older than
  *     `staleMs` (30 s); an unparsable body is aged by file mtime and left alone ("conflict") if the fs gives no mtime.
@@ -16,12 +23,14 @@
  * RESIDUAL, NOT CLOSED (also in the manifest): (a) a holder displaced because its pid is unverifiable (other host / legacy body) and stalled
  * >staleMs, or because it was stalled >liveCeilingMs, can still rename after its last check (saveQueue's token + content check is the narrowed
  * defence: a few instructions, not zero); (b) between the takeover's last re-read and its rename, a lock that was legitimately released and
- * re-created by a third party can be overwritten (same gap as the run-state lock); (c) pid reuse keeps a dead owner "alive" up to the ceiling;
+ * re-created by a third party can be overwritten (same gap as the run-state lock); (c) pid reuse is detected only when the OS start time is available and the lock is >= staleMs old; a LIVE worker thread blocked inside the critical section longer than `threadLeaseMs` is displaced like a dead one and can then clobber after its last check (same window as (a));
  * (d) network filesystems / no exclusive-create guarantee; (e) same-thread callers cannot wait on it, so never nest queue calls.
  * ISS-JOBQLOST-004: on Windows a create/read racing a delete of the lock fails with EPERM/EBUSY/EACCES, not EEXIST. On the LOCK path only that is
  * contention (retry within `waitMs`, then "conflict"); if no lock file exists, 5 such errors in a row mean the directory is unwritable -> "io-error".
  */
 import { createHash, randomUUID } from "node:crypto";
+import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { hostname as osHostname } from "node:os";
 import { join } from "node:path";
 import { threadId } from "node:worker_threads";
@@ -36,16 +45,44 @@ export interface QueueLockOptions {
   liveCeilingMs?: number;
   /** Test seams; production leaves these unset. */
   host?: string; pid?: number; thread?: number; isAlive?: (pid: number) => QueueLiveness;
+  /** ISS-JOBQSTALL-002. Hold time after which a WORKER-THREAD holder (thread id > 0) is presumed dead. Default 60 s. */
+  threadLeaseMs?: number;
+  /** ISS-JOBQSTALL-002. OS start time (epoch ms) of a live pid, null if unknown. Default: the real lookup, or "unknown" when `isAlive` is injected. */
+  startTime?: (pid: number) => number | null;
 }
 export const QUEUE_LOCK_WAIT_MS = 2000;
 export const QUEUE_LOCK_STALE_MS = 30_000;
 export const QUEUE_LOCK_LIVE_CEILING_MS = 3_600_000;
+export const QUEUE_LOCK_THREAD_LEASE_MS = 60_000;
+/** A holder started before it wrote the lock; allow for OS-clock vs Date.now() rounding before calling a pid "reused". */
+export const QUEUE_LOCK_REUSE_SLACK_MS = 1000;
 
 /** `process.kill(pid, 0)` sends nothing. Only ESRCH is death; EPERM means the process exists; anything else is "unknown". */
 export function defaultQueueIsAlive(pid: number): QueueLiveness {
   if (!Number.isSafeInteger(pid) || pid <= 0) return "unknown"; // pid 0 / negatives would signal a process group
   try { process.kill(pid, 0); return "alive"; }
   catch (e) { const c = (e as NodeJS.ErrnoException)?.code; return c === "ESRCH" ? "dead" : c === "EPERM" ? "alive" : "unknown"; }
+}
+
+/** Process start time (epoch ms) of a live pid, or null when it cannot be had (no permission, no tool, timeout). Never throws. Own pid: free. */
+export function defaultQueueStartTime(pid: number): number | null {
+  try {
+    if (!Number.isSafeInteger(pid) || pid <= 0) return null;
+    if (pid === process.pid) return Date.now() - process.uptime() * 1000;
+    if (process.platform === "linux") {
+      const st = readFileSync(`/proc/${pid}/stat`, "utf8"), f = st.slice(st.lastIndexOf(")") + 2).split(" "); // field 22 = f[19]
+      const ticks = Number(f[19]), bt = /^btime (\d+)/m.exec(readFileSync("/proc/stat", "utf8"));
+      return Number.isFinite(ticks) && bt ? Number(bt[1]) * 1000 + (ticks / 100) * 1000 : null; // CLK_TCK is 100 on every Linux we run on
+    }
+    const run = (exe: string, args: string[]) => spawnSync(exe, args, { encoding: "utf8", timeout: 5000, windowsHide: true, env: { ...process.env, LC_ALL: "C" } });
+    let out: string | undefined;
+    if (process.platform === "win32") {
+      const ps = join(process.env.SystemRoot ?? "C:\\Windows", "System32", "WindowsPowerShell", "v1.0", "powershell.exe");
+      out = run(ps, ["-NoProfile", "-NonInteractive", "-Command", `(Get-Process -Id ${pid} -ErrorAction Stop).StartTime.ToUniversalTime().ToString('o')`]).stdout;
+    } else if (process.platform === "darwin") out = run("/bin/ps", ["-o", "lstart=", "-p", String(pid)]).stdout;
+    const t = out ? Date.parse(out.trim()) : NaN;
+    return Number.isFinite(t) ? t : null;
+  } catch { return null; }
 }
 
 /** Errors Windows gives an exclusive create that races a delete of the same path. Applies to the lock CREATE only. */
@@ -68,7 +105,10 @@ function parseHolder(raw: string): Holder | null {
     thread: Number.isSafeInteger(j.thread) && j.thread >= 0 ? j.thread : null,
   };
 }
-interface Ctx { fs: QueueFs; o: QueueLockOptions; host: string; pid: number; thread: number; staleMs: number; ceilingMs: number; isAlive: (pid: number) => QueueLiveness }
+interface Ctx {
+  fs: QueueFs; o: QueueLockOptions; host: string; pid: number; thread: number; staleMs: number; ceilingMs: number; leaseMs: number;
+  isAlive: (pid: number) => QueueLiveness; startTime: (pid: number) => number | null; starts: Map<number, number | null>;
+}
 interface Seen { raw: string; mtime: number | null; holder: Holder | null }
 
 function peek(c: Ctx, p: string): Seen | null {
@@ -81,6 +121,13 @@ function ageOf(c: Ctx, s: Seen): number | undefined {
   if (s.holder && s.holder.at !== null && s.holder.at <= now + MAX_FUTURE_SKEW_MS) return Math.max(0, now - s.holder.at);
   return s.mtime === null ? undefined : Math.max(0, now - s.mtime); // a far-future `at` is never "old"
 }
+/** ISS-JOBQSTALL-002: true only when the live process owning `h.pid` is KNOWN to have started after the holder wrote the lock (cached per call). */
+function pidReused(c: Ctx, h: Holder): boolean {
+  if (h.pid === null || h.at === null) return false;
+  if (!c.starts.has(h.pid)) { let t: number | null; try { t = c.startTime(h.pid); } catch { t = null; } c.starts.set(h.pid, typeof t === "number" && Number.isFinite(t) ? t : null); }
+  const started = c.starts.get(h.pid);
+  return typeof started === "number" && started > h.at + QUEUE_LOCK_REUSE_SLACK_MS;
+}
 /** The takeover rule (see the header). True = the lock may be replaced. */
 function judge(c: Ctx, s: Seen): boolean {
   const age = ageOf(c, s), h = s.holder;
@@ -90,6 +137,11 @@ function judge(c: Ctx, s: Seen): boolean {
   if (age === undefined) return false;
   if (live === "unknown") return age >= c.staleMs;
   if (h.pid === c.pid && (h.thread ?? c.thread) === c.thread && !heldHere.has(h.token)) return age >= c.staleMs; // our own leftover
+  const nested = h.pid === c.pid && (h.thread ?? c.thread) === c.thread && heldHere.has(h.token); // a holder inside its call on THIS thread is live by construction
+  if (age >= c.staleMs && !nested) { // a healthy holder keeps the lock for milliseconds: only now is the (costly) identity evidence worth having
+    if (h.thread !== null && h.thread > 0 && age >= c.leaseMs) return true; // worker-thread lease expired (dead thread, or blocked past the lease)
+    if (pidReused(c, h)) return true;
+  }
   return age > c.ceilingMs;
 }
 const claimKey = (s: Seen) => s.holder ? s.holder.token : `u${createHash("sha1").update(s.raw).digest("hex").slice(0, 20)}-${Math.floor(s.mtime ?? 0)}`;
@@ -122,6 +174,8 @@ export function withQueueLock<T>(fs: QueueFs, dir: string, o: QueueLockOptions, 
   const c: Ctx = {
     fs, o, host: o.host ?? osHostname(), pid: o.pid ?? process.pid, thread: o.thread ?? threadId,
     staleMs: o.staleMs, ceilingMs: o.liveCeilingMs ?? QUEUE_LOCK_LIVE_CEILING_MS, isAlive: o.isAlive ?? defaultQueueIsAlive,
+    leaseMs: o.threadLeaseMs ?? QUEUE_LOCK_THREAD_LEASE_MS, starts: new Map(),
+    startTime: o.startTime ?? (o.isAlive ? () => null : defaultQueueStartTime), // a test that fakes pids must not probe the real process table
   };
   const token = randomUUID();
   const mine = JSON.stringify({ token, pid: c.pid, host: c.host, thread: c.thread, at: o.wallNow() });

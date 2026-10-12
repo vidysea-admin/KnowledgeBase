@@ -16,7 +16,9 @@ export interface FileJobQueueOptions { dir: string; now: () => number; leaseMs?:
   /** Lock wait budget / stale-takeover age (wall ms) and the wall clock used for them; defaults 2,000 / 30,000 / Date.now. */
   lockWaitMs?: number; lockStaleMs?: number; wallNow?: () => number;
   /** Lock takeover judge (ISS-JOBQLOST-003): ceiling above which a live-looking holder is displaced (default 1 h) and test seams for the owner identity / pid probe. */
-  lockLiveCeilingMs?: number; lockOwner?: { host?: string; pid?: number; thread?: number }; lockIsAlive?: (pid: number) => QueueLiveness }
+  lockLiveCeilingMs?: number; lockOwner?: { host?: string; pid?: number; thread?: number }; lockIsAlive?: (pid: number) => QueueLiveness;
+  /** ISS-JOBQSTALL-002: worker-thread lease (default 60 s) and the OS start-time source used to detect a reused pid (default: the real lookup). */
+  lockThreadLeaseMs?: number; lockStartTime?: (pid: number) => number | null }
 const err = (code: QueueError["code"], message: string): { ok: false; error: QueueError } => ({ ok: false, error: { code, message } });
 const refError = (r: LeaseRef) => validateQueueId(r?.id, "job id") ?? validateQueueId(r?.workerId, "worker id") ?? (r?.tenantId === undefined ? null : validateQueueId(r.tenantId, "tenant id"));
 const expired = (j: QueueJob, now: number) => j.status === "leased" && j.leaseExpiresAt !== null && now >= j.leaseExpiresAt;
@@ -35,7 +37,8 @@ export class FileJobQueue implements JobQueue {
   private run<T>(change: (s: QueueFileState, now: number) => QueueResult<T>): QueueResult<T> {
     const t = this.time(); if (!t.ok) return t;
     const lk = { waitMs: this.o.lockWaitMs ?? QUEUE_LOCK_WAIT_MS, staleMs: this.o.lockStaleMs ?? QUEUE_LOCK_STALE_MS, wallNow: this.o.wallNow ?? Date.now,
-      liveCeilingMs: this.o.lockLiveCeilingMs, host: this.o.lockOwner?.host, pid: this.o.lockOwner?.pid, thread: this.o.lockOwner?.thread, isAlive: this.o.lockIsAlive };
+      liveCeilingMs: this.o.lockLiveCeilingMs, host: this.o.lockOwner?.host, pid: this.o.lockOwner?.pid, thread: this.o.lockOwner?.thread, isAlive: this.o.lockIsAlive,
+      threadLeaseMs: this.o.lockThreadLeaseMs, startTime: this.o.lockStartTime };
     return withQueueLock(this.fs, this.o.dir, lk, stillHeld => {
       const l = loadQueue(this.fs, this.o.dir); if (!l.ok) return l;
       const state: QueueFileState = structuredClone(l.value.state), before = JSON.stringify(state);
