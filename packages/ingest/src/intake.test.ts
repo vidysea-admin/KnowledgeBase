@@ -8,7 +8,7 @@ import { createDocumentSource } from "./sources/document.js";
 import { createUrlSource } from "./sources/url.js";
 import { createYoutubeSource, type YoutubeExec } from "./sources/youtube.js";
 import { createOnairSource, createZoomRecordingSource, type HostedDownloadRequest } from "./sources/hosted-recording.js";
-import type { Source } from "./source.js";
+import { tenantSourceId, type Source } from "./source.js";
 import { baseConsent, fakeBytesReader, fakeHasher, fakeTextReader, fakeUrlFetcher, FIXED_NOW, TENANT } from "./testUtils.js";
 
 const WORK = "/work/media";
@@ -118,7 +118,7 @@ function stub(tenant: string, turns: number, title?: unknown): Source {
     detect: () => true,
     fetch: async (_i, c) => ({
       source: {
-        _id: "h",
+        _id: tenantSourceId(tenant, "h"),
         tenantId: tenant,
         kind: "url",
         captureMode: c.captureMode,
@@ -162,4 +162,70 @@ test("consent refusal from the adapter propagates and persists nothing", async (
   const sink = memSink();
   await assert.rejects(intakeFromSource({ url: ONAIR_URL, tenantId: TENANT }, baseConsent({ given: false }), deps(sink)), /consent-refused/);
   assert.equal(sink.saves, 0);
+});
+
+// ---- ISS-T045INTAKE-001: tenant-scoped source identity ----
+/** Deliberately tenant-IGNORING sink: matches on sourceId alone and (like a global-unique _id index) rejects duplicate ids. */
+function ignoringSink() {
+  const plans: IntakePlan[] = [];
+  const ids = new Set<string>();
+  const sink: IntakeSink & { plans: IntakePlan[]; lookups: Array<[string, string]> } = {
+    plans,
+    lookups: [],
+    async findSessionBySource(tenantId, sourceId) {
+      sink.lookups.push([tenantId, sourceId]);
+      const p = plans.find((x) => x.source._id === sourceId); // ignores tenantId
+      return p ? { sessionId: p.session._id } : undefined;
+    },
+    async save(plan) {
+      if (ids.has(plan.source._id)) throw new Error("E11000 duplicate key sources._id");
+      ids.add(plan.source._id);
+      plans.push(plan);
+    },
+  };
+  return sink;
+}
+
+for (const [name, url] of CASES) {
+  test(`ISS-T045INTAKE-001 ${name}: tenant B ingesting tenant A's bytes gets its own session, never learns of A's, even via a tenant-ignoring sink`, async () => {
+    const sink = ignoringSink();
+    const d = deps(sink); // one shared id counter across both tenants
+    const a = await intakeFromSource({ url, tenantId: "tenant-a" }, baseConsent(), d);
+    const b = await intakeFromSource({ url, tenantId: "tenant-b" }, baseConsent(), d);
+    assert.equal(a.status, "created");
+    assert.equal(b.status, "created"); // not already-ingested, not sink-failed (no duplicate-key collision)
+    assert.notEqual(b.sessionId, a.sessionId);
+    assert.notEqual(b.sourceId, a.sourceId);
+    assert.equal(sink.plans.length, 2);
+    const [pa, pb] = sink.plans as [IntakePlan, IntakePlan];
+    assert.equal(pa.source.hash, pb.source.hash); // same bytes, bare hash kept as its own field
+    assert.equal(pa.source._id, tenantSourceId("tenant-a", pa.source.hash));
+    assert.equal(pb.source._id, tenantSourceId("tenant-b", pb.source.hash));
+    assert.equal(pb.media[0]!.sourceRef, pb.source._id);
+    assert.ok(pb.media[0]!._id.startsWith(pb.source._id));
+    assert.equal(pa.source.tenantId, "tenant-a"); // A's doc is untouched
+    // same-tenant re-ingest is still idempotent (D-135)
+    const again = await intakeFromSource({ url, tenantId: "tenant-a" }, baseConsent(), d);
+    assert.equal(again.status, "already-ingested");
+    assert.equal(again.sessionId, a.sessionId);
+    assert.equal(sink.plans.length, 2);
+  });
+}
+
+test("ISS-T045INTAKE-001: tenantSourceId is injective across tenant/hash splits and validates input", () => {
+  assert.notEqual(tenantSourceId("a", "b:c"), tenantSourceId("a:b", "c"));
+  assert.notEqual(tenantSourceId("a", "h"), tenantSourceId("b", "h"));
+  assert.equal(tenantSourceId("a", "h"), tenantSourceId("a", "h"));
+  assert.throws(() => tenantSourceId("", "h"));
+  assert.throws(() => tenantSourceId("a", ""));
+});
+
+test("ISS-T045INTAKE-001: a source whose _id is a bare hash (or another tenant's scoped id) is refused, nothing saved", async () => {
+  for (const id of ["h", tenantSourceId("other", "h")]) {
+    const sink = ignoringSink();
+    const bare: Source = { ...stub(TENANT, 1), fetch: async (i, c) => { const r = await stub(TENANT, 1).fetch(i, c); return { ...r, source: { ...r.source, _id: id } }; } };
+    await assert.rejects(intakeFromSource({ tenantId: TENANT }, baseConsent(), deps(sink, [bare])), (e: unknown) => e instanceof IntakeError && e.code === "unscoped-source");
+    assert.equal(sink.plans.length, 0);
+    assert.equal(sink.lookups.length, 0);
+  }
 });
