@@ -1,6 +1,6 @@
 # iss-jobqstall-002-pid-reuse-and-dead-thread
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (open ledger issue ISS-JOBQSTALL-002, medium, class data write path: full ceremony). One of the conditions keeping ISS-JOBQUEUE-002 at `open-before-wiring`; does NOT wire the queue and changes no existing ledger row.
 Lane: lane/jobqpid (from b9e6f80). Ledger for this lane: qa/issues.jobqpid.jsonl, ids ISS-JOBQPID-NNN (2 filed, both low, open).
