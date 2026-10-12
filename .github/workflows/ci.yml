@@ -35,6 +35,12 @@ jobs:
       - name: Python validator deps
         run: python -m pip install --quiet jsonschema
 
+      # ISS-WEBFIXTURE-001: apps/api activity-health router.test.ts runs workers/transcribe/src/job_queue.py
+      # through the interpreter named by D2_FIXTURE_PYTHON (set on the Unit tests step); it imports pymongo
+      # and jsonschema. Uses the worker's own pinned requirements file. setup-python 3.12 matches the local .venv.
+      - name: Python deps for the D2 queue fixture test
+        run: python -m pip install --quiet -r workers/transcribe/requirements.txt
+
       # Tests shell out to ffmpeg/ffprobe (capture/record-backend remux test, upload, watch, ingest
       # chain, process-video). ubuntu-latest does not guarantee them, so install explicitly.
       - name: Install ffmpeg (provides ffprobe)
@@ -74,6 +80,9 @@ jobs:
         run: pnpm -r typecheck
 
       - name: Unit tests
+        env:
+          # No .venv/Scripts/python.exe on ubuntu; use the setup-python interpreter on PATH.
+          D2_FIXTURE_PYTHON: python
         run: pnpm -r test
 
       - name: Generated types match schema/
