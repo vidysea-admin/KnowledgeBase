@@ -52,6 +52,8 @@ async function loadTreeRoot(tenantId: string, db: Pick<Db, "collection">): Promi
 export function prepareChunkDocuments(
   tenantId: string, sessionId: string, plans: ReturnType<typeof buildChunks>,
   embedded: Awaited<ReturnType<IndexEmbedFn>>,
+  /** D-149 (pending append): carried from a `legacy-unbound` session onto its chunks; omitted otherwise. */
+  provenance?: { status: "legacy-unbound"; reason: string },
 ): Chunks[] {
   // The correlation JSON Schema cannot express (the U1.2 verdict's finding): `vector` and
   // `dims` are independently optional there, so `{vector: [3 items], dims: 99}` validates.
@@ -78,7 +80,8 @@ export function prepareChunkDocuments(
       vector: toEvidenceTuple(vector),
       dims: embedded.dims,
       embeddingModel: embedded.model,
-    };
+      ...(provenance ? { provenance: { ...provenance } } : {}),
+    } as Chunks;
   });
   return chunkDocs;
 }
@@ -90,6 +93,7 @@ export async function writeSessionChunks(
   embed: IndexEmbedFn,
   db: Pick<Db, "collection">,
   persist = true,
+  provenance?: { status: "legacy-unbound"; reason: string },
 ): Promise<ChunkWriteResult> {
   const chunksColl = scopedCollection<Chunks>(db as never, "chunks");
   const plans = buildChunks(turns);
@@ -105,7 +109,7 @@ export async function writeSessionChunks(
   try {
     const embedded = await embed({ kind: "embedding", texts: plans.map((p) => p.text), purpose: "document" });
 
-    const chunkDocs = prepareChunkDocuments(tenantId, sessionId, plans, embedded);
+    const chunkDocs = prepareChunkDocuments(tenantId, sessionId, plans, embedded, provenance);
     // Clean replace, never accumulate — a re-index must not double the corpus. Reached only
     // after every assertion above has passed, so the delete never runs without its replacement.
     if (!persist) return { written: chunkDocs.length, skipped: null };
