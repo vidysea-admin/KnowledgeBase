@@ -79,7 +79,7 @@ def test_iss_374_redirect_to_approved_host_also_fails_closed():
 
 def test_iss_374_control_follow_mode_would_leak():
     """The fake server does leak when redirects are followed: proves the cases above bite."""
-    patched = sb_join.REGISTRATION_JS.replace("redirect:'error'", "redirect:'follow'")
+    patched = sb_join.REGISTRATION_JS.replace("i.redirectMode === 'follow' ? 'follow' : 'error'", "'follow'")
     assert patched != sb_join.REGISTRATION_JS
     payload = {"script": patched, "instructions": INSTRUCTIONS, "action": "submit",
                "scenario": {"server": {"/submit": {"code": 307, "location": "http://localhost:50707/redirected"}}}}
