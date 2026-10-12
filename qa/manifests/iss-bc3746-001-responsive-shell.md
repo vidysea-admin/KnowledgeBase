@@ -1,6 +1,6 @@
 # iss-bc3746-001-responsive-shell
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: 2-adjacent (open medium issue ISS-BC3746-001, filed on lane bc3746 at 8d3f21b0 in qa/issues.bc3746.jsonl; row copied to qa/issues.webresponsive.jsonl). Class: UI layout only, no auth/tenancy/data write. Lane: lane/webresponsive. Touches apps/web only (plus qa files).
 
