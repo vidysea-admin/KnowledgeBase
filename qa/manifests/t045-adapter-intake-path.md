@@ -1,6 +1,6 @@
 # t045-adapter-intake-path
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (next unblocked roadmap task T-045, "More sources"). Class: data-write planning (persist is injected, none wired): full ceremony.
 Lane: lane/t045intake. Lane ledger `qa/issues.t045intake.jsonl`: ISS-T045INTAKE-001 (medium, file-don't-fix).
