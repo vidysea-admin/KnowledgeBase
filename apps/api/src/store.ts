@@ -30,6 +30,7 @@ import type { GraphReadDeps } from "./routes/graph.js";
 import type { ApiKeySummary, KeysDeps } from "./routes/keys.js";
 import type { MeetingCandidatesDeps } from "./routes/meeting-candidates.js";
 import { scanGmailForMeetingCandidates } from "./gws-gmail.js";
+import { isRefusedWorkDb } from "./db-name.js";
 import { sha256Hex } from "./hash.js";
 
 /** `schema/index.json`'s top-level keys ARE the canonical list of real Mongo collections (its
@@ -166,7 +167,7 @@ export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, s
     getWorkDatabase(tenantId) {
       if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) return undefined;
       const work = process.env.MONGO_WORK_DB?.trim(), actual = databaseName();
-      return work && !["lkb", "global_university_db"].includes(work) && actual === work ? actual : undefined;
+      return work && !isRefusedWorkDb(work) && actual === work ? actual : undefined;
     },
     async scanGmail(tenantId) {
       if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) throw new Error("Connected Gmail owner mismatch");

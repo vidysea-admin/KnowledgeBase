@@ -26,7 +26,9 @@ services:
     command: ["npx", "migrate-mongo", "up", "-f", "migrate-mongo-config.cjs"]
     environment:
       MONGODB_URL: ${MONGODB_URL:?set MONGODB_URL (see .env's MONGODB_URL)}
-      MONGODB_DB: ${MONGODB_DB:-lkb}
+      # Set EXPLICITLY (ISS-LEGACYSEED-009): the api refuses to start without a database name and has no
+      # default. Production is `lkb`; it is written here, not inherited from a fallback.
+      MONGODB_DB: lkb
     volumes:
       - ./migrations:/app/migrations:ro
       - ./migrate-mongo-config.cjs:/app/migrate-mongo-config.cjs:ro
@@ -43,7 +45,9 @@ services:
       - "3300:3300"
     environment:
       MONGODB_URL: ${MONGODB_URL:?set MONGODB_URL (see .env's MONGODB_URL)}
-      MONGODB_DB: ${MONGODB_DB:-lkb}
+      # Set EXPLICITLY (ISS-LEGACYSEED-009): the api refuses to start without a database name and has no
+      # default. Production is `lkb`; it is written here, not inherited from a fallback.
+      MONGODB_DB: lkb
       # The web origin (WEB_PORT) must be listed here: nginx has no /api proxy, so the browser
       # calls api directly (cross-origin).
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080}

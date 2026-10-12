@@ -5,6 +5,7 @@ import path from "node:path";
 import { config as loadEnv } from "dotenv";
 import { connect } from "@lkb/db";
 import { startServer } from "./server.js";
+import { startFromEnv } from "./bootstrap.js";
 import { buildProductionDeps } from "./composition/production.js";
 import { logger } from "./composition/logger.js";
 
@@ -18,8 +19,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 loadEnv({ path: path.resolve(__dirname, "../../../.env") });
 
 async function main(): Promise<void> {
-  await connect(process.env.MONGODB_URL ?? "mongodb://localhost:27017", process.env.MONGODB_DB ?? "lkb");
-  const server = startServer(buildProductionDeps());
+  // No database default (ISS-LEGACYSEED-009): MONGODB_DB must be set explicitly or startup refuses.
+  const server = await startFromEnv(process.env, { connect, buildDeps: buildProductionDeps, startServer });
   server.on("listening", () => {
     const addr = server.address();
     const port = typeof addr === "object" && addr ? addr.port : addr;

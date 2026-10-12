@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { bindDerivedArtifacts } from "../lib/transcript-provenance.mjs";
+import { isProtectedWorkDbName, bindDerivedArtifacts } from "../lib/transcript-provenance.mjs";
 /**
  * scripts/webinar/sync-session.mjs (moved from scripts/sync-webinar-session.mjs 2026-09-24,
  * fix cycle 1 — lint-dirsize budget: scripts/ was 33/32, this was the only new file in the diff,
@@ -189,7 +189,7 @@ const upsert = (coll, doc) => {
 const strip = ({ tenantId: _t, ...rest }) => rest;
 
 const workDb = process.env.MONGO_WORK_DB?.trim();
-if (!workDb || ["lkb", "global_university_db"].includes(workDb)) throw new Error("MONGO_WORK_DB must name an isolated work database; production writes refused");
+if (isProtectedWorkDbName(workDb, process.env)) throw new Error("MONGO_WORK_DB must name an isolated work database; production writes refused");
 await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", workDb);
 const gen = `gen-${Date.now()}`;
 try {

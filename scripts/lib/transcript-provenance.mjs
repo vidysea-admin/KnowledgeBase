@@ -82,8 +82,18 @@ export function assertDerivedArtifactsCurrent(dir, readBytes = readFileSync) {
       Object.keys(proof.hashes ?? {}).length !== Object.keys(current.hashes).length) throw new Error("derived provenance stale or mismatched; knowledge writes refused");
   return current;
 }
+/** lkb_staging (any casing) is usable only as the exact name with LKB_ALLOW_STAGING=lkb_staging (ISS-LEGACYSEED-010). */
+export function stagingRefused(name, env) {
+  const n = String(name ?? "").trim();
+  return n.toLowerCase() === "lkb_staging" && !(n === "lkb_staging" && env.LKB_ALLOW_STAGING === "lkb_staging");
+}
+export function isProtectedWorkDbName(name, env) {
+  const n = String(name ?? "").trim();
+  return !n || ["lkb", "global_university_db"].includes(n.toLowerCase()) || stagingRefused(n, env);
+}
 export function requireWorkDatabase(env) {
   const work = env.MONGO_WORK_DB?.trim(), selected = env.MONGODB_DB?.trim();
+  if (stagingRefused(work, env) || stagingRefused(selected, env)) throw new Error("lkb_staging requires LKB_ALLOW_STAGING=lkb_staging; production writes refused");
   if (!work || !/^[a-zA-Z0-9_-]{1,64}$/.test(work) || ["lkb", "global_university_db"].includes(work.toLowerCase()) ||
       (selected && selected !== work) || !valid(env.MONGODB_URL)) throw new Error("explicit isolated work database and Mongo URL required; production writes refused");
   return {url: env.MONGODB_URL, dbName: work};

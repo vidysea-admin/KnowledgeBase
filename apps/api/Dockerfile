@@ -45,6 +45,8 @@ COPY --from=prod-deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=build /app/apps/api/dist ./apps/api/dist
 COPY schema ./schema
 COPY config ./config
+# Required runtime env: MONGODB_URL and MONGODB_DB. There is NO database default: the server refuses to
+# start when MONGODB_DB is unset or empty (docker-compose.yml sets MONGODB_DB: lkb explicitly for production).
 # Runtime file dependencies of the bundle: schema/index.json, config/ai-routing.yaml (both baked in
 # above). The brain routes also read <root>/data/** and <root>/raw/** when present; those are
 # DATA, not code, and are not in the image -- mount them (e.g. at /app/data) if /brain is needed.
