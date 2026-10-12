@@ -5,8 +5,6 @@
  * accessor while other collections use their tenant-scoped accessors.
  */
 import { randomUUID, randomBytes } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import {
   getDb, assertValidTenantId, createEvalRun, recordScore as recordEvalRunScore,
   sessions as sessionsColl, sources as sourcesColl, gaps as gapsColl,
@@ -37,7 +35,6 @@ import { sha256Hex } from "./hash.js";
 /** `schema/index.json`'s top-level keys ARE the canonical list of real Mongo collections (its
  * own comment excludes `features_event` deliberately — a JSONL-file schema, not a collection) —
  * reused here instead of a second hand-maintained list that could drift from it. */
-const SCHEMA_INDEX_PATH = fileURLToPath(new URL("../../../schema/index.json", import.meta.url));
 
 export function createMongoApiKeyStore(): ApiKeyStore {
   return {
@@ -247,30 +244,11 @@ export function createMongoKeysDeps(): KeysDeps {
 }
 
 /** Real `HealthDeps` (routes/health.ts). `db.command({ping: 1})` is the standard MongoDB
- * liveness probe — cheaper than a real query and works even against an empty database. Counts
- * are ACROSS ALL TENANTS deliberately (this is an ops signal, not a tenant-scoped read — the
- * route is unauthenticated for exactly that reason, so it must never leak tenant-scoped content,
- * only aggregate numbers). A ping failure returns `db: "error"` and empty counts rather than
- * throwing — the route's whole job is to report an unhealthy backend, not crash reporting it. */
+ * liveness probe. LIVENESS ONLY: no countDocuments here (ISS-T057SCREEN-001) — the route is
+ * unauthenticated, so it reports reachability and nothing about data. A ping failure returns
+ * `db: "error"` rather than throwing. */
 export function createMongoHealthDeps(): HealthDeps {
-  return {
-    checkHealth: () =>
-      probeMongoHealth(
-        () => getDb().command({ ping: 1 }),
-        async () => {
-          const db = getDb();
-          const index = JSON.parse(readFileSync(SCHEMA_INDEX_PATH, "utf8")) as Record<string, unknown>;
-          const names = Object.keys(index).filter((k) => !k.startsWith("$"));
-          const collections: Record<string, number> = {};
-          await Promise.all(
-            names.map(async (name) => {
-              collections[name] = await db.collection(name).countDocuments();
-            }),
-          );
-          return collections;
-        },
-      ),
-  };
+  return { checkHealth: () => probeMongoHealth(() => getDb().command({ ping: 1 })) };
 }
 
 /**

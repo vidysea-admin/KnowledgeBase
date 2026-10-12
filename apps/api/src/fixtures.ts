@@ -159,7 +159,7 @@ export function fakeCitationsDeps(overrides: Partial<CitationsDeps> = {}): Citat
 /** An in-memory `HealthDeps` — tests never touch Mongo. Defaults to a healthy report with two
  * fixture collection counts. */
 export function fakeHealthDeps(overrides: Partial<HealthDeps> = {}): HealthDeps {
-  const healthy: HealthReport = { db: "ok", collections: { sessions: 1, claims: 1 } };
+  const healthy: HealthReport = { db: "ok" };
   return {
     checkHealth: async () => healthy,
     ...overrides,
