@@ -1,6 +1,6 @@
 # t050-runner-adapter
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap task T-050, slice 5: runner adapter, step 1 of runner adapter -> graph -> /ask graph). T-050 stays in_progress.
 Lane: lane/t050adapter (from 9a7e3fce). Data-write class (it drives the queue and the run-state store): full ceremony.
