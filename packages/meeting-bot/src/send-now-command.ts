@@ -12,6 +12,8 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { planSendNow, type SendNowJob, type SendNowRefusal } from "./send-now.js";
 import { assertTenantTag } from "./calendar/state-tenant-tag.js";
+import { liveRecordingDir, readLiveRecordings, type LiveProbes } from "./live-recording/live-recording.js";
+import { claimedRecordWithDefaults } from "./live-recording/claimed-record.js";
 
 export interface SendNowDeps {
   /** Live jobs for the duplicate check. MUST THROW when the state cannot be read: that is "cannot tell", never "no jobs". */
@@ -83,7 +85,7 @@ export async function runSendNow(rest: string[], deps: SendNowDeps): Promise<num
 
 /** Where live jobs can be found today (see the manifest): the poller's operations rows carry status but NO url;
  * the task-scheduler's per-job files carry url but NO status. They are joined on sessionId. Neither store is
- * written by `runRecord`, so a manual record is invisible to this check. */
+ * written by `runRecord`; manual and poller recordings are covered by `readAllLiveJobs` (live-recording view). */
 export interface LiveJobSources { operationsFile: string; scheduledDir: string; tenantId: string }
 
 /** "No jobs": operations.json absent (readWebinarOperationState returns an empty state) and/or no scheduled dir.
@@ -113,6 +115,15 @@ export function readLiveJobs(
   return jobs;
 }
 
+/** ISS-T039CMD-001/-002: scheduler jobs PLUS every recorder that claimed a meeting in the live-recording view (manual, poller, scheduler, send-now).
+ * Either half throwing = "cannot tell" (callers refuse). */
+export function readAllLiveJobs(
+  src: LiveJobSources & { recordingsDir: string }, now: Date,
+  readOperations: Parameters<typeof readLiveJobs>[2], probes?: LiveProbes,
+): SendNowJob[] {
+  return [...readLiveJobs(src, now, readOperations), ...readLiveRecordings({ dir: src.recordingsDir, tenantId: src.tenantId }, now, probes)];
+}
+
 /** Real wiring for cli.ts. Dynamic imports keep this module's tests free of the OBS/browser dependency graph. */
 export async function defaultSendNowDeps(): Promise<SendNowDeps> {
   const [{ runRecord, captureTenant, todayAt }, { readWebinarOperationState }] = await Promise.all([
@@ -121,9 +132,9 @@ export async function defaultSendNowDeps(): Promise<SendNowDeps> {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
   const now = () => new Date();
   return {
-    runRecord, now, write: (line) => console.error(line), validateUntil: todayAt,
-    readLiveJobs: () => readLiveJobs(
-      { operationsFile: path.join(root, "data", "webinar-release", "operations.json"), scheduledDir: path.join(root, "raw", "webinars", "scheduled"), tenantId: captureTenant([]) },
+    runRecord: (rest) => claimedRecordWithDefaults(rest, runRecord), now, write: (line) => console.error(line), validateUntil: todayAt,
+    readLiveJobs: () => readAllLiveJobs(
+      { operationsFile: path.join(root, "data", "webinar-release", "operations.json"), scheduledDir: path.join(root, "raw", "webinars", "scheduled"), recordingsDir: liveRecordingDir(root), tenantId: captureTenant([]) },
       now(), readWebinarOperationState),
   };
 }
