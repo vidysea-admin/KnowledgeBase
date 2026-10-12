@@ -21,7 +21,7 @@ import { dedupeKeyframes, type Keyframe, type KeyframeDedupeOptions } from "../d
 import type { KeyframeFrame } from "../domain/keyframe-dedupe-validate.js";
 import { alignSlidesToTurns, type AlignResult, type AlignTurn, type SlideObservation } from "../domain/slide-turn-alignment.js";
 import { FFMPEG_ENV, framePassArgs, hashPassArgs, KeyframeExtractError, resolveFfmpeg } from "./ffmpeg-args.js";
-import { ocrKeyframes, type OcrFn, type OcrStageError } from "./ocr-stage.js";
+import { ocrKeyframes, type OcrFn, type OcrRetryOptions, type OcrStageError } from "./ocr-stage.js";
 import { dHashRawStream, HASH_FRAME_BYTES } from "./perceptual-hash.js";
 
 export const DEFAULT_INTERVAL_SEC = 2;
@@ -111,6 +111,8 @@ export interface PipelineOptions extends ExtractOptions {
   endSec?: number;
   /** Optional injected OCR (fake in tests). When given, alignment uses its text instead of the `keyframe:<hash>` stand-in; `slides` keeps the stand-in and no OCR text is returned. */
   ocr?: OcrFn;
+  /** Retry/backoff/fallback for `ocr` (D-137 pending append); see ocr-stage.ts. */
+  ocrRetry?: OcrRetryOptions;
 }
 
 /** recording -> keyframes (timestamp, hash, PNG path) -> merged dedupe -> slide/turn alignment. */
@@ -136,7 +138,7 @@ export async function extractSlideTurnAlignment(input: string, options: Pipeline
   let alignSlides = slides;
   let ocrErrors: OcrStageError[] = [];
   if (options.ocr) {
-    const o = await ocrKeyframes(keyframes, options.ocr);
+    const o = await ocrKeyframes(keyframes, options.ocr, options.ocrRetry);
     alignSlides = o.observations;
     ocrErrors = o.errors;
   }
