@@ -6,7 +6,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { alignTileNamesToTurns, type LabelResult, type RefusalReason } from "@lkb/core";
-import { acceptedIntroNames, fuseSpeakerNames, namesAgree, type FusionTurn } from "./speaker-tile-fusion.js";
+import { acceptedIntroNames, cleanTileName, FUSION_DEFAULTS, fuseSpeakerNames, namesAgree, type FusionOptions, type FusionTurn } from "./speaker-tile-fusion.js";
 
 const turn = (id: string, ref: string, text: string, tStart = 0, tEnd = tStart + 10): FusionTurn => ({ id, speakerRef: ref, tStart, tEnd, text });
 const tileNamed = (ref: string, displayName: string): LabelResult => ({
@@ -17,7 +17,8 @@ const tileNamed = (ref: string, displayName: string): LabelResult => ({
 });
 const tileRefused = (ref: string, reason: RefusalReason): LabelResult => ({ speakerRef: ref, totalSec: 60, observedSec: 60, candidates: [], decision: { status: "refused", reason } });
 const INTRO = "Hello everyone, my name is Priya Nair and I lead admissions.";
-const one = (tile: LabelResult[], turns: FusionTurn[]) => fuseSpeakerNames(tile, turns).labels[0]!;
+const TILE_ON: FusionOptions = { allowTileOnly: true };   // tile-only naming is OFF by default (ISS-T042FUSION-001); tests of that path opt in
+const one = (tile: LabelResult[], turns: FusionTurn[], o?: FusionOptions) => fuseSpeakerNames(tile, turns, o).labels[0]!;
 
 test("agreement: tile and self-introduction name the same person -> name, basis agree, fuller name, both sources in evidence", () => {
   const l = one([tileNamed("spk:0", "Priya Nair")], [turn("a", "spk:0", INTRO, 5, 20)]);
@@ -32,11 +33,49 @@ test("agreement: tile and self-introduction name the same person -> name, basis 
   assert.deepEqual(rev.status === "named" && [rev.name, rev.basis], ["Priya Nair", "agree"]);
 });
 
-test("tile only: a named tile with no introduction in the label's turns -> tile-only", () => {
-  const l = one([tileNamed("spk:0", "Priya Nair")], [turn("a", "spk:0", "We will cover eligibility next.")]);
+test("tile only: OFF by default; when enabled a person-shaped tile with no introduction -> tile-only", () => {
+  assert.equal(FUSION_DEFAULTS.allowTileOnly, false);
+  const dflt = one([tileNamed("spk:0", "Priya Nair")], [turn("a", "spk:0", "We will cover eligibility next.")]);
+  assert.deepEqual(dflt.status === "none" && dflt.reason, "source-disabled");
+  const l = one([tileNamed("spk:0", "Priya Nair")], [turn("a", "spk:0", "We will cover eligibility next.")], TILE_ON);
   assert.deepEqual(l.status === "named" && [l.name, l.basis, l.intro], ["Priya Nair", "tile-only", null]);
   const off = fuseSpeakerNames([tileNamed("spk:0", "Priya Nair")], [turn("a", "spk:0", "ok")], { allowTileOnly: false }).labels[0]!;
   assert.deepEqual(off.status === "none" && off.reason, "source-disabled");
+});
+
+// ISS-T042FUSION-001: the checker's 12 recorded junk tile names (+ the rest of its list), through the REAL aligner, verbatim.
+const CHECKER_12 = ["Vidysea", "Acme Corp", "Sales Team", "Admissions", "Support", "Student", "Samsung S21", "User 1", "J", "hello@vidysea.com", "Rahul | Vidysea", "Priya (Vidysea)"];
+const CHECKER_REST = ["Marketing", "Office", "Parent", "Tablet", "Redmi Note 9", "Q&A", "Otter.ai", "Priya - Vidysea", "Priya Nair (she/her)", "Careers Counselor", "VIDYSEA ADMISSIONS TEAM", "Dr. Priya", "Mr. Rahul Verma"];
+function viaAligner(displayName: string, o?: FusionOptions): string {
+  const turns = [turn("t0", "spk:0", "We will cover eligibility next.", 0, 60)];
+  const aligned = alignTileNamesToTurns(Array.from({ length: 60 }, (_, s) => ({ tSec: s, displayName })), turns.map(({ id, tStart, tEnd, speakerRef }) => ({ id, tStart, tEnd, speakerRef })));
+  const l = fuseSpeakerNames(aligned, turns, o).labels[0]!;
+  return l.status === "named" ? `${l.name}/${l.basis}` : `none:${l.reason}`;
+}
+test("ISS-T042FUSION-001 replay: the checker's 12 junk tile names -> none by default; none with tile-only on except a real person left after stripping the org decoration", () => {
+  const dflt = CHECKER_12.map((n) => [n, viaAligner(n)]);
+  const on = CHECKER_12.map((n) => [n, viaAligner(n, TILE_ON)]);
+  console.log(`ISS-T042FUSION-001 replay default: named ${dflt.filter(([, r]) => !r!.startsWith("none")).length}/12; tile-only on: ${JSON.stringify(on.filter(([, r]) => !r!.startsWith("none")))}`);
+  assert.deepEqual(dflt.filter(([, r]) => !r!.startsWith("none")), []);
+  // DECISION: "Rahul | Vidysea" and "Priya (Vidysea)" are a first name plus an org decoration; with tile-only explicitly enabled the stripped remainder IS a person name.
+  assert.deepEqual(on.filter(([, r]) => !r!.startsWith("none")), [["Rahul | Vidysea", "Rahul/tile-only"], ["Priya (Vidysea)", "Priya/tile-only"]]);
+  for (const n of CHECKER_REST) {
+    const r = viaAligner(n);
+    assert.ok(r.startsWith("none"), `${n} -> ${r}`);
+  }
+  const onRest = Object.fromEntries(CHECKER_REST.map((n) => [n, viaAligner(n, TILE_ON)]).filter(([, r]) => !r!.startsWith("none")));
+  assert.deepEqual(onRest, { "Priya - Vidysea": "Priya/tile-only", "Priya Nair (she/her)": "Priya Nair/tile-only", "Dr. Priya": "Priya/tile-only", "Mr. Rahul Verma": "Rahul Verma/tile-only" });
+});
+
+test("cleanTileName: person shapes pass; email, digits, initials, ALL-CAPS, role/org/team/device words, bare titles and org-only remainders fail closed", () => {
+  const ok: [string, string][] = [["Priya Nair", "Priya Nair"], ["Rahul | Vidysea", "Rahul"], ["Priya (Vidysea)", "Priya"], ["Dr. Priya Nair", "Priya Nair"], ["Anaïs", "Anaïs"], ["Mary-Jane O'Neil", "Mary-Jane O'Neil"], ["Ravi van der Berg", "Ravi van der Berg"]];
+  for (const [i, o] of ok) assert.equal(cleanTileName(i), o, i);
+  const stripsToPerson = /Dr\.|Mr\.|she|Priya -/u;
+  for (const bad of [...CHECKER_12.filter((n) => !n.includes("|") && !n.includes("(")), ...CHECKER_REST.filter((n) => !stripsToPerson.test(n)), "Dr", "Mr.", "Vidysea | Rahul", "Vidysea Admissions", "R. K.", "Priya N1", "iPhone", "Guest", "Everyone", "", "   ", "Priya‮An"]) assert.equal(cleanTileName(bad), null, bad);
+  assert.equal(cleanTileName(42 as never), null);
+  // a tile that is not person-shaped is NO evidence: with a clean introduction the intro stands alone and the junk tile is recorded as a refusal
+  const l = one([tileNamed("spk:0", "Sales Team")], [turn("a", "spk:0", INTRO)]);
+  assert.deepEqual(l.status === "named" && [l.name, l.basis, l.tile, l.tileRefusal], ["Priya Nair", "intro-only", null, "non-person-name"]);
 });
 
 test("self-introduction only (strong): no tile data at all, a clean introduction names the label; options can switch it off", () => {
@@ -61,7 +100,7 @@ test("conflict -> NO name: tile and introduction disagree; two introductions in 
 });
 
 test("a name that would land on two labels is refused for both (diarizer split / shared device), including part-of-name matches", () => {
-  const r = fuseSpeakerNames([tileNamed("spk:0", "Priya Nair")], [turn("a", "spk:0", "ok"), turn("b", "spk:1", "Hi, I'm Priya Nair.", 20, 30), turn("c", "spk:2", "Hello, I'm Rahul Verma.", 40, 50)]);
+  const r = fuseSpeakerNames([tileNamed("spk:0", "Priya Nair")], [turn("a", "spk:0", "ok"), turn("b", "spk:1", "Hi, I'm Priya Nair.", 20, 30), turn("c", "spk:2", "Hello, I'm Rahul Verma.", 40, 50)], TILE_ON);
   assert.deepEqual(r.labels.map((l) => [l.speakerRef, l.status === "none" ? l.reason : l.status === "named" ? l.name : ""]), [["spk:0", "name-on-multiple-labels"], ["spk:1", "name-on-multiple-labels"], ["spk:2", "Rahul Verma"]]);
   const p = fuseSpeakerNames([], [turn("a", "spk:0", "Hi, I'm Priya."), turn("b", "spk:1", "Hi, I'm Priya Nair.", 20, 30)]);
   assert.deepEqual(p.labels.map((l) => l.status), ["none", "none"]);
@@ -70,7 +109,7 @@ test("a name that would land on two labels is refused for both (diarizer split /
 test("reported speech never names: not as intro evidence, not as a veto, not alongside a tile name", () => {
   const rep = "He said I am Rahul Verma.";
   assert.deepEqual(acceptedIntroNames(rep), []);
-  const t = one([tileNamed("spk:0", "Priya Nair")], [turn("a", "spk:0", rep)]);
+  const t = one([tileNamed("spk:0", "Priya Nair")], [turn("a", "spk:0", rep)], TILE_ON);
   assert.deepEqual(t.status === "named" && [t.name, t.basis, t.intro], ["Priya Nair", "tile-only", null]);   // the tile stands alone; the quote neither agrees nor conflicts
   assert.equal(one([], [turn("a", "spk:0", rep)]).status, "none");
   assert.equal(one([], [turn("a", "spk:0", "She told us, I'm Rahul Verma."), turn("b", "spk:0", INTRO, 20, 30)]).status, "named");   // a reported line does not make a second name
@@ -100,9 +139,11 @@ test("end to end with the real aligner: 4-panelist style log + introductions", (
   const turns = [turn("t0", "spk:0", INTRO, 0, 60), turn("t1", "spk:1", "Hi, I'm Rahul Verma.", 60, 120), turn("t2", "spk:2", "I think so.", 120, 180)];
   const log = Array.from({ length: 180 }, (_, s) => ({ tSec: s, displayName: s < 60 ? "Priya Nair" : s < 120 ? "Mohan Rao" : "Anita Das" }));
   const aligned = alignTileNamesToTurns(log, turns.map(({ id, tStart, tEnd, speakerRef }) => ({ id, tStart, tEnd, speakerRef })));
-  const r = fuseSpeakerNames(aligned, turns);
+  const r = fuseSpeakerNames(aligned, turns, TILE_ON);
   assert.deepEqual(r.labels.map((l) => [l.speakerRef, l.status === "named" ? `${l.name}/${l.basis}` : l.reason]),
     [["spk:0", "Priya Nair/agree"], ["spk:1", "tile-intro-conflict"], ["spk:2", "Anita Das/tile-only"]]);
+  const d = fuseSpeakerNames(aligned, turns);   // defaults: the tile-only label is not named
+  assert.deepEqual(d.labels.map((l) => [l.speakerRef, l.status === "named" ? `${l.name}/${l.basis}` : l.reason]), [["spk:0", "Priya Nair/agree"], ["spk:1", "tile-intro-conflict"], ["spk:2", "source-disabled"]]);
 });
 
 test("hostile input never throws and is reported: bad turns, duplicate ids, NaN times, huge text, proto names", () => {
@@ -133,10 +174,10 @@ function replay(texts: [string, string][]): { refused: number; open: string[] } 
   const open: string[] = [];
   for (const [T, N] of texts) {
     const alone = fuseSpeakerNames([], [turn("a", "spk:0", T)]);
-    const withTile = fuseSpeakerNames([tileNamed("spk:0", N)], [turn("a", "spk:0", T)]).labels[0]!;
+    const withTile = fuseSpeakerNames([tileNamed("spk:0", N)], [turn("a", "spk:0", T)], TILE_ON).labels[0]!;
     const l = alone.labels[0]!;
     const ok = l.status === "none" && l.introNames.length === 0 && alone.turns[0]!.name === null
-      && withTile.introNames.length === 0 && withTile.status === "named" && withTile.basis === "tile-only";   // never "agree": the quote is not corroboration
+      && withTile.introNames.length === 0 && withTile.intro === null && !(withTile.status === "named" && withTile.basis !== "tile-only");   // never "agree": the quote is not corroboration (a name-shaped tile may stand alone as tile-only; "Moderator"/"Paris" are refused by the shape gate)
     if (!ok) open.push(T);
   }
   return { refused: texts.length - open.length, open };
@@ -179,4 +220,23 @@ test("not vacuous: the same fusion path DOES name clean introductions (recall ke
     const l = fuseSpeakerNames([], [turn("a", "spk:0", T)]).labels[0]!;
     assert.deepEqual(l.status === "named" && [l.name, l.basis], [N, "intro-only"], T);
   }
+});
+
+test("ISS-T042FUSION-002: whole-token containment is pinned (kills the substring-agreement mutant)", () => {
+  for (const [a, b] of [["Raj", "Rajesh Kumar"], ["Rajesh Kumar", "Raj"], ["Raj Kumar", "Rajesh Kumar"], ["Ana", "Anaïs"], ["Priya Nair", "Priya Sharma"], ["Pri", "Priya"], ["Nair", "Priyanka Nair"], ["ya Nair", "Priya Nair"]]) assert.equal(namesAgree(a!, b!), false, `${a} ~ ${b}`);
+  for (const [a, b] of [["Priya", "Priya Nair"], ["Nair Das", "Priya Nair Das"], ["Priya Nair", "Priya Nair"]]) assert.equal(namesAgree(a!, b!), true, `${a} ~ ${b}`);
+  // through the fusion path: tile Priya Nair + intro Priya Sharma -> none; tile Raj + intro Rajesh Kumar -> none
+  const c1 = one([tileNamed("spk:0", "Priya Nair")], [turn("a", "spk:0", "Hello everyone, my name is Priya Sharma and I lead admissions.")], TILE_ON);
+  assert.deepEqual(c1.status === "none" && c1.reason, "tile-intro-conflict");
+  const c2 = one([tileNamed("spk:0", "Raj")], [turn("a", "spk:0", "Hi, I'm Rajesh Kumar.")], TILE_ON);
+  assert.deepEqual(c2.status === "none" && c2.reason, "tile-intro-conflict");
+});
+
+test("ISS-T042FUSION-003: a bare title never agrees; a bare surname never agrees with a fuller name; titles are stripped from returned names", () => {
+  for (const [a, b] of [["Dr", "Dr Priya"], ["Dr.", "Dr. Priya Nair"], ["Mr", "Mr Kumar"], ["Kumar", "Rajesh Kumar"], ["Nair", "Priya Nair"], ["Dr", "Dr"]]) assert.equal(namesAgree(a!, b!), false, `${a} ~ ${b}`);
+  assert.equal(namesAgree("Dr. Priya", "Priya"), true);
+  assert.equal(namesAgree("Kumar", "Kumar"), true);
+  assert.equal(namesAgree("Mr Kumar", "Kumar"), true);
+  const l = one([tileNamed("spk:0", "Dr. Priya")], [turn("a", "spk:0", "Hi all, I'm Priya.")]);
+  assert.deepEqual(l.status === "named" && [l.name, l.basis], ["Priya", "agree"]);
 });

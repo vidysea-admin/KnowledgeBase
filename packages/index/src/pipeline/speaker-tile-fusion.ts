@@ -15,7 +15,9 @@
  *   - tile refused for contradictory evidence -> none (`tile-contradicted`: two-strong-names, runner-up-too-strong, name-on-multiple-labels)
  *   - tile named + intro, names agree         -> name, basis `agree`
  *   - tile named + intro, names differ        -> none (`tile-intro-conflict`)
- *   - tile named only                         -> name, basis `tile-only` (alignment already demands duration/majority/lag stability)
+ *   - tile named only                         -> DEFAULT OFF (`source-disabled`, ISS-T042FUSION-001). When `allowTileOnly` is set: name, basis `tile-only`,
+ *                                                only if the tile name passes `cleanTileName` (person shape: no digits/@/|/&/parens, 2+ letter capitalised tokens, not
+ *                                                all-caps, no role/org/device word, not discourse-only); titles and a trailing org decoration are stripped first
  *   - intro only                              -> name, basis `intro-only` (the allow-list is whole-sentence; strong alone)
  *   - neither                                 -> none (`no-evidence`)
  *   Agreement = case/NFKC-folded equality, or one name's tokens are a contiguous run of the other's ("Priya" in "Priya Nair"); the
@@ -23,13 +25,14 @@
  * The result is still a CLAIM about a label, not a verified identity and not a `person:` entity (owner policy on display names is open).
  */
 import type { LabelResult, RefusalReason, TileAlignResult } from "@lkb/core";
-import { foldKey, normalizeDisplayName } from "@lkb/core";
+import { foldKey, nonPerson, normalizeDisplayName } from "@lkb/core";
+import { isDiscourseOnly, looksLikeAName } from "./speaker-name-rules.js";
 import { citesNameAsSelfIdentification } from "./speaker-relation-rules.js";
 import { selfIntroductionCandidates } from "./speaker-selfid-rules.js";
 
 export interface FusionTurn { id: string; tStart: number; tEnd: number; speakerRef: string; text: string }
 export interface FusionOptions { allowTileOnly?: boolean; allowIntroOnly?: boolean; maxTurnChars?: number }
-export const FUSION_DEFAULTS = { allowTileOnly: true, allowIntroOnly: true, maxTurnChars: 50_000 } as const;
+export const FUSION_DEFAULTS = { allowTileOnly: false, allowIntroOnly: true, maxTurnChars: 50_000 } as const;
 export type FusionBasis = "agree" | "tile-only" | "intro-only";
 export type FusionNoneReason = "no-evidence" | "intro-names-conflict" | "tile-contradicted" | "tile-intro-conflict" | "name-on-multiple-labels" | "source-disabled";
 export type FusionErrorCode = "invalid-turn" | "invalid-id" | "duplicate-id" | "invalid-time" | "invalid-text" | "text-too-long";
@@ -46,9 +49,40 @@ const cmp = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
 const isNum = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
 const introKey = (s: string): string => s.replaceAll("’", "'").replace(/\s+/gu, " ").trim();
 const tokens = (s: string): string[] => foldKey(normalizeDisplayName(s)).split(" ").filter(Boolean);
+const TITLES: ReadonlySet<string> = new Set(["dr", "mr", "mrs", "ms", "miss", "mx", "prof", "professor", "shri", "smt", "sri"]);
+/** Agreement tokens: folded, leading titles dropped ("Dr. Priya" -> priya; a bare "Dr" -> nothing, so it agrees with nothing). */
+const agreeTokens = (s: string): string[] => { const t = tokens(s); while (t.length > 0 && TITLES.has(t[0]!.replace(/\.$/u, ""))) t.shift(); return t; };
 const contiguous = (small: string[], big: string[]): boolean => small.length > 0 && big.some((_, i) => small.every((t, k) => big[i + k] === t));
+/** A single token against a fuller name agrees only as its FIRST (given) token: a bare surname ("Kumar") never matches "Rajesh Kumar". */
+const part = (small: string[], big: string[]): boolean => (small.length === 1 && big.length > 1 ? big[0] === small[0] : contiguous(small, big));
 /** Same person-string: folded-equal, or one is a whole-token contiguous part of the other. */
-export const namesAgree = (a: string, b: string): boolean => { const [x, y] = [tokens(a), tokens(b)]; return contiguous(x, y) || contiguous(y, x); };
+export const namesAgree = (a: string, b: string): boolean => { const [x, y] = [agreeTokens(a), agreeTokens(b)]; return part(x, y) || part(y, x); };
+
+/** Role / team / organisation / device words, ADDED to the reused `looksLikeAName` + `isDiscourseOnly` (speaker-name-rules, over NEVER_A_PERSON) and the aligner's own `nonPerson` list. */
+const NOT_A_PERSON_WORDS: ReadonlySet<string> = new Set([
+  "vidysea", "admissions", "admission", "marketing", "sales", "support", "office", "student", "students", "parent", "parents", "counselor", "counsellor", "careers", "career",
+  "department", "dept", "desk", "helpdesk", "help", "service", "services", "group", "club", "university", "college", "school", "institute", "academy", "corp", "corporation",
+  "inc", "ltd", "llc", "pvt", "limited", "company", "co", "org", "tablet", "tab", "mobile", "samsung", "redmi", "xiaomi", "oppo", "vivo", "oneplus", "realme", "nokia", "motorola",
+  "lenovo", "dell", "hp", "asus", "acer", "huawei", "otter", "fireflies", "assistant", "interviewer", "candidate", "user", "member", "organizer", "organiser", "owner", "manager",
+  "staff", "faculty", "management", "operations", "hr", "it", "ai", "bot", "notetaker", "recording", "meeting", "webinar", "class", "classroom", "channel", "account", "team"]);
+/**
+ * Person-shape gate for a PLATFORM display name (ISS-T042FUSION-001). Returns the cleaned name or null. Strips leading titles and a TRAILING decoration
+ * (" | Org", " - Org", "(...)") but only keeps the remainder if it passes; fails closed on anything else. A single-token org name ("Acme") cannot be told
+ * from a first name by shape -- which is why tile-only naming is also OFF by default.
+ */
+export function cleanTileName(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  const s = normalizeDisplayName(raw).replace(/\s*\([^()]*\)\s*$/u, "").replace(/\s+[|\-\u2013\u2014/]\s+.*$/u, "").trim();
+  const t = s.split(" ").filter(Boolean);
+  while (t.length > 0 && TITLES.has(t[0]!.toLowerCase().replace(/\.$/u, ""))) t.shift();
+  if (t.length === 0 || t.length > 4) return null;
+  const name = t.join(" ");
+  const word = /^\p{Lu}(?:['\u2019]\p{Lu})?\p{Ll}\p{L}*(?:['\u2019-]\p{L}+)*\.?$/u;   // letters only, 2+ chars, capitalised, not ALL-CAPS
+  if (!t.every((w, i) => word.test(w) || (i > 0 && /^(?:van|von|der|de|del|di|da|bin|al|el|la|le|dos|du)$/u.test(w)))) return null;
+  if (!looksLikeAName(name) || isDiscourseOnly(name) || nonPerson(name)) return null;
+  if (t.some((w) => NOT_A_PERSON_WORDS.has(w.toLowerCase().replace(/\.$/u, "")))) return null;
+  return name;
+}
 const fuller = (a: string, b: string): string => (tokens(a).length >= tokens(b).length ? a : b);
 
 /** Names the existing guards accept as a clean first-person self-introduction in ONE turn's text. Never throws. */
@@ -100,8 +134,9 @@ export function fuseSpeakerNames(tileIn: TileAlignResult | readonly LabelResult[
     const intro: SourceEvidence | null = introNames.length === 1 && first !== undefined
       ? { name: first, turnIds: src.map((t) => t.id), from: Math.min(...src.map((t) => t.tStart)), to: Math.max(...src.map((t) => t.tEnd)) } : null;
     const tl = tileLabels.get(ref)?.decision;
-    const tile: SourceEvidence | null = tl?.status === "named" ? { name: tl.claim.displayName, turnIds: [...tl.evidence.turnIds], from: tl.evidence.from, to: tl.evidence.to } : null;
-    const tileRefusal = tl?.status === "refused" ? tl.reason : null;
+    const tileClean = tl?.status === "named" ? cleanTileName(tl.claim.displayName) : null;   // a tile name that is not person-shaped is no evidence at all
+    const tile: SourceEvidence | null = tl?.status === "named" && tileClean !== null ? { name: tileClean, turnIds: [...tl.evidence.turnIds], from: tl.evidence.from, to: tl.evidence.to } : null;
+    const tileRefusal: RefusalReason | null = tl?.status === "refused" ? tl.reason : tl?.status === "named" && tileClean === null ? "non-person-name" : null;
     const base = { speakerRef: ref, tile, intro, introNames, tileRefusal };
     const none = (reason: FusionNoneReason): LabelFusion => ({ ...base, status: "none", reason });
     const named = (name: string, basis: FusionBasis): LabelFusion => ({ ...base, status: "named", name, basis, verified: false });
