@@ -13,7 +13,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
-import { extractSpeakers as laneExtract, type SpeakersCompleteFn } from "./speakers-llm.js";
+import { extractSpeakersRuleBased as laneExtract, type SpeakersCompleteFn } from "./speakers-llm.js";
 import { citesNameAsSelfIdentification } from "./speaker-relation-rules.js";
 import { selfIntroductionCandidates, turnHoldsOtherSelfIntroduction } from "./speaker-selfid-rules.js";
 
