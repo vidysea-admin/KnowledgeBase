@@ -1,6 +1,6 @@
 # t039-send-now-api-endpoint
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: 3 (next unblocked roadmap task, T-039). Class: auth scope + operator URL that drives a browser join: FULL ceremony. Verdict by the checker only.
 Lane: lane/sendnowapi. Ledger shard `qa/issues.sendnowapi.jsonl` (ISS-SENDNOWAPI-001..005).
