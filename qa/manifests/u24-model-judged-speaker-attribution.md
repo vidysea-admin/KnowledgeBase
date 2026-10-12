@@ -1,7 +1,7 @@
 # u24-model-judged-speaker-attribution
 
 **Handshake status:** ready-for-check
-Fix cycle: 1
+Fix cycle: 2
 Tier: 3 (roadmap U2.4 speaker naming). Class: identity attribution that is written into the KB (the precision-critical path): FULL ceremony.
 Lane: lane/u24smart. Authority: D-132 (pending append), owner decision "make it intelligent instead of rule based". Gate bars 1 (100% accepted-identity precision) and 2 (0 wrong links) are UNCHANGED. No model API call was made in this unit. config/ai-routing.yaml, qa/contracts/, docs/DECISIONS.md untouched.
 
@@ -42,3 +42,27 @@ No live model run; the new prompt is unmeasured. Sessions over 600k characters d
 - D-015 replay of the recorded ISS-U24SMART-001 reproductions (the checker fixture, host spk:0 "Thanks Rashi, that was clear..." / "Thank you Rashi, great point..." before spk:2, real Rashi spk:1), kinds address and called-on as recorded plus handover/thanks/role-continuity: refused 5/5 kinds (test "a thank-you naming the previous speaker never names the NEXT block"). Controls: thanks AFTER Rashi's block ships spk:1 with independent quotes; the same two quotes from one host do not. Rival-label and floor-held collisions abstain.
 - ISS-U24SMART-002: audit AFTER 0/409 live bypasses with a passing non-vacuity control; `--self-test` prints "seeded bypass CAUGHT". (`--base <ref>` fails at HEAD because the scratch copy cannot resolve speaker-name-data.js: pre-existing, only usable for refs before that split; not touched.)
 - Tests: speakers-grounded 33/33 (3 new); all 12 legacy speaker suites pass; tsc clean. Offline replay re-run: strict 0 accepted both models; synthetic stress deepseek-v4-pro 0 accepted, gpt-oss:120b 3 accepted, 3 correct (bar 1 = 1.0), 0 wrong identities, 0 wrong evidence pairs. No model calls.
+
+## Cycle 2 (structural redesign; fix of ISS-U24SMART-003 high, ISS-U24SMART-004 medium; earlier sections kept, where they describe kind/position/direction regexes they are SUPERSEDED here)
+Why: cycle 1 still shipped wrong names (a second name in the quote, a one-turn backchannel, host + cohost as "independent"), and an offline replay of the live re-gate showed the hand-written kind/position rules were what killed recall (96 correct deepseek proposals refused on kind/position, 26 on corroboration, ~250 proposals per model with bare-name or "[Name]" labels). D-132 asks for judgement, not more regex.
+- Deterministic grounding kept: verbatim single-turn quote, >= 3 words, contains the name (or an unambiguous token), whole name spoken in the transcript, not quoted/reported speech, floor not contradicted. NEW hard abstain: the quote mentions a second distinct person (vocative, mid-sentence capitalised, or known name); a self-intro is exempt. A quote spoken by the label itself only counts as the existing clean self-introduction. Adjacency is the immediate turn (MAX_DISTANCE = 1), so a backchannel breaks the binding.
+- The kind/position/thank-direction/forward-cue regexes are REMOVED. In their place `speakers-verifier.ts`: an injectable `SpeakerVerifier` sees a window (4 turns before the label's block, its 2-turn opening, the quote turn) and answers "does this evidence show speaker <label> IS <name>? yes/no/unsure". Three differently FRAMED calls per piece (no temperature dependence); ship only on >= 2 yes and no "no". No verifier -> non-self-intro identities abstain. `llmVerifier(complete)` is the production verifier; unparseable or failing = unsure.
+- Vote keyed on (label, name) over the 3 proposer runs (>= 2), not on the quote turn. Labels `[spk:N]`, `Speaker N` normalised; a bare-name or "[Name]" label maps to the quote turn's diarized label only for a self-intro in a positional turn (for a call-on or thanks the quote's speaker is the CALLER, so that mapping would be wrong).
+- Corroboration (chosen: `independent-pair`): a self-intro alone, or two verified pieces from different quote speakers on OPPOSITE sides of the block (a host and a cohost on the same side are one handover). `single-verified` (one piece + verifier yes) is kept as a config switch and NOT the default; see numbers below.
+- ISS-U24SMART-004: `audit-closed-class.mjs` control now calls `shipsAsPerson` itself (genuine "My name is Priya Nair"); reply shape is switchable; `--self-test` runs (1) a seeded bypass that is planted only for the new reply shape (CAUGHT) and (2) the probe mutated to the legacy shape (DETECTED as blind); `--self-test --mutate-probe` and `--mutate-probe` exit 1.
+
+Evidence (no model call):
+```
+speakers-grounded.test.ts  tests 42 pass 42 (all six kinds; cycle-0 Rashi fixture x5 kinds; cycle-1 attacks (a) second name, (b) welcome+second name, (c) backchannel+host/cohost, each with an always-"yes" verifier -> nothing ships; verifier no / unsure / mixed / throwing; vote on (label,name); label normalisation; second-name unit tests)
+12 legacy speaker suites pass (name-rules 110, relation-ledger 8, relation-rules 10, selfid-allowlist 6, selfid-ledger 8, twointro 8, differential 5, speakers-llm 50, windows 29, docs 13, speakers 16, tile-fusion 18); tsc --noEmit -p packages/index clean
+audit-closed-class.mjs: 0/409 live bypasses; --self-test rc 0 (both halves); --self-test --mutate-probe rc 1; --mutate-probe rc 1
+```
+Offline replay of the LIVE recorded proposals (qa/evidence/u24-smart-cycle2-2026-10-12/, 13-replay-cycle2.mts, scorer 05-score.mjs; 11 sessions x 3 outer runs). Oracle = verifier answering from gold (upper bound), pessimist = always yes (worst case):
+| model / corroboration | oracle accepted/correct/wrong | pessimist accepted/correct/wrong |
+|---|---|---|
+| deepseek-v4-pro independent-pair | 3 / 3 / 0 (0 additions) | 3 / 3 / 0 |
+| deepseek-v4-pro single-verified | 15 / 15 / 0 (4 additions) | 16 / 12 / 4 (Bidya x3, Kshitij) |
+| gpt-oss:120b independent-pair | 3 / 3 / 0 (1 addition, Rashi; bar 4 unstable) | 3 / 3 / 0 |
+| gpt-oss:120b single-verified | 4 / 4 / 0 | 4 / 3 / 1 (Alka) |
+Choice: `independent-pair`, because it is the only option with 0 wrong at the pessimist worst case on both models; `single-verified` needs a verifier that is itself 100% precise, which is unmeasured. Cost: recall. With a perfect verifier the single-piece rule would reach 4 additions on deepseek; independent-pair reaches 0-1. The live verifier's real precision is the next measurement; if it is 100% on the ledger corpus the Approver can switch the default.
+Not verified: the verifier prompts have never run against a live model; bar 4 (stability) for gpt-oss independent-pair is unstable in one session; ISS-U24SMART-003's fix is shown on the checker's three fixtures and the replay, not on a live run.
