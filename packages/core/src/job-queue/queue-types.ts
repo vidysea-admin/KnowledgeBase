@@ -20,7 +20,7 @@ export interface QueueJob {
   workerId: string | null;
   leaseExpiresAt: number | null;
   errorCode: string | null;
-  /** ISS-JOBQLOST-001: queue-clock time the job was first seen terminal (done/dead). Written ONLY when pruning is enabled (FileJobQueueOptions.pruneTerminalAfterMs); absent otherwise. */
+  /** ISS-JOBQLOST-001: queue-clock time the job was first seen terminal (done/dead). Written ONLY when pruning is enabled (the default, 30 days; FileJobQueueOptions.pruneTerminalAfterMs: null disables); absent otherwise. */
   terminalAt?: number;
 }
 

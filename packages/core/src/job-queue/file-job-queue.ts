@@ -19,30 +19,34 @@ export interface FileJobQueueOptions { dir: string; now: () => number; leaseMs?:
   lockLiveCeilingMs?: number; lockOwner?: { host?: string; pid?: number; thread?: number }; lockIsAlive?: (pid: number) => QueueLiveness;
   /** ISS-JOBQSTALL-002: worker-thread lease (default 60 s) and the OS start-time source used to detect a reused pid (default: the real lookup). */
   lockThreadLeaseMs?: number; lockStartTime?: (pid: number) => number | null;
-  /** ISS-JOBQLOST-001: retention for TERMINAL jobs (done/dead), in queue-clock ms. OFF when unset (default): nothing is ever removed. When set (a positive safe integer),
-   *  inside the same locked load->save an operation drops the terminal jobs of ITS OWN tenant that have been terminal for >= this long. The value is a product decision
-   *  because pruning forgets the id: re-enqueueing a pruned id enqueues a NEW job (idempotency only lasts for the retention window). nextSeq never rewinds. */
-  pruneTerminalAfterMs?: number }
+  /** ISS-JOBQLOST-001 / ISS-JOBQPRUNE-001: retention for TERMINAL jobs (done/dead), in queue-clock ms. DEFAULT 30 days (DEFAULT_PRUNE_TERMINAL_AFTER_MS; Approver ruling 2026-10-12 (2)):
+   *  unset = pruning ON at 30 days. A positive safe integer overrides the value. `null` DISABLES pruning (nothing is stamped or removed; the pre-default behaviour). 0, negatives and non-integers throw RangeError.
+   *  Inside the same locked load->save an operation drops the terminal jobs of ITS OWN tenant that have been terminal for >= this long. Pruning forgets the id: re-enqueueing a pruned id
+   *  enqueues a NEW job (idempotency only lasts for the retention window). nextSeq never rewinds. */
+  pruneTerminalAfterMs?: number | null }
+/** Default retention for terminal jobs: 30 days (Approver ruling 2026-10-12 (2)). */
+export const DEFAULT_PRUNE_TERMINAL_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 const err = (code: QueueError["code"], message: string): { ok: false; error: QueueError } => ({ ok: false, error: { code, message } });
 const refError = (r: LeaseRef) => validateQueueId(r?.id, "job id") ?? validateQueueId(r?.workerId, "worker id") ?? (r?.tenantId === undefined ? null : validateQueueId(r.tenantId, "tenant id"));
 const expired = (j: QueueJob, now: number) => j.status === "leased" && j.leaseExpiresAt !== null && now >= j.leaseExpiresAt;
 
 export class FileJobQueue implements JobQueue {
-  private readonly fs: QueueFs; private readonly leaseMs: number;
+  private readonly fs: QueueFs; private readonly leaseMs: number; private readonly keepTerminalMs: number | null;
   constructor(private readonly o: FileJobQueueOptions) {
     this.fs = o.fs ?? realQueueFs; this.leaseMs = o.leaseMs ?? DEFAULT_LEASE_MS;
     if (!Number.isSafeInteger(this.leaseMs) || this.leaseMs <= 0) throw new RangeError("leaseMs must be a positive integer");
     const p = o.pruneTerminalAfterMs;
-    if (p !== undefined && (!Number.isSafeInteger(p) || p <= 0)) throw new RangeError("pruneTerminalAfterMs must be a positive integer");
+    if (p !== undefined && p !== null && (!Number.isSafeInteger(p) || p <= 0)) throw new RangeError("pruneTerminalAfterMs must be a positive integer or null (disabled)");
+    this.keepTerminalMs = p === undefined ? DEFAULT_PRUNE_TERMINAL_AFTER_MS : p;
   }
   private time(): QueueResult<number> {
     let n: unknown; try { n = this.o.now(); } catch { return err("invalid-input", "clock threw"); }
     return Number.isSafeInteger(n) && (n as number) >= 0 ? { ok: true, value: n as number } : err("invalid-input", "clock returned a bad time");
   }
-  /** ISS-JOBQLOST-001 (no-op when pruneTerminalAfterMs is unset). Stamps every terminal job not yet stamped (incl. ones written by an older build) with `now`, then removes the
+  /** ISS-JOBQLOST-001 (no-op when pruning is disabled with pruneTerminalAfterMs: null). Stamps every terminal job not yet stamped (incl. ones written by an older build) with `now`, then removes the
    *  terminal jobs of `tenantId` (none when the operation names no tenant) whose stamp is >= the retention old. ready/leased jobs are never touched; a clock that went backwards prunes nothing. */
   private prune(s: QueueFileState, now: number, tenantId: string | undefined): void {
-    const keep = this.o.pruneTerminalAfterMs; if (keep === undefined) return;
+    const keep = this.keepTerminalMs; if (keep === null) return;
     for (const j of s.jobs) if ((j.status === "done" || j.status === "dead") && j.terminalAt === undefined) j.terminalAt = now;
     if (tenantId === undefined) return;
     s.jobs = s.jobs.filter(j => !((j.status === "done" || j.status === "dead") && j.tenantId === tenantId && j.terminalAt !== undefined && now - j.terminalAt >= keep));
