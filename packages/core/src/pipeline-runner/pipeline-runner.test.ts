@@ -240,3 +240,90 @@ test("every queue call carries the tenant: claim is restricted and every LeaseRe
   const s = val(runner.step(c.lease)) as { attempt: { stage: string; attemptId: string } }; val(runner.fail(c.lease, s.attempt, "x"));
   assert.deepEqual(claims, ["tA"]); assert.ok(refs.length >= 2 && refs.every((x) => x.tenantId === "tA"), JSON.stringify(refs));
 });
+
+// ---- ISS-T050ADAPTER-001: every complete/fail ref carries tenantId (the queue enforces it; these pin the adapter) ----
+function recordingRig() {
+  const qfs = new MemQueueFs(), sfs = new FakeRunStateFs(); let t = 1000;
+  const inner = new FileJobQueue({ dir: "/q", now: () => t, leaseMs: 1000, fs: qfs });
+  const calls: Array<{ op: string; ref: { id: string; tenantId?: string }; code?: string }> = [];
+  const spy = { enqueue: (i: never) => inner.enqueue(i), claim: (w: string, o?: { tenantId?: string }) => inner.claim(w, o),
+    heartbeat: (x: { id: string; tenantId?: string }) => inner.heartbeat(x as never),
+    complete: (x: { id: string; tenantId?: string }) => { calls.push({ op: "complete", ref: { ...x } }); return inner.complete(x as never); },
+    fail: (x: { id: string; tenantId?: string }, c: string) => { calls.push({ op: "fail", ref: { ...x }, code: c }); return inner.fail(x as never, c); } };
+  const raw = createRunStateStore("/runs", sfs);
+  const runner = createPipelineRunner({ def: DEF, queue: spy as never, store: raw, now: () => t });
+  return { qfs, sfs, raw, runner, calls };
+}
+const assertTenantRef = (c: { op: string; ref: { id: string; tenantId?: string }; code?: string } | undefined, op: string, tenant: string, id: string, code?: string) => {
+  assert.ok(c, `${op} was not called`); assert.equal(c.op, op); assert.equal(c.ref.tenantId, tenant, `${op}${code ? ":" + code : ""} ref lost its tenantId`); assert.equal(c.ref.id, id); assert.equal(c.code, code);
+};
+
+test("ISS-T050ADAPTER-001: queue.complete (complete run and failed-terminal) carries tenantId", () => {
+  const r = recordingRig(); const sub = val(r.runner.submit(SUB)); const c = val(r.runner.claim("w1", "tA"))!;
+  const s = val(r.runner.step(c.lease)) as { attempt: { stage: string; attemptId: string } };
+  val(r.runner.fail(c.lease, s.attempt, "bad-media")); // capture non-retryable
+  assert.equal(val(r.runner.step(c.lease)).kind, "failed-terminal");
+  assertTenantRef(r.calls[0], "complete", "tA", sub.runId); assert.equal(r.calls.length, 1);
+  const r2 = recordingRig(); const sub2 = val(r2.runner.submit(SUB)); const c2 = val(r2.runner.claim("w1", "tA"))!;
+  for (const [i, n] of ["capture", "media", "transcript"].entries()) {
+    const st = val(r2.runner.step(c2.lease)) as { attempt: { stage: string; attemptId: string } }; assert.equal(st.attempt.stage, n); val(r2.runner.succeed(c2.lease, st.attempt, `o${i}`));
+  }
+  val(r2.runner.skip(c2.lease, "screen"));
+  const st = val(r2.runner.step(c2.lease)) as { attempt: { stage: string; attemptId: string } }; val(r2.runner.succeed(c2.lease, st.attempt, "oi"));
+  assert.deepEqual(val(r2.runner.step(c2.lease)), { kind: "complete" });
+  assertTenantRef(r2.calls[0], "complete", "tA", sub2.runId); assert.equal(r2.calls.length, 1);
+});
+
+test("ISS-T050ADAPTER-001: queue.fail run-missing, bad-payload and plan-invalid carry tenantId", () => {
+  const a = recordingRig(); const subA = val(a.runner.submit(SUB)); const cA = val(a.runner.claim("w1", "tA"))!;
+  for (const k of [...a.sfs.files.keys()]) if (k.includes(subA.runId)) a.sfs.files.delete(k);
+  assert.equal(code(a.runner.step(cA.lease)), "runner:run-missing");
+  assertTenantRef(a.calls[0], "fail", "tA", subA.runId, "run-missing"); assert.equal(a.calls.length, 1);
+
+  const b = recordingRig(); const subB = val(b.runner.submit(SUB));
+  const raw = JSON.parse(b.qfs.files.get(`/q/${QUEUE_FILE}`)!); raw.jobs[0].payload = { runKey: "other", sourceFingerprint: "fp1" };
+  b.qfs.files.set(`/q/${QUEUE_FILE}`, JSON.stringify(raw));
+  assert.equal(code(b.runner.claim("w1", "tA")), "runner:bad-payload");
+  assertTenantRef(b.calls[0], "fail", "tA", subB.runId, "bad-payload"); assert.equal(b.calls.length, 1);
+
+  const c = recordingRig(); const subC = val(c.runner.submit(SUB)); const cC = val(c.runner.claim("w1", "tA"))!;
+  const ld = c.raw.load(subC.runId); assert.ok(ld.ok && ld.state);
+  const tampered = JSON.parse(JSON.stringify(ld.state)); tampered.stages.bogus = JSON.parse(JSON.stringify(tampered.stages.capture));
+  const sv = c.raw.save(subC.runId, ld.state, tampered); assert.ok(sv.ok, JSON.stringify(sv));
+  assert.equal(code(c.runner.step(cC.lease)), "workflow:unknown-stage");
+  assertTenantRef(c.calls[0], "fail", "tA", subC.runId, "plan-invalid"); assert.equal(c.calls.length, 1);
+});
+
+test("ISS-T050ADAPTER-001: the real queue refuses tenant B's complete/fail on tenant A's job (not-found, job untouched)", () => {
+  const r = rig(); const sub = val(r.runner.submit(SUB)); const la = lease(r, "tA", "w1");
+  const ref = { id: sub.runId, workerId: la.workerId, attempt: la.attempt };
+  const before = r.qfs.files.get(`/q/${QUEUE_FILE}`);
+  for (const res of [r.queue.complete({ ...ref, tenantId: "tB" }), r.queue.fail({ ...ref, tenantId: "tB" }, "x")]) {
+    assert.equal(res.ok, false); assert.equal((res as { error: { code: string } }).error.code, "not-found");
+  }
+  assert.equal(r.qfs.files.get(`/q/${QUEUE_FILE}`), before, "queue file byte-identical");
+  assert.equal(jobs(r.qfs)[0]!.status, "leased");
+  assert.equal(r.queue.complete({ ...ref, tenantId: "tA" }).ok, true, "the owning tenant can still complete");
+});
+
+// ---- ISS-T050ADAPTER-002: the store's save warning is surfaced ----
+test("ISS-T050ADAPTER-002: a save warning is returned as warnings on step/succeed/fail/heartbeat/skip and submit; absent otherwise", () => {
+  let warn: string | undefined;
+  const r = rig({ wrap: (s) => ({ load: (id) => s.load(id), save: (id, e, n) => { const x = s.save(id, e, n); return x.ok && warn ? { ok: true, warning: warn } : x; } }) });
+  warn = "lock-leftover";
+  const sub = r.runner.submit(SUB); assert.ok(sub.ok); assert.deepEqual(sub.warnings, ["lock-leftover"]);
+  warn = undefined; const l = lease(r);
+  const clean = r.runner.step(l); assert.ok(clean.ok); assert.equal("warnings" in clean, false, "no warning, no field");
+  const at = (clean as { ok: true; value: { attempt: StageAttemptT } }).value.attempt;
+  warn = "w-hb"; const hb = r.runner.heartbeat(l, at); assert.ok(hb.ok); assert.deepEqual(hb.warnings, ["w-hb"]);
+  warn = "w-ok"; const su = r.runner.succeed(l, at, "o1"); assert.ok(su.ok); assert.deepEqual(su.warnings, ["w-ok"]);
+  warn = "w-step"; const st = r.runner.step(l); assert.ok(st.ok); assert.deepEqual(st.warnings, ["w-step"]);
+  const at2 = (st as { ok: true; value: { attempt: StageAttemptT } }).value.attempt;
+  warn = "w-fail"; const fl = r.runner.fail(l, at2, "io-error"); assert.ok(fl.ok); assert.deepEqual(fl.warnings, ["w-fail"]);
+  // skip: finish to the optional stage on a fresh rig
+  const r2 = rig({ wrap: (s) => ({ load: (id) => s.load(id), save: (id, e, n) => { const x = s.save(id, e, n); return x.ok && warn ? { ok: true, warning: warn } : x; } }) });
+  warn = undefined; val(r2.runner.submit(SUB)); const l2 = lease(r2);
+  doStage(r2, l2, "capture", "o1"); doStage(r2, l2, "media", "o2"); doStage(r2, l2, "transcript", "o3");
+  warn = "w-skip"; const sk = r2.runner.skip(l2, "screen"); assert.ok(sk.ok); assert.deepEqual(sk.warnings, ["w-skip"]);
+});
+type StageAttemptT = { stage: string; attemptId: string };
