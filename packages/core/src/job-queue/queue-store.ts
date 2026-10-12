@@ -46,6 +46,7 @@ function validJob(j: any): j is QueueJob {
   if (!["ready", "leased", "done", "dead"].includes(j.status)) return false;
   if (!isInt(j.seq) || !isInt(j.enqueuedAt) || !isInt(j.attempt) || !isInt(j.maxAttempts) || j.maxAttempts < 1 || j.attempt > j.maxAttempts) return false;
   if (!isStrOrNull(j.workerId) || !isStrOrNull(j.errorCode) || !(j.leaseExpiresAt === null || isInt(j.leaseExpiresAt))) return false;
+  if ("terminalAt" in j && (!isInt(j.terminalAt) || (j.status !== "done" && j.status !== "dead"))) return false; // only a terminal job may carry it
   return j.status === "leased" ? j.workerId !== null && j.leaseExpiresAt !== null : j.workerId === null && j.leaseExpiresAt === null;
 }
 export function decodeQueue(raw: string): QueueResult<QueueFileState> {
