@@ -18,7 +18,11 @@ export interface FileJobQueueOptions { dir: string; now: () => number; leaseMs?:
   /** Lock takeover judge (ISS-JOBQLOST-003): ceiling above which a live-looking holder is displaced (default 1 h) and test seams for the owner identity / pid probe. */
   lockLiveCeilingMs?: number; lockOwner?: { host?: string; pid?: number; thread?: number }; lockIsAlive?: (pid: number) => QueueLiveness;
   /** ISS-JOBQSTALL-002: worker-thread lease (default 60 s) and the OS start-time source used to detect a reused pid (default: the real lookup). */
-  lockThreadLeaseMs?: number; lockStartTime?: (pid: number) => number | null }
+  lockThreadLeaseMs?: number; lockStartTime?: (pid: number) => number | null;
+  /** ISS-JOBQLOST-001: retention for TERMINAL jobs (done/dead), in queue-clock ms. OFF when unset (default): nothing is ever removed. When set (a positive safe integer),
+   *  inside the same locked load->save an operation drops the terminal jobs of ITS OWN tenant that have been terminal for >= this long. The value is a product decision
+   *  because pruning forgets the id: re-enqueueing a pruned id enqueues a NEW job (idempotency only lasts for the retention window). nextSeq never rewinds. */
+  pruneTerminalAfterMs?: number }
 const err = (code: QueueError["code"], message: string): { ok: false; error: QueueError } => ({ ok: false, error: { code, message } });
 const refError = (r: LeaseRef) => validateQueueId(r?.id, "job id") ?? validateQueueId(r?.workerId, "worker id") ?? (r?.tenantId === undefined ? null : validateQueueId(r.tenantId, "tenant id"));
 const expired = (j: QueueJob, now: number) => j.status === "leased" && j.leaseExpiresAt !== null && now >= j.leaseExpiresAt;
@@ -28,13 +32,23 @@ export class FileJobQueue implements JobQueue {
   constructor(private readonly o: FileJobQueueOptions) {
     this.fs = o.fs ?? realQueueFs; this.leaseMs = o.leaseMs ?? DEFAULT_LEASE_MS;
     if (!Number.isSafeInteger(this.leaseMs) || this.leaseMs <= 0) throw new RangeError("leaseMs must be a positive integer");
+    const p = o.pruneTerminalAfterMs;
+    if (p !== undefined && (!Number.isSafeInteger(p) || p <= 0)) throw new RangeError("pruneTerminalAfterMs must be a positive integer");
   }
   private time(): QueueResult<number> {
     let n: unknown; try { n = this.o.now(); } catch { return err("invalid-input", "clock threw"); }
     return Number.isSafeInteger(n) && (n as number) >= 0 ? { ok: true, value: n as number } : err("invalid-input", "clock returned a bad time");
   }
+  /** ISS-JOBQLOST-001 (no-op when pruneTerminalAfterMs is unset). Stamps every terminal job not yet stamped (incl. ones written by an older build) with `now`, then removes the
+   *  terminal jobs of `tenantId` (none when the operation names no tenant) whose stamp is >= the retention old. ready/leased jobs are never touched; a clock that went backwards prunes nothing. */
+  private prune(s: QueueFileState, now: number, tenantId: string | undefined): void {
+    const keep = this.o.pruneTerminalAfterMs; if (keep === undefined) return;
+    for (const j of s.jobs) if ((j.status === "done" || j.status === "dead") && j.terminalAt === undefined) j.terminalAt = now;
+    if (tenantId === undefined) return;
+    s.jobs = s.jobs.filter(j => !((j.status === "done" || j.status === "dead") && j.tenantId === tenantId && j.terminalAt !== undefined && now - j.terminalAt >= keep));
+  }
   /** load -> `change(state, now)` on a private copy -> save only if the copy changed (a failed/no-op change writes nothing). */
-  private run<T>(change: (s: QueueFileState, now: number) => QueueResult<T>): QueueResult<T> {
+  private run<T>(change: (s: QueueFileState, now: number) => QueueResult<T>, tenantId?: string): QueueResult<T> {
     const t = this.time(); if (!t.ok) return t;
     const lk = { waitMs: this.o.lockWaitMs ?? QUEUE_LOCK_WAIT_MS, staleMs: this.o.lockStaleMs ?? QUEUE_LOCK_STALE_MS, wallNow: this.o.wallNow ?? Date.now,
       liveCeilingMs: this.o.lockLiveCeilingMs, host: this.o.lockOwner?.host, pid: this.o.lockOwner?.pid, thread: this.o.lockOwner?.thread, isAlive: this.o.lockIsAlive,
@@ -43,6 +57,7 @@ export class FileJobQueue implements JobQueue {
       const l = loadQueue(this.fs, this.o.dir); if (!l.ok) return l;
       const state: QueueFileState = structuredClone(l.value.state), before = JSON.stringify(state);
       const r = change(state, t.value);
+      if (r.ok) this.prune(state, t.value, tenantId);
       if (JSON.stringify(state) === before) return r;
       const s = saveQueue(this.fs, this.o.dir, l.value, state, stillHeld);
       return s.ok ? r : s;
@@ -63,7 +78,7 @@ export class FileJobQueue implements JobQueue {
       }
       s.jobs.push({ id: input.id, tenantId: input.tenantId, payload, status: "ready", seq: s.nextSeq++, enqueuedAt: now, attempt: 0, maxAttempts: max, workerId: null, leaseExpiresAt: null, errorCode: null });
       return { ok: true, value: "enqueued" as const };
-    });
+    }, input.tenantId);
   }
   claim(workerId: string, opts: { tenantId?: string } = {}): QueueResult<QueueJob | null> {
     const bad = validateQueueId(workerId, "worker id") ?? (opts.tenantId === undefined ? null : validateQueueId(opts.tenantId, "tenant id"));
@@ -78,7 +93,7 @@ export class FileJobQueue implements JobQueue {
       if (!j) return { ok: true, value: null };
       j.status = "leased"; j.workerId = workerId; j.attempt += 1; j.leaseExpiresAt = now + this.leaseMs; j.errorCode = null;
       return { ok: true, value: structuredClone(j) };
-    });
+    }, opts.tenantId);
   }
   private owned(s: QueueFileState, ref: LeaseRef): QueueResult<QueueJob> {
     const j = s.jobs.find(x => x.id === ref.id);
@@ -93,14 +108,14 @@ export class FileJobQueue implements JobQueue {
     return this.run((s, now) => {
       const o = this.owned(s, ref); if (!o.ok) return o;
       o.value.leaseExpiresAt = now + this.leaseMs; return { ok: true, value: structuredClone(o.value) };
-    });
+    }, ref.tenantId);
   }
   complete(ref: LeaseRef): QueueResult<QueueJob> {
     const bad = refError(ref); if (bad) return { ok: false, error: bad };
     return this.run(s => {
       const o = this.owned(s, ref); if (!o.ok) return o;
       Object.assign(o.value, { status: "done", workerId: null, leaseExpiresAt: null, errorCode: null }); return { ok: true, value: structuredClone(o.value) };
-    });
+    }, ref.tenantId);
   }
   fail(ref: LeaseRef, errorCode: string): QueueResult<QueueJob> {
     const bad = refError(ref) ?? validateQueueId(errorCode, "error code"); if (bad) return { ok: false, error: bad };
@@ -109,6 +124,6 @@ export class FileJobQueue implements JobQueue {
       const j = o.value;
       Object.assign(j, { status: j.attempt >= j.maxAttempts ? "dead" : "ready", workerId: null, leaseExpiresAt: null, errorCode });
       return { ok: true, value: structuredClone(j) };
-    });
+    }, ref.tenantId);
   }
 }

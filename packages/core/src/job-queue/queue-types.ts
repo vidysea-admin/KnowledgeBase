@@ -20,6 +20,8 @@ export interface QueueJob {
   workerId: string | null;
   leaseExpiresAt: number | null;
   errorCode: string | null;
+  /** ISS-JOBQLOST-001: queue-clock time the job was first seen terminal (done/dead). Written ONLY when pruning is enabled (FileJobQueueOptions.pruneTerminalAfterMs); absent otherwise. */
+  terminalAt?: number;
 }
 
 /** What a worker holds after a claim; every later call must present it (fences a stale handler of an older attempt). */
