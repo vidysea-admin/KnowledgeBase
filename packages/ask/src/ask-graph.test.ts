@@ -6,13 +6,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
 import type { TreeIndexNode } from "@lkb/core";
 import type { ScoreFn } from "./evaluator.js";
 import type { CompleteFn } from "./select-nodes.js";
 import { fakeComplete, fakeWrite, fakeTreeSearch } from "./testUtils.js";
-import { askV2, type AskV2Deps } from "./ask-v2.js";
-import { BoundedAskError, type SourceQuote } from "./source-context.js";
+import { askV2, type AskV2Deps, type AskV2Result } from "./ask-v2.js";
+import { BoundedAskError, SOURCE_LIMITS, type SourceQuote } from "./source-context.js";
 import { ASK_GRAPH, askGraphV2, initAskGraphState, runAskGraphNodes } from "./ask-graph.js";
 
 const TREE: TreeIndexNode = {
@@ -79,7 +80,56 @@ function bounded(o: { score?: number; attack?: string } = {}, extra: Partial<Ask
   };
 }
 
-type Scenario = { name: string; tree: TreeIndexNode; query: string; make: () => Rig };
+// ---- ISS-T050ASKGRAPH-001: extra bounded rig (multi-node, web citation, degraded hydrate, throwing complete) ----
+const TEXT = "Visa requires a form.";
+function mkQuote(i: number, node: TreeIndexNode): SourceQuote {
+  return { ...quote, id: `q${i}`, nodeId: node.node_id, sessionRef: `s${i}`, turnId: `s${i}-t1`, turnTextSHA256: sha(TEXT), sliceSHA256: sha(TEXT) };
+}
+interface BoundedXOpts { n?: number; score?: number; citeWeb?: boolean; degraded?: string; throwOn?: string; swallowedHuge?: boolean }
+type RigX = Rig & { hydrateSeen: () => number[]; tree: TreeIndexNode };
+function boundedX(o: BoundedXOpts = {}, extra: Partial<AskV2Deps> = {}): RigX {
+  const n = o.n ?? 1;
+  const nodes: TreeIndexNode[] = Array.from({ length: n }, (_, i) => ({ node_id: `tenant:t/session:s${i}`, title: `S${i}`, level: "session",
+    summary: "PRIVATE ".repeat(10), evidence: { sessionRef: `s${i}` }, children: [] } as unknown as TreeIndexNode));
+  const xtree: TreeIndexNode = { node_id: "tenant:t", title: "T", level: "tenant", summary: "", children: nodes };
+  const calls: string[] = []; const writes: unknown[] = []; const seen: number[] = [];
+  const complete: CompleteFn = async (job) => {
+    calls.push(job.kind);
+    if (job.kind === o.throwOn) throw new Error("provider exploded");
+    if (job.kind === "ask.select_nodes") return jres({ node_ids: nodes.map((x) => x.node_id) });
+    if (job.kind === "ask.refine_batch") {
+      const strips = JSON.parse(job.messages[1]!.content).strips;
+      return jres({ decisions: strips.map((s: { id: string }) => ({ id: s.id, keep: true })) });
+    }
+    if (job.kind === "ask.answer_grounding") return jres({ decisions: [{ id: "sentence-0", supported: true, answersQuery: true }] });
+    if (job.kind === "ask.score_probe") return jres({});
+    return jres({ sentences: [{ text: "The source says a visa requires a form.", sourceIds: o.citeWeb ? ["q0", "web-0"] : ["q0"] }] });
+  };
+  const sc: Partial<AskV2Deps> = o.swallowedHuge
+    ? { scoreFnForComplete: (c: CompleteFn) => async () => {
+        try { await c({ kind: "ask.score_probe", messages: [{ role: "user", content: "x".repeat(70_000) }] }); } catch { /* swallowed like the evaluator's heuristic fallback */ }
+        return 0.9; } }
+    : {};
+  const deps: AskV2Deps = {
+    complete, scoreFn: () => [o.score ?? 0.9, "offline structural fixture"], tenantId: "t",
+    treeSearchFn: (_r, ids) => nodes.filter((x) => ids.includes(x.node_id)),
+    // elapsedStartMs is wall-clock; mask it so the write comparison is deterministic.
+    write: async (job) => { const { createdAt: _c, ...rest } = job as unknown as Record<string, unknown>;
+      if (typeof rest.error === "string") rest.error = rest.error.replace(/"elapsedStartMs":\d+/g, '"elapsedStartMs":0');
+      writes.push(rest); },
+    sourceContext: { hydrate: async (_q, given) => { seen.push(given.length); return { nodes: given.map((g) => {
+      const k = Number(g.node_id.split(":s").pop());
+      const q = mkQuote(k, g);
+      return { ...g, summary: JSON.stringify([q]), children: [], evidence: { sessionRef: `s${k}`, sourceQuotes: [q], sourceSnapshotSHA256: snapshot } } as unknown as TreeIndexNode;
+    }), snapshotSHA256: snapshot, sourceBytes: 100, ...(o.degraded ? { degraded: o.degraded } : {}) }; } },
+    ...sc, ...extra,
+  };
+  return { deps, writes: () => writes, calls: () => calls, hydrateSeen: () => seen, tree: xtree };
+}
+const xt = (n: number): TreeIndexNode => boundedX({ n }).tree;
+const wkind = (rig: Rig) => rig.writes().map((w) => (w as { kind: string }).kind);
+
+type Scenario = { name: string; tree: TreeIndexNode; query: string; make: () => Rig; check?: (r: AskV2Result, rig: Rig) => void };
 const S: Scenario[] = [
   { name: "correct verdict", tree: TREE, query: "what color are apples?",
     make: () => plain([{ json: { node_ids: [A.node_id] } }, { text: "Final answer" }], { [A.node_id]: 0.9 }, { webFallbackFn: () => { throw new Error("no web"); } }) },
@@ -115,12 +165,70 @@ const S: Scenario[] = [
     make: () => bounded({ score: 0.1 }, { tavilySearchFn: async () => [] }) },
   { name: "bounded poisoned arm", tree: btree, query: "visa form",
     make: () => bounded({}, { extraCandidateArmsFn: async () => ({ arms: [[{ ...bnode, summary: "FOREIGN", evidence: { sessionRef: "foreign" } } as unknown as TreeIndexNode]], degraded: null }) }) },
+  // ---- ISS-T050ASKGRAPH-001: previously uncovered branches ----
+  { name: "bounded + tavily with web results: web becomes a citable bounded source", tree: xt(1), query: "visa form",
+    make: () => boundedX({ score: 0.5, citeWeb: true }, { tavilySearchFn: async () => [{ title: "Gov", content: "Web visa evidence." }] }),
+    check: (r, rig) => {
+      assert.equal(r.web_used, true); assert.equal(r.insufficient_coverage, false);
+      assert.ok(r.auditLog.some((e) => e.jobKind === "ask.web_fallback"));
+      assert.ok(wkind(rig).includes("ask.web_fallback"));
+      assert.deepEqual(rig.calls(), ["ask.select_nodes", "ask.refine_batch", "ask.answer", "ask.answer_grounding"]);
+      assert.match(r.answer, /visa requires a form/);
+    } },
+  { name: "bounded candidate cap: 8 candidates are cut to SOURCE_LIMITS.candidates before hydrate", tree: xt(8), query: "visa form",
+    make: () => boundedX({ n: 8 }),
+    check: (r, rig) => {
+      assert.deepEqual((rig as RigX).hydrateSeen(), [SOURCE_LIMITS.candidates]);
+      const e = r.auditLog.find((x) => x.jobKind === "ask.candidates_bounded");
+      assert.equal(e?.step, `${8 - SOURCE_LIMITS.candidates} lower-ranked candidates omitted from bounded scoring`);
+      assert.match(r.auditLog.find((x) => x.jobKind === "ask.source_hydrated")!.step, /^6 source nodes;/);
+    } },
+  { name: "bounded exactly at the cap: no candidates_bounded entry", tree: xt(6), query: "visa form",
+    make: () => boundedX({ n: 6 }),
+    check: (r, rig) => {
+      assert.deepEqual((rig as RigX).hydrateSeen(), [6]);
+      assert.ok(!r.auditLog.some((x) => x.jobKind === "ask.candidates_bounded"));
+    } },
+  { name: "scoreFnForComplete: score calls are logged via complete, ask.score audit is skipped", tree: TREE, query: "what color are apples?",
+    make: () => plain([{ json: { node_ids: [A.node_id] } }, { text: "scored" }, { text: "Final answer" }], {},
+      { scoreFnForComplete: (c) => async () => { await c({ kind: "evaluator", messages: [{ role: "user", content: "score" }] }); return 0.9; } }),
+    check: (r, rig) => {
+      assert.equal(r.auditLog.filter((e) => e.jobKind === "ask.score").length, 1, "exactly the one logged call, no per-node ask.score on top");
+      assert.ok(r.auditLog.some((e) => e.jobKind === "ask.score" && e.provider === "fake"));
+      assert.deepEqual(wkind(rig), ["ask.select_nodes", "ask.score", "ask.answer"]);
+    } },
+  { name: "scoreFnForComplete absent: one ask.score audit entry per scored node", tree: TREE, query: "q",
+    make: () => plain([{ json: { node_ids: [A.node_id, B.node_id] } }, { text: "Final answer" }], { [A.node_id]: 0.9, [B.node_id]: 0.9 }),
+    check: (r) => assert.equal(r.auditLog.filter((e) => e.jobKind === "ask.score").length, 2) },
+  { name: "hydrate degraded: failed retrieval_degraded write and audit entry", tree: xt(1), query: "visa form",
+    make: () => boundedX({ degraded: "lexical index stale" }),
+    check: (r, rig) => {
+      assert.ok(r.auditLog.some((e) => e.jobKind === "ask.retrieval_degraded" && e.step === "lexical index stale"));
+      assert.ok(rig.writes().some((w) => { const x = w as { kind: string; status: string; error?: string }; return x.kind === "ask.retrieval_degraded" && x.status === "failed" && x.error === "lexical index stale"; }));
+    } },
+  { name: "legacy tavily returning []: still a web fallback (only bounded mode refuses empty)", tree: TREE, query: "q",
+    make: () => plain([{ json: { node_ids: [B.node_id] } }, { text: "Final answer" }], { [B.node_id]: 0.05 }, { tavilySearchFn: async () => [] }),
+    check: (r, rig) => {
+      assert.equal(r.web_used, true); assert.equal(r.insufficient_coverage, false); assert.deepEqual(r.sources.web, []);
+      assert.ok(r.auditLog.some((e) => e.jobKind === "ask.web_fallback"));
+      assert.ok(!r.auditLog.some((e) => e.jobKind === "ask.web_fallback_empty"));
+      assert.ok(wkind(rig).includes("ask.web_fallback"));
+    } },
 ];
 
 async function settle(f: () => Promise<unknown>): Promise<{ ok: true; value: unknown } | { ok: false; name: string; message: string }> {
   try { return { ok: true, value: await f() }; }
   catch (e) { return { ok: false, name: (e as Error).constructor.name, message: (e as Error).message }; }
 }
+
+// Frozen pre-refactor baseline (ISS-T050ASKGRAPH-002): the byte-exact askV2 result, writes and provider
+// calls per scenario, recorded from the ORIGINAL duplicated-body askV2. Once askV2 and the graph share
+// one set of node functions the two-way comparison alone can no longer see a regression; this can.
+// Regenerate only deliberately: WRITE_ASK_BASELINE=1.
+const BASELINE_PATH = new URL("./ask-graph.baseline.json", import.meta.url);
+const baseline: Record<string, string> = existsSync(BASELINE_PATH) ? JSON.parse(readFileSync(BASELINE_PATH, "utf8")) : {};
+const recorded: Record<string, string> = {};
+process.on("exit", () => { if (process.env.WRITE_ASK_BASELINE === "1") writeFileSync(BASELINE_PATH, JSON.stringify(recorded, null, 1) + "\n"); });
 
 for (const sc of S) {
   test(`golden: ${sc.name} - graph output, writes and provider calls equal askV2`, async () => {
@@ -131,8 +239,58 @@ for (const sc of S) {
     assert.equal(JSON.stringify(neu), JSON.stringify(old), "byte-identical serialisation");
     assert.deepEqual(b.writes(), a.writes());
     assert.deepEqual(b.calls(), a.calls());
+    sc.check?.(old, a);
+    sc.check?.(neu, b);
+    const frozen = JSON.stringify({ result: old, writes: a.writes(), calls: a.calls() });
+    recorded[sc.name] = frozen;
+    if (process.env.WRITE_ASK_BASELINE !== "1") assert.equal(frozen, baseline[sc.name], "askV2 drifted from the frozen pre-refactor baseline");
   });
 }
+
+test("golden: bounded completion-budget refusal (swallowed over-budget call, then assertHealthy) is identical and carries diagnostics", async () => {
+  const mk = () => boundedX({ swallowedHuge: true });
+  const a = mk(); const b = mk();
+  const old = await settle(() => askV2("visa form", a.tree, a.deps));
+  const neu = await settle(() => askGraphV2("visa form", b.tree, b.deps));
+  assert.deepEqual(neu, old);
+  assert.equal(old.ok, false);
+  assert.match((old as { message: string }).message, /budget exhausted/);
+  assert.deepEqual(a.calls(), ["ask.select_nodes"], "refused right after evaluate, before refine/answer spend");
+  assert.deepEqual(b.writes(), a.writes());
+  const w = a.writes().find((x) => (x as { kind: string }).kind === "ask.source_context_refused") as { error: string; status: string };
+  assert.equal(w.status, "failed");
+  const parsed = JSON.parse(w.error);
+  assert.equal(parsed.format, "lkb.budget_refusal.v1");
+  assert.equal(parsed.budgetRefusal.reason, "job_byte_limit");
+});
+
+for (const kind of ["ask.answer", "ask.select_nodes"]) {
+  test(`golden: bounded non-BoundedAskError from ${kind} is wrapped identically as 'source or completion processing failed'`, async () => {
+    const mk = () => boundedX({ throwOn: kind });
+    const a = mk(); const b = mk();
+    const old = await settle(() => askV2("visa form", a.tree, a.deps));
+    const neu = await settle(() => askGraphV2("visa form", b.tree, b.deps));
+    assert.deepEqual(neu, old);
+    assert.equal(old.ok, false);
+    assert.equal((old as { name: string }).name, "BoundedAskError");
+    assert.match((old as { message: string }).message, /source or completion processing failed/);
+    assert.deepEqual(b.writes(), a.writes());
+    const w = a.writes().filter((x) => (x as { kind: string }).kind === "ask.source_context_refused") as Array<{ error: string }>;
+    assert.equal(w.length, 1);
+    assert.match(w[0]!.error, /source or completion processing failed/);
+    assert.ok(!w[0]!.error.includes("provider exploded"), "raw provider error is not leaked into the write");
+  });
+}
+
+test("golden: legacy mode does NOT wrap a non-Bounded error", async () => {
+  const mk = () => plain([{ json: { node_ids: [A.node_id] } }, () => { throw new Error("raw-boom"); }], { [A.node_id]: 0.9 });
+  const a = mk(); const b = mk();
+  const old = await settle(() => askV2("q", TREE, a.deps));
+  const neu = await settle(() => askGraphV2("q", TREE, b.deps));
+  assert.deepEqual(neu, old);
+  assert.deepEqual(old, { ok: false, name: "Error", message: "raw-boom" });
+  assert.equal(wkind(b).includes("ask.source_context_refused"), false);
+});
 
 for (const attack of ["source-unknown", "judge-unknown", "unsupported"]) {
   test(`golden: bounded refusal ${attack} - same error and same refusal write`, async () => {

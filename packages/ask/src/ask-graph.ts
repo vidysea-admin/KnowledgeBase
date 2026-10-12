@@ -2,10 +2,11 @@
  * packages/ask/src/ask-graph.ts — T-050 slice: the /ask flow as a typed graph of 4 coarse nodes
  * (D-142, pending append): retrieve -> evaluate -> refine -> answer. Nodes may be split later.
  *
- * NOT exported from index.ts and NOT wired to any route. `askV2` in ./ask-v2.ts stays the one
- * production path, byte-unchanged; this module is an equivalent, opt-in re-expression of it
- * (golden-equivalence tested). Graph = wiring only: every node calls the same functions askV2 calls.
- * A node failure is NOT wrapped — the original error propagates exactly as in askV2.
+ * NOT exported from index.ts and NOT wired to any route. ISS-T050ASKGRAPH-002: these node functions are
+ * now the ONLY implementation of the /ask pipeline: `askV2` (./ask-v2.ts, the production path) delegates
+ * to `askGraphV2` below, so there is no second copy to drift. Outputs, writes and provider calls are
+ * pinned byte-for-byte by ask-graph.baseline.json. A node failure is NOT wrapped (bounded mode wraps
+ * non-BoundedAskError once, in askGraphV2) — the original error propagates exactly as before.
  */
 import type { TreeIndexNode } from "@lkb/core";
 import { recordJob } from "@lkb/ai";
@@ -218,7 +219,7 @@ export async function runAskGraphNodes(nodes: readonly AskGraphNode[], state: As
   throw new Error("ask graph ended without a result");
 }
 
-/** Graph twin of `askV2` (same signature, same refusal handling). Off by default: nothing calls it. */
+/** The single /ask implementation (askV2 delegates here). The graph itself stays unexported from index.ts. */
 export async function askGraphV2(query: string, tree: TreeIndexNode, deps: AskV2Deps): Promise<AskV2Result> {
   try { return await runAskGraphNodes(ASK_GRAPH, initAskGraphState(query, tree, deps)); }
   catch (err) {
