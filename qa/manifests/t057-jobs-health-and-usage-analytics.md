@@ -1,6 +1,6 @@
 # t057-jobs-health-and-usage-analytics
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap task T-057, features D2 and D4). Lane: lane/t057ops, base d14128e. Read-only: no write path, no schema/ or migrations/ change, no dependency added. UI-touching (D-024): source scope only (jsdom), live-browser check owed. No qa/contracts file exists; the checker supplies one. Lane ledger `qa/issues.t057ops.jsonl` (2 findings: ISS-T057OPS-001, ISS-T057OPS-002).
 
