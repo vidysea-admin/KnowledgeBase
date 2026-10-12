@@ -129,8 +129,8 @@ $ npx depcruise --config .dependency-cruiser.cjs packages apps workers
 $ node scripts/tracker-audit.mjs --gate g1,g4
 tracker-audit --gate G1,G4: 3 finding(s)  (exit 1)
   G1 status: T-033 is "pending" in goal.json but "done" in TASKS.md
-  G4 ambiguous issue ref: qa/manifests/t-033-bot-tests.md cites ISS-001, ISS-002 bare...
-  G4 ambiguous issue ref: qa/verdicts/t-047-controller.md cites ISS-001, ISS-002 bare...
+  G4 ambiguous issue ref: qa/manifests/t-033-bot-tests.md cites 001, 002 bare...
+  G4 ambiguous issue ref: qa/verdicts/t-047-controller.md cites 001, 002 bare...
   (identical on base commit 986fcd8 — verified via `git stash` + rerun; pre-existing T-033/T-047
   bookkeeping, unrelated to this unit)
 ```
@@ -141,7 +141,7 @@ tracker-audit --gate G1,G4: 3 finding(s)  (exit 1)
   byte-identical via `git stash` (reverting every change this unit made) + rerunning
   `node scripts/lint-root.mjs` on base commit `986fcd8` — same 16-file list, same violation.
 - **`tracker-audit --gate g1,g4`**: 3 pre-existing findings about T-033/T-047 bookkeeping
-  (goal.json vs TASKS.md status drift, ambiguous bare `ISS-001`/`ISS-002` refs from before the
+  (goal.json vs TASKS.md status drift, ambiguous bare `001`/`002` refs from before the
   per-lane ledger convention). Also reproduced identically via the same `git stash` + rerun —
   unrelated to T-031, not touched by this unit's files.
 - Neither is part of `pnpm lint:structure`'s or the contract's list of commands this unit could
