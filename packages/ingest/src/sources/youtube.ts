@@ -19,6 +19,8 @@ export type YoutubeErrorCode =
   | "invalid-url"
   | "consent-refused"
   | "exec-failed"
+  | "binary-missing"
+  | "bad-config"
   | "non-zero-exit"
   | "timeout"
   | "no-output"
@@ -78,12 +80,48 @@ function flavourFor(dir: string): typeof posix | typeof win32 {
   return /^[A-Za-z]:[\\/]/.test(dir) || dir.startsWith("\\\\") ? win32 : posix;
 }
 
+/** Env var naming the yt-dlp binary (repo convention: `LKB_<TOOL>_PATH`, like `LKB_GWS_PATH`). */
+export const YT_DLP_ENV = "LKB_YT_DLP_PATH";
+/** Env var naming the ffmpeg binary or directory yt-dlp uses for audio extraction. */
+export const FFMPEG_ENV = "LKB_FFMPEG_PATH";
+
+function validBinaryPath(value: string): boolean {
+  return value.length > 0 && value.length <= 1024 && value === value.trim() && !value.startsWith("-") && !/[\u0000-\u001f\u007f]/.test(value);
+}
+
+/** Pure: the yt-dlp command from an env map (never reads process.env itself). Default `yt-dlp` (PATH lookup). */
+export function resolveYtDlpCommand(env: Record<string, string | undefined>): string {
+  const v = env[YT_DLP_ENV];
+  if (v === undefined || v === "") return "yt-dlp";
+  if (!validBinaryPath(v)) throw new YoutubeSourceError("bad-config", `${YT_DLP_ENV} is not a usable path`);
+  return v;
+}
+
+/** Pure: optional ffmpeg location from an env map; undefined means "let yt-dlp find ffmpeg on PATH". */
+export function resolveFfmpegLocation(env: Record<string, string | undefined>): string | undefined {
+  const v = env[FFMPEG_ENV];
+  if (v === undefined || v === "") return undefined;
+  if (!validBinaryPath(v) || !(posix.isAbsolute(v) || win32.isAbsolute(v))) {
+    throw new YoutubeSourceError("bad-config", `${FFMPEG_ENV} must be an absolute path`);
+  }
+  return v;
+}
+
 /** yt-dlp argument vector (for spawn, no shell). `workDir` is the caller's absolute directory. */
-export function buildYtDlpArgs(videoId: string, workDir: string): string[] {
+export function buildYtDlpArgs(videoId: string, workDir: string, opts: { ffmpegLocation?: string } = {}): string[] {
   const url = canonicalYoutubeUrl(videoId);
   const out = flavourFor(workDir).join(workDir, `yt-${videoId}.%(ext)s`);
+  const ffmpeg: string[] = [];
+  if (opts.ffmpegLocation !== undefined) {
+    const loc = opts.ffmpegLocation;
+    if (!validBinaryPath(loc) || !(posix.isAbsolute(loc) || win32.isAbsolute(loc))) {
+      throw new YoutubeSourceError("bad-config", "ffmpegLocation must be an absolute path");
+    }
+    ffmpeg.push("--ffmpeg-location", loc);
+  }
   return [
     "--ignore-config",
+    ...ffmpeg,
     "--no-playlist",
     "--no-progress",
     "-x",
@@ -173,6 +211,8 @@ export interface YoutubeAdapterDeps {
   transcribe: Transcribe;
   now?: () => string;
   ytDlpCommand?: string;
+  /** Absolute ffmpeg binary/dir passed as `--ffmpeg-location`; see `resolveFfmpegLocation`. */
+  ffmpegLocation?: string;
   timeoutMs?: number;
 }
 
@@ -217,13 +257,15 @@ export function createYoutubeSource(deps: YoutubeAdapterDeps): Source {
       }
       const { videoId, tenantId } = parsed;
       const canonicalUrl = canonicalYoutubeUrl(videoId);
-      const args = buildYtDlpArgs(videoId, deps.workDir);
+      const args = buildYtDlpArgs(videoId, deps.workDir, { ffmpegLocation: deps.ffmpegLocation });
+      const command = deps.ytDlpCommand ?? "yt-dlp";
+      if (!validBinaryPath(command)) throw new YoutubeSourceError("bad-config", "ytDlpCommand is not a usable path");
 
       let timer: ReturnType<typeof setTimeout> | undefined;
       let result: YoutubeExecResult;
       try {
         result = await Promise.race([
-          deps.exec(deps.ytDlpCommand ?? "yt-dlp", args, { cwd: deps.workDir, timeoutMs }),
+          deps.exec(command, args, { cwd: deps.workDir, timeoutMs }),
           new Promise<never>((_, rej) => {
             timer = setTimeout(
               () => rej(new YoutubeSourceError("timeout", `no result within ${timeoutMs}ms`)),
@@ -233,6 +275,9 @@ export function createYoutubeSource(deps: YoutubeAdapterDeps): Source {
         ]);
       } catch (e) {
         if (e instanceof YoutubeSourceError) throw e;
+        if ((e as { code?: unknown } | null)?.code === "ENOENT") {
+          throw new YoutubeSourceError("binary-missing", `yt-dlp binary not found (command "${command}"); set ${YT_DLP_ENV} or install yt-dlp`);
+        }
         throw new YoutubeSourceError("exec-failed", e instanceof Error ? e.message : String(e));
       } finally {
         if (timer) clearTimeout(timer);

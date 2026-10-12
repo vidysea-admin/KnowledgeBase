@@ -19,3 +19,9 @@ export * from "./watched/run.js";
 
 export { createGuardedFetcher, isBlockedAddress, isGuardedFetcher, GUARDED, type GuardedFetchDeps, type GuardedFetcher } from "./sources/guarded-fetch.js";
 export { resolveAll, httpRequest, type HttpTransportResponse } from "./sources/node-transport.js";
+
+// T-045: media-URL sources + the ordered registry.
+export * from "./sources/youtube.js";
+export * from "./sources/hosted-recording.js";
+export { parseOnairUrl, extractOnairEventId, canonicalOnairUrl, onairAdapter, ONAIR_HOST, type OnairParse, type OnairRefusal } from "./sources/onair.js";
+export { parseZoomRecordingUrl, extractZoomRecordingId, canonicalZoomRecordingUrl, zoomRecordingAdapter, ZOOM_HOST, type ZoomRecordingParse, type ZoomRecordingRefusal } from "./sources/zoom-recording.js";
