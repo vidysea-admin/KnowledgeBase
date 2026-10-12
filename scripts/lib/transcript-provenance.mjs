@@ -124,3 +124,13 @@ export function requireLegacyUnboundDatabase(env) {
     throw new Error("legacy-unbound staging requires LKB_ALLOW_STAGING=lkb_staging, MONGO_WORK_DB=lkb_staging and a Mongo URL; other databases refused");
   return {url: env.MONGODB_URL, dbName: "lkb_staging"};
 }
+/**
+ * DB guard for writers that previously defaulted to `lkb` (backfill, sync-speakers). No default database:
+ * refuses lkb/empty/unset. LKB_ALLOW_STAGING selects the lkb_staging path and is honoured ONLY together
+ * with the `--legacy-unbound` flag; otherwise the existing requireWorkDatabase rules apply.
+ */
+export function requireBackfillDatabase(env, {legacyUnbound = false} = {}) {
+  if (env.LKB_ALLOW_STAGING === undefined) return requireWorkDatabase(env);
+  if (!legacyUnbound) throw new Error("LKB_ALLOW_STAGING requires --legacy-unbound; staging write refused");
+  return requireLegacyUnboundDatabase(env);
+}

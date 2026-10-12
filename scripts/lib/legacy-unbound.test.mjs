@@ -68,3 +68,24 @@ test("seed-toc --dry-run: refuses without --legacy-unbound, succeeds with it (no
   const a2 = spawnSync(process.execPath, ["--import", "tsx", "scripts/seed-toc.mjs", "--dry-run", ...one], {cwd: root, encoding: "utf8"}); assert.notEqual(a2.status, 0);
   const b = run("--legacy-unbound", ...one); assert.equal(b.status, 0, b.stderr); assert.match(b.stdout, /No Mongo connection attempted/);
 });
+import { requireBackfillDatabase } from "./transcript-provenance.mjs";
+import { readFileSync } from "node:fs";
+test("backfill/sync-speakers DB guard: no default, refuses lkb, accepts lkb_work_* and staging under double opt-in", () => {
+  const loop = {MONGODB_URL: "mongodb://127.0.0.1:27019", MONGO_WORK_DB: "lkb_work_x"};
+  assert.deepEqual(requireBackfillDatabase(loop), {url: loop.MONGODB_URL, dbName: "lkb_work_x"});
+  assert.throws(() => requireBackfillDatabase({}), /production writes refused/);
+  assert.throws(() => requireBackfillDatabase({MONGODB_URL: loop.MONGODB_URL}), /production writes refused/);
+  assert.throws(() => requireBackfillDatabase({...loop, MONGO_WORK_DB: "lkb"}), /production writes refused/);
+  assert.throws(() => requireBackfillDatabase({MONGODB_URL: loop.MONGODB_URL, MONGODB_DB: "lkb"}), /production writes refused/);
+  assert.throws(() => requireBackfillDatabase({...loop, MONGODB_DB: "lkb"}), /production writes refused/);
+  assert.deepEqual(requireBackfillDatabase(ok, {legacyUnbound: true}).dbName, "lkb_staging");
+  assert.throws(() => requireBackfillDatabase(ok), /requires --legacy-unbound/);
+  assert.throws(() => requireBackfillDatabase({...ok, MONGO_WORK_DB: "lkb"}, {legacyUnbound: true}), /refused/);
+  assert.throws(() => requireBackfillDatabase({...ok, LKB_ALLOW_STAGING: "lkb"}, {legacyUnbound: true}), /refused/);
+});
+test("backfill.mjs and sync-speakers.mjs no longer default to lkb and use the guard", () => {
+  for (const f of ["backfill.mjs", "sync-speakers.mjs"]) {
+    const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", f), "utf8");
+    assert.doesNotMatch(src, /\|\|\s*"lkb"/); assert.match(src, /require(Backfill|Work)Database\(process\.env/);
+  }
+});
