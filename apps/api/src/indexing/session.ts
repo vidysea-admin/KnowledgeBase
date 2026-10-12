@@ -34,6 +34,8 @@ export interface IndexSessionDeps {
   complete: SummarizeCompleteFn;
 
   strictWebinar?: boolean;
+  /** T-040: with strictWebinar, a proposal that fails strict quote verification or the judge is dropped (and counted) instead of degrading the whole page. */
+  dropUnverified?: boolean;
 
   embed?: IndexEmbedFn;
 
@@ -144,8 +146,8 @@ export async function indexSession(
     catch (error) { await sessionsColl(tenantId).updateOne({ _id: sessionId }, { $set: { "status.index": "failed" } }); throw new Error(`strict webinar index incomplete: ${error instanceof Error ? error.message : String(error)}`); }
   }
   const [summarizeResult, claimsResult] = await Promise.all([
-    summarizeSession(turns, deps.complete, { strictWebinar: strict }),
-    extractClaims(turns, deps.complete, { strictWebinar: strict }),
+    summarizeSession(turns, deps.complete, { strictWebinar: strict, dropUnverified: deps.dropUnverified }),
+    extractClaims(turns, deps.complete, { strictWebinar: strict, dropUnverified: deps.dropUnverified }),
   ]);
   const { page: summary, degraded: summaryDegraded } = summarizeResult;
   const { claims: extractedClaims, degraded: claimsDegraded } = claimsResult;
@@ -289,8 +291,8 @@ export async function indexSession(
 
   await sessionsColl(tenantId).updateOne({ _id: sessionId }, { $set: { "status.index": "done" } });
 
-  return { sessionId, chunks, entities, summary: { degraded: summaryDegraded?.reason ?? null },
-    claims: { degraded: claimsDegraded?.reason ?? null },
+  return { sessionId, chunks, entities, summary: { degraded: summaryDegraded?.reason ?? null, ...(summarizeResult.dropped ? { dropped: summarizeResult.dropped.length } : {}) },
+    claims: { degraded: claimsDegraded?.reason ?? null, ...(claimsResult.dropped ? { dropped: claimsResult.dropped.length } : {}) },
     completion: { version: 2, strict, complete: !summaryDegraded && !claimsDegraded && !chunks.skipped && Boolean(newRoot), generation: randomUUID(), turnCount: turns.length, treeWritten: Boolean(newRoot) } };
 }
 
