@@ -18,3 +18,22 @@ Scope: API half of T-039 only (the unit is not T-039 complete; no status endpoin
 - After: harness deleted, production files equal HEAD blobs, `git status` clean.
 
 ISSUES-WRITTEN: ISS-SENDNOWAPI-005
+
+---
+
+# Cycle checked: 1
+
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: 7c1fe0c (lane/sendnowapi)
+
+## EXPLANATION
+
+- Mint (ISS-SENDNOWAPI-001): `DEFAULT_SCOPES` in scripts/lib/mint-scopes.mjs equals the 14-scope `ALL_SCOPES` of the merge base b9e6f80 element for element and in order; `send-now` is added only by `--with-scope send-now`; any other name (typo, `join-rules`, `ask`) or a missing value throws and mint-key exits 1. `join-rules` is NOT in the default list and no script under scripts/ mints it; its WRITE_SCOPE is only checked in apps/api. So the precedent is "no default key holds a dedicated write scope"; no separate finding. scripts/ top level unchanged (lib/ is a subdir; only mint-key.mjs edited).
+- Until (ISS-SENDNOWAPI-005): HH:MM is interpreted in the process's local zone via `setHours`, exactly as the existing `todayAt`/`runRecord`; hour>23 / minute>59 rejected (stricter than todayAt, which would roll over). ISO needs a UTC offset (Z or +hh:mm), real calendar date (Feb 29 non-leap rejected), seconds <=59 (no leap second 60). Boundary: `at <= now` refused (exactly now = rejected), `> +24 h` refused (exactly +24 h accepted). Everything the API accepts is also accepted by `todayAt` and passes runRecord's future check (the API's check is the same or stricter), so no 202-then-fail for until. Residual: HH:MM already passed today is "not in the future" (no next-day wrap), same as runRecord.
+- 24 h cap: ASSUMPTION for the Approver, not a FAIL. grep of record-commands, send-now-command, the planner and docs finds no meeting-length bound (runRecord only requires future). The cap is the maker's; a multi-day webinar series is not a single recording, but the Approver should confirm 24 h.
+- Tests: send-now.test 12/12, send-now-host.test 12/12. `tsc --noEmit -p apps/api`: exactly the 2 known base errors (src/indexing/session.ts:161, src/routes/brain.test.ts:139), none in touched files.
+- Mutations (own harness inside the worktree, per-mutation backup in `finally`, hash == HEAD verified): M1 send-now added to the default list -> KILLED (send-now.test 1 fail); M2 past-time check disabled -> KILLED (send-now-host.test 2 fails). 2 of 2 killed. Harness deleted, trees clean.
+- ISS-SENDNOWAPI-001 and -005 set to verified in qa/issues.sendnowapi.jsonl.
+
+ISSUES-WRITTEN: none
