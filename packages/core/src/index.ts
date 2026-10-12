@@ -23,6 +23,7 @@ export * from "./generated/topics.js";
 export * from "./generated/tree_index.js";
 export * from "./generated/trusted_senders.js";
 export * from "./generated/turns.js";
+export * from "./generated/usage_events.js";
 export * from "./generated/watch_heartbeat.js";
 export * from "./generated/watch_reports.js";
 export * from "./generated/watch_state.js";

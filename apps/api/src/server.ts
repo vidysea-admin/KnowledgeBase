@@ -36,6 +36,9 @@ import { createActivityHealthRouter, unavailableActivityHealthDeps } from "./act
 import type { ActivityHealthDeps } from "./activity-health/types.js";
 import { createNotificationsRouter } from "./activity-health/notifications.js";
 import { createWatchRunsRouter, unavailableWatchRunsDeps, type WatchRunsDeps } from "./activity-health/watch-runs.js";
+import { usageRecorder } from "./usage/recorder.js";
+import { createUsageRouter, unavailableUsageReadDeps } from "./usage/router.js";
+import type { UsageDeps } from "./usage/store.js";
 import { logger as defaultLogger, type Logger } from "./composition/logger.js";
 import { requestLogger } from "./composition/request-log.js";
 import { bodyParserErrorHandler } from "./composition/body-parser-error.js";
@@ -65,6 +68,8 @@ export interface ServerDeps {
   activityHealth?: ActivityHealthDeps;
   /** T-057 D2 watcher run history (GET /watch-runs, scope jobs). Optional: absent -> 503 (fail closed). */
   watchRuns?: WatchRunsDeps;
+  /** T-057 D4 usage events: recorded after /ask and /search respond, read by GET /usage (scope jobs). Optional: absent -> nothing recorded, /usage 503. */
+  usage?: UsageDeps;
   rateLimit?: RateLimitOptions;
   /** apps/web's real origin(s) in dev/prod (e.g. "http://localhost:5173") — no default, an
    * empty list means no cross-origin browser call succeeds, which is the safe default until a
@@ -93,6 +98,8 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createHealthRouter(deps.health));
   app.use(requireAuth(deps.keyStore));
   app.use(createRateLimiter(deps.rateLimit));
+  app.use(usageRecorder(deps.usage, log)); // T-057 D4: fire-and-forget, after the response; never fails or delays a request
+  app.use(createUsageRouter(deps.usage ?? unavailableUsageReadDeps));
   app.use(createSystemStatusRouter(deps.systemStatus ?? unavailableSystemStatusDeps));
   app.use(createAskRouter(deps.ask));
   app.use(createCompeteRouter({ ...deps.ask, evalRuns: deps.evalRuns }));

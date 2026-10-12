@@ -24,3 +24,5 @@ export * from "./collections/watch-reports.js";
 // polling phase; read by apps/api/src/routes/health.ts's staleness detector, in a DIFFERENT
 // process from the writer (a detector inside the writer dies with it).
 export * from "./collections/watch-heartbeat.js";
+// T-057 D4: content-free per-request usage rows (kind/outcome/latency/day) for GET /usage.
+export * from "./collections/usage-events.js";
