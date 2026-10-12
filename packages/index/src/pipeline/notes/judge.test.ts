@@ -18,6 +18,8 @@ import { createLlmNoteJudge, judgeCandidates, makeJudgeContext, writeJudgeSideca
 import { ATTACKS, CONTROLS } from "./judge-corpus.js";
 
 type Obj = Record<string, any>;
+/** Parse the delimited item blocks the adapter puts in the user message. */
+const itemsOf = (content: string): Obj[] => [...content.matchAll(/^<<<NOTE_ITEM (\d+)>>>\n(.*)\n<<<END_NOTE_ITEM \1>>>$/gm)].map((m) => JSON.parse(m[2]!));
 const SID = "s1";
 const turn = (id: string, speakerRef: string, text: string, tStart: number): Turns => ({ _id: id, tenantId: "t1", sessionId: SID, speakerRef, tStart, tEnd: tStart + 1, text });
 const reply = (o: unknown): CompleteResult => ({ text: JSON.stringify(o), usage: { inputTokens: 1, outputTokens: 1 }, provider: "fake", model: "fake-1", costUsd: 0 });
@@ -140,7 +142,7 @@ test("a judged answer that is not same leaves its question unanswered", async ()
 
 test("the LLM adapter routes by job kind note-judge, parses verdicts, records usage and cost, and fails closed on malformed output", async () => {
   const jobs: Job[] = [];
-  const good = createLlmNoteJudge(async (job) => { jobs.push(job); const p = JSON.parse(job.messages[1]!.content); return { text: JSON.stringify({ verdicts: p.items.map((i: Obj, k: number) => ({ id: i.id, verdict: k ? "different" : "same", reason: "r" })) }), usage: { inputTokens: 100, outputTokens: 20 }, provider: "fake", model: "m1", costUsd: 0.002 }; });
+  const good = createLlmNoteJudge(async (job) => { jobs.push(job); const p = { items: itemsOf(job.messages[1]!.content) }; return { text: JSON.stringify({ verdicts: p.items.map((i: Obj, k: number) => ({ id: i.id, verdict: k ? "different" : "same", reason: "r" })) }), usage: { inputTokens: 100, outputTokens: 20 }, provider: "fake", model: "m1", costUsd: 0.002 }; });
   const turns = base();
   const m = model(() => ({ items: [item("insight", "t1", FEE), item("decision", "t2", DEC)] }));
   const r = await run(turns, m, good);
