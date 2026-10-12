@@ -1,6 +1,6 @@
 # iss-runlock-003-refuse-takeover-on-failed-reap
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3/2 (open ledger issues ISS-RUNLOCK-003 medium, flagged before-wiring, and ISS-RUNREV-001 medium; class data write: full ceremony). Does NOT wire the store.
 Lane: lane/runrevclose. Ledger for this lane: qa/issues.runrevclose.jsonl, ids ISS-RUNREVCLOSE-NNN (1 filed, low, open). Existing ledger rows (qa/issues.runlock.jsonl, qa/issues.runrev.jsonl) untouched.
