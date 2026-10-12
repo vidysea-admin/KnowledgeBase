@@ -14,7 +14,19 @@
     "text": { "type": "string" },
     "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
     "speakerLabel": { "type": "string", "description": "human-readable speaker name, when the source already knows one (e.g. a WhatsApp archiver's real pushName/savedName); speakerRef stays the stable id" },
-    "occurredAt": { "type": "string", "description": "real wall-clock ISO datetime the turn occurred, when the source has one (e.g. a WhatsApp message's real ts); tStart/tEnd stay relative-offset seconds" }
+    "occurredAt": { "type": "string", "description": "real wall-clock ISO datetime the turn occurred, when the source has one (e.g. a WhatsApp message's real ts); tStart/tEnd stay relative-offset seconds" },
+    "screenEvidence": {
+      "type": "object",
+      "description": "optional: present only on speakerRef 'screen' turns derived from a captured frame",
+      "required": ["frameId", "file", "hash", "tStart"],
+      "properties": {
+        "frameId": { "type": "string", "minLength": 1 },
+        "file": { "type": "string", "pattern": "^screen-frames/[a-zA-Z0-9-]+/frame-[0-9]+[.]jpg$", "description": "confined relative frame path under the session's screen-frames directory" },
+        "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$", "description": "sha256 hex of the frame bytes" },
+        "tStart": { "type": "number", "minimum": 0, "description": "frame time in seconds; equals the turn's tStart" }
+      },
+      "additionalProperties": false
+    }
   },
   "additionalProperties": true
 }

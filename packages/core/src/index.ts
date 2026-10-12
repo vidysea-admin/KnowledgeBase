@@ -29,15 +29,18 @@ export * from "./generated/watch_state.js";
 export * from "./generated/watched_sources.js";
 
 export * from "./domain/keyframe-dedupe.js";
+export * from "./domain/keyframe-dedupe-validate.js";
+export * from "./domain/lean-video.js";
+export * from "./domain/pipeline-workflow.js";
+export * from "./domain/pipeline-workflow-reduce.js";
 export * from "./domain/purge-policy.js";
 export * from "./domain/sender-authentication.js";
+export * from "./domain/slide-turn-alignment.js";
+export * from "./domain/speaker-tile-alignment.js";
+export * from "./domain/speaker-tile-names.js";
+export * from "./domain/speaker-tile-scan.js";
 export * from "./domain/webinar-types.js";
 
 // U4b/R2 (D-053): the thin alert interface apps/* imports so a real alert can be delivered
 // without apps/* importing packages/meeting-bot (.dependency-cruiser.cjs forbids that edge).
 export * from "./alerts/alert-sink.js";
-
-// T-050 slice 2 (UNWIRED): file-backed store for the pipeline planner's RunState. Uses node:fs: server-side only.
-export * from "./run-state-store/run-state-id.js";
-export * from "./run-state-store/run-state-fs.js";
-export * from "./run-state-store/run-state-store.js";

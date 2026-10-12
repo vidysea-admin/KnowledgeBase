@@ -1,0 +1,1 @@
+{"_id":"pg4","tenantId":"toc","sessionId":"sess1","summary":"x","evidence":[{"turnId":"t1","sessionId":"sess1"}],"qa":[{"id":"q1","question":"When?","questionEvidence":[{"turnId":"t3","sessionId":"sess1","quote":"When?"}],"answer":"March.","answerEvidence":[],"status":"answered"}]}

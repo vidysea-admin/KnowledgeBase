@@ -16,6 +16,14 @@ export interface SessionPages {
     [k: string]: unknown;
   }[];
   /**
+   * optional grounded notes (T-040); legacy summary/keyInsights/decisions/actionItems stay valid and are derived from these
+   */
+  citedItems?: CitedItem[];
+  /**
+   * optional grounded question/answer pairs (T-040)
+   */
+  qa?: QaEntry[];
+  /**
    * @minItems 1
    */
   evidence: [
@@ -30,5 +38,56 @@ export interface SessionPages {
       [k: string]: unknown;
     }[]
   ];
+  [k: string]: unknown;
+}
+export interface CitedItem {
+  /**
+   * stable id (digest of the quoted evidence)
+   */
+  id: string;
+  kind: "insight" | "decision" | "action";
+  /**
+   * extractive: equals the quoted evidence, adds no facts
+   */
+  text: string;
+  /**
+   * source of the cited turns; screen origins are never presented as speech
+   */
+  origin: "speaker-statement" | "screen-ocr" | "visual-observation";
+  verification: "unverified";
+  /**
+   * @minItems 1
+   */
+  evidence: [QuotedEvidence, ...QuotedEvidence[]];
+  [k: string]: unknown;
+}
+export interface QuotedEvidence {
+  turnId: string;
+  sessionId: string;
+  /**
+   * literal contiguous substring of the cited turn's text
+   */
+  quote: string;
+  [k: string]: unknown;
+}
+export interface QaEntry {
+  id: string;
+  /**
+   * extractive
+   */
+  question: string;
+  /**
+   * @minItems 1
+   */
+  questionEvidence: [QuotedEvidence, ...QuotedEvidence[]];
+  /**
+   * null exactly when status is unanswered
+   */
+  answer: string | null;
+  /**
+   * separate from questionEvidence; empty exactly when unanswered
+   */
+  answerEvidence: QuotedEvidence[];
+  status: "answered" | "unanswered";
   [k: string]: unknown;
 }
