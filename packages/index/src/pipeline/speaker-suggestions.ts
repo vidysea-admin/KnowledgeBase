@@ -1,5 +1,5 @@
 /**
- * packages/index/src/pipeline/speaker-suggestions.ts -- U2.4 suggested speaker names (D-141, pending append). The PURE half.
+ * packages/index/src/pipeline/speaker-suggestions.ts -- U2.4 suggested speaker names (D-141). The PURE half.
  *
  * `extractSpeakersGrounded(..., { suggest: true })` returns `suggested`: identities that passed deterministic grounding and a
  * verifier "yes" on SINGLE evidence. This module turns them into `speaker_suggestions` documents. It is deliberately NOT

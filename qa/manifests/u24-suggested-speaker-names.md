@@ -2,8 +2,8 @@
 
 **Handshake status:** ready-for-check
 Fix cycle: 0
-Tier: owner decision (D-141, pending append), not a ledger issue. Class: data write + tenancy (new collection, tenant-scoped confirm/reject): FULL ceremony. Verdict by the checker only.
-Lane: lane/u24suggest. No ledger shard written (no issue fixed; no new issue filed). Cites "D-141 (pending append)": the entry did not exist when this was built; nothing here edits docs/DECISIONS.md or qa/contracts/.
+Tier: owner decision (D-141), not a ledger issue. Class: data write + tenancy (new collection, tenant-scoped confirm/reject): FULL ceremony. Verdict by the checker only.
+Lane: lane/u24suggest. No ledger shard written (no issue fixed; no new issue filed). Cites D-141 (appended; first built before it landed). Nothing here edits docs/DECISIONS.md or qa/contracts/.
 
 ## Scope (what D-141 asked, what was built)
 - Model-proposed names that pass deterministic grounding (verbatim quote with the name, multi-name abstain, floor not contradicted) and get a verifier "yes" on SINGLE evidence are stored as SUGGESTED, each with its quote and kind. Never final until a human confirms; confirm -> final with provenance `human-confirmed`; reject stores the rejection so it is not suggested again. Auto-final stays: deterministic floor + independent-pair.
@@ -35,7 +35,12 @@ Mutations (harness in the worktree, deleted before commit; per-mutation byte bac
 - Migration not applied; no real Mongo (the fake Db has no tenant logic: the real `scopedCollection` runs on top, but real index/unique behaviour is unverified).
 - No caller generates or persists suggestions in any run (by instruction). `insertSuggestionsIfAbsent` + `listRejected` + `buildSuggestionDocs` are the pieces a later wiring unit joins; wiring and an ai-routing entry need the Approver.
 - `packages/core` was touched minimally and additively because the schema convention demands it: new `generated/speaker_suggestions.ts` (generated) and one `export` line in `src/index.ts`. No other core file.
-- `scripts/lint-dirsize.mjs` already failed at HEAD with 6 violations; this lane adds one: `schema/` 31 files (budget 30; one schema file per collection is the convention and the generator requires it). `structure.config.json` was not edited.
+- **STOP on lint-dirsize (open, needs the Approver):** `schema/` is 31 files (budget 30; HEAD 30, plus 6 unrelated pre-existing violations). No relocation precedent exists for schema/: gen-types, validate.py, the `kb://` resolver and CI all read it flat. The only other options are moving validate.py (CI + ARCHITECTURE.md paths) or raising the budget; neither was done.
 - Rejection key is (session, speakerRef, personId): rejecting "Priya" on spk:1 does not suppress her on another label or session.
 - Suggestions are served with scope `sessions`; confirm/reject use the same scope (no separate write scope exists in the key model).
-- Existing `scripts/sync-speakers`/`writeSpeakerDocs` delete-then-insert by personId would drop the `provenance`/`confirmations` fields of a human-confirmed row if re-run. Not changed here; a checker may want that filed.
+
+## Fix cycle 0 addendum (coordinator review, same cycle): human decisions survive re-index
+- `writeSpeakerDocs` read the row first (`SpeakerWriteTarget.findOne`, pinned in tenantScope.typecheck-test) and SKIPS a human-confirmed row (`provenance: human-confirmed` or non-empty `confirmations`) before any delete; result gains `preserved`. `extractSpeakersGrounded({confirmed})` + `dropOverriddenByConfirmed`: a later auto, floor or suggested result for a confirmed label naming a different person is dropped; a confirmed person is not re-suggested. `listConfirmed` feeds it. Rejection tombstones: re-insert is a no-op; extractor honours `rejected`.
+- Tests `apps/api/src/speaker-suggestions/reindex-survival.test.ts` 7/7: writer re-run twice after confirm (byte-identical), ordinary rows still replaced, full extractor + writer after confirm and after reject, floor result vs confirmed label, auto row later confirmed. speaker-docs/suggestions/grounded 64/64, db 13/13, tsc clean (temp paths mapping, deleted).
+- Mutations (5, restored, hash-verified): writer overwrites confirmed KILLED (2 fail); human-does-not-beat-auto KILLED; confirmed label still suggested KILLED; isHumanConfirmed ignoring `confirmations` SURVIVED until the auto-row-then-confirm test was added, then KILLED.
+- D-141 is cited by its real id (appended). Schema description changed, so the generated type was regenerated (`gen-types --check` OK).

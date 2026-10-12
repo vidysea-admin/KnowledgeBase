@@ -1,4 +1,4 @@
-// U2.4 (D-141, pending append): the suggestion accessor against a stateful fake Db (no Mongo). The real scopedCollection runs
+// U2.4 (D-141): the suggestion accessor against a stateful fake Db (no Mongo). The real scopedCollection runs
 // on top, so these tests pin tenant isolation, the confirm/reject state machine, idempotency, and the "never final" boundary.
 import assert from "node:assert/strict";
 import test from "node:test";

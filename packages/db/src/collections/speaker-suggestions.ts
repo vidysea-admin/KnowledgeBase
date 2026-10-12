@@ -1,4 +1,4 @@
-// packages/db/src/collections/speaker-suggestions.ts - U2.4 suggested speaker names (D-141, pending append).
+// packages/db/src/collections/speaker-suggestions.ts - U2.4 suggested speaker names (D-141).
 // Every operation goes through `scopedCollection()` (tenantId forced at the call site, merged into every filter); there is
 // no raw handle. A suggestion lives HERE and never in `speakers`: the only path from a suggestion to a final name is
 // `confirmSpeakerSuggestion`, which a human triggers. A rejection is a durable tombstone (never expired, never overwritten
@@ -67,6 +67,12 @@ export async function listSessionSuggestions(tenantId: string, sessionId: string
 /** The (label, person) pairs a human rejected in this session: feed to `extractSpeakersGrounded({ rejected })`. */
 export async function listRejected(tenantId: string, sessionId: string, db: Db = getDb()): Promise<{ speakerRef: string; personId: string }[]> {
   const rows = await speakerSuggestions(tenantId, db).find({ sessionId, status: "rejected" }).toArray();
+  return rows.map((r) => ({ speakerRef: r.speakerRef, personId: r.personId }));
+}
+
+/** The (label, person) pairs a human confirmed in this session: feed to `extractSpeakersGrounded({ confirmed })`. */
+export async function listConfirmed(tenantId: string, sessionId: string, db: Db = getDb()): Promise<{ speakerRef: string; personId: string }[]> {
+  const rows = await speakerSuggestions(tenantId, db).find({ sessionId, status: "confirmed" }).toArray();
   return rows.map((r) => ({ speakerRef: r.speakerRef, personId: r.personId }));
 }
 

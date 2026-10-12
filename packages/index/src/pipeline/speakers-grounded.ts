@@ -39,7 +39,7 @@ export const EVIDENCE_KINDS: readonly EvidenceKind[] = ["self-intro", "called-on
 
 export interface SpeakerProvenance { turnId: string; evidenceQuote: string; evidenceKind: EvidenceKind }
 /**
- * A model-proposed name that passed grounding and a verifier "yes" on SINGLE evidence only (D-141, pending append).
+ * A model-proposed name that passed grounding and a verifier "yes" on SINGLE evidence only (D-141).
  * It is NOT a final identity: the quote and kind travel with it, and only a human confirmation makes it final.
  */
 export type SuggestedSpeaker = ResolvedSpeaker & { provenance: SpeakerProvenance[] };
@@ -56,7 +56,14 @@ export interface GroundConfig {
 }
 /** A (label, person) a human already rejected in THIS session: never suggested again. */
 export interface RejectedSuggestion { speakerRef: string; personId: string }
+/** A (label, person) a human CONFIRMED in this session: the name is final and no auto/floor/suggested result may displace it. */
+export interface ConfirmedSpeaker { speakerRef: string; personId: string }
+/** Drops any result for a label a human already confirmed, unless it names the same person. Human beats auto and floor. */
+export function dropOverriddenByConfirmed<T extends { speakerRef: string; personId: string }>(results: readonly T[], confirmed: readonly ConfirmedSpeaker[]): T[] {
+  return results.filter((r) => !confirmed.some((c) => c.speakerRef === r.speakerRef && c.personId !== r.personId));
+}
 export interface SuggestOptions {
+  confirmed?: readonly ConfirmedSpeaker[];
   /** OFF by default. When false/absent no suggestion is computed (and no extra verifier call is made). */
   suggest?: boolean;
   rejected?: readonly RejectedSuggestion[];
@@ -357,12 +364,16 @@ export async function extractSpeakersGrounded(turns: Turns[], complete: Complete
   if (runs.every((r) => !Array.isArray(r))) return degrade("speakers responses were not JSON arrays in any run");
 
   const verifier = opts.verifier ?? llmVerifier(complete);
-  const { resolved, unresolved } = await groundSpeakerProposals(turns, runs, verifier, { corroboration: opts.corroboration });
+  const grounded = await groundSpeakerProposals(turns, runs, verifier, { corroboration: opts.corroboration });
+  const { unresolved } = grounded;
+  const confirmed = opts.confirmed ?? [];
+  const resolved = dropOverriddenByConfirmed(grounded.resolved, confirmed);
   // The suggested tier (D-141): single-verified evidence, only for labels/names the auto-final path did not already name.
   let suggested: SuggestedSpeaker[] | undefined;
   if (opts.suggest === true) {
     const single = await groundSpeakerProposals(turns, runs, verifier, { corroboration: "single-verified" });
-    suggested = selectSuggestions(single.resolved, resolved, opts.rejected ?? []);
+    const confirmedLabels = new Set(confirmed.map((c) => c.speakerRef));
+    suggested = selectSuggestions(single.resolved, resolved, opts.rejected ?? []).filter((s) => !confirmedLabels.has(s.speakerRef));
   }
   let reason: string | null = null;
   if (failures.length > 0 || junk > 0) {

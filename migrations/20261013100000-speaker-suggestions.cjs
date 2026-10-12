@@ -1,4 +1,4 @@
-// migrations/20261013100000-speaker-suggestions.cjs - U2.4 suggested speaker names (D-141, pending append).
+// migrations/20261013100000-speaker-suggestions.cjs - U2.4 suggested speaker names (D-141).
 // Creates the `speaker_suggestions` collection and applies its schema/index.json entries - same shape as
 // 20261012100000-usage-events.cjs. NOT RUN by the lane that wrote it; applying it is the Approver's step.
 // Indexes come from schema/index.json (the only place index changes are made). The unique

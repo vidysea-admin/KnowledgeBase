@@ -1,5 +1,5 @@
 /**
- * U2.4 suggested speaker names (D-141, pending append): the HTTP surface, over the REAL scoped @lkb/db accessor on an in-memory Db
+ * U2.4 suggested speaker names (D-141): the HTTP surface, over the REAL scoped @lkb/db accessor on an in-memory Db
  * (no Mongo). Pins: auth + scope, tenant isolation for list/confirm/reject, idempotency, no-store, the 409 state machine,
  * the final-vs-suggested boundary (a suggestion never shows up in /sessions, /ask, /search), and the human-confirmed provenance.
  */

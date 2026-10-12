@@ -36,6 +36,8 @@ export function memoryDb() {
   const collection = (name: string) => ({
     find: (filter: Row) => { const out = rowsOf(name).filter((r) => matches(r, filter)).map((r) => structuredClone(r)); return { toArray: async () => out }; },
     async findOne(filter: Row) { const r = rowsOf(name).find((x) => matches(x, filter)); return r ? structuredClone(r) : null; },
+    async deleteMany(filter: Row) { const rows = rowsOf(name); let n = 0; for (let i = rows.length - 1; i >= 0; i--) if (matches(rows[i]!, filter)) { rows.splice(i, 1); n++; } return { deletedCount: n }; },
+    async countDocuments(filter: Row) { return rowsOf(name).filter((r) => matches(r, filter)).length; },
     async insertOne(doc: Row) { rowsOf(name).push(structuredClone(doc)); return { acknowledged: true }; },
     async updateOne(filter: Row, update: Row, options: { upsert?: boolean } = {}) {
       const hit = rowsOf(name).find((x) => matches(x, filter));

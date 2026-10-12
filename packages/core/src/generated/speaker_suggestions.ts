@@ -5,7 +5,7 @@
  */
 
 /**
- * U2.4 model-judged speaker names that passed deterministic grounding (verbatim quote containing the name, multi-name abstain, deterministic floor not contradicted) and a verifier 'yes' on SINGLE evidence (D-141, pending append). A suggestion is NEVER a final speaker identity: it lives here, not in `speakers`, and no reader that serves final names (sessions, /ask citations, notes, graph) reads this collection. Only a human can confirm it (status `confirmed`, `finalProvenance` `human-confirmed`, and only then is a `speakers` row written). A `rejected` row is a durable tombstone: re-indexing must not re-suggest the same (sessionId, speakerRef, personId). Auto-final names stay limited to the deterministic floor plus the independent-pair rule and never pass through this collection.
+ * U2.4 model-judged speaker names that passed deterministic grounding (verbatim quote containing the name, multi-name abstain, deterministic floor not contradicted) and a verifier 'yes' on SINGLE evidence (D-141). A suggestion is NEVER a final speaker identity: it lives here, not in `speakers`, and no reader that serves final names (sessions, /ask citations, notes, graph) reads this collection. Only a human can confirm it (status `confirmed`, `finalProvenance` `human-confirmed`, and only then is a `speakers` row written). A `rejected` row is a durable tombstone: re-indexing must not re-suggest the same (sessionId, speakerRef, personId). Auto-final names stay limited to the deterministic floor plus the independent-pair rule and never pass through this collection.
  */
 export type SpeakerSuggestions = {
   /**

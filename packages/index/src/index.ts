@@ -27,11 +27,11 @@ export { summarizeSession, type SessionSummaryResult, type SummarizeResult, type
 export { extractClaims, type ExtractedClaim, type ClaimsCompleteFn } from "./pipeline/claims.js";
 export { resolveSpeakers, personIdFor, type ResolvedSpeaker, type SpeakerResolution } from "./pipeline/speakers.js";
 export { extractSpeakers, extractSpeakersRuleBased, type SpeakersCompleteFn, type SpeakerExtractionResult } from "./pipeline/speakers-llm.js";
-export { groundSpeakerProposals, extractSpeakersGrounded, selectSuggestions, type EvidenceKind, type SuggestedSpeaker, type RejectedSuggestion } from "./pipeline/speakers-grounded.js";
+export { groundSpeakerProposals, extractSpeakersGrounded, selectSuggestions, dropOverriddenByConfirmed, type ConfirmedSpeaker, type EvidenceKind, type SuggestedSpeaker, type RejectedSuggestion } from "./pipeline/speakers-grounded.js";
 export { buildSuggestionDocs, suggestionId } from "./pipeline/speaker-suggestions.js";
 export { llmVerifier, type SpeakerVerifier, type VerifierQuestion } from "./pipeline/speakers-verifier.js";
 export { looksLikeAName, isDiscourseOnly, containsNameVerbatim, citesNameAsAnIntroduction } from "./pipeline/speaker-name-rules.js";
-export { buildSpeakerDocs, type SessionResolution, type SpeakerCollision, type SpeakerDocsResult } from "./pipeline/speaker-docs.js";
+export { buildSpeakerDocs, writeSpeakerDocs, isHumanConfirmed, type SpeakerWriteTarget, type SessionResolution, type SpeakerCollision, type SpeakerDocsResult } from "./pipeline/speaker-docs.js";
 
 export { buildSourceSlices, sourceSpanText, type SourceSpan, type SourceSlicePlan } from "./chunk/source-spans.js";
 export { verifyQuote, verifyQuotes, normaliseForQuote, type QuoteSourceTurn, type ClaimedQuote, type QuoteVerdict, type QuoteLocation, type QuoteRefusal } from "./pipeline/quote/quote-verify.js";

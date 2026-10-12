@@ -1,5 +1,5 @@
 /**
- * U2.4 suggested speaker names (D-141, pending append): the generation side. Offline: fake proposer + fake verifier, no network.
+ * U2.4 suggested speaker names (D-141): the generation side. Offline: fake proposer + fake verifier, no network.
  * Pins: suggestions are single-verified only; the auto-final path stays pair mode; the flag is OFF by default; quote+kind travel;
  * a rejected (label, person) is not re-suggested; a suggestion never leaks into `resolved`.
  */

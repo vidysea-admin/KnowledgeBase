@@ -72,7 +72,7 @@ export interface ServerDeps {
   watchRuns?: WatchRunsDeps;
   /** T-057 D4 usage events: recorded after /ask and /search respond, read by GET /usage (scope jobs). Optional: absent -> nothing recorded, /usage 503. */
   usage?: UsageDeps;
-  /** U2.4 suggested speaker names (D-141, pending append): list/confirm/reject. Optional: absent -> 503. */
+  /** U2.4 suggested speaker names (D-141): list/confirm/reject. Optional: absent -> 503. */
   speakerSuggestions?: SpeakerSuggestionDeps;
   rateLimit?: RateLimitOptions;
   /** apps/web's real origin(s) in dev/prod (e.g. "http://localhost:5173") — no default, an

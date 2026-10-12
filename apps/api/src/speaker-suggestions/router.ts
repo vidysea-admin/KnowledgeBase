@@ -1,5 +1,5 @@
 /**
- * apps/api/src/speaker-suggestions/router.ts - U2.4 suggested speaker names (D-141, pending append).
+ * apps/api/src/speaker-suggestions/router.ts - U2.4 suggested speaker names (D-141).
  *   GET  /sessions/:sessionId/speaker-suggestions                     pending + confirmed suggestions of one session
  *   POST /sessions/:sessionId/speaker-suggestions/:id/confirm         a human makes the name final (provenance human-confirmed)
  *   POST /sessions/:sessionId/speaker-suggestions/:id/reject          a human rejects it; it is never suggested again

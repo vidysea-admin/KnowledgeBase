@@ -1,6 +1,6 @@
 import { apiFetch, ApiError } from "./client.js";
 
-/** One suggested speaker name (U2.4, D-141 pending append). A suggestion is NOT a final name until `status` is "confirmed". */
+/** One suggested speaker name (U2.4, D-141). A suggestion is NOT a final name until `status` is "confirmed". */
 export interface SpeakerSuggestion {
   id: string; sessionId: string; speakerRef: string; suggestedName: string;
   status: "suggested" | "confirmed";
