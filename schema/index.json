@@ -24,5 +24,6 @@
   "watch_state": [{ "keys": { "tenantId": 1 } }, { "keys": { "tenantId": 1, "sourceType": 1, "sourceId": 1 }, "unique": true }],
   "watch_reports": [{ "keys": { "tenantId": 1 } }, { "keys": { "tenantId": 1, "runAt": 1 } }],
   "watch_heartbeat": [{ "keys": { "tenantId": 1 } }, { "keys": { "tenantId": 1, "sourceType": 1 }, "unique": true }],
-  "usage_events": [{ "keys": { "tenantId": 1 } }, { "keys": { "tenantId": 1, "day": 1 } }]
+  "usage_events": [{ "keys": { "tenantId": 1 } }, { "keys": { "tenantId": 1, "day": 1 } }],
+  "speaker_suggestions": [{ "keys": { "tenantId": 1 } }, { "keys": { "tenantId": 1, "sessionId": 1, "status": 1 } }, { "keys": { "tenantId": 1, "sessionId": 1, "speakerRef": 1, "personId": 1 }, "unique": true }]
 }

@@ -4,6 +4,7 @@ import { useAuth } from "../../auth/AuthContext.js";
 import { getSession, getSessionMedia, streamSessionMedia } from "../../api/sessions.js";
 import { ApiError } from "../../api/client.js";
 import type { SessionDetail } from "../../api/types.js";
+import { SpeakerSuggestions } from "./SpeakerSuggestions.js";
 
 const MAX_TURNS_SHOWN = 200;
 
@@ -132,6 +133,8 @@ export function SessionDetailPage(): React.ReactElement {
         <div className="section-title">Overview</div>
         <p>{detail.page ? detail.page.summary : "(no summary yet)"}</p>
       </div>
+
+      <SpeakerSuggestions apiKey={apiKey} sessionId={detail.session._id} />
 
       {detail.media && <div className="card">
         <div className="section-title">Recording</div>

@@ -40,6 +40,7 @@ import { createWatchRunsRouter, unavailableWatchRunsDeps, type WatchRunsDeps } f
 import { usageRecorder } from "./usage/recorder.js";
 import { createUsageRouter, unavailableUsageReadDeps } from "./usage/router.js";
 import type { UsageDeps } from "./usage/store.js";
+import { createSpeakerSuggestionsRouter, unavailableSpeakerSuggestionDeps, type SpeakerSuggestionDeps } from "./speaker-suggestions/router.js";
 import { logger as defaultLogger, type Logger } from "./composition/logger.js";
 import { requestLogger } from "./composition/request-log.js";
 import { bodyParserErrorHandler } from "./composition/body-parser-error.js";
@@ -71,6 +72,8 @@ export interface ServerDeps {
   watchRuns?: WatchRunsDeps;
   /** T-057 D4 usage events: recorded after /ask and /search respond, read by GET /usage (scope jobs). Optional: absent -> nothing recorded, /usage 503. */
   usage?: UsageDeps;
+  /** U2.4 suggested speaker names (D-141): list/confirm/reject. Optional: absent -> 503. */
+  speakerSuggestions?: SpeakerSuggestionDeps;
   rateLimit?: RateLimitOptions;
   /** apps/web's real origin(s) in dev/prod (e.g. "http://localhost:5173") — no default, an
    * empty list means no cross-origin browser call succeeds, which is the safe default until a
@@ -105,6 +108,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createSetupStatusRouter()); // T-057 E4: booleans only, authenticated
   app.use(createAskRouter(deps.ask));
   app.use(createCompeteRouter({ ...deps.ask, evalRuns: deps.evalRuns }));
+  app.use(createSpeakerSuggestionsRouter(deps.speakerSuggestions ?? unavailableSpeakerSuggestionDeps));
   app.use(createBrainRouter(deps.brain));
   app.use(createJobsRouter(deps.jobs ?? unavailableJobsReadDeps));
   app.use(createActivityHealthRouter(deps.activityHealth ?? unavailableActivityHealthDeps));

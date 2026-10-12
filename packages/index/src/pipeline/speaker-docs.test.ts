@@ -145,6 +145,7 @@ function fakeTarget() {
       return { deletedCount: before - stored.length };
     },
     insertOne: async (doc) => { calls.push("insertOne"); stored.push({ ...doc, tenantId: "toc" }); return { acknowledged: true }; },
+    findOne: async (filter) => stored.find((r) => Object.entries(filter).every(([k, v]) => r[k] === v)) ?? null,
   };
   return { target, stored, calls };
 }

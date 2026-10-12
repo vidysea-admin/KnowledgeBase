@@ -82,9 +82,11 @@ export const speakerWriteSurface = () => {
   const _count: (filter?: object) => Promise<number> = coll.countDocuments;
   const _delete: (filter: object) => Promise<{ deletedCount: number }> = coll.deleteMany;
   const _insert = coll.insertOne;
+  const _findOne = coll.findOne;   // D-141: writeSpeakerDocs reads a row before replacing it
   void _count;
   void _delete;
   void _insert;
+  void _findOne;
 };
 
 /** T-057 D4. Same pin for `usage_events`: a tenant-less call must not compile. */
