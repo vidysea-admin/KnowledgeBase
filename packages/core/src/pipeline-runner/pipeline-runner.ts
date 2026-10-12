@@ -5,6 +5,8 @@
  *  - tenantId on every claim and every LeaseRef (queue B3); job and run ids are a hash of tenantId + runKey, so an id is neither guessable nor shared (queue B4).
  *  - a fresh attemptId per attempt, from an injected minter (default crypto.randomUUID) (store B3 / ABA).
  *  - every state change is load -> pure event -> CAS save; `conflict` is retried a few times with a reload, anything else (incl. `locked`) is returned for the caller to retry (store B8).
+ *  - D-139: a run that ends failed-terminal finishes its queue job as FAILED ("dead", via fail with terminal:true), never done. A resubmit of the same runKey after that starts a NEW
+ *    attempt = a new GENERATION (a new job id and run id; generation 0 keeps the original ids). In-flight and succeeded runs stay idempotent.
  *  - every operation first heartbeats the queue lease, which fences a stale worker before any state is touched.
  */
 import { createHash, randomUUID } from "node:crypto";
@@ -18,22 +20,28 @@ export interface PipelineRunnerOptions { def: WorkflowDef; queue: JobQueue; stor
 const ok = <T>(value: T): RunnerResult<T> => ({ ok: true, value });
 const bad = (source: RunnerError["source"], code: string, message: string): { ok: false; error: RunnerError } => ({ ok: false, error: { source, code, message } });
 const qerr = (e: { code: string; message: string }) => bad("queue", e.code, e.message);
-const idOf = (tenantId: string, runKey: string) => `r-${createHash("sha256").update(`${tenantId}\0${runKey}`).digest("hex").slice(0, 32)}`;
+const idOf = (tenantId: string, runKey: string, generation = 0) => `r-${createHash("sha256").update(generation === 0 ? `${tenantId}\0${runKey}` : `${tenantId}\0${runKey}\0${generation}`).digest("hex").slice(0, 32)}`;
+const MAX_GENERATIONS = 10_000;
+const validGeneration = (g: unknown): g is number => Number.isSafeInteger(g) && (g as number) >= 0 && (g as number) <= MAX_GENERATIONS;
+/** A queue-safe error code for the failed job: the stage's own code when it is a valid queue id, else a fixed one. */
+const failCode = (code: string) => (validateQueueId(code, "error code") === null ? code : "run-failed");
 const checkIds = (tenantId: unknown, runKey: unknown) => validateQueueId(tenantId, "tenant id") ?? validateQueueId(runKey, "run key");
 const checkLease = (l: RunnerLease) => checkIds(l?.tenantId, l?.runKey) ?? validateQueueId(l?.workerId, "worker id")
-  ?? (Number.isSafeInteger(l?.attempt) ? null : { code: "invalid-input", message: "lease attempt must be an integer" });
+  ?? (Number.isSafeInteger(l?.attempt) ? null : { code: "invalid-input", message: "lease attempt must be an integer" })
+  ?? (l?.generation === undefined || validGeneration(l.generation) ? null : { code: "invalid-input", message: "lease generation must be a small non-negative integer" });
 
 type Built<T> = { event: WorkflowEvent; value: T } | { done: RunnerResult<T> };
 
 export function createPipelineRunner(o: PipelineRunnerOptions): PipelineRunner {
   const mint = o.mintAttemptId ?? randomUUID, retries = o.maxConflictRetries ?? 3;
-  const refOf = (l: RunnerLease): LeaseRef => ({ id: idOf(l.tenantId, l.runKey), workerId: l.workerId, attempt: l.attempt, tenantId: l.tenantId });
+  const lid = (l: RunnerLease) => idOf(l.tenantId, l.runKey, l.generation ?? 0);
+  const refOf = (l: RunnerLease): LeaseRef => ({ id: lid(l), workerId: l.workerId, attempt: l.attempt, tenantId: l.tenantId });
 
   /** Fence + load + `build` + CAS save, reloading on `conflict`. `build` returns an event, or a result to hand back without saving. */
   function mutate<T>(l: RunnerLease, build: (s: RunState, now: number) => Built<T>): RunnerResult<T> {
     const badLease = checkLease(l); if (badLease) return qerr(badLease);
     const hb = o.queue.heartbeat(refOf(l)); if (!hb.ok) return qerr(hb.error);
-    const runId = idOf(l.tenantId, l.runKey);
+    const runId = lid(l);
     for (let i = 0; i <= retries; i++) {
       const ld = o.store.load(runId); if (!ld.ok) return bad("store", ld.code, ld.message);
       if (ld.state === null) { o.queue.fail(refOf(l), "run-missing"); return bad("runner", "run-missing", "no run state exists for this job"); }
@@ -53,24 +61,33 @@ export function createPipelineRunner(o: PipelineRunnerOptions): PipelineRunner {
     submit(i: SubmitInput): RunnerResult<Submitted> {
       const b = checkIds(i?.tenantId, i?.runKey); if (b) return qerr(b);
       if (typeof i.sourceFingerprint !== "string" || i.sourceFingerprint.length === 0) return bad("runner", "invalid-input", "sourceFingerprint must be a non-empty string");
-      const runId = idOf(i.tenantId, i.runKey);
-      const q = o.queue.enqueue({ id: runId, tenantId: i.tenantId, payload: { runKey: i.runKey, sourceFingerprint: i.sourceFingerprint }, maxAttempts: i.maxAttempts });
+      // D-139: find the current generation. A generation whose run ended failed-terminal is dead (its job is FAILED): the resubmit is the next generation.
+      let generation = 0;
+      for (;; generation++) {
+        if (generation > MAX_GENERATIONS) return bad("runner", "too-many-attempts", "too many failed attempts for this run key");
+        const cur = o.store.load(idOf(i.tenantId, i.runKey, generation)); if (!cur.ok) return bad("store", cur.code, cur.message);
+        if (cur.state === null || planNext(o.def, cur.state, o.now()).outcome !== "failed-terminal") break;
+      }
+      const runId = idOf(i.tenantId, i.runKey, generation);
+      const payload = generation === 0 ? { runKey: i.runKey, sourceFingerprint: i.sourceFingerprint } : { runKey: i.runKey, sourceFingerprint: i.sourceFingerprint, generation };
+      const q = o.queue.enqueue({ id: runId, tenantId: i.tenantId, payload, maxAttempts: i.maxAttempts });
       if (!q.ok) return qerr(q.error);
       const ld = o.store.load(runId); if (!ld.ok) return bad("store", ld.code, ld.message);
-      if (ld.state !== null) return ok({ runId, queue: q.value, state: "exists" });
+      if (ld.state !== null) return ok({ runId, queue: q.value, state: "exists", generation });
       const sv = o.store.save(runId, null, initialState(o.def, i.sourceFingerprint));
-      if (sv.ok) return ok({ runId, queue: q.value, state: "created" });
-      if (sv.code === "conflict") return ok({ runId, queue: q.value, state: "exists" }); // another submit won the race
+      if (sv.ok) return ok({ runId, queue: q.value, state: "created", generation });
+      if (sv.code === "conflict") return ok({ runId, queue: q.value, state: "exists", generation }); // another submit won the race
       return bad("store", sv.code, sv.message);
     },
     claim(workerId: string, tenantId: string): RunnerResult<ClaimedRun | null> {
       const b = validateQueueId(tenantId, "tenant id"); if (b) return qerr(b);
       const c = o.queue.claim(workerId, { tenantId }); if (!c.ok) return qerr(c.error);
       const j = c.value; if (j === null) return ok(null);
-      const p = j.payload as { runKey?: unknown } | null;
+      const p = j.payload as { runKey?: unknown; generation?: unknown } | null;
       const runKey = p !== null && typeof p === "object" ? p.runKey : undefined;
-      const lease: RunnerLease | null = typeof runKey === "string" && !checkIds(tenantId, runKey) && idOf(tenantId, runKey) === j.id
-        ? { tenantId, runKey, workerId, attempt: j.attempt } : null;
+      const gen = p !== null && typeof p === "object" && p.generation !== undefined ? p.generation : 0;
+      const lease: RunnerLease | null = typeof runKey === "string" && !checkIds(tenantId, runKey) && validGeneration(gen) && idOf(tenantId, runKey, gen) === j.id
+        ? { tenantId, runKey, workerId, attempt: j.attempt, ...(gen === 0 ? {} : { generation: gen }) } : null;
       if (lease === null) { o.queue.fail({ id: j.id, workerId, attempt: j.attempt, tenantId }, "bad-payload"); return bad("runner", "bad-payload", "job payload does not match its id"); }
       return ok({ lease, runId: j.id });
     },
@@ -79,8 +96,9 @@ export function createPipelineRunner(o: PipelineRunnerOptions): PipelineRunner {
         const plan = planNext(o.def, s, now);
         if (plan.outcome === "invalid") { o.queue.fail(refOf(l), "plan-invalid"); return { done: bad("workflow", plan.errors[0]?.code ?? "invalid", plan.reason) }; }
         const finish = (v: Step): Built<Step> => { const c = o.queue.complete(refOf(l)); return { done: c.ok ? ok(v) : qerr(c.error) }; };
+        const finishFailed = (v: Step & { kind: "failed-terminal" }): Built<Step> => { const c = o.queue.fail(refOf(l), failCode(v.code), { terminal: true }); return { done: c.ok ? ok(v) : qerr(c.error) }; };
         if (plan.outcome === "complete") return finish({ kind: "complete" });
-        if (plan.outcome === "failed-terminal") { const t = plan.terminal!; return finish({ kind: "failed-terminal", stage: t.stage, code: t.code, why: t.why }); }
+        if (plan.outcome === "failed-terminal") { const t = plan.terminal!; return finishFailed({ kind: "failed-terminal", stage: t.stage, code: t.code, why: t.why }); }
         const r = plan.ready[0];
         if (!r) return { done: ok({ kind: "waiting", reason: plan.reason }) };
         const attemptId = mint();

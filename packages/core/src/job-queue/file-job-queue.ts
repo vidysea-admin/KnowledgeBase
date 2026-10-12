@@ -121,12 +121,12 @@ export class FileJobQueue implements JobQueue {
       Object.assign(o.value, { status: "done", workerId: null, leaseExpiresAt: null, errorCode: null }); return { ok: true, value: structuredClone(o.value) };
     }, ref.tenantId);
   }
-  fail(ref: LeaseRef, errorCode: string): QueueResult<QueueJob> {
+  fail(ref: LeaseRef, errorCode: string, opts?: { terminal?: boolean }): QueueResult<QueueJob> {
     const bad = refError(ref) ?? validateQueueId(errorCode, "error code"); if (bad) return { ok: false, error: bad };
     return this.run(s => {
       const o = this.owned(s, ref); if (!o.ok) return o;
       const j = o.value;
-      Object.assign(j, { status: j.attempt >= j.maxAttempts ? "dead" : "ready", workerId: null, leaseExpiresAt: null, errorCode });
+      Object.assign(j, { status: opts?.terminal === true || j.attempt >= j.maxAttempts ? "dead" : "ready", workerId: null, leaseExpiresAt: null, errorCode });
       return { ok: true, value: structuredClone(j) };
     }, ref.tenantId);
   }

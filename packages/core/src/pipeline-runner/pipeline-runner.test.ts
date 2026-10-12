@@ -104,7 +104,7 @@ test("a tampered job payload (runKey that does not hash to the job id) is failed
   assert.equal(jobs(r.qfs)[0]!.status, "ready"); assert.equal(run(r, a.runId).stages.capture!.status, "pending");
 });
 
-test("retryable failure: the same stage is planned again with a NEW attempt id; non-retryable ends the run and finishes the job", () => {
+test("retryable failure: the same stage is planned again with a NEW attempt id; non-retryable ends the run and marks the job FAILED (D-139)", () => {
   const r = rig(); val(r.runner.submit(SUB)); const l = lease(r);
   doStage(r, l, "capture", "o1");
   const s1 = val(r.runner.step(l)) as { attempt: { attemptId: string } };
@@ -114,7 +114,7 @@ test("retryable failure: the same stage is planned again with a NEW attempt id; 
   assert.notEqual(s2.attempt.attemptId, s1.attempt.attemptId);
   val(r.runner.fail(l, { stage: "media", attemptId: s2.attempt.attemptId }, "io-error")); // attempts exhausted (max 2)
   const end = val(r.runner.step(l)); assert.deepEqual(end, { kind: "failed-terminal", stage: "media", code: "io-error", why: "retry-exhausted" });
-  assert.equal(jobs(r.qfs)[0]!.status, "done");
+  assert.deepEqual([jobs(r.qfs)[0]!.status, jobs(r.qfs)[0]!.errorCode], ["dead", "io-error"], "D-139: a terminally failed run is a FAILED job, not done");
   const r2 = rig(); val(r2.runner.submit(SUB)); const l2 = lease(r2);
   const c = val(r2.runner.step(l2)) as { attempt: { attemptId: string } };
   val(r2.runner.fail(l2, { stage: "capture", attemptId: c.attempt.attemptId }, "bad-media"));
@@ -239,4 +239,102 @@ test("every queue call carries the tenant: claim is restricted and every LeaseRe
   val(runner.submit(SUB)); const c = val(runner.claim("w1", "tA"))!;
   const s = val(runner.step(c.lease)) as { attempt: { stage: string; attemptId: string } }; val(runner.fail(c.lease, s.attempt, "x"));
   assert.deepEqual(claims, ["tA"]); assert.ok(refs.length >= 2 && refs.every((x) => x.tenantId === "tA"), JSON.stringify(refs));
+});
+
+/** Drive a fresh run to a terminal failure (non-retryable capture failure); returns the lease used. */
+function failRun(r: ReturnType<typeof rig>, tenantId = "tA", worker = "w1"): RunnerLease {
+  const l = lease(r, tenantId, worker);
+  const c = val(r.runner.step(l)) as { attempt: { attemptId: string } };
+  val(r.runner.fail(l, { stage: "capture", attemptId: c.attempt.attemptId }, "bad-media"));
+  assert.equal(val(r.runner.step(l)).kind, "failed-terminal"); return l;
+}
+
+test("D-139: a terminal failure marks the job FAILED (dead) at once, even with queue attempts left, and the lease is released", () => {
+  const r = rig(); val(r.runner.submit({ ...SUB, maxAttempts: 5 })); const l = failRun(r);
+  const j = jobs(r.qfs)[0]!; assert.deepEqual([j.status, j.errorCode, j.workerId, j.attempt < j.maxAttempts], ["dead", "bad-media", null, true]);
+  assert.equal(code(r.runner.step(l)), "queue:terminal", "a failed job accepts no more steps");
+  assert.equal(val(r.runner.claim("w2", "tA")), null, "a failed job is never claimed again");
+});
+
+test("D-139: a stage error code that is not a valid queue id still fails the job, with the fixed code run-failed", () => {
+  const r = rig(); val(r.runner.submit(SUB)); const l = lease(r);
+  const c = val(r.runner.step(l)) as { attempt: { attemptId: string } };
+  val(r.runner.fail(l, { stage: "capture", attemptId: c.attempt.attemptId }, "bad code/with space"));
+  const e = val(r.runner.step(l)); assert.equal(e.kind, "failed-terminal");
+  assert.deepEqual([jobs(r.qfs)[0]!.status, jobs(r.qfs)[0]!.errorCode], ["dead", "run-failed"]);
+});
+
+test("D-139: resubmitting a terminally failed run key creates a NEW attempt (new ids), which can run on; the dead one is untouched", () => {
+  const r = rig(); const first = val(r.runner.submit(SUB)); failRun(r);
+  const second = val(r.runner.submit(SUB));
+  assert.deepEqual([second.queue, second.state, second.generation], ["enqueued", "created", 1]);
+  assert.notEqual(second.runId, first.runId);
+  assert.deepEqual(jobs(r.qfs).map(j => j.status).sort(), ["dead", "ready"]);
+  const l2 = lease(r, "tA", "w2"); assert.equal(l2.generation, 1);
+  for (const [stage, out] of [["capture", "o1"], ["media", "o2"]] as const) doStage(r, l2, stage, out);
+  assert.equal(run(r, first.runId).stages.capture!.status, "failed", "the dead attempt's state is not reused or reset");
+  const r3 = rig(); val(r3.runner.submit(SUB)); failRun(r3); val(r3.runner.submit(SUB)); failRun(r3, "tA", "w2");
+  const third = val(r3.runner.submit({ ...SUB, sourceFingerprint: "fp-new" })); assert.deepEqual([third.generation, third.state], [2, "created"]);
+});
+
+test("D-139: while the run is in flight (queued, leased, mid-stage) a resubmit stays idempotent and starts no new attempt", () => {
+  const r = rig(); const a = val(r.runner.submit(SUB));
+  assert.deepEqual([val(r.runner.submit(SUB)).queue, val(r.runner.submit(SUB)).generation], ["exists", 0]);
+  const l = lease(r); const again = val(r.runner.submit(SUB)); assert.deepEqual([again.runId, again.queue, again.state], [a.runId, "exists", "exists"]);
+  val(r.runner.step(l)); // a stage is running
+  const mid = val(r.runner.submit(SUB)); assert.deepEqual([mid.runId, mid.queue, mid.generation], [a.runId, "exists", 0]);
+  assert.equal(code(r.runner.submit({ ...SUB, sourceFingerprint: "other" })), "queue:payload-mismatch", "an in-flight run is not re-fingerprinted");
+  assert.equal(jobs(r.qfs).length, 1);
+});
+
+test("D-139: a retryable failure (retries not yet exhausted) is not terminal, so a resubmit stays idempotent", () => {
+  const r = rig(); const a = val(r.runner.submit(SUB)); const l = lease(r);
+  doStage(r, l, "capture", "o1");
+  const s1 = val(r.runner.step(l)) as { attempt: { attemptId: string } };
+  val(r.runner.fail(l, { stage: "media", attemptId: s1.attempt.attemptId }, "io-error")); // 1 of 2 attempts
+  assert.deepEqual([val(r.runner.submit(SUB)).runId, jobs(r.qfs).length], [a.runId, 1]);
+});
+
+test("D-139: a succeeded run stays idempotent: resubmit is exists/exists, generation 0, the job stays done", () => {
+  const r = rig(); const a = val(r.runner.submit(SUB)); const l = lease(r);
+  for (let i = 0; i < 30; i++) {
+    const s = val(r.runner.step(l)); if (s.kind === "complete") break;
+    if (s.kind === "started") val(r.runner.succeed(l, s.attempt, `o${i}`));
+    else if (s.kind === "waiting") val(r.runner.skip(l, "screen"));
+  }
+  assert.equal(jobs(r.qfs)[0]!.status, "done");
+  const again = val(r.runner.submit(SUB)); assert.deepEqual([again.runId, again.queue, again.state, again.generation], [a.runId, "exists", "exists", 0]);
+  assert.equal(jobs(r.qfs).length, 1);
+});
+
+test("D-139: tenant scoping holds across generations: B's failure does not touch A; the same runKey of two tenants has separate generations; a forged generation is fenced", () => {
+  const r = rig(); const a = val(r.runner.submit(SUB)); val(r.runner.submit({ ...SUB, tenantId: "tB" }));
+  failRun(r, "tB", "wB");
+  assert.equal(val(r.runner.submit(SUB)).runId, a.runId, "A's run is still gen 0, in flight");
+  const b2 = val(r.runner.submit({ ...SUB, tenantId: "tB" })); assert.equal(b2.generation, 1);
+  assert.notEqual(b2.runId, a.runId);
+  const lb = lease(r, "tB", "wB2"); assert.equal(lb.generation, 1);
+  assert.equal(code(r.runner.step({ ...lb, tenantId: "tA" })), "queue:not-found", "A cannot reach B's generation-1 job");
+  const la = lease(r, "tA", "wA");
+  assert.equal(code(r.runner.step({ ...la, generation: 1 })), "queue:not-found", "a forged generation points at no job of A");
+  assert.equal(code(r.runner.step({ ...la, generation: -1 })), "queue:invalid-input");
+  assert.equal(code(r.runner.step({ ...la, generation: 1.5 })), "queue:invalid-input");
+  const jb = jobs(r.qfs).filter(j => j.tenantId === "tB").map(j => j.status).sort(); assert.deepEqual(jb, ["dead", "leased"]);
+});
+
+test("D-139: a tampered payload generation is failed, not run", () => {
+  const r = rig(); const a = val(r.runner.submit(SUB));
+  const f = r.qfs.files.get(`/q/${QUEUE_FILE}`)!; r.qfs.files.set(`/q/${QUEUE_FILE}`, f.replace(`"sourceFingerprint":"fp1"`, `"sourceFingerprint":"fp1","generation":3`));
+  assert.equal(code(r.runner.claim("w1", "tA")), "runner:bad-payload"); assert.equal(jobs(r.qfs).find(j => j.id === a.runId)!.errorCode, "bad-payload");
+});
+
+test("D-139 graph consistency: a failed node (stage-failed) -> failed-terminal run -> FAILED job, for retry-exhausted", () => {
+  const r = rig(); val(r.runner.submit(SUB)); const l = lease(r);
+  doStage(r, l, "capture", "o1");
+  for (let n = 1; n <= 2; n++) {
+    const s = val(r.runner.step(l)) as { kind: string; attempt: { attemptId: string } }; assert.equal(s.kind, "started");
+    val(r.runner.fail(l, { stage: "media", attemptId: s.attempt.attemptId }, "io-error"));
+    assert.equal(jobs(r.qfs)[0]!.status, "leased", "still leased until the planner says terminal");
+  }
+  assert.equal(val(r.runner.step(l)).kind, "failed-terminal"); assert.equal(jobs(r.qfs)[0]!.status, "dead");
 });
