@@ -1,6 +1,6 @@
 # searchmocks-searchpage-test-routing
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: main-red fix (tests only). Class: test-only, no auth/tenancy/data write. Lane: lane/searchmocks. Ledger shard `qa/issues.searchmocks.jsonl` (ISS-SEARCHMOCKS-001, cites ebca1cea).
 
