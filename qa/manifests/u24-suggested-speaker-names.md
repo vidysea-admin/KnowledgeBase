@@ -1,6 +1,6 @@
 # u24-suggested-speaker-names
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: owner decision (D-141), not a ledger issue. Class: data write + tenancy (new collection, tenant-scoped confirm/reject): FULL ceremony. Verdict by the checker only.
 Lane: lane/u24suggest. No ledger shard written (no issue fixed; no new issue filed). Cites D-141 (appended; first built before it landed). Nothing here edits docs/DECISIONS.md or qa/contracts/.
