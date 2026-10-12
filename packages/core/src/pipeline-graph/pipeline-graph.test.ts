@@ -17,11 +17,11 @@ const STAGES = DEF.stages.map((s) => s.name);
 const fp = (...p: string[]) => createHash("sha256").update(p.join("\0")).digest("hex").slice(0, 16);
 class Crash extends Error {}
 
-function rig() {
+function rig(def: typeof DEF = DEF) {
   const qfs = new MemQueueFs(), sfs = new FakeRunStateFs(), clock = { t: 10_000 };
   const queue = new FileJobQueue({ dir: "/q", now: () => clock.t, leaseMs: 1000, fs: qfs });
   const store = createRunStateStore("/runs", sfs);
-  const runner = createPipelineRunner({ def: DEF, queue, store, now: () => clock.t });
+  const runner = createPipelineRunner({ def, queue, store, now: () => clock.t });
   return { qfs, clock, runner };
 }
 const val = <T>(r: RunnerResult<T>): T => { assert.ok(r.ok, JSON.stringify(r)); return (r as { ok: true; value: T }).value; };
@@ -38,15 +38,39 @@ function fakes(overrides: Partial<Record<string, (c: NodeContext) => NodeResult>
 }
 function graphOf(handlers: Record<string, NodeHandler>, skip?: string[]): PipelineGraph { const g = buildGraph(DEF, handlers, { skip }); assert.ok(g.ok, JSON.stringify(g)); return (g as { ok: true; graph: PipelineGraph }).graph; }
 
-test("graph order: nodes run in the definition's dependency order; the skipped optional node is never run; the job finishes", async () => {
+test("graph order: nodes run in the definition's dependency order and the job finishes", async () => {
   const r = rig(), f = fakes(); val(r.runner.submit(SUB));
-  const g = graphOf(f.handlers, ["screen"]);
+  const g = graphOf(f.handlers);
   assert.deepEqual(g.nodes.map((n) => n.name), STAGES);
   assert.deepEqual(g.nodes.find((n) => n.name === "index")!.deps, ["screen"]);
   const res = await runGraph({ runner: r.runner, graph: g, lease: claim(r.runner) });
-  assert.deepEqual([res.outcome, res.ran, res.skipped], ["complete", ["capture", "media", "transcript", "index"], ["screen"]]);
-  assert.deepEqual(f.calls.map((c) => c.stage), ["capture", "media", "transcript", "index"]);
+  assert.deepEqual([res.outcome, res.ran, res.skipped], ["complete", STAGES, []]);
   assert.equal(jobs(r.qfs)[0]!.status, "done");
+});
+
+test("ISS-T050GRAPH-001 skip-screen: skipping screen while index runs is refused (record-commands.ts:90 --index requires --process-video)", () => {
+  const f = fakes();
+  const g = buildGraph(DEF, f.handlers, { skip: ["screen"] });
+  assert.equal(g.ok, false);
+  assert.match((g as { error: string }).error, /cannot skip stage screen: stage index requires it/);
+  assert.match((g as { error: string }).error, /--index requires --process-video/);
+  assert.deepEqual(f.calls, [], "no handler ran");
+});
+
+test("a skipped optional LEAF stage (nothing depends on it) is still skipped cleanly and the job finishes", async () => {
+  const def = { ...DEF, stages: [...DEF.stages, { name: "notify", deps: ["index"], optional: true, maxAttempts: 1, retryable: [] as string[] }] };
+  const r = rig(def), f = fakes(); f.handlers.notify = f.handlers.capture!; val(r.runner.submit(SUB));
+  const b = buildGraph(def, f.handlers, { skip: ["notify"] }); assert.ok(b.ok);
+  const res = await runGraph({ runner: r.runner, graph: (b as { ok: true; graph: PipelineGraph }).graph, lease: claim(r.runner) });
+  assert.deepEqual([res.outcome, res.ran, res.skipped], ["complete", STAGES, ["notify"]]);
+});
+
+test("ISS-T050GRAPH-001 screen-failed: a failed screen is failed-terminal and index never runs", async () => {
+  const r = rig(), f = fakes({ screen: () => ({ kind: "fail", code: "bad-frames" }) }); val(r.runner.submit(SUB));
+  const res = await runGraph({ runner: r.runner, graph: graphOf(f.handlers), lease: claim(r.runner) });
+  assert.equal(res.outcome, "failed-terminal");
+  assert.equal(res.failedTerminal!.stage, "screen");
+  assert.deepEqual(f.calls.map((c) => c.stage), ["capture", "media", "transcript", "screen"]);
 });
 
 test("graph order: with the optional node enabled all five run in order, each fed its upstream's output fingerprint", async () => {
@@ -168,6 +192,7 @@ test("buildGraph validates against the definition: missing, unknown and non-opti
   assert.match((buildGraph(DEF, { ...f.handlers, bogus: f.handlers.capture! }) as { error: string }).error, /unknown stage: bogus/);
   assert.match((buildGraph(DEF, f.handlers, { skip: ["index"] }) as { error: string }).error, /not optional/);
   assert.match((buildGraph(DEF, f.handlers, { skip: ["nope"] }) as { error: string }).error, /not optional/);
+  assert.equal(buildGraph(DEF, f.handlers, { skip: ["screen", "index"] }).ok, false, "index is not optional, so it can never be skipped to make a screen skip legal");
   assert.equal(buildGraph(DEF, Object.create(f.handlers) as Record<string, NodeHandler>).ok, false);
 });
 
