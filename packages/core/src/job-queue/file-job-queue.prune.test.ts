@@ -39,7 +39,7 @@ test("a terminal job is kept until it has been terminal for the retention, then 
 test("retention counts from when the job became terminal, not from when it was enqueued", () => {
   const { c, q, ids } = mk();
   q.enqueue({ id: "old", tenantId: "ta", payload: 1 }); c.t += 50 * KEEP;
-  const j = (q.claim("w") as any).value; q.complete({ id: "old", workerId: "w", attempt: j.attempt, tenantId: "ta" });
+  const j = (q.claim("w", { tenantId: "ta" }) as any).value; q.complete({ id: "old", workerId: "w", attempt: j.attempt, tenantId: "ta" });
   q.enqueue({ id: "n", tenantId: "ta", payload: 1 }); assert.deepEqual(ids(), ["old", "n"], "completed just now: not pruned although enqueued long ago");
 });
 test("ready, leased and lease-expired jobs are never pruned, however old", () => {
@@ -51,10 +51,10 @@ test("ready, leased and lease-expired jobs are never pruned, however old", () =>
   assert.deepEqual(ids(), ["r", "l", "n"]); assert.deepEqual(state().jobs.map(j => j.status), ["leased", "ready", "ready"]);
   assert.ok(state().jobs.every(j => !("terminalAt" in j)));
 });
-test("tenant scope: an operation prunes only its own tenant's terminal jobs; a tenant-less claim prunes nothing", () => {
+test("tenant scope: an operation prunes only its own tenant's terminal jobs; a tenant-less claim is refused and prunes nothing", () => {
   const { c, q, finish, ids } = mk();
   finish("a", "ta", "done"); finish("b", "tb", "done"); c.t += 10 * KEEP;
-  assert.deepEqual(q.claim("w"), { ok: true, value: null }); assert.deepEqual(ids(), ["a", "b"], "no tenant named: nothing pruned");
+  assert.equal((q.claim("w", {} as never) as any).error.code, "invalid-input"); assert.deepEqual(ids(), ["a", "b"], "no tenant named: refused, nothing pruned");
   q.enqueue({ id: "n", tenantId: "ta", payload: 1 }); assert.deepEqual(ids(), ["b", "n"], "ta's old job gone, tb's untouched");
   q.claim("w2", { tenantId: "tb" }); assert.deepEqual(ids(), ["n"], "tb's own claim prunes tb");
 });

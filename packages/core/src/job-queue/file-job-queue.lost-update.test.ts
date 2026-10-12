@@ -93,7 +93,7 @@ test("lock protocol: live lock refuses; stale lock (>= staleMs) is taken over; l
   assert.deepEqual(q().enqueue({ id: "a", tenantId: "t", payload: 1 }), { ok: true, value: "enqueued" });
   assert.deepEqual([...fs.files.keys()], [`/q/${QUEUE_FILE}`], "taken over, used, released, no debris");
   assert.deepEqual(q().enqueue({ id: "a", tenantId: "t", payload: 1 }), { ok: true, value: "exists" }); assert.ok(!fs.files.has(LOCK), "released after a no-op");
-  assert.equal((q().claim("bad/id") as any).error.code, "invalid-input"); assert.ok(!fs.files.has(LOCK));
+  assert.equal((q().claim("bad/id", { tenantId: "t" }) as any).error.code, "invalid-input"); assert.ok(!fs.files.has(LOCK));
 });
 test("unparseable lock: aged by mtime (conflict when young or when the fs gives no mtime, takeover when old)", () => {
   const { fs, q } = mem();

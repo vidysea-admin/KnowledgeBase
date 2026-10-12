@@ -24,8 +24,8 @@ function runSequence(seed: number) {
       const res = q.enqueue({ id, tenantId, payload: { id }, maxAttempts: 1 + Math.floor(r() * 3) });
       if (res.ok) { assert.equal(res.value, dup ? "exists" : "enqueued"); enq.set(id, tenantId); } else assert.equal(res.error.code, "io-error");
     } else if (op < 0.55) {
-      const w = pick(WORKERS), tenantId = r() < 0.5 ? pick(TENANTS) : undefined;
-      const res = q.claim(w, tenantId === undefined ? {} : { tenantId });
+      const w = pick(WORKERS), tenantId = pick(TENANTS);
+      const res = q.claim(w, { tenantId });
       if (res.ok && res.value) {
         claims++; const j: QueueJob = res.value;
         const prev = holder.get(j.id);
@@ -33,7 +33,7 @@ function runSequence(seed: number) {
         assert.ok(tenantId === undefined || j.tenantId === tenantId, "tenant leak"); assert.equal(j.tenantId, enq.get(j.id), "tenant changed");
         const eligible = pre.filter(x => (x.status === "ready" || (x.status === "leased" && x.leaseExpiresAt! <= clock.t && x.attempt < x.maxAttempts)) && (tenantId === undefined || x.tenantId === tenantId));
         assert.equal(j.seq, Math.min(...eligible.map(x => x.seq)), "FIFO order");
-        const ref = { id: j.id, workerId: w, attempt: j.attempt }; holder.set(j.id, { ref, expires: clock.t + LEASE }); handles.push(ref);
+        const ref = { id: j.id, workerId: w, attempt: j.attempt, tenantId: j.tenantId }; holder.set(j.id, { ref, expires: clock.t + LEASE }); handles.push(ref);
       } else if (res.ok) {
         assert.ok(!pre.some(x => (x.status === "ready" || (x.status === "leased" && x.leaseExpiresAt! <= clock.t && x.attempt < x.maxAttempts)) && (tenantId === undefined || x.tenantId === tenantId)), "claim returned null with an eligible job");
       } else assert.equal(res.error.code, "io-error");

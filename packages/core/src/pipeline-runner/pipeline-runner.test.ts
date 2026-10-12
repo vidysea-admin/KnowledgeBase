@@ -232,7 +232,7 @@ test("every queue call carries the tenant: claim is restricted and every LeaseRe
   const qfs = new MemQueueFs(); let t = 1000;
   const inner = new FileJobQueue({ dir: "/q", now: () => t, leaseMs: 1000, fs: qfs });
   const claims: unknown[] = [], refs: Array<{ tenantId?: string }> = [];
-  const spy = { enqueue: (i: never) => inner.enqueue(i), claim: (w: string, o?: { tenantId?: string }) => { claims.push(o?.tenantId); return inner.claim(w, o); },
+  const spy = { enqueue: (i: never) => inner.enqueue(i), claim: (w: string, o: { tenantId: string }) => { claims.push(o.tenantId); return inner.claim(w, o); },
     heartbeat: (x: { tenantId?: string }) => { refs.push(x); return inner.heartbeat(x as never); }, complete: (x: { tenantId?: string }) => { refs.push(x); return inner.complete(x as never); },
     fail: (x: { tenantId?: string }, c: string) => { refs.push(x); return inner.fail(x as never, c); } };
   const runner = createPipelineRunner({ def: DEF, queue: spy as never, store: createRunStateStore("/runs", new FakeRunStateFs()), now: () => t });

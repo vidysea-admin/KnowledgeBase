@@ -19,11 +19,11 @@ test("path-escape corpus (>= 25 ids) is refused for job, tenant and worker ids a
     assert.equal(validateQueueId(id, "x")?.code, "invalid-input", JSON.stringify(id));
     assert.equal((q.enqueue({ id: id as string, tenantId: "t", payload: 1 }) as any).error.code, "invalid-input");
     assert.equal((q.enqueue({ id: "ok", tenantId: id as string, payload: 1 }) as any).error.code, "invalid-input");
-    assert.equal((q.claim(id as string) as any).error.code, "invalid-input");
+    assert.equal((q.claim(id as string, { tenantId: "t" }) as any).error.code, "invalid-input");
     if (id !== undefined) assert.equal((q.claim("w", { tenantId: id as string }) as any).error.code, "invalid-input");
-    assert.equal((q.heartbeat({ id: id as string, workerId: "w", attempt: 1 }) as any).error.code, "invalid-input");
-    assert.equal((q.complete({ id: "ok", workerId: id as string, attempt: 1 }) as any).error.code, "invalid-input");
-    assert.equal((q.fail({ id: "ok", workerId: "w", attempt: 1 }, id as string) as any).error.code, "invalid-input");
+    assert.equal((q.heartbeat({ id: id as string, workerId: "w", attempt: 1, tenantId: "t" }) as any).error.code, "invalid-input");
+    assert.equal((q.complete({ id: "ok", workerId: id as string, attempt: 1, tenantId: "t" }) as any).error.code, "invalid-input");
+    assert.equal((q.fail({ id: "ok", workerId: "w", attempt: 1, tenantId: "t" }, id as string) as any).error.code, "invalid-input");
   }
   assert.equal(fs.calls, 0, "no filesystem call for a refused id");
   for (const id of GOOD) assert.equal(validateQueueId(id, "x"), null, id);
@@ -31,7 +31,7 @@ test("path-escape corpus (>= 25 ids) is refused for job, tenant and worker ids a
 test("every path the queue touches stays directly inside its root", () => {
   const fs = new MemQueueFs(); const q = new FileJobQueue({ dir: "/q", now: () => 5, fs });
   for (const id of GOOD) q.enqueue({ id, tenantId: "t", payload: 1 });
-  q.claim("w");
+  q.claim("w", { tenantId: "t" });
   for (const l of fs.log) { const p = l.split(" ")[1] ?? ""; assert.match(p, /^\/q(\/[^/]+)?$/, l); }
 });
 
@@ -39,14 +39,14 @@ type Step = (q: FileJobQueue, ctx: { clock: { t: number } }) => unknown;
 const SCRIPT: Step[] = [
   q => q.enqueue({ id: "a", tenantId: "t", payload: { n: 1 }, maxAttempts: 3 }),
   q => q.enqueue({ id: "b", tenantId: "u", payload: 2 }),
-  q => q.claim("w1"),
-  (q, c) => { c.clock.t = 110; return q.heartbeat({ id: "a", workerId: "w1", attempt: 1 }); },
-  q => q.fail({ id: "a", workerId: "w1", attempt: 1 }, "boom"),
-  (q, c) => { c.clock.t = 610; return q.claim("w2"); },
+  q => q.claim("w1", { tenantId: "t" }),
+  (q, c) => { c.clock.t = 110; return q.heartbeat({ id: "a", workerId: "w1", attempt: 1, tenantId: "t" }); },
+  q => q.fail({ id: "a", workerId: "w1", attempt: 1, tenantId: "t" }, "boom"),
+  (q, c) => { c.clock.t = 610; return q.claim("w2", { tenantId: "t" }); },
   q => q.claim("w3", { tenantId: "u" }),
-  q => q.complete({ id: "b", workerId: "w3", attempt: 1 }),
-  (q, c) => { c.clock.t = 1110; return q.claim("w4"); }, // a: attempt 2 expired nowhere yet -> reclaim path
-  (q, c) => { c.clock.t = 1610; return q.claim("w5"); }, // a exhausted -> dead
+  q => q.complete({ id: "b", workerId: "w3", attempt: 1, tenantId: "u" }),
+  (q, c) => { c.clock.t = 1110; return q.claim("w4", { tenantId: "t" }); }, // a: attempt 2 expired nowhere yet -> reclaim path
+  (q, c) => { c.clock.t = 1610; return q.claim("w5", { tenantId: "t" }); }, // a exhausted -> dead
 ];
 function fresh() { const fs = new MemQueueFs(); const clock = { t: 100 }; const wall = { t: 5_000_000 }; fs.wall = () => wall.t; return { fs, clock, wall, q: new FileJobQueue({ dir: "/q", now: () => clock.t, leaseMs: 100, fs, wallNow: () => wall.t }) }; }
 const rawOf = (fs: MemQueueFs) => fs.files.get(`/q/${QUEUE_FILE}`) ?? null;
@@ -82,7 +82,7 @@ test("a crash on the final rename leaves the old queue file and no temp file; a 
   const w = fresh(); w.q.enqueue({ id: "a", tenantId: "t", payload: 1 });
   const before = rawOf(w.fs); w.fs.calls = 0; w.fs.log = [];
   w.fs.rename = () => { throw new SimulatedCrash(-1); }; w.fs.unlink = () => { throw new SimulatedCrash(-2); };
-  const r = w.q.claim("w") as any;
+  const r = w.q.claim("w", { tenantId: "t" }) as any;
   assert.equal(r.error.code, "io-error"); assert.equal(rawOf(w.fs), before);
   assert.equal([...w.fs.files.keys()].filter(p => p.endsWith(".tmp")).length, 1);
 });

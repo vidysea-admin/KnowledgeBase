@@ -27,7 +27,7 @@ export interface FileJobQueueOptions { dir: string; now: () => number; leaseMs?:
 /** Default retention for terminal jobs: 30 days (Approver ruling 2026-10-12 (2)). */
 export const DEFAULT_PRUNE_TERMINAL_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 const err = (code: QueueError["code"], message: string): { ok: false; error: QueueError } => ({ ok: false, error: { code, message } });
-const refError = (r: LeaseRef) => validateQueueId(r?.id, "job id") ?? validateQueueId(r?.workerId, "worker id") ?? (r?.tenantId === undefined ? null : validateQueueId(r.tenantId, "tenant id"));
+const refError = (r: LeaseRef) => validateQueueId(r?.id, "job id") ?? validateQueueId(r?.workerId, "worker id") ?? validateQueueId(r?.tenantId, "tenant id");
 const expired = (j: QueueJob, now: number) => j.status === "leased" && j.leaseExpiresAt !== null && now >= j.leaseExpiresAt;
 
 export class FileJobQueue implements JobQueue {
@@ -84,14 +84,14 @@ export class FileJobQueue implements JobQueue {
       return { ok: true, value: "enqueued" as const };
     }, input.tenantId);
   }
-  claim(workerId: string, opts: { tenantId?: string } = {}): QueueResult<QueueJob | null> {
-    const bad = validateQueueId(workerId, "worker id") ?? (opts.tenantId === undefined ? null : validateQueueId(opts.tenantId, "tenant id"));
+  claim(workerId: string, opts: { tenantId: string }): QueueResult<QueueJob | null> {
+    const bad = validateQueueId(workerId, "worker id") ?? validateQueueId(opts?.tenantId, "tenant id"); // ISS-JOBQTENANT-001: tenant required
     if (bad) return { ok: false, error: bad };
     return this.run((s, now) => {
       for (const j of s.jobs) if (expired(j, now) && j.attempt >= j.maxAttempts) { // exhausted dead worker: terminal, never re-run
         j.status = "dead"; j.workerId = null; j.leaseExpiresAt = null; j.errorCode = "lease-expired";
       }
-      const ready = s.jobs.filter(j => (j.status === "ready" || expired(j, now)) && (opts.tenantId === undefined || j.tenantId === opts.tenantId));
+      const ready = s.jobs.filter(j => (j.status === "ready" || expired(j, now)) && j.tenantId === opts.tenantId);
       ready.sort((a, b) => a.seq - b.seq);
       const j = ready[0];
       if (!j) return { ok: true, value: null };
@@ -101,7 +101,7 @@ export class FileJobQueue implements JobQueue {
   }
   private owned(s: QueueFileState, ref: LeaseRef): QueueResult<QueueJob> {
     const j = s.jobs.find(x => x.id === ref.id);
-    if (!j || (ref.tenantId !== undefined && j.tenantId !== ref.tenantId)) return err("not-found", "no such job"); // another tenant's job is indistinguishable from a missing one
+    if (!j || j.tenantId !== ref.tenantId) return err("not-found", "no such job"); // another tenant's job is indistinguishable from a missing one
     if (j.status === "done" || j.status === "dead") return err("terminal", `job is ${j.status}`);
     if (j.status !== "leased") return err("not-leased", "job is not leased");
     if (j.workerId !== ref.workerId || j.attempt !== ref.attempt) return err("stale-lease", "lease belongs to another worker or attempt");

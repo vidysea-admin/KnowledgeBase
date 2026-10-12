@@ -25,8 +25,8 @@ export interface QueueJob {
 }
 
 /** What a worker holds after a claim; every later call must present it (fences a stale handler of an older attempt). */
-/** `tenantId` is optional for compatibility: when present it MUST own the job or the call is refused as "not-found" (BEFORE WIRING: production callers must pass it). */
-export interface LeaseRef { id: string; workerId: string; attempt: number; tenantId?: string }
+/** ISS-JOBQTENANT-001: `tenantId` is REQUIRED. It MUST own the job or the call is refused as "not-found". A missing, empty or malformed tenant is refused as "invalid-input"; it is never a wildcard. */
+export interface LeaseRef { id: string; workerId: string; attempt: number; tenantId: string }
 
 export type QueueErrorCode =
   | "invalid-input" | "corrupt" | "io-error" | "conflict" | "id-conflict" | "payload-mismatch" | "not-found" | "not-leased" | "stale-lease" | "terminal";
@@ -38,8 +38,8 @@ export interface EnqueueInput { id: string; tenantId: string; payload: unknown; 
 export interface JobQueue {
   /** Idempotent on `id`. Same id + same tenant + equal payload (canonical JSON): "exists". Same id, other tenant: error "id-conflict" (fixed message, same for every job state). Same tenant, different payload: error "payload-mismatch". Never overwrites. */
   enqueue(input: EnqueueInput): QueueResult<"enqueued" | "exists">;
-  /** Oldest ready job (or leased job whose lease expired and attempts remain), restricted to `tenantId` when given. null = none. */
-  claim(workerId: string, opts?: { tenantId?: string }): QueueResult<QueueJob | null>;
+  /** Oldest ready job (or leased job whose lease expired and attempts remain), of `opts.tenantId` (REQUIRED, ISS-JOBQTENANT-001: a missing/empty tenant is "invalid-input", never "any tenant"). null = none. */
+  claim(workerId: string, opts: { tenantId: string }): QueueResult<QueueJob | null>;
   heartbeat(ref: LeaseRef): QueueResult<QueueJob>;
   complete(ref: LeaseRef): QueueResult<QueueJob>;
   /** Back to ready while attempts remain, else terminal "dead". */
