@@ -23,3 +23,25 @@ One blocking finding: the headline production-risk behaviour (silent under `node
 Required for PASS: close ISS-APILOGGER-003 (test both branches of the test-mode default; M6 must go red). ISS-APILOGGER-001 and -004 may remain filed.
 
 ISSUES-WRITTEN: ISS-APILOGGER-003, ISS-APILOGGER-004
+
+---
+
+# Cycle checked: 1
+
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: ecebad8 (lane/apilogger), cycle 0 FAIL was dc91bc6.
+
+## EXPLANATION
+
+Cycle 1 fixes exactly what failed and breaks nothing.
+
+- ISS-APILOGGER-003: `resolveLevel(raw, env)` + `LoggerOptions.env`; three tests pin both branches via injected env. I replayed M6 (`!v && ctx` -> `!v`): KILLED (exit 1). Own variants (applied by hash-verified change, per-mutation backup restored in `finally`, restored hash == original each time): test default silent->error KILLED; never-silent KILLED; ctx truthiness inverted KILLED; ctx-only (`if (ctx)`) SURVIVED, equivalent except a non-blank invalid LOG_LEVEL under test context (nonsense -> silent vs info), immaterial (note only). The prod-default `info`->`warn` variant was not run (pattern missed CRLF); the `{}` env test asserts info/warn/error lines so it would fail.
+- ISS-APILOGGER-001: body-parser-error.ts is mounted after all routers and BEFORE the terminal 500 handler. It acts only when `err.type` is in the body-parser type set AND status is a number 400-599; otherwise `next(err)`. I verified by direct call: `{status:400}` (no type), `{status:404,type:"other"}`, plain Error, null, type without status, status 200 all call `next(err)` and write nothing. Mutation "swallow all (no type check)" SURVIVED the maker's tests (passthrough is untested; code is correct, filed as note, not blocking).
+- Byte-identity: I generated the baseline from a bare Express 5.2.1 app (`express.json()`, no error handler, NODE_ENV=production, finalhandler 2.1.1) and compared raw status + all headers (minus date/request id/CORS/ratelimit) + body against the real server in NODE_ENV production AND development, for body `ZZSECRETZZ`, 200000 x's, `{"a":`: all three identical (400/138, 413/144, 400/138; CSP, nosniff, content-type html). The literals are real.
+- ZZSECRETZZ replay in both NODE_ENVs: leaks in client body, stdout log and stderr = 0 (stderr empty; the baseline bare Express printed stacks, ours none). Log line carries errType/status/requestId only.
+- Counts re-run: new 5/5, request-log 8/8, server 8/8; tsc --noEmit exit 0. Mutants V7 (log err), V9 (drop CSP), V10 (status 400 constant) KILLED.
+- After: logger.ts, body-parser-error.ts, server.ts hash == HEAD; harness deleted; worktree clean before this section.
+- Rows ISS-APILOGGER-001 and -003 set to verified in qa/issues.apilogger.jsonl. -002 and -004 stay open (low).
+
+ISSUES-WRITTEN: none
