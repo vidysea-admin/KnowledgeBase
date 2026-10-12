@@ -23,6 +23,8 @@ import type { BrowserJoinerDeps } from "../joiners/browser-joiner.js";
 import { ensureObsReady, type ObsGuardProbes } from "./obs-guard.js";
 import { browserProfileArgs } from "./browser/browser-profile.js";
 import { startBotChild, type BotEvent } from "./browser/bot-child.js";
+import { applyLeanVideoToObs } from "../lean-video-obs.js";
+import type { LeanVideoInput } from "@lkb/core/src/domain/lean-video.js";
 
 export type { BotEvent };
 
@@ -47,6 +49,9 @@ export interface ObsBrowserConfig {
   /** Let the bot click Join/computer-audio buttons. Only for web clients that need it (Zoho):
    * on arbitrary sites a "Join" button can be anything (YouTube: channel membership). */
   autoClick?: boolean;
+  /** T-035: lean video (720p, low fps/bitrate) applied to OBS before each recording. `{}` = defaults,
+   * an object = overrides; undefined or false = OBS's own video settings untouched (today's behaviour). */
+  leanVideo?: LeanVideoInput | false;
   /** Called for every JSON line sb_join.py prints. */
   onEvent?: (handle: string, ev: BotEvent) => void;
   log?: (msg: string) => void;
@@ -201,6 +206,8 @@ export function createObsBrowserDeps(cfg: ObsBrowserConfig, overrides: ObsBrowse
     await upsertInput(AUDIO_INPUT, "wasapi_process_output_capture", { window, priority: WINDOW_PRIORITY_TITLE });
     await obs.call("SetInputMute", { inputName: AUDIO_INPUT, inputMuted: false });
 
+    // T-035: lean video settings go in BEFORE the canvas is read, so the transform below fits the lean size.
+    if (cfg.leanVideo !== undefined && cfg.leanVideo !== false) await applyLeanVideoToObs(obs, cfg.leanVideo, log);
     // Fit the window capture to the canvas.
     const video = await obs.call("GetVideoSettings");
     const { sceneItemId } = await obs.call("GetSceneItemId", { sceneName: SCENE, sourceName: VIDEO_INPUT });

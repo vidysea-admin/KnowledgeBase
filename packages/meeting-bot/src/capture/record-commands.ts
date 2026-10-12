@@ -133,6 +133,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     browserExecutable: process.env.LKB_BROWSER_EXECUTABLE,
     profileDirectory,
     autoClick: shouldAutoClick(platform),
+    leanVideo: {}, // T-035: lean defaults (720p, 5 fps, 500+64 kbps) for every OBS recording
     onEvent,
   });
   const joiner = createBrowserJoiner(bot.deps);

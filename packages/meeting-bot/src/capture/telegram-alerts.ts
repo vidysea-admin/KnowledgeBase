@@ -45,6 +45,9 @@ export interface FinishedSummary {
   turnCount?: number;
 }
 
+/** T-035: measured size of a finished recording vs. the lean target (MB = 1,000,000 bytes). */
+export interface OverTargetInfo { title: string; sessionId: string; mbPerHour: number; targetMbPerHour: number; sizeMb: number; durationSec: number }
+
 export interface TelegramNotifierDeps {
   /** Defaults to process.env.TELEGRAM_BOT_TOKEN. */
   token?: string;
@@ -67,6 +70,8 @@ export interface TelegramNotifier {
    * it on its own. */
   notifySilence(durationSec: number): void;
   notifyFinished(summary: FinishedSummary): void;
+  /** T-035: a finished recording whose measured size is NOT under the lean-video target. */
+  notifyOverTarget(info: OverTargetInfo): void;
   /** R1 (u4a-watch-failure-alerts, D-046, spec.md R1): fires when a watch run records
    * `status: "failed"` for one watched source. Names the source (`sourceType`/`sourceId`), the
    * time, and `failureReason` VERBATIM — no rewording, no truncation — so a reader can match it
@@ -166,6 +171,12 @@ export function createTelegramNotifier(deps: TelegramNotifierDeps = {}): Telegra
       if (summary.transcriptPath) lines.push(`transcript: ${summary.transcriptPath}`);
       if (summary.turnCount !== undefined) lines.push(`turns: ${summary.turnCount}`);
       fireAndForget(`finished:${summary.sessionId}`, lines.join("\n"));
+    },
+    notifyOverTarget(info) {
+      fireAndForget(
+        `overTarget:${info.sessionId}`,
+        `📦 Recording over size target: ${info.title} — ${info.mbPerHour.toFixed(1)} MB/h (target under ${info.targetMbPerHour} MB/h; ${info.sizeMb.toFixed(1)} MB over ${formatDuration(info.durationSec)})`,
+      );
     },
     notifyPollFailed(tenantId, sourceType, sourceId, failedAt, failureReason) {
       fireAndForget(
