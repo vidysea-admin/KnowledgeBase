@@ -20,3 +20,26 @@ The wiring does what the manifest says, but it permanently rewrites the operator
 - Default-ON owner decision: needed. Turning lean on for every OBS recording changes the operator's profile permanently; Umesh should decide restore vs bot-owned profile.
 
 ISSUES-WRITTEN: ISS-LEANWIRE-003 (high), ISS-LEANWIRE-004 (medium)
+
+---
+
+# Cycle 1
+
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: 7ebed10 (lane/leanwire)
+Scope: lean-video-obs.ts, obs-windows.ts, record-commands.ts, telegram-alerts.ts, tests; no live OBS.
+
+## EXPLANATION
+
+ISS-LEANWIRE-003 is closed: previous values are persisted before the first Set call and put back after StopRecord. ISS-LEANWIRE-002 is closed by the end-to-end runRecord behaviour test (exact OBS call sequence through the new inject seams).
+
+- (1) Restore correctness: values restored from the persisted snapshot; "unset" is stored as null and sent as parameterValue null (obs-websocket v5 deletes the key; not an empty string). Order: stop() awaits StopRecord and the 3 s size-stable wait, then restores in `finally`; restore also checks GetRecordStatus and skips with the state kept if the output is still active; the call-sequence test asserts SetVideoSettings(operator) after StopRecord. recordDir is NOT per recording: it is the shared RECORD_DIR (LKB_RECORD_DIR or raw/webinars), so crash in recording A then recording B finds A's leftover file, keeps A's originals (never overwrites with lean values) and restores at B's stop. Caveat: if LKB_RECORD_DIR differs between runs, B would snapshot lean values as "originals" (ISS-LEANWIRE-005, low). A leftover file that is unreadable blocks lean (nothing changed), the safe direction.
+- (2) `lkb finalize` without --stop-obs: cannot restore and gives no alert or warning; the profile stays lean until the next record or `finalize --stop-obs`. Only after a crash; documented in the manifest. Filed low (ISS-LEANWIRE-005), not a unit.
+- (3) Sensitive data: the state file holds only GetVideoSettings numbers and four profile keys (Output/Mode is read but not stored; SimpleOutput VBitrate, ABitrate stored). No stream key, password or URL is captured or stored; keys come from toObsRequests (VBitrate/ABitrate only).
+- (4) record-backend: 2 failures (live WebM remux: ffmpeg exit null; interrupted recovery: EPERM symlink on Windows) are identical in the lane and in the main tree (which has none of the lane's changes), environmental, unrelated.
+- (5) Tests: lean-video-obs 21/21, lean-finalize-alert 6/6, obs-windows 8/8, record-commands 22 pass + 1 skip, telegram-alerts 31/31, controller-state 22/22, tsc exit 0. None launched OBS/ffmpeg/Chrome.
+- Mutations (own harness inside the worktree, per-mutation backup in finally, deleted after; every touched file hash == HEAD afterwards): skip restore after StopRecord KILLED (2 fail); overwrite leftover state with current values KILLED (1 fail); restore while OBS is recording KILLED (1 fail). 3/3.
+- Owner decision still open: default-ON lean recording (`leanVideo: {}` for every OBS recording) is now non-destructive when the restore works, but it is still the owner's call whether it should be default-ON, and whether 720p/5 fps/500 kbps is legible enough for slides; the Output-mode skip means it may silently do nothing on Advanced-mode profiles.
+
+ISSUES-WRITTEN: ISS-LEANWIRE-005 (low). Flipped to verified: ISS-LEANWIRE-003, ISS-LEANWIRE-002.
