@@ -747,13 +747,13 @@ for (const [key, selector] of Object.entries(i.form.fields)) values[key] = value
 if (final.form !== first.form || final.target.href !== before.target.href
   || body !== new URLSearchParams(before.entries).toString()) { done(blocked('changed_after_validation')); return; }
 fetch(final.target.href, {method:'POST', body, headers:{'Content-Type':'application/x-www-form-urlencoded'},
-  redirect:'error', credentials:'include', mode:'no-cors', cache:'no-store'})
+  redirect:i.redirectMode === 'follow' ? 'follow' : 'error', credentials:'include', mode:'no-cors', cache:'no-store'})
   .then(() => done({status:'submitted', reason:'awaiting_confirmation', target:final.target.href, body, values}),
         () => done({status:'uncertain', reason:'submission_not_confirmed'}));
 """
 
 
-def register_form(sb, instructions, script_isolated=False, policy_check=None):
+def register_form(sb, instructions, script_isolated=False, policy_check=None, cdp_connect=None):
     """One submit attempt; positive result is awaiting confirmation, never registration proof."""
     if not script_isolated:
         return {"status": "action_required", "reason": "script_isolation_unproved"}
@@ -808,7 +808,8 @@ def register_form(sb, instructions, script_isolated=False, policy_check=None):
                 return {"status": "action_required", "reason": "request_policy_unproved"}
         if policy_check() is not True:
             return {"status": "action_required", "reason": "persistent_policy_unproved"}
-        result = sb.execute_async_script(script, instructions, "submit")
+        import registration_cdp  # T-052: optional CDP redirect policy; cdp_connect=None keeps redirect:'error'
+        result = registration_cdp.submit_with_redirects(sb, script, instructions, hosts, raw_url, cdp_connect)
         if not isinstance(result, dict):
             return {"status": "uncertain", "reason": "navigation_during_submit"}
         if result.get("status") == "submitted":
@@ -1118,7 +1119,7 @@ def main():
                             raise RuntimeError("Registration network isolation not acknowledged")
                     sb.driver.execute_cdp_cmd("Emulation.setScriptExecutionDisabled", {"value": True})
                     sb.driver.default_get(a.url)
-                    emit("registration-result", **register_form(sb, registration, script_isolated=True, policy_check=policy_check))
+                    emit("registration-result", **register_form(sb, registration, script_isolated=True, policy_check=policy_check, cdp_connect=__import__("registration_cdp").connect_page_cdp))
                     return
                 sb.uc_open_with_reconnect(a.url, 4)
                 emit("opened", url=sb.get_current_url())
