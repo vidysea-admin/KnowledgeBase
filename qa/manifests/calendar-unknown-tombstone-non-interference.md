@@ -2,7 +2,7 @@
 
 Status: ready-for-check
 **Handshake status:** ready-for-check
-Fix cycle: 1
+Fix cycle: 2
 Priority tier: 2 - open HIGH ledger issue ISS-T036CAL-011 (pre-existing, found by the t036 checker, cycle 3)
 Security class: an outsider can stop the bot from recording the user's legitimate meetings (denial of the product's core function). FULL ceremony; never round-capped.
 Lane: lane/tombstone (base 01635f6). New issues go to qa/issues.tombstone.jsonl as ISS-TOMBSTONE-NNN (filed: ISS-TOMBSTONE-001, the residual).
@@ -111,3 +111,38 @@ One at a time, each `node --test --import tsx src/calendar/<file>.test.ts`: webi
 - unknown-tombstone-non-interference.test.ts: pass 12, fail 0. unknown-tombstone-property.test.ts: pass 2, fail 0. webinar-policy.test.ts 19/19, schedule-state.test.ts 18/18, auto-join.test.ts 39/39.
 - `node tsc.js --noEmit -p tsconfig.json` (packages/meeting-bot): exit 0.
 - Mutations (own harness, untracked, deleted; per-mutation byte backup restored in finally; `git hash-object` of the reach file after = d00864e9c80574ad810fa42b3769f24f31665ec9 = the committed blob): start window 5 min KILLED; exact start only KILLED; no horizon KILLED; span never holds KILLED; no lead slack KILLED; no-clock row holds nothing KILLED (after adding the no-clock test; it first SURVIVED).
+
+## Fix cycle 2 (responds to verdict PASS cycle 1 with merge conditions 4 and 5 open and ISS-TOMBSTONE-008)
+
+Approver ruling 2026-10-12 "Amend + live check allow", recorded as D-129 (D-060 floor amended for the one webinar-policy cancelled-tombstone assertion, proven pair only; one read-only live check) and clarified by D-130. Merge condition 4 is satisfied by D-129 (no other D-060 assertion is amended; I changed none: webinar-policy.test.ts is untouched this cycle, 19/19).
+
+### Step 1: live check (merge condition 5) - done, evidence qa/evidence/tombstone-live-shape-2026-10-12/summary.md
+Read-only `calendar events list` x2 with the repo's pinned gws CLI (no token or secret printed or stored; no event created, changed or cancelled). Query B (the adapter's baseline shape, showDeleted, no time filter): 211 items, 15 cancelled. Field presence on the 15: start/end/iCalUID/updated/htmlLink 15/15 (none id-only), recurringEventId + originalStartTime 11/15, recurrence 4/15, organizer/summary/attendees/conferenceData/hangoutLink 4/15 (never without start). Limit: a never-accepted outsider invite was not observed (none can be created under a read-only check); the incremental-sync (syncToken) form of a deletion was not observed.
+Consequence: the common cancelled event is a BARE START (start, end, iCalUID, updated); id-only was not seen; organizer/title/link are the exception. The cycle-1 start-less blanket was the unusual shape, and the match keys available are link identity, organiser/title and start (iCalUID is not carried by the adapter or by core: outside this unit).
+
+### Step 2: the fix (ISS-TOMBSTONE-008)
+`tombstone/unknown-tombstone-reach.ts` rewritten. A tombstone holds an UNLINKED Gmail row only through a match:
+- LINK: its trusted (Google conference data) link and the row's link name the same meeting (zoom /j/ vs /w/?tk=, meet code, pwd/tk stripped), whatever the start; window [min(S,T)-24h, max(S,T)+30d]. A free-text link is never an identity.
+- HOST: its organiser is the row's sender (an outsider cannot be) and (same normalised title, or the row starts within 24h of its start, or it names neither start nor title); same window. Covers a cancelled series master and a rescheduled copy.
+- START: a start S and the row within +-24h of S, unless the tombstone names an organiser that is not the row's sender (nor its domain) and shares neither title nor link (another party's meeting).
+- NEAR: a tombstone with no start and nothing to match (id only) holds only rows starting in [T-24h, T+48h]. Kept solely because webinar-policy.test.ts "available-source coverage" (a D-060 assertion D-129/D-130 do not amend) requires an id-only tombstone to hold `orphan-mail`; Google sent none of these live (0/15). Setting NEAR_AHEAD_MS and NEAR_BEHIND_MS to 0 makes it hold nothing, which needs a further Approver amendment of that assertion.
+Everything else holds nothing and stays listed as `unknown-tombstone` in the inventory (the log). Each hold ends with its window. `calendar-client.ts` is unchanged this cycle (first-seen stamp kept).
+
+### Reproduction counts (recorded cases re-run; 2 scopes x 2 modes cells; all on the current code)
+- ISS-T036CAL-011: 12/12 cells unaffected; P1 3200 runs, P2 1076 runs, 0 violations.
+- ISS-TOMBSTONE-001: 2/2 (recorded case: g5, g6 held, g1/c0/c1 run).
+- ISS-TOMBSTONE-002: 16/16 refused. ISS-TOMBSTONE-003: 20/20 refused (the link forms are now matched by meeting identity, not URL+start).
+- ISS-TOMBSTONE-004: 6/6 as specified. One expectation CHANGED by design: a new id-only row six days out is no longer held (matches nothing); it is the cycle-1 14-day blanket being removed.
+- ISS-TOMBSTONE-005: left OPEN, named: a bare-start tombstone with no organiser still holds the unlinked row within 24h of its start; a detail-bearing outsider tombstone copying a start no longer does (8/8 cells free).
+- ISS-TOMBSTONE-006: fixed (cycle 1); lint-dupes still the same 5 pre-existing violations, none ours.
+- ISS-TOMBSTONE-007: (a)-(d) superseded by 009.
+- ISS-TOMBSTONE-008, direction 1 (no outsider suppression): 30/30 unrelated rows run (start-less outsider invite with unrelated title/organiser vs rows +3d/+13d/+14d/+20d; id-only vs +3d/+13d; invites renewed with fresh ids at day 0 and 13 vs a day-20 row; a detail-bearing outsider copying the victim's start). Direction 2 (no fail-open): 44/44 cells held for the recorded gap shapes when the tombstone carries a trusted link, or host + title (copy +-25h/+30h, link-only +13d/+15d/+16d, recurring instance +30d incl. originalStartTime-only, cancelled master later instance +21d, rescheduled copy +3d). NAMED, NOT held (36/36 pinned): the same gaps for a BARE tombstone (start only) or id-only: there is nothing in it to match on. Filed as ISS-TOMBSTONE-009 (medium, open).
+
+### Evidence (from packages/meeting-bot; node --test --import tsx <file>)
+unknown-tombstone-matched-hold.test.ts (NEW) 10/10; unknown-tombstone-non-interference.test.ts 11/11 (the no-clock test moved to the new file, the id-only and link-only expectations updated as above); unknown-tombstone-property.test.ts 2/2; webinar-policy 19/19; schedule-state 18/18; auto-join 39/39; schedule-tick 14/14; join-rules-select 11/11. `node tsc.js --noEmit -p tsconfig.json`: exit 0. lint-dirsize OK (124 dirs). lint-dupes: 5 pre-existing violations, none ours.
+Mutations (harness tombstone-c2 inside the worktree, deleted; per-mutation byte backup restored in finally; pre/post hash of the reach file equal): 13 run, 13 killed after adding two tests (first run: host match removed SURVIVED, killed by "host and title without any link ..."): link match removed; host match removed; other-party contradiction removed; id-only window 14d; matched horizon unbounded; start window 1 min; free-text link trusted; zoom path forms not collapsed; host alone holds; no-clock matched row holds nothing; id-only window removed; start-only never holds; title alone holds. Final: `git hash-object` of the reach file equals the committed blob.
+
+### Not done / open
+- ISS-TOMBSTONE-009 open (bare-start and id-only residual; needs iCalUID/UID through apps/api and core, outside this unit). ISS-TOMBSTONE-001, -005, -007, -008 ledger rows: statuses not changed here.
+- Constants are assumptions for the Approver: 24h windows, MATCHED_HORIZON_MS 30d, NEAR [-24h, +48h].
+- No sender-binding for the bare-start tier (a bare invite has no organiser to bind).

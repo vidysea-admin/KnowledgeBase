@@ -96,7 +96,7 @@ test("reach by what the tombstone carries: a start holds Gmail rows around that 
     const elsewhere: TombstoneRow = { id: "k4", cancelled: true, title: "x", startTime: iso(Date.parse(s5) + 10 * DAY), endTime: iso(Date.parse(e5) + 10 * DAY), meetingUrl: meet(9), meetingUrlSource: "conference", providerUpdated: REV };
     assert.deepEqual(gmailIds(recon([cal(0), elsewhere], gm, available)), ["g5", "g6", "g7"], "a tombstone far from every Gmail row holds none");
     const urlOnly: TombstoneRow = { id: "k3", cancelled: true, meetingUrl: meet(5), meetingUrlSource: "conference", providerUpdated: REV };
-    assert.deepEqual(gmailIds(recon([cal(0), urlOnly], gm, available)), [], "no start: the cancellation-time window (2026-09-30 .. 2026-10-15) holds all three");
+    assert.deepEqual(gmailIds(recon([cal(0), urlOnly], gm, available)), ["g6", "g7"], "link only, no start: the trusted link names meeting 5, so only g5 is held (matched by link identity, not by a time window)");
   }
 });
 
@@ -141,7 +141,7 @@ test("ISS-TOMBSTONE-003 recorded reproductions verbatim: a trusted-link tombston
   console.log(`ISS-TOMBSTONE-003: ${ok}/${n} refused`); assert.equal(ok, n);
 });
 
-test("ISS-TOMBSTONE-004/001 recorded reproductions: an id-only tombstone holds near-term unlinked Gmail rows (D-060 pin) but expires, on every later tick and after 40 days", () => {
+test("ISS-TOMBSTONE-004/001 recorded reproductions: an id-only tombstone holds imminent unlinked Gmail rows (D-060 pin) but expires, on every later tick and after 40 days", () => {
   let ok = 0, n = 0;
   for (const available of SCOPES) {
     // ISS-TOMBSTONE-001 recorded case: calendar [c0, c1 (linked to g1)] + Gmail [g1, g5, g6] + {id:'ghost',cancelled:true}
@@ -154,8 +154,8 @@ test("ISS-TOMBSTONE-004/001 recorded reproductions: an id-only tombstone holds n
     let state = r.state;
     for (let tick = 1; tick <= 4; tick++) state = recon([cal(0), cal(1)], gm, available, state, iso(Date.parse(CHECKED) + tick * 300_000)).state;
     const week = recon([cal(0), cal(1)], [...gm, mailAt(8, 6 * DAY), mailAt(9, 20 * DAY)], available, state, iso(Date.parse(CHECKED) + 5 * DAY));
-    n++; if (week.candidates.some(c => c.id === "g9") && !week.candidates.some(c => c.id === "g8")) ok++;
-    assert.ok(!week.candidates.some(c => c.id === "g8"), "inside the 14-day horizon a new row is still held"); assert.ok(week.candidates.some(c => c.id === "g9"), "beyond the horizon it is not held");
+    n++; if (week.candidates.some(c => c.id === "g9") && week.candidates.some(c => c.id === "g8")) ok++;
+    assert.ok(week.candidates.some(c => c.id === "g8"), "ISS-TOMBSTONE-008: an id-only tombstone matches nothing, so a row six days out is not held (only the imminent [T-24h, T+48h] rows are)"); assert.ok(week.candidates.some(c => c.id === "g9"), "beyond the horizon it is not held");
     const late = recon([cal(0), cal(1)], [...gm, mailAt(10, 41 * DAY)], available, state, iso(Date.parse(CHECKED) + 40 * DAY));
     n++; if (late.candidates.some(c => c.id === "g10") && !late.inventory.some(i => i.reason === "unproven-calendar-history" && i.snapshot.id === "g10")) ok++;
     assert.ok(late.candidates.some(c => c.id === "g10"), "40 days later a new email-only meeting runs");
@@ -204,14 +204,5 @@ test("1, 2 and 500 unknown tombstones change nothing for trusted rows and stay l
     time(100, available);
     const small = Math.min(time(250, available), time(250, available)), large = Math.min(time(1000, available), time(1000, available));
     assert.ok(large < small * 9 + 50, `4x the rows must cost about 4x, not 16x (small ${small.toFixed(0)}ms, large ${large.toFixed(0)}ms)`);
-  }
-});
-
-test("a stored tombstone row with no clock at all (written before first-seen stamping) cannot expire, so it still holds near rows (fail closed)", () => {
-  for (const available of SCOPES) {
-    const first = recon([cal(0), { id: "ghost", cancelled: true }], [], available), state = JSON.parse(JSON.stringify(first.state));
-    for (const o of Object.values(state.occurrences) as { snapshot: { id: string; providerUpdated?: string }; revision?: string }[]) if (o.snapshot.id === "ghost") { delete o.snapshot.providerUpdated; delete o.revision; }
-    const r = recon([cal(0)], [mailAt(7, 60 * DAY)], available, state, iso(Date.parse(CHECKED) + 50 * DAY));
-    assert.deepEqual(gmailIds(r), [], "no clock: held whatever the distance"); assert.equal(reasonOf(r, "g7"), "unproven-calendar-history");
   }
 });
