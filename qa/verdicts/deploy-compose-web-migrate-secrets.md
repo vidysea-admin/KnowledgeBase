@@ -44,3 +44,37 @@ Three cycle-0 findings are fixed, but the fix exposes a fourth defect that makes
 Rows: -004 and -005 set to verified; -003 left open; -001 and -002 unchanged.
 
 ISSUES-WRITTEN: ISS-DEPLOYCOMPOSE-006 (high)
+
+---
+
+# Cycle checked: 2
+
+VERDICT: PASS
+Cycle checked: 2
+Commit checked: 76e456a (lane/deploycompose), against the merged apps/api/Dockerfile (main HEAD). Docker not installed; nothing built or run.
+
+## EXPLANATION
+
+Independently listed every runtime read and resolved it (working_dir /app; `build` stage = root pnpm install, so /app/node_modules has dotenv 17.4.2 and migrate-mongo 14.0.7 from root package.json):
+
+| Read | Resolves to | Source |
+|---|---|---|
+| `npx migrate-mongo` | /app/node_modules/.bin | build stage install |
+| `-f migrate-mongo-config.cjs` | /app/migrate-mongo-config.cjs | bind mount |
+| config `require("dotenv/config")` | /app/node_modules/dotenv | build stage |
+| config MONGODB_URL / MONGODB_DB | process env | compose environment |
+| config `migrationsDir: "migrations"` | /app/migrations (cwd-relative) | bind mount |
+| 4 migrations `require("fs")`, `require("path")` | node builtins | n/a |
+| 4 migrations `join(__dirname,"..","schema","index.json")` (baseline, meeting-candidates, source-watcher, watch-heartbeat) | /app/schema/index.json | NEW `./schema:/app/schema:ro` mount; file exists |
+| tree-index-tenant-id | no requires, no file reads (db only) | n/a |
+
+No unresolved read. The mounted schema/index.json is the repo copy the migrations were written against.
+
+- `git diff 01238e5..76e456a`: only docker-compose.yml (+3 lines, the schema mount and comment), the issues ledger, manifest and verdict. No other production change.
+- Compose parses (js-yaml 4.x): services migrate, api, web, local-mongo; migrate `profiles ["migrate"]`; api has no profile and no depends_on; web depends_on api only. Plain `up` neither builds nor runs migrate; api starts without it. Profile gating unchanged.
+- No secrets: only `${VAR}` references in compose; no credentialed URIs or keys.
+- Trees clean before this section.
+
+Rows: ISS-DEPLOYCOMPOSE-003 and -006 set to verified. -001 and -002 unchanged (open, medium).
+
+ISSUES-WRITTEN: none
