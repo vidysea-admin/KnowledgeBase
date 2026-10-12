@@ -246,7 +246,7 @@ function recordingRig() {
   const qfs = new MemQueueFs(), sfs = new FakeRunStateFs(); let t = 1000;
   const inner = new FileJobQueue({ dir: "/q", now: () => t, leaseMs: 1000, fs: qfs });
   const calls: Array<{ op: string; ref: { id: string; tenantId?: string }; code?: string }> = [];
-  const spy = { enqueue: (i: never) => inner.enqueue(i), claim: (w: string, o?: { tenantId?: string }) => inner.claim(w, o),
+  const spy = { enqueue: (i: never) => inner.enqueue(i), claim: (w: string, o: { tenantId: string }) => inner.claim(w, o),
     heartbeat: (x: { id: string; tenantId?: string }) => inner.heartbeat(x as never),
     complete: (x: { id: string; tenantId?: string }) => { calls.push({ op: "complete", ref: { ...x } }); return inner.complete(x as never); },
     fail: (x: { id: string; tenantId?: string }, c: string) => { calls.push({ op: "fail", ref: { ...x }, code: c }); return inner.fail(x as never, c); } };
