@@ -1,7 +1,7 @@
 # iss-373-374-registration-redirect-and-post-validation
 
 Status: ready-for-check
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 1 (open HIGH ledger issues ISS-374, ISS-373). Class: security (data disclosure of registrant values; submission integrity): full ceremony.
 Lane: lane/regsafe. Ledger for this lane: qa/issues.regsafe.jsonl, ids ISS-REGSAFE-NNN. Existing rows ISS-373/ISS-374 NOT edited (checker flips status).
