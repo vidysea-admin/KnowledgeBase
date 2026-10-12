@@ -4,7 +4,7 @@ Checker-owned. Scope: the web page `/join-rules` (apps/web/src/pages/join-rules/
 
 ## Criteria
 
-- **C1 - Scope.** Only the join-rules directory, a 2-line App.tsx edit (import + route inside the existing guard/shell), a 1-line NavSidebar entry, and the single shared-code change in api/client.ts, which must be type-only (`"PUT"` in the method union) and keep passing the same key variable to `invalidateAuth` on 401.
+- **C1 - Scope.** Only the join-rules directory, a 2-line App.tsx edit (import + route inside the existing guard/shell), a 1-line NavSidebar entry, and the single shared-code change in api/client.ts, which must be type-only (`"PUT"` in the method union) and keep passing the same key variable to `invalidateAuth` on 401. (Amended 2026-10-12 per D-126, Approver ruling: additive runtime options on apiFetch are also allowed.)
 - **C2 - Request bodies.** Save sends ONLY `{version, ownDomains, rules}` (no `state`, approvals, opt-outs, tenant or server metadata); approve sends exactly `{kind, value}`; opt-out exactly `{eventId}`.
 - **C3 - No wipe.** No UI action can PUT while the load is pending or failed (no Save control, no editable form); a failed pre-save freshness GET never leads to a PUT; a 400/403/413/500/503/network failure on a write keeps the user's input and writes nothing partial; after a successful write the page re-fetches and renders the server's answer. The compare-then-PUT race is acknowledged as best effort (needs an API version field).
 - **C4 - Empty rule set.** Saving zero rules is permitted only if the engine permits it, and the UI states what no rules means.
