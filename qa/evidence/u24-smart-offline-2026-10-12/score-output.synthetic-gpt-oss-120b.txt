@@ -1,15 +1,15 @@
 {
-  "accepted": 5,
-  "correct": 5,
+  "accepted": 3,
+  "correct": 3,
   "precision": 1,
   "wrongIdentities": 0,
-  "wrongPairs": 6,
+  "wrongPairs": 0,
   "wrongPairsRelational": 0,
   "floorTurns": 2,
   "floorCoveredTurns": 42,
   "floorLabels": 2,
   "contradicted": 0,
-  "stableAll": false,
-  "additions": 1,
-  "ISS255": "3/4"
+  "stableAll": true,
+  "additions": 0,
+  "ISS255": "4/4"
 }

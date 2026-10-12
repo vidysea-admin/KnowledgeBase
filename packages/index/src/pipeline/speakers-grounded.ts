@@ -42,6 +42,10 @@ const AGREEMENT_RUNS = 3;
 const AGREEMENT_THRESHOLD = 2;
 const MIN_QUOTE_WORDS = 3;
 const MIN_CORROBORATION = 2;
+/** A quote that thanks someone names the PREVIOUS speaker. */
+const THANKS_CUE = /\bthank(?:s| you)\b/i;
+/** Forward-looking shapes: a call-on, a handover, a welcome, a role announcement. */
+const FORWARD_CUE = /\b(?:over to|hand(?:ing)? (?:it )?over to|pass(?:ing)? (?:it )?to|next (?:up|speaker|presenter)|welcome|hello|hi|introduc\w*|please|go ahead|your turn|(?:can|could|would|will|do|did) you|what|how|why|(?:will|going to) (?:take|moderate|chair|host|lead|run|speak|present|share)|(?:is|are) (?:our|the) (?:moderator|host|panelist|speaker|presenter)|our (?:moderator|host|speaker|presenter))\b/i;
 const MAX_QUOTE_CHARS = 500;
 const MAX_SESSION_CHARS = 600_000;
 
@@ -152,6 +156,11 @@ function groundEntry(turns: Turns[], blocks: Map<string, Block[]>, fullText: str
     if (refs.length === 0) continue;
     const live = refs.some((r) => nameOccurrences(text, r).some((at) => at >= spanStart && at + r.length <= spanEnd && !isReportedAt(text, r, at)));
     if (!live) continue;
+    // WHO does the quote name? A "thank you, X" / "thanks X" addresses the person who JUST spoke, never the next block.
+    const backward = THANKS_CUE.test(span);
+    if (backward && (en.kind === "called-on" || en.kind === "handover" || en.kind === "role-continuity")) continue;   // a thanks-shaped quote cannot call someone forward
+    if (en.kind === "thanks" && !backward) continue;
+    if ((en.kind === "called-on" || en.kind === "handover" || (en.kind === "address" && !backward) || en.kind === "role-continuity") && !FORWARD_CUE.test(span) && !(en.kind === "role-continuity" && labelBlocks.some((b) => k >= b.startTurnIndex && k <= b.endTurnIndex))) continue;
 
     const inBlock = labelBlocks.find((b) => k >= b.startTurnIndex && k <= b.endTurnIndex);
     const before = labelBlocks.find((b) => b.startTurnIndex === k + 1);            // the turn right BEFORE this block
@@ -162,8 +171,8 @@ function groundEntry(turns: Turns[], blocks: Map<string, Block[]>, fullText: str
       case "handover":
       case "called-on": block = turn.speakerRef !== en.label ? before : undefined; break;
       case "thanks": block = turn.speakerRef !== en.label ? after : undefined; break;
-      case "address": block = turn.speakerRef !== en.label ? before ?? after : undefined; break;
-      case "role-continuity": block = inBlock ?? before ?? after; break;
+      case "address": block = turn.speakerRef !== en.label ? (backward ? after : before) : undefined; break;
+      case "role-continuity": block = inBlock ?? before; break;
     }
     if (block) return { turnId: turn._id, sessionId: turn.sessionId, block, i: k, quote: en.quote, kind: en.kind };
   }
@@ -202,6 +211,9 @@ export function groundSpeakerProposals(turns: Turns[], runs: unknown[]): { resol
   }
 
   const floor = resolveSpeakers(turns).resolved;
+  const collides = (label: string, name: string): boolean =>
+    floor.some((f) => f.speakerRef !== label && tokenOverlap(f.displayName, name)) ||
+    [...claims].some(([other, byOther]) => other !== label && [...byOther.keys()].some((n) => tokenOverlap(n, name)));
   const labelsByTurn = new Map<string, Set<string>>();
   for (const [ref, byName] of claims) for (const gs of byName.values()) for (const g of gs) labelsByTurn.set(g.turnId, (labelsByTurn.get(g.turnId) ?? new Set()).add(ref));
 
@@ -212,8 +224,9 @@ export function groundSpeakerProposals(turns: Turns[], runs: unknown[]): { resol
     if (!displayName || bound.length === 0) continue;
     if (floor.some((f) => f.speakerRef === speakerRef && !tokenOverlap(f.displayName, displayName))) continue;   // contradicts the floor
     if (bound.some((g) => (labelsByTurn.get(g.turnId)?.size ?? 0) > 1)) continue;  // one quote turn binds one label
-    // Corroboration (prefer abstaining): a self-introduction stands alone; any other kind needs >= MIN_CORROBORATION distinct quote turns.
-    if (!bound.some((g) => g.kind === "self-intro") && new Set(bound.map((g) => g.turnId)).size < MIN_CORROBORATION) continue;
+    // Corroboration (prefer abstaining): a self-introduction stands alone; any other kind needs >= MIN_CORROBORATION INDEPENDENT quotes.
+    if (!bound.some((g) => g.kind === "self-intro") && new Set(bound.map((g) => `${turns.find((t) => t._id === g.turnId)?.speakerRef}|${g.kind}`)).size < MIN_CORROBORATION) continue;   // independent = different quote speaker or different kind, never one repeated pattern
+    if (collides(speakerRef, displayName)) continue;                               // the same person is plausibly another label
     const ordered = [...bound].sort((a, b) => a.i - b.i);
     const scope = [...new Map(ordered.map((g) => [g.block.startTurnIndex, g.block])).values()].sort((a, b) => a.startTurnIndex - b.startTurnIndex);
     const provenance: SpeakerProvenance[] = ordered.map((g) => ({ turnId: g.turnId, evidenceQuote: g.quote, evidenceKind: g.kind }));

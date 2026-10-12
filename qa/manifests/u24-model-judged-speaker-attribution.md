@@ -1,7 +1,7 @@
 # u24-model-judged-speaker-attribution
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 3 (roadmap U2.4 speaker naming). Class: identity attribution that is written into the KB (the precision-critical path): FULL ceremony.
 Lane: lane/u24smart. Authority: D-132 (pending append), owner decision "make it intelligent instead of rule based". Gate bars 1 (100% accepted-identity precision) and 2 (0 wrong links) are UNCHANGED. No model API call was made in this unit. config/ai-routing.yaml, qa/contracts/, docs/DECISIONS.md untouched.
 
@@ -35,3 +35,10 @@ Recorded D-131 proposals (commit 2bdf5445) have NO evidenceQuote, so:
 
 ## Not delivered / not verified
 No live model run; the new prompt is unmeasured. Sessions over 600k characters degrade to the floor. Bar 3 floor presence unchanged from D-131 (Ruby in visa-blueprint still comes only from the floor). The corroboration rule trades recall for precision and is a candidate for the Approver to revisit once live numbers exist.
+
+## Cycle 1 (fix of ISS-U24SMART-001 high, ISS-U24SMART-002 medium; cycle-0 sections above kept)
+- 001: the gate now binds a quote to its referent. A quote containing thank/thanks names the PREVIOUS speaker: it can only bind via `thanks` (block ending right before the quote) or `address` read backward; called-on, handover and role-continuity quotes with a thank cue are refused. `thanks` requires the cue; called-on, handover, forward address and role-continuity require a forward cue (over to, welcome, hello, please, what/how/can you, will take, our moderator). Corroboration needs INDEPENDENT quotes (different quote-turn speaker or different kind; one host repeating one pattern is one piece of evidence). A name is refused when another label holds it in the floor or has a grounded claim for it (abstain on both). Role-continuity no longer binds the block after the quote.
+- 002: `scripts/lib/audit-closed-class.mjs` probes the grounded extractor with the new `{label,name,evidenceQuote,evidenceKind}` shape and also the legacy extractor with the legacy shape; a control (a genuine self-intro must ship) aborts the audit if the probe is blind; `--self-test` seeds one bypass and requires it to be caught.
+- D-015 replay of the recorded ISS-U24SMART-001 reproductions (the checker fixture, host spk:0 "Thanks Rashi, that was clear..." / "Thank you Rashi, great point..." before spk:2, real Rashi spk:1), kinds address and called-on as recorded plus handover/thanks/role-continuity: refused 5/5 kinds (test "a thank-you naming the previous speaker never names the NEXT block"). Controls: thanks AFTER Rashi's block ships spk:1 with independent quotes; the same two quotes from one host do not. Rival-label and floor-held collisions abstain.
+- ISS-U24SMART-002: audit AFTER 0/409 live bypasses with a passing non-vacuity control; `--self-test` prints "seeded bypass CAUGHT". (`--base <ref>` fails at HEAD because the scratch copy cannot resolve speaker-name-data.js: pre-existing, only usable for refs before that split; not touched.)
+- Tests: speakers-grounded 33/33 (3 new); all 12 legacy speaker suites pass; tsc clean. Offline replay re-run: strict 0 accepted both models; synthetic stress deepseek-v4-pro 0 accepted, gpt-oss:120b 3 accepted, 3 correct (bar 1 = 1.0), 0 wrong identities, 0 wrong evidence pairs. No model calls.

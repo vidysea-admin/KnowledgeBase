@@ -1,6 +1,4 @@
-[synthetic-gpt-oss-120b run 1] 2026-04-21-visa-blueprint-part2-italy-france-nz ACCEPTED spk:0 -> "Ruby" kind=thanks,called-on blocks=[{"startTurnIndex":246,"endTurnIndex":263},{"startTurnIndex":280,"endTurnIndex":280}]
-[synthetic-gpt-oss-120b run 2] 2026-04-21-visa-blueprint-part2-italy-france-nz ACCEPTED spk:0 -> "Ruby" kind=called-on,thanks,called-on blocks=[{"startTurnIndex":246,"endTurnIndex":263},{"startTurnIndex":265,"endTurnIndex":265},{"startTurnIndex":280,"endTurnIndex":280}]
+[synthetic-gpt-oss-120b run 1] 2026-08-24-uniaccess-leeds-arts-university ACCEPTED spk:0 -> "Jubin Thakkar" kind=self-intro blocks=[{"startTurnIndex":5,"endTurnIndex":5}]
 [synthetic-gpt-oss-120b run 2] 2026-08-24-uniaccess-leeds-arts-university ACCEPTED spk:0 -> "Jubin Thakkar" kind=self-intro blocks=[{"startTurnIndex":5,"endTurnIndex":5}]
-[synthetic-gpt-oss-120b run 3] 2026-04-21-visa-blueprint-part2-italy-france-nz ACCEPTED spk:0 -> "Ruby" kind=thanks,called-on,called-on blocks=[{"startTurnIndex":246,"endTurnIndex":263},{"startTurnIndex":265,"endTurnIndex":265},{"startTurnIndex":280,"endTurnIndex":280}]
 [synthetic-gpt-oss-120b run 3] 2026-08-24-uniaccess-leeds-arts-university ACCEPTED spk:0 -> "Jubin Thakkar" kind=self-intro blocks=[{"startTurnIndex":5,"endTurnIndex":5}]
 synthetic-gpt-oss-120b: recorded entries=924, given a synthetic quote=288; score with: node qa/evidence/u24-smart-offline-2026-10-12/05-score.mjs --tag synthetic-gpt-oss-120b --raw-tag oc-gpt-oss-120b
