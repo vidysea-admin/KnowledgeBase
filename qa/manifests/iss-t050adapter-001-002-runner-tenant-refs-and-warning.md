@@ -1,6 +1,6 @@
 # iss-t050adapter-001-002-runner-tenant-refs-and-warning
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (T-050 adapter follow-up; open medium issues ISS-T050ADAPTER-001 and -002). Class: tenancy-adjacent test gap + before-wiring result field. Verdict by the checker only.
 Lane: lane/t050fix (from lane/t050adapter d5254470). Ledger rows in `qa/issues.t050adapter.jsonl` NOT edited here.
