@@ -17,6 +17,7 @@ import { parseJsonLoose } from "@lkb/ai";
 import { resolveEvidence, extractiveText } from "./notes/evidence.js";
 import { runtimeVerdicts, verdictPasses } from "./grounded.js";
 import type { DroppedNote } from "./notes/drop-mode.js";
+import { makeJudgeContext, judgeCandidates, type JudgeContext, type JudgeSidecar, type NoteJudge } from "./notes/judge.js";
 import { runtimeChronologicalTurns, runtimeWindows, runtimeComplete, runtimeRecord, runtimeArray, assertRuntimeCoverage, runtimeInventory, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin, runtimeDigest, runtimeJudge, type RuntimeEvidence, type RuntimeOrigin } from "./grounded.js";
 
 export type ClaimsCompleteFn = (job: Job) => Promise<CompleteResult>;
@@ -71,13 +72,16 @@ export interface ClaimsResult {
   degraded: { reason: string } | null;
   /** Drop-unverified mode only: claims that failed verification and were NOT emitted. */
   dropped?: DroppedNote[];
+  /** D-144: present when a `noteJudge` ran. */
+  judgeSidecar?: JudgeSidecar;
 }
 
-export async function extractClaims(turns: Turns[], complete: ClaimsCompleteFn, options: { strictWebinar?: boolean; dropUnverified?: boolean } = {}): Promise<ClaimsResult> {
+export async function extractClaims(turns: Turns[], complete: ClaimsCompleteFn, options: { strictWebinar?: boolean; dropUnverified?: boolean; noteJudge?: NoteJudge; judgeMaxCostUsd?: number } = {}): Promise<ClaimsResult> {
   if (options.strictWebinar) {
     const dropped: DroppedNote[] | undefined = options.dropUnverified ? [] : undefined;
-    try { return { claims: await strictRuntimeClaims(turns, complete, dropped), degraded: null, ...(dropped ? { dropped } : {}) }; }
-    catch (error) { return { claims: [], degraded: { reason: `strict grounded claims incomplete: ${error instanceof Error ? error.message : String(error)}` } }; }
+    const jc = dropped && options.noteJudge ? makeJudgeContext(options.noteJudge, { maxCostUsd: options.judgeMaxCostUsd }) : undefined;
+    try { return { claims: await strictRuntimeClaims(turns, complete, dropped, jc), degraded: null, ...(dropped ? { dropped } : {}), ...(jc ? { judgeSidecar: jc.sidecar } : {}) }; }
+    catch (error) { return { claims: [], degraded: { reason: `strict grounded claims incomplete: ${error instanceof Error ? error.message : String(error)}` }, ...(jc ? { judgeSidecar: jc.sidecar } : {}) }; }
   }
   if (turns.length === 0) return { claims: [], degraded: null };
 
@@ -115,7 +119,7 @@ export async function extractClaims(turns: Turns[], complete: ClaimsCompleteFn, 
   return { claims, degraded: null };
 }
 
-async function strictRuntimeClaims(turns: Turns[], complete: ClaimsCompleteFn, dropped?: DroppedNote[]): Promise<ExtractedClaim[]> {
+async function strictRuntimeClaims(turns: Turns[], complete: ClaimsCompleteFn, dropped?: DroppedNote[], jc?: JudgeContext): Promise<ExtractedClaim[]> {
   turns = runtimeChronologicalTurns(turns);
   const result = new Map<string, ExtractedClaim>();
   for (const spans of runtimeWindows(turns)) {
@@ -123,7 +127,7 @@ async function strictRuntimeClaims(turns: Turns[], complete: ClaimsCompleteFn, d
       'Read ALL supplied source spans; return {processed:exact inventory,claims:[{text,origin:speaker-statement|screen-ocr|visual-observation,verification:"unverified",evidence:[{turnId,sessionId,quote}]}]}. Extract atomic factual source statements only. Text equals literal evidence quotes joined by newline, and every quote lies entirely inside a submitted span. Preserve unverified screen origin. Return claims:[] only if no factual claim exists; no made-up facts or speaker identities.',
       { phase: "extract-claims", spans, inventory: runtimeInventory(spans) }));
     assertRuntimeCoverage(raw.processed, spans);
-    const proposed = dropped ? dropUnverifiedClaims(runtimeArray(raw.claims), turns, spans, dropped) : runtimeArray(raw.claims).map((entry) => {
+    const proposed = dropped ? dropUnverifiedClaims(runtimeArray(raw.claims), turns, spans, dropped, !!jc) : runtimeArray(raw.claims).map((entry) => {
       const c = runtimeRecord(entry), evidence = runtimeEvidence(c.evidence, turns, spans), origin = runtimeEvidenceOrigin(evidence, turns);
       if (c.origin !== origin || c.verification !== "unverified") throw new Error("claim source origin mismatch");
       return { id: runtimeDigest(["claim", evidence]), text: runtimeExtractive(c.text, evidence), origin, verification: "unverified" as const, evidence };
@@ -133,19 +137,23 @@ async function strictRuntimeClaims(turns: Turns[], complete: ClaimsCompleteFn, d
     if (dropped) {
       const verdicts = await runtimeVerdicts(complete, "claims", turns, spans, proposed);
       accepted = proposed.filter((c) => verdictPasses(verdicts.find((v) => v.id === c.id)) || (dropped.push({ what: "claim", reason: "independent judge rejected the claim", excerpt: c.text.slice(0, 120) }), false));
+      if (jc) {
+        const keep = await judgeCandidates(jc, turns, accepted.map((c) => ({ id: c.id, kind: "claim", note: c.text, evidence: c.evidence })));
+        accepted = accepted.filter((c) => keep.has(c.id) || (dropped.push({ what: "claim", reason: `note judge ${jc.sidecar.entries.filter((e) => e.id === c.id).map((e) => `${e.verdict}: ${e.reason}`).at(-1) ?? "not same"}`, excerpt: c.text.slice(0, 120) }), false));
+      }
     } else await runtimeJudge(complete, "claims", turns, spans, proposed);
     for (const c of accepted) result.set(c.id, { text: c.text, evidenceTurnIds: c.evidence.map((e) => e.turnId), evidence: c.evidence, origin: c.origin, verification: c.verification });
   }
   return [...result.values()];
 }
 
-function dropUnverifiedClaims(raws: unknown[], turns: Turns[], spans: ReturnType<typeof runtimeWindows>[number], dropped: DroppedNote[]) {
+function dropUnverifiedClaims(raws: unknown[], turns: Turns[], spans: ReturnType<typeof runtimeWindows>[number], dropped: DroppedNote[], judged = false) {
   const out = new Map<string, { id: string; text: string; origin: RuntimeOrigin; verification: "unverified"; evidence: RuntimeEvidence[] }>();
   for (const entry of raws) {
     const c = typeof entry === "object" && entry !== null && !Array.isArray(entry) ? (entry as Record<string, unknown>) : undefined;
     const drop = (reason: string) => void dropped.push({ what: "claim", reason, excerpt: typeof c?.text === "string" ? c.text.slice(0, 120) : "" });
     if (!c) { drop("not an object"); continue; }
-    const ev = resolveEvidence(c.evidence, turns, spans);
+    const ev = resolveEvidence(c.evidence, turns, spans, judged ? { judged: true } : {});
     if (!ev.ok) { drop(ev.reason); continue; }
     let origin: RuntimeOrigin;
     try { origin = runtimeEvidenceOrigin(ev.evidence, turns); } catch { drop("mixed or unavailable source origin"); continue; }

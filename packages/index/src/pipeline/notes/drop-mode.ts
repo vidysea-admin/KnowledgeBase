@@ -8,18 +8,20 @@
 import type { Turns, CitedItem, QaEntry } from "@lkb/core";
 import { runtimeArray, runtimeDigest, runtimeEvidenceOrigin, runtimeVerdicts, verdictPasses, type RuntimeComplete, type RuntimeSpan, type RuntimeVerdict } from "../grounded.js";
 import { resolveEvidence, extractiveText } from "./evidence.js";
+import { judgeCandidates, type JudgeContext } from "./judge.js";
 
 export interface DroppedNote { what: "insight" | "decision" | "action" | "qa" | "qa-answer" | "claim" | "unknown"; reason: string; excerpt: string }
+const jopts = (judged: boolean, extra: { allowQuestion?: boolean } = {}) => ({ ...extra, ...(judged ? { judged: true } : {}) });
 const KINDS = new Set(["insight", "decision", "action"]);
 const rec = (v: unknown): Record<string, unknown> | undefined => (typeof v === "object" && v !== null && !Array.isArray(v) ? (v as Record<string, unknown>) : undefined);
 const excerpt = (v: unknown) => (typeof v === "string" ? v.slice(0, 120) : "");
 
 /** Build one grounded item from a raw proposal, or undefined (and a log entry) when it cannot be fully verified. */
-export function tryItem(raw: unknown, turns: Turns[], spans: RuntimeSpan[] | undefined, log: DroppedNote[]): CitedItem | undefined {
+export function tryItem(raw: unknown, turns: Turns[], spans: RuntimeSpan[] | undefined, log: DroppedNote[], judged = false): CitedItem | undefined {
   const r = rec(raw), drop = (reason: string) => (log.push({ what: r && KINDS.has(String(r.kind)) ? (r.kind as DroppedNote["what"]) : "unknown", reason, excerpt: excerpt(r?.text) }), undefined);
   if (!r) return drop("not an object");
   if (!KINDS.has(String(r.kind))) return drop("unknown extraction category");
-  const ev = resolveEvidence(r.evidence, turns, spans);
+  const ev = resolveEvidence(r.evidence, turns, spans, jopts(judged));
   if (!ev.ok) return drop(ev.reason);
   let origin;
   try { origin = runtimeEvidenceOrigin(ev.evidence, turns); } catch (e) { return drop(e instanceof Error ? e.message : "origin unavailable"); }
@@ -31,10 +33,10 @@ export function tryItem(raw: unknown, turns: Turns[], spans: RuntimeSpan[] | und
 }
 
 /** Build one Q&A entry. A bad question drops it; a bad or incoherent answer leaves it unanswered. */
-export function tryQA(raw: unknown, turns: Turns[], questionSpans: RuntimeSpan[] | undefined, answerSpans: RuntimeSpan[] | undefined, log: DroppedNote[]): QaEntry | undefined {
+export function tryQA(raw: unknown, turns: Turns[], questionSpans: RuntimeSpan[] | undefined, answerSpans: RuntimeSpan[] | undefined, log: DroppedNote[], judged = false): QaEntry | undefined {
   const r = rec(raw), drop = (what: DroppedNote["what"], reason: string) => (log.push({ what, reason, excerpt: excerpt(r?.question) }), undefined);
   if (!r) return drop("qa", "not an object");
-  const q = resolveEvidence(r.questionEvidence, turns, questionSpans, { allowQuestion: true });
+  const q = resolveEvidence(r.questionEvidence, turns, questionSpans, jopts(judged, { allowQuestion: true }));
   if (!q.ok) return drop("qa", `question: ${q.reason}`);
   const question = extractiveText(r.question, q);
   if (question === undefined) return drop("qa", "question text is not the verified quotes");
@@ -44,7 +46,7 @@ export function tryQA(raw: unknown, turns: Turns[], questionSpans: RuntimeSpan[]
     if (r.status !== "answered" && r.status !== "unanswered") return drop("qa", "invalid question status");
     return unanswered();
   }
-  const a = resolveEvidence(r.answerEvidence, turns, answerSpans), answer = a.ok ? extractiveText(r.answer, a) : undefined;
+  const a = resolveEvidence(r.answerEvidence, turns, answerSpans, jopts(judged)), answer = a.ok ? extractiveText(r.answer, a) : undefined;
   if (!a.ok || answer === undefined) { drop("qa-answer", a.ok ? "answer text is not the verified quotes" : `answer: ${a.reason}`); return unanswered(); }
   return { ...base, answer, answerEvidence: a.evidence, status: "answered" };
 }
@@ -52,12 +54,27 @@ export function tryQA(raw: unknown, turns: Turns[], questionSpans: RuntimeSpan[]
 export const unansweredCopy = (q: QaEntry): QaEntry => ({ id: q.id, question: q.question, questionEvidence: q.questionEvidence, answer: null, answerEvidence: [], status: "unanswered" });
 
 /** Window-extract helper: build every proposal, dedupe by id, run the judge, and drop what it flags. */
-export async function collectWindow(complete: RuntimeComplete, turns: Turns[], spans: RuntimeSpan[], rawItems: unknown, rawQa: unknown, log: DroppedNote[]): Promise<{ items: CitedItem[]; qa: QaEntry[] }> {
+export async function collectWindow(complete: RuntimeComplete, turns: Turns[], spans: RuntimeSpan[], rawItems: unknown, rawQa: unknown, log: DroppedNote[], jc?: JudgeContext): Promise<{ items: CitedItem[]; qa: QaEntry[] }> {
   const items = new Map<string, CitedItem>(), qa = new Map<string, QaEntry>();
-  for (const raw of runtimeArray(rawItems)) { const i = tryItem(raw, turns, spans, log); if (i) items.set(i.id, i); }
-  for (const raw of runtimeArray(rawQa)) { const q = tryQA(raw, turns, spans, spans, log); if (q) qa.set(q.id, q); }
+  for (const raw of runtimeArray(rawItems)) { const i = tryItem(raw, turns, spans, log, !!jc); if (i) items.set(i.id, i); }
+  for (const raw of runtimeArray(rawQa)) { const q = tryQA(raw, turns, spans, spans, log, !!jc); if (q) qa.set(q.id, q); }
   const verdicts = await runtimeVerdicts(complete, "summarize", turns, spans, [...items.values(), ...qa.values()]);
-  return applyVerdicts(verdicts, items, qa, log);
+  const out = applyVerdicts(verdicts, items, qa, log);
+  return jc ? applyNoteJudge(jc, turns, out.items, out.qa, log) : out;
+}
+
+/** D-144: the negation judge runs after the structural checks. Only "same" ships; an answer that is not "same" leaves its question unanswered. */
+async function applyNoteJudge(jc: JudgeContext, turns: Turns[], items: CitedItem[], qa: QaEntry[], log: DroppedNote[]): Promise<{ items: CitedItem[]; qa: QaEntry[] }> {
+  const answered = qa.filter((q) => q.status === "answered");
+  const keep = await judgeCandidates(jc, turns, [
+    ...items.map((i) => ({ id: i.id, kind: i.kind, note: i.text, evidence: i.evidence })),
+    ...answered.map((q) => ({ id: q.id, kind: "qa-answer", note: q.answer ?? "", evidence: q.answerEvidence })),
+  ]);
+  const why = (id: string) => jc.sidecar.entries.filter((e) => e.id === id).map((e) => `${e.verdict}: ${e.reason}`).at(-1) ?? "not same";
+  return {
+    items: items.filter((i) => keep.has(i.id) || (log.push({ what: i.kind, reason: `note judge ${why(i.id)}`, excerpt: i.text.slice(0, 120) }), false)),
+    qa: qa.map((q) => (q.status === "answered" && !keep.has(q.id) ? (log.push({ what: "qa-answer", reason: `note judge ${why(q.id)}`, excerpt: q.question.slice(0, 120) }), unansweredCopy(q)) : q)),
+  };
 }
 
 function applyVerdicts(verdicts: RuntimeVerdict[], items: Map<string, CitedItem>, qa: Map<string, QaEntry>, log: DroppedNote[]): { items: CitedItem[]; qa: QaEntry[] } {
@@ -73,8 +90,12 @@ function applyVerdicts(verdicts: RuntimeVerdict[], items: Map<string, CitedItem>
 }
 
 /** Judge pending-question candidates; a candidate the judge rejects is discarded and the prior unanswered question stands. */
-export async function judgePendingCandidates(complete: RuntimeComplete, turns: Turns[], spans: RuntimeSpan[], candidates: QaEntry[], log: DroppedNote[]): Promise<QaEntry[]> {
+export async function judgePendingCandidates(complete: RuntimeComplete, turns: Turns[], spans: RuntimeSpan[], candidates: QaEntry[], log: DroppedNote[], jc?: JudgeContext): Promise<QaEntry[]> {
   const verdicts = await runtimeVerdicts(complete, "summarize", turns, spans, candidates, "pending-qa");
   const byId = new Map(verdicts.map((v) => [v.id, v]));
-  return candidates.filter((c) => c.status === "unanswered" || (verdictPasses(byId.get(c.id)) || (log.push({ what: "qa-answer", reason: "judge rejected the late answer", excerpt: c.question.slice(0, 120) }), false)));
+  const passed = candidates.filter((c) => c.status === "unanswered" || (verdictPasses(byId.get(c.id)) || (log.push({ what: "qa-answer", reason: "judge rejected the late answer", excerpt: c.question.slice(0, 120) }), false)));
+  if (!jc) return passed;
+  const answered = passed.filter((c) => c.status === "answered");
+  const keep = await judgeCandidates(jc, turns, answered.map((c) => ({ id: c.id, kind: "qa-answer", note: c.answer ?? "", evidence: c.answerEvidence })));
+  return passed.filter((c) => c.status === "unanswered" || keep.has(c.id) || (log.push({ what: "qa-answer", reason: "note judge: late answer not same as its source", excerpt: c.question.slice(0, 120) }), false));
 }

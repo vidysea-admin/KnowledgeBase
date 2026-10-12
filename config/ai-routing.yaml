@@ -18,3 +18,8 @@ ask: [gemini, claude-code]
 # entirely locally when the corpus must not leave our infrastructure (goal.md). Providers without
 # an embed() are skipped by the router rather than failing the chain, so listing one is harmless.
 embedding: [gemini, ollama]
+# T-040 / D-144: the negation-safety JUDGE. A SECOND model (not the generating summarize/claims chain, which is
+# gemini-first) checks each generated note against its cited source sentence(s) for same/different/unsure meaning,
+# polarity and negation included. claude-code first so the judge is a different model family from the generator;
+# gemini is the fallback. Job kind "note-judge" (packages/index/src/pipeline/notes/judge.ts). No existing route changed.
+note-judge: [claude-code, gemini]
