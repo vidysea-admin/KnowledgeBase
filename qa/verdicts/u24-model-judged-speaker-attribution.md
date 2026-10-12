@@ -1,17 +1,15 @@
 # Verdict: u24-model-judged-speaker-attribution
 
 VERDICT: FAIL
-Cycle checked: 0
-Commit checked: 9a8618bb (lane/u24smart). No model API calls were made.
+Cycle checked: 1
+Commit checked: 5fa25015 (lane/u24smart). No model API calls. Cycle 0 verdict (FAIL) is superseded by this file.
 
 EXPLANATION:
-1. Production exposure: NOT reachable. `extractSpeakers` has no production caller. It is only re-exported from packages/index/src/index.ts, and the sole other importer is scripts/lib/audit-closed-class.mjs. `scripts/sync-speakers.mjs` calls `resolveSpeakers` only. No file under apps/ or packages/ outside pipeline tests imports it. config/ai-routing.yaml is unchanged (`speakers: [ollama]`), and the gate file says the route is switched only after a model passes, in a separate unit (D-127/D-131 Result). So the swap is not live and no flag is needed now. Note: the swap leaves no wiring switch either; the later wiring unit must keep the gate. Side effect: audit-closed-class.mjs is now vacuous (ISS-U24SMART-002, medium).
-2. Grounding soundness: FAIL. Fabricated and paraphrased quotes are refused (punctuation-stripped Hinglish quote abstains, NFD-vs-NFC abstains, 11 tests die when the verbatim check is dropped). Devanagari names abstain (looksLikeAName is Latin-shaped), which is safe but means zero recall there. But the gate never checks WHO a quote names. Fixture: host (spk:0) says "Thanks Rashi, that was clear. Now over to our next speaker." and "Thank you Rashi, great point. Next up ..." each directly before spk:2's block, with the real Rashi as spk:1. Proposals {spk:2, Rashi, address} (or called-on), 3 runs, ship `spk:2 = Rashi`: a wrong identity. The thanks-to-previous-speaker pattern recurs at every handover, so the 2-distinct-turn corroboration is met by the same wrong pattern. A model that mislabels once per session gets through. This breaks bar 1/2 and the stated design promise. ISS-U24SMART-001 (high).
-3. Floor: the floor check is present and mutation-tested (see 5). Existing speaker suites: 311 tests pass (speaker*.test.ts), speakers-grounded 30/30. `tsc --noEmit -p packages/index` clean.
-4. speaker-docs.test.ts and speaker-tile-fusion.test.ts: `git hash-object` equals the HEAD blob for both, `git diff --quiet` is 0, index and worktree are LF with core.autocrlf=true. This is a stat/autocrlf refresh artifact, not a content change. Do not commit them; `git update-index --refresh` (or leaving them) is harmless for the merge.
-5. Mutations (per-mutation byte backup, restore in finally, hash == HEAD blob after each, harness deleted): drop verbatim check KILLED (11 fail); agreement threshold 2->1 KILLED (2); drop floor check KILLED (1); thanks accepts before-side KILLED (1); drop corroboration KILLED (10); called-on accepts either side KILLED (1). All 6 killed. The test suite does not cover the who-is-named hole above.
-6. Offline stress result in the manifest (synthetic quotes) is not a model measurement; unchanged.
+- ISS-U24SMART-001 original fixture: FIXED. The "Thanks Rashi" before spk:2 case is refused for all five kinds (address, called-on, handover, thanks, role-continuity).
+- But the referent binding is still unsound (ISS-U24SMART-003, high). Wrong identities still ship with 3 identical runs: (a) host and cohost each say "Rashi, can you hand over to Ruby ..." before Rashi's block, proposal spk:1=Ruby (handover or address) ships; (b) "Welcome Ruby, and Rashi will go first" before Rashi's block, spk:1=Ruby ships; (c) a one-turn backchannel "Yes please." by spk:2 between the call-on and the real answerer (spk:1) makes spk:2=Priya Nair ship. The gate checks only that the name occurs in a forward-cue quote, not which name is the addressee, and two different quote speakers satisfy "independent" corroboration.
+- Production exposure unchanged: still no production caller of extractSpeakers; routing unchanged.
+- ISS-U24SMART-002: partly fixed. Audit passes 0/409 and --self-test prints CAUGHT, but both are blind to the original defect: with shipsAsPerson mutated back to the legacy reply shape, --self-test still prints CAUGHT and the audit still prints 0/409 (ISS-U24SMART-004, medium). The --base HEAD failure is pre-existing: the base scratch dir copies only speaker-name-rules.ts, which imports ./speaker-name-data.js, absent from the scratch dir; the diff touches neither that import nor the copy logic.
+- Mutations (per-mutation backup, restore in finally, hash == HEAD blob each time, harness deleted): KILLED: drop collision check, corroboration by turn only, drop floor check, drop verbatim check. SURVIVED: remove referent binding (the THANKS_CUE line), address-backward-binds-before, drop FORWARD_CUE requirement. The new binding rules are weakly tested.
+- tsc clean; 314 speaker tests pass. speaker-docs/tile-fusion modified-status remains stat-only (hash equals HEAD).
 
-Required fix: close ISS-U24SMART-001 with a regression using the exact fixture, then re-submit. Optional before merge: ISS-U24SMART-002.
-
-ISSUES-WRITTEN: ISS-U24SMART-001 (high), ISS-U24SMART-002 (medium) in qa/issues.u24smart.jsonl
+ISSUES-WRITTEN: ISS-U24SMART-003 (high), ISS-U24SMART-004 (medium) in qa/issues.u24smart.jsonl
