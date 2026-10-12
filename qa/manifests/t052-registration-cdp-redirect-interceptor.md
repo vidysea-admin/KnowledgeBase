@@ -1,7 +1,7 @@
 # t052-registration-cdp-redirect-interceptor
 
-Status: ready-for-check
-**Handshake status:** ready-for-check
+Status: checked-PASS
+**Handshake status:** checked-PASS (cycle 1)
 Fix cycle: 1
 Tier: owner-approved follow-up to ISS-374/ISS-373 (cost accepted "until a CDP interceptor exists"; ISS-REGSAFE-001 fix_direction). Class: security (registrant data leaving to unapproved hosts): full ceremony.
 Lane: lane/regcdp. Ledger for this lane: qa/issues.regcdp.jsonl, ids ISS-REGCDP-NNN.
