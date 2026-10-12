@@ -1,6 +1,6 @@
 # iss-t057screen-001-health-liveness-only
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS (cycle 0)
 Fix cycle: 0
 Tier: 2/3 (open ISS-T057SCREEN-001). Lane: lane/healthlive (base e4d6f14). Class: security (cross-tenant read, unauthenticated). Authority: Approver Umesh 2026-10-12 ("Counts hatao, sirf liveness"); the DECISIONS entry amending qa/contracts/health-route.md C1/C2 was being appended in parallel and had not landed in this worktree (docs/DECISIONS.md tops out at D-128) -- the checker should cite it once present. qa/contracts/ NOT edited by this unit; contract C1/C2 are knowingly superseded by the ruling.
 
