@@ -1,6 +1,6 @@
 # t040-grounded-notes-generation
 
-**Handshake status:** ready-for-check (cycle 3; cycle-0, -1 and -2 text below is history, FAIL verdicts `qa/verdicts/t040-grounded-notes-generation.md`)
+**Handshake status:** checked-PASS (cycle 3; cycle-0, -1 and -2 text below is history, FAIL verdicts `qa/verdicts/t040-grounded-notes-generation.md`)
 Fix cycle: 3
 Tier: 3 (next unblocked roadmap task: T-040; the schema blocker was lifted by D-126 / merge c99c44d). Class: data write (session_pages, claims persisted through indexSession): full ceremony. Verdict by the checker only.
 Lane: lane/t040gen (base 9e24d1f). Lane ledger `qa/issues.t040gen.jsonl`: ISS-T040GEN-001..005 (2 medium, 3 low; all open, none fixed here).
