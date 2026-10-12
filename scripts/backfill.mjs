@@ -157,7 +157,7 @@ ${failures.length} session(s) failed promotion:`);
       continue;
     }
 
-    const res = await writeSessionChunks(TENANT, s._id, turns, embed, db);
+    const res = await writeSessionChunks(TENANT, s._id, turns, embed, db, true, s.provenance?.status === "legacy-unbound" ? { status: "legacy-unbound", reason: s.provenance.reason } : undefined);
     totalWritten += res.written;
     // `writeSessionChunks` never throws — it returns why it skipped. Reporting that explicitly is
     // the point: a backfill that printed only successes would hide a provider outage as "done".

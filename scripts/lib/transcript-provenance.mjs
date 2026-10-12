@@ -97,3 +97,30 @@ export async function assertTranscriptReplacementSafe({turns, claims, sessionPag
   const priorPage = await sessionPages(tenantId).findOne({sessionId});
   if (priorClaims || priorPage) throw new Error("transcript replacement has existing derived knowledge; version-aware reindex required before mutation");
 }
+/** D-149 (pending append): the stamp carried by every doc seeded without derivation provenance. */
+export const LEGACY_UNBOUND = Object.freeze({status: "legacy-unbound", reason: "D-149"});
+const stamp = doc => ({...doc, provenance: {...LEGACY_UNBOUND}});
+/**
+ * Opt-in (`--legacy-unbound`) loader. Accepts a session ONLY when derivation-provenance.json is absent; a
+ * present proof (current, stale or mismatched) still goes through assertDerivedArtifactsCurrent unchanged.
+ * Identity/evidence integrity is still enforced by artifactGeneration. Never writes or binds provenance.
+ */
+export function loadSessionArtifacts(dir, {legacyUnbound = false} = {}) {
+  if (!legacyUnbound || existsSync(join(dir, "derivation-provenance.json"))) return assertDerivedArtifactsCurrent(dir);
+  const {documents: d} = artifactGeneration(dir);
+  return {documents: {source: stamp(d.source), session: stamp(d.session), turns: d.turns.map(stamp),
+    claims: d.claims.map(stamp), page: stamp(d.page)}};
+}
+/**
+ * Target database for a `--legacy-unbound` live write. LKB_ALLOW_STAGING=lkb_staging selects the staging
+ * path, which accepts ONLY database `lkb_staging`; anything else (lkb, empty, other names, mismatched
+ * MONGODB_DB) is refused. Without that env the existing requireWorkDatabase rules apply unchanged.
+ */
+export function requireLegacyUnboundDatabase(env) {
+  const allow = env.LKB_ALLOW_STAGING;
+  if (allow === undefined) return requireWorkDatabase(env);
+  const work = env.MONGO_WORK_DB?.trim(), selected = env.MONGODB_DB?.trim();
+  if (allow !== "lkb_staging" || work !== "lkb_staging" || (selected && selected !== "lkb_staging") || !valid(env.MONGODB_URL))
+    throw new Error("legacy-unbound staging requires LKB_ALLOW_STAGING=lkb_staging, MONGO_WORK_DB=lkb_staging and a Mongo URL; other databases refused");
+  return {url: env.MONGODB_URL, dbName: "lkb_staging"};
+}
