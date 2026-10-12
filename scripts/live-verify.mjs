@@ -108,9 +108,10 @@ const collectionNames = readdirSync(join(ROOT, "schema"))
 let mongoOk = false;
 try {
   const { connect, getDb } = await import("../packages/db/src/index.ts");
-  const url = process.env.MONGODB_URL;
-  if (!url) throw new Error("MONGODB_URL not set");
-  await connect(url, process.env.MONGODB_DB ?? "lkb");
+  // ISS-LEGACYSEED-005: no lkb default; read-only, but lkb needs --i-know-this-is-production + MONGODB_DB=lkb.
+  const { requireScriptDatabase } = await import("./lib/transcript-provenance.mjs");
+  const target = requireScriptDatabase(process.env, process.argv, {allowProduction: true});
+  await connect(target.url, target.dbName);
   const db = getDb();
   for (const name of collectionNames) {
     preflight.collections[name] = await db.collection(name).countDocuments();

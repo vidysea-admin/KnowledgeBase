@@ -3,7 +3,7 @@
 import { existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { decideReingestAction, assertIndexed, ingestOneDriveFile } from "./lib/ingest-chain.mjs";
-import { ROOT, TENANT, LOCK_PATH, RECORDINGS_DIR, AUDIO_DIR, CALENDAR_FIRST_YEAR, MONTHS, MONGODB_DB } from "./watch-config.mjs";
+import { ROOT, TENANT, LOCK_PATH, RECORDINGS_DIR, AUDIO_DIR, CALENDAR_FIRST_YEAR, MONTHS, watchDbTarget } from "./watch-config.mjs";
 import { runGws, findCurrentMonthFolder } from "./watch-sources.mjs";
 import { markDriveState } from "./watch-store.mjs";
 import { replaceSessionRows, withFailureRecorded } from "./lib/reingest-swap.mjs";
@@ -33,7 +33,8 @@ export async function runReingest(gdrive, driveFileId, calendarEvents, now) {
 }
 
 async function runReingestUnderWatchLock(gdrive, driveFileId, calendarEvents, now, connect, findWatchState) {
-  const db = await connect(process.env.MONGODB_URL, MONGODB_DB);
+  const target = watchDbTarget();
+  const db = await connect(target.url, target.dbName);
   console.log(`--reingest ${driveFileId}: connected to Mongo db "${db.databaseName}"`);
 
   // ISS-REINGESTSAFE-001: a previous run killed between the first delete and the end of ingest left a

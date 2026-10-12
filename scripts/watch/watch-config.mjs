@@ -22,6 +22,7 @@ export const CALENDAR_CSV = join(ROOT, "raw", "TOC", "TOC-Materials", "_csv", "c
 export const CALENDAR_FIRST_YEAR = 2026; // the sheet's own first month header (APRIL) — see toc-calendar.ts
 export const WATCH_DIR = join(ROOT, "qa", "watch");
 export const LOCK_PATH = join(ROOT, "data", ".watch.lock");
+import { requireScriptDatabase } from "../lib/transcript-provenance.mjs";
 export const DRY_RUN = process.argv.includes("--dry-run");
 export const INGEST = process.argv.includes("--ingest");
 export const REINGEST_IDX = process.argv.indexOf("--reingest");
@@ -34,7 +35,11 @@ export const REINGEST_DRIVE_ID = REINGEST_IDX >= 0 ? process.argv[REINGEST_IDX +
 // seed-toc.mjs (every other caller's same fallback) had actually written the turns. `indexSession`
 // then queried an empty collection and printed "no chunkable turns" for a session that had 27 real
 // ones, just in the other database.
-export const MONGODB_DB = process.env.MONGODB_DB ?? "lkb";
+// ISS-LEGACYSEED-003: NO lkb default any more. Resolved lazily (import must not throw: --dry-run/tests import this file).
+// lkb is reachable only with --i-know-this-is-production + MONGODB_DB=lkb; otherwise an isolated work DB / lkb_staging.
+export function watchDbTarget(env = process.env, argv = process.argv) {
+  return requireScriptDatabase(env, argv, { allowProduction: true });
+}
 
 export const MONTHS = [
   "January", "February", "March", "April", "May", "June",

@@ -543,7 +543,7 @@ test("ISS-REINGESTEJSON-006: runReingest takes data/.watch.lock (withWatchLock) 
   const run = src.slice(src.indexOf("export async function runReingest("), src.indexOf("async function reingestLocked("));
   const iWatch = run.indexOf("withWatchLock({ lockPath: LOCK_PATH }");
   assert.ok(iWatch > 0, "runReingest wraps its body in withWatchLock(LOCK_PATH)");
-  assert.ok(iWatch < run.indexOf("connect(process.env"), "watch lock before any db connection");
+  assert.ok(iWatch < run.indexOf("watchDbTarget()"), "watch lock before any db connection");
   assert.ok(iWatch < run.indexOf("recoverAll("), "watch lock before startup recovery");
   assert.ok(run.indexOf("recoverAll(") < run.indexOf("withReingestLock("), "fixed order: watch lock -> recovery -> per-file lock");
 });
