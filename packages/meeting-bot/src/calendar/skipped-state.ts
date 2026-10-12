@@ -84,7 +84,7 @@ function renameReplacing(rename: typeof renameSync, from: string, to: string): v
   }
 }
 
-function writeAtomic(file: string, bytes: string, rename: typeof renameSync, owns: () => void): void {
+export function writeAtomic(file: string, bytes: string, rename: typeof renameSync, owns: () => void): void {
   const temporary = `${file}.${randomUUID()}.tmp`;
   let fd: number | undefined, created = false;
   try {
