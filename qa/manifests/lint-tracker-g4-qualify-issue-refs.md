@@ -1,6 +1,6 @@
 # lint-tracker-g4-qualify-issue-refs
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Lane:** g4refs (branch lane/g4refs)
 **Slug:** lint-tracker-g4-qualify-issue-refs
