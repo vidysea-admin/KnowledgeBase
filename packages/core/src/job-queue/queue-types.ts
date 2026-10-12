@@ -42,8 +42,8 @@ export interface JobQueue {
   claim(workerId: string, opts: { tenantId: string }): QueueResult<QueueJob | null>;
   heartbeat(ref: LeaseRef): QueueResult<QueueJob>;
   complete(ref: LeaseRef): QueueResult<QueueJob>;
-  /** Back to ready while attempts remain, else terminal "dead". */
-  fail(ref: LeaseRef, errorCode: string): QueueResult<QueueJob>;
+  /** Back to ready while attempts remain, else terminal "dead". `opts.terminal: true` (D-139) marks it "dead" at once whatever the attempts left: for a failure that retrying cannot fix (the run itself failed terminally). */
+  fail(ref: LeaseRef, errorCode: string, opts?: { terminal?: boolean }): QueueResult<QueueJob>;
 }
 
 export const MAX_QUEUE_ID_LENGTH = 64;
