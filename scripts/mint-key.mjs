@@ -8,7 +8,8 @@
  * exact bypass that made an earlier 'verified live' claim misleading). Minting a credential is
  * not seeding content, so this script exists to make `live-verify.mjs` runnable without it.
  *
- * Usage: node scripts/mint-key.mjs [--tenant toc] [--label live-verify]
+ * Usage: node scripts/mint-key.mjs [--tenant toc] [--label live-verify] [--with-scope send-now]
+ *   Default keys never hold the dedicated write scope send-now (it can launch a recording bot); ask for it by name.
  */
 import { randomUUID, randomBytes, createHash } from "node:crypto";
 import "dotenv/config";
@@ -16,16 +17,16 @@ import { register } from "tsx/esm/api";
 
 register();
 
-const ALL_SCOPES = [
-  "ask", "compete", "sources", "sessions", "search", "citations", "webhooks",
-  "gaps", "graph", "calendar", "gmail", "whatsapp", "keys", "ingest",
-];
+const { scopesFromArgv } = await import("./lib/mint-scopes.mjs");
 
 function argOf(name, fallback) {
   const i = process.argv.indexOf(`--${name}`);
   return i >= 0 && process.argv[i + 1] ? process.argv[i + 1] : fallback;
 }
 
+let scopes;
+try { scopes = scopesFromArgv(process.argv.slice(2)); }
+catch (err) { console.error(`mint-key: ${err.message}`); process.exit(1); }
 const tenantId = argOf("tenant", "toc");
 const label = argOf("label", "live-verify");
 
@@ -48,7 +49,7 @@ await db.collection("api_keys").insertOne({
   _id: randomUUID(),
   tenantId,
   keyHash: createHash("sha256").update(rawKey, "utf8").digest("hex"),
-  scopes: ALL_SCOPES,
+  scopes,
   label,
   createdAt: new Date().toISOString(),
   revokedAt: null,
