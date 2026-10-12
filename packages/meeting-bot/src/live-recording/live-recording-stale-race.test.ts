@@ -39,7 +39,7 @@ async function runOnce(dir: string): Promise<Answer[]> {
       child.stderr.on("data", (d) => { err += d; });
       child.stdout.on("data", (d) => {
         out += d;
-        if (!done && out.includes("\n")) { done = true; clearTimeout(timer); try { resolve(JSON.parse(out.split("\n")[0])); } catch { reject(new Error(`worker p${i} gave bad JSON: ${out.slice(0, 200)}`)); } }
+        if (!done && out.includes("\n")) { done = true; clearTimeout(timer); try { resolve(JSON.parse(out.split("\n")[0] ?? "")); } catch { reject(new Error(`worker p${i} gave bad JSON: ${out.slice(0, 200)}`)); } }
       });
       child.on("close", () => { clearTimeout(timer); if (!done) { done = true; reject(new Error(`worker p${i} exited without an answer: stdout=${out.slice(0, 200)} stderr=${err.slice(0, 300)}`)); } });
     })));
