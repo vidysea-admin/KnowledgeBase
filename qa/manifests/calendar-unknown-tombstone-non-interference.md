@@ -1,7 +1,7 @@
 # calendar-unknown-tombstone-non-interference
 
 Status: ready-for-check
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS (cycle 2)
 Fix cycle: 2
 Priority tier: 2 - open HIGH ledger issue ISS-T036CAL-011 (pre-existing, found by the t036 checker, cycle 3)
 Security class: an outsider can stop the bot from recording the user's legitimate meetings (denial of the product's core function). FULL ceremony; never round-capped.
