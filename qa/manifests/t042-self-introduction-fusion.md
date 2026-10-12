@@ -1,7 +1,7 @@
 # Manifest — t042-self-introduction-fusion
 
 **Handshake status:** ready-for-check
-**Fix cycle:** 0
+**Fix cycle:** 1
 **Goal task:** T-042 "Speaker naming for webinar turns", slice 2 of 3 remaining (self-introduction fusion). Tier 3 (roadmap) pull. NOT claimed: T-042 stays open.
 **Lane:** T042FUSION (no issues filed; `qa/issues.t042fusion.jsonl` not created)
 **Files (new only):** `packages/index/src/pipeline/speaker-tile-fusion.ts` (127 lines), `speaker-tile-fusion.test.ts` (182), this manifest. No existing file edited (no speaker rule file, no `grounded.ts`, no package index).
@@ -28,3 +28,14 @@ Mutations (9 incl. one retest, all killed after adding the nested-turn case for 
 
 ## NOT done
 No live tile capture; no wiring into `sync-speakers` or the live runner (D-119); no `person:` mapping. T-042 stays open in TASKS.md / goal.json (not edited).
+
+## Fix cycle 1 (against FAIL verdict, commit 7ee2745; fix commit ecb94ee; cycle-0 history above is kept)
+
+Scope: only `speaker-tile-fusion.ts` and its test. No ledger status changes (ISS-T042FUSION-001/-002/-003 stay as filed; the checker closes them).
+
+- **ISS-T042FUSION-001 (high):** `FUSION_DEFAULTS.allowTileOnly` is now **false** (tile-only label -> none, `source-disabled`). When enabled, the tile name must pass `cleanTileName`: leading titles (Dr/Mr/Mrs/Ms/Prof...) and a trailing decoration (` | X`, ` - X`, `(...)`) are stripped, and the remainder must be 1-4 tokens of letters only, capitalised, 2+ chars, not ALL-CAPS (so no digits, `@`, `&`, `.` inside, single initials, emails), pass `looksLikeAName` and `isDiscourseOnly` (speaker-name-rules, over `NEVER_A_PERSON` -- REUSED), pass core `nonPerson` (the aligner's device/room/guest list -- REUSED), and contain no word from a small NEW role/org/team/device list (`NOT_A_PERSON_WORDS`: vidysea, admissions, sales, support, student, corp, samsung, redmi, team, ...). No existing list covered org/role/device words, hence the new one. A non-person-shaped tile is treated as no tile evidence (`tileRefusal: "non-person-name"`), so a clean introduction still names the label as `intro-only`.
+- **12-case replay** (checker's list verbatim, real aligner): default -> **0/12 named**. Tile-only enabled -> only `Rahul | Vidysea` -> `Rahul` and `Priya (Vidysea)` -> `Priya` are named; the other 10 none. Choice: with the owner-opt-in on, a first name left after stripping an org decoration is a real person name. The 13 other listed names also stay none by default; enabled, only `Priya - Vidysea`, `Priya Nair (she/her)`, `Dr. Priya`, `Mr. Rahul Verma` name (as Priya / Priya Nair / Priya / Rahul Verma). Residual: a single-token org like "Acme" is indistinguishable from a first name by shape, hence the default-off.
+- **ISS-T042FUSION-002 (medium):** new test pins Raj/Rajesh Kumar, Raj Kumar/Rajesh Kumar, Ana/Anais, Pri/Priya, ya Nair/Priya Nair, Priya Nair/Priya Sharma (through fusion -> `tile-intro-conflict`) and Raj tile + Rajesh Kumar intro. The substring mutant survived cycle 0 because no test asserted any false-agreement pair.
+- **ISS-T042FUSION-003 (low):** leading titles are dropped before agreement (a bare "Dr" has no tokens and agrees with nothing); a single token against a fuller name agrees only as the fuller name's FIRST token, so a bare surname ("Kumar") never agrees with "Rajesh Kumar". Returned names are title-stripped. Merged-label limit (one intro names every turn of the label) is unchanged and documented for the wiring unit.
+- **Kept:** guard reuse, PH3-004 98/98 and PH3-006 85/85 + Makrand replays (tile-only enabled in the replay so the tile path is still exercised).
+- **Evidence:** test file 18/18 (`node --test --import tsx src/pipeline/speaker-tile-fusion.test.ts`); `tsc --noEmit` in packages/index exit 0. Mutations (own harness inside the worktree, per-mutation byte backup in `finally`, 240 s timeout, hash-verified against HEAD after each): substring agreement KILLED, default tile-on KILLED, shape gate removed KILLED, title strip removed KILLED, surname-contiguous KILLED, role/org list removed KILLED, decoration strip removed KILLED, shape regex opened KILLED; both files' blobs equal HEAD after; harness deleted.
