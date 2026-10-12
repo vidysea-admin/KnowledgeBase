@@ -1,6 +1,6 @@
 # t035-lean-video-settings-wiring
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: 3 (roadmap T-035, slice 3 of the lean-video seam; PASSes so far on this seam: 2, both are builder/report slices that were pure and unwired, this is the first wiring). Class: recorder configuration plus an advisory alert; no auth, tenancy or data-write surface.
 Lane: lane/leanwire, base 5cd5451. Lane ledger `qa/issues.leanwire.jsonl` (ISS-LEANWIRE-001 low, -002 medium).
