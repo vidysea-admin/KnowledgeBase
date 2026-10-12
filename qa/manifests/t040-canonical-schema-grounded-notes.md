@@ -1,6 +1,6 @@
 # t040-canonical-schema-grounded-notes
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (next unblocked roadmap task: T-040 / T-051 schema blocker). Class: data-model change (canonical schema + generated types): full ceremony. Verdict by the checker only.
 Lane: lane/schemaedit. Lane ledger `qa/issues.schemaedit.jsonl`: ISS-SCHEMAEDIT-001 (medium), ISS-SCHEMAEDIT-002 (low).
