@@ -1,6 +1,6 @@
 # deploy-compiled-api-build-and-healthchecks
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap: deployment readiness D1 + D2). Class: build/packaging only; no auth, tenancy or data-write code touched.
 Lane: lane/deploybuild. Lane ledger `qa/issues.deploybuild.jsonl`: ISS-DEPLOYBUILD-001 (medium), -002, -003 (low).
