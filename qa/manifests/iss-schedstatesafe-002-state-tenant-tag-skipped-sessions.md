@@ -1,6 +1,6 @@
 # iss-schedstatesafe-002-state-tenant-tag-skipped-sessions
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2-adjacent (medium ISS-SCHEDSTATESAFE-002, red test on main). Class: test-only change over tenant tagging of a state file (not a new write path); verified-by-mutation.
 Lane: lane/tenanttagfix, branched from lane/schedstatesafe 4ec51c83. Ledger row ISS-SCHEDSTATESAFE-002 status NOT changed here (checker closes).
