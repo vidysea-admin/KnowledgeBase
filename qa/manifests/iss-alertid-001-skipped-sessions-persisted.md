@@ -1,6 +1,6 @@
 # iss-alertid-001-skipped-sessions-persisted
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2 (open high ISS-ALERTID-001; also ISS-ALERTID-007 medium). Class: data write (new tenant-tagged state file): FULL ceremony.
 Lane: lane/alertwho. Ledger rows ISS-ALERTID-001/-007 status NOT changed here (checker closes).

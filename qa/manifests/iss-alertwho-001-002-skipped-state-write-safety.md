@@ -1,6 +1,6 @@
 # iss-alertwho-001-002-skipped-state-write-safety
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2-adjacent (open ledger issues ISS-ALERTWHO-001 medium, data-write class; ISS-ALERTWHO-002 low). Full ceremony (data write). Verdict by the checker only.
 Lane: lane/alertwhofix (branched from lane/alertwho 8af6907c). Ledger rows in qa/issues.alertwho.jsonl NOT edited (status left to the checker).
