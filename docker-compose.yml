@@ -1,10 +1,40 @@
-# docker-compose.yml — local/production packaging for @lkb/api.
+# docker-compose.yml — local/production packaging for @lkb/api and @lkb/web.
 #
 # Mongo is NOT containerized here on purpose: production data lives in the real shared cluster
 # (`MONGODB_URL` in .env, database `lkb` only — see ARCHITECTURE.md / D-003 on why this repo
 # never touches any other database on that cluster). `local-mongo` below is an OPT-IN profile for
 # a fully offline dev loop against empty local data, never started by a plain `docker compose up`.
 services:
+  # One-shot schema migration (migrate-mongo up). OPT-IN: it sits behind the `migrate` profile, so
+  # a plain `docker compose up` never writes to a database schema, and api does not depend on it.
+  # Run it deliberately, once, with:
+  #   docker compose --profile migrate run --rm migrate
+  # Running it against the production database needs the owner's approval (D-117: production DB
+  # writes are not authorized). It migrates the database named by MONGODB_URL / MONGODB_DB, the
+  # same one api uses, so check .env first.
+  # Built from the api Dockerfile's `build` stage (full pnpm install: workspace node_modules incl.
+  # migrate-mongo and dotenv at /app/node_modules); the runtime stage ships neither migrations/
+  # nor the config, so they are bind-mounted read-only. NOTE: relies on the stage name `build`
+  # in apps/api/Dockerfile (ISS-DEPLOYCOMPOSE-001).
+  migrate:
+    profiles: ["migrate"]
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: build
+    working_dir: /app
+    command: ["npx", "migrate-mongo", "up", "-f", "migrate-mongo-config.cjs"]
+    environment:
+      MONGODB_URL: ${MONGODB_URL:?set MONGODB_URL (see .env's MONGODB_URL)}
+      MONGODB_DB: ${MONGODB_DB:-lkb}
+    volumes:
+      - ./migrations:/app/migrations:ro
+      - ./migrate-mongo-config.cjs:/app/migrate-mongo-config.cjs:ro
+      # Four of the five migrations read <__dirname>/../schema/index.json (= /app/schema/index.json);
+      # the `build` stage does not copy schema/ (only the runtime stage does) (ISS-DEPLOYCOMPOSE-006).
+      - ./schema:/app/schema:ro
+    restart: "no"
+
   api:
     build:
       context: .
@@ -14,9 +44,26 @@ services:
     environment:
       MONGODB_URL: ${MONGODB_URL:?set MONGODB_URL (see .env's MONGODB_URL)}
       MONGODB_DB: ${MONGODB_DB:-lkb}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+      # The web origin (WEB_PORT) must be listed here: nginx has no /api proxy, so the browser
+      # calls api directly (cross-origin).
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080}
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       PORT: 3300
+    restart: unless-stopped
+
+  # Static SPA behind nginx (apps/web/Dockerfile). VITE_API_BASE_URL is BAKED INTO THE BUNDLE at
+  # build time, so it must be the URL the BROWSER uses to reach api (not the compose-internal name).
+  # OWNER DECISIONS (placeholders, not decided here): public hostnames, exposed ports, TLS.
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3300}
+    depends_on:
+      - api
+    ports:
+      - "${WEB_PORT:-8080}:80"
     restart: unless-stopped
 
   local-mongo:
