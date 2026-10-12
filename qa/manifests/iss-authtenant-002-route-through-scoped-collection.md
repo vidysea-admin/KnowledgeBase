@@ -1,6 +1,6 @@
 # iss-authtenant-002-route-through-scoped-collection
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2-adjacent (open ISS-AUTHTENANT-002, medium, tenancy class). Full ceremony. Lane: lane/authtenant2, ledger shard `qa/issues.authtenant2.jsonl`. ISS-AUTHTENANT-002 row status NOT changed here.
 
