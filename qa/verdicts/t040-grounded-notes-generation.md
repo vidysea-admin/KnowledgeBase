@@ -27,3 +27,43 @@ One defect fails the unit; everything else checked holds.
 - Open for the maker (not blocking beyond -002): ISS-T040GEN-001 (12-char minimum refuses short real answers) and -004 (no numbers category) remain owner decisions.
 
 ISSUES-WRITTEN: ISS-T040GEN-002 (severity raised to high with the reproduction)
+
+---
+
+# Cycle 1
+
+VERDICT: FAIL
+Cycle checked: 1
+Commit checked: 1f5bf4b (lane/t040gen)
+
+## EXPLANATION
+
+The lexical floor holds for the negations it was tested on, but a common-English abbreviation lets a negation-dropping quote ship as verified evidence. ISS-T040GEN-002 stays open; its fix is incomplete.
+
+**(1) Rule match.** Line 82: quote spans a whole sentence or clause, starting at turn start or after sentence punctuation, ending at sentence punctuation or turn end; failing quotes dropped. `sentence-span.ts` matches: clause marks `, ; :` count as boundaries together with `. ! ? … danda`, opening quotes/brackets and trailing closers are skipped, failures drop in `resolveEvidence` and in the audit. The marker floor is an addition beyond the written rule. Item text must equal its quotes (`extractiveText`, unchanged), so a text-only reversal still drops.
+
+**(2) Bypass table** (`sentenceSpanProblem`; null = ships):
+
+| Case | Result |
+|---|---|
+| "No. We recommend March." quote 2nd sentence | null (fine: separate statement) |
+| hardly, avoid, against, don't ever, won't, isn't, mustn't, can't, cannot, need not, no one, nobody, fail/refuse/stop/oppose/skip, not-recommended, NOT caps | refused (starts-mid-sentence: the start rule catches them before the marker list matters) |
+| curly don’t / won’t / isn’t | refused |
+| "I do not think e.g. March works for everyone." quote "March works for everyone." | **SHIPS** |
+| "We do not accept applications from the U.S. after March first." quote "after March first." | **SHIPS** |
+| "...it vs. applying in March works." / "...approx. 3.5 lakh fee." / "..., Dr. Rao recommends applying in March." | **SHIPS** |
+| "Dr. Rao does not recommend applying in March." quote from "Rao" | null, correct (negation kept) |
+| "Apply in March? Absolutely not." quote "Apply in March?" | ships (next-sentence answer; medium) |
+| Unicode lookalikes | not exploitable by a model: the quote is the exact source slice, so lookalikes are the speaker's own text |
+
+Cause of the FAIL: every `.` followed by whitespace is a sentence break in `sentenceStart/End`, so the "not" falls into a "previous sentence" and the floor never sees it. Also found: the MARKER regex is a plain string, so `\p{L}` became `p{L}` (class `[p{L}p{N}_]`); harmless on realistic text (ISS-T040GEN-007).
+
+**(3) Fixture change.** Legitimate: the typography test quoted "we'll review ... next week." out of "She said we’ll ...", a mid-sentence start the written rule forbids. It now quotes the whole sentence with the same assertions on the verbatim source slice. Not weakened.
+
+**(4) Recall.** Reproduced: 3427 turns, 15 091 sentences of 12+ chars, 14 898 pass (98.7%), all 193 refusals `omits-qualifier`. Clause quotes: my splitter 18 442 of 32 692 (56.4%) vs the maker's 51.6% of 29 375; splitters differ, same order.
+
+**(5) Suites.** packages/index claims+summarize+quote/*+grounded-notes 150/150; apps/api indexing 57/57; `tsc` index 0, api (own path mapping) 0; no LLM/Mongo/network.
+
+**Mutations** (own harness in the worktree, per-mutation backup restored in `finally`, 120 s kill, `git hash-object` == HEAD after each, folder deleted): remove `n't` branch KILLED; clause marks treated as sentence-only marks KILLED; curly branch (`n’t` to `n't`) SURVIVED (correct code, unpinned; ISS-T040GEN-007).
+
+ISSUES-WRITTEN: ISS-T040GEN-006 (high, abbreviation bypass, 5 reproductions), ISS-T040GEN-007 (medium). ISS-T040GEN-002 left open.
