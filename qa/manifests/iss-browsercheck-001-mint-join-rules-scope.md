@@ -1,6 +1,6 @@
 # Manifest: iss-browsercheck-001-mint-join-rules-scope
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Lane:** mintjoin
 **Class:** auth (key scope issuance)
