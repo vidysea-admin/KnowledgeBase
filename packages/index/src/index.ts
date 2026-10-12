@@ -21,6 +21,8 @@ export { createNullRetriever, assessBaseline, type BaselineAssessment, type Base
 export { lexicalSearchTurns, lexicalQueryTokens, type LexicalHit, type SearchableTurn } from "./search/lexical.js";
 
 export { runtimeChronologicalTurns, assertGroundedTurns, validateRuntimePage, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin } from "./pipeline/grounded.js";
+export { resolveEvidence, extractiveText, citationTimes, auditGroundedNotes } from "./pipeline/notes/evidence.js";
+export type { DroppedNote } from "./pipeline/notes/drop-mode.js";
 export { summarizeSession, type SessionSummaryResult, type SummarizeResult, type SummarizeCompleteFn } from "./pipeline/summarize.js";
 export { extractClaims, type ExtractedClaim, type ClaimsCompleteFn } from "./pipeline/claims.js";
 export { resolveSpeakers, personIdFor, type ResolvedSpeaker, type SpeakerResolution } from "./pipeline/speakers.js";

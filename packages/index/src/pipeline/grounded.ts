@@ -1,30 +1,14 @@
 /** Runtime evidence validation; permissive canonical schemas remain unchanged. */
 import { createHash } from "node:crypto";
-import type { Turns } from "@lkb/core";
+import type { Turns, QuotedEvidence, CitedItem, QaEntry } from "@lkb/core";
 import { parseJsonLoose, type CompleteResult, type Job } from "@lkb/ai";
 export type RuntimeComplete = (job: Job) => Promise<CompleteResult>;
-export type RuntimeOrigin = "speaker-statement" | "screen-ocr" | "visual-observation";
-export interface RuntimeEvidence {
-    turnId: string;
-    sessionId: string;
-    quote: string;
-}
-export interface RuntimeItem {
-    id: string;
-    kind: "insight" | "decision" | "action";
-    text: string;
-    origin: RuntimeOrigin;
-    verification: "unverified";
-    evidence: RuntimeEvidence[];
-}
-export interface RuntimeQA {
-    id: string;
-    question: string;
-    questionEvidence: RuntimeEvidence[];
-    answer: string | null;
-    answerEvidence: RuntimeEvidence[];
-    status: "answered" | "unanswered";
-}
+export type RuntimeOrigin = CitedItem["origin"];
+/** The generated canonical types (ISS-SCHEMAEDIT-002); the old runtime duplicates are aliases only. */
+export type RuntimeEvidence = QuotedEvidence;
+export type RuntimeItem = CitedItem;
+export type RuntimeQA = QaEntry;
+type NonEmptyEvidence = [QuotedEvidence, ...QuotedEvidence[]];
 export interface RuntimeSpan {
     turnId: string;
     sessionId: string;
@@ -126,7 +110,7 @@ export function assertRuntimeCoverage(value: unknown, spans: RuntimeSpan[]): voi
     if (JSON.stringify(rows) !== JSON.stringify(runtimeInventory(spans)))
         throw new Error("incomplete or altered processed-span acknowledgement");
 }
-export function runtimeEvidence(value: unknown, turns: Turns[], spans?: RuntimeSpan[]): RuntimeEvidence[] {
+export function runtimeEvidence(value: unknown, turns: Turns[], spans?: RuntimeSpan[]): NonEmptyEvidence {
     const evidence = runtimeArray(value).map((raw) => {
         const e = runtimeRecord(raw), turnId = runtimeString(e.turnId), sessionId = runtimeString(e.sessionId), quote = runtimeString(e.quote);
         const turn = turns.find((t) => t._id === turnId && t.sessionId === sessionId);
@@ -136,7 +120,7 @@ export function runtimeEvidence(value: unknown, turns: Turns[], spans?: RuntimeS
     });
     if (!evidence.length || new Set(evidence.map((e) => JSON.stringify(e))).size !== evidence.length)
         throw new Error("empty/duplicate quoted evidence");
-    return evidence;
+    return evidence as NonEmptyEvidence;
 }
 export function runtimeExtractive(text: unknown, evidence: RuntimeEvidence[]): string {
     const result = runtimeString(text);
@@ -183,9 +167,11 @@ export async function runtimeComplete(complete: RuntimeComplete, kind: "summariz
     const result = await complete({ kind, messages: [{ role: "system", content: system }, { role: "user", content }] });
     return result.json ?? parseJsonLoose(result.text);
 }
-export async function runtimeJudge(complete: RuntimeComplete, kind: "summarize" | "claims", turns: Turns[], spans: RuntimeSpan[], items: {
+export interface RuntimeVerdict { id: string; supported: unknown; categoryCorrect: unknown; answerRelevant: unknown }
+/** Runs the independent judge and returns the verdict records; protocol failures (coverage, completeness, missing/duplicate/unknown ids) still throw. */
+export async function runtimeVerdicts(complete: RuntimeComplete, kind: "summarize" | "claims", turns: Turns[], spans: RuntimeSpan[], items: {
     id: string;
-}[], mode: "summary-extraction" | "claim-extraction" | "pending-qa" = kind === "claims" ? "claim-extraction" : "summary-extraction"): Promise<void> {
+}[], mode: "summary-extraction" | "claim-extraction" | "pending-qa" = kind === "claims" ? "claim-extraction" : "summary-extraction"): Promise<RuntimeVerdict[]> {
     const citedIds = new Set(spans.map((s) => s.turnId));
     for (const item of items)
         for (const key of ["evidence", "questionEvidence", "answerEvidence"]) {
@@ -204,7 +190,15 @@ export async function runtimeJudge(complete: RuntimeComplete, kind: "summarize" 
     if (raw.complete !== true || (items.length === 0 && (mode === "claim-extraction" ? raw.noClaims !== true : mode === "summary-extraction" && raw.noContent !== true)))
         throw new Error("informative extraction gap or incomplete semantic review");
     const verdicts = runtimeArray(raw.verdicts).map(runtimeRecord);
-    if (verdicts.length !== items.length || new Set(verdicts.map((v) => v.id)).size !== verdicts.length || verdicts.some((v) => !items.some((item) => item.id === v.id) || v.supported !== true || v.categoryCorrect !== true || v.answerRelevant !== true))
+    if (verdicts.length !== items.length || new Set(verdicts.map((v) => v.id)).size !== verdicts.length || verdicts.some((v) => !items.some((item) => item.id === v.id)))
+        throw new Error("missing/failed/unknown semantic verdict");
+    return verdicts as unknown as RuntimeVerdict[];
+}
+export const verdictPasses = (v: RuntimeVerdict | undefined) => v?.supported === true && v.categoryCorrect === true && v.answerRelevant === true;
+export async function runtimeJudge(complete: RuntimeComplete, kind: "summarize" | "claims", turns: Turns[], spans: RuntimeSpan[], items: {
+    id: string;
+}[], mode: "summary-extraction" | "claim-extraction" | "pending-qa" = kind === "claims" ? "claim-extraction" : "summary-extraction"): Promise<void> {
+    if ((await runtimeVerdicts(complete, kind, turns, spans, items, mode)).some((v) => !verdictPasses(v)))
         throw new Error("missing/failed/unknown semantic verdict");
 }
 export function validateRuntimePage(turns: Turns[], raw: unknown): {
