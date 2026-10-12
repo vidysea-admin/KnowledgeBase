@@ -1,6 +1,6 @@
 # t046-retention-purge-executor
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap T-046; owner decision D-145 (pending append): raw media purged 90 days after capture; transcripts, notes, claims, citations kept forever). Class: DATA DELETE: FULL ceremony. Verdict by the checker only.
 Lane: lane/t046purge. No ledger issue is being fixed; no new issues filed. Round cap: seam t046 retention has 2 prior PASSed verdicts (planner, dry-run report); this is a new capability (the executor those units deferred), not a round N+1 on the report.
