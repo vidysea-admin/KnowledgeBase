@@ -38,12 +38,28 @@ export type EvidenceKind = "self-intro" | "called-on" | "address" | "handover" |
 export const EVIDENCE_KINDS: readonly EvidenceKind[] = ["self-intro", "called-on", "address", "handover", "thanks", "role-continuity"];
 
 export interface SpeakerProvenance { turnId: string; evidenceQuote: string; evidenceKind: EvidenceKind }
-export interface GroundedSpeakerResult { resolved: ResolvedSpeaker[]; unresolved: string[]; degraded: { reason: string } | null }
+/**
+ * A model-proposed name that passed grounding and a verifier "yes" on SINGLE evidence only (D-141, pending append).
+ * It is NOT a final identity: the quote and kind travel with it, and only a human confirmation makes it final.
+ */
+export type SuggestedSpeaker = ResolvedSpeaker & { provenance: SpeakerProvenance[] };
+export interface GroundedSpeakerResult {
+  resolved: ResolvedSpeaker[]; unresolved: string[]; degraded: { reason: string } | null;
+  /** Present only when `suggest: true` was asked for. Never merged into `resolved`. */
+  suggested?: SuggestedSpeaker[];
+}
 type CompleteFn = (job: Job) => Promise<CompleteResult>;
 export type Corroboration = "independent-pair" | "single-verified";
 export interface GroundConfig {
   /** Which corroboration rule applies to non-self-intro evidence. Default "independent-pair". */
   corroboration?: Corroboration;
+}
+/** A (label, person) a human already rejected in THIS session: never suggested again. */
+export interface RejectedSuggestion { speakerRef: string; personId: string }
+export interface SuggestOptions {
+  /** OFF by default. When false/absent no suggestion is computed (and no extra verifier call is made). */
+  suggest?: boolean;
+  rejected?: readonly RejectedSuggestion[];
 }
 
 const POSITIONAL = /^spk:\d+$/;
@@ -314,7 +330,7 @@ export async function groundSpeakerProposals(turns: Turns[], runs: unknown[], ve
 }
 
 /** Speaker identities for one session's positional labels, via the injected model `complete`. Never throws. */
-export async function extractSpeakersGrounded(turns: Turns[], complete: CompleteFn, opts: { verifier?: SpeakerVerifier } & GroundConfig = {}): Promise<GroundedSpeakerResult> {
+export async function extractSpeakersGrounded(turns: Turns[], complete: CompleteFn, opts: { verifier?: SpeakerVerifier } & GroundConfig & SuggestOptions = {}): Promise<GroundedSpeakerResult> {
   const degrade = (reason: string): GroundedSpeakerResult => {
     const { resolved, unresolved } = resolveSpeakers(turns);
     return { resolved, unresolved, degraded: { reason } };
@@ -340,12 +356,36 @@ export async function extractSpeakersGrounded(turns: Turns[], complete: Complete
   if (runs.length === 0) return degrade(`speakers provider call failed on all ${AGREEMENT_RUNS} run(s); first: ${failures[0]}`);
   if (runs.every((r) => !Array.isArray(r))) return degrade("speakers responses were not JSON arrays in any run");
 
-  const { resolved, unresolved } = await groundSpeakerProposals(turns, runs, opts.verifier ?? llmVerifier(complete), opts);
+  const verifier = opts.verifier ?? llmVerifier(complete);
+  const { resolved, unresolved } = await groundSpeakerProposals(turns, runs, verifier, { corroboration: opts.corroboration });
+  // The suggested tier (D-141): single-verified evidence, only for labels/names the auto-final path did not already name.
+  let suggested: SuggestedSpeaker[] | undefined;
+  if (opts.suggest === true) {
+    const single = await groundSpeakerProposals(turns, runs, verifier, { corroboration: "single-verified" });
+    suggested = selectSuggestions(single.resolved, resolved, opts.rejected ?? []);
+  }
   let reason: string | null = null;
   if (failures.length > 0 || junk > 0) {
     reason = `${failures.length + junk} of ${AGREEMENT_RUNS} speaker run(s) failed`;
     if (failures.length > 0) reason += `: ${failures[0]}`;
     if (junk > 0) reason += `; ${junk} run(s) returned junk`;
   }
-  return { resolved, unresolved, degraded: reason ? { reason } : null };
+  return { resolved, unresolved, degraded: reason ? { reason } : null, ...(suggested ? { suggested } : {}) };
+}
+
+/**
+ * Pure: which single-verified identities are shipped as SUGGESTIONS. Never a label or name the auto-final path already
+ * resolved, never a (label, person) a human rejected, and always with its quote and kind (no provenance, no suggestion).
+ */
+export function selectSuggestions(single: ResolvedSpeaker[], final: ResolvedSpeaker[], rejected: readonly RejectedSuggestion[]): SuggestedSpeaker[] {
+  const finalLabels = new Set(final.map((f) => f.speakerRef));
+  const finalPeople = new Set(final.map((f) => f.personId));
+  const out: SuggestedSpeaker[] = [];
+  for (const s of single) {
+    if (finalLabels.has(s.speakerRef) || finalPeople.has(s.personId)) continue;
+    if (rejected.some((r) => r.speakerRef === s.speakerRef && r.personId === s.personId)) continue;
+    if (!s.provenance || s.provenance.length === 0) continue;
+    out.push({ ...s, provenance: s.provenance as SpeakerProvenance[] });
+  }
+  return out;
 }

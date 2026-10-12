@@ -30,6 +30,7 @@ import { createSourceRequestDepsFor } from "../ask/source-context.js";
 import { withSessionArtifacts } from "../routes/brain.js";
 import { createMongoJobsReadDeps } from "../jobs/store.js";
 import { createMongoUsageDeps } from "../usage/store.js";
+import { createMongoSpeakerSuggestionDeps } from "../speaker-suggestions/store.js";
 import { createMongoWatchRunsDeps } from "../activity-health/watch-runs.js";
 import { createMongoClaimsListDeps } from "../claims/store.js";
 import { createConfiguredActivityHealthDeps } from "../activity-health/queue-reader.js";
@@ -204,6 +205,7 @@ export function buildProductionDeps(): ServerDeps {
     activityHealth: createConfiguredActivityHealthDeps(),
     watchRuns: createMongoWatchRunsDeps(),
     usage: createMongoUsageDeps(),
+    speakerSuggestions: createMongoSpeakerSuggestionDeps(),
     // CORS_ORIGINS is a comma-separated allowlist (e.g. "http://localhost:5173" in dev, the real
     // apps/web deployment origin in prod) — no default beyond "" -> empty list, matching
     // server.ts's safe-by-default stance.

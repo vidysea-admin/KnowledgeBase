@@ -17,6 +17,7 @@ export * from "./generated/programs.js";
 export * from "./generated/session_pages.js";
 export * from "./generated/sessions.js";
 export * from "./generated/sources.js";
+export * from "./generated/speaker_suggestions.js";
 export * from "./generated/speakers.js";
 export * from "./generated/tenants.js";
 export * from "./generated/topics.js";

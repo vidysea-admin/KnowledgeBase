@@ -26,3 +26,5 @@ export * from "./collections/watch-reports.js";
 export * from "./collections/watch-heartbeat.js";
 // T-057 D4: content-free per-request usage rows (kind/outcome/latency/day) for GET /usage.
 export * from "./collections/usage-events.js";
+// U2.4 (D-141, pending append): suggested speaker names. A suggestion is never a final identity; confirm is the only path.
+export * from "./collections/speaker-suggestions.js";
