@@ -1,9 +1,9 @@
 # t039-send-now-api-endpoint
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 3 (next unblocked roadmap task, T-039). Class: auth scope + operator URL that drives a browser join: FULL ceremony. Verdict by the checker only.
-Lane: lane/sendnowapi. Ledger shard `qa/issues.sendnowapi.jsonl` (ISS-SENDNOWAPI-001..004).
+Lane: lane/sendnowapi. Ledger shard `qa/issues.sendnowapi.jsonl` (ISS-SENDNOWAPI-001..005).
 Authority: Approver (Umesh) ruling 2026-10-12 - create a new dedicated API key scope named exactly `send-now` for this endpoint (the DECISIONS entry is being appended in parallel; cite the ruling, not an entry id).
 Round cap: planner (PASS cycle 2) and command (PASS cycle 0) PASSes name the send-now seam; this is the third unit; the cap applies to non-security findings only and this unit is security-class.
 
@@ -40,3 +40,27 @@ Test coverage: 403 without scope (read key, near-miss scopes) / 401 no key / 202
 
 ## Not delivered / not verified
 Real CLI, Chrome, OBS, a meeting: never run. The 60 s join clause: not measured. No mutation run. Full suite not run. `mint-key.mjs` not executed (needs Mongo). The wiring in `join-rules-api-host.ts` is typechecked only, not started. Router logs body-parser JSON errors to the console in tests (existing behaviour).
+
+## Fix cycle 1 (maker; checker verdict d5dfee7 PASS cycle 0 left ISS-SENDNOWAPI-001 and -005 open; ledger status NOT changed here)
+
+### ISS-SENDNOWAPI-001 - send-now is no longer on default keys
+- `scripts/lib/mint-scopes.mjs` (new, pure, + `.d.mts`): `DEFAULT_SCOPES` = the pre-T-039 14 scopes, unchanged; `WRITE_SCOPES = ["send-now"]`; `scopesFromArgv(argv)` returns the defaults plus any scope named with `--with-scope send-now`. An unknown/typo'd name, `keys`, `join-rules`, or a bare flag throws, and `mint-key.mjs` exits 1 before connecting. `mint-key.mjs` no longer has `ALL_SCOPES`; it mints `scopesFromArgv(process.argv.slice(2))`.
+- "Mirror join-rules": I could not mirror anything. `mint-key.mjs` never handled `join-rules` (it is not mintable by this script at all; grep finds no mention). I applied the contract rule (t037 item 10, read-only: no key holds the dedicated write scope unless issued deliberately) directly: explicit request only. The checker should confirm this reading.
+- Existing keys, seed keys and fixtures: untouched. Test (`send-now.test.ts` minting test, rewritten): default and unrelated flags -> exactly the 14 defaults; `--with-scope send-now` (also repeated) -> defaults + send-now; 6 refusal cases.
+
+### ISS-SENDNOWAPI-005 - `until` is validated as a real time
+- `untilProblem(until, now)` in `scripts/webinar/send-now-host.ts`, called in `plan()` after the existing `todayAt` check and before the live-job read, so a 400 `invalid-until` happens before any spawn. Rules: HH:MM needs hour 0-23 and minute 0-59 (the old `todayAt` rolled 25:00/99:99 into the next day); ISO needs a UTC offset (`Z` or +hh:mm), a real calendar date (V8 rolls 2026-02-30 to March, so it is checked explicitly), seconds/minutes/hours in range, no trailing text; then `until` must be after now (an HH:MM already passed today is refused as past) and at most 24 h ahead.
+- Source of the bounds: past = `runRecord` already throws "--until must be in the future" (record-commands.ts:101), so this refuses it early. **Upper bound: no existing bound found** (planSendNow, send-now-command and runRecord bound only the lower side), so 24 h (`MAX_UNTIL_AHEAD_MS`) is **my assumption; checker please confirm or set another cap**.
+- Tests (`send-now-host.test.ts`, 9 -> 12): `untilProblem` table (16 bad values incl. 25:00, 24:00, 99:99, 12:60, impossible ISO clock, trailing text, 2099, 2000; exact-now and earlier-today refused; boundaries just inside/outside 24 h); route-level 400 with no log file/spawn for 25:00, 09:00, 2000, 2099, one second ago, then a valid `18:00` still 202; Feb-29 rollover case. Test clock `NOW` is now local 10:00 so `"18:00"` is time-zone independent; the one scheduled-job fixture date moved to 2026-10-13 for the same reason.
+
+### Evidence (node from the toolchain; nothing launched except `node argv-dump-fixture.mjs`)
+```
+node --test --import tsx apps/api/src/join-rules/send-now.test.ts   -> ℹ tests 12  ℹ pass 12  ℹ fail 0
+node --test --import tsx scripts/webinar/send-now-host.test.ts      -> ℹ tests 12  ℹ pass 12  ℹ fail 0
+apps/api: tsc --noEmit -p tsconfig.json -> 2 errors, both PRE-EXISTING at the base commit (src/indexing/session.ts:161, src/routes/brain.test.ts:139; same 2 with my changes stashed); none in files touched here.
+scripts/webinar/send-now-host.ts + test: tsc --strict -> clean.
+```
+Mutations (harness inside the worktree, deleted; per-mutation byte backup restored in `finally`; blob hash == pre-run verified): M1 no past check KILLED; M2 no 24 h cap KILLED; M3 hour limit 23->24 KILLED; M4 plan() skips untilProblem KILLED; M5 send-now in default scopes KILLED; M6 no scope-name validation KILLED; M7 calendar-date check dropped (first attempt SURVIVED because Feb 30 is already past on the test clock) -> added the 2026-02-29 test, re-mutated by deleting the check line: KILLED. 7 of 7 killed after the added test.
+
+### Still not done
+Not run: mint-key.mjs itself (needs Mongo), real CLI/Chrome/OBS, full suite. ISS-SENDNOWAPI-002/-003/-004 and the T-039 remainder are unchanged.

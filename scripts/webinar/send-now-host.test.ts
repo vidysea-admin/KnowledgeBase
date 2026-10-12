@@ -10,12 +10,12 @@ import os from "node:os";
 import path from "node:path";
 import { startTestServer } from "../../apps/api/src/testUtils.js";
 import { buildTestDeps, fakeCalendarReadDeps, fakeKeyStore } from "../../apps/api/src/fixtures.js";
-import { createSendNowDeps, type SendNowHostOptions } from "./send-now-host.js";
+import { createSendNowDeps, untilProblem, MAX_UNTIL_AHEAD_MS, type SendNowHostOptions } from "./send-now-host.js";
 
 const FIXTURE = path.join(import.meta.dirname, "argv-dump-fixture.mjs");
 const KEYS = { "a-key": { tenantId: "tenant-a", scopes: ["send-now"] }, "b-key": { tenantId: "tenant-b", scopes: ["send-now"] }, "ro-key": { tenantId: "tenant-a", scopes: ["calendar"] } };
 const MEET = "https://meet.google.com/abc-defg-hij";
-const NOW = new Date("2026-10-12T10:00:00Z");
+const NOW = new Date(2026, 9, 12, 10, 0, 0); // local 10:00, so "18:00" is 8 h ahead in any time zone
 
 async function withHost(opts: SendNowHostOptions, fn: (post: (key: string, body: unknown) => Promise<{ status: number; json: any }>, root: string) => Promise<void>) {
   const root = mkdtempSync(path.join(os.tmpdir(), "send-now-host-"));
@@ -70,7 +70,7 @@ test("duplicate through the REAL live-job reader: a scheduled job file for the m
   const root = mkdtempSync(path.join(os.tmpdir(), "send-now-real-"));
   const sched = path.join(root, "raw", "webinars", "scheduled");
   mkdirSync(sched, { recursive: true });
-  writeFileSync(path.join(sched, "job-1.json"), JSON.stringify({ url: MEET, sessionId: "s1", until: "2026-10-12T12:00:00Z" }));
+  writeFileSync(path.join(sched, "job-1.json"), JSON.stringify({ url: MEET, sessionId: "s1", until: "2026-10-13T12:00:00Z" }));
   const deps = createSendNowDeps({ root, now: () => NOW, hostTenant: () => "tenant-a", validateUntil: () => undefined, cliEntry: FIXTURE, livenessMs: 1 });
   try {
     const dup = await deps.plan("tenant-a", { meetingUrl: MEET, until: "18:00" });
@@ -119,4 +119,38 @@ test("launcher that dies at once -> 502 (not 202); a missing node binary -> 502"
 
 test("scope: a key with only calendar is 403 end to end", async () => {
   await withHost(fx(), async (post) => assert.equal((await post("ro-key", { meetingUrl: MEET, until: "18:00" })).status, 403));
+});
+
+test("untilProblem: invalid clock values, past times and times beyond 24 h are refused; real near-future values pass", () => {
+  const iso = (ms: number) => new Date(NOW.getTime() + ms).toISOString();
+  const H = 3600_000;
+  for (const bad of ["25:00", "24:00", "99:99", "12:60", "1:5", "tomorrow", "", "18:00 extra", "2026-13-01T10:00:00Z", "2026-02-30T10:00:00Z", "2026-10-12T25:00:00Z", "2026-10-12T10:61:00Z", "2026-10-12T11:00:00", "2026-10-12T18:00:00Z junk", "2099-01-01T00:00:00Z", "2000-01-01T00:00:00Z"]) {
+    assert.ok(untilProblem(bad, NOW), `should refuse '${bad}'`);
+  }
+  assert.match(untilProblem("10:00", NOW)!, /not in the future/);          // exactly now
+  assert.match(untilProblem("09:59", NOW)!, /not in the future/);          // earlier today
+  assert.match(untilProblem(iso(-1000), NOW)!, /not in the future/);
+  assert.match(untilProblem(iso(MAX_UNTIL_AHEAD_MS + 1000), NOW)!, /24 hours/);
+  assert.equal(untilProblem("18:00", NOW), undefined);
+  assert.equal(untilProblem("23:59", NOW), undefined);
+  assert.equal(untilProblem(iso(H), NOW), undefined);
+  assert.equal(untilProblem(iso(MAX_UNTIL_AHEAD_MS - 1000), NOW), undefined);
+  assert.equal(untilProblem("2026-10-12T18:00:00+05:30".replace("2026-10-12T18:00:00+05:30", iso(2 * H).replace("Z", "+00:00")), NOW), undefined);
+});
+
+test("until through the real route: past and far-future values are 400 with NO launch (no log file); a valid one still launches", async () => {
+  await withHost(fx({ validateUntil: () => undefined }), async (post, root) => {
+    for (const until of ["25:00", "09:00", "2000-01-01T00:00:00Z", "2099-01-01T00:00:00Z", new Date(NOW.getTime() - 1000).toISOString()]) {
+      const r = await post("a-key", { meetingUrl: MEET, until });
+      assert.deepEqual([r.status, r.json.reason], [400, "invalid-until"], until);
+    }
+    assert.equal(existsSync(path.join(root, "raw")), false, "refused before any spawn");
+    assert.equal((await post("a-key", { meetingUrl: MEET, until: "18:00" })).status, 202);
+  });
+});
+
+test("untilProblem: a non-existent calendar date that would roll into the 24 h window is refused (2026-02-29 is not a date)", () => {
+  const feb28 = new Date(Date.UTC(2026, 1, 28, 12, 0, 0));
+  assert.match(untilProblem("2026-02-29T10:00:00Z", feb28)!, /not a real calendar date/);
+  assert.equal(untilProblem("2026-03-01T10:00:00Z", feb28), undefined);
 });

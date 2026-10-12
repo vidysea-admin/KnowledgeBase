@@ -35,6 +35,30 @@ export interface SendNowHostOptions {
   logDir?: string;
 }
 
+/** Longest recording window the API will start. ASSUMPTION: neither planSendNow, send-now-command nor runRecord bounds `until` above (runRecord only requires it be in the future), so 24 h is this unit's own cap. */
+export const MAX_UNTIL_AHEAD_MS = 24 * 60 * 60 * 1000;
+
+/** Real-time check of `until` against `now`: HH:MM (hour 0-23, minute 0-59, today, local) or an ISO datetime with a real calendar date and clock. Returns an error message, or undefined when acceptable (in the future, at most 24 h ahead). */
+export function untilProblem(until: string, now: Date): string | undefined {
+  let at: number;
+  const hm = /^(\d{1,2}):(\d{2})$/.exec(until);
+  const iso = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})$/.exec(until);
+  if (hm) {
+    if (Number(hm[1]) > 23 || Number(hm[2]) > 59) return `bad time '${until}': hour must be 0-23 and minute 0-59`;
+    const d = new Date(now); d.setHours(Number(hm[1]), Number(hm[2]), 0, 0); at = d.getTime();
+  } else if (iso) {
+    const [, y, mo, d, h, mi, sec] = iso;
+    if (Number(h) > 23 || Number(mi) > 59 || Number(sec ?? 0) > 59) return `bad ISO datetime '${until}': not a real clock time`;
+    const day = new Date(Date.UTC(Number(y), Number(mo) - 1, Number(d)));
+    if (day.getUTCFullYear() !== Number(y) || day.getUTCMonth() !== Number(mo) - 1 || day.getUTCDate() !== Number(d)) return `bad ISO datetime '${until}': not a real calendar date`;
+    at = Date.parse(until);
+    if (Number.isNaN(at)) return `bad ISO datetime '${until}'`;
+  } else return `bad time '${until}', expected HH:MM or an ISO datetime with a UTC offset`;
+  if (at <= now.getTime()) return `until '${until}' is not in the future`;
+  if (at - now.getTime() > MAX_UNTIL_AHEAD_MS) return `until '${until}' is more than 24 hours ahead`;
+  return undefined;
+}
+
 const DUPLICATE: SendNowPlanValue = { ok: false, kind: "duplicate", reason: "duplicate-live-job", message: "" };
 
 export function createSendNowDeps(opts: SendNowHostOptions = {}): SendNowDeps {
@@ -52,6 +76,8 @@ export function createSendNowDeps(opts: SendNowHostOptions = {}): SendNowDeps {
       if (tenantId !== tenant) return { ok: false, kind: "forbidden", reason: "tenant-not-served", message: "this host does not capture for your tenant" };
       try { await (opts.validateUntil ?? (await rec()).todayAt)(until); }
       catch (e) { return { ok: false, kind: "invalid", reason: "invalid-until", message: e instanceof Error ? e.message.slice(0, 200) : "bad until" }; }
+      const untilBad = untilProblem(until, now());
+      if (untilBad) return { ok: false, kind: "invalid", reason: "invalid-until", message: untilBad.slice(0, 200) };
       let jobs: SendNowJob[];
       try {
         if (opts.readLiveJobs) jobs = await opts.readLiveJobs();

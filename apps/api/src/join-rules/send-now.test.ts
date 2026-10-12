@@ -175,11 +175,19 @@ test("no launcher injected: scoped key gets a fail-closed 503, an unscoped key 4
   } finally { await s.close(); }
 });
 
-test("minting: scripts/mint-key.mjs ALL_SCOPES lists send-now exactly once (the router's scope constant)", () => {
-  const src = readFileSync(new URL("../../../../scripts/mint-key.mjs", import.meta.url), "utf8");
-  const m = /const ALL_SCOPES = \[([\s\S]*?)\];/.exec(src);
-  assert.ok(m, "ALL_SCOPES not found");
-  const scopes = [...m[1]!.replace(/\/\/.*$/gm, "").matchAll(/"([^"]+)"/g)].map((x) => x[1]);
+test("minting: send-now is never in a default key; it is issued only when asked for by name; typos and other names are refused", async () => {
+  const { DEFAULT_SCOPES, WRITE_SCOPES, scopesFromArgv } = await import("../../../../scripts/lib/mint-scopes.mjs");
   assert.equal(SEND_NOW_SCOPE, "send-now");
-  assert.equal(scopes.filter((s) => s === SEND_NOW_SCOPE).length, 1);
+  assert.deepEqual(WRITE_SCOPES, [SEND_NOW_SCOPE]);
+  assert.ok(!DEFAULT_SCOPES.includes(SEND_NOW_SCOPE));
+  assert.deepEqual(scopesFromArgv([]), DEFAULT_SCOPES);
+  assert.deepEqual(scopesFromArgv(["--tenant", "toc", "--label", "live-verify"]), DEFAULT_SCOPES);
+  assert.deepEqual(DEFAULT_SCOPES, ["ask", "compete", "sources", "sessions", "search", "citations", "webhooks", "gaps", "graph", "calendar", "gmail", "whatsapp", "keys", "ingest"]); // the pre-T-039 set, unchanged
+  assert.deepEqual(scopesFromArgv(["--with-scope", "send-now"]), [...DEFAULT_SCOPES, "send-now"]);
+  assert.deepEqual(scopesFromArgv(["--with-scope", "send-now", "--with-scope", "send-now"]), [...DEFAULT_SCOPES, "send-now"]);
+  for (const bad of [["--with-scope"], ["--with-scope", "--tenant"], ["--with-scope", "send-nowx"], ["--with-scope", "keys"], ["--with-scope", "join-rules"], ["--with-scope", "send-now,admin"]]) {
+    assert.throws(() => scopesFromArgv(bad), /with-scope/, bad.join(" "));
+  }
+  const src = readFileSync(new URL("../../../../scripts/mint-key.mjs", import.meta.url), "utf8");
+  assert.ok(/scopesFromArgv\(process\.argv/.test(src) && !/ALL_SCOPES/.test(src), "mint-key mints exactly what scopesFromArgv returns");
 });
