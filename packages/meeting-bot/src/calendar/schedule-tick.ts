@@ -10,6 +10,7 @@ import {
 } from "./auto-join.js";
 import { describeSkip } from "./skip-describe.js";
 import { requireStateTenant } from "./state-tenant-tag.js";
+import { recordSkipped } from "./skipped-state.js";
 import { createKeyTenantLoader } from "./join-rules-wiring/key-tenant.js";
 import { enforceJoinRules, parseJoinRulesEnforce, type JoinRulesEnforceIo } from "./join-rules-enforce.js";
 import { readScheduledKeys, recordScheduled, writeScheduledJob, validateWebinarCalendarAcquisition, type WebinarCalendarAcquisition } from "./schedule-state.js";
@@ -269,6 +270,12 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
     deps.log("schedule-tick: --dry-run — nothing scheduled, nothing written to state");
     return result;
   }
+
+  // ISS-ALERTID-001/-007 (D-134): remember skipped sessions (key + start + source only) so `lkb alert-who` can resolve their alert ids.
+  try {
+    recordSkipped(deps.stateDir, stateTenant, result.skipped, now, (s) =>
+      s.source === "calendar" ? calendarEvents.find((e) => e.id === s.sourceId)?.startTime : candidates.find((c) => c.id === s.sourceId)?.startTime);
+  } catch (err) { deps.log(`  could not record skipped sessions: ${err instanceof Error ? err.message : String(err)}`); }
 
   for (const item of result.toSchedule) {
     // ISS-317 fix: no title/url/sessionId ever reaches the Task Scheduler command line. The
