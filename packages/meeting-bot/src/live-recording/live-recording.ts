@@ -10,12 +10,13 @@
  *
  * Layout: <dir>/<tenantId>/<sha256(meetingKey)[0..32]>.json  (tenant + normalised meetingIdentity = the key).
  * Claim = write a temp file, then `linkSync` it to the final name: atomic create-with-content, EEXIST for the loser.
+ * A STALE entry is replaced by an exclusive claim-then-rename takeover (one winner per judged-dead content; ISS-T039DUPES-004).
  * Liveness: an entry is LIVE while its pid exists (ESRCH is the only death; EPERM = exists) AND the pid's OS start time still equals
  * the one recorded (PID reuse) AND `until` + grace has not passed. A dead entry never blocks and is replaced by the next claim.
  * Fail direction (reader): anything unreadable, malformed or tagged for another tenant THROWS = "cannot tell" = send-now refuses.
  */
 import { createHash } from "node:crypto";
-import { existsSync, linkSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, linkSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { controllerMatchesIdentity, getProcessStartTime } from "../capture/controller-state.js";
 import { meetingIdentity, type SendNowJob } from "../send-now.js";
@@ -111,16 +112,40 @@ export function claimLiveRecording(
     ...(startedAt ? { processStartedAt: startedAt } : {}), until: src.until ? src.until.toISOString() : null, startedAt: now.toISOString(),
   };
   const tmp = path.join(tdir, `.tmp-${pid}-${createHash("sha256").update(`${src.sessionId}|${Math.random()}`).digest("hex").slice(0, 10)}`);
-  writeFileSync(tmp, JSON.stringify(entry, null, 2) + "\n");
+  const body = JSON.stringify(entry, null, 2) + "\n";
+  writeFileSync(tmp, body);
+  const sleep = (ms: number) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
   try {
     for (let attempt = 0; ; attempt++) {
       try { linkSync(tmp, file); break; }
       catch (e) {
         if ((e as NodeJS.ErrnoException).code !== "EEXIST") throw e;
-        const held = parseEntry(readFileSync(file, "utf8"), path.basename(file), src.tenantId); // unreadable holder = THROW (cannot tell)
+        let raw: string;
+        try { raw = readFileSync(file, "utf8"); } catch { continue; } // vanished meanwhile (a release): try the link again
+        const held = parseEntry(raw, path.basename(file), src.tenantId); // unreadable holder = THROW (cannot tell)
         if (entryIsLive(held, now, probes)) return { ok: false, reason: "held", heldBy: { sessionId: held.sessionId, pid: held.pid } };
-        if (attempt >= 2) throw new Error("could not replace a stale live-recording entry");
-        rmSync(file, { force: true }); // dead holder: stale, replace it (a racing claimer that wins the link makes us loop to "held")
+        if (attempt >= 100) throw new Error("could not replace a stale live-recording entry");
+        // ATOMIC TAKEOVER of a dead holder (ISS-T039DUPES-004), the run-state lock's claim-then-rename: every contender that judged THIS
+        // exact content dead races for ONE exclusive claim file keyed by that content; only the claim holder may touch the entry. It
+        // re-reads the bytes under the claim, replaces the entry by rename (never absent, a live entry is never moved) and verifies.
+        const claim = path.join(tdir, `.tmp-takeover-${createHash("sha256").update(raw).digest("hex").slice(0, 24)}`);
+        const claimTmp = `${tmp}.claim`;
+        writeFileSync(claimTmp, JSON.stringify({ pid }));
+        let got = false;
+        try { linkSync(claimTmp, claim); got = true; }
+        catch (ce) {
+          if ((ce as NodeJS.ErrnoException).code !== "EEXIST") throw ce;
+          let other: { pid?: unknown } = {};
+          try { other = JSON.parse(readFileSync(claim, "utf8")); } catch { /* being removed or half-written: retry */ }
+          if (typeof other.pid === "number" && other.pid !== pid && !alive(other.pid, probes)) rmSync(claim, { force: true }); // abandoned by a dead taker
+        } finally { rmSync(claimTmp, { force: true }); }
+        if (!got) { sleep(15); continue; } // someone else is replacing it: re-read (they will win -> we see "held")
+        let won = false;
+        try {
+          let again = ""; try { again = readFileSync(file, "utf8"); } catch { /* removed meanwhile */ }
+          if (again === raw) { renameSync(tmp, file); won = readFileSync(file, "utf8") === body; }
+        } finally { rmSync(claim, { force: true }); }
+        if (won) break;
       }
     }
   } finally { rmSync(tmp, { force: true }); }

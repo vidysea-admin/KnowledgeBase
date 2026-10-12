@@ -1,7 +1,7 @@
 # iss-t039cmd-001-002-send-now-duplicate-launches
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 3-adjacent (T-039 completion; open medium issues ISS-T039CMD-001 and ISS-T039CMD-002). Class: data write (new state file) + the guard against a second browser join: FULL ceremony. Verdict by the checker only.
 Lane: lane/t039dupes. Ledger shard `qa/issues.t039dupes.jsonl` (ISS-T039DUPES-001..003). Ledger rows ISS-T039CMD-001/-002 status NOT changed here.
 
@@ -36,3 +36,14 @@ Mutation (inside the worktree, hash-verified, backup restored in finally, no mis
 
 ## Not delivered / not verified
 Real `cli.ts record`, Chrome, OBS: never run. Recordings running before deploy have no entry (ISS-T039DUPES-001). Plan-to-claim window (ISS-T039DUPES-003). Full suite not run. The view is per repo root (one machine), not shared across machines.
+
+## Cycle 1 (fix of ISS-T039DUPES-004 and ISS-T039DUPES-005; cycle-0 sections above kept)
+
+- **ISS-T039DUPES-004 (stale replacement atomic).** `claimLiveRecording` no longer does read-dead, `rmSync`, link. Contenders that judged the same dead bytes race for ONE exclusive claim file `.tmp-takeover-<sha256(dead bytes)[0..24]>` (linkSync, EEXIST for losers; body `{pid}`; a claim whose pid is dead is removed). Only the claim holder re-reads the entry; if the bytes still equal what was judged dead it replaces the entry by `renameSync(tmp, file)` (never absent, a live entry is never moved) and verifies the file holds its own body; the claim is removed in `finally`. Losers re-read and see the winner as `held`. Same pattern as the run-state lock (claim-then-rename, re-read under the claim); no import from core.
+- **Reproduction before the fix** (new real-process test, stale-seeded, 8 processes): two runs of 20 gave 2/20 and 0/20 runs with two winners (the first also showed an EPERM error in a loser); 3 processes x 20 runs: 0 double winners (window too small; the checker saw 1/20). A deterministic in-process interleaving test (B judged dead, A replaces fully, B continues) is added and is red on the old logic.
+- **After:** stale-seeded, 3 processes x 30 runs: pass (30/30 single winner); 8 processes x 30 runs: pass (30/30).
+- **ISS-T039DUPES-005.** `scripts/webinar/send-now-host.test.ts` fixture `job-1.json` now carries `tenantId: "tenant-a"` (the reader's flat tag, as `scheduleJob` writes it: `{...job, tenantId}`; there is no wrapper format). Reader unchanged. 12/12.
+- **Fast-fail.** live-recording.test.ts: fake recorders use `holdOpen()`, which rejects after 4 s with "a recorder started that should have been refused by the live-recording claim"; the real-process tests have per-test timeouts and per-worker timeouts with clear messages.
+- **Tests:** live-recording.test.ts 13/13 (was 12), live-recording-stale-race.test.ts 2/2 (stale-seeded and fresh, real processes, STALE_RACE_RUNS/PROCS env), send-now-host 12/12.
+- **Mutations** (harness `t039dupes-c1/`, hash-verified, per-mutation backup in finally): see commit message / checker re-run; results recorded in the final report.
+- Mutation results (5): skip claim KILLED; old rm+link stale replace KILLED; takeover without re-read KILLED; ignore liveness KILLED; check-then-plain-write claim SURVIVED (its race window is a few microseconds, real-process fresh race did not hit it in 8 runs). All restored, hash == HEAD.

@@ -15,6 +15,17 @@ import { readAllLiveJobs, runSendNow, type SendNowDeps } from "../send-now-comma
 const MEET = "https://meet.google.com/abc-defg-hij";
 const NOW = new Date("2026-10-12T10:00:00.000Z");
 const ALIVE: LiveProbes = { isAlive: () => true, startTime: () => "T0" };
+/** A fake "recording" that stays open until released. FAST-FAIL: a fake recorder nobody released (i.e. a claim that was NOT refused, so a
+ * second recorder started) rejects after 4 s with a clear message instead of hanging the suite (the 240 s hang the mutants used to cause). */
+function holdOpen(): { gate: Promise<void>; release: () => void } {
+  let release: () => void = () => {};
+  const gate = new Promise<void>((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error("FAST-FAIL: a recorder started that should have been refused by the live-recording claim (claim skipped or not exclusive)")), 4000);
+    t.unref(); release = () => { clearTimeout(t); resolve(); };
+  });
+  gate.catch(() => {}); // the rejection is observed by whoever awaits it; never an unhandled one
+  return { gate, release };
+}
 const mk = () => mkdtempSync(path.join(tmpdir(), "live-rec-"));
 const claimDeps = (dir: string, extra: Partial<ClaimedRecordDeps> = {}): ClaimedRecordDeps => ({
   dir, now: () => NOW, probes: ALIVE, tenant: (rest) => (rest.includes("--tenant") ? rest[rest.indexOf("--tenant") + 1]! : "vidysea"),
@@ -23,8 +34,7 @@ const claimDeps = (dir: string, extra: Partial<ClaimedRecordDeps> = {}): Claimed
 /** The send-now command wired exactly like defaultSendNowDeps, except runRecord is a fake that stays "recording" until released. */
 function sendNow(dir: string, ops: Record<string, Record<string, unknown>> = {}) {
   const launched: string[][] = [], out: string[] = [];
-  let release: () => void = () => {};
-  const gate = new Promise<void>((r) => { release = r; });
+  const { gate, release } = holdOpen();
   const deps: SendNowDeps = {
     now: () => NOW, write: (l) => out.push(l),
     runRecord: (rest) => runClaimedRecord(rest, async (r) => { launched.push(r); await gate; }, claimDeps(dir)),
@@ -57,7 +67,7 @@ test("ISS-T039CMD-001 verbatim: send-now, then the same send-now one minute late
 test("ISS-T039CMD-001: a MANUAL `lkb record <url> --until` is seen by send-now (any URL spelling)", async () => {
   const dir = mk();
   try {
-    let stop: () => void = () => {}; const gate = new Promise<void>((r) => { stop = r; });
+    const { gate, release: stop } = holdOpen();
     const manual = runClaimedRecord([MEET, "--until", "15:00", "--title", "hand"], () => gate, claimDeps(dir));
     await tick();
     for (const spelling of [MEET, "https://meet.google.com/ABC-defg-hij?authuser=2", `  ${MEET}/  `]) {
@@ -75,7 +85,7 @@ test("ISS-T039CMD-002 verbatim: poller has the webinar in 'recording' (operation
   const dir = mk();
   try {
     // the poller's launch (run-pipeline.mjs:224): record <url> --backend tab --until <ISO> --session-id <id> --title ... --transcribe --process-video --index
-    let stop: () => void = () => {}; const gate = new Promise<void>((r) => { stop = r; });
+    const { gate, release: stop } = holdOpen();
     const poller = runClaimedRecord(["https://zoom.us/j/12345678901?pwd=abc", "--backend", "tab", "--until", "2026-10-12T11:00:00.000Z", "--session-id", "webinar-1",
       "--title", "Webinar", "--transcribe", "--process-video", "--index"], () => gate, claimDeps(dir, { tenant: () => "vidysea" }));
     await tick();
@@ -104,7 +114,7 @@ test("two send-now racing (both planned an empty view): the second CLAIM is refu
 test("tenant is part of the key: another tenant's recording of the same link does not block, and is never read as ours", async () => {
   const dir = mk();
   try {
-    let stop: () => void = () => {}; const gate = new Promise<void>((r) => { stop = r; });
+    const { gate, release: stop } = holdOpen();
     const other = runClaimedRecord([MEET, "--until", "15:00", "--tenant", "acme"], () => gate, claimDeps(dir));
     await tick();
     const h = sendNow(dir); h.release();
@@ -189,7 +199,7 @@ test("UNREADABLE view: corrupt, wrong-shape, foreign-tenant or stray files -> th
 test("record path: claim refused while held (runRecord never starts); released when runRecord throws; link with no meeting identity is not claimed", async () => {
   const dir = mk();
   try {
-    let stop: () => void = () => {}; const gate = new Promise<void>((r) => { stop = r; });
+    const { gate, release: stop } = holdOpen();
     const first = runClaimedRecord([MEET, "--until", "15:00", "--session-id", "s1"], () => gate, claimDeps(dir));
     await tick();
     let started = false;
@@ -221,4 +231,30 @@ test("wiring: cli.ts `record` and defaultSendNowDeps' runRecord both go through 
   const cmd = readFileSync(path.join(here, "..", "send-now-command.ts"), "utf8");
   assert.match(cmd, /runRecord: \(rest\) => claimedRecordWithDefaults\(rest, runRecord\)/);
   assert.match(cmd, /readLiveJobs: \(\) => readAllLiveJobs\(/);
+});
+
+test("ISS-T039DUPES-004 deterministic: claimer B has judged the stale entry dead, claimer A then replaces it completely; B must end 'held', never a second winner", () => {
+  const dir = mk();
+  try {
+    seed(dir, entry({ processStartedAt: undefined }), `${createHash("sha256").update("meet:abc-defg-hij").digest("hex").slice(0, 32)}.json`);
+    const src = { dir, tenantId: "vidysea", meetingUrl: MEET, until: null };
+    let a: ReturnType<typeof claimLiveRecording> | undefined;
+    const probes: LiveProbes = {
+      isAlive: (p) => p === 3131, // only A is alive; the seeded holder is dead
+      startTime: () => "T9",
+      // runs while B is deciding the entry is dead (after B read it), exactly the interleaving of the race
+      ...{},
+    };
+    let injected = false;
+    const bProbes: LiveProbes = { ...probes, isAlive: (p) => {
+      const r = probes.isAlive!(p);
+      if (!injected && p !== 5151 && !r) { injected = true; a = claimLiveRecording({ ...src, sessionId: "A" }, NOW, probes, 3131); }
+      return r;
+    } };
+    const b = claimLiveRecording({ ...src, sessionId: "B" }, NOW, bProbes, 5151);
+    assert.equal(a?.ok, true, "A (inside B's decision) replaced the stale entry");
+    assert.equal(b.ok, false, "TWO WINNERS: B also replaced the stale entry (it deleted A's live entry) - two recordings of one meeting");
+    assert.deepEqual(b.ok === false && b.heldBy, { sessionId: "A", pid: 3131 });
+    assert.deepEqual(readdirSync(path.join(dir, "vidysea")).filter((n) => n.startsWith(".tmp-")), [], "no temp or claim files left");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });

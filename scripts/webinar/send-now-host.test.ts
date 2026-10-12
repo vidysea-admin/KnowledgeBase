@@ -70,7 +70,7 @@ test("duplicate through the REAL live-job reader: a scheduled job file for the m
   const root = mkdtempSync(path.join(os.tmpdir(), "send-now-real-"));
   const sched = path.join(root, "raw", "webinars", "scheduled");
   mkdirSync(sched, { recursive: true });
-  writeFileSync(path.join(sched, "job-1.json"), JSON.stringify({ url: MEET, sessionId: "s1", until: "2026-10-13T12:00:00Z" }));
+  writeFileSync(path.join(sched, "job-1.json"), JSON.stringify({ url: MEET, sessionId: "s1", until: "2026-10-13T12:00:00Z", tenantId: "tenant-a" }));
   const deps = createSendNowDeps({ root, now: () => NOW, hostTenant: () => "tenant-a", validateUntil: () => undefined, cliEntry: FIXTURE, livenessMs: 1 });
   try {
     const dup = await deps.plan("tenant-a", { meetingUrl: MEET, until: "18:00" });
