@@ -1,6 +1,6 @@
 # t049-langfuse-ingestion-partial-errors
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (next roadmap task, T-049 "Langfuse tracing"; follow-up to the sink manifest's NOT-done line on 207 per-event errors). Class: telemetry export, no auth/tenancy/data-write path; payload-leak surface re-checked. Verdict by the checker only.
 Lane: lane/langfuse207. Lane ledger `qa/issues.langfuse207.jsonl`: ISS-LANGFUSE207-001 (low), -002 (low).
