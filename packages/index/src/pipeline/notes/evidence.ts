@@ -6,10 +6,11 @@
  * token boundaries, 12 code points / 2 tokens minimum, no stitched ellipsis, no cross-turn match), and, when
  * windows were submitted, entirely inside a submitted span. The emitted quote is always the exact slice of the
  * source turn (`turn.text.slice(start, end)`), never the model's string, so typography differences cannot
- * smuggle in a non-source quote. It proves occurrence, not that the excerpt keeps the speaker's meaning.
+ * smuggle in a non-source quote. Cycle 1: the quote must also be a whole sentence/clause with no omitted negation or qualifier (sentence-span.ts).
  */
 import type { Turns, QuotedEvidence, CitedItem, QaEntry } from "@lkb/core";
 import { verifyQuote, normaliseForQuote } from "../quote/quote-verify.js";
+import { sentenceSpanProblem } from "./sentence-span.js";
 import { runtimeOrigin, type RuntimeSpan } from "../grounded.js";
 
 export type NonEmptyEvidence = [QuotedEvidence, ...QuotedEvidence[]];
@@ -29,8 +30,12 @@ export function resolveEvidence(value: unknown, turns: Turns[], spans?: RuntimeS
     if (!turn) return { ok: false, reason: "cited turn is not in this session" };
     const verdict = verifyQuote([{ id: turn._id, text: turn.text, speakerRef: turn.speakerRef }], { text: raw.quote, speakerRef: turn.speakerRef });
     if (!verdict.ok) return { ok: false, reason: `quote refused: ${verdict.reason}` };
-    const where = verdict.locations.find((l) => l.turnId === turn._id && (!spans || spans.some((s) => s.turnId === turn._id && s.from <= l.start && l.end <= s.to)));
-    if (!where) return { ok: false, reason: "quote lies outside the submitted spans" };
+    const inSpan = verdict.locations.filter((l) => l.turnId === turn._id && (!spans || spans.some((s) => s.turnId === turn._id && s.from <= l.start && l.end <= s.to)));
+    if (!inSpan.length) return { ok: false, reason: "quote lies outside the submitted spans" };
+    // ISS-T040GEN-002: sentence/clause-span rule (manifest t040-strict-quote-verifier-and-windowing.md:82) + omitted-qualifier floor.
+    const problems = inSpan.map((l) => sentenceSpanProblem(turn.text, l.start, l.end));
+    const where = inSpan[problems.indexOf(null)];
+    if (!where) return { ok: false, reason: `quote is not a whole sentence or clause: ${problems[0]}` };
     const quote = turn.text.slice(where.start, where.end);
     const key = JSON.stringify([turn._id, quote]);
     if (seen.has(key)) continue;

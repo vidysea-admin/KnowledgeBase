@@ -1,7 +1,7 @@
 # t040-grounded-notes-generation
 
-**Handshake status:** ready-for-check
-Fix cycle: 0
+**Handshake status:** ready-for-check (cycle 1; cycle-0 text below is history, FAIL verdict `qa/verdicts/t040-grounded-notes-generation.md`)
+Fix cycle: 1
 Tier: 3 (next unblocked roadmap task: T-040; the schema blocker was lifted by D-126 / merge c99c44d). Class: data write (session_pages, claims persisted through indexSession): full ceremony. Verdict by the checker only.
 Lane: lane/t040gen (base 9e24d1f). Lane ledger `qa/issues.t040gen.jsonl`: ISS-T040GEN-001..005 (2 medium, 3 low; all open, none fixed here).
 
@@ -45,3 +45,34 @@ All 12 killed: M1 model quote emitted instead of source slice; M2 span check off
 - No live model run and no live webinar: `dropUnverified` is not enabled by `buildIndexer` or `sync-session.mjs`; the live-model eval gates of the repair plan are untouched. `buildNotes` / final-notes sync and API/UI rendering of citations with times are later units.
 - Findings: ISS-T040GEN-001 (12-code-point minimum refuses real short answers such as "In March."), -002 (sentence-span rule from the verifier manifest not enforced; a verified quote can drop a negation), -003 (4000-char span cuts), -004 (no "numbers" category in the schema), -005 (not wired / buildNotes). 001, 002 and 004 need an owner decision.
 - The judge is a model: a semantically wrong but verbatim item that the judge accepts is emitted (labelled `unverified`).
+
+---
+
+# Fix cycle 1 (answers verdict `qa/verdicts/t040-grounded-notes-generation.md`, FAIL cycle 0, ISS-T040GEN-002 high)
+**Handshake status:** ready-for-check. **Fix cycle:** 1. Lane lane/t040gen. Nothing in the ledger changed status.
+
+## The written rule (found, so no owner decision was needed)
+`qa/manifests/t040-strict-quote-verifier-and-windowing.md:82`: "**A wiring unit must add** (the verifier alone is not enough): require the quote to span a whole sentence or clause (start at turn start or after sentence punctuation, end at sentence punctuation or turn end), OR display the full surrounding sentence/turn next to the quote, linked to the turn id and offsets returned in `locations`; and drop or flag quotes that fail. Do not render a verified quote without its surrounding sentence when that sentence contains a negation." (same file :81 states the limit: "it cannot ... detect a dropped negation".)
+The first alternative (span rule + drop) is implemented; the display alternative is not (no UI in this unit).
+
+## Implementation
+- New `packages/index/src/pipeline/notes/sentence-span.ts`, `sentenceSpanProblem(text, start, end)`:
+  1. **Start**: the previous non-space, non-opening-quote/bracket character must be a sentence or clause mark (`. , ; : ! ? … ।  ॥`) or the turn start, else `starts-mid-sentence`.
+  2. **End**: the quote's last character is such a mark, or the next non-space/non-closing character is one (or turn end), else `ends-mid-sentence`.
+  3. **Safety floor** (the clause marks let a cut sit right after a comma, so the span rule alone is not enough): the part of the SAME sentence the quote leaves out (before and after; sentence break = `. ! ? … । ॥` followed by whitespace, so "3.5" is not a break) must not contain a marker: not, never, no, none, nobody, nothing, nowhere, neither, nor, without, cannot, any `n't`, if, unless, until, only, except, hardly, barely, rarely, seldom, and the Hinglish negators `nahi`, `nahin`. Else `omits-qualifier`.
+- `notes/evidence.ts resolveEvidence`: among the verifier's in-span locations, the first that passes is emitted (the slice is still `turn.text.slice`); if none passes the evidence is refused (`quote is not a whole sentence or clause: <why>`). `dropUnverified` therefore drops the item/claim, marks a Q&A answer unanswered, drops a Q&A whose question fails (existing handling). `auditGroundedNotes` uses the same function, so a tampered page is flagged too. Option stays OFF by default (`dropUnverified` + `strictWebinar` only); nothing else changed.
+- Hinglish check (data/toc-migrated, 3427 turns): `nahi` 19 occurrences, `nahin` 0, `mat` 0, `na` 3, Devanagari नहीं/मत 0, danda/double danda 17. So `nahi` (and its variant `nahin`) are markers; `mat` and `na` are NOT added (no corpus use, `na` is a filler); Devanagari negators not added (none in corpus).
+
+## Evidence (node = codex runtime)
+- Replay of the checker's reproductions verbatim: "We do not recommend applying in March" -> "recommend applying in March"; "I do not think it is safe to wait" -> "think it is safe to wait"; "Never apply before the deadline opens" -> "apply before the deadline opens": all DROPPED (`dropped[0].reason` = `quote is not a whole sentence or clause: starts-mid-sentence`), sibling item still emitted, `degraded: null`, audit clean. 3/3.
+- New tests in `notes/grounded-notes.test.ts` (14 -> 18): the replay; 8 positive and 11 negative span cases (clause boundaries, quoted sentence, danda, `nahi` before/after, `n't`, unless, only if, if, trailing ", not down", cut before a comma-glued "not up"); "3.5" is not a sentence break; Q&A answer cutting a negation reverts to unanswered; repeated quote judged per occurrence.
+- `notes/grounded-notes.test.ts` 18/18; regression `claims summarize quote/* grounded-notes` 150/150 (was 146; +4 new tests); packages/index `tsc --noEmit` exit 0; apps/api `src/indexing/*.test.ts` 57/57 (TSX_TSCONFIG_PATH to the temporary lane mapping); apps/api `tsc -p` with the temporary `paths` mapping (scratchpad tsconfig.api.json) exit 0.
+- **Recall cost** on existing fixtures: 1 previously-emitted item now drops (the typography test quoted "we'll review ... next week." out of "She said we’ll ..."; the test now quotes the whole sentence). Every other fixture quote was already a whole sentence: 0 other items, 0 api-test items changed. On the real corpus (data/toc-migrated, 3427 turns, 15 091 sentences of 12+ chars split by a quick script): 98.7% (14 898) of WHOLE-sentence quotes pass (the 193 refusals checked at 6 samples are splitter artefacts of that script at decimals/quote marks, not confirmed one by one); comma/semicolon CLAUSE quotes (29 375) pass only 51.6% (15 160); all 14 215 refusals are `omits-qualifier` (a marker such as "if", "no", "only" elsewhere in the sentence). That is the owner-visible cost of the safety floor: a model quoting a clause of a sentence that contains a negation or "if/only" loses it; quoting the full sentence keeps it. Marker list is a conservative judgement, not an approved parameter.
+
+## Mutations (13; harness in `t040gen-c1/` inside the worktree, byte backup PER mutation restored in `finally`, 120 s SIGKILL timeout, `git hash-object` before == after for all; folder deleted afterwards)
+C1 start rule off, C2 end rule off, C3 floor off, C4 trailing text ignored, C5 leading text ignored, C6 `nahi` removed, C7 "3.5" breaks a sentence, C8 whole-sentence end not recognised, C9 danda not a mark, C10 `n't` removed, C11 evidence ignores the rule, C12 only the first location judged, C13 if/unless/only removed: all KILLED (C12 first SURVIVED; the repeated-quote test was added and it was killed on re-run).
+
+## Not covered / limits
+- The display-the-sentence alternative of :82 is not built. Judge (a model) remains the only check on semantic reversal that has no lexical marker (e.g. "low"/"high", "approve"/"reject" swaps inside a whole sentence cannot occur since the whole sentence is quoted).
+- ISS-T040GEN-001 (12-char minimum), -003, -004, -005 remain open owner decisions; unchanged.
+- No live model; not wired to production (D-119).

@@ -96,10 +96,10 @@ test("every strict-verifier refusal and binding failure drops the item (table)",
 test("typographic variants are accepted but the emitted quote is the exact source slice", async () => {
   const src = "She said we’ll review the “growth plan” — carefully — next week.";
   const turns = [turn("t1", "spk:0", src)];
-  const q = "we'll review the \"growth plan\" - carefully - next week.";
+  const q = "She said we'll review the \"growth plan\" - carefully - next week.";
   const r = await run(turns, model({ extract: () => ({ items: [item("insight", "t1", q)] }) }));
   assert.equal(r.degraded, null); assert.equal(r.page.citedItems!.length, 1);
-  const expected = "we’ll review the “growth plan” — carefully — next week.";
+  const expected = src;
   assert.equal(r.page.citedItems![0]!.evidence[0]!.quote, expected);
   assert.equal(r.page.citedItems![0]!.text, expected);
 });
@@ -292,4 +292,66 @@ test("auditGroundedNotes flags tampered pages (independent oracle)", async () =>
   assert.ok(tamper((p) => { p.citedItems[0].text = "Paraphrase of the fee."; }).length);
   assert.ok(tamper((p) => { p.citedItems[0].origin = "screen-ocr"; }).length);
   assert.ok(tamper((p) => { p.qa = [{ id: "x", question: FEE, questionEvidence: p.citedItems[0].evidence, answer: "yes", answerEvidence: [], status: "unanswered" }]; }).length);
+});
+
+// ---- cycle 1: ISS-T040GEN-002 sentence/clause-span rule (manifest t040-strict-quote-verifier-and-windowing.md:82) ----
+const emitted = async (text: string, quote: string) => {
+  const turns = [turn("t1", "spk:0", text), turn("t2", "spk:1", DEC, 10, 14)];
+  const r = await run(turns, model({ extract: () => ({ items: [item("insight", "t1", quote), item("insight", "t2", DEC)] }) }));
+  if (r.degraded) throw new Error(JSON.stringify(r.degraded));
+  return { r, kept: r.page.citedItems!.some((i) => i.evidence[0].turnId === "t1"), turns };
+};
+test("ISS-T040GEN-002 replay: a quote that drops a governing negation is dropped (checker's reproductions, verbatim)", async () => {
+  for (const [src, quote] of [["We do not recommend applying in March", "recommend applying in March"], ["I do not think it is safe to wait", "think it is safe to wait"], ["Never apply before the deadline opens", "apply before the deadline opens"]] as const) {
+    const { r, kept, turns } = await emitted(src, quote);
+    assert.equal(kept, false, quote); assert.equal(r.degraded, null);
+    assert.equal(r.page.citedItems!.length, 1, "the sibling survives");
+    assert.ok(r.dropped!.some((d) => /whole sentence or clause/.test(d.reason)), JSON.stringify(r.dropped));
+    assert.deepEqual(auditGroundedNotes(r.page, turns), []);
+  }
+});
+test("sentence-span rule: whole sentences and clauses on punctuation still pass; cuts and omitted qualifiers do not", async () => {
+  const S = "Apply early, because seats fill fast. We do not recommend applying in March.";
+  const ok: [string, string][] = [
+    [S, "Apply early, because seats fill fast."], [S, "We do not recommend applying in March."], [S, "We do not recommend applying in March"],
+    [S, "because seats fill fast."], ["Honestly, the fee is 1,000 rupees today.", "the fee is 1,000 rupees today."],
+    ["Hello all. \"The fee is 1,000 rupees today.\" Thanks.", "The fee is 1,000 rupees today."],
+    ["Fee kitna hai, wo bataya nahi gaya.", "wo bataya nahi gaya."], ["Yeh option achha hai। Fees 1000 rupees hai।", "Fees 1000 rupees hai।"],
+  ];
+  const bad: [string, string, string][] = [
+    [S, "recommend applying in March.", "starts-mid-sentence"], [S, "Apply early, because seats fill", "ends-mid-sentence"],
+    ["The revenue is not up this quarter, sadly.", "The revenue is not up", "ends-mid-sentence"],
+    ["Revenue is up this quarter, not down in March.", "Revenue is up this quarter", "omits-qualifier"],
+    ["We can apply, unless the portal closes early.", "We can apply", "omits-qualifier"],
+    ["Only if you apply early, you get a discount.", "you get a discount.", "omits-qualifier"],
+    ["I don't think so, we should apply in March.", "we should apply in March.", "omits-qualifier"],
+    ["We won't apply, the portal is closed today.", "the portal is closed today.", "omits-qualifier"],
+    ["Wo option achha nahi hai, fees 1000 rupees hai.", "fees 1000 rupees hai.", "omits-qualifier"],
+    ["Aaj nahi, kal apply karo please.", "kal apply karo please.", "omits-qualifier"],
+    ["If you apply early, you get a discount here.", "you get a discount here.", "omits-qualifier"],
+  ];
+  const { sentenceSpanProblem } = await import("./sentence-span.js");
+  for (const [text, q] of ok) { const i = text.indexOf(q); assert.ok(i >= 0, q); assert.equal(sentenceSpanProblem(text, i, i + q.length), null, q); }
+  for (const [text, q, why] of bad) { const i = text.indexOf(q); assert.ok(i >= 0, q); assert.equal(sentenceSpanProblem(text, i, i + q.length), why, q); }
+  for (const [text, q] of ok) assert.equal((await emitted(text, q)).kept, true, q);
+  for (const [text, q] of bad) assert.equal((await emitted(text, q)).kept, false, q);
+});
+test("a number joiner is not a sentence break, and a Q&A answer that cuts a negation reverts to unanswered", async () => {
+  const { sentenceSpanProblem } = await import("./sentence-span.js");
+  const t = "Fees are not 3.5 lakh; fees are 4.5 lakh."; const q = "fees are 4.5 lakh.";
+  assert.equal(sentenceSpanProblem(t, t.indexOf(q), t.indexOf(q) + q.length), "omits-qualifier", "the not before 3.5 is in the same sentence");
+  const t2 = "Fees are not 3.5 lakh. Fees are 4.5 lakh."; assert.equal(sentenceSpanProblem(t2, t2.indexOf("Fees are 4"), t2.length), null);
+  const NEG = "We do not accept applications after the fifteenth of March.", cut = "accept applications after the fifteenth of March.";
+  const turns = [turn("q1", "spk:0", Q, 0, 2), turn("a1", "spk:1", NEG, 3, 6), turn("pad", "spk:1", THANKS, 7, 8)];
+  const asked = { question: Q, questionEvidence: [ev("q1", Q)], answer: null, answerEvidence: [], status: "unanswered" };
+  const m = model({ extract: (spans) => ({ items: [item("insight", "pad", THANKS)], qa: spans.some((s) => s.turnId === "q1") ? [asked] : [] }),
+    answers: (qs) => qs.map((x) => ({ id: x.id, answer: cut, answerEvidence: [ev("a1", cut)] })) });
+  const r = await run(turns, m);
+  const entry = r.page.qa!.find((x) => x.question === Q)!;
+  assert.equal(entry.status, "unanswered"); assert.equal(entry.answer, null); assert.deepEqual(entry.answerEvidence, []);
+});
+test("a quote that occurs twice is judged per occurrence: one clean occurrence is enough", async () => {
+  const { kept } = await emitted("Not good, apply early today. Fine, apply early today.", "apply early today");
+  assert.equal(kept, true);
+  assert.equal((await emitted("Not good, apply early today. Then apply early today.", "apply early today")).kept, false);
 });
