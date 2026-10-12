@@ -1,6 +1,6 @@
 # iss-alloc-005-lock-create-eperm-is-contention
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 4 (open ledger issue ISS-ALLOC-005, medium; ledger write path, full ceremony). Lane: lane/alloc005. No new issues filed (no lane ledger needed).
 
