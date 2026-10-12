@@ -1,5 +1,5 @@
 /**
- * packages/ingest/src/retention-report/ops.ts - T-046 dry-run report. The pipeline's own
+ * packages/ingest/src/retention/retention-report/ops.ts - T-046 dry-run report. The pipeline's own
  * IN-PROGRESS signal: the webinar poller's operations.json (data/webinar-release/operations.json,
  * written by scripts/webinar/run-pipeline.mjs, rows keyed by session id with a `status` and, once
  * capture starts, the `artifact` path). Read-only, bounded, and DOWNGRADE-ONLY.
@@ -18,7 +18,7 @@
  */
 import { lstatSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { isPlain } from "../strict-record.js";
+import { isPlain } from "../../strict-record.js";
 import type { GuardHit } from "../retention-report-guards.js";
 import { fileKeys, REAL_IO, type MediaIo } from "../retention-report-media.js";
 import { cleanText } from "../retention-report-text.js";

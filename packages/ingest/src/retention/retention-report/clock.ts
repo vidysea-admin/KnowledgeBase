@@ -1,5 +1,5 @@
 /**
- * packages/ingest/src/retention-report/clock.ts - T-046 dry-run report. `now` sanity check.
+ * packages/ingest/src/retention/retention-report/clock.ts - T-046 dry-run report. `now` sanity check.
  * A wrong system clock is the one input every verdict depends on and no single record can disprove
  * a clock that is too FAR AHEAD. The rule (simple, fail-closed):
  *   - the report always prints the as-of instant it used;

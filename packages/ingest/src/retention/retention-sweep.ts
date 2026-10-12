@@ -1,5 +1,5 @@
 /**
- * packages/ingest/src/retention-sweep.ts — T-046. A PURE, READ-ONLY dry-run planner for D-008's
+ * packages/ingest/src/retention/retention-sweep.ts — T-046. A PURE, READ-ONLY dry-run planner for D-008's
  * gated media purge. It returns data and nothing else: no fs, no DB, no network, no clock read
  * (`now` is a parameter), no deletion. A caller that wanted to delete would have to take the plan
  * and do it elsewhere; nothing here can.
@@ -19,7 +19,7 @@ import type { Claims, EvidenceClipWindow, Media, Turns } from "@lkb/core";
 import {
   arrayOf, bool, isoInstant, num, oneOf, parseIsoInstant, posNum, readArray, readFields,
   record, str, strList, type Spec,
-} from "./strict-record.js";
+} from "../strict-record.js";
 
 export interface RetentionParams {
   /** Minimum age (ms) since `processedAt` before a media item may be purge-eligible. Required, > 0. */

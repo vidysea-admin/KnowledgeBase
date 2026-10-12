@@ -1,5 +1,5 @@
 /**
- * packages/ingest/src/retention-sweep.test.ts — T-046. Pure fixtures, no I/O.
+ * packages/ingest/src/retention/retention-sweep.test.ts — T-046. Pure fixtures, no I/O.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
