@@ -136,7 +136,7 @@ test("session assets enforce auth, tenant ownership, confinement and frame hashe
     getSessionDetail: async (tenant, id) => {
       if (tenant !== "tenant-1") return null;
       const detail = await original.getSessionDetail(tenant, id);
-      if (detail) detail.turns[0]!.screenEvidence = { frameId: "f1", file: frame.file, hash };
+      if (detail) detail.turns[0]!.screenEvidence = { frameId: "f1", file: frame.file, hash, tStart: frame.tStart };
       return detail;
     },
     listSources: async (tenant) => tenant === "tenant-1" ? [{ _id: "source-1", tenantId: tenant, kind: "recording", captureMode: "silent", hash: "hash", createdAt: "2026-09-30", path: sourcePath, consent: { given: true, recordedBy: "test" } }] : [],

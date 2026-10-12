@@ -2,7 +2,7 @@
 import { randomUUID } from "node:crypto";
 import type { Db } from "mongodb";
 import { getDb, scopedCollection } from "@lkb/db";
-import type { SessionPages, Chunks, Claims, Sessions, TreeIndexRootDocument, Turns } from "@lkb/core";
+import type { SessionPages, Chunks, Claims, Sessions, TreeIndexRootDocument, Turns, CitedItem, QaEntry } from "@lkb/core";
 import { summarizeSession, extractClaims, buildChunks, buildTree, regenerate, treeIndexRootFilter, type SummarizeCompleteFn, runtimeChronologicalTurns, assertGroundedTurns, validateRuntimePage, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin } from "@lkb/index";
 import { recordVectorGap } from "./vector-gap.js";
 import { promoteAndPersistEntities, type PromotionResult } from "./promote-entities.js";
@@ -15,6 +15,19 @@ export type { IndexEmbedFn, ChunkSkipReason, ChunkWriteResult, IndexSessionResul
 function toEvidenceTuple<T>(items: T[]): [T, ...T[]] {
   if (items.length === 0) throw new Error("toEvidenceTuple: evidence must be non-empty");
   return items as [T, ...T[]];
+}
+
+/**
+ * Runtime grounded items carry `evidence: RuntimeEvidence[]`; the canonical schema (D-057/D-126) requires a
+ * non-empty QuotedEvidence tuple. Runtime validation already rejects empty evidence, so a throw here is a
+ * defensive backstop: an evidence-less item is never emitted as a CitedItem/QaEntry.
+ */
+type QuotedEv = { turnId: string; sessionId: string; quote: string };
+function toCitedItems(items: ReadonlyArray<Pick<CitedItem, "id" | "kind" | "text" | "origin" | "verification"> & { evidence: QuotedEv[] }>): CitedItem[] {
+  return items.map((i) => ({ ...i, evidence: toEvidenceTuple(i.evidence.map((e) => ({ ...e }))) }));
+}
+function toQaEntries(entries: ReadonlyArray<Pick<QaEntry, "id" | "question" | "answer" | "status"> & { questionEvidence: QuotedEv[]; answerEvidence: QuotedEv[] }>): QaEntry[] {
+  return entries.map((q) => ({ ...q, questionEvidence: toEvidenceTuple(q.questionEvidence.map((e) => ({ ...e }))), answerEvidence: q.answerEvidence.map((e) => ({ ...e })) }));
 }
 
 export interface IndexSessionDeps {
@@ -159,6 +172,7 @@ export async function indexSession(
           claim.evidence = evidence;
         }
         const preparedPage: SessionPages = { _id: randomUUID(), tenantId, sessionId, ...summary,
+          citedItems: toCitedItems(summary.citedItems!), qa: toQaEntries(summary.qa!),
           evidence: toEvidenceTuple([...summary.citedItems!.flatMap((i) => i.evidence), ...summary.qa!.flatMap((q) => [...q.questionEvidence, ...q.answerEvidence])].map((e) => ({ ...e }))) };
         candidatePage = preparedPage;
         const [sessions, pages, root] = await Promise.all([sessionsColl(tenantId).find({}).toArray(), sessionPagesColl(tenantId).find({}).toArray(), loadTreeRoot(tenantId, db)]);
