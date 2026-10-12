@@ -1,6 +1,6 @@
 # iss-webinarrelease-002-not-ready-after-degraded-extraction
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Lane: webrel002 (base 9e24d1f). Tier: 2 (open high issue).
 
