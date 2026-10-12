@@ -2050,3 +2050,35 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Why:** Coarse nodes keep the graph a thin wrapper that can be proven output-identical to runAskV2; finer splits can follow once that is shown.
 **Result:** 4-node graph, unexported, off by default, output-identical to runAskV2.
 **Links:** T-050
+
+## D-143 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Live and staging writes go to the Mongo server in .env MONGODB_URL, using a SEPARATE database named `lkb_staging`. The production database `lkb` is never written by agents. Every write path must set the database name explicitly and assert that it is not `lkb`. Migrations, including tenant-scoped-source-ids and speaker-suggestions, may run against lkb_staging only. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** A separate staging database lets live runs and migrations be exercised on the real server without any risk to production data.
+**Result:** All agent writes target lkb_staging with an explicit database name and a guard against `lkb`; migrations run on lkb_staging only.
+**Approved-by:** Umesh
+**Links:** D-117; T-043; D-136; D-141
+
+## D-144 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Negation safety in generated notes moves from rule-based detection to an LLM JUDGE. A second model checks each generated note or claim against its cited source sentence(s), and drops or flags any note whose meaning differs, including polarity and negation. Deterministic grounding stays: the citation must exist. The judge is injectable and fakeable, and its cost per session is recorded. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** Rule-based negation detection cannot cover the ways meaning flips; a second model comparing note to cited source catches polarity and negation errors while citation existence stays deterministic.
+**Result:** An injectable LLM judge gates generated notes against their cited sentences; per-session judge cost is recorded.
+**Approved-by:** Umesh
+**Links:** T-040; ISS-T040GEN-012
+
+## D-145 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Retention: raw media (video and audio recordings and their derived media files) is purged 90 days after capture. Transcripts, notes, claims and citations are kept forever. The purge executor honours the existing dry-run vetoes, and logs what it deletes. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** Raw media is large and costly to keep, while the text artifacts carry the durable knowledge and the citations that reference it.
+**Result:** Media is purged at 90 days after capture; text artifacts are retained indefinitely; the executor respects dry-run vetoes and logs deletions.
+**Approved-by:** Umesh
+**Links:** T-046; Q6
+
+## D-146 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Live runs are approved: (1) T-043 indexing plus cited /ask against lkb_staging, with Gemini embeddings; (2) live browser checks for U3.1, U3.2, T-046 and the T-037 editor, using real local Chrome, up to 15 concurrent browsers on this machine; (3) the T-049 Langfuse live check; (4) a 60-minute live capture for T-034 and T-035, once Umesh provides a meeting link. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** These items cannot be proven by local fakes alone; approving them against the staging database bounds the risk to production.
+**Result:** Agents may run the listed live checks, writing only to lkb_staging (D-143); the T-034/T-035 capture waits for a meeting link from Umesh.
+**Approved-by:** Umesh
+**Links:** D-024; T-043; T-049; T-034; T-035; U3.1; U3.2; T-046; T-037
