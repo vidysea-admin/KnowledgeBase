@@ -1,6 +1,6 @@
 # iss-t050askgraph-001-002-golden-coverage-and-shared-nodes
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: roadmap-adjacent (T-050 ask graph; medium issues ISS-T050ASKGRAPH-001 and -002). Touches the PRODUCTION /ask path (askV2): full ceremony. Verdict by the checker only.
 Lane: lane/askshared (from lane/t050askgraph 14cf68d8). Ledger rows ISS-T050ASKGRAPH-001/-002 status NOT changed here. Only packages/ask touched (+ this manifest).
