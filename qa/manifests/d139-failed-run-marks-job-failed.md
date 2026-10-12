@@ -1,6 +1,6 @@
 # d139-failed-run-marks-job-failed
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: 3 (owner decision D-139, T-050 runner adapter "open design call" in qa/manifests/t050-runner-adapter.md). Class: data write (queue job state): FULL ceremony. Verdict by the checker only.
 Lane: lane/failedjob (base 6be0570c). No ledger issue; no new issue filed.
