@@ -1,0 +1,1 @@
+{"id":"ISS-SENDNOWWEB-001","severity":"low","status":"open","title":"Send-now form cannot know the key lacks the send-now scope until the first submit (no probe endpoint); the disabled state is not remembered across reloads","unit":"t039-send-now-web-button","fix_direction":"API could expose granted scopes (e.g. GET /auth/me); then hide the form up front"}
