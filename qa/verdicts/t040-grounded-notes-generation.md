@@ -101,3 +101,38 @@ The cycle-1 bypasses are closed, but the fix is a list: an abbreviation that is 
 **Mutations** (own harness in the worktree, per-mutation backup, `git hash-object` == HEAD after each, folder deleted, trees clean): break after any abbreviation KILLED (2 failures); disable negated-by-reply KILLED (1); drop the `u` flag from MARKER KILLED (2).
 
 ISSUES-WRITTEN: ISS-T040GEN-008 (high), ISS-T040GEN-009 (medium). ISS-T040GEN-002, -006, -007 left open (006 remains open for the unlisted-abbreviation class; 007 is functionally fixed and could be verified with the next PASS).
+
+---
+
+# Cycle 3
+
+VERDICT: PASS
+Cycle checked: 3
+Commit checked: 0ae7fe7 (lane/t040gen)
+
+## EXPLANATION
+
+The cycle-3 boundary rule is structural for every capitalised, mixed-case, digit-bearing, single-letter or dotted token, so the -008 class (Pvt./Univ./Asst./Ave./Pkwy./Q1.) cannot reappear and no common-English path ships a meaning-reversed quote. Two exotic, medium gaps are filed. ISS-T040GEN-002, -006, -007, -008, -009 are verified closed.
+
+**Replay.** All -008 cases (Pvt., Univ., Asst., Ave., Pkwy., Q1.): only the whole sentence ships. Cycle 0-2 cases (e.g., U.S., vs., approx., Dr. Rao, Govt., etc., a.m., Mr. Not Sure, "Apply in March? Absolutely not.", "not April"): only negation-bearing quotes ship; tests replay them. -009: a quote in a question sentence is dropped (is-question) for any reply; "Apply in March. Wrong./Incorrect./I disagree." now merge, so "Apply in March." alone no longer ships.
+
+**New-bypass table** (every word-aligned quote enumerated; "ships" = negation-dropping quote returns null):
+
+| Case | Result |
+|---|---|
+| approx (no dot), dept./govt. lower-case, etc. mid-sentence, a.m. / a.m. On, Rs./rs. 5000, st./dr. lower-case, "Rs. 5000 is not the fee" | refused (whole sentence only) |
+| "10. Never apply in March.", "3. Not recommended...", "Step 10. Never apply...", "Apply in March, 10. Never apply in April." | negation always inside the shipped quote; list number opening a sentence does not break |
+| Real sentence end then negation ("Fees are not 1000 rupees. Apply in March.") | negation stays in its own quote; correct |
+| **"We do not accept pvt. Colleges applications after March first."** (also univ., mgmt., pg. Courses) quote "Colleges applications ..." | **SHIPS**: unlisted lower-case abbreviation + capital -> ISS-T040GEN-010 medium (0 occurrences in the 3427-turn corpus) |
+| "Fees are 1000 rupees. Wrong." / "Ignore that." / ">5-word rejection" | ships the statement -> ISS-T040GEN-011 medium |
+| "Is it good? Not really." / "What is the fee? It is not fixed yet." | answer ships on its own (correct) |
+
+**Question rule.** Correct for its purpose: a "?" sentence is a question, not a fact; the only legitimate loss is a non-question item that cites a question as topic evidence (e.g., "student asked about fees"), which is dropped, a deliberate conservative cost (about 10.5 pts of sentence recall). Q&A question evidence is exempt via allowQuestion; answers are not. Quotes with a "?" followed by a quote mark are dropped too (conservative).
+
+**Recall (independent run on data/toc-migrated, 3427 turns, my own splitter, pieces of 12+ chars).** Sentence 11 002/15 565 = 70.7% (maker 71.9%; refusals starts-mid 1640, is-question 1765, ends-mid 947, omits-qualifier 160, negated-by-reply 51); clause 20 547/34 037 = 60.4% (maker 60.5%). Reproduces within splitter noise.
+
+**Suites.** grounded-notes 26/26; all packages/index pipeline tests 421/421; `tsc --noEmit` index exit 0. No LLM/Mongo/network.
+
+**Mutations** (own harness in the worktree, per-mutation backup, `git hash-object` == HEAD after each, folder deleted, trees clean): allow break after a capitalised token KILLED (4 failures); disable is-question KILLED (1 failure).
+
+ISSUES-WRITTEN: ISS-T040GEN-010 (medium), ISS-T040GEN-011 (medium). Verified: ISS-T040GEN-002, -006, -007, -008, -009.
