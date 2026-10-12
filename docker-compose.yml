@@ -5,17 +5,23 @@
 # never touches any other database on that cluster). `local-mongo` below is an OPT-IN profile for
 # a fully offline dev loop against empty local data, never started by a plain `docker compose up`.
 services:
-  # One-shot schema migration (migrate-mongo up), run to completion before api starts.
-  # A production run needs the owner's approval (D-117: production DB writes are not authorized).
-  # Same MONGODB_URL / MONGODB_DB as api, so it migrates exactly the database api will use.
-  # Built from the api Dockerfile's `deps` stage (workspace node_modules incl. migrate-mongo and
-  # dotenv); the runtime stage ships neither migrations/ nor the config, so they are bind-mounted
-  # read-only. NOTE: this relies on the stage name `deps` in apps/api/Dockerfile.
+  # One-shot schema migration (migrate-mongo up). OPT-IN: it sits behind the `migrate` profile, so
+  # a plain `docker compose up` never writes to a database schema, and api does not depend on it.
+  # Run it deliberately, once, with:
+  #   docker compose --profile migrate run --rm migrate
+  # Running it against the production database needs the owner's approval (D-117: production DB
+  # writes are not authorized). It migrates the database named by MONGODB_URL / MONGODB_DB, the
+  # same one api uses, so check .env first.
+  # Built from the api Dockerfile's `build` stage (full pnpm install: workspace node_modules incl.
+  # migrate-mongo and dotenv at /app/node_modules); the runtime stage ships neither migrations/
+  # nor the config, so they are bind-mounted read-only. NOTE: relies on the stage name `build`
+  # in apps/api/Dockerfile (ISS-DEPLOYCOMPOSE-001).
   migrate:
+    profiles: ["migrate"]
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-      target: deps
+      target: build
     working_dir: /app
     command: ["npx", "migrate-mongo", "up", "-f", "migrate-mongo-config.cjs"]
     environment:
@@ -30,9 +36,6 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-    depends_on:
-      migrate:
-        condition: service_completed_successfully
     ports:
       - "3300:3300"
     environment:
