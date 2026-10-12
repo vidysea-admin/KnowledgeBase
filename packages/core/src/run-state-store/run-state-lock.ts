@@ -212,15 +212,42 @@ export function releaseRunStateLock(c: RunStateLockCtx, lock: string, token: str
   return `lock ${lock} could not be removed after a successful save (${last}); a later save recovers it once its owner is gone`;
 }
 
-/** Removes `<id>.run-state.json.<uuid>.tmp` files. Only called while holding the lock right after a takeover, when any such file
- *  belongs to the dead owner (a live writer creates its temp file only after taking the lock). Returns the names removed. */
-export function reapRunStateTemps(c: RunStateLockCtx, root: string, runId: string): string[] {
-  const prefix = `${runId}.run-state.json.`, out: string[] = [];
+/** How long a failing reap unlink is retried (EPERM/EACCES/EBUSY on Windows: antivirus, indexer) before it counts as a failure. */
+export const REAP_RETRY_MS = 1500;
+
+export interface RunStateReap {
+  removed: string[];
+  /** Set when an orphan temp file could not be removed. The caller MUST NOT write: the previous holder's rename may still land on it
+   *  (ISS-RUNLOCK-003). `busy` = EPERM/EBUSY that outlasted the retry budget (something still has the file: a retry later may succeed,
+   *  report `conflict`); otherwise the failure will not clear by waiting (EACCES that persists, EISDIR, EROFS, EIO...): report `io-error`. */
+  failure: { name: string; code: string; busy: boolean; message: string } | null;
+}
+
+/** Removes `<id>.run-state.json.<uuid>.tmp` files. Only called while holding the lock, when any such file belongs to a dead or displaced
+ *  previous holder (a live writer creates its temp file only after taking the lock). A file already gone (ENOENT, or gone after the
+ *  error) counts as removed. Transient errors are retried within REAP_RETRY_MS; the first failure that survives stops the reap. */
+export function reapRunStateTemps(c: RunStateLockCtx, root: string, runId: string): RunStateReap {
+  const prefix = `${runId}.run-state.json.`, removed: string[] = [];
   let names: string[] = [];
-  try { names = c.fs.listDir(root); } catch { return out; }
+  try { names = c.fs.listDir(root); } catch (e) {
+    return { removed, failure: { name: root, code: code(e) || "EIO", busy: false, message: `cannot list ${root} to reap orphan temp files: ${e instanceof Error ? e.message : String(e)}` } };
+  }
+  const start = c.fs.now();
   for (const name of names) {
     if (!name.startsWith(prefix) || !name.endsWith(".tmp") || !/^[A-Za-z0-9-]+$/.test(name.slice(prefix.length, -4))) continue;
-    try { c.fs.unlink(path.join(root, name)); out.push(name); } catch { /* best effort */ }
+    const file = path.join(root, name);
+    for (;;) {
+      try { c.fs.unlink(file); removed.push(name); break; }
+      catch (e) {
+        const k = code(e);
+        if (k === "ENOENT") break;
+        let there = true;
+        try { there = c.fs.kind(file) !== null; } catch { /* cannot tell: treat as present */ }
+        if (!there) { removed.push(name); break; }
+        if (TRANSIENT.includes(k) && c.fs.now() - start <= REAP_RETRY_MS) { c.fs.sleep(5); continue; }
+        return { removed, failure: { name, code: k, busy: k === "EPERM" || k === "EBUSY", message: `orphan temp file ${file} of a previous writer could not be removed (${e instanceof Error ? e.message : String(e)}); nothing was written because that writer's rename could still land` } };
+      }
+    }
   }
-  return out;
+  return { removed, failure: null };
 }

@@ -86,14 +86,22 @@ function stalled(unlinkFails: boolean, hookAt: "recheck" | "rename") {
   return { w, ares, bres };
 }
 
-for (const unlinkFails of [false, true]) {
-  test(`recorded repro (2 sim pids, >1 h stall, B's reap unlink ${unlinkFails ? "throws EPERM" : "works"}), stall before the re-check read: A refused, B's acknowledged save survives`, () => {
-    const { w, ares, bres } = stalled(unlinkFails, "recheck");
-    assert.deepEqual(bres, ["ok"]);
-    assert.equal(ares, "conflict");
-    assert.deepEqual(stored(w), st(2));
-  });
-}
+test("recorded repro (2 sim pids, >1 h stall, B's reap unlink works), stall before the re-check read: A refused, B's acknowledged save survives", () => {
+  const { w, ares, bres } = stalled(false, "recheck");
+  assert.deepEqual(bres, ["ok"]);
+  assert.equal(ares, "conflict");
+  assert.deepEqual(stored(w), st(2));
+});
+
+// ISS-RUNLOCK-003 fix: B's reap of A's orphan temp fails, so B REFUSES (nothing written, nothing acknowledged). A is the only writer left
+// and its save (revision still the one it expected) lands: exactly one acknowledged write, none lost.
+test("recorded repro (>1 h stall before the re-check read, B's reap unlink throws EPERM): B refuses `conflict` and writes nothing; A's save is the only one acknowledged", () => {
+  const { w, ares, bres } = stalled(true, "recheck");
+  assert.deepEqual(bres, ["conflict"]);
+  assert.equal(ares, "ok");
+  assert.deepEqual(stored(w), st(5));
+  assert.deepEqual(debris(w), [], `lock and temp gone: ${w.names()}`);
+});
 
 test("recorded repro, stall ON the rename syscall, B's unlink works: A gets io-error (ENOENT on its reaped temp), B's state intact", () => {
   const { w, ares, bres } = stalled(false, "rename");
@@ -102,11 +110,14 @@ test("recorded repro, stall ON the rename syscall, B's unlink works: A gets io-e
   assert.deepEqual(stored(w), st(2));
 });
 
-// The one-syscall residual no read-then-rename can close; filed as ISS-RUNREV-001. Runs and reports, never fails the suite.
-test("recorded repro EXACT (stall ON the rename, B's reap unlink fails): A must not replace B's state", { todo: "ISS-RUNREV-001: residual one-syscall window" }, () => {
-  const { w, ares } = stalled(true, "rename");
-  assert.notEqual(ares, "ok", "A must not report ok over B's newer state");
-  assert.deepEqual(stored(w), st(2));
+// ISS-RUNREV-001 / ISS-RUNLOCK-003 case (1), the row's EXACT repro. Closed by refusing the takeover when the reap fails: B never writes while
+// A's in-flight rename can still land, so A's rename cannot replace a newer ACKNOWLEDGED state (B acknowledged nothing).
+test("recorded repro EXACT (stall ON the rename, B's reap unlink fails): B refuses `conflict`, writes nothing; A's save is the only acknowledged one", () => {
+  const { w, ares, bres } = stalled(true, "rename");
+  assert.deepEqual(bres, ["conflict"], "B must not report ok while A's rename can still land");
+  assert.equal(ares, "ok");
+  assert.deepEqual(stored(w), st(5), "no acknowledged state was replaced: the data is A's, B never acknowledged a write");
+  assert.deepEqual(debris(w), [], `lock released, no debris: ${w.names()}`);
 });
 
 test("recorded timing guards still hold: 2 h stall before the re-check -> A locked, nothing lost; 59 min -> B locked, A saves", () => {
