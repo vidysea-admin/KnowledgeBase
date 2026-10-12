@@ -1,6 +1,6 @@
 # u24-model-judged-speaker-attribution
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 2
 Tier: 3 (roadmap U2.4 speaker naming). Class: identity attribution that is written into the KB (the precision-critical path): FULL ceremony.
 Lane: lane/u24smart. Authority: D-132 (pending append), owner decision "make it intelligent instead of rule based". Gate bars 1 (100% accepted-identity precision) and 2 (0 wrong links) are UNCHANGED. No model API call was made in this unit. config/ai-routing.yaml, qa/contracts/, docs/DECISIONS.md untouched.
