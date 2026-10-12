@@ -11,6 +11,7 @@ established the caller keeps redirect:'error' (this module is optional, never re
 import json
 import queue
 import re
+import sys
 import threading
 from urllib.parse import urljoin, urlsplit
 
@@ -18,6 +19,8 @@ REDIRECT_CODES = (301, 302, 303, 307, 308)
 BODY_RESENDING = (307, 308)
 MAX_HOPS = 5
 LOOPBACK = ("127.0.0.1", "localhost")
+# debuggerAddress forms accepted for the CDP socket: exactly these three loopback hosts, a numeric port.
+LOOPBACK_ADDRESS = re.compile(r"(127\.0\.0\.1|localhost|\[::1\]):([0-9]{1,5})")
 _SCHEME_START = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 _ABSOLUTE = re.compile(r"^https?://[^/\\?#]", re.I)
 _NETWORK_PATH = re.compile(r"^//[^/\\?#]")
@@ -111,6 +114,11 @@ class RedirectInterceptor:
         if not isinstance(reply, dict):
             raise RuntimeError("Fetch.enable not acknowledged")
         self.started = True
+
+    def heartbeat(self):
+        """Raise unless the socket answers a round trip right now (called just before the submit)."""
+        if not self.started or not self.cdp.alive() or not isinstance(self.cdp.send("Browser.getVersion", {}), dict):
+            raise RuntimeError("CDP heartbeat failed")
 
     def stop(self):
         try:
@@ -209,17 +217,27 @@ class RedirectInterceptor:
         return None
 
 
+def _note_inactive(result, why):
+    """CDP is off for this run: say so (stderr + result note) instead of silently using redirect:'error'."""
+    print("registration-cdp inactive (" + why + "): redirect:'error' fallback in use", file=sys.stderr, flush=True)
+    return dict(result, cdp="inactive", cdp_reason=why) if isinstance(result, dict) else result
+
+
 def submit_with_redirects(sb, script, instructions, approved_hosts, origin_url, connect):
     """Run the 'submit' script. With a working interceptor the fetch follows redirects under CDP policy;
-    without one (connect is None or fails) it is exactly the old redirect:'error' path."""
-    interceptor = None
+    without one (connect is None or fails) it is exactly the old redirect:'error' path, and that is reported
+    (stderr line plus cdp/cdp_reason on a dict result) whenever a connector was supplied but could not be used."""
+    interceptor, why = None, None
+    driver = getattr(sb, "driver", sb)  # SB's own execute_async_script takes (script, timeout); the selenium driver takes script args
     if connect is not None:
         cdp = None
         try:
-            cdp = connect(getattr(sb, "driver", sb))
+            cdp = connect(driver)
             interceptor = RedirectInterceptor(cdp, approved_hosts, origin_url)
             interceptor.start()
-        except Exception:  # noqa: BLE001 - CDP unavailable: fail closed to redirect:'error'
+            interceptor.heartbeat()  # ISS-REGCDP-003: never enable 'follow' on a socket that is not answering now
+        except Exception as error:  # noqa: BLE001 - CDP unavailable: fail closed to redirect:'error'
+            why = str(error)[:80] or type(error).__name__
             if cdp is not None:
                 try:
                     cdp.close()
@@ -227,9 +245,10 @@ def submit_with_redirects(sb, script, instructions, approved_hosts, origin_url, 
                     pass
             interceptor = None
     if interceptor is None:
-        return sb.execute_async_script(script, instructions, "submit")
+        result = driver.execute_async_script(script, instructions, "submit")
+        return _note_inactive(result, why) if why is not None else result
     try:
-        result = sb.execute_async_script(script, dict(instructions, redirectMode="follow"), "submit")
+        result = driver.execute_async_script(script, dict(instructions, redirectMode="follow"), "submit")
     except Exception:
         interceptor.stop()
         raise
@@ -310,12 +329,16 @@ def connect_page_cdp(driver):
     import urllib.request
     import websocket  # pinned websocket-client (requirements.txt)
     address = driver.capabilities.get("goog:chromeOptions", {}).get("debuggerAddress", "")
-    if not isinstance(address, str) or not re.fullmatch(r"127\.0\.0\.1:[0-9]{1,5}", address):
+    found = LOOPBACK_ADDRESS.fullmatch(address) if isinstance(address, str) else None
+    if not found or not 0 < int(found.group(2)) < 65536:
         raise RuntimeError("debugger endpoint refused")
+    # Chrome listens on the numeric loopback; connect to the literal so a name ("localhost") is never resolved.
+    host = {"localhost": "127.0.0.1"}.get(found.group(1), found.group(1))
+    address = host + ":" + found.group(2)
     target = driver.current_window_handle.removeprefix("CDwindow-")
     if not re.fullmatch(r"[A-Fa-f0-9]{32}", target):
         raise RuntimeError("page target refused")
     connection = websocket.create_connection("ws://" + address + "/devtools/page/" + target, timeout=5,
-                                             suppress_origin=True, http_no_proxy=["127.0.0.1"], redirect_limit=0)
+                                             suppress_origin=True, http_no_proxy=[host], redirect_limit=0)
     connection.settimeout(None)
     return PageCdp(connection)

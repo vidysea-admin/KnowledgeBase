@@ -21,8 +21,9 @@ LOCAL_POST = "http://127.0.0.1:50700/submit"
 
 
 class FakeCDP:
-    def __init__(self, fail_enable=False):
+    def __init__(self, fail_enable=False, fail_ping=False):
         self.sent, self.handler, self._alive, self.fail_enable, self.closed = [], None, True, fail_enable, False
+        self.fail_ping = fail_ping
 
     def set_handler(self, fn):
         self.handler = fn
@@ -30,6 +31,8 @@ class FakeCDP:
     def send(self, method, params=None):
         if method == "Fetch.enable" and self.fail_enable:
             raise RuntimeError("no CDP")
+        if method == "Browser.getVersion" and self.fail_ping:
+            raise RuntimeError("CDP Browser.getVersion unanswered")
         self.sent.append((method, params))
         return {}
 
@@ -334,7 +337,8 @@ def test_cdp_unavailable_falls_back_to_redirect_error(failure):
         return made[0]
     sb = CdpSB({"server": {"/submit": {"code": 302, "location": "http://127.0.0.1:50700/thanks"}}}, [])
     result = sb_join.register_form(sb, INSTRUCTIONS, script_isolated=True, policy_check=lambda: True, cdp_connect=connect)
-    assert result == {"status": "uncertain", "reason": "submission_not_confirmed"}
+    assert {k: result[k] for k in ("status", "reason")} == {"status": "uncertain", "reason": "submission_not_confirmed"}
+    assert result["cdp"] == "inactive"  # cycle 1: the fallback is announced, the verdict itself is unchanged
     assert sb.submit_runs[0]["posts"][0]["redirect"] == "error"
     assert all(c.closed for c in made)
 
@@ -379,3 +383,96 @@ def test_page_cdp_round_trip_and_event_dispatch():
     assert sorted(m["method"] for m in ws.sent) == ["Fetch.continueRequest", "Fetch.enable"]
     cdp.close()
     assert not cdp.alive()
+
+
+# --- cycle 1: loopback debugger addresses, loud fallback, heartbeat ------------------------------
+TARGET = "A" * 32
+
+
+class _Driver:
+    def __init__(self, address):
+        self.capabilities = {"goog:chromeOptions": {"debuggerAddress": address}}
+        self.current_window_handle = "CDwindow-" + TARGET
+
+
+def _connect(monkeypatch, address):
+    import websocket
+    seen = {}
+
+    class Conn:
+        def settimeout(self, _v): pass
+        def recv(self): threading.Event().wait(0.05); raise OSError("closed")
+        def close(self): pass
+
+    def create(url, **kwargs):
+        seen["url"], seen["kwargs"] = url, kwargs
+        return Conn()
+    monkeypatch.setattr(websocket, "create_connection", create)
+    cdp = rc.connect_page_cdp(_Driver(address))
+    cdp.close()
+    return seen
+
+
+@pytest.mark.parametrize("address,url_host", [("127.0.0.1:9222", "127.0.0.1:9222"), ("localhost:9222", "127.0.0.1:9222"),
+                                              ("[::1]:9222", "[::1]:9222")])
+def test_loopback_debugger_addresses_are_accepted(monkeypatch, address, url_host):
+    seen = _connect(monkeypatch, address)
+    assert seen["url"] == "ws://" + url_host + "/devtools/page/" + TARGET  # 'localhost' is never resolved
+    assert seen["kwargs"]["http_no_proxy"] == [url_host.rsplit(":", 1)[0]]
+
+
+@pytest.mark.parametrize("address", ["", None, 5, "localhost", "127.0.0.1", ":9222", "127.0.0.1:", "127.0.0.1:0", "localhost:65536",
+                                     "127.0.0.1:123456", "LOCALHOST:9222", "localhost.:9222", "localhost.evil.test:9222",
+                                     "evil.test:9222", "127.0.0.2:9222", "127.1:9222", "0.0.0.0:9222", "[::2]:9222", "[::1]",
+                                     "::1:9222", "[::ffff:127.0.0.1]:9222", "10.0.0.5:9222", "user@127.0.0.1:9222",
+                                     "127.0.0.1:9222/x", " 127.0.0.1:9222", "127.0.0.1:9222\n", "localhost:9222@evil.test",
+                                     "evil.test#localhost:9222", "http://localhost:9222", "127.0.0.1:92a2", "localhost:١"])
+def test_non_loopback_or_malformed_debugger_addresses_are_refused(monkeypatch, address):
+    with pytest.raises(RuntimeError, match="debugger endpoint refused"):
+        _connect(monkeypatch, address)
+
+
+def test_heartbeat_failure_keeps_redirect_error_and_says_cdp_is_inactive(capsys):
+    made = []
+
+    def connect(_driver):
+        made.append(FakeCDP(fail_ping=True))
+        return made[0]
+    sb = CdpSB({"server": {"/submit": {"code": 302, "location": "/thanks"}}}, [])
+    result = sb_join.register_form(sb, INSTRUCTIONS, script_isolated=True, policy_check=lambda: True, cdp_connect=connect)
+    assert sb.submit_runs[0]["posts"][0]["redirect"] == "error" and made[0].closed
+    assert result["cdp"] == "inactive" and "heartbeat" in result["cdp_reason"] or "Browser.getVersion" in result["cdp_reason"]
+    assert "registration-cdp inactive" in capsys.readouterr().err
+
+
+def test_dead_socket_at_submit_time_is_not_followed():
+    cdp = FakeCDP()
+    cdp._alive = False
+    icp = rc.RedirectInterceptor(cdp, APPROVED, ORIGIN)
+    icp.started = True
+    with pytest.raises(RuntimeError, match="heartbeat"):
+        icp.heartbeat()
+
+
+def test_healthy_socket_pings_before_the_submit_and_activates_follow():
+    result, sb, box = register_cdp({"server": {"/submit": {"code": 302, "location": "/thanks"}}})
+    assert result["status"] == "submitted" and "cdp" not in result
+    assert [m for m, _ in box[0].sent].index("Browser.getVersion") > [m for m, _ in box[0].sent].index("Fetch.enable")
+    assert sb.submit_runs[0]["posts"][0]["redirect"] == "follow"
+
+
+@pytest.mark.parametrize("failure", ["enable", "connect"])
+def test_fallback_is_loud_when_cdp_cannot_start(failure, capsys):
+    def connect(_driver):
+        if failure == "connect":
+            raise RuntimeError("debugger endpoint refused")
+        return FakeCDP(fail_enable=True)
+    sb = CdpSB({"server": {"/submit": {"code": 302, "location": "/thanks"}}}, [])
+    result = sb_join.register_form(sb, INSTRUCTIONS, script_isolated=True, policy_check=lambda: True, cdp_connect=connect)
+    assert result["cdp"] == "inactive" and result["status"] == "uncertain"
+    assert "registration-cdp inactive" in capsys.readouterr().err
+
+
+def test_no_connector_is_not_reported_as_a_cdp_failure(capsys):
+    result, _, _ = register_cdp({}, connect=False)
+    assert "cdp" not in result and capsys.readouterr().err == ""

@@ -791,7 +791,7 @@ def register_form(sb, instructions, script_isolated=False, policy_check=None, cd
                 return {"status": "action_required", "reason": "request_policy_unproved"}
         if not callable(policy_check) or policy_check() is not True:
             return {"status": "action_required", "reason": "persistent_policy_unproved"}
-        result = sb.execute_async_script(script, instructions, "inspect")
+        result = driver.execute_async_script(script, instructions, "inspect")  # selenium driver: SB's own wrapper takes (script, timeout)
         if result.get("status") != "ready":
             return result
         installed = sb.execute_script(r"""
@@ -1119,7 +1119,8 @@ def main():
                             raise RuntimeError("Registration network isolation not acknowledged")
                     sb.driver.execute_cdp_cmd("Emulation.setScriptExecutionDisabled", {"value": True})
                     sb.driver.default_get(a.url)
-                    emit("registration-result", **register_form(sb, registration, script_isolated=True, policy_check=policy_check, cdp_connect=__import__("registration_cdp").connect_page_cdp))
+                    import registration_cdp
+                    emit("registration-result", **register_form(sb, registration, script_isolated=True, policy_check=policy_check, cdp_connect=registration_cdp.connect_page_cdp))
                     return
                 sb.uc_open_with_reconnect(a.url, 4)
                 emit("opened", url=sb.get_current_url())

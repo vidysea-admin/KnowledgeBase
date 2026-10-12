@@ -2,7 +2,7 @@
 
 Status: ready-for-check
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: owner-approved follow-up to ISS-374/ISS-373 (cost accepted "until a CDP interceptor exists"; ISS-REGSAFE-001 fix_direction). Class: security (registrant data leaving to unapproved hosts): full ceremony.
 Lane: lane/regcdp. Ledger for this lane: qa/issues.regcdp.jsonl, ids ISS-REGCDP-NNN.
 
@@ -28,3 +28,31 @@ Mutations (harness inside the worktree, untracked, deleted; per-mutation byte ba
 - If the interceptor's websocket dies mid-submit, Chrome resumes paused requests; the persistent DNR policy (allow-list of approved host/port) remains the backstop for unapproved hosts, but a 307/308 to a different APPROVED host could then be followed. The verdict downgrades such a run to `uncertain`, but the second POST would already have gone. See ISS-REGCDP-002.
 - Final status is read from CDP (the fetch response is opaque); a 2xx page that is itself an error page is still only `awaiting_confirmation`, as before.
 - `test_sb_join_iframe.py` and `test_sb_join_ownership.py` (launch Chrome) not run; full suite not run.
+
+
+## Cycle 1 (fix cycle 1; cycle-0 text above is kept as history)
+Inputs: checker PASS-offline 0999ff8; real-Chrome evidence 5887813 (qa/evidence/regcdp-real-chrome-2026-10-12/summary.md). Ledger: ISS-REGCDP-001/-002/-003 NOT changed here.
+
+### Changes (packages/meeting-bot/py only)
+1. Loopback debugger address (ISS-REGCDP-001 real-Chrome finding). `registration_cdp.connect_page_cdp` now accepts exactly `127.0.0.1:P`, `localhost:P`, `[::1]:P` (fullmatch, case-sensitive, port 1-65535) and nothing else. `localhost` is connected as the literal `127.0.0.1` (a name is never resolved). uc_driver reports `localhost:<port>`; verified in real Chrome with NO shim.
+2. Loud fallback. If a connector is supplied but CDP cannot be used (connect, `Fetch.enable` or heartbeat failure) `submit_with_redirects` prints `registration-cdp inactive (<why>): redirect:'error' fallback in use` to stderr and adds `cdp: "inactive"`, `cdp_reason` to a dict result (the TS joiner whitelists status/reason, so verdicts are unchanged). `cdp_connect=None` stays silent.
+3. ISS-REGCDP-003 mitigation (no policy choice): `RedirectInterceptor.heartbeat()` (a `Browser.getVersion` round trip plus alive flag) runs immediately before the submit; if the socket is not answering, 'follow' is never enabled and the old `redirect:'error'` submit runs (1 POST, cannot follow). RESIDUAL (owner decision, unchanged): a socket that dies after the heartbeat while a 307/308 is paused makes Chrome follow it; DNR still blocks unapproved hosts, but a POST re-send to ANOTHER APPROVED host (not the same host) goes out and the verdict is only downgraded to `uncertain`. Real Chrome d1 reproduces it (2 POSTs: 127.0.0.1:P/submit then localhost:P/final); d2 with strict DNR shows 1 POST. Options remain as filed: keep `redirect:'error'` when more than one approved host, or accept DNR as backstop.
+4. PRE-EXISTING defect found and fixed (not caused by this lane, present at base e4d6f140): `register_form` called `sb.execute_async_script(script, instructions, action)`, but SeleniumBase 4.51.9 `BaseCase.execute_async_script(script, timeout)` takes 2 args (TypeError -> `browser_failure`), so production registration through the real SB could never reach the inspect/submit step. Now both calls go through `driver = getattr(sb, "driver", sb)` (the selenium driver). 1 changed line in sb_join.py, 1 in registration_cdp.py. This also explains why csp_exact_origin (6) and native confinement (7) failed at base: confirmed by running them against e4d6f140 sources (13 failed there).
+5. sb_join.py net change this cycle: `import registration_cdp` line before the emit (replaces an inline `__import__`) and the `driver.execute_async_script` inspect line.
+
+### Test changes (each justified; none weakens an ownership/cleanup assertion)
+- ownership `registered` fake: gains `cdp_connect=None` (main() now passes it) and ADDS `assert cdp_connect is registration_cdp.connect_page_cdp` (stronger).
+- ownership confinement needle: exact source text updated to the new call (built from one `call` string shared by the needle and the instrumented replacement); copies `registration_cdp.py` next to the copied `sb_join.py` because the copied main imports it.
+- ownership `positive-alias` (307 to the second approved host): expected `[/submit]` and `uncertain/submission_not_confirmed` instead of two POSTs with `[auth, None]` cookies. This is the documented T-052 rule (307/308 re-send the body only to the same host) and matches the iframe test's `paths = ["/submit"]`; it never passed at base (the whole case failed on the TypeError above). Zero foreign requests and cookie checks are unchanged.
+- ownership `csp_exact_origin` fake: now provides the async executor and an operator/target/values result so register_form can reach `submitted` (was missing since the executor change); the policy assertion is unchanged.
+- test_registration_cdp.py: FakeCDP gains `fail_ping`; the existing fallback test now also asserts `cdp == "inactive"` (verdict fields unchanged); NEW tests: loopback accept (3 forms, URL literal check) and 30 refusal spellings, heartbeat failure keeps `redirect:'error'` and is loud, dead socket, healthy ping before follow, loud on connect/enable failure, silent when no connector.
+
+### Evidence (repo .venv python, `-p no:cacheprovider`, from packages/meeting-bot/py)
+- test_registration_cdp.py: 170 passed. test_sb_join_registration_redirect.py: 15 passed. test_sb_join.py + test_sb_join_profile.py: 49 passed.
+- REAL CHROME (cft headless, hei-sweep not running, localhost fixtures, 0 chrome/chromedriver processes before and after): test_sb_join_ownership.py + test_sb_join_iframe.py: 66 passed (ownership 52 + iframe 14; was 33/19 failed).
+- Cases a-d re-run with the production-style `localhost:<port>` address and the production connector, NO shim (throwaway script, scratchpad, deleted; uc_driver reported `localhost:55738`): a1 302 same host followed, `submitted`, POST+GET /final. a3 307 same host followed (2 POSTs same host), `submitted`. b1 302->localhost with only 127.0.0.1 approved: refused, 1 POST, `uncertain`. b2 302->unapproved port: refused, 1 POST. c1 307->approved localhost: refused, exactly 1 POST. d0 socket dead before submit: heartbeat fails, loud `cdp inactive` line and `cdp: inactive`, redirect:'error', 1 POST. d1 (residual) socket killed while the 307 is paused with DNR allowing both: Chrome followed, 2 POSTs (second to localhost), verdict `uncertain`. d2 same with strict DNR: 1 POST.
+- Mutations (harness regcdp-c1 inside the worktree, untracked and deleted; byte backup restored in finally, sha256 verified): KILLED 10: drop localhost, drop [::1], any-host regex, prefix match instead of fullmatch, unchecked port range, connect by name, heartbeat call removed, heartbeat without ping, silent fallback, note not attached. One mutation not run (needle matched twice; equivalent since PageCdp.send already raises on a dead socket).
+
+### NOT covered
+- The residual in item 3. Production SeleniumBase launch (as opposed to webdriver.Chrome + uc_driver) was not driven end to end; both report through `driver.capabilities`.
+- ISS-REGSAFE-002 and the medium issues are untouched.

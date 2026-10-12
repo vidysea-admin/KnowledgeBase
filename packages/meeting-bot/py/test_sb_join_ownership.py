@@ -182,8 +182,9 @@ def test_registration_main_disables_scripts_before_same_target_navigation(monkey
     def fake_sb(**kwargs):
         assert kwargs["extension_dir"] == extension
         yield SimpleNamespace(driver=driver)
-    def registered(_sb, instructions, script_isolated=False, policy_check=None):
-        assert _sb.driver is driver and script_isolated is True
+    def registered(_sb, instructions, script_isolated=False, policy_check=None, cdp_connect=None):
+        import registration_cdp  # T-052: main() now also hands register_form the CDP connector
+        assert _sb.driver is driver and script_isolated is True and cdp_connect is registration_cdp.connect_page_cdp
         assert callable(policy_check) and policy_check() is True
         calls.append(("submitted", instructions["url"]))
         return {"status": "submitted", "reason": "awaiting_confirmation"}
@@ -266,16 +267,18 @@ def test_registration_native_same_host_other_port_confinement(tmp_path, case):
     for server in (approved, foreign_server): threading.Thread(target=server.serve_forever, daemon=True).start()
     # Observe values after the real helper, without replacing policy, transport or submission.
     source = pathlib.Path(sb_join.__file__).read_text(encoding="utf-8")
-    needle = 'emit("registration-result", **register_form(sb, registration, script_isolated=True, policy_check=policy_check))'
+    call = 'register_form(sb, registration, script_isolated=True, policy_check=policy_check, cdp_connect=registration_cdp.connect_page_cdp)'  # T-052: new seam
+    needle = 'emit("registration-result", **' + call + ')'
     assert source.count(needle) == 1
     observer = "return Array.from(document.querySelectorAll('#first,#last,#email'), element => element.value)"
-    instrumented = source.replace(needle, 'result = register_form(sb, registration, script_isolated=True, policy_check=policy_check)\n                    emit("registration-result", **result)\n                    emit("fixture-values", values=sb.driver.execute_script(' + json.dumps(observer) + '))')
+    instrumented = source.replace(needle, 'result = ' + call + '\n                    emit("registration-result", **result)\n                    emit("fixture-values", values=sb.driver.execute_script(' + json.dumps(observer) + '))')
     compile(instrumented, "fixture-main", "exec")
     expected_values = {"first": ["Fixture"], "last": ["Operator"], "email": ["fixture@example.test"], "csrf": ["token"]}
     try:
         mode[0] = case; posts.clear(); foreign.clear(); cookies.clear()
         root = tmp_path / case; root.mkdir(); program = root / "sb_join.py"; program.write_text(instrumented, encoding="utf-8")
         shutil.copytree(pathlib.Path(sb_join.__file__).parent / "tab-capture", root / "tab-capture")
+        shutil.copy(pathlib.Path(sb_join.__file__).parent / "registration_cdp.py", root / "registration_cdp.py")  # the copied main imports it
         profile = str((root / "profile").resolve()); stop = str((root / "stop").resolve())
         instructions = {"url": f"http://127.0.0.1:{approved.server_port}/register", "localFixture": True,
             "allowedHosts": ["127.0.0.1", "localhost"] if case == "positive-alias" else ["127.0.0.1"],
@@ -295,9 +298,11 @@ def test_registration_native_same_host_other_port_confinement(tmp_path, case):
                 assert outcome["status"] == "action_required" and outcome["reason"] == "redirect_host"
             else:
                 assert outcome["status"] in ("submitted", "uncertain")
-                paths = ["/submit", "/redirected"] if case == "positive-alias" else ["/submit"]
+                # T-052: a 307/308 re-sends the body, so even to another APPROVED host it is refused (one POST only).
+                paths = ["/submit"]
+                if case == "positive-alias": assert outcome == {**outcome, "status": "uncertain", "reason": "submission_not_confirmed"}
                 assert posts == [{"path": path, "values": expected_values} for path in paths]
-                assert cookies == (["auth=fixture", None] if case == "positive-alias" else ["auth=fixture"] * len(paths))
+                assert cookies == ["auth=fixture"] * len(paths)
         finally:
             # The parent exited before independent cleanup. Only this fixture's exact Job/profile is eligible.
             # Verify identity, exercise strict owned cleanup, then prove recorded browser death.
@@ -338,7 +343,11 @@ def test_registration_csp_exact_origin(url):
         if len(arguments) == 1:
             policies.append(arguments[0]); return True
         return {"status": "ready" if arguments[-1] == "inspect" else "submitted", "reason": "fixture"}
-    browser = SimpleNamespace(execute_script=execute, execute_cdp_cmd=lambda *_args: {})
-    instructions = {"url": url, "allowedHosts": hosts, "localFixture": parsed.scheme == "http"}
+    operator = {"firstName": "Fixture", "lastName": "Operator", "email": "fixture@example.test"}
+    def execute_async(_script, instructions, action):  # the selenium driver's async executor (what register_form calls)
+        if action == "inspect": return {"status": "ready"}
+        return {"status": "submitted", "reason": "awaiting_confirmation", "target": url, "body": "email=fixture%40example.test", "values": operator}
+    browser = SimpleNamespace(execute_script=execute, execute_async_script=execute_async, execute_cdp_cmd=lambda *_args: {})
+    instructions = {"url": url, "allowedHosts": hosts, "localFixture": parsed.scheme == "http", "operator": operator}
     assert sb_join.register_form(browser, instructions, script_isolated=True, policy_check=lambda: True)["status"] == "submitted"
     assert policies == ["form-action " + " ".join(f"{parsed.scheme}://{host}:{port}" for host in hosts)]
