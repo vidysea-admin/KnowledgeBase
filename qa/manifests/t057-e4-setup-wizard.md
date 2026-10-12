@@ -1,6 +1,6 @@
 # Manifest — t057-e4-setup-wizard
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS (cycle 0)
 **Fix cycle:** 0
 **Goal task:** T-057 feature E4 "Setup wizard" (docs/PROGRESS.md; /status is the "check" half). Tier 3 pull. T-057 stays open.
 **Lane:** SETUPWIZARD (`qa/issues.setupwizard.jsonl`: ISS-SETUPWIZARD-001 and -002 medium, -003 low, all filed, none fixed here).

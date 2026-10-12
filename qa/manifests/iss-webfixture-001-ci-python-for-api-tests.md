@@ -1,6 +1,6 @@
 # Manifest: iss-webfixture-001-ci-python-for-api-tests
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS (cycle 0)
 **Fix cycle:** 0
 **Lane:** cipython
 **Issue:** ISS-WEBFIXTURE-001 (qa/issues.webfixture.jsonl)
