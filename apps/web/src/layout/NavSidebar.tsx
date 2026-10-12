@@ -39,6 +39,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/claims", label: "Claims", icon: <DocsIcon /> },
   { to: "/status", label: "System status", icon: <SettingsIcon /> },
   { to: "/ops-health", label: "Operations health", icon: <SettingsIcon /> },
+  { to: "/notifications", label: "Notifications", icon: <SettingsIcon /> },
 ];
 
 export function NavSidebar(): React.ReactElement {

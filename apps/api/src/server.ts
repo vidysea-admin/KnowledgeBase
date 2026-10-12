@@ -34,6 +34,7 @@ import { createJobsRouter, type JobsReadDeps } from "./jobs/router.js";
 import { unavailableJobsReadDeps } from "./jobs/fixture-store.js";
 import { createActivityHealthRouter, unavailableActivityHealthDeps } from "./activity-health/router.js";
 import type { ActivityHealthDeps } from "./activity-health/types.js";
+import { createNotificationsRouter } from "./activity-health/notifications.js";
 import { createWatchRunsRouter, unavailableWatchRunsDeps, type WatchRunsDeps } from "./activity-health/watch-runs.js";
 import { logger as defaultLogger, type Logger } from "./composition/logger.js";
 import { requestLogger } from "./composition/request-log.js";
@@ -99,6 +100,9 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createJobsRouter(deps.jobs ?? unavailableJobsReadDeps));
   app.use(createActivityHealthRouter(deps.activityHealth ?? unavailableActivityHealthDeps));
   app.use(createWatchRunsRouter(deps.watchRuns ?? unavailableWatchRunsDeps));
+  // T-057 D5: read-only aggregation of the three sources above; no store of its own.
+  app.use(createNotificationsRouter({ activityHealth: deps.activityHealth ?? unavailableActivityHealthDeps,
+    jobs: deps.jobs ?? unavailableJobsReadDeps, watchRuns: deps.watchRuns ?? unavailableWatchRunsDeps }));
   app.use(createWatchedSourcesRouter(deps.watchedSources));
   app.use(createCitationsRouter(deps.citations));
   app.use(createClaimsListRouter(deps.claims ?? unavailableClaimsListDeps));
