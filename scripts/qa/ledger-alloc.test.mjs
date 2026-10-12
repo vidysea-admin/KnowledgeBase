@@ -3,7 +3,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync, utimesSync, readdirSync } from "node:fs";
+import { openSync, mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync, utimesSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -207,6 +207,53 @@ test("lock: a fresh lock held by someone else times out with a clear message and
     const held = acquireLock(root);
     assert.throws(() => acquireLock(root, { waitMs: 150 }), /still held by someone else after 150ms/);
     assert.ok(existsSync(held));
+  } finally { done(root); }
+});
+
+const enoent = () => Object.assign(new Error("ENOENT: no such file"), { code: "ENOENT" });
+const errno = (code) => Object.assign(new Error(`${code}: simulated`), { code });
+
+for (const code of ["EPERM", "EACCES", "EBUSY"]) {
+  test(`lock: ISS-ALLOC-005 transient ${code} on create with the lock already gone is contention, not a permission error`, () => {
+    const root = fixture({ "issues.jsonl": [mk("ISS-1")] });
+    try {
+      let n = 0;
+      const open = (p, f) => { if (n++ < 3) throw errno(code); return openSync(p, f); };
+      const lock = acquireLock(root, { io: { open, stat: () => { throw enoent(); } } });
+      assert.equal(n, 4); assert.ok(existsSync(lock)); rmSync(lock);
+    } finally { done(root); }
+  });
+}
+
+test("lock: ISS-ALLOC-005 EPERM that persists with no lock file ever seen is still reported as a permission problem", () => {
+  const root = fixture({ "issues.jsonl": [mk("ISS-1")] });
+  try {
+    let n = 0;
+    const t0 = Date.now();
+    assert.throws(() => acquireLock(root, { io: { open: () => { n++; throw errno("EPERM"); }, stat: () => { throw enoent(); } } }),
+      /cannot create ledger lock.*EPERM.*not contention/s);
+    assert.equal(n, 6, "bounded retries"); assert.ok(Date.now() - t0 < 2000);
+  } finally { done(root); }
+});
+
+test("lock: ISS-ALLOC-005 EPERM while the lock is present but unstat-able, then clears, is contention; never-clearing times out", () => {
+  const root = fixture({ "issues.jsonl": [mk("ISS-1")] });
+  try {
+    let n = 0;
+    const open = (p, f) => { if (n++ < 4) throw errno("EPERM"); return openSync(p, f); };
+    const lock = acquireLock(root, { io: { open, stat: () => { throw errno("EPERM"); } } });
+    assert.equal(n, 5); rmSync(lock);
+    assert.throws(() => acquireLock(root, { waitMs: 150, io: { open: () => { throw errno("EPERM"); }, stat: () => { throw errno("EPERM"); } } }),
+      /still contended after 150ms/);
+  } finally { done(root); }
+});
+
+test("lock: ISS-ALLOC-005 non-permission create errors (ENOSPC) still fail at once", () => {
+  const root = fixture({ "issues.jsonl": [mk("ISS-1")] });
+  try {
+    let n = 0;
+    assert.throws(() => acquireLock(root, { io: { open: () => { n++; throw errno("ENOSPC"); } } }), /cannot create ledger lock.*ENOSPC/s);
+    assert.equal(n, 1);
   } finally { done(root); }
 });
 
