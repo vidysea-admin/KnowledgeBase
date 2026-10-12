@@ -1956,3 +1956,11 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** Record only; no code or enforcement path changed. No partial-supersession syntax exists in append_decision.ps1 or the resolver, and a later entry cannot un-supersede, so the computed index may still print D-060 as SUPERSEDED (by D-129); readers must apply this entry: D-060 is ACTIVE except the one amended assertion. Adding an amends relation to the resolver would be an enforcement-path change needing its own Approved-by entry.
 **Approved-by:** Umesh (ruling 2026-10-12 "Amend + live check allow", which authorised only the single D-060 webinar-policy tombstone assertion amendment and one read-only live Google Calendar check)
 **Links:** D-060; D-129; T-051; T-036; ISS-TOMBSTONE-008
+
+## D-131 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 speaker model: Ollama Cloud via Umesh's paid Ollama API key instead of local qwen3:8b. Umesh ruled in-session 2026-10-12, verbatim: "ollama paid api key and we can use more advance model too . via api key. thik hai . tere paas hai naa ye key C:\Users\product\Desktop\KnowledgeBase\.env". Speaker naming (U2.4) may use an Ollama Cloud model (POST https://ollama.com/api/chat, bearer key read from .env) and a more capable model than qwen3:8b is acceptable. Transcript windows may be sent to ollama.com for this gate measurement.
+**Why:** qwen3:8b is not installed locally and is not offered on Ollama Cloud; D-127 ruled out downloading models and allowed an API model. Umesh has a paid Ollama key, so a more capable cloud model is available at known cost.
+**Result:** The gate's five bars, prompts, windows, 2-of-3 voting and scoring are UNCHANGED. Production config/ai-routing.yaml speakers routing is switched ONLY after a model passes the gate, in a separate unit. Results are recorded as measured on the named cloud model. A checker, not the runner, rules on ISS-104 / ISS-282. D-127 stays as history (no Supersedes field).
+**Approved-by:** Umesh
+**Links:** U2.4; ISS-104; ISS-282; D-127
