@@ -274,7 +274,8 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
   // ISS-ALERTID-001/-007 (D-134): remember skipped sessions (key + start + source only) so `lkb alert-who` can resolve their alert ids.
   try {
     recordSkipped(deps.stateDir, stateTenant, result.skipped, now, (s) =>
-      s.source === "calendar" ? calendarEvents.find((e) => e.id === s.sourceId)?.startTime : candidates.find((c) => c.id === s.sourceId)?.startTime);
+      s.source === "calendar" ? calendarEvents.find((e) => e.id === s.sourceId)?.startTime : candidates.find((c) => c.id === s.sourceId)?.startTime,
+      { onQuarantine: (name) => deps.log(`  WARNING: skipped-sessions.json was corrupt; moved aside as ${name} (history in it is NOT merged back; inspect it)`) });
   } catch (err) { deps.log(`  could not record skipped sessions: ${err instanceof Error ? err.message : String(err)}`); }
 
   for (const item of result.toSchedule) {
