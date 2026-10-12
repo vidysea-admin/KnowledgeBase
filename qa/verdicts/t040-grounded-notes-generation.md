@@ -67,3 +67,37 @@ Cause of the FAIL: every `.` followed by whitespace is a sentence break in `sent
 **Mutations** (own harness in the worktree, per-mutation backup restored in `finally`, 120 s kill, `git hash-object` == HEAD after each, folder deleted): remove `n't` branch KILLED; clause marks treated as sentence-only marks KILLED; curly branch (`n’t` to `n't`) SURVIVED (correct code, unpinned; ISS-T040GEN-007).
 
 ISSUES-WRITTEN: ISS-T040GEN-006 (high, abbreviation bypass, 5 reproductions), ISS-T040GEN-007 (medium). ISS-T040GEN-002 left open.
+
+---
+
+# Cycle 2
+
+VERDICT: FAIL
+Cycle checked: 2
+Commit checked: ff696ba (lane/t040gen)
+
+## EXPLANATION
+
+The cycle-1 bypasses are closed, but the fix is a list: an abbreviation that is not in the 70-word list still breaks the sentence before a capital word, so the same reversal ships through common Indian-education English ("Pvt.", "Univ."). ISS-T040GEN-006's class is not closed; -002, -006 stay open. -007 (a)(b)(c) are fixed and pinned.
+
+**Replay.** All 5 cycle-1 abbreviation cases (e.g., U.S., vs., approx., Dr.): only the whole sentence (negation included) ships; the negation-dropping tail is refused. "Dr. Rao does not recommend" still passes whole. "Apply in March? Absolutely not." now refuses the question alone (negated-by-reply). Curly n’t covered.
+
+**New-bypass table** (every word-aligned quote enumerated; "ships" = the negation-dropping quote returns null):
+
+| Case | Result |
+|---|---|
+| Govt. / Corp. / Inc. / a.k.a. / "approx" without dot / Mr. Not Sure / B.Tech. / M.Sc. / p.m. / Jan. Mar. Sat. Oct. / etc. | refused (whole sentence only) |
+| ellipsis "..." and "…", "apply...April", newline in the turn, (not March), "not March" in quotes, "3.5 not 4", ")." and quote-then-period edges | refused |
+| Hinglish nahi before Dr./approx.; nahi + danda; fullwidth "。"; emoji | refused (negation kept or merged) |
+| "Don't apply. Don't forget April..." | ships only the part that carries its own negation |
+| **"We do not accept Pvt. Colleges applications after March first." quote "Colleges applications after March first."** | **SHIPS** (also Univ., Asst., Ave., Pkwy., "Q1.") -> ISS-T040GEN-008 high |
+| "Apply in March. Wrong." / Incorrect. / I disagree. / Bad idea. / That is false. quote "Apply in March." | ships (lexical reply list) -> ISS-T040GEN-009 medium |
+| "Apply in March. Never./Nope./Not at all./No way./Don’t./Nahin." | refused |
+
+**Recall (independent splitter on data/toc-migrated, 3427 turns, 12+ chars).** Whole sentence 14 859/15 565 = 95.5% (maker 97.1%; refusals: omits-qualifier 288, starts-mid 185, ends-mid 149, negated-by-reply 84); clause 24 989/34 064 = 73.4% (maker 73.5%). Same order; splitters differ. Corpus shows no unlisted-abbreviation + capital case, so 008 is a gap in the design, not a measured loss.
+
+**Suites.** grounded-notes 23/23; all packages/index pipeline tests 418/418; `tsc --noEmit` index exit 0 (api 3/3 not re-run: unchanged by this commit). No LLM/Mongo/network.
+
+**Mutations** (own harness in the worktree, per-mutation backup, `git hash-object` == HEAD after each, folder deleted, trees clean): break after any abbreviation KILLED (2 failures); disable negated-by-reply KILLED (1); drop the `u` flag from MARKER KILLED (2).
+
+ISSUES-WRITTEN: ISS-T040GEN-008 (high), ISS-T040GEN-009 (medium). ISS-T040GEN-002, -006, -007 left open (006 remains open for the unlisted-abbreviation class; 007 is functionally fixed and could be verified with the next PASS).
