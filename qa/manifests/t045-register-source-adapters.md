@@ -1,6 +1,6 @@
 # t045-register-source-adapters
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (next unblocked roadmap task T-045, "More sources"). Class: ingest routing plus subprocess arguments built from user-supplied URLs: full ceremony.
 Lane: lane/sourcesreg. Lane ledger `qa/issues.sourcesreg.jsonl`: ISS-SOURCESREG-001 (medium), ISS-SOURCESREG-002 (low), both file-don't-fix.
