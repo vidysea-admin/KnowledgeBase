@@ -1,6 +1,6 @@
 # iss-t039cmd-001-002-send-now-duplicate-launches
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS (cycle 2)
 Fix cycle: 2
 Tier: 3-adjacent (T-039 completion; open medium issues ISS-T039CMD-001 and ISS-T039CMD-002). Class: data write (new state file) + the guard against a second browser join: FULL ceremony. Verdict by the checker only.
 Lane: lane/t039dupes. Ledger shard `qa/issues.t039dupes.jsonl` (ISS-T039DUPES-001..003). Ledger rows ISS-T039CMD-001/-002 status NOT changed here.

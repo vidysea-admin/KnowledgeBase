@@ -1,6 +1,6 @@
 # calendar-unknown-tombstone-non-interference
 
-Status: ready-for-check
+Status: checked-PASS
 **Handshake status:** checked-PASS (cycle 2)
 Fix cycle: 2
 Priority tier: 2 - open HIGH ledger issue ISS-T036CAL-011 (pre-existing, found by the t036 checker, cycle 3)
