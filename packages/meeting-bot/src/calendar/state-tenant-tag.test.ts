@@ -14,6 +14,7 @@ import {
 } from "./schedule-state.js";
 import { runScheduleTickOnce, type ScheduleTickDeps } from "./schedule-tick.js";
 import { StateTenantRefusal, assertTenantTag, requireStateTenant } from "./state-tenant-tag.js";
+import { readSkippedRecords, recordSkipped, skippedStateFilePath } from "./skipped-state.js";
 import { readLiveJobs } from "../send-now-command.js";
 import { readWebinarOperationState } from "./schedule-state.js";
 import { deriveJobKey } from "./task-scheduler.js";
@@ -146,15 +147,74 @@ test("ISS-ALERTID-006: the tick refuses when its tenant is missing/invalid, or w
       } else {
         total++; await assert.rejects(run, StateTenantRefusal); assert.deepEqual(calls, []); pass++;
       }
-      assert.deepEqual(tree(dir), before, `${setup}: nothing changed on disk`);
+      // A tick that runs to completion legitimately writes skipped-sessions.json (f9287b07, ISS-ALERTID-001/-007). It must be tagged with THIS
+      // tenant; everything else on disk is unchanged. Refusing ticks (rejects above) write nothing at all, so there it is compared whole.
+      const wrote = path.basename(skippedStateFilePath(dir));
+      const strip = (t: string[]) => t.filter((r) => !r.startsWith(`${wrote}|`));
+      if (setup === "untagged-job") {
+        assert.deepEqual(strip(tree(dir)), strip(before), `${setup}: nothing but ${wrote} changed on disk`);
+        assert.equal(JSON.parse(readFileSync(skippedStateFilePath(dir), "utf8")).tenantId, A, `${wrote} is tagged with the tick's tenant`);
+      } else assert.deepEqual(tree(dir), before, `${setup}: nothing changed on disk`);
     } finally { rmSync(dir, { recursive: true, force: true }); }
   }
-  for (const bad of [undefined, "", "../b"]) {
+});
+
+// One test per bad tenant, so a failure in one case cannot stop the others from running.
+for (const bad of [undefined, "", "../b"]) {
+  test(`ISS-ALERTID-006: the tick refuses a missing/invalid tenant (${JSON.stringify(bad)}) and writes nothing`, async () => {
     const dir = mkdtempSync(path.join(tmpdir(), "alerttenant-tick-")), calls: string[] = [];
     try {
       total++; await assert.rejects(runScheduleTickOnce(tickDeps(dir, { stateTenantId: bad as never }, calls), false), StateTenantRefusal);
       await assert.rejects(runScheduleTickOnce(tickDeps(dir, { stateTenantId: bad as never }, calls), true), StateTenantRefusal);
       assert.deepEqual(calls, []); assert.deepEqual(readdirSync(dir), []); pass++;
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+}
+
+// ----- skipped-sessions.json (added by f9287b07): the same tenant-tag discipline as schedule-state.json -----
+const SKIP = { sessionKey: "cal:skip", source: "calendar" } as never;
+const NOW = "2026-10-10T09:00:00.000Z";
+
+test("ISS-SCHEDSTATESAFE-002: skipped-sessions.json is written tagged with the tenant, and each entry carries it", () => tmp((dir) => {
+  recordSkipped(dir, A, [SKIP], NOW, () => undefined);
+  const body = JSON.parse(readFileSync(skippedStateFilePath(dir), "utf8"));
+  check("file tagged", () => assert.equal(body.tenantId, A));
+  check("entry tagged", () => assert.equal(body.entries["cal:skip"].tenantId, A));
+  assert.deepEqual(Object.keys(readSkippedRecords(dir, A)), ["cal:skip"]);
+  check("B cannot extend A", () => refused(() => recordSkipped(dir, B, [SKIP], NOW, () => undefined), /different tenant/));
+}));
+
+test("ISS-SCHEDSTATESAFE-002: skipped-sessions.json - untagged / other-tenant / bad-tenant are refused by reader and writer and left byte-identical", () => {
+  for (const [name, body] of [["untagged", { version: 1, entries: {} }], ["bare map", { "cal:skip": { sessionKey: "cal:skip" } }], ["other tenant", { version: 1, tenantId: B, entries: {} }]] as const) {
+    tmp((dir) => {
+      writeFileSync(skippedStateFilePath(dir), JSON.stringify(body));
+      const before = tree(dir);
+      check(`${name}: read`, () => refused(() => readSkippedRecords(dir, A), /no tenant tag|different tenant/));
+      check(`${name}: record`, () => refused(() => recordSkipped(dir, A, [SKIP], NOW, () => undefined), /no tenant tag|different tenant/));
+      const noLock = (t: string[]) => t.filter((r) => !r.includes(".lock"));
+      assert.deepEqual(noLock(tree(dir)), noLock(before), `${name}: file untouched`);
+    });
+  }
+  tmp((dir) => {
+    for (const bad of [undefined, null, "", "../b", "a/b"]) {
+      check(`bad tenant ${JSON.stringify(bad)}`, () => {
+        assert.throws(() => readSkippedRecords(dir, bad as never), StateTenantRefusal);
+        assert.throws(() => recordSkipped(dir, bad as never, [SKIP], NOW, () => undefined), StateTenantRefusal);
+      });
+    }
+    assert.deepEqual(readdirSync(dir), [], "nothing was created");
+  });
+});
+
+test("ISS-SCHEDSTATESAFE-002: a tick over another tenant's / untagged skipped-sessions.json logs the refusal and leaves the file byte-identical", async () => {
+  for (const [name, body] of [["untagged", { version: 1, entries: {} }], ["other tenant", { version: 1, tenantId: B, entries: {} }]] as const) {
+    const dir = mkdtempSync(path.join(tmpdir(), "alerttenant-tick-")), calls: string[] = [], logs: string[] = [];
+    try {
+      writeFileSync(skippedStateFilePath(dir), JSON.stringify(body));
+      const before = readFileSync(skippedStateFilePath(dir), "utf8");
+      await runScheduleTickOnce(tickDeps(dir, { stateTenantId: A, log: (m) => logs.push(m) }, calls), false);
+      total++; assert.ok(logs.some((l) => /could not record skipped sessions: .*(no tenant tag|different tenant)/.test(l)), `${name}: ${logs.join("\n")}`); pass++;
+      assert.equal(readFileSync(skippedStateFilePath(dir), "utf8"), before, `${name}: skipped-sessions.json untouched`);
     } finally { rmSync(dir, { recursive: true, force: true }); }
   }
 });
@@ -167,6 +227,7 @@ test("ISS-ALERTID-006: two tenants on two state dirs each tick normally; a norma
       assert.equal(calls.length, 1);
       assert.equal(JSON.parse(readFileSync(scheduleStateFilePath(dir), "utf8")).tenantId, t);
       assert.equal(JSON.parse(readFileSync(scheduledJobFilePath(dir, calls[0]!), "utf8")).tenantId, t);
+      assert.equal(JSON.parse(readFileSync(skippedStateFilePath(dir), "utf8")).tenantId, t, "skipped-sessions.json is tagged too");
     } finally { rmSync(dir, { recursive: true, force: true }); }
   }
 });
