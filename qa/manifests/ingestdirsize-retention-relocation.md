@@ -1,6 +1,6 @@
 # ingestdirsize-retention-relocation
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3-adjacent (lint-dirsize regression after t046purge merge). Class: move-only refactor, no data write/auth/tenancy. Lane: lane/ingestdirsize.
 
