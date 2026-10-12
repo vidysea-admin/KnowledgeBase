@@ -1,6 +1,6 @@
 # u22-corpus-reconciliation-report
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap U2.2 remaining gate: corpus reconciliation). Read-only reporting; no data write, auth or tenancy surface. Verdict by the checker only.
 Lane: lane/corpusreconcile. Lane ledger `qa/issues.corpusreconcile.jsonl`: ISS-CORPUSRECONCILE-001 (medium, owner decision), -002, -003 (low).
