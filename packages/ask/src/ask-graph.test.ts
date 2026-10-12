@@ -255,6 +255,7 @@ test("golden: bounded completion-budget refusal (swallowed over-budget call, the
   assert.deepEqual(neu, old);
   assert.equal(old.ok, false);
   assert.match((old as { message: string }).message, /budget exhausted/);
+  assert.deepEqual(a.calls(), ["ask.select_nodes"], "refused right after evaluate, before refine/answer spend");
   assert.deepEqual(b.writes(), a.writes());
   const w = a.writes().find((x) => (x as { kind: string }).kind === "ask.source_context_refused") as { error: string; status: string };
   assert.equal(w.status, "failed");
