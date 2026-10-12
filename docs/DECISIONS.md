@@ -2090,3 +2090,11 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** lint-dirsize budget for schema/ is 40.
 **Approved-by:** Umesh
 **Links:** U2.4; D-141; lane u24suggest
+
+## D-148 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-043 staging data: Umesh chose to rebuild real derivation provenance by running the repo's own knowledge pipeline over raw/TOC/TOC-Materials (the 23 sessions), then seed and index lkb_staging (per D-143). Integrity checks (validation.json / derivation-provenance.json guards) stay in force; no forged or bypassed provenance. Model spend cap USD 10.
+**Why:** Provenance must be real, so staging data is derived by the repo's own pipeline rather than forged or the guards bypassed.
+**Result:** Staging is rebuilt from the 23 sessions with guards on and a USD 10 model spend cap.
+**Approved-by:** Umesh
+**Links:** T-043; D-143; D-146
