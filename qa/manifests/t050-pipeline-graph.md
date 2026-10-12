@@ -1,6 +1,6 @@
 # t050-pipeline-graph
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap task T-050, slice 6: graph executor, step 2 of runner adapter -> graph -> /ask graph). T-050 stays in_progress.
 Lane: lane/t050graph (from e3fda503). Data-write class (it drives the queue and run-state through the runner): full ceremony.
