@@ -48,7 +48,7 @@ Fix: new exported `splitAdvisory()`; a G4 finding whose path is not under `qa/ma
 D-015 count: ISS-164 records 1 reproduction (G4 red on `qa/contracts/entity-promotion.md`); 1/1 replayed verbatim as the test input, plus verdict and manifest controls.
 Before and after, `node scripts/tracker-audit.mjs --gate g1,g4`: 6 gating findings before; 4 gating (all `qa/manifests/`) plus 2 advisory (`qa/verdicts/t-031-audio-watchdog.md`, `qa/verdicts/t-047-controller.md`) after.
 Test: `ISS-164 splitAdvisory ...` passes.
-Note: the gate still exits 1 on this tree because four lane MANIFESTS cite bare ISS-001/002; those are other lanes' files and are not touched.
+Note: the gate still exits 1 on this tree because four lane MANIFESTS cite bare 001/002; those are other lanes' files and are not touched.
 
 ## ISS-315 (commit b400661)
 

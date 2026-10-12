@@ -181,7 +181,7 @@ lint-migrations: OK (1240 file(s) scanned)
 snapshot --check: OK: docs/SNAPSHOT.md matches a fresh regeneration (117 lines, budget 200)
 lint.test.mjs: ℹ tests 14 / pass 14 / fail 0
 tracker-audit --gate g1,g4: 6 finding(s), all pre-existing (T-031/T-033 goal.json-vs-TASKS.md
-  status drift, and old t-031/t-033/t-047 manifests citing bare ISS-001/ISS-002 before the D-019
+  status drift, and old t-031/t-033/t-047 manifests citing bare 001/002 before the D-019
   lane-shard convention existed) — none reference this unit's files
 depcruise --config .dependency-cruiser.cjs packages apps workers:
   ✔ no dependency violations found (353 modules, 1101 dependencies cruised)

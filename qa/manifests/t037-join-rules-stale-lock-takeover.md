@@ -111,10 +111,10 @@ Invariants after every step: at most one believer; a believer's token is in the 
 | scope | orderings | violating |
 |---|---|---|
 | EXHAUSTIVE, 2 takers, aged dead lock | 27,412 complete orderings (187 distinct states) | 0 |
-| EXHAUSTIVE, 3 takers, aged dead lock (ISS-004 shape) | 1,638,018,372 (2,876 states) | 0 |
+| EXHAUSTIVE, 3 takers, aged dead lock (ISS-LOCKTAKE-004 shape) | 1,638,018,372 (2,876 states) | 0 |
 | EXHAUSTIVE, 2 takers + original holder alive and slow (late save + release), lock older than staleMs | 91,230 (264 states) | 0 |
 | SEEDED, 4 takers + 1 normal acquirer, retries, seed 20261011 | 60,000 | 0 |
-| SEEDED, ISS-004 scenario, 3 takers, lock aged 100 s, seed 20261012 | 25,000 (checker saw 35 + 27 in 12,000 on the old code) | 0 |
+| SEEDED, ISS-LOCKTAKE-004 scenario, 3 takers, lock aged 100 s, seed 20261012 | 25,000 (checker saw 35 + 27 in 12,000 on the old code) | 0 |
 | SEEDED, live holder + 3 takers, seed 20261013 | 25,000 | 0 |
 | SEEDED, a taker dies at a random point before it holds, seed 20261014 | 20,000 | 0 |
 | REAL FILES, one taker paused at each of 13 steps x 3 roles, others run to the end | 39 directed plans + 400 seeded (seed 20261018) | 0 |
@@ -124,7 +124,7 @@ Residuals MEASURED, not asserted (printed by tests): probe lies about a live hol
 
 ## D-015: the ledger's own reproductions, re-run
 - **ISS-LOCKTAKE-004: 4/5, one left open and named.** (1) mtime of the claim: the claim's mtime is its own while the lock is backdated 1 h, and its body carries the claimant's time (guard "claimant's own"): pass. (2) Directed 3-contender plan: pass (real files, plus exhaustive). (3) Random bursty, 3 takers, lock aged 100 s: 25,000 seeded and 1.6e9 exhaustive: 0 violating (old code: 35/12,000). (4) Control, lock not older than staleMs: never taken (age tests): pass. (5) Operator deleting the dead lock mid-takeover: NOT closed (ISS-LOCKTAKE-007).
-- **ISS-LOCKTAKE-003: 2/2.** (a) ownership check -> data rename with a takeover in between: write refused, nothing written ("a holder wrongly judged dead wakes ..."). (b) release restore gap: releasing a foreign lock performs one read and nothing else; no live lock is destroyed in any ordering of the live-holder runs. (The row's residual, owns()->rename with a lying probe, is ISS-005.)
+- **ISS-LOCKTAKE-003: 2/2.** (a) ownership check -> data rename with a takeover in between: write refused, nothing written ("a holder wrongly judged dead wakes ..."). (b) release restore gap: releasing a foreign lock performs one read and nothing else; no live lock is destroyed in any ordering of the live-holder runs. (The row's residual, owns()->rename with a lying probe, is ISS-LOCKTAKE-005.)
 - **ISS-T037LOCK-001: 2/2.** Repro 1 (lockWaitMs 1000) and repro 2 (lockStaleMs 200): real child, real SIGKILL, real OS probe: recovered. CHANGED by the age requirement: the recorded repro 1 expects recovery right after the kill, which now needs the lock older than staleMs, so the test sets `lockTest.now = Date.now() + 31000`; a third test pins the delay (a young lock stays `locked`, byte-identical, then recovers once older).
 
 ## Existing assertions changed (old -> new, why)
@@ -180,7 +180,7 @@ node --test --import tsx src/calendar/join-rules-store-lock-explore.test.ts  -> 
   exhaustive [2 takers + the original holder alive and slow ...]: 91230 complete orderings over 264 distinct states, longest 17 steps, 0 violating
   self-check: memoised 27412 vs plain 27412 complete orderings
   seeded [5 contenders, waitMs 40] seed=20261011: 60000 orderings, 2676519 steps, 0 violating
-  seeded [ISS-004: 3 takers aged lock] seed=20261012: 25000 orderings, 0 violating
+  seeded [ISS-LOCKTAKE-004: 3 takers aged lock] seed=20261012: 25000 orderings, 0 violating
   seeded [live holder + 3 takers] seed=20261013: 25000 orderings, 0 violating
   seeded [claimant death] seed=20261014: 20000 orderings, 0 violating
   lying probe: young lock 0/20000 violating (must be 0); old lock 10791/20000 violating (residual 005/003)
