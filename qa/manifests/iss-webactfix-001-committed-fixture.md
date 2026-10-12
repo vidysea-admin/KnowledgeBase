@@ -1,7 +1,7 @@
 # Manifest: iss-webactfix-001-committed-fixture
 
 **Lane:** webfixture
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Fixes:** ISS-WEBACTFIX-001 (medium; row lives on lane/webactfix, qa/issues.webactfix.jsonl)
 **Base:** lane/webactfix 485e080 (path fix not yet merged to master when this lane started; wait budget of 30 min exhausted)
