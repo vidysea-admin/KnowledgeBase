@@ -1,11 +1,11 @@
 /**
- * packages/ingest/src/retention-sweep.strict.test.ts — T-046 fix cycle 1. Replays the EXACT recorded
+ * packages/ingest/src/retention/retention-sweep.strict.test.ts — T-046 fix cycle 1. Replays the EXACT recorded
  * reproductions of ISS-T046-001/-002/-003 verbatim, then hostile shapes for every decision field.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { planRetentionSweep, type RetentionPlan, type RetentionSweepInput } from "./retention-sweep.js";
-import { parseIsoInstant } from "./strict-record.js";
+import { parseIsoInstant } from "../strict-record.js";
 
 const NOW = Date.parse("2026-10-10T12:00:00.000Z");
 const MIN = 604800000;

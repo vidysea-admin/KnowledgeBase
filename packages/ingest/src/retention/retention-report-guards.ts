@@ -1,5 +1,5 @@
 /**
- * packages/ingest/src/retention-report-guards.ts - T-046 dry-run report. DOWNGRADE-ONLY guards.
+ * packages/ingest/src/retention/retention-report-guards.ts - T-046 dry-run report. DOWNGRADE-ONLY guards.
  * The planner (`planRetentionSweep`) alone decides eligibility. A guard looks at the media file
  * evidence and may turn the planner's "purge-eligible" into KEEP with a named reason. It can never
  * turn a KEEP into eligible: `finalEligible` is `planned eligible AND no guard fired`, and `guard`

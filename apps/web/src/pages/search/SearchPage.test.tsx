@@ -24,6 +24,16 @@ function show(key: string | null = "fixture-key") {
   return render(<AuthProvider><MemoryRouter initialEntries={["/search"]}><Controls /><Routes><Route path="/search" element={<SearchPage />} /></Routes></MemoryRouter></AuthProvider>);
 }
 function submit(query: string) { fireEvent.change(screen.getByRole("searchbox"), { target: { value: query } }); fireEvent.submit(screen.getByRole("form", { name: "Search transcripts" })); }
+/** Routes by URL: speaker-suggestions (U2.4, ebca1cea) gets an empty list and is recorded in `suggestions`; every other call goes to the ordered `inner` mock, so its order and count are unchanged. */
+function routeSuggestions(inner: ReturnType<typeof vi.fn>) {
+  const suggestions: string[] = [];
+  const routed = vi.fn((input: unknown, init?: unknown) => {
+    const path = new URL(String(input), "http://local.invalid").pathname;
+    if (/\/sessions\/[^/]+\/speaker-suggestions$/.test(path)) { suggestions.push(path); return Promise.resolve(new Response(JSON.stringify({ suggestions: [] }), { headers: { "content-type": "application/json" } })); }
+    return inner(input, init);
+  });
+  return { routed, suggestions };
+}
 function deferred<T>() { let resolve!: (value: T) => void; const promise = new Promise<T>((done) => { resolve = done; }); return { promise, resolve }; }
 
 describe("SearchPage actual client/fake HTTP workflow", () => {
@@ -85,13 +95,14 @@ describe("SearchPage actual client/fake HTTP workflow", () => {
     const fetcher = vi.fn().mockResolvedValueOnce(reply("size", [raw])).mockResolvedValueOnce(new Response(JSON.stringify({
       session: raw.session, page: null, claims: [], turns: [raw.turn],
     }), { headers: { "content-type": "application/json" } }));
-    vi.stubGlobal("fetch", fetcher);
+    const { routed, suggestions } = routeSuggestions(fetcher); vi.stubGlobal("fetch", routed);
     try {
       render(<App />); expect(screen.getByRole("link", { name: "Search" })).toHaveAttribute("href", "/search");
       expect(screen.getByRole("heading", { name: "Search" })).toBeInTheDocument(); expect(fetcher).not.toHaveBeenCalled();
       submit("size"); fireEvent.click(await screen.findByRole("link", { name: "Open transcript" }));
       await waitFor(() => expect(document.getElementById("turn-t/1")).toHaveTextContent("Downstream literal passage"));
       expect(scroll).toHaveBeenCalled(); expect(fetcher).toHaveBeenCalledTimes(2);
+      await waitFor(() => expect(suggestions).toEqual(["/sessions/s%2F1/speaker-suggestions"])); // suggestions call happens and leaves the 2 search+transcript calls untouched
       expect(new URL(String(fetcher.mock.calls[1]?.[0]), "http://local.invalid").pathname).toBe("/sessions/s%2F1");
     } finally { HTMLElement.prototype.scrollIntoView = previous; }
   });
@@ -129,11 +140,13 @@ describe("SearchPage actual client/fake HTTP workflow", () => {
     }
   });
   test("session navigation hides the old loaded transcript during the next source read", async () => {
-    const pending = deferred<Response>(); vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(new Response(JSON.stringify(detail("old", "Private previous source"))))
-      .mockReturnValueOnce(pending.promise)); showSource(); await screen.findByText("Private previous source");
+    const pending = deferred<Response>(), inner = vi.fn().mockResolvedValueOnce(new Response(JSON.stringify(detail("old", "Private previous source"))))
+      .mockReturnValueOnce(pending.promise), { routed, suggestions } = routeSuggestions(inner); vi.stubGlobal("fetch", routed);
+    showSource(); await screen.findByText("Private previous source");
     fireEvent.click(screen.getByRole("button", { name: "Next session" })); expect(screen.queryByText("Private previous source")).toBeNull();
     await act(async () => { pending.resolve(new Response(JSON.stringify(detail("new", "New session source")))); });
     expect(await screen.findByText("New session source")).toBeInTheDocument();
+    expect(inner).toHaveBeenCalledTimes(2); await waitFor(() => expect(suggestions).toContain("/sessions/old/speaker-suggestions"));
   });
   test("a delayed old session read cannot replace the requested new session", async () => {
     const pending = deferred<Response>(); vi.stubGlobal("fetch", vi.fn().mockReturnValueOnce(pending.promise)

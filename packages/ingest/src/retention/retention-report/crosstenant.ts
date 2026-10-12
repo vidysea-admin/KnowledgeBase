@@ -1,5 +1,5 @@
 /**
- * packages/ingest/src/retention-report/crosstenant.ts - T-046 dry-run report. KEY-ONLY pass over
+ * packages/ingest/src/retention/retention-report/crosstenant.ts - T-046 dry-run report. KEY-ONLY pass over
  * the OTHER tenants' directories under the data root. For each sibling tenant segment
  * (<data-root>/<64 hex>/<session>/source.json) it reads ONLY the media path field and turns it into
  * the physical-file identity keys; nothing else of the record (id, tenant, title, claims, turns)
@@ -13,7 +13,7 @@
  */
 import { lstatSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { isPlain } from "../strict-record.js";
+import { isPlain } from "../../strict-record.js";
 import { probeMedia, type MediaIo } from "../retention-report-media.js";
 
 const SEGMENT = /^[0-9a-f]{64}$/;

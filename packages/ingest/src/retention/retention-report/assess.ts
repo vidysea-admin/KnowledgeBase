@@ -1,5 +1,5 @@
 /**
- * packages/ingest/src/retention-report/assess.ts - T-046 dry-run report. Turns the planner's
+ * packages/ingest/src/retention/retention-report/assess.ts - T-046 dry-run report. Turns the planner's
  * per-record verdicts into the reported verdicts. Everything here is DOWNGRADE-ONLY:
  *   1. per record: media guards (finalEligible), then the unconfirmed-clock refusal, then the
  *      pipeline in-progress signal. Each can turn eligible into KEEP; none can do the reverse.
@@ -12,7 +12,7 @@
  * make a group eligible. Totals count each physical file's bytes once.
  */
 import type { PlanItem } from "../retention-sweep.js";
-import { parseIsoInstant } from "../strict-record.js";
+import { parseIsoInstant } from "../../strict-record.js";
 import { NOT_ASSESSABLE, finalEligible, type GuardHit } from "../retention-report-guards.js";
 import type { SessionInfo } from "../retention-report-state.js";
 import type { ClockCheck } from "./clock.js";

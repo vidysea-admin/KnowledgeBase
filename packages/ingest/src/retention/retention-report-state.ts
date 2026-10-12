@@ -1,5 +1,5 @@
 /**
- * packages/ingest/src/retention-report-state.ts - T-046 dry-run report. READ-ONLY gatherer: turns
+ * packages/ingest/src/retention/retention-report-state.ts - T-046 dry-run report. READ-ONLY gatherer: turns
  * one tenant's session directories into the raw inputs of `planRetentionSweep`. It imports only
  * read APIs (lstatSync, readdirSync, readFileSync) and never writes, renames or deletes.
  *
@@ -17,7 +17,7 @@
 import { createHash } from "node:crypto";
 import { lstatSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { isPlain } from "./strict-record.js";
+import { isPlain } from "../strict-record.js";
 import type { ReportOptions } from "./retention-report-args.js";
 import { NO_MEDIA, REAL_IO, probeMedia, type MediaEvidence, type MediaIo } from "./retention-report-media.js";
 

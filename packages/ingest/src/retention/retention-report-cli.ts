@@ -1,6 +1,6 @@
 /**
- * packages/ingest/src/retention-report-cli.ts - T-046. Entry point for the report-only retention
- * dry run: `node --import tsx packages/ingest/src/retention-report-cli.ts --tenant ... --data-root ...
+ * packages/ingest/src/retention/retention-report-cli.ts - T-046. Entry point for the report-only retention
+ * dry run: `node --import tsx packages/ingest/src/retention/retention-report-cli.ts --tenant ... --data-root ...
  * --min-age-days N --clip-padding-seconds N`. Wiring it into the `lkb` dispatcher is a separate
  * step (meeting-bot would import it through @lkb/ingest once it is exported).
  */

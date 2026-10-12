@@ -1,5 +1,5 @@
 /**
- * packages/ingest/src/retention-purge-cli.ts - T-046 / D-145. Entry point for the raw-media purge
+ * packages/ingest/src/retention/retention-purge-cli.ts - T-046 / D-145. Entry point for the raw-media purge
  * executor. DRY RUN unless `--execute` is passed. Not scheduled, not wired into `lkb`.
  */
 import { runRetentionPurge } from "./retention-purge.js";

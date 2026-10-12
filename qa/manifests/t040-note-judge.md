@@ -1,6 +1,6 @@
 # t040-note-judge
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap T-040 follow-up; supersedes the rule-based negation approach per D-144). Class: generated-note acceptance gate (no data write path touched): FULL ceremony requested because it changes what ships as evidence.
 Lane: lane/t040judge (base 2d262d39). Owner decision: D-144 (appended to docs/DECISIONS.md on main, Approved-by Umesh). Links: ISS-T040GEN-002/-006/-007/-008/-009/-010/-011/-012. No new ledger issues filed by this unit.
