@@ -34,6 +34,7 @@ import { createJobsRouter, type JobsReadDeps } from "./jobs/router.js";
 import { unavailableJobsReadDeps } from "./jobs/fixture-store.js";
 import { createActivityHealthRouter, unavailableActivityHealthDeps } from "./activity-health/router.js";
 import type { ActivityHealthDeps } from "./activity-health/types.js";
+import { createWatchRunsRouter, unavailableWatchRunsDeps, type WatchRunsDeps } from "./activity-health/watch-runs.js";
 import { logger as defaultLogger, type Logger } from "./composition/logger.js";
 import { requestLogger } from "./composition/request-log.js";
 import { bodyParserErrorHandler } from "./composition/body-parser-error.js";
@@ -61,6 +62,8 @@ export interface ServerDeps {
   ingest: IngestDeps;
   jobs?: JobsReadDeps;
   activityHealth?: ActivityHealthDeps;
+  /** T-057 D2 watcher run history (GET /watch-runs, scope jobs). Optional: absent -> 503 (fail closed). */
+  watchRuns?: WatchRunsDeps;
   rateLimit?: RateLimitOptions;
   /** apps/web's real origin(s) in dev/prod (e.g. "http://localhost:5173") — no default, an
    * empty list means no cross-origin browser call succeeds, which is the safe default until a
@@ -95,6 +98,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createBrainRouter(deps.brain));
   app.use(createJobsRouter(deps.jobs ?? unavailableJobsReadDeps));
   app.use(createActivityHealthRouter(deps.activityHealth ?? unavailableActivityHealthDeps));
+  app.use(createWatchRunsRouter(deps.watchRuns ?? unavailableWatchRunsDeps));
   app.use(createWatchedSourcesRouter(deps.watchedSources));
   app.use(createCitationsRouter(deps.citations));
   app.use(createClaimsListRouter(deps.claims ?? unavailableClaimsListDeps));

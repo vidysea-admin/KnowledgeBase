@@ -24,6 +24,7 @@ import { ActivityHealthPage } from "./pages/activity-health/ActivityHealthPage.j
 import { AnalyticsPage } from "./pages/analytics/AnalyticsPage.js";
 import { JoinRulesPage } from "./pages/join-rules/JoinRulesPage.js";
 import { SystemStatusPage } from "./pages/system-status/SystemStatusPage.js";
+import { OpsHealthPage } from "./pages/ops-health/OpsHealthPage.js";
 
 export function App(): React.ReactElement {
   return (
@@ -51,6 +52,7 @@ export function App(): React.ReactElement {
               <Route path="/jobs" element={<JobsPage />} />
               <Route path="/claims" element={<ClaimsPage />} />
               <Route path="/status" element={<SystemStatusPage />} />
+              <Route path="/ops-health" element={<OpsHealthPage />} />
               <Route path="/ingest" element={<IngestPage />} />
               <Route path="/meeting-bot" element={<MeetingBotPage />} />
               <Route path="/whatsapp" element={<WhatsAppPage />} />
