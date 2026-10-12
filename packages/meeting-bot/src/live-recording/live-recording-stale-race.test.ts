@@ -22,16 +22,31 @@ function seedStale(dir: string): void {
   writeFileSync(path.join(tdir, `${createHash("sha256").update(key).digest("hex").slice(0, 32)}.json`), JSON.stringify(entry));
 }
 
-function runOnce(dir: string): Promise<Array<{ sid: string; ok: boolean; error?: string }>> {
+type Answer = { sid: string; ok: boolean; error?: string };
+/** Workers hold any claim they win until the stop file appears (written once ALL have answered), so a late starter can only ever see
+ *  a live holder: "winners > 1" now means a genuine exclusivity break, never start skew. Answers are read from each worker's first line. */
+async function runOnce(dir: string): Promise<Answer[]> {
   const at = Date.now() + 2500;
-  return Promise.all(Array.from({ length: PROCS }, (_, i) => new Promise<{ sid: string; ok: boolean; error?: string }>((resolve, reject) => {
-    const child = spawn(process.execPath, ["--import", "tsx", WORKER, dir, MEET, `p${i}`, String(at)], { stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
-    let out = "", err = "";
-    child.stdout.on("data", (d) => { out += d; }); child.stderr.on("data", (d) => { err += d; });
-    // fast-fail: a hung or crashed worker is an assertion failure with a clear message, never a 240 s suite hang
-    const timer = setTimeout(() => { child.kill(); reject(new Error(`worker p${i} produced no answer within ${RUN_TIMEOUT_MS} ms (hang in claimLiveRecording?) stderr=${err.slice(0, 300)}`)); }, RUN_TIMEOUT_MS);
-    child.on("close", () => { clearTimeout(timer); try { resolve(JSON.parse(out.trim().split("\n").pop() ?? "")); } catch { reject(new Error(`worker p${i} gave no JSON: stdout=${out.slice(0, 200)} stderr=${err.slice(0, 300)}`)); } });
-  })));
+  const stopFile = path.join(dir, "STOP");
+  const closed: Array<Promise<void>> = [];
+  try {
+    return await Promise.all(Array.from({ length: PROCS }, (_, i) => new Promise<Answer>((resolve, reject) => {
+      const child = spawn(process.execPath, ["--import", "tsx", WORKER, dir, MEET, `p${i}`, String(at), stopFile], { stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
+      closed.push(new Promise<void>((r) => child.on("close", () => r())));
+      let out = "", err = "", done = false;
+      // fast-fail: a hung or crashed worker is an assertion failure with a clear message, never a suite hang
+      const timer = setTimeout(() => { done = true; child.kill(); reject(new Error(`worker p${i} produced no answer within ${RUN_TIMEOUT_MS} ms (hang in claimLiveRecording?) stderr=${err.slice(0, 300)}`)); }, RUN_TIMEOUT_MS);
+      child.stderr.on("data", (d) => { err += d; });
+      child.stdout.on("data", (d) => {
+        out += d;
+        if (!done && out.includes("\n")) { done = true; clearTimeout(timer); try { resolve(JSON.parse(out.split("\n")[0])); } catch { reject(new Error(`worker p${i} gave bad JSON: ${out.slice(0, 200)}`)); } }
+      });
+      child.on("close", () => { clearTimeout(timer); if (!done) { done = true; reject(new Error(`worker p${i} exited without an answer: stdout=${out.slice(0, 200)} stderr=${err.slice(0, 300)}`)); } });
+    })));
+  } finally {
+    writeFileSync(stopFile, "x"); // release every holder (also on failure), then wait for them to exit before the dir is removed
+    await Promise.race([Promise.all(closed), new Promise((r) => setTimeout(r, 10_000))]);
+  }
 }
 
 for (const stale of [true, false]) {

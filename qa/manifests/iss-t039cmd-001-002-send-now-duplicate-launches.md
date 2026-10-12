@@ -1,7 +1,7 @@
 # iss-t039cmd-001-002-send-now-duplicate-launches
 
 **Handshake status:** ready-for-check
-Fix cycle: 1
+Fix cycle: 2
 Tier: 3-adjacent (T-039 completion; open medium issues ISS-T039CMD-001 and ISS-T039CMD-002). Class: data write (new state file) + the guard against a second browser join: FULL ceremony. Verdict by the checker only.
 Lane: lane/t039dupes. Ledger shard `qa/issues.t039dupes.jsonl` (ISS-T039DUPES-001..003). Ledger rows ISS-T039CMD-001/-002 status NOT changed here.
 
@@ -47,3 +47,12 @@ Real `cli.ts record`, Chrome, OBS: never run. Recordings running before deploy h
 - **Tests:** live-recording.test.ts 13/13 (was 12), live-recording-stale-race.test.ts 2/2 (stale-seeded and fresh, real processes, STALE_RACE_RUNS/PROCS env), send-now-host 12/12.
 - **Mutations** (harness `t039dupes-c1/`, hash-verified, per-mutation backup in finally): see commit message / checker re-run; results recorded in the final report.
 - Mutation results (5): skip claim KILLED; old rm+link stale replace KILLED; takeover without re-read KILLED; ignore liveness KILLED; check-then-plain-write claim SURVIVED (its race window is a few microseconds, real-process fresh race did not hit it in 8 runs). All restored, hash == HEAD.
+
+## Cycle 2 (fix of the checker's findings on cycle 1: flaky real-process race test; never-reap mutant survived; cycle 0/1 sections above kept)
+
+**Handshake status:** ready-for-check (Fix cycle: 2). Tests only; no product code changed.
+
+- `stale-race-worker.ts` / `live-recording-stale-race.test.ts` redesign: the worker used to hold its claim ~1.5 s, so a process starting late under load legitimately took over after the release and was counted as a second winner. Now every worker that wins holds the claim until a STOP file appears; the parent writes it only after ALL workers have answered (also in `finally`, then waits for exits). A late starter can therefore only ever see a live holder, so `winners !== 1` now means a genuine exclusivity break. Assertion unchanged (exactly one winner per run, stale-seeded and fresh); per-worker 30 s fast-fail kept; worker hard-capped at 60 s so a dead parent leaves no orphan.
+- New test in `live-recording.test.ts`: a takeover claim file (keyed by the seeded entry's content) left by a dead taker pid is reaped and a contender still wins within 5 s, leaving no temp files.
+- Mutation (hash-verified, backup restored, file hash == HEAD): replacing the dead-taker `rmSync(claim)` with a no-op makes the new test FAIL (contender throws "could not replace a stale live-recording entry"); mutant killed.
+- Evidence: 30 runs x 8 processes, both tests: 2/2 pass (stale 125 s, fresh 131 s total for 30 runs each, 267 s overall, under current load); live-recording + send-now suites 54/54; tsc clean.

@@ -258,3 +258,21 @@ test("ISS-T039DUPES-004 deterministic: claimer B has judged the stale entry dead
     assert.deepEqual(readdirSync(path.join(dir, "vidysea")).filter((n) => n.startsWith(".tmp-")), [], "no temp or claim files left");
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("ISS-T039DUPES-004 cycle 2: a takeover claim file abandoned by a DEAD taker is reaped - a contender still wins (kills the never-reap mutant)", () => {
+  const dir = mk();
+  try {
+    const name = `${createHash("sha256").update("meet:abc-defg-hij").digest("hex").slice(0, 32)}.json`;
+    seed(dir, entry({ processStartedAt: undefined }), name);
+    const tdir = path.join(dir, "vidysea");
+    const raw = readFileSync(path.join(tdir, name), "utf8");
+    // exactly the claim file a contender would race for on this content, left behind by a taker that died mid-takeover
+    writeFileSync(path.join(tdir, `.tmp-takeover-${createHash("sha256").update(raw).digest("hex").slice(0, 24)}`), JSON.stringify({ pid: 6262 }));
+    const t0 = Date.now();
+    const r = claimLiveRecording({ dir, tenantId: "vidysea", meetingUrl: MEET, sessionId: "C", until: null }, NOW, { isAlive: () => false, startTime: () => "T9" }, 7373);
+    assert.equal(r.ok, true, "a dead taker's abandoned claim blocked every contender");
+    assert.ok(Date.now() - t0 < 5000, "took the abandoned claim over promptly");
+    assert.equal(JSON.parse(readFileSync(path.join(tdir, name), "utf8")).sessionId, "C");
+    assert.deepEqual(readdirSync(tdir).filter((n) => n.startsWith(".tmp-")), [], "no temp or claim files left");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
