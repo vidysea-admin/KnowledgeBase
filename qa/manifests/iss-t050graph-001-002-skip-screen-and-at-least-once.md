@@ -1,6 +1,6 @@
 # iss-t050graph-001-002-skip-screen-and-at-least-once
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2/4 (ledger issues ISS-T050GRAPH-001 medium, -002 low; data-write class module, unwired).
 Lane: lane/t050graphfix (from b8baec4c). Touches only packages/core/src/pipeline-graph (+ this manifest).
