@@ -21,3 +21,28 @@ ISS-T039CMD-001 and -002 are verified (rows flipped in qa/issues.t039cmd.jsonl).
 - After: live-recording.ts blob 834dc9f and claimed-record.ts blob 5fa8d97 equal HEAD; harness deleted; worktree clean before my ledger edits; main tree clean.
 
 ISSUES-WRITTEN: ISS-T039DUPES-004 (medium), ISS-T039DUPES-005 (medium)
+
+---
+
+# Cycle 1
+
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: 37838d3 (lane/t039dupes)
+Scope: same as cycle 0 (one machine, local filesystem, real `cli.ts record`/Chrome/OBS never run).
+
+## EXPLANATION
+
+ISS-T039DUPES-004 and ISS-T039DUPES-005 are verified (rows flipped in qa/issues.t039dupes.jsonl).
+
+- Takeover design (read in source): a contender that judged exact content `raw` dead links a claim file `.tmp-takeover-<sha256(raw)[0..24]>` (content `{pid}` already inside, so the link is atomic with content). Only the claim holder re-reads the entry; if bytes still equal `raw` it renames its temp over the entry and verifies by reading back; the claim is removed in `finally`. A loser sleeps 15 ms and re-reads, so it ends at `held`. A live entry is never moved (the re-read gate), and the entry is never absent. A claimer that raced a full replacement (cycle 0's double-winner interleaving) re-reads different bytes, does not rename, and returns `held`; the deterministic unit test covers exactly that.
+- 8-process stale race: the maker's own test at `STALE_RACE_RUNS=30 STALE_RACE_PROCS=8` FAILED when I ran it (stale: runs 1 and 15 had 3 and 2 "winners"; the FRESH variant, whose code path is unchanged `linkSync`, also showed 2 winners in run 4). Cause is the test, not the takeover: under the live Chrome worker's CPU load, `node --import tsx` startup of 8 children spreads by seconds past the 2.5 s barrier, and the worker exits 1.5 s after its claim, so a straggler legitimately sees a dead entry and takes over. I re-ran with my own worker (same `claimLiveRecording`, 4 s barrier, winner held 6 s so no legitimate takeover is possible): stale-seeded, 8 real processes, 30 runs: 30/30 exactly one winner, no `.tmp-*` leftovers. Default test settings (4 procs x 5 runs, both variants) 2/2 pass.
+- Crashed claim holder: pre-seeding a claim file with a dead pid (2147483001) and the correct content hash, 8 processes, 15 runs: 15/15 exactly one winner, no leftover claim. A contender removes a claim whose holder pid is dead. Not forever: a claim whose holder pid is ALIVE (hung, or the pid reused by an unrelated process) is respected, and contenders throw "could not replace a stale live-recording entry" after 100 attempts (about 1.5 s plus); `claimed-record` then fails open as cycle 0 described. That needs a crash inside a microsecond window plus pid reuse; low, not filed. A crash after the claim leaves only `.tmp-*` clutter, which the reader skips.
+- Survived mutant (check-then-plain-write, `writeFileSync` instead of `renameSync`): equivalent for exclusivity, because only the claim holder reaches that line. The difference is atomicity for readers: a concurrent reader can see a half-written entry, which `parseEntry` rejects with a throw (cannot tell, send-now refuses): fail-closed, transient. Not a double-winner risk.
+- Fixture (-005): the `send-now-host` job file is tagged `tenantId: "tenant-a"`; `scripts/webinar/send-now-host.test.ts` 12/12 on this lane. Fast-fail fakes: `holdOpen()` rejects after 4 s with a clear message instead of a 240 s hang.
+- Re-run by me: live-recording 15 tests incl. deterministic and stale-race (pass 15 / fail 0 with live-recording.test.ts and the race file together); `src/live-recording/*.test.ts` + `src/send-now*.test.ts` 53/53; send-now-host 12/12; `tsc --noEmit -p packages/meeting-bot` exit 0.
+- Mutations (own harness inside the worktree, per-mutation byte backup in `finally`, SIGKILL timeout, hash changed on apply, hash == HEAD blob after): M1 skip the re-read under the claim (`if (true)`) KILLED (1 fail, the deterministic test); M3 plain write SURVIVED, equivalent (above); M2 never reap a dead-pid claim SURVIVED the whole suite, and my 3-run probe with M2 applied failed all 3 runs (winners=0, every contender threw, claim left on disk). So the crashed-holder reaping works (15/15 above) but has no regression test. Note, low: add a test that seeds a dead-pid claim. Not filed.
+- Notes (low, not filed): the 8-proc env-var setting of the race test is load-sensitive because of the 1500 ms hold; raise the worker's hold when raising `STALE_RACE_PROCS`.
+- After: live-recording.ts blob equals `git rev-parse HEAD:<file>`; harness deleted; tree clean apart from the ledger flip.
+
+ISSUES-WRITTEN: none
