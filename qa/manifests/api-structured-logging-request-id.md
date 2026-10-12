@@ -1,6 +1,6 @@
 # api-structured-logging-request-id
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: deployment readiness D7 (structured logging + request id). Class: security-adjacent (secret redaction in logs): full ceremony. Verdict by the checker only.
 Lane: lane/apilogger. Lane ledger `qa/issues.apilogger.jsonl`: ISS-APILOGGER-001 (medium), ISS-APILOGGER-002 (low).
