@@ -1,6 +1,6 @@
 # fix-web-activity-health-integration-test (lane webactfix)
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 
 ## Failure (verbatim, before)
