@@ -1996,3 +1996,19 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** Re-ingest of the same content hash is a no-op that reports the existing session id as already ingested.
 **Approved-by:** Umesh
 **Links:** T-045
+
+## D-136 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Source identity is tenant-scoped for ALL ingest adapters (url, recording, document, whatsapp, as already done for youtube/onair/zoom): source `_id` = tenantSourceId(tenant, contentHash), with contentHash kept as its own field. Existing stored data gets a migrate-mongo migration that rewrites old bare-hash ids and every reference to them. The migration is built and tested locally only, and is run against any real database ONLY with Umesh's explicit approval at that time. Reads must accept both the old and new id forms until the migration has run. This also clarifies D-135: "content-hash source _id" means the tenant-scoped content-hash id, and the within-tenant idempotency policy is unchanged. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** A bare content hash lets two tenants collide on one source id; tenant scoping closes ISS-T045TENANTID-001 consistently across every adapter.
+**Result:** All adapters use the tenant-scoped id; a local-only migration plus dual-form reads cover existing data; no real-database run without explicit approval.
+**Approved-by:** Umesh
+**Links:** ISS-T045TENANTID-001; ISS-T045INTAKE-001; T-045; D-135
+
+## D-137 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-041 OCR failure handling (assumption A5 in qa/manifests/t041-ocr-stage-alignment.md): when OCR fails on a keyframe, retry it a bounded number of times with backoff, then try a configured fallback OCR function if one is injected. Only if every attempt fails, omit the frame from alignment and report it in ocrErrors with its attempt count. A failed frame is never silently treated as blank text. Decided by Umesh (Approver) in chat 2026-10-12: "there must be a fallback or retry mechanism".
+**Why:** Silently treating a failed OCR frame as blank text would hide data loss and corrupt alignment; retry and fallback recover transient failures and the rest are reported.
+**Result:** Bounded retry with backoff, then optional injected fallback, then omit and report in ocrErrors with attempt count.
+**Approved-by:** Umesh
+**Links:** T-041; A5 (qa/manifests/t041-ocr-stage-alignment.md)
