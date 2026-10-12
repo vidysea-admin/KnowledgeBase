@@ -1,6 +1,6 @@
 # iss-alertid-006-state-file-tenant-tag
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2 (open HIGH ledger issue ISS-ALERTID-006, security class: tenancy). Full ceremony.
 Lane: lane/alerttenant (base 031b0e2). Ledger for this lane: qa/issues.alerttenant.jsonl, ids ISS-ALERTTENANT-NNN (001-003 filed).
