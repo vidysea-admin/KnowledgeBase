@@ -5,7 +5,7 @@
  * convention the plan's `url` adapter (T-023) will reuse, since document and URL content share
  * the same "extracted text -> paragraph turns" shape.
  */
-import type { Source, SourceDoc, MediaDoc, ConsentContext, Turn } from "../source.js";
+import { tenantSourceId, type Source, type SourceDoc, type MediaDoc, type ConsentContext, type Turn } from "../source.js";
 
 const DOCUMENT_EXTENSIONS = [".pdf", ".docx", ".txt", ".md"];
 /** T-023: an http(s) string is a URL-shaped input, never a local document path, even when it
@@ -92,7 +92,7 @@ export function createDocumentSource(deps: DocumentAdapterDeps): Source {
       const hash = await deps.hasher(text);
 
       const source: SourceDoc = {
-        _id: hash,
+        _id: tenantSourceId(tenantId, hash),
         tenantId,
         kind: "document",
         captureMode: consent.captureMode,
