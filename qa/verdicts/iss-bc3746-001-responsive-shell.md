@@ -1,0 +1,17 @@
+# Verdict: iss-bc3746-001-responsive-shell
+
+VERDICT: FAIL
+Cycle checked: 0
+Commit checked: e0740a9f (lane/webresponsive). Checker evidence: qa/evidence/webresponsive-checker-iss-bc3746-001/ (own script chk.mjs, node Playwright + system Chrome headless, 1 browser at a time, API fully mocked, no DB, no secrets; both Vite servers and Chrome stopped afterwards).
+
+EXPLANATION:
+1. Live sweep, 25 routes x {375, 1280}, scrollWidth/body.scrollWidth vs viewport plus a real scrollTo(200,0) test. With the maker's empty mock everything passes. With a realistic mock (3 sessions with long titles, a 3-node graph) 49/50 pass and ONE FAILS: /explorer at 375 = scrollWidth 418 vs 375 (scrollX reaches 43). Cause: the "Session scope" <select> sizes to its longest option (402px) and has no max-width. Base (pre-fix) also overflows there, so the fix is incomplete for the stated acceptance ("no page scrolls horizontally at 375"). The maker's run missed it because no session data was mocked. Filed as ISS-WEBRESPONSIVE-001 (medium, one-rule CSS fix).
+2. ISS reproductions: 3/3 refused at the page level. /join-rules 375 and /meeting-bot 375 fit (375 vs 375). The /join-rules confirm dialog at 375 was exercised for real (fill sender, "Approve sender", alertdialog x=33 w=309 inside the viewport, Confirm and Cancel buttons inside, scrollWidth 375 vs 375, Confirm sends POST /calendar/join-rules/approvals once, dialog closes; domain-warning dialog, opt-out dialog and Cancel also fit; menu open fits). Calendar with an event selected (300px detail panel) and its opt-out confirm also fit at 375.
+3. Desktop 1280 vs the pre-fix commit (0d8ac5bc src served from a scratchpad copy): 25 page screenshots pixel-compared. 20 identical, 3 differ by 18 to 355 pixels at timestamp text only (sessions, calendar, meeting-bot), 2 differ intentionally: /brain (sidebar was squashed by 1320px overflow before) and /graph-confidence (1360 vs 1280 before) are now correct. No desktop regression found. Note: at 1280 the brain graph SVG now scales to the panel; nodes sit near the panel edge with the 3-node mock (cosmetic, mock-dependent).
+4. Accessibility: Menu is a native button, reached by the first Tab, Enter and Space both toggle, aria-expanded flips false/true, aria-controls target exists, Tab from open menu enters the first link, 40px touch height, default focus ring (auto 1px) kept. At 1280 the button is hidden and links shown. 9/9.
+5. apps/web: tsc --noEmit exit 0. vitest 707 pass / 2 fail (the known SearchPage failures only; not counted), 66/67 files; responsive.test.tsx 6/6.
+6. Mutations (per-mutation byte backup and trap, restored and hash equal to HEAD blob each time, harness deleted): M1 media query disabled -> vitest 2 fail and live 25 fails at 375; M2 aria-expanded removed -> vitest 1 fail and live 4 fails; M3 menu not collapsed -> vitest 1 fail and live 2 fails; M4 GraphSvg maxWidth removed -> vitest passes (no unit pin) but live sweep catches 1280 /graph-confidence 1360 and 375 1116. 4/4 caught.
+Reason for FAIL: acceptance not fully met on a realistic page (/explorer). Everything else holds. Re-check after ISS-WEBRESPONSIVE-001, with a long-title select mock added to the live check.
+Side note: Vite run from the lane via the node_modules symlink writes its .vite cache into the main tree's node_modules; this checker used a scratchpad cacheDir for the final runs, but the first start touched that cache.
+
+ISSUES-WRITTEN: ISS-WEBRESPONSIVE-001 (medium) in qa/issues.webresponsive.jsonl
