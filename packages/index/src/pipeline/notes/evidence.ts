@@ -20,7 +20,7 @@ export const MAX_EVIDENCE_PER_ITEM = 8;
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 
 /** Resolve model-claimed evidence against the source turns; never throws. */
-export function resolveEvidence(value: unknown, turns: Turns[], spans?: RuntimeSpan[], opts: { allowQuestion?: boolean } = {}): Resolved {
+export function resolveEvidence(value: unknown, turns: Turns[], spans?: RuntimeSpan[], opts: { allowQuestion?: boolean; judged?: boolean } = {}): Resolved {
   if (!Array.isArray(value) || value.length === 0) return { ok: false, reason: "no evidence" };
   if (value.length > MAX_EVIDENCE_PER_ITEM) return { ok: false, reason: "too many evidence entries" };
   const evidence: QuotedEvidence[] = [], claimed: string[] = [], seen = new Set<string>();
@@ -63,10 +63,10 @@ export function citationTimes(evidence: ReadonlyArray<QuotedEvidence>, turns: Tu
  * verifier, checks extractiveness, the origin, the answered/unanswered coupling and id uniqueness.
  * Returns problems (empty = clean). Legacy pages (no citedItems/qa) audit clean.
  */
-export function auditGroundedNotes(page: { citedItems?: CitedItem[]; qa?: QaEntry[] }, turns: Turns[]): string[] {
+export function auditGroundedNotes(page: { citedItems?: CitedItem[]; qa?: QaEntry[] }, turns: Turns[], auditOpts: { judged?: boolean } = {}): string[] {
   const problems: string[] = [], ids = new Set<string>();
   const check = (label: string, text: string, ev: ReadonlyArray<QuotedEvidence>, allowQuestion = false) => {
-    const r = resolveEvidence(ev, turns, undefined, { allowQuestion });
+    const r = resolveEvidence(ev, turns, undefined, { allowQuestion, ...(auditOpts.judged ? { judged: true } : {}) });
     if (!r.ok) return void problems.push(`${label}: ${r.reason}`);
     if (r.evidence.some((e, i) => e.quote !== ev[i]!.quote) || r.evidence.length !== ev.length) problems.push(`${label}: quote is not the verbatim source slice`);
     if (extractiveText(text, r) !== text) problems.push(`${label}: text is not the joined quotes`);
