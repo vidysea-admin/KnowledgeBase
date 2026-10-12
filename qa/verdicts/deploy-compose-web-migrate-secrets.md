@@ -19,3 +19,28 @@ The lane is internally sound but breaks `docker compose build` as soon as deploy
 - ISS-DEPLOYCOMPOSE-001 and -002 stay OPEN; 001 is now realised as -003. Image security (non-root, no secrets in the image) is covered in the deploybuild verdict.
 
 ISSUES-WRITTEN: ISS-DEPLOYCOMPOSE-003 (high), ISS-DEPLOYCOMPOSE-004 (medium), ISS-DEPLOYCOMPOSE-005 (medium)
+
+---
+
+# Cycle checked: 1
+
+VERDICT: FAIL
+Cycle checked: 1
+Commit checked: 01238e5 (lane/deploycompose), against the merged apps/api/Dockerfile (main HEAD, from 643c096). Cycle 0 FAIL was 3f6dfe2. Docker not installed; nothing built or run.
+
+## EXPLANATION
+
+Three cycle-0 findings are fixed, but the fix exposes a fourth defect that makes the migrate command fail: ISS-DEPLOYCOMPOSE-006 (high).
+
+- ISS-DEPLOYCOMPOSE-006 (new, blocking): all four migrations do `readFileSync(join(__dirname, "..", "schema", "index.json"))`. With `./migrations` bind-mounted at /app/migrations that is /app/schema/index.json. The merged Dockerfile's `build` stage copies only manifests, packages/ and apps/api (`COPY schema` is in the runtime stage only), and compose mounts only migrations and the config. The first migration (baseline) dies with ENOENT. Fix: add `./schema:/app/schema:ro` to the migrate service.
+- Verified OK in the merged Dockerfile: stages are base, manifests, build, prod-deps, runtime; `target: build` exists. `build` = manifests (root package.json lists migrate-mongo 14.0.7 and dotenv 17.4.2; lockfile importer `.` has migrate-mongo) + `pnpm install --frozen-lockfile` at WORKDIR /app, no `--prod`, so /app/node_modules/.bin/migrate-mongo (npx) and dotenv/config resolve. The config's `migrationsDir: "migrations"` resolves relative to /app. Config and migrations exist at repo root and are tracked.
+- ISS-DEPLOYCOMPOSE-005 fixed: js-yaml 4.3.2 parse: migrate `profiles ["migrate"]`; api has no depends_on and no profile; web depends_on api only; local-mongo `local-dev`. A plain `up` neither builds nor starts migrate, and api starts without it. The documented command `docker compose --profile migrate run --rm migrate` is consistent. Not run (no docker).
+- ISS-DEPLOYCOMPOSE-004 fixed: .env.example CORS_ORIGINS equals the compose default and includes :8080 on localhost and 127.0.0.1.
+- ISS-DEPLOYCOMPOSE-003: the missing-stage defect is gone, but the row stays open because the migrate service still cannot do its job (see -006); close it with -006.
+- .dockerignore vs merged Dockerfile COPY lines (package manifests, packages, apps/api, schema, config): none excluded (qa, raw, data, .env* are the only relevant exclusions; `config/client_secret.json` excluded, `.env.example` kept). Compatible.
+- No secrets: grep for credentialed Mongo URIs, AIza, sk- in compose/.env.example/.dockerignore: none; only `.env.example` is tracked among .env files.
+- Both trees clean before this section; no mutation was needed.
+
+Rows: -004 and -005 set to verified; -003 left open; -001 and -002 unchanged.
+
+ISSUES-WRITTEN: ISS-DEPLOYCOMPOSE-006 (high)
