@@ -1,5 +1,5 @@
 # Manifest: legacyseed-legacy-unbound-toc-seed
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 **Lane:** legacyseed (branch lane/legacyseed). **Authority:** D-143, D-149 (pending append) — Umesh 2026-10-12.
 
