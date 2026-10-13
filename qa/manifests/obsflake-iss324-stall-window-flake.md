@@ -1,6 +1,6 @@
 # obsflake-iss324-stall-window-flake
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: test-only flake fix (no ledger issue; no auth/tenancy/data write). Lane: lane/obsflake.
 
@@ -15,7 +15,7 @@ Tier: test-only flake fix (no ledger issue; no auth/tenancy/data write). Lane: l
 
 ## Evidence
 10 sequential runs of `node --test --import tsx src/capture/obs/obs-windows.test.ts`: every run `ℹ tests 8 ℹ pass 8 ℹ fail 0` (10/10).
-Mutation (bot-child.ts line 95 `>= stallMs` -> `>= 1e12`, byte backup, restored, hash verified == HEAD blob 0e926bc5): `ℹ pass 7 ℹ fail 1` (a test fails).
+Mutation (packages/meeting-bot/src/capture/browser/bot-child.ts line 95 `>= stallMs` -> `>= 1e12`, byte backup, restored, hash verified == HEAD blob 0e926bc5): `ℹ pass 7 ℹ fail 1` (a test fails).
 
 ## Not verified
 Full suite not run; no browser/OBS opened (fake OBS + node fixture only).
