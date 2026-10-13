@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 import { gapsForSourceDoc, type GapWindow } from "./reconnect-gaps.js";
-import { createTelegramNotifier, readTurnCount, type TelegramNotifier } from "./telegram-alerts.js";
+import { createTelegramNotifier, readTurnCount, type TelegramNotifier } from "./notify/telegram-alerts.js";
 // Deep import: packages/core/src/index.ts does not re-export lean-video yet (ISS-LEANWIRE-001).
 import { isWithinLeanTarget, LEAN_TARGET_MB_PER_HOUR } from "@lkb/core/src/domain/lean-video.js";
 

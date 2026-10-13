@@ -30,7 +30,7 @@ export * from "./live-monitor.js";
 // telegram-alerts.ts's own T-030 exports (createTelegramNotifier etc.) are intentionally NOT
 // re-exported here (they never were, pre-U3) — record-commands.ts/record-finalize.ts import them
 // by relative path within this package, same as before.
-export * from "./capture/notify-channels.js";
-export * from "./capture/telegram-channel.js";
-export * from "./capture/whatsapp-channel.js";
-export * from "./capture/configured-notifier.js";
+export * from "./capture/notify/notify-channels.js";
+export * from "./capture/notify/telegram-channel.js";
+export * from "./capture/notify/whatsapp-channel.js";
+export * from "./capture/notify/configured-notifier.js";

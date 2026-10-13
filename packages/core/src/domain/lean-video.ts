@@ -1,7 +1,7 @@
 /**
  * packages/core/src/domain/lean-video.ts — T-035 slice 1 (UNWIRED). Pure builder for "lean video"
  * recording settings, a size estimator, and a mapping to the OBS websocket request shapes. No I/O.
- * Nothing imports this yet: the recorder (meeting-bot capture/obs-windows.ts) is unchanged and
+ * Nothing imports this yet: the recorder (meeting-bot capture/obs/obs-windows.ts) is unchanged and
  * never calls it. Applying settings to a live OBS is a later unit.
  *
  * Source of numbers: TASKS.md T-035 "720p, low fps, under 400 MB per hour"; the live run measured

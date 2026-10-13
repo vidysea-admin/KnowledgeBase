@@ -5,7 +5,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { reconcileWebinarSources } from "../calendar-client.js";
-import { prepareWebinarSourceState, type WebinarCalendarAcquisition } from "../schedule-state.js";
+import { prepareWebinarSourceState, type WebinarCalendarAcquisition } from "../state/schedule-state.js";
 import { selectAutoRecordItems } from "../auto-join.js";
 
 const T1 = "2026-10-11T10:00:00.000Z", T2 = "2026-10-11T10:05:00.000Z", REV = "2026-09-30T10:00:00.000Z";

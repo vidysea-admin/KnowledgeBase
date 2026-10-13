@@ -9,7 +9,7 @@ import type { AutoRecordCandidateInput } from "./calendar/auto-join.js";
 import { alertIdFor, buildAttentionAlerts } from "./calendar/alerts/attention-alerts.js";
 import type { CalendarEvent } from "./calendar/calendar-client.js";
 import { runScheduleTickOnce } from "./calendar/schedule-tick.js";
-import { SKIPPED_RETENTION_DAYS, readSkippedRecords, recordSkipped, skippedStateFilePath } from "./calendar/skipped-state.js";
+import { SKIPPED_RETENTION_DAYS, readSkippedRecords, recordSkipped, skippedStateFilePath } from "./calendar/state/skipped-state.js";
 import { runAlertWho, type AlertWhoDeps } from "./alert-who-command.js";
 
 const NOW = "2026-10-10T10:00:00.000Z";

@@ -321,7 +321,7 @@ test("selectAutoRecordItems: a candidate with no parseable startTime is silently
 });
 
 // ---- T-036 fix cycle 1: link provenance (ISS-T036CAL-001) ----------------------------------------------------------
-import { describeSkip } from "./skip-describe.js";
+import { describeSkip } from "./state/skip-describe.js";
 import { reconcileWebinarSources } from "./calendar-client.js";
 
 const P_NOW = "2026-10-11T11:58:00Z";

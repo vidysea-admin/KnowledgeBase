@@ -59,7 +59,7 @@ export function createCalendarAttendanceSource({account, tenantId, run, acquire,
 
 export async function configureCalendarAttendance(deps, account, dependencies = {}) {
   const {runGws, listUpcomingGwsMeetings} = dependencies.transport ?? await import('../../apps/api/src/gws-calendar.ts');
-  const {validateWebinarCalendarAcquisition} = dependencies.state ?? await import('../../packages/meeting-bot/src/calendar/schedule-state.ts');
+  const {validateWebinarCalendarAcquisition} = dependencies.state ?? await import('../../packages/meeting-bot/src/calendar/state/schedule-state.ts');
   const binary = deps.env.LKB_GWS_PATH ?? join(deps.root, '.cache/tools/gws-0.22.5/gws.exe');
   if (!isAbsolute(binary)) throw new Error('Attendance GWS executable must be an absolute path');
   const nativeRun = args => runGws(args, (_file, nativeArgs, options, callback) => execFile(binary,

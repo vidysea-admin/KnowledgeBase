@@ -5,7 +5,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { isTrustedSender, loadTrustedSenderConfig } from "./auto-record-policy.js";
-import { parseStrictEmail } from "./join-rules.js";
+import { parseStrictEmail } from "./join-rules/join-rules.js";
 
 const cfg = loadTrustedSenderConfig({} as NodeJS.ProcessEnv); // defaults: 2 emails, 2 domains
 

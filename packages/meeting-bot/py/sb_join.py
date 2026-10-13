@@ -1,6 +1,6 @@
 """
 packages/meeting-bot/py/sb_join.py — the real bot browser behind joiners/browser-joiner.ts
-(spawned by src/capture/obs-windows.ts). SeleniumBase 4, UC mode, HEADED (a headless Chrome
+(spawned by src/capture/obs/obs-windows.ts). SeleniumBase 4, UC mode, HEADED (a headless Chrome
 plays no audio), with a persistent profile the user logs into once so the bot attends "as him".
 
 It never records anything itself: OBS captures this window's audio + video. What it does:
