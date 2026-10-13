@@ -22,7 +22,7 @@
         "properties": {
           "turnId": { "type": "string" },
           "evidenceQuote": { "type": "string", "minLength": 1 },
-          "evidenceKind": { "type": "string", "enum": ["self-intro", "called-on", "address", "handover", "thanks", "role-continuity"] }
+          "evidenceKind": { "type": "string", "enum": ["self-intro", "called-on", "address", "handover", "thanks", "role-continuity", "tile"] }
         },
         "additionalProperties": false
       }
