@@ -15,7 +15,7 @@ import { projectJobSummary, type JobsReadDeps } from "../jobs/router.js";
 import { projectActivitySnapshot, queueTimestamp, type ActivityHealthDeps } from "./types.js";
 import { projectWatchRun, type WatchRunsDeps } from "./watch-runs.js";
 
-export const notificationSources = ["upload-queue", "provider-jobs", "watcher"] as const;
+export const notificationSources = ["upload-queue", "provider-jobs", "watcher", "file-queue"] as const;
 export type NotificationSource = typeof notificationSources[number];
 export interface Notification {
   id: string;
@@ -31,9 +31,18 @@ export interface NotificationsResponse {
   limit: number;
   /** True when any source had older rows than its window, or more failures than `limit` were found. */
   truncated: boolean;
-  sources: { uploadQueue: SourceState; providerJobs: SourceState; watcher: SourceState };
+  sources: { uploadQueue: SourceState; providerJobs: SourceState; watcher: SourceState; /** Present only when a file-queue reader is wired (ISS-FAILEDJOB-001). */ fileQueue?: SourceState };
 }
-export interface NotificationsDeps { activityHealth: ActivityHealthDeps; jobs: JobsReadDeps; watchRuns: WatchRunsDeps }
+/** Tenant-scoped read of the tenant's terminally failed ("dead") packages/core FILE-queue jobs (D-139); `at` is queue-clock ms. Backed by FileJobQueue.listDead, which requires the tenant. */
+export interface FileQueueDeadDeps { listDeadJobs(tenantId: string, limit: number): Promise<{ jobs: { id: string; errorCode: string | null; at: number }[]; truncated: boolean }> }
+export interface NotificationsDeps { activityHealth: ActivityHealthDeps; jobs: JobsReadDeps; watchRuns: WatchRunsDeps; fileQueue?: FileQueueDeadDeps }
+
+/** Fixed allow-list: a recorded queue error code is shown only as one of these labels; anything else (stage codes can be arbitrary) becomes "unrecognised". */
+const fileQueueErrorLabels: Readonly<Record<string, string>> = {
+  "lease-expired": "worker lease expired", "run-missing": "run state missing", "bad-payload": "job payload invalid", "plan-invalid": "run plan invalid",
+  "bad-node-result": "stage returned an invalid result", "run-failed": "run failed",
+};
+export const fileQueueErrorLabel = (code: unknown): string => typeof code === "string" && Object.hasOwn(fileQueueErrorLabels, code) ? fileQueueErrorLabels[code]! : "unrecognised";
 
 const safeWord = (v: unknown): string | null => typeof v === "string" && /^[A-Za-z0-9._:-]{1,64}$/.test(v) ? v : null;
 const safeId = (source: NotificationSource, id: string): string => {
@@ -44,10 +53,20 @@ interface Part { items: Notification[]; truncated: boolean }
 
 async function fromQueue(deps: NotificationsDeps, tenantId: string, limit: number): Promise<Part> {
   const snap = projectActivitySnapshot(await deps.activityHealth.readActivityHealth(tenantId, limit), limit);
-  const items = snap.jobs.filter((j) => j.status === "failed").map((j): Notification => ({
+  const items = snap.jobs.filter((j) => j.status === "failed" && j.source !== "job-queue").map((j): Notification => ({
     id: safeId("upload-queue", j.id), source: "upload-queue", severity: "error", title: "Upload transcription job failed",
     detail: `Failure class: ${j.errorClass ?? "unknown"}; attempts ${j.attempts} of ${j.maxAttempts}`, occurredAt: queueTimestamp(j.updatedAt ?? j.createdAt) }));
   return { items, truncated: snap.truncated };
+}
+async function fromFileQueue(deps: NotificationsDeps, tenantId: string, limit: number): Promise<Part> {
+  const res = await deps.fileQueue!.listDeadJobs(tenantId, limit);
+  if (!res || !Array.isArray(res.jobs) || typeof res.truncated !== "boolean" || res.jobs.length > limit || res.truncated && res.jobs.length !== limit) throw new Error("Invalid file queue response");
+  const items = res.jobs.map((j): Notification => {
+    if (!j || typeof j.id !== "string" || !/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(j.id) || !Number.isSafeInteger(j.at) || j.at < 0 || j.at > 8640000000000000) throw new Error("Invalid file queue job");
+    return { id: safeId("file-queue", j.id), source: "file-queue", severity: "error", title: "Pipeline run failed",
+      detail: `Kind: pipeline-run; reason: ${fileQueueErrorLabel(j.errorCode)}`, occurredAt: new Date(j.at).toISOString() };
+  });
+  return { items, truncated: res.truncated };
 }
 async function fromProviderJobs(deps: NotificationsDeps, tenantId: string, limit: number): Promise<Part> {
   const res = await deps.jobs.listJobs(tenantId, limit);
@@ -72,9 +91,10 @@ async function fromWatcher(deps: NotificationsDeps, tenantId: string, limit: num
 export async function collectNotifications(deps: NotificationsDeps, tenantId: string, limit: number): Promise<NotificationsResponse> {
   if (!Number.isInteger(limit) || limit < 1 || limit > 100) throw new Error("Invalid notifications limit");
   if (typeof tenantId !== "string" || !tenantId.trim()) throw new Error("Missing verified tenant");
-  const settled = await Promise.allSettled([fromQueue(deps, tenantId, limit), fromProviderJobs(deps, tenantId, limit), fromWatcher(deps, tenantId, limit)]);
+  const settled = await Promise.allSettled([fromQueue(deps, tenantId, limit), fromProviderJobs(deps, tenantId, limit), fromWatcher(deps, tenantId, limit),
+    ...(deps.fileQueue ? [fromFileQueue(deps, tenantId, limit)] : [])]);
   const state = (i: number): SourceState => settled[i]!.status === "fulfilled" ? "ok" : "unavailable";
-  const sources = { uploadQueue: state(0), providerJobs: state(1), watcher: state(2) };
+  const sources: NotificationsResponse["sources"] = { uploadQueue: state(0), providerJobs: state(1), watcher: state(2), ...(deps.fileQueue ? { fileQueue: state(3) } : {}) };
   if (settled.every((s) => s.status === "rejected")) throw new Error("All notification sources unavailable");
   const all = settled.flatMap((s) => s.status === "fulfilled" ? s.value.items : [])
     .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt) || a.id.localeCompare(b.id));

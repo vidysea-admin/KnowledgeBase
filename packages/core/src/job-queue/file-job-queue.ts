@@ -25,6 +25,7 @@ export interface FileJobQueueOptions { dir: string; now: () => number; leaseMs?:
    *  enqueues a NEW job (idempotency only lasts for the retention window). nextSeq never rewinds. */
   pruneTerminalAfterMs?: number | null }
 /** Default retention for terminal jobs: 30 days (Approver ruling 2026-10-12 (2)). */
+export interface DeadJobInfo { id: string; errorCode: string | null; at: number; enqueuedAt: number; attempt: number; maxAttempts: number }
 export const DEFAULT_PRUNE_TERMINAL_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 const err = (code: QueueError["code"], message: string): { ok: false; error: QueueError } => ({ ok: false, error: { code, message } });
 const refError = (r: LeaseRef) => validateQueueId(r?.id, "job id") ?? validateQueueId(r?.workerId, "worker id") ?? validateQueueId(r?.tenantId, "tenant id");
@@ -51,12 +52,15 @@ export class FileJobQueue implements JobQueue {
     if (tenantId === undefined) return;
     s.jobs = s.jobs.filter(j => !((j.status === "done" || j.status === "dead") && j.tenantId === tenantId && j.terminalAt !== undefined && now - j.terminalAt >= keep));
   }
+  private lockOptions() {
+    return { waitMs: this.o.lockWaitMs ?? QUEUE_LOCK_WAIT_MS, staleMs: this.o.lockStaleMs ?? QUEUE_LOCK_STALE_MS, wallNow: this.o.wallNow ?? Date.now,
+      liveCeilingMs: this.o.lockLiveCeilingMs, host: this.o.lockOwner?.host, pid: this.o.lockOwner?.pid, thread: this.o.lockOwner?.thread, isAlive: this.o.lockIsAlive,
+      threadLeaseMs: this.o.lockThreadLeaseMs, startTime: this.o.lockStartTime };
+  }
   /** load -> `change(state, now)` on a private copy -> save only if the copy changed (a failed/no-op change writes nothing). */
   private run<T>(change: (s: QueueFileState, now: number) => QueueResult<T>, tenantId?: string): QueueResult<T> {
     const t = this.time(); if (!t.ok) return t;
-    const lk = { waitMs: this.o.lockWaitMs ?? QUEUE_LOCK_WAIT_MS, staleMs: this.o.lockStaleMs ?? QUEUE_LOCK_STALE_MS, wallNow: this.o.wallNow ?? Date.now,
-      liveCeilingMs: this.o.lockLiveCeilingMs, host: this.o.lockOwner?.host, pid: this.o.lockOwner?.pid, thread: this.o.lockOwner?.thread, isAlive: this.o.lockIsAlive,
-      threadLeaseMs: this.o.lockThreadLeaseMs, startTime: this.o.lockStartTime };
+    const lk = this.lockOptions();
     return withQueueLock(this.fs, this.o.dir, lk, stillHeld => {
       const l = loadQueue(this.fs, this.o.dir); if (!l.ok) return l;
       const state: QueueFileState = structuredClone(l.value.state), before = JSON.stringify(state);
@@ -65,6 +69,18 @@ export class FileJobQueue implements JobQueue {
       if (JSON.stringify(state) === before) return r;
       const s = saveQueue(this.fs, this.o.dir, l.value, state, stillHeld);
       return s.ok ? r : s;
+    });
+  }
+  /** Read-only (ISS-FAILEDJOB-001, D-139): the DEAD jobs of `opts.tenantId` (REQUIRED, ISS-JOBQTENANT-001: missing/empty/malformed is "invalid-input", never "any tenant"), newest first, at most `limit` (1..100)
+   *  and a `truncated` flag. Only id, errorCode, attempt counts and queue-clock times (at = terminalAt when stamped, else enqueuedAt; enqueuedAt) are returned: no payload, worker or lease. Never writes, never prunes, never stamps. */
+  listDead(opts: { tenantId: string }, limit = 50): QueueResult<{ jobs: DeadJobInfo[]; truncated: boolean }> {
+    const bad = validateQueueId(opts?.tenantId, "tenant id"); if (bad) return { ok: false, error: bad };
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) return err("invalid-input", "limit must be an integer 1..100");
+    return withQueueLock(this.fs, this.o.dir, this.lockOptions(), () => {
+      const l = loadQueue(this.fs, this.o.dir); if (!l.ok) return l;
+      const dead = l.value.state.jobs.filter(j => j.status === "dead" && j.tenantId === opts.tenantId)
+        .map((j): DeadJobInfo => ({ id: j.id, errorCode: j.errorCode, at: j.terminalAt ?? j.enqueuedAt, enqueuedAt: j.enqueuedAt, attempt: j.attempt, maxAttempts: j.maxAttempts })).sort((x, y) => y.at - x.at || (x.id < y.id ? -1 : 1));
+      return { ok: true, value: { jobs: dead.slice(0, limit), truncated: dead.length > limit } };
     });
   }
   enqueue(input: EnqueueInput): QueueResult<"enqueued" | "exists"> {
