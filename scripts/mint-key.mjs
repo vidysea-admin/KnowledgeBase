@@ -11,6 +11,8 @@
  * Usage: node scripts/mint-key.mjs [--tenant toc] [--label live-verify] [--with-scope send-now] [--with-scope join-rules]
  *   Default keys never hold a dedicated write scope; ask for it by name (repeatable, or comma list). Unknown names exit 1.
  *   send-now can launch a recording bot; join-rules lets a key edit the join rules (PUT/POST). Without it /join-rules opens read-only.
+ *   Database: no default. An isolated MONGO_WORK_DB (or lkb_staging with LKB_ALLOW_STAGING) is used without a flag; `lkb` needs
+ *   --i-know-this-is-production AND MONGODB_DB=lkb exactly (D-150); anything else is refused before connecting.
  *   Editor key:  node scripts/mint-key.mjs --tenant toc --label join-rules-editor --with-scope join-rules
  */
 import { randomUUID, randomBytes, createHash } from "node:crypto";
@@ -20,6 +22,7 @@ import { register } from "tsx/esm/api";
 register();
 
 const { scopesFromArgv } = await import("./lib/mint-scopes.mjs");
+const { requireScriptDatabase } = await import("./lib/transcript-provenance.mjs");
 
 function argOf(name, fallback) {
   const i = process.argv.indexOf(`--${name}`);
@@ -38,9 +41,12 @@ const { connect, getDb, assertValidTenantId } = await import("../packages/db/src
 try { assertValidTenantId(tenantId, "mint-key --tenant"); }
 catch (err) { console.error(`mint-key: ${err.message}`); process.exit(1); }
 
-const url = process.env.MONGODB_URL;
-if (!url) throw new Error("MONGODB_URL not set in environment/.env");
-await connect(url, process.env.MONGODB_DB ?? "lkb");
+// ISS-LEGACYSEED-002 (D-150): no lkb default. Work/staging DBs only, unless --i-know-this-is-production AND MONGODB_DB=lkb exactly.
+// Refuses (exit 1) BEFORE connecting or touching api_keys.
+let target;
+try { target = requireScriptDatabase(process.env, process.argv.slice(2), {allowProduction: true}); }
+catch (err) { console.error(`mint-key: ${err.message}`); process.exit(1); }
+await connect(target.url, target.dbName);
 
 const rawKey = `lv_${randomBytes(24).toString("hex")}`;
 const db = getDb();
