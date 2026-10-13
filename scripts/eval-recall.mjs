@@ -35,6 +35,7 @@ function loadJson(path) {
 }
 
 import { computeFilterBias } from "./eval/filter-bias.mjs";
+import { parseLlmArgs, redactor, createEvalComplete, createLlmScoreFn, rankSessionsLlm, limitByQuestion, callSummary, fallbackWarning, resultsPath, writeResults } from "./eval/llm-eval.mjs";
 export { computeFilterBias };
 
 /**
@@ -104,7 +105,7 @@ async function main() {
   const tree = roots[tenantId];
   if (!tree) throw new Error(`eval-recall: no tree built for tenantId "${tenantId}"`);
 
-  const questions = loadJson(GOLDEN_SET_PATH);
+  let questions = loadJson(GOLDEN_SET_PATH);
 
   // `--retriever vector` (U1.4) scores the brute-force cosine retriever over the REAL `chunks`
   // rows instead of the tree heuristic, so both numbers come out of the same harness, the same
@@ -121,7 +122,23 @@ async function main() {
   let retrieverName = "heuristic";
   let latency = null;
   let retrieve = createHeuristicRetriever(tree);
-  if (useHybrid) {
+  // `--llm --model <id> --max-calls|--max-cost-usd <n>` (U0.10, D-164): rank every session with the real LLM evaluator
+  // (createLlmScorer, jobKind "evaluator"), then score with the SAME harness, golden set and question-blind control.
+  const llm = parseLlmArgs(process.argv.slice(2), process.env);
+  let llmRun = null;
+  if (llm.llm) {
+    if (llm.error) { console.error(llm.error); process.exitCode = 2; return; }
+    const sessionNodes = new Map();
+    (function collect(n) { if (n.level === "session" && n.evidence?.sessionRef) sessionNodes.set(n.evidence.sessionRef, n); n.children.forEach(collect); })(tree);
+    const { scoreFn, stats } = await createLlmScoreFn(await createEvalComplete(llm, process.env), llm);
+    const selected = limitByQuestion(questions, (q) => q.question, llm.limitQuestions);
+    const r = await rankSessionsLlm(selected, sessionNodes, scoreFn, K);
+    questions = selected.filter((q) => r.ranked.has(q.question)); // only whole, LLM-ranked questions are scored
+    retrieve = (question, kk) => (r.ranked.get(question) ?? []).slice(0, kk);
+    retrieverName = `llm (${llm.provider}/${llm.model}, jobKind evaluator, rank all ${sessionNodes.size} sessions per question)`;
+    llmRun = { stats, selected: selected.length, notScored: r.notScored, fallbackQuestions: r.fallbackQuestions, llm };
+  }
+  if (llm.llm) { /* skip the other retrievers */ } else if (useHybrid) {
     const { createVectorRetriever } = await import("../packages/index/src/vector/retriever.ts");
     const { createHeuristicRetriever: heur } = await import("../packages/index/src/eval/heuristic-retriever.ts");
     const { rrfMerge } = await import("../packages/ask/src/merge.ts");
@@ -213,7 +230,7 @@ async function main() {
     }));
   }
   const filterBias = computeFilterBias({
-    rejectedPathExists: existsSync(REJECTED_PATH),
+    rejectedPathExists: existsSync(REJECTED_PATH) && !llmRun, // --llm: rejected questions are not LLM-ranked, so bias is honestly NOT MEASURED
     rejectedQs,
     keptResult: result,
     computeRejected: () => computeRecallAtK(rejectedQs, retrieve, K),
@@ -266,6 +283,17 @@ async function main() {
         "uninterpretable until provenance exists.",
     filterBias,
   };
+  if (llmRun) {
+    const date = new Date().toISOString().slice(0, 10), o = llmRun.llm;
+    const out = { kind: "recall", date, generatedAt: report.generatedAt, model: o.model, provider: o.provider, baseUrl: o.provider === "ollama" ? o.baseUrl : undefined,
+      jobKind: "evaluator", k: K, questionsSelected: llmRun.selected, questionsScored: result.total, questionsNotScored: llmRun.notScored,
+      questionsWithHeuristicFallback: llmRun.fallbackQuestions, limitQuestions: o.limitQuestions ?? null,
+      summary: { recallAtK: result.recallAtK, hits: result.hits, total: result.total, misses: result.misses.length, controlRecallAtK: control.recallAtK, chanceFloor: assessment.chanceFloor, verdict: assessment.verdict, reason: assessment.reason },
+      ...fallbackWarning(llmRun.stats), goldenSetProvenance: report.goldenSetProvenance, calls: callSummary(llmRun.stats, o), report };
+    console.log(`llm calls=${llmRun.stats.calls} (ok ${llmRun.stats.ok}, failed ${llmRun.stats.failed}, fallbacks ${llmRun.stats.fallbacks}) p50=${out.calls.latency.p50Ms ?? "n/a"}ms p95=${out.calls.latency.p95Ms ?? "n/a"}ms; questions scored ${result.total}/${llmRun.selected}`);
+    console.log(`wrote ${writeResults(resultsPath("recall", o, date, o.limitQuestions !== undefined), out, redactor([process.env.OLLAMA_API_KEY, process.env.GEMINI_API_KEY]))}`);
+    return;
+  }
   writeFileSync(useHybrid ? HYBRID_REPORT_PATH : useVector ? VECTOR_REPORT_PATH : REPORT_PATH, JSON.stringify(report, null, 2) + "\n", "utf8");
   console.log(`wrote ${useHybrid ? HYBRID_REPORT_PATH : useVector ? VECTOR_REPORT_PATH : REPORT_PATH}`);
 }

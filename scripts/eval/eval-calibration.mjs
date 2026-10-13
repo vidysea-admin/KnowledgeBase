@@ -9,6 +9,7 @@ import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { register } from "tsx/esm/api";
+import { parseLlmArgs, redactor, createEvalComplete, createLlmScoreFn, calibrateLlm, limitByQuestion, callSummary, fallbackWarning, resultsPath, writeResults } from "./llm-eval.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const DATA_DIR = join(ROOT, "data", "toc-migrated");
@@ -19,6 +20,29 @@ register();
 
 function loadJson(path) {
   return JSON.parse(readFileSync(path, "utf8"));
+}
+
+/** U0.10 `--llm --model <id> --max-calls|--max-cost-usd <n> [--provider ollama|gemini] [--limit-questions N] [--out file]`. Never touches calibration-report.json. */
+async function runLlm(allPairs, computeMAE) {
+  await import("dotenv/config"); // keys stay in memory; never printed
+  const o = parseLlmArgs(process.argv.slice(2), process.env);
+  if (o.error) { console.error(o.error); process.exitCode = 2; return; }
+  const redact = redactor([process.env.OLLAMA_API_KEY, process.env.GEMINI_API_KEY]);
+  const pairs = limitByQuestion(allPairs, (p) => p.query, o.limitQuestions);
+  const { scoreFn, stats } = await createLlmScoreFn(await createEvalComplete(o, process.env), o);
+  const r = await calibrateLlm(pairs, scoreFn, computeMAE);
+  const date = new Date().toISOString().slice(0, 10);
+  const report = {
+    kind: "calibration", date, generatedAt: new Date().toISOString(), model: o.model, provider: o.provider,
+    baseUrl: o.provider === "ollama" ? o.baseUrl : undefined, jobKind: "evaluator",
+    referenceSet: "data/eval/evaluator-calibration-set.json: DERIVED reference (own session 1.0 / other session 0.0), NOT human-hand-scored (qa/contracts/evaluator-calibration.md); an MAE here is a proxy, not the plan's final calibration",
+    pairsSelected: pairs.length, pairsScored: r.n, pairsNotScored: r.notScored, limitQuestions: o.limitQuestions ?? null,
+    summary: { mae: r.mae, n: r.n, heuristicFallbackPairs: r.fallbackIds },
+    ...fallbackWarning(stats), calls: callSummary(stats, o), details: r.details,
+  };
+  const path = writeResults(resultsPath("calibration", o, date, o.limitQuestions !== undefined), report, redact);
+  console.log(`llm calibration ${o.provider}/${o.model}: mae=${r.mae === null ? "n/a" : r.mae.toFixed(3)} over ${r.n}/${pairs.length} pairs, calls=${stats.calls} (ok ${stats.ok}, failed ${stats.failed}, fallbacks ${stats.fallbacks}), p50=${report.calls.latency.p50Ms ?? "n/a"}ms p95=${report.calls.latency.p95Ms ?? "n/a"}ms`);
+  console.log(`wrote ${path}`);
 }
 
 async function main() {
@@ -63,6 +87,7 @@ async function main() {
     })
     .filter((p) => p !== undefined);
 
+  if (process.argv.includes("--llm")) return runLlm(pairs, computeMAE);
   const result = await computeMAE(pairs, heuristicScorer);
 
   console.log(`mae = ${result.mae.toFixed(3)} over ${result.n} pairs`);
