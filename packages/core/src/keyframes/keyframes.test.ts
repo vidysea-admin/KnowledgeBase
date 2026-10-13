@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { isAbsolute, join, resolve } from "node:path";
 import test from "node:test";
 import { hexHammingDistance } from "../domain/keyframe-dedupe.js";
 import { FFMPEG_ENV, framePassArgs, hashPassArgs, KeyframeExtractError, resolveFfmpeg } from "./ffmpeg-args.js";
@@ -157,7 +157,9 @@ test("end-to-end on a generated 8 s video (real ffmpeg)", { skip: REAL === null 
       "-f", "lavfi", "-i", "smptebars=s=160x120:d=4:r=5", "-filter_complex", "[1:v]hflip[b];[0:v][b]concat=n=2:v=1:a=0",
       "-pix_fmt", "yuv420p", "-c:v", "mpeg4", "-y", video], { timeout: 60_000, windowsHide: true });
     assert.equal(gen.status, 0, String(gen.stderr));
-    const env = { ...process.env, [FFMPEG_ENV]: REAL! };
+    // REAL is a bare "ffmpeg" when it came from PATH (CI); LKB_FFMPEG_PATH must be absolute, so only set it when REAL is.
+    const env: Record<string, string | undefined> = { ...process.env };
+    if (isAbsolute(REAL!)) env[FFMPEG_ENV] = REAL!; else delete env[FFMPEG_ENV];
     const frames = await extractFrameHashes(video, { env, intervalSec: 2 });
     assert.equal(frames.length, 4);
     assert.deepEqual(frames.map((f) => f.tSec), [0, 2, 4, 6]);
