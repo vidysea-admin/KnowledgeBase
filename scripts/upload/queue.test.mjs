@@ -4,6 +4,7 @@ import { mkdtemp, mkdir, writeFile, readFile, rm, symlink, link } from 'node:fs/
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { spawn, spawnSync } from 'node:child_process';
 import 'dotenv/config';
 import { operation, connectQueue, createQueueTransport } from './queue.mjs';
@@ -13,7 +14,15 @@ import { loadWebinarSession } from '../webinar/session-rows.mjs';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const tempRoot = join(ROOT, '.cache', 'upload-worker-tests');
-const python = join(ROOT, '.venv', 'Scripts', 'python.exe');
+const python = process.env.UPLOAD_PYTHON ?? join(ROOT, '.venv', 'Scripts', 'python.exe');
+// ISS-SCRIPTSFIX-001: tests that need the Python worker interpreter or a real MongoDB skip with a reason
+// instead of failing when the environment lacks them. They never fall back to .env MONGODB_URL.
+const noPython = existsSync(python) ? false : `Python interpreter not found at ${python}; set UPLOAD_PYTHON or create .venv`;
+const ffprobe = process.env.UPLOAD_FFPROBE ?? join(ROOT, '.cache', 'tools', 'ffmpeg-9.0.2', 'bin', 'ffprobe.exe');
+const noFfprobe = noPython || (existsSync(ffprobe) ? false : `ffprobe not found at ${ffprobe}; set UPLOAD_FFPROBE`);
+const testMongo = process.env.TEST_MONGO_URL;
+const noMongo = !testMongo ? 'TEST_MONGO_URL not set (a dedicated loopback MongoDB is required; .env MONGODB_URL is never used)'
+  : !/^mongodb:\/\/(?:[^@/]*@)?(?:127\.0\.0\.1|localhost|\[::1\])(?::\d+)?(?:[/?]|$)/.test(testMongo) ? 'TEST_MONGO_URL must point at a loopback host' : false;
 async function temporary() { await mkdir(tempRoot, { recursive: true }); return mkdtemp(join(tempRoot, 'case-')); }
 async function cleanup(path) {
   assert.ok(resolve(path).startsWith(`${resolve(tempRoot)}${process.platform === 'win32' ? '\\' : '/'}`));
@@ -25,7 +34,7 @@ const startRequest = () => ({ method: 'POST', url: 'https://generativelanguage.g
 const validTurn = { speakerRef: 'spk:0', tStart: 0, tEnd: 12, text: 'Lifecycle fixture; not real STT proof.' };
 const SHORT_CAPTURE = '[00:00] spk:0: VDC controlled test. This generated voice is for an authorized private test. [00:08] The video shows a changing pattern and a frame counter. Test number one.';
 
-test('actual recording submission passes measured duration through production STT and downstream publication', async () => {
+test('actual recording submission passes measured duration through production STT and downstream publication', { skip: noFfprobe }, async () => {
   const dir=await temporary();
   try {
     for(const name of ['input','spool','output'])await mkdir(join(dir,name));
@@ -113,7 +122,7 @@ test('input pinning refuses traversal, hard links, escaping link and parent link
   } finally { await cleanup(dir); }
 });
 
-test('existing consumer validates schema-valid publication; invalid bounds preserve prior bytes', async () => {
+test('existing consumer validates schema-valid publication; invalid bounds preserve prior bytes', { skip: noPython }, async () => {
   const dir = await temporary(), tenantId = 'fixture-tenant', sessionId = 'fixture-session';
   const source = { _id: hash('audio'), tenantId, kind: 'recording', hash: hash('audio'), captureMode: 'provided',
     consent: { given: true, recordedBy: 'test-operator' }, createdAt: new Date().toISOString(), title: sessionId };
@@ -132,10 +141,10 @@ test('existing consumer validates schema-valid publication; invalid bounds prese
   } finally { await cleanup(dir); }
 });
 
-test('actual Python background worker consumes real Mongo operation; missing key fails without outbound call', { timeout: 30000 }, async () => {
+test('actual Python background worker consumes real Mongo operation; missing key fails without outbound call', { timeout: 30000, skip: noMongo || noPython }, async () => {
   const dir = await temporary(), db = `upload_queue_${randomUUID().replaceAll('-', '')}`;
   const env = { ...process.env, UPLOAD_QUEUE_DB: db, UPLOAD_TENANT_ID: 'process-tenant', UPLOAD_ACTOR: 'test-operator',
-    UPLOAD_SPOOL_ROOT: dir, MONGODB_URL: process.env.MONGODB_URL ?? 'mongodb://127.0.0.1:27017', GEMINI_API_KEY: '' };
+    UPLOAD_SPOOL_ROOT: dir, MONGODB_URL: testMongo, GEMINI_API_KEY: '' };
   const queue = await connectQueue(env); let child, stdout = '';
   try {
     child = spawn(python, [join(ROOT, 'workers', 'transcribe', 'src', 'worker.py')], { env, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -153,9 +162,9 @@ test('actual Python background worker consumes real Mongo operation; missing key
   }
 });
 
-test('producer cancellation and timeout are durable; foreign tenant result cannot be read', { timeout: 15000 }, async () => {
+test('producer cancellation and timeout are durable; foreign tenant result cannot be read', { timeout: 15000, skip: noMongo }, async () => {
   const dir = await temporary(), db = `upload_queue_${randomUUID().replaceAll('-', '')}`;
-  const env = { ...process.env, UPLOAD_QUEUE_DB: db, UPLOAD_TENANT_ID: 'a', UPLOAD_ACTOR: 'operator', MONGODB_URL: process.env.MONGODB_URL ?? 'mongodb://127.0.0.1:27017' };
+  const env = { ...process.env, UPLOAD_QUEUE_DB: db, UPLOAD_TENANT_ID: 'a', UPLOAD_ACTOR: 'operator', MONGODB_URL: testMongo };
   const queue = await connectQueue(env);
   try {
     const abort = new AbortController(), transport = await createQueueTransport(queue, { spoolRoot: dir, runId: hash('cancel'), timeoutMs: 2000, signal: abort.signal, pollMs: 10 });
