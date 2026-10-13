@@ -1,6 +1,6 @@
 # cilinux5: tab-receiver-integration "crash-exit-code-only" flaky on Ubuntu CI
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 
 ## Root cause
