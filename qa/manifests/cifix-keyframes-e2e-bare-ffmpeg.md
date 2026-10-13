@@ -1,6 +1,6 @@
 # Manifest: cifix-keyframes-e2e-bare-ffmpeg
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Lane:** lane/cifix
 
