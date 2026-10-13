@@ -1,6 +1,6 @@
 # t008search
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap task T-008, first slice). Touches a tenant-scoped read (checker full ceremony per tenancy rule). T-008 stays OPEN.
 Lane: lane/t008search. No ledger issues fixed or filed.
