@@ -2,7 +2,7 @@
 //
 // WHY THIS EXISTS. `qa/gates/golden-set-redesign.md` (Option C) makes condition 3 a PRECONDITION on
 // reporting a recall number: the two leakage diagnostics "must be re-run on any regenerated set
-// BEFORE its recall number is reported" (`scripts/lib/golden-set-diagnostics.mjs` header, verbatim).
+// BEFORE its recall number is reported" (`scripts/eval/golden-set-diagnostics.mjs` header, verbatim).
 //
 // They were run — on a 75-question set that scored recall@5 0.307. THE OPERATIVE SET IS A DIFFERENT
 // ONE: `data/eval/golden-set.json` holds 92 questions generated 2026-09-08T09:01 (kept 92,
@@ -18,8 +18,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { diagnose, tokenize } from "../../scripts/lib/golden-set-diagnostics.mjs";
-import { loadCorpora, buildPinTokens } from "../../scripts/lib/golden-set-build.mjs";
+import { diagnose, tokenize } from "../../scripts/eval/golden-set-diagnostics.mjs";
+import { loadCorpora, buildPinTokens } from "../../scripts/eval/golden-set-build.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const SET_PATH = join(ROOT, "data", "eval", "golden-set.json");

@@ -10,7 +10,7 @@ services:
   # Run it deliberately, once, with:
   #   docker compose --profile migrate run --rm migrate
   # Running it against the production database needs the owner's approval (D-117: production DB
-  # writes are not authorized). migrate-mongo-config.cjs has NO default database (ISS-SCRIPTGUARDS-001):
+  # writes are not authorized). config/migrate-mongo-config.cjs has NO default database (ISS-SCRIPTGUARDS-001):
   # you must pass the target explicitly, and `lkb` additionally needs the production opt-in:
   #   MONGODB_DB=lkb_work_x docker compose --profile migrate run --rm migrate          # isolated work DB
   #   MONGODB_DB=lkb LKB_I_KNOW_THIS_IS_PRODUCTION=1 docker compose --profile migrate run --rm migrate   # production, deliberate
@@ -26,7 +26,7 @@ services:
       dockerfile: apps/api/Dockerfile
       target: build
     working_dir: /app
-    command: ["npx", "migrate-mongo", "up", "-f", "migrate-mongo-config.cjs"]
+    command: ["npx", "migrate-mongo", "up", "-f", "config/migrate-mongo-config.cjs"]
     environment:
       MONGODB_URL: ${MONGODB_URL:?set MONGODB_URL (see .env's MONGODB_URL)}
       # No default (ISS-SCRIPTGUARDS-001): the caller names the database every run. `lkb` also needs the opt-in below.
@@ -35,7 +35,7 @@ services:
       LKB_ALLOW_STAGING: ${LKB_ALLOW_STAGING:-}
     volumes:
       - ./migrations:/app/migrations:ro
-      - ./migrate-mongo-config.cjs:/app/migrate-mongo-config.cjs:ro
+      - ./config/migrate-mongo-config.cjs:/app/config/migrate-mongo-config.cjs:ro
       # Four of the five migrations read <__dirname>/../schema/index.json (= /app/schema/index.json);
       # the `build` stage does not copy schema/ (only the runtime stage does) (ISS-DEPLOYCOMPOSE-006).
       - ./schema:/app/schema:ro

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * scripts/gen-calibration-set.mjs — T-022 C3. Derives `data/eval/evaluator-calibration-set.json`
+ * scripts/eval/gen-calibration-set.mjs — T-022 C3. Derives `data/eval/evaluator-calibration-set.json`
  * from T-021's real `data/eval/golden-set.json`: for each of the first 15 golden questions, two
  * pairs — its own session (referenceScore 1.0, "clearly relevant") and a deliberately different
  * session (referenceScore 0.0, "clearly irrelevant") — at least 30 pairs total. Idempotent
@@ -10,7 +10,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const GOLDEN_SET_PATH = join(ROOT, "data", "eval", "golden-set.json");
 const OUT_PATH = join(ROOT, "data", "eval", "evaluator-calibration-set.json");
 const N_QUESTIONS = 15;

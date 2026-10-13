@@ -1,5 +1,5 @@
 /**
- * scripts/lib/golden-set-diagnostics.mjs — the two leakage diagnostics the golden-set gate
+ * scripts/eval/golden-set-diagnostics.mjs — the two leakage diagnostics the golden-set gate
  * (qa/gates/golden-set-redesign.md, Option C, condition 3) requires be re-run on any regenerated
  * set BEFORE its recall number is reported.
  *

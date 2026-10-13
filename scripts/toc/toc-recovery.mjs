@@ -2,7 +2,7 @@
 import {createHash, randomUUID} from "node:crypto";
 import {readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync, renameSync, rmSync, realpathSync} from "node:fs";
 import {join, resolve, relative, dirname, basename} from "node:path";
-import {immutableTranscriptTurns, bindDerivedArtifacts, assertDerivedArtifactsCurrent} from "./transcript-provenance.mjs";
+import {immutableTranscriptTurns, bindDerivedArtifacts, assertDerivedArtifactsCurrent} from "../lib/transcript-provenance.mjs";
 
 export const ORIGINAL_SESSION_IDS = [
   "2026-04-21-visa-blueprint-part2-italy-france-nz", "2026-05-08-funding-dreams-loans-forex",

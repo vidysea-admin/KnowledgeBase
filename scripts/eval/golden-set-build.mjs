@@ -1,5 +1,5 @@
 /**
- * scripts/lib/golden-set-build.mjs — the corpora, the pin criterion, provenance, and the no-API
+ * scripts/eval/golden-set-build.mjs — the corpora, the pin criterion, provenance, and the no-API
  * re-filter path for `gen-golden-set.mjs`. Split out when that file crossed its 300-LOC budget;
  * the generator keeps the prompt and the generation loop.
  *
