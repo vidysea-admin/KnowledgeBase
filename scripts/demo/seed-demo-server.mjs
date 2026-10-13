@@ -19,9 +19,9 @@ async function main() {
   const { connect, getDb, sessions, sessionPages } = await import("../../packages/db/src/index.ts");
   const { buildTree } = await import("../../packages/index/src/tree/build.ts");
 
-  const url = process.env.MONGODB_URL;
-  const dbName = process.env.MONGODB_DB ?? "lkb";
-  if (!url) throw new Error("MONGODB_URL not set in environment/.env");
+  const { requireScriptDatabase } = await import("../lib/transcript-provenance.mjs");
+  // ISS-LEGACYSEED-001: no lkb default; isolated work DB / staging only (demo seeding never targets production).
+  const { url, dbName } = requireScriptDatabase(process.env, process.argv);
   await connect(url, dbName);
 
   const tenantId = "toc";

@@ -88,7 +88,10 @@ async function embedQuestionsAndLoadChunks(questions, tenantId, opts = {}) {
   const { embed: routeEmbed } = await import("../packages/ai/src/index.ts");
   const { buildRouting } = await import("../apps/api/src/composition/production.ts");
 
-  await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", process.env.MONGODB_DB || "lkb");
+  // ISS-LEGACYSEED-006: no lkb default; read-only, but lkb needs --i-know-this-is-production + MONGODB_DB=lkb.
+  const { requireScriptDatabase } = await import("./lib/transcript-provenance.mjs");
+  const target = requireScriptDatabase(process.env, process.argv, {allowProduction: true});
+  await connect(target.url, target.dbName);
   try {
     const chunks = await scopedCollection(getDb(), "chunks")(tenantId).find({}).toArray();
     if (chunks.length === 0) {

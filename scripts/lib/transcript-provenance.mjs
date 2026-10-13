@@ -144,3 +144,19 @@ export function requireBackfillDatabase(env, {legacyUnbound = false} = {}) {
   if (!legacyUnbound) throw new Error("LKB_ALLOW_STAGING requires --legacy-unbound; staging write refused");
   return requireLegacyUnboundDatabase(env);
 }
+
+export const PRODUCTION_FLAG = "--i-know-this-is-production";
+/**
+ * ISS-LEGACYSEED-001/003/005/006 shared guard for scripts that used to default MONGODB_DB to `lkb`.
+ * No default database. Isolated work DB / lkb_staging go through requireLegacyUnboundDatabase unchanged.
+ * `lkb` itself is reachable ONLY when allowProduction is set by the script AND argv carries
+ * --i-know-this-is-production AND MONGODB_DB is exactly "lkb" (a flag alone, or an env alone, is refused).
+ */
+export function requireScriptDatabase(env, argv = [], {allowProduction = false} = {}) {
+  if (allowProduction && argv.includes(PRODUCTION_FLAG)) {
+    if (env.MONGODB_DB?.trim() !== "lkb" || !valid(env.MONGODB_URL))
+      throw new Error(`${PRODUCTION_FLAG} requires an explicit MONGODB_DB=lkb and a Mongo URL`);
+    return {url: env.MONGODB_URL, dbName: "lkb"};
+  }
+  return requireLegacyUnboundDatabase(env);
+}
