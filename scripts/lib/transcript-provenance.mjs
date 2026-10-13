@@ -3,6 +3,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync, rmSync } from "node:fs";
 import { join, relative } from "node:path";
 import { loadWebinarSession } from "../webinar/session-rows.mjs";
+import { assertTurnTimings } from "./turn-timing.mjs";
 const sha = bytes => createHash("sha256").update(bytes).digest("hex");
 const valid = value => typeof value === "string" && value.trim().length > 0;
 const load = path => JSON.parse(readFileSync(path, "utf8"));
@@ -55,6 +56,7 @@ function artifactGeneration(dir, turnArtifact = "turns.json", readBytes = readFi
       !Array.isArray(claims) || page?.tenantId !== tenantId || page?.sessionId !== sessionId ||
       turns.some(t => t?.tenantId !== tenantId || t?.sessionId !== sessionId || !valid(t._id)) ||
       new Set(turns.map(t => t._id)).size !== turns.length) throw new Error("invalid derivation identity");
+  assertTurnTimings(turns, sessionId); // refuse tEnd < tStart etc. before anything is seeded or bound; /ask refuses the whole request on one such row
   if (turnArtifact === "knowledge-turns.json") {
     const validated = loadWebinarSession(dir, sessionId, read);
     if (!validated.screenEvidence || JSON.stringify(validated.rawTurns) !== JSON.stringify(turns)) throw new Error("combined turn artifact not validated");
