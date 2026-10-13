@@ -1,7 +1,7 @@
 # iss-webhigh-002-003-sender-validator-parity
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: ledger issues ISS-WEBHIGH-002 (medium) and -003 (low), requested explicitly by orchestrator. Class: data-write gate (join-rules API) -> full ceremony.
 Lane: lane/senderfix, branched from main HEAD 16d20ec9. Ledger rows (qa/issues.webhigh.jsonl) NOT changed here; checker closes.
 
@@ -30,3 +30,7 @@ packages/meeting-bot: join-rules/*.test.ts + sender-authentication + trusted-sen
 ```
 Mutations (each: backup per mutation, restored in finally, hash-object == HEAD blob afterwards), 9 run, 9 killed:
 api drop length check; api length 321; api drop forbidden-chars check; api drop colon; api first-rule-only (003); engine length 321; engine drop colon. (2 further pattern-miss attempts were re-run as the colon mutants.)
+
+## Fix cycle 1 (ISS-WEBHIGH-004)
+Checker FAIL cycle 0: the fixture "backslash" row was written `a\b@...` (JSON escape for U+0008), so no row tested U+005C; no empty-string row. Fixed: value is now `a\b@x.example` (parsed: U+005C), added row "empty string" (reject); 24 rows. Every row's decoded non-alphanumeric code points were listed and checked: all as intended, no other escape errors.
+Mutants dropping backslash from the forbidden class: API killed, engine killed. Parity tests: api sender-ascii 8/8, meeting-bot sender-fixture 1/1; tsc 0 in both. Hashes of mutated files == HEAD after run.

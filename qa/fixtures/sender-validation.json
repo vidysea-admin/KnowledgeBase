@@ -108,12 +108,17 @@
     },
     {
       "name": "backslash",
-      "value": "a\b@x.example",
+      "value": "a\\b@x.example",
       "accept": false
     },
     {
       "name": "angle-bracket display form",
       "value": "Ann <ann@x.example>",
+      "accept": false
+    },
+    {
+      "name": "empty string",
+      "value": "",
       "accept": false
     }
   ]
