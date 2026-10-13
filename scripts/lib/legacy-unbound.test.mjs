@@ -5,7 +5,7 @@ import { join, resolve, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { loadSessionArtifacts, assertDerivedArtifactsCurrent, bindDerivedArtifacts, requireLegacyUnboundDatabase, LEGACY_UNBOUND } from "./transcript-provenance.mjs";
+import { loadSessionArtifacts, assertDerivedArtifactsCurrent, bindDerivedArtifacts, requireLegacyUnboundDatabase, requireWorkDatabase, isProtectedWorkDbName, LEGACY_UNBOUND } from "./transcript-provenance.mjs";
 const put = (dir, name, value) => writeFileSync(join(dir, name), JSON.stringify(value));
 function fixture() {
   const dir = mkdtempSync(join(tmpdir(), "lkb-legacy-"));
@@ -88,4 +88,26 @@ test("backfill.mjs and sync-speakers.mjs no longer default to lkb and use the gu
     const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", f), "utf8");
     assert.doesNotMatch(src, /\|\|\s*"lkb"/); assert.match(src, /require(Backfill|Work)Database\(process\.env/);
   }
+});
+
+// ISS-LEGACYSEED-010: lkb_staging needs LKB_ALLOW_STAGING=lkb_staging on EVERY guard path.
+test("ISS-LEGACYSEED-010: every guard path refuses lkb_staging without the opt-in", () => {
+  const base = {MONGODB_URL: "mongodb://remote.example:27017"};
+  const noOpt = [{...base, MONGO_WORK_DB: "lkb_staging"}, {...base, MONGO_WORK_DB: "lkb_staging", MONGODB_DB: "lkb_staging"},
+    {...base, MONGO_WORK_DB: "LKB_STAGING"}, {...base, MONGO_WORK_DB: "lkb_staging", LKB_ALLOW_STAGING: ""}, {...base, MONGO_WORK_DB: "lkb_staging", LKB_ALLOW_STAGING: "lkb"}];
+  for (const env of noOpt) {
+    assert.throws(() => requireWorkDatabase(env), /refused/, JSON.stringify(env));
+    assert.throws(() => requireBackfillDatabase(env), /refused/, JSON.stringify(env));
+    assert.throws(() => requireBackfillDatabase(env, {legacyUnbound: true}), /refused/, JSON.stringify(env));
+    assert.throws(() => requireLegacyUnboundDatabase(env), /refused/, JSON.stringify(env));
+    assert.equal(isProtectedWorkDbName(env.MONGO_WORK_DB, env), true);
+  }
+  assert.equal(isProtectedWorkDbName("lkb_staging", ok), false);
+  assert.equal(isProtectedWorkDbName("lkb_work_x", {}), false);
+  assert.equal(isProtectedWorkDbName("lkb", ok), true);
+  assert.equal(isProtectedWorkDbName("", ok), true);
+  assert.equal(requireWorkDatabase(ok).dbName, "lkb_staging");           // with the opt-in
+  assert.equal(requireWorkDatabase({...base, MONGO_WORK_DB: "lkb_work_x"}).dbName, "lkb_work_x"); // ordinary work db unaffected
+  // MONGODB_DB selecting staging while MONGO_WORK_DB is a different name is already refused (mismatch) and stays so.
+  assert.throws(() => requireWorkDatabase({...base, MONGO_WORK_DB: "lkb_work_x", MONGODB_DB: "lkb_staging"}), /refused/);
 });

@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, openSync, closeSync, readFileSync, writeFileSync
 import { dirname, join, resolve, relative, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {randomUUID} from 'node:crypto';
+import {isProtectedWorkDbName} from '../lib/transcript-provenance.mjs';
 import { register } from 'tsx/esm/api';
 register();
 const {selectAutoRecordItems} = await import('../../packages/meeting-bot/src/calendar/auto-join.ts');
@@ -38,7 +39,7 @@ function confined(root, file) {
 }
 export function validateRunGate(root, env) {
   const work = env.MONGO_WORK_DB?.trim();
-  if (!work || ['lkb', 'global_university_db'].includes(work)) throw new Error('MONGO_WORK_DB must identify an isolated work database; production writes refused');
+  if (isProtectedWorkDbName(work, env)) throw new Error('MONGO_WORK_DB must identify an isolated work database; production writes refused');
   const file = join(root, 'data/webinar-release/live-proof.json');
   if (!existsSync(file)) throw new Error('Manual live audio/video proof is required before unattended --run; see docs/webinar-release.md');
   const proof = load(file);

@@ -11,6 +11,7 @@ import path from "node:path";
 import { config as loadEnv } from "dotenv";
 import { connect } from "../../packages/db/src/index.js";
 import { startServer } from "../../apps/api/src/server.js";
+import { requireDatabaseName } from "../../apps/api/src/db-name.js";
 import { buildProductionDeps } from "../../apps/api/src/composition/production.js";
 import { createSendNowDeps } from "./send-now-host.js";
 import { acquireHostLock, createJoinRulesDeps, prepareStateDir, resolveStateDir } from "./join-rules-host.js";
@@ -26,7 +27,7 @@ async function main(): Promise<void> {
   for (const sig of ["SIGINT", "SIGTERM"] as const) process.on(sig, () => { release(); process.exit(sig === "SIGINT" ? 130 : 143); });
   try {
     console.log(`join-rules state directory: ${stateDir}`);
-    await connect(process.env.MONGODB_URL ?? "mongodb://localhost:27017", process.env.MONGODB_DB ?? "lkb");
+    await connect(process.env.MONGODB_URL ?? "mongodb://localhost:27017", requireDatabaseName());
     const prod = buildProductionDeps();
     // T-039: POST /calendar/send-now is live only through this host (needs the "send-now" scope on the key).
     const server = startServer({ ...prod, calendar: { ...prod.calendar, sendNow: createSendNowDeps() }, joinRules: createJoinRulesDeps({ stateDir }) });

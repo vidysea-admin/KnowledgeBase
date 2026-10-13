@@ -1,6 +1,7 @@
 /** ISS-367: default dependency wiring + log redaction for run-pipeline.mjs, split out for the file-length budget. */
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isProtectedWorkDbName } from '../lib/transcript-provenance.mjs';
 import { register } from 'tsx/esm/api';
 register();
 const {createHttpCalendarLoader, createHttpCandidateLoader} = await import('../../packages/meeting-bot/src/calendar/schedule-tick.ts');
@@ -38,7 +39,7 @@ export function createPipelineDeps(env = process.env) {
         const headers = {authorization: `Bearer ${env.LKB_API_KEY}`};
         const preflight = await fetch(`${api}/meeting-candidates`, {headers, redirect: 'error', signal: AbortSignal.timeout(30000)});
         try {
-          if (!preflight.ok || !env.MONGO_WORK_DB || preflight.headers.get('x-lkb-work-db') !== env.MONGO_WORK_DB || ['lkb', 'global_university_db'].includes(env.MONGO_WORK_DB)) throw new Error('Connected Gmail work database not bound');
+          if (!preflight.ok || isProtectedWorkDbName(env.MONGO_WORK_DB, env) || preflight.headers.get('x-lkb-work-db') !== env.MONGO_WORK_DB) throw new Error('Connected Gmail work database not bound');
         } finally { await preflight.body?.cancel(); }
         const scanned = await fetch(`${api}/gmail/scan`, {method: 'POST', headers: {...headers, 'X-LKB-Work-DB': env.MONGO_WORK_DB}, redirect: 'error', signal: AbortSignal.timeout(30000)});
         if (!scanned.ok) { await scanned.body?.cancel(); throw new Error('Gmail discovery unavailable'); }
