@@ -22,7 +22,7 @@
  * none was sufficient.
  */
 
-import { DEMONSTRATIVE_CUES, LOCATIVE_GOVERNORS, NEVER_A_PERSON } from "./speaker-name-data.js";
+import { DEMONSTRATIVE_CUES, LOCATIVE_GOVERNORS, NEVER_A_PERSON } from "./speaker-rules/speaker-name-data.js";
 
 /**
  * Name particles that are legitimately lowercase INSIDE a name ("van der Berg", "de Souza").

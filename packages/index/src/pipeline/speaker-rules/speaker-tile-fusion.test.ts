@@ -204,7 +204,7 @@ test("D-015 ISS-PH3-006 replay: 17 recorded forms x 5 names = 85 texts + the Mak
 });
 
 test("the replayed forms are the ledger's: each literal appears in qa/issues.ph3.jsonl rows 004 / 006", () => {
-  const path = new URL("../../../../qa/issues.ph3.jsonl", import.meta.url);
+  const path = new URL("../../../../../qa/issues.ph3.jsonl", import.meta.url);
   if (!existsSync(path)) return;
   const rows = readFileSync(path, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l) as { id: string; evidence?: string });
   const ev = (id: string): string => rows.find((r) => r.id === id)?.evidence ?? "";

@@ -26,8 +26,8 @@
  */
 import type { LabelResult, RefusalReason, TileAlignResult } from "@lkb/core";
 import { foldKey, nonPerson, normalizeDisplayName } from "@lkb/core";
-import { isDiscourseOnly, looksLikeAName } from "./speaker-name-rules.js";
-import { citesNameAsSelfIdentification } from "./speaker-relation-rules.js";
+import { isDiscourseOnly, looksLikeAName } from "../speaker-name-rules.js";
+import { citesNameAsSelfIdentification } from "../speaker-relation-rules.js";
 import { selfIntroductionCandidates } from "./speaker-selfid-rules.js";
 
 export interface FusionTurn { id: string; tStart: number; tEnd: number; speakerRef: string; text: string }

@@ -23,7 +23,7 @@
  * Places, organisations and role words ("Hello, I'm Google.") are unchanged policy (D-052; open Approver question).
  */
 
-import { looksLikeAName, isDiscourseOnly } from "./speaker-name-rules.js";
+import { looksLikeAName, isDiscourseOnly } from "../speaker-name-rules.js";
 
 const OPENER_WORDS = "hi|hello|hey|namaste|good (?:morning|afternoon|evening|day)|okay|ok|so|well|alright|now|um|uh|thanks|thank you|welcome|everyone|all|folks|friends|and|again|actually|there";
 const OPEN = String.raw`(?:(?:${OPENER_WORDS})[,\s]+)*`;
