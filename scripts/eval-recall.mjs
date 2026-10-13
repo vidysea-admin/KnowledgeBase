@@ -35,7 +35,7 @@ function loadJson(path) {
 }
 
 import { computeFilterBias } from "./eval/filter-bias.mjs";
-import { parseLlmArgs, redactor, createEvalComplete, createLlmScoreFn, rankSessionsLlm, limitByQuestion, callSummary, resultsPath, writeResults } from "./eval/llm-eval.mjs";
+import { parseLlmArgs, redactor, createEvalComplete, createLlmScoreFn, rankSessionsLlm, limitByQuestion, callSummary, fallbackWarning, resultsPath, writeResults } from "./eval/llm-eval.mjs";
 export { computeFilterBias };
 
 /**
@@ -289,7 +289,7 @@ async function main() {
       jobKind: "evaluator", k: K, questionsSelected: llmRun.selected, questionsScored: result.total, questionsNotScored: llmRun.notScored,
       questionsWithHeuristicFallback: llmRun.fallbackQuestions, limitQuestions: o.limitQuestions ?? null,
       summary: { recallAtK: result.recallAtK, hits: result.hits, total: result.total, misses: result.misses.length, controlRecallAtK: control.recallAtK, chanceFloor: assessment.chanceFloor, verdict: assessment.verdict, reason: assessment.reason },
-      goldenSetProvenance: report.goldenSetProvenance, calls: callSummary(llmRun.stats, o), report };
+      ...fallbackWarning(llmRun.stats), goldenSetProvenance: report.goldenSetProvenance, calls: callSummary(llmRun.stats, o), report };
     console.log(`llm calls=${llmRun.stats.calls} (ok ${llmRun.stats.ok}, failed ${llmRun.stats.failed}, fallbacks ${llmRun.stats.fallbacks}) p50=${out.calls.latency.p50Ms ?? "n/a"}ms p95=${out.calls.latency.p95Ms ?? "n/a"}ms; questions scored ${result.total}/${llmRun.selected}`);
     console.log(`wrote ${writeResults(resultsPath("recall", o, date, o.limitQuestions !== undefined), out, redactor([process.env.OLLAMA_API_KEY, process.env.GEMINI_API_KEY]))}`);
     return;

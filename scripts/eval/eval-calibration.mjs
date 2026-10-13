@@ -9,7 +9,7 @@ import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { register } from "tsx/esm/api";
-import { parseLlmArgs, redactor, createEvalComplete, createLlmScoreFn, calibrateLlm, limitByQuestion, callSummary, resultsPath, writeResults } from "./llm-eval.mjs";
+import { parseLlmArgs, redactor, createEvalComplete, createLlmScoreFn, calibrateLlm, limitByQuestion, callSummary, fallbackWarning, resultsPath, writeResults } from "./llm-eval.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const DATA_DIR = join(ROOT, "data", "toc-migrated");
@@ -38,7 +38,7 @@ async function runLlm(allPairs, computeMAE) {
     referenceSet: "data/eval/evaluator-calibration-set.json: DERIVED reference (own session 1.0 / other session 0.0), NOT human-hand-scored (qa/contracts/evaluator-calibration.md); an MAE here is a proxy, not the plan's final calibration",
     pairsSelected: pairs.length, pairsScored: r.n, pairsNotScored: r.notScored, limitQuestions: o.limitQuestions ?? null,
     summary: { mae: r.mae, n: r.n, heuristicFallbackPairs: r.fallbackIds },
-    calls: callSummary(stats, o), details: r.details,
+    ...fallbackWarning(stats), calls: callSummary(stats, o), details: r.details,
   };
   const path = writeResults(resultsPath("calibration", o, date, o.limitQuestions !== undefined), report, redact);
   console.log(`llm calibration ${o.provider}/${o.model}: mae=${r.mae === null ? "n/a" : r.mae.toFixed(3)} over ${r.n}/${pairs.length} pairs, calls=${stats.calls} (ok ${stats.ok}, failed ${stats.failed}, fallbacks ${stats.fallbacks}), p50=${report.calls.latency.p50Ms ?? "n/a"}ms p95=${report.calls.latency.p95Ms ?? "n/a"}ms`);

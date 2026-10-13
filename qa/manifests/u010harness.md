@@ -3,7 +3,7 @@
 **Contract:** none new. Built against `qa/contracts/evaluator-calibration.md`, `qa/contracts/eval-baseline-control.md`, `qa/gates/golden-set-redesign.md`, D-156, D-164.
 **Goal task:** U0.10 (code only; the paid baseline is NOT run in this unit).
 **Date:** 2026-10-13
-**Fix cycle:** 0
+**Fix cycle:** 1
 **Dual check:** no
 **Status:** ready-for-check
 **Lane:** lane/u010harness
@@ -40,3 +40,10 @@ Without `--llm` both scripts behave as before (the new code is gated on the flag
 Per model, with `$env:DOTENV_CONFIG_PATH` pointing at the .env if the worktree has none:
 `node scripts/eval/eval-calibration.mjs --llm --model <id> --max-calls 40` (30 pairs) then
 `node scripts/eval-recall.mjs --llm --model <id> --max-calls 2200` (92 questions x 23 sessions = 2116 calls, ~67 min serial at the smoke p50 of ~1.9 s/call). Ids: glm-5.3-flash, deepseek-v4.1-flash; Gemini last with `--provider gemini --model <id> --max-cost-usd <n>`.
+
+## Fix cycle 1 (ISS-U010HARNESS-001, high)
+
+- `--max-cost-usd` alone is now refused (exit 2) in `parseLlmArgs`: OllamaProvider (ollama.ts:93) and GeminiProvider (gemini.ts:85) return `costUsd: 0`, so it can never trip. It is accepted only with `--max-calls`, which is the binding cap. No per-token prices invented (grep for a pricing table in packages/ai: none).
+- Cap comparison extracted to exported `capHit`; boundary tests for `>=` on both calls and cost. New `fallbackWarning`: top-level `warning` field in both results JSONs when heuristicFallbacks > 0.
+- Reproduction `--llm --model m --max-cost-usd 5` (ollama and gemini): refused, exit 2, 2/2. Test: scripts/eval 14/14, packages/ai 220/220, tsc 0, lint-loc OK.
+- Mutations (hash-verified, restored, HEAD-equal): calls `>=`->`>` KILLED; cost `>=`->`>` KILLED; refusal removed KILLED; `||`->`&&` KILLED; warning `>0`->`>1` initially SURVIVED, test strengthened (fallbacks: 1), now KILLED.

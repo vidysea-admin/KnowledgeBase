@@ -29,6 +29,8 @@ export function parseLlmArgs(argv, env = {}) {
   if (!o.model) return bad("--llm requires --model <id>");
   if (!["ollama", "gemini"].includes(o.provider)) return bad("--provider must be ollama or gemini");
   if (o.maxCostUsd === undefined && o.maxCalls === undefined) return bad("--llm requires a cap: --max-calls <n> and/or --max-cost-usd <n>");
+  // ISS-U010HARNESS-001: OllamaProvider and GeminiProvider both report costUsd: 0, so a cost-only cap can never trip.
+  if (o.maxCostUsd !== undefined && o.maxCalls === undefined) return bad("--max-cost-usd alone is not a cap: the ollama and gemini adapters report costUsd 0, so it can never trip. Use --max-calls <n> (the binding cap); --max-cost-usd is only accepted alongside it");
   for (const [k, v] of [["--max-cost-usd", o.maxCostUsd], ["--max-calls", o.maxCalls], ["--limit-questions", o.limitQuestions]])
     if (v !== undefined && (!Number.isFinite(v) || v <= 0)) return bad(`${k} must be a positive number`);
   if (o.provider === "ollama" && o.baseUrl !== "http://localhost:11434" && !env.OLLAMA_API_KEY) return bad("OLLAMA_API_KEY is not set for a non-local Ollama base URL");
@@ -55,6 +57,16 @@ export async function createEvalComplete(o, env, transport) {
   return (job) => ai.complete("evaluator", job, config);
 }
 
+/** True when the next call must not be sent. `>=`: a run exactly at the cap has spent it. */
+export function capHit(caps, stats) {
+  return (caps.maxCalls !== undefined && stats.calls >= caps.maxCalls) || (caps.maxCostUsd !== undefined && stats.costUsd >= caps.maxCostUsd);
+}
+
+/** Top-level results-JSON field: spread into the report; absent when there were no heuristic fallbacks. */
+export function fallbackWarning(stats) {
+  return stats.fallbacks > 0 ? { warning: `${stats.fallbacks} call(s) fell back to the heuristic scorer: this is NOT a pure LLM number; do not cite it as one` } : {};
+}
+
 /** Wraps createLlmScorer with a call/cost cap, latency and fallback accounting. Cap is checked BEFORE each call. */
 export async function createLlmScoreFn(complete, caps, now = () => performance.now()) {
   const { createLlmScorer } = await import("../../apps/api/src/score.ts");
@@ -79,7 +91,7 @@ export async function createLlmScoreFn(complete, caps, now = () => performance.n
   };
   const inner = createLlmScorer(counted);
   const scoreFn = async (query, node) => {
-    if ((caps.maxCalls !== undefined && stats.calls >= caps.maxCalls) || (caps.maxCostUsd !== undefined && stats.costUsd >= caps.maxCostUsd)) {
+    if (capHit(caps, stats)) {
       stats.capReached = true;
       throw new CapReached("call/cost cap reached; call not sent");
     }

@@ -4,7 +4,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseLlmArgs, redactor, createEvalComplete, createLlmScoreFn, calibrateLlm, rankSessionsLlm, limitByQuestion, latencySummary, CapReached } from "./llm-eval.mjs";
+import { parseLlmArgs, redactor, createEvalComplete, createLlmScoreFn, calibrateLlm, rankSessionsLlm, limitByQuestion, latencySummary, CapReached, capHit, fallbackWarning } from "./llm-eval.mjs";
 
 const env = { OLLAMA_API_KEY: "ok-key-123456", GEMINI_API_KEY: "gem-key-123456" };
 const node = { title: "T", summary: "S" };
@@ -21,6 +21,30 @@ test("flags: without --llm nothing is enabled; --llm needs a model and a cap", (
   assert.equal(ok.error, undefined);
   assert.equal(ok.baseUrl, "https://ollama.com");
   assert.equal(ok.limitQuestions, 3);
+});
+
+test("ISS-U010HARNESS-001: --max-cost-usd alone is refused (adapters report costUsd 0); allowed with --max-calls", () => {
+  for (const provider of ["ollama", "gemini"]) {
+    const alone = parseLlmArgs(["--llm", "--model", "m", "--provider", provider, "--max-cost-usd", "5"], env);
+    assert.match(alone.error, /--max-calls/);
+    assert.match(alone.error, /can never trip/);
+    const both = parseLlmArgs(["--llm", "--model", "m", "--provider", provider, "--max-cost-usd", "5", "--max-calls", "10"], env);
+    assert.equal(both.error, undefined);
+    assert.equal(both.maxCalls, 10);
+  }
+});
+
+test("cap boundary: at exactly the limit the next call is refused; one below it is allowed", () => {
+  assert.equal(capHit({ maxCostUsd: 0.5 }, { calls: 0, costUsd: 0.5 }), true);
+  assert.equal(capHit({ maxCostUsd: 0.5 }, { calls: 0, costUsd: 0.4999 }), false);
+  assert.equal(capHit({ maxCalls: 3 }, { calls: 3, costUsd: 0 }), true);
+  assert.equal(capHit({ maxCalls: 3 }, { calls: 2, costUsd: 0 }), false);
+  assert.equal(capHit({}, { calls: 99, costUsd: 99 }), false);
+});
+
+test("results warning field appears only when heuristic fallbacks > 0", () => {
+  assert.deepEqual(fallbackWarning({ fallbacks: 0 }), {});
+  assert.match(fallbackWarning({ fallbacks: 1 }).warning, /1 call\(s\) fell back.*NOT a pure LLM/);
 });
 
 test("fake transport: cloud URL + bearer header sent, model id passed, OLLAMA_BASE_URL untouched", async () => {
@@ -47,6 +71,7 @@ test("cap: checked before each call; the capped call is never sent", async () =>
   const { scoreFn, stats } = await createLlmScoreFn(counting, { maxCostUsd: 0.5 });
   await scoreFn("q", node);
   await scoreFn("q", node);
+  assert.equal(stats.costUsd, 0.8);
   await assert.rejects(scoreFn("q", node), CapReached);
   assert.equal(sent, 2);
   assert.equal(stats.capReached, true);
