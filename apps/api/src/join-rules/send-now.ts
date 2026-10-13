@@ -32,9 +32,20 @@ export interface SendNowDeps {
   plan(tenantId: string, request: SendNowRequestValue): Promise<SendNowPlanValue> | SendNowPlanValue;
   /** Starts the bot detached and resolves once it is started. MUST throw when it did not start. Called only after an ok plan. */
   launch(tenantId: string, plan: Extract<SendNowPlanValue, { ok: true }>, until: string): Promise<{ jobId: string }>;
+  /**
+   * OPTIONAL (flag-gated by the host, ISS-SENDNOWAPI-003): status of a job this API launched. Absent -> GET /calendar/send-now/:jobId is not
+   * mounted at all (404, as before this slice). It reports recorder PROCESS state only; "joined the meeting" is never claimed.
+   */
+  status?(tenantId: string, jobId: string): Promise<SendNowStatusValue> | SendNowStatusValue;
   /** Test seam. */
   now?: () => number;
 }
+export type SendNowJobState = "launching" | "running" | "not-running";
+export type SendNowStatusValue =
+  | { ok: true; status: SendNowJobState; meetingKey?: string; startedAt?: string; until?: string | null }
+  | { ok: false; kind: "unreadable" | "forbidden"; reason: string; message: string };
+/** Shape of a job id minted by the host adapter (`send-now-<14 digits>-<6 hex>`); anything else is a 400 before the host is asked. */
+export const JOB_ID_PATTERN = /^send-now-\d{14}-[0-9a-f]{6}$/;
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const KINDS = { invalid: [400, "send_now_refused"], duplicate: [409, "send_now_duplicate"], unreadable: [503, "send_now_unavailable"], forbidden: [403, "send_now_forbidden"] } as const;
@@ -87,6 +98,29 @@ export function createSendNowRouter(deps: SendNowDeps): Router {
       if (slot) inFlight.delete(slot);
     }
   });
+  if (deps.status) {
+    const status = deps.status.bind(deps);
+    router.get("/calendar/send-now/:jobId", requireScope(SEND_NOW_SCOPE), async (req: Request, res: Response) => {
+      const jobId = req.params.jobId;
+      if (typeof jobId !== "string" || !JOB_ID_PATTERN.test(jobId)) {
+        res.status(400).json({ error: "bad_request", message: "jobId is not a send-now job id" }); return;
+      }
+      try {
+        const v = await status(req.auth!.tenantId, jobId); // tenant ONLY from the key
+        if (!v.ok) {
+          const [code, error] = KINDS[v.kind];
+          res.status(code).json({ error, reason: v.reason, message: v.message }); return;
+        }
+        res.status(200).json({
+          jobId, status: v.status, ...(v.meetingKey ? { meetingKey: v.meetingKey } : {}),
+          ...(v.startedAt ? { startedAt: v.startedAt } : {}), ...(v.until !== undefined ? { until: v.until } : {}),
+          joined: "unknown", // process state only; whether the bot is inside the meeting is not measured
+        });
+      } catch {
+        res.status(503).json({ error: "send_now_unavailable", message: "send-now status is unavailable" });
+      }
+    });
+  }
   return router;
 }
 

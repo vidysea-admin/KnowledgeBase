@@ -64,7 +64,7 @@ export function entryIsLive(e: LiveRecordingEntry, now: Date, probes: LiveProbes
   return controllerMatchesIdentity(e.processStartedAt, actual); // proven mismatch = PID reuse = dead; unknown = trust the pid
 }
 
-function parseEntry(text: string, where: string, tenantId: string): LiveRecordingEntry {
+export function parseEntry(text: string, where: string, tenantId: string): LiveRecordingEntry {
   let v: any;
   try { v = JSON.parse(text); } catch { throw new Error(`live-recording entry ${where} is not JSON`); }
   if (!v || typeof v !== "object" || v.version !== 1 || typeof v.meetingUrl !== "string" || typeof v.meetingKey !== "string" ||
