@@ -217,7 +217,9 @@ test("D-015: the corpus above is byte-faithful to ISS-104's own recorded reprodu
   let row: { evidence: string } | undefined;
   for (const shard of shards) {
     for (const line of readFileSync(join(qa, shard), "utf8").split("\n")) {
-      if (!line.trim()) continue;
+      // Only the ISS-104 row is parsed. An unrelated shard row that is not valid JSON (e.g. the bad
+      // escape in qa/issues.webhigh.jsonl line 2) must not fail THIS test; a malformed ISS-104 row still throws.
+      if (!/"id"\s*:\s*"ISS-104"/.test(line)) continue;
       const parsed = JSON.parse(line) as { id?: string; evidence?: string };
       if (parsed.id === "ISS-104" && typeof parsed.evidence === "string") row = { evidence: parsed.evidence };
     }
