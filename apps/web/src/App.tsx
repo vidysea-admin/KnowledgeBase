@@ -36,7 +36,7 @@ export function App(): React.ReactElement {
           <AppShell>
             <Routes>
               <Route path="/" element={<DashboardPage />} />
-              <Route path="/sessions" element={<SessionsListPage />} />
+              <Route path="/sessions" element={<SessionsListPage enableFilters={import.meta.env.VITE_SESSIONS_FILTERS === "1"} />} />
               <Route path="/sessions/:id" element={<SessionDetailPage />} />
               <Route path="/ask" element={<AskPage />} />
               <Route path="/search" element={<SearchPage />} />
