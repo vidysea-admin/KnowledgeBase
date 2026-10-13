@@ -187,8 +187,9 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
         const lockFd = openSync(lock, "wx"); writeSync(lockFd, String(process.pid)); closeSync(lockFd); locked = true;
         if (existsSync(recoveryLock)) throw new Error("Profile recovery claimed during capture startup");
         let ready = false, failure: string | undefined;
+        let admittedSeen = false; // ISS-CAPTUREFIX-001: status says "recording" only once the bot is admitted (the recorder starts in the lobby)
         receiver = await createTabCaptureReceiver(output, (event) => {
-          if (event.event === "capture-started") { ready = true; captureStartedAt = new Date().toISOString(); status("recording"); }
+          if (event.event === "capture-started") { ready = true; captureStartedAt = new Date().toISOString(); status(admittedSeen ? "recording" : "starting"); }
           if (event.event === "capture-error") { failure = String(event.error ?? "Capture failed"); status("failed", failure); }
           // A stop that is not failed:false is a failure by itself: the capture-error POST may have been lost.
           // The partial .webm stays on disk, status "failed" (never "stopped"); stop() throws so nothing finalizes it.
@@ -230,7 +231,9 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
           if (pending.length > 65536) { failure = "Browser event line too large"; pending = ""; return; }
           const lines = pending.split("\n"); pending = lines.pop() ?? "";
           for (const line of lines) {
-            try { const event = JSON.parse(line) as BotEvent; if (event.event === "fatal") failure = String(event.error); cfg.onEvent?.(handle, event); }
+            try { const event = JSON.parse(line) as BotEvent; if (event.event === "fatal") failure = String(event.error);
+              if (event.event === "admitted") { admittedSeen = true; if (captureStartedAt && !failure && !runs.get(handle)?.stopped) status("recording"); }
+              cfg.onEvent?.(handle, event); }
             catch { /* non-JSON Selenium diagnostics are not protocol events */ }
           }
         });

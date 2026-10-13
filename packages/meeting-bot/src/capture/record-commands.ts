@@ -116,9 +116,11 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   const gaps: GapWindow[] = []; // T-029: filled from "gap" events on sb_join.py's stdout stream
   const telegram = inject.telegram ?? createTelegramNotifier();
   let captureFailure: string | undefined;
+  let joinedNotified = false;
   const gate = createAdmissionGate(); // ISS-CAPTUREFIX-001: the silence watchdog starts only after `admitted`
   const onEvent = (_h: string, ev: Parameters<typeof collectGapEvent>[1]) => {
     const gateFailure = gate.onEvent(ev as Parameters<typeof gate.onEvent>[0]);
+    if (ev.event === "admitted" && !joinedNotified) { joinedNotified = true; telegram.notifyJoined(title, platform); } // T-030, now only once admitted (ISS-CAPTUREFIX-001)
     if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
     if (ev.event === "capture-error") captureFailure = gateFailure ?? String(ev.error ?? "capture failed");
     if (ev.event === "admission_timeout") captureFailure ??= gateFailure;
@@ -152,7 +154,6 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   }, inject.obs);
   const joiner = createBrowserJoiner(bot.deps);
   const { sessionHandle } = await joiner.join(url, { tenantId, consentNote: title });
-  telegram.notifyJoined(title, platform); // T-030
   let gone = false;
   void bot.browserExited(sessionHandle)?.then(() => (gone = true));
   const audioWatchdog = createAudioWatchdog({
