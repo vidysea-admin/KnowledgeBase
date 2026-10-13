@@ -79,6 +79,8 @@ export interface Candidate {
   label: string; name: string; kind: EvidenceKind; quote: string;
   turnIdx: number; turnId: string; sessionId: string; speaker: string;
   block: Block; side: "inside" | "before" | "after"; run: number;
+  /** The quote carries a forward cue ("over to X"): it may only be paired with evidence about the SAME block. */
+  forward?: boolean;
 }
 
 /** Distinct OTHER person names in a span: mid-sentence capitalised words (or known names) outside `name`. */
@@ -95,7 +97,34 @@ export function otherNamesIn(span: string, name: string, known: Set<string>): st
     if (sentenceInitial && !known.has(lw) && !vocative) continue;
     if (looksLikeAName(w)) found.add(lw);
   }
+  // ISS-U24SMART-005: a second name needs no capital. Any word that is a session candidate name (case-insensitive), or the
+  // word after a Hinglish conjunction ("aap aur ruby"), is a second person -> abstain (a false abstain is cheap).
+  const wordRe = /\p{L}[\p{L}'’-]*/gu;
+  for (let m = wordRe.exec(span); m; m = wordRe.exec(span)) {
+    const lw = m[0].toLowerCase();
+    if (!own.has(lw) && lw.length >= 3 && known.has(lw) && !isDiscourseOnly(lw) && !NOT_A_SECOND_NAME.has(lw)) found.add(lw);
+  }
+  const conj = /\b(?:aur|ya|evam|tatha)\s+(\p{L}{3,})/giu;
+  for (let m = conj.exec(span); m; m = conj.exec(span)) {
+    const lw = (m[1] ?? "").toLowerCase();
+    if (!own.has(lw) && !isDiscourseOnly(lw) && !NOT_A_SECOND_NAME.has(lw)) found.add(lw);
+  }
   return [...found];
+}
+/** Hinglish function words that follow "aur"/"ya" without being a person. */
+const NOT_A_SECOND_NAME = new Set(["main", "mein", "hum", "aap", "yeh", "woh", "ese", "kal", "aaj", "sab", "sabhi", "kuch", "koi", "mere", "apne", "hamare", "humare", "unka", "unki", "uska", "uski", "bhi", "phir", "abhi", "ek", "kya", "kaise", "thoda", "zyada", "bahut", "isse", "usse", "isko", "usko", "unko", "inko", "mujhe", "tumhe", "aapko", "humein"]);
+
+/** A FORWARD cue ("over to X", "hand over", "next speaker", "invite"): a name after it is the NEXT speaker; a name before it is the addressee. */
+const FORWARD_CUE = /\b(?:over to|hand(?:ing|s)? over|pass(?:ing)? (?:it |the mic )?(?:on )?to|next speaker|next presenter|next up|coming up next|welcome our next|invit(?:e|ed|es|ing))\b/iu;
+/** "before" = the quote may only describe a block that FOLLOWS it; null = the quote names the addressee, bind nothing. */
+export function forwardDirection(span: string, name: string): "before" | "any" | null {
+  const cue = FORWARD_CUE.exec(span);
+  if (!cue) return "any";
+  const lower = span.toLowerCase();
+  const refs = [name, ...personTokens(name).filter((t) => t.length >= 3)].map((r) => r.toLowerCase());
+  const named = refs.flatMap((r) => { const at: number[] = []; for (let i = lower.indexOf(r); i >= 0; i = lower.indexOf(r, i + 1)) at.push(i); return at; });
+  if (named.some((at) => at < cue.index)) return null;                              // "Rashi, over to our next speaker": Rashi is the one being addressed
+  return "before";
 }
 
 function candidatesFor(turns: Turns[], blocks: Map<string, Block[]>, fullText: string, ambiguous: Set<string>, known: Set<string>, positional: Set<string>, en: Entry, run: number): Candidate[] {
@@ -130,7 +159,7 @@ function candidatesFor(turns: Turns[], blocks: Map<string, Block[]>, fullText: s
     if (refs.length === 0) continue;
     if (!refs.some((r) => nameOccurrences(text, r).some((at) => at >= spanStart && at + r.length <= spanEnd && !isReportedAt(text, r, at)))) continue;
 
-    const mk = (block: Block, side: Candidate["side"]): Candidate => ({ label, name: en.name, kind: en.kind, quote: en.quote, turnIdx: k, turnId: turn._id, sessionId: turn.sessionId, speaker: turn.speakerRef, block, side, run });
+    const mk = (block: Block, side: Candidate["side"]): Candidate => ({ label, name: en.name, kind: en.kind, quote: en.quote, turnIdx: k, turnId: turn._id, sessionId: turn.sessionId, speaker: turn.speakerRef, block, side, run, ...(FORWARD_CUE.test(span) ? { forward: true } : {}) });
     if (en.kind === "self-intro") {
       const inBlock = labelBlocks.find((b) => k >= b.startTurnIndex && k <= b.endTurnIndex);
       if (inBlock && turn.speakerRef === label && refs[0] === en.name && citesNameAsSelfIdentification(turn.text ?? "", en.name)) out.push(mk(inBlock, "inside"));
@@ -138,10 +167,12 @@ function candidatesFor(turns: Turns[], blocks: Map<string, Block[]>, fullText: s
     }
     if (turn.speakerRef === label) continue;                                       // a speaker is not identified by their own words
     if (otherNamesIn(span, en.name, known).length > 0) continue;                   // two people in one quote: abstain
+    const dir = forwardDirection(span, en.name);
+    if (dir === null) continue;
     const before = labelBlocks.filter((b) => b.startTurnIndex > k && b.startTurnIndex - k <= MAX_DISTANCE).sort((a, b) => a.startTurnIndex - b.startTurnIndex)[0];
     const after = labelBlocks.filter((b) => b.endTurnIndex < k && k - b.endTurnIndex <= MAX_DISTANCE).sort((a, b) => b.endTurnIndex - a.endTurnIndex)[0];
     if (before) out.push(mk(before, "before"));
-    if (after) out.push(mk(after, "after"));
+    if (after && dir === "any") out.push(mk(after, "after"));
   }
   return out;
 }
@@ -167,5 +198,5 @@ export function groundCandidates(turns: Turns[], runs: unknown[]): { candidates:
 
 /** Two pieces are independent witnesses: different quote speakers AND opposite sides of the block (host + cohost are one handover). */
 export function independent(a: Candidate, b: Candidate): boolean {
-  return a.turnIdx !== b.turnIdx && a.speaker !== b.speaker && a.side !== b.side && a.side !== "inside" && b.side !== "inside";
+  return !((a.forward || b.forward) && a.block.startTurnIndex !== b.block.startTurnIndex) && a.turnIdx !== b.turnIdx && a.speaker !== b.speaker && a.side !== b.side && a.side !== "inside" && b.side !== "inside";
 }

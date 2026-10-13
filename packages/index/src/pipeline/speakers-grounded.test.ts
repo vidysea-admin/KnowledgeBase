@@ -341,3 +341,53 @@ test("a session with no positional labels makes no model call", async () => {
   assert.equal(calls, 0);
   assert.deepEqual(out, { resolved: [], unresolved: [], degraded: null });
 });
+
+// ---------- cycle 2 (ISS-U24SMART-005): forward cue direction, same-block pair, lowercase second name ----------
+
+const FWD = [
+  turn("t0", "spk:0", "Rashi, over to our next speaker please."), turn("t1", "spk:2", "Good morning, I will talk about permits."),
+  turn("t2", "spk:3", "Thanks Rashi for that handover."), turn("t3", "spk:4", "Okay."),
+];
+const FWD_Q = ["Rashi, over to our next speaker please", "Thanks Rashi for that handover"];
+
+test("ISS-U24SMART-005 (a): the checker fixture 'Rashi, over to our next speaker' + 'Thanks Rashi' never ships spk:2=Rashi under an always-yes verifier", async () => {
+  for (const [ka, kb] of [["handover", "thanks"], ["address", "thanks"], ["called-on", "handover"], ["handover", "handover"]]) {
+    assert.deepEqual(await shipped(FWD, [prop("spk:2", "Rashi", FWD_Q[0] ?? "", ka ?? ""), prop("spk:2", "Rashi", FWD_Q[1] ?? "", kb ?? "")]), [], `${ka}+${kb}`);
+  }
+});
+
+test("ISS-U24SMART-005 (b): a forward cue that names X AFTER the cue binds only the next block, and the legitimate pair still ships", async () => {
+  const turns = [
+    turn("t0", "spk:0", "Now over to Rashi for the visa part."), turn("t1", "spk:2", "Good morning, I will talk about permits."),
+    turn("t2", "spk:3", "Thanks Rashi for that clear talk."), turn("t3", "spk:4", "Okay."),
+  ];
+  const props = [prop("spk:2", "Rashi", "Now over to Rashi for the visa part", "handover"), prop("spk:2", "Rashi", "Thanks Rashi for that clear talk", "thanks")];
+  assert.deepEqual((await shipped(turns, props)).map((r) => [r.speakerRef, r.displayName]), [["spk:2", "Rashi"]]);
+  // the same forward quote cannot describe the block BEFORE it
+  const back = [turn("t0", "spk:2", "Good morning, I will talk about permits."), turn("t1", "spk:0", "Now over to Rashi for the visa part."), turn("t2", "spk:3", "Thanks Rashi again for that clear talk."), turn("t3", "spk:4", "Okay.")];
+  assert.deepEqual(await shipped(back, [prop("spk:2", "Rashi", "Now over to Rashi for the visa part", "handover"), prop("spk:2", "Rashi", "Thanks Rashi again for that clear talk", "thanks")]), []);
+  const { candidates } = groundCandidates(back, [[prop("spk:2", "Rashi", "Now over to Rashi for the visa part", "handover")]]);
+  assert.equal(candidates[0]?.length, 0, "forward cue has no 'after' binding");
+});
+
+test("ISS-U24SMART-005 (c): a forward-cue quote pairs only with evidence about the SAME block", () => {
+  const base = { label: "spk:1", name: "N", kind: "address" as EvidenceKind, quote: "q", turnId: "t", sessionId: "s", run: 0 };
+  const c = (turnIdx: number, speaker: string, side: "before" | "after", start: number, forward = false) => ({ ...base, turnIdx, speaker, side, forward, block: { startTurnIndex: start, endTurnIndex: start } });
+  assert.ok(independent(c(0, "spk:0", "before", 1), c(2, "spk:3", "after", 1)));
+  assert.ok(!independent(c(0, "spk:0", "before", 1, true), c(6, "spk:3", "after", 5)), "forward cue + thanks around two different blocks");
+  assert.ok(independent(c(0, "spk:0", "before", 1), c(6, "spk:3", "after", 5)), "non-forward quotes keep the existing rule");
+});
+
+test("ISS-U24SMART-005 (d): a lowercase / Hinglish second name abstains; the single-name control ships", async () => {
+  const mk = (q: string) => [
+    turn("t0", "spk:0", `${q}.`), turn("t1", "spk:1", "Sure, the visa process takes a month."),
+    turn("t2", "spk:3", "Thanks Rashi for the clear answer."), turn("t3", "spk:4", "Okay."),
+  ];
+  const ps = (q: string) => [prop("spk:1", "Rashi", q, "called-on"), prop("spk:1", "Rashi", "Thanks Rashi for the clear answer", "thanks")];
+  const ctl = "Rashi, aap bataiye please";
+  assert.equal((await shipped(mk(ctl), ps(ctl))).length, 1, "control");
+  for (const q of ["Rashi, aap aur ruby milkar bataiye please", "Rashi, aap ya priyanka bataiye please"]) assert.deepEqual(await shipped(mk(q), ps(q)), [], q);
+  assert.deepEqual(otherNamesIn("Rashi, aap aur ruby milkar bataiye", "Rashi", new Set(["rashi"])), ["ruby"]);
+  assert.deepEqual(otherNamesIn("Rashi, aap ruby milkar bataiye", "Rashi", new Set(["rashi", "ruby"])), ["ruby"], "a known candidate name needs no capital");
+  assert.deepEqual(otherNamesIn("Rashi, aap aur main milkar bataiye", "Rashi", new Set(["rashi"])), [], "common Hinglish function word is not a name");
+});
