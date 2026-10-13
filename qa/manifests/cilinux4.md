@@ -1,5 +1,5 @@
 # cilinux4: ai-transport "Deadline kills owned descendant tree" fails on Ubuntu CI
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Owner: cilinux4 lane
 Tier: 3 (CI portability, medium; light ceremony).
