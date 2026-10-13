@@ -1,6 +1,6 @@
 # iss-tenantsrcid-003-migration-scale-gaps-index
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: low-severity ledger issue ISS-TENANTSRCID-003, pulled by the orchestrator. Class: data write (migration over sources/sessions/gaps/media): FULL ceremony. Verdict by the checker only.
 Lane: lane/tsrcid3. The ledger row (qa/issues.tenantsrcid.jsonl) is NOT edited here. Its owner-map clause was already resolved by D-138 (owner-config.ts rejects it); two parts remain and are fixed here.
