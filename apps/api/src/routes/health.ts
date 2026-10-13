@@ -36,7 +36,7 @@ export interface HeartbeatRow {
  *  - `listHeartbeats` must be the tenant-scoped accessor (`listHeartbeats` in
  *    packages/db/src/collections/watch-heartbeat.ts), so each read is `withTenant`-merged.
  *  - `notifyWatchSilent` is structurally identical to `TelegramNotifier.notifyWatchSilent`
- *    (packages/meeting-bot/src/capture/telegram-alerts.ts), so a real notifier satisfies it with NO
+ *    (packages/meeting-bot/src/capture/notify/telegram-alerts.ts), so a real notifier satisfies it with NO
  *    import — `.dependency-cruiser.cjs` forbids `apps/* -> packages/meeting-bot`, so injection is the
  *    only way this route can reach that notifier at all. See the manifest's HUMAN_GATE section.
  */

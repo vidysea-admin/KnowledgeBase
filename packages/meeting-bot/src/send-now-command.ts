@@ -11,7 +11,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { planSendNow, type SendNowJob, type SendNowRefusal } from "./send-now.js";
-import { assertTenantTag } from "./calendar/state-tenant-tag.js";
+import { assertTenantTag } from "./calendar/state/state-tenant-tag.js";
 import { liveRecordingDir, readLiveRecordings, type LiveProbes } from "./live-recording/live-recording.js";
 import { claimedRecordWithDefaults } from "./live-recording/claimed-record.js";
 
@@ -127,7 +127,7 @@ export function readAllLiveJobs(
 /** Real wiring for cli.ts. Dynamic imports keep this module's tests free of the OBS/browser dependency graph. */
 export async function defaultSendNowDeps(): Promise<SendNowDeps> {
   const [{ runRecord, captureTenant, todayAt }, { readWebinarOperationState }] = await Promise.all([
-    import("./capture/record-commands.js"), import("./calendar/schedule-state.js"),
+    import("./capture/record-commands.js"), import("./calendar/state/schedule-state.js"),
   ]);
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
   const now = () => new Date();

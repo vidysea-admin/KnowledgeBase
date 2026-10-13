@@ -9,7 +9,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { finalizeRecordingWith, measuredMbPerHour } from "./capture/record-finalize.js";
-import { createTelegramNotifier, type TelegramNotifier } from "./capture/telegram-alerts.js";
+import { createTelegramNotifier, type TelegramNotifier } from "./capture/notify/telegram-alerts.js";
 
 // --- over-target report ------------------------------------------------------------------------
 

@@ -93,7 +93,7 @@ async function main() {
   // U4a (D-046): same construction as record-commands.ts's default — reads
   // TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID, degrades to `enabled: false` (never throws) when unset,
   // so a watch tick with no Telegram configured behaves exactly as before this unit.
-  const { createTelegramNotifier } = await import("../../packages/meeting-bot/src/capture/telegram-alerts.ts");
+  const { createTelegramNotifier } = await import("../../packages/meeting-bot/src/capture/notify/telegram-alerts.ts");
   const telegram = createTelegramNotifier();
 
   // u2-fix1: parsed once, up front, and hoisted (was scoped inside step 3's own try block) so

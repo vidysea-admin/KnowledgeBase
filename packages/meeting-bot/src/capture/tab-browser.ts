@@ -10,7 +10,7 @@ import path from "node:path";
 import type { BrowserJoinerDeps } from "../joiners/browser-joiner.js";
 import { getProcessStartTime } from "./controller-state.js";
 import { browserProfileArgs } from "./browser/browser-profile.js";
-import type { BotEvent } from "./obs-windows.js";
+import type { BotEvent } from "./obs/obs-windows.js";
 import {validateCaptureControlGaps, validateCaptureStatusIdentity, type GapWindow} from "./reconnect-gaps.js";
 
 const MAX_CHUNK = 8 * 1024 * 1024;

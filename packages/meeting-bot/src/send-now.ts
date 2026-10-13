@@ -14,13 +14,13 @@ export const MAX_SEND_NOW_URL_LENGTH = 2048;
 /** Job states that mean the bot is, or is about to be, in the meeting. */
 export const LIVE_JOB_STATUSES = ["queued", "joining", "recording"] as const;
 export type LiveJobStatus = (typeof LIVE_JOB_STATUSES)[number];
-/** Job states that have left the meeting (calendar/schedule-state.ts:63 minus queued/recording; a test
+/** Job states that have left the meeting (calendar/state/schedule-state.ts:63 minus queued/recording; a test
  * pins that literal so this cannot drift). ONLY these exact values stop blocking: an unknown, missing or
  * differently cased status counts as LIVE (fail closed - this guard exists to prevent a second bot). */
 export const TERMINAL_JOB_STATUSES = ["processing", "ready", "failed", "action_required"] as const;
 
 /** Minimal view of an existing job the planner needs. `status` is a plain string so the scheduler's
- * `Operation.status` values (calendar/schedule-state.ts) can be passed through unconverted. */
+ * `Operation.status` values (calendar/state/schedule-state.ts) can be passed through unconverted. */
 export interface SendNowJob {
   meetingUrl: string;
   status: string;

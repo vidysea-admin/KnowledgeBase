@@ -1,6 +1,6 @@
 /**
  * Pure model for the join-rules editor. The rule-set shape and every refusal below mirror the engine's
- * `validateJoinRuleSet` (packages/meeting-bot/src/calendar/join-rules.ts) and its normalisers
+ * `validateJoinRuleSet` (packages/meeting-bot/src/calendar/join-rules/join-rules.ts) and its normalisers
  * (join-rules-normalize.ts). apps/web may not import packages/meeting-bot, so the rules are re-stated here;
  * this is a CONVENIENCE for the form only. The server re-validates and stays the authority.
  */

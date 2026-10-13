@@ -8,9 +8,9 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { readScheduledKeys } from "../schedule-state.js";
-import { saveJoinRules } from "../join-rules-store.js";
-import { resetJoinRulesEnforceWarnings } from "../join-rules-enforce.js";
+import { readScheduledKeys } from "../state/schedule-state.js";
+import { saveJoinRules } from "../join-rules/join-rules-store.js";
+import { resetJoinRulesEnforceWarnings } from "../join-rules/join-rules-enforce.js";
 import { buildRealScheduleTickDeps, runScheduleTickOnce, type ScheduleTickDeps } from "../schedule-tick.js";
 import { createKeyTenantLoader } from "./key-tenant.js";
 

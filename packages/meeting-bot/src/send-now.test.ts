@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { planSendNow, meetingIdentity, PLATFORM_EXTRACTORS, MAX_SEND_NOW_URL_LENGTH, TERMINAL_JOB_STATUSES, type SendNowJob } from "./send-now.js";
 import { detectPlatform, type Platform } from "./platform.js";
-import { PLATFORMS } from "./calendar/join-rules.js";
+import { PLATFORMS } from "./calendar/join-rules/join-rules.js";
 
 const NOW = "2026-10-10T12:00:00.000Z";
 const ok = (url: string, jobs: SendNowJob[] = []) => {
@@ -139,8 +139,8 @@ test("unknown, missing or non-canonical statuses count as LIVE (fail closed)", (
   ok("https://meet.google.com/abc-defg-hik", [live("https://meet.google.com/abc-defg-hij", "mystery")]);
 });
 
-test("the status vocabulary matches calendar/schedule-state.ts (drift guard)", () => {
-  const src = readFileSync(new URL("./calendar/schedule-state.ts", import.meta.url), "utf8");
+test("the status vocabulary matches calendar/state/schedule-state.ts (drift guard)", () => {
+  const src = readFileSync(new URL("./calendar/state/schedule-state.ts", import.meta.url), "utf8");
   const m = /\[("queued"[^\]]*)\]\.includes\(row\.status\)/.exec(src);
   assert.ok(m, "status literal not found in schedule-state.ts");
   const states = m[1]!.split(",").map((s) => s.trim().replace(/"/g, "")).sort();

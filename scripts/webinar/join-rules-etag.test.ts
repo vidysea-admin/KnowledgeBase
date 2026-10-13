@@ -14,12 +14,12 @@ import { pathToFileURL } from "node:url";
 import { startTestServer } from "../../apps/api/src/testUtils.js";
 import { buildTestDeps, fakeKeyStore } from "../../apps/api/src/fixtures.js";
 import type { JoinRulesDeps } from "../../apps/api/src/join-rules/deps.js";
-import { evaluateJoinRules, type JoinRuleSet } from "../../packages/meeting-bot/src/calendar/join-rules.js";
-import { joinRulesFilePath, joinRulesValidator, loadJoinRules, saveJoinRules, JOIN_RULES_ABSENT } from "../../packages/meeting-bot/src/calendar/join-rules-store.js";
+import { evaluateJoinRules, type JoinRuleSet } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules.js";
+import { joinRulesFilePath, joinRulesValidator, loadJoinRules, saveJoinRules, JOIN_RULES_ABSENT } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules-store.js";
 import { createJoinRulesDeps } from "./join-rules-host.js";
 
 const HERE = import.meta.dirname;
-const STORE_URL = pathToFileURL(path.join(HERE, "..", "..", "packages", "meeting-bot", "src", "calendar", "join-rules-store.ts")).href;
+const STORE_URL = pathToFileURL(path.join(HERE, "..", "..", "packages", "meeting-bot", "src", "calendar", "join-rules", "join-rules-store.ts")).href;
 const LEDGER = path.join(HERE, "..", "..", "qa", "issues.unoptlock.jsonl");
 const P = "/calendar/join-rules";
 const KEYS = {
