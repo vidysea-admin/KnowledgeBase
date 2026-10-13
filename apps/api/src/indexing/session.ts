@@ -5,6 +5,8 @@ import { getDb, scopedCollection } from "@lkb/db";
 import type { SessionPages, Chunks, Claims, Sessions, TreeIndexRootDocument, Turns, CitedItem, QaEntry } from "@lkb/core";
 import { summarizeSession, extractClaims, buildChunks, buildTree, regenerate, treeIndexRootFilter, type SummarizeCompleteFn, runtimeChronologicalTurns, assertGroundedTurns, validateRuntimePage, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin } from "@lkb/index";
 import { recordVectorGap } from "./vector-gap.js";
+import { decisionsEnabled } from "@lkb/index";
+import { extractAndPersistDecisions } from "./decisions-persist.js";
 import { promoteAndPersistEntities, type PromotionResult } from "./promote-entities.js";
 import type { IndexEmbedFn, ChunkWriteResult, IndexSessionResult } from "./types.js";
 
@@ -38,6 +40,9 @@ export interface IndexSessionDeps {
   dropUnverified?: boolean;
 
   embed?: IndexEmbedFn;
+
+  /** U2.5: extract + persist decisions. Default (undefined) follows LKB_EXTRACT_DECISIONS, which is off. */
+  extractDecisions?: boolean;
 
   db?: Pick<Db, "collection">;
 }
@@ -254,6 +259,13 @@ export async function indexSession(
     await claimsColl(tenantId).insertMany(claimDocs);
   }
 
+  // U2.5 (flag-gated, OFF by default): flag-off reaches no decisions code, no collection, no job.
+  let decisionsOut: { count: number; degraded: string | null } | undefined;
+  if (deps.extractDecisions ?? decisionsEnabled()) {
+    try { decisionsOut = await extractAndPersistDecisions(tenantId, sessionId, turns, deps.complete, db); }
+    catch (error) { decisionsOut = { count: 0, degraded: `decisions persist failed: ${error instanceof Error ? error.message : String(error)}` }; }
+  }
+
   // ISS-116's SECOND defect: this return used to be discarded, so a session that got no vectors
   // was indistinguishable from one that did — `indexSession` resolved, `status.index` flipped to
   // "done", and the only trace was a console warning nobody reads. That is how three whole
@@ -297,6 +309,7 @@ export async function indexSession(
 
   return { sessionId, chunks, entities, summary: { degraded: summaryDegraded?.reason ?? null, ...(summarizeResult.dropped ? { dropped: summarizeResult.dropped.length } : {}) },
     claims: { degraded: claimsDegraded?.reason ?? null, ...(claimsResult.dropped ? { dropped: claimsResult.dropped.length } : {}) },
+    ...(decisionsOut ? { decisions: decisionsOut } : {}),
     completion: { version: 2, strict, complete: !summaryDegraded && !claimsDegraded && !chunks.skipped && Boolean(newRoot), generation: randomUUID(), turnCount: turns.length, treeWritten: Boolean(newRoot) } };
 }
 

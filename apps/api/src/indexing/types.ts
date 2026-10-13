@@ -24,6 +24,8 @@ export interface IndexSessionResult {
   sessionId: string;
   summary?: { degraded: string | null; dropped?: number };
   claims?: { degraded: string | null; dropped?: number };
+  /** U2.5: present only when decisions extraction ran (flag on). */
+  decisions?: { count: number; degraded: string | null };
   completion?: { version: 2; strict: boolean; complete: boolean; generation: string; turnCount: number; treeWritten: boolean };
   chunks: ChunkWriteResult;
   /** U2.1 entity promotion. `null` when no tree root was produced, so there was nothing to promote

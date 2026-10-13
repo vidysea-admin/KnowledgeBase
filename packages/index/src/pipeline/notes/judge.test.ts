@@ -225,7 +225,7 @@ test("config/ai-routing.yaml has a note-judge route (second model, claude-code f
   assert.deepEqual(chains["note-judge"], ["claude-code", "gemini"]);
   assert.notEqual(chains["note-judge"]![0], chains.summarize![0], "the judge must not be the generating model first");
   assert.deepEqual(Object.fromEntries(Object.entries(chains).filter(([k]) => k !== "note-judge")), {
-    transcribe: ["gemini", "ollama", "claude-code"], namemap: ["gemini", "claude-code"], summarize: ["gemini", "claude-code", "ollama"], claims: ["gemini", "claude-code"],
+    transcribe: ["gemini", "ollama", "claude-code"], namemap: ["gemini", "claude-code"], summarize: ["gemini", "claude-code", "ollama"], claims: ["gemini", "claude-code"], decisions: ["gemini", "claude-code"],
     speakers: ["ollama"], "tree-summary": ["gemini", "claude-code"], evaluator: ["gemini", "claude-code"], answer: ["gemini", "claude-code", "ollama"], ask: ["gemini", "claude-code"], embedding: ["gemini", "ollama"],
   });
 });
