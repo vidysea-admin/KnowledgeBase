@@ -21,11 +21,11 @@ import { opsGuard, type OpsState } from "./ops.js";
 /** What the scan could not see: any unreadable/skipped entry makes the whole report refuse; foreign keys are other tenants' file identities (nothing else of theirs is held). */
 export interface Scope { incomplete: boolean; foreignKeys: ReadonlySet<string> }
 
-export interface Row { info: SessionInfo | undefined; item: PlanItem | undefined }
+export interface AssessRow { info: SessionInfo | undefined; item: PlanItem | undefined }
 export interface RowVerdict { eligible: boolean; hit: GuardHit | null; shared: number }
 export type Bucket = "eligible" | "policy" | "guard" | "notAssessable";
 export interface BucketTotal { records: number; files: number; bytes: number }
-export interface Assessment { verdicts: Map<Row, RowVerdict>; totals: Record<Bucket, BucketTotal>; unlocated: number; sharedFiles: number }
+export interface Assessment { verdicts: Map<AssessRow, RowVerdict>; totals: Record<Bucket, BucketTotal>; unlocated: number; sharedFiles: number }
 
 export function bucketOf(v: RowVerdict): Bucket {
   if (v.eligible) return "eligible";
@@ -33,7 +33,7 @@ export function bucketOf(v: RowVerdict): Bucket {
   return NOT_ASSESSABLE.has(v.hit.code) ? "notAssessable" : "guard";
 }
 
-function perRow(r: Row, now: number, clock: ClockCheck, ops: OpsState, scope: Scope): RowVerdict {
+function perRow(r: AssessRow, now: number, clock: ClockCheck, ops: OpsState, scope: Scope): RowVerdict {
   const planned = r.item?.decision ?? "keep";
   const { info } = r;
   if (info === undefined) {
@@ -48,10 +48,10 @@ function perRow(r: Row, now: number, clock: ClockCheck, ops: OpsState, scope: Sc
   return { eligible: o === null, hit: o, shared: 1 };
 }
 
-export function assess(rows: Row[], unmatched: SessionInfo[], now: number, clock: ClockCheck, ops: OpsState, scope: Scope): Assessment {
-  const verdicts = new Map<Row, RowVerdict>(rows.map((r) => [r, perRow(r, now, clock, ops, scope)]));
+export function assess(rows: AssessRow[], unmatched: SessionInfo[], now: number, clock: ClockCheck, ops: OpsState, scope: Scope): Assessment {
+  const verdicts = new Map<AssessRow, RowVerdict>(rows.map((r) => [r, perRow(r, now, clock, ops, scope)]));
   // union-find over identity keys; members = printed rows plus unmatched session records (never eligible)
-  const members = [...rows.map((r) => ({ info: r.info, row: r as Row | null })), ...unmatched.map((info) => ({ info: info as SessionInfo | undefined, row: null as Row | null }))];
+  const members = [...rows.map((r) => ({ info: r.info, row: r as AssessRow | null })), ...unmatched.map((info) => ({ info: info as SessionInfo | undefined, row: null as AssessRow | null }))];
   const parent = new Map<string, string>();
   const find = (k: string): string => { let x = k; while (parent.get(x) !== x) x = parent.get(x) as string; return x; };
   for (const m of members) {
@@ -77,15 +77,15 @@ export function assess(rows: Row[], unmatched: SessionInfo[], now: number, clock
         if (m.row && v?.eligible) verdicts.set(m.row, { eligible: false, shared: group.length, hit: { code: "shared-media-not-all-eligible", detail: `${group.length} session record(s) reference this one physical file and not every one of them is eligible (a file is purge-eligible only if ALL of its records are)` } });
         else if (v) v.shared = group.length;
       }
-    } else for (const m of group) (verdicts.get(m.row as Row) as RowVerdict).shared = group.length;
+    } else for (const m of group) (verdicts.get(m.row as AssessRow) as RowVerdict).shared = group.length;
     const printed = group.filter((m) => m.row !== null);
-    const buckets = printed.map((m) => bucketOf(verdicts.get(m.row as Row) as RowVerdict));
+    const buckets = printed.map((m) => bucketOf(verdicts.get(m.row as AssessRow) as RowVerdict));
     for (const b of buckets) totals[b].records++;
     if (printed.length === 0) continue;
     const fileBucket = allEligible ? "eligible" : order.find((b) => buckets.includes(b)) ?? "policy";
     totals[fileBucket].files++;
     totals[fileBucket].bytes += group.find((m) => m.info?.media.sizeBytes != null)?.info?.media.sizeBytes ?? 0;
   }
-  for (const m of unlocatedRows) totals[bucketOf(verdicts.get(m.row as Row) as RowVerdict)].records++;
+  for (const m of unlocatedRows) totals[bucketOf(verdicts.get(m.row as AssessRow) as RowVerdict)].records++;
   return { verdicts, totals, unlocated: unlocatedRows.length, sharedFiles };
 }

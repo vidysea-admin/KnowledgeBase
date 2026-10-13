@@ -15,7 +15,7 @@ import {
   extractSpeakersGrounded, groundSpeakerProposals, groundCandidates, otherNamesIn, normalizeLabel, independent,
   GROUNDED_SYSTEM_PROMPT, type EvidenceKind,
 } from "./speakers-grounded.js";
-import { buildVerifierWindow, llmVerifier, type SpeakerVerifier, type Verdict } from "./speakers-verifier.js";
+import { buildVerifierWindow, llmVerifier, type SpeakerVerifier, type SpeakerVerdict } from "./speakers-verifier.js";
 import { extractSpeakers } from "./speakers-llm.js";
 
 function turn(id: string, speakerRef: string, text: string): Turns {
@@ -24,7 +24,7 @@ function turn(id: string, speakerRef: string, text: string): Turns {
 const completion = (json: unknown, text = ""): CompleteResult => ({ text, json, usage: { inputTokens: 1, outputTokens: 1 }, provider: "fake", model: "fake-1", costUsd: 0 });
 const prop = (label: string, name: string, evidenceQuote: string, evidenceKind: string) => ({ label, name, evidenceQuote, evidenceKind });
 const threeRuns = (...entries: unknown[]) => [entries, entries, entries];
-const always = (verdict: Verdict): SpeakerVerifier => async () => ({ verdict });
+const always = (verdict: SpeakerVerdict): SpeakerVerifier => async () => ({ verdict });
 const YES = always("yes");   // the adversary
 const NO = always("no");
 
@@ -76,7 +76,7 @@ test("without a verifier, only self-introductions ship", async () => {
 test("verifier path: a 'no', an 'unsure', or a single 'yes' of three all abstain; two yes and no 'no' ships", async () => {
   assert.deepEqual(await shipped(BASE, pair("called-on", "thanks"), NO), []);
   assert.deepEqual(await shipped(BASE, pair("called-on", "thanks"), always("unsure")), []);
-  const seq = (verdicts: Verdict[]): SpeakerVerifier => { const n = new Map<string, number>(); return async (q) => { const i = n.get(q.quoteTurnId) ?? 0; n.set(q.quoteTurnId, i + 1); return { verdict: verdicts[i % verdicts.length] ?? "unsure" }; }; };
+  const seq = (verdicts: SpeakerVerdict[]): SpeakerVerifier => { const n = new Map<string, number>(); return async (q) => { const i = n.get(q.quoteTurnId) ?? 0; n.set(q.quoteTurnId, i + 1); return { verdict: verdicts[i % verdicts.length] ?? "unsure" }; }; };
   assert.deepEqual(await shipped(BASE, pair("called-on", "thanks"), seq(["yes", "unsure", "unsure"])), []);
   assert.deepEqual(await shipped(BASE, pair("called-on", "thanks"), seq(["yes", "yes", "no"])), []);
   assert.equal((await shipped(BASE, pair("called-on", "thanks"), seq(["yes", "yes", "unsure"]))).length, 1);

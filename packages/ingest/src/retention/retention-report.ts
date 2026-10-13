@@ -20,7 +20,7 @@ import { parseArgs, USAGE, type ReportOptions } from "./retention-report-args.js
 import { gatherState, tenantSegment, type Gathered, type SessionInfo } from "./retention-report-state.js";
 import { cleanText } from "./retention-report-text.js";
 import { NOT_ASSESSABLE, QUIET_PERIOD_MS } from "./retention-report-guards.js";
-import { assess, type Row, type Scope, type RowVerdict } from "./retention-report/assess.js";
+import { assess, type AssessRow, type Scope, type RowVerdict } from "./retention-report/assess.js";
 import { scanOtherTenants } from "./retention-report/crosstenant.js";
 import { checkClock, CLOCK_HORIZON_MS } from "./retention-report/clock.js";
 import { TERMINAL_STATUSES, loadOps, type OpsState } from "./retention-report/ops.js";
@@ -70,7 +70,7 @@ function section(g: Gathered, plan: RetentionPlan | null, opts: ReportOptions, m
     const info = g.infos[g.mediaInfo[i] ?? -1];
     if (info?.mediaId !== undefined && (info.mediaTenant === undefined || info.mediaTenant === g.tenantId)) byId.set(info.mediaId, [...(byId.get(info.mediaId) ?? []), info]);
   });
-  const rows: Row[] = g.infos.filter((i) => i.unreadable).map((info) => ({ info, item: undefined }));
+  const rows: AssessRow[] = g.infos.filter((i) => i.unreadable).map((info) => ({ info, item: undefined }));
   for (const item of plan?.items ?? []) {
     let info: SessionInfo | undefined;
     if (item.mediaId.startsWith("index:")) info = g.infos[g.mediaInfo[Number(item.mediaId.slice(6))] ?? -1];

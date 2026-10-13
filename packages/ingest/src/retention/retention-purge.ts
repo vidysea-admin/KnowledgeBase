@@ -28,7 +28,7 @@ import { parseIsoInstant } from "../strict-record.js";
 import { parseArgs, USAGE, type ReportOptions } from "./retention-report-args.js";
 import { gatherState, tenantSegment, type SessionInfo } from "./retention-report-state.js";
 import { cleanText } from "./retention-report-text.js";
-import { assess, type Row } from "./retention-report/assess.js";
+import { assess, type AssessRow } from "./retention-report/assess.js";
 import { scanOtherTenants } from "./retention-report/crosstenant.js";
 import { checkClock } from "./retention-report/clock.js";
 import { loadOps } from "./retention-report/ops.js";
@@ -53,9 +53,9 @@ export interface PurgeDeps {
   afterPlan?: () => void;
 }
 
-export interface Candidate { key: string; relPath: string; absPath: string; sizeBytes: number; ageDays: number }
+export interface PurgeCandidate { key: string; relPath: string; absPath: string; sizeBytes: number; ageDays: number }
 type Evaluation =
-  | { ok: true; candidates: Candidate[]; vetoes: Map<string, string>; inScope: number }
+  | { ok: true; candidates: PurgeCandidate[]; vetoes: Map<string, string>; inScope: number }
   | { ok: false; code: 2 | 3; message: string };
 
 /** Capture-age and file-type veto; null = no objection. */
@@ -70,7 +70,7 @@ function mediaVeto(info: SessionInfo, now: number): string | null {
 }
 
 /** One complete, fresh, read-only evaluation: gather, plan, guards, then the D-145 age and type rules. */
-export function evaluate(opts: ReportOptions, io: MediaIo, now: number): Evaluation {
+export function evaluatePurge(opts: ReportOptions, io: MediaIo, now: number): Evaluation {
   if (!mediaRootUsable(opts.mediaRoot)) return { ok: false, code: 3, message: "cannot read --media-root: it must be an existing directory" };
   const gathered = gatherState(opts, io);
   if (!gathered.ok) return { ok: false, code: 3, message: gathered.message };
@@ -91,7 +91,7 @@ export function evaluate(opts: ReportOptions, io: MediaIo, now: number): Evaluat
     const info = g.infos[g.mediaInfo[i] ?? -1];
     if (info?.mediaId !== undefined && (info.mediaTenant === undefined || info.mediaTenant === g.tenantId)) byId.set(info.mediaId, [...(byId.get(info.mediaId) ?? []), info]);
   });
-  const rows: Row[] = g.infos.filter((i) => i.unreadable).map((info) => ({ info, item: undefined }));
+  const rows: AssessRow[] = g.infos.filter((i) => i.unreadable).map((info) => ({ info, item: undefined }));
   for (const item of planned.plan.items) {
     const info = item.mediaId.startsWith("index:") ? g.infos[g.mediaInfo[Number(item.mediaId.slice(6))] ?? -1] : byId.get(item.mediaId)?.shift();
     rows.push({ info, item });
@@ -99,7 +99,7 @@ export function evaluate(opts: ReportOptions, io: MediaIo, now: number): Evaluat
   const printed = new Set(rows.map((r) => r.info));
   const a = assess(rows, g.infos.filter((i) => !printed.has(i)), now, clock, ops, { incomplete, foreignKeys: foreign.keys });
 
-  const candidates: Candidate[] = [];
+  const candidates: PurgeCandidate[] = [];
   const vetoes = new Map<string, string>();
   for (const row of rows) {
     const { info, item } = row;
@@ -122,7 +122,7 @@ export interface PurgeSummary { candidates: number; deleted: number; bytes: numb
 export function executePurge(opts: ReportOptions, execute: boolean, deps: PurgeDeps): { code: number; summary: PurgeSummary | null } {
   const io = deps.io ?? REAL_IO;
   const purgeIo = deps.purgeIo ?? REAL_PURGE_IO;
-  const first = evaluate(opts, io, deps.now());
+  const first = evaluatePurge(opts, io, deps.now());
   if (!first.ok) { deps.error(`retention-purge: ${first.message}`); return { code: first.code, summary: null }; }
   deps.write(execute
     ? `RETENTION PURGE - EXECUTE mode (D-145 pending append: raw media older than ${PURGE_AFTER_DAYS} days). Each item is re-checked from disk immediately before deletion.`
@@ -139,7 +139,7 @@ export function executePurge(opts: ReportOptions, execute: boolean, deps: PurgeD
       continue;
     }
     try {
-      const fresh = evaluate(opts, io, deps.now());
+      const fresh = evaluatePurge(opts, io, deps.now());
       if (!fresh.ok) throw new Error(`re-check failed: ${fresh.message}`);
       const c = fresh.candidates.find((x) => x.key === planned.key && x.relPath === planned.relPath);
       if (c === undefined) {

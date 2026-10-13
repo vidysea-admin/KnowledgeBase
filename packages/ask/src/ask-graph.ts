@@ -19,7 +19,7 @@ import { refine, type RefinableDoc } from "./refine.js";
 import { answer as generateAnswer } from "./answer.js";
 import { sourceCatalog, validateHydration, sourceQuotes, completionBudget, BoundedAskError, SOURCE_LIMITS } from "./source-context.js";
 import { boundedRefine, contextStrips, type ContextSource } from "./bounded-refine.js";
-import type { AskV2Deps, AskV2Result, AuditEntry } from "./ask-v2.js";
+import type { AskV2Deps, AskV2Result, AuditEntry } from "./ask-shared.js";
 
 export type AskNodeName = "retrieve" | "evaluate" | "refine" | "answer";
 

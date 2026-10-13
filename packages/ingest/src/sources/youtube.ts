@@ -83,7 +83,8 @@ function flavourFor(dir: string): typeof posix | typeof win32 {
 /** Env var naming the yt-dlp binary (repo convention: `LKB_<TOOL>_PATH`, like `LKB_GWS_PATH`). */
 export const YT_DLP_ENV = "LKB_YT_DLP_PATH";
 /** Env var naming the ffmpeg binary or directory yt-dlp uses for audio extraction. */
-export const FFMPEG_ENV = "LKB_FFMPEG_PATH";
+const FFMPEG_ENV = "LKB_FFMPEG_PATH";
+export { FFMPEG_ENV }; // still public via @lkb/ingest; core/keyframes/ffmpeg-args.ts keeps its own declaration (lint-dupes)
 
 function validBinaryPath(value: string): boolean {
   return value.length > 0 && value.length <= 1024 && value === value.trim() && !value.startsWith("-") && !/[\u0000-\u001f\u007f]/.test(value);
