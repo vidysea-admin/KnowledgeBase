@@ -1,6 +1,6 @@
 # loc401-speaker-name-rules-test-split
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (lint-loc stage red; test-file split only, no source change, no data write, no auth/tenancy). Lane: lane/loc401.
 
