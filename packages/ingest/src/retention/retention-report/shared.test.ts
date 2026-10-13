@@ -3,7 +3,7 @@ import { linkSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 import type { MediaIo } from "../retention-report-media.js";
-import { DAY, NOW, baseArgs, iso, runCmd, snapshot, tempRoot, writeSession, type Ran } from "../retention-report.fixtures.js";
+import { DAY, NOW, baseArgs, fsCaseInsensitive, iso, runCmd, snapshot, tempRoot, writeSession, type Ran } from "../retention-report.fixtures.js";
 
 function withRoots(fn: (root: string, media: string) => void): void {
   const root = tempRoot();
@@ -35,7 +35,9 @@ test("ISS-T046DRY-003 recorded fixtures: 2/2 - fixture 1 both KEEP and nothing c
     for (const io of [undefined, noInode]) {
       const r = run(root, media, io);
       assert.equal(["A", "B", "C"].filter((x) => verdict(r.out, x) === "ELIGIBLE").length, 3);
-      assert.match(line(r.out, "eligible"), /3 recording\(s\) = 1 file\(s\), 100 B/, "three spellings are ONE file counted once");
+      // M/SHARED.WEBM is the same file only where the filesystem folds case; on a case-sensitive one it is a second, distinct file.
+      const files = fsCaseInsensitive() ? 1 : 2;
+      assert.match(line(r.out, "eligible"), new RegExp(`3 recording\\(s\\) = ${files} file\\(s\\), ${files * 100} B`), "spellings of one file are counted once; a distinct file is counted on its own");
       assert.match(r.out, /files referenced by more than one session record: 1/);
     }
     n++;
@@ -66,9 +68,13 @@ test("hardlinks and a case-differing spelling are one file (device + file index;
   assert.equal(guardOf(r2.out, "h1"), "shared-media-not-all-eligible");
   writeSession(root, media, { name: "k1", ...old, mediaPath: "k/Case.webm", mediaBytes: 20 });
   writeSession(root, media, { name: "k2", ...old, mediaPath: "K/CASE.WEBM", mediaBytes: 20, claims: unverified("k2") });
+  // k/Case.webm and K/CASE.WEBM are one file only on a case-insensitive filesystem. On a case-sensitive one they are two files,
+  // each decided on its own: k1 is ELIGIBLE and only k2 (policy keep) is KEEP.
+  const ci = fsCaseInsensitive();
   for (const io of [undefined, noInode]) {
     const r3 = run(root, media, io);
-    assert.deepEqual([verdict(r3.out, "k1"), guardOf(r3.out, "k1"), verdict(r3.out, "k2")], ["KEEP", "shared-media-not-all-eligible", "KEEP"], io ? "no file index" : "file index");
+    assert.deepEqual([verdict(r3.out, "k1"), guardOf(r3.out, "k1"), verdict(r3.out, "k2")],
+      ci ? ["KEEP", "shared-media-not-all-eligible", "KEEP"] : ["ELIGIBLE", "none", "KEEP"], `${io ? "no file index" : "file index"}, case-insensitive=${ci}`);
   }
 }));
 

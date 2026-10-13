@@ -3,7 +3,7 @@
  * on-disk layout, runs the command, and snapshots a directory tree (content hash, size, mtime).
  */
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { isAbsolute, join, relative, resolve } from "node:path";
 import { runRetentionReport } from "./retention-report.js";
@@ -16,6 +16,12 @@ export const iso = (msAgo: number): string => new Date(NOW - msAgo).toISOString(
 
 export function tempRoot(): string {
   return mkdtempSync(join(tmpdir(), "t046dry-fixture-"));
+}
+
+/** Probes the REAL temp filesystem: true when an upper-cased spelling of an existing file names the same file (Windows/macOS default), false on Linux. */
+export function fsCaseInsensitive(): boolean {
+  const dir = tempRoot();
+  try { writeFileSync(join(dir, "caseprobe.txt"), "x"); return existsSync(join(dir, "CASEPROBE.TXT")); } finally { rmSync(dir, { recursive: true, force: true }); }
 }
 
 export interface SessionSpec {
