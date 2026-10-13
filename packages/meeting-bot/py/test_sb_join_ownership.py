@@ -278,7 +278,8 @@ def test_registration_native_same_host_other_port_confinement(tmp_path, case):
         mode[0] = case; posts.clear(); foreign.clear(); cookies.clear()
         root = tmp_path / case; root.mkdir(); program = root / "sb_join.py"; program.write_text(instrumented, encoding="utf-8")
         shutil.copytree(pathlib.Path(sb_join.__file__).parent / "tab-capture", root / "tab-capture")
-        shutil.copy(pathlib.Path(sb_join.__file__).parent / "registration_cdp.py", root / "registration_cdp.py")  # the copied main imports it
+        for module in sorted(pathlib.Path(sb_join.__file__).parent.glob("*.py")):  # the copied main imports its split-out modules (registration_cdp*, sb_join_*)
+            if module.name.startswith(("registration_cdp", "sb_join_")): shutil.copy(module, root / module.name)
         profile = str((root / "profile").resolve()); stop = str((root / "stop").resolve())
         instructions = {"url": f"http://127.0.0.1:{approved.server_port}/register", "localFixture": True,
             "allowedHosts": ["127.0.0.1", "localhost"] if case == "positive-alias" else ["127.0.0.1"],

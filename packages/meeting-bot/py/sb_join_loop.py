@@ -1,0 +1,108 @@
+"""sb_join: the hold-the-window polling loop (moved verbatim from main())."""
+import json
+
+from sb_join_detect import (END_PHRASES, JOIN_TEXTS, ReconnectState, apply_reload, click_gate, detect_trouble,
+                            should_force_reload)
+from sb_join_scripts import BODY_TEXT_JS, CLICK_JS
+
+
+def run_session(sb, a, *, os, time, emit):
+    started = time.time()
+    clicks = 0
+    last_click = 0.0
+    last_beat = 0.0
+    pinned = json.dumps(a.title)
+    errors = 0
+    reconnect = ReconnectState()  # T-029
+    extra_click_until = 0.0  # widened click window after a reload; MAX_CLICKS/JOIN_TEXTS unchanged
+    gave_up_emitted = False
+    while not os.path.exists(a.stop_file):
+        if errors >= 10:
+            # Only a browser with no windows left ends the run; a page that is merely
+            # unresponsive (redirect, interstitial, alert) must not cut a live webinar.
+            try:
+                alive = bool(sb.driver.window_handles)
+            except Exception:
+                alive = False
+            if not alive:
+                break
+            errors = 0
+        try:
+            handles = sb.driver.window_handles
+            if handles and sb.driver.current_window_handle != handles[-1]:
+                sb.driver.switch_to.window(handles[-1])
+                emit("tab-switch", count=len(handles))
+            real_title = sb.execute_script("return document.title")
+            if real_title != a.title:
+                sb.execute_script(f"document.title = {pinned};")
+            now = time.time()
+            if click_gate(clicks, now, started, extra_click_until, last_click, a.no_click):
+                hit = sb.execute_script(CLICK_JS, JOIN_TEXTS)
+                if hit:
+                    clicks += 1
+                    last_click = now
+                    emit("clicked", text=hit)
+            body = (sb.execute_script(BODY_TEXT_JS) or "").lower()
+            ended = next((p for p in END_PHRASES if p in body), None)
+            if ended:
+                emit("ended", reason=ended)
+
+            # T-031: forced reload from the Node-side audio watchdog — independent of T-029's
+            # own DOM-banner detection below (silence has no banner). No gap is recorded here:
+            # silence is not necessarily a connectivity gap (the whole "muted tab" case).
+            if should_force_reload(a.reload_file):
+                try:
+                    os.remove(a.reload_file)
+                except OSError:
+                    pass
+                emit("watchdog-reload", reason="audio-silence")
+                try:
+                    sb.uc_open_with_reconnect(a.url, 4)
+                    clicks, extra_click_until = apply_reload(clicks, time.time())
+                    emit("watchdog-rejoined")
+                except Exception as e:
+                    emit("warn", error=f"watchdog reload failed: {str(e)[:200]}")
+
+            # T-029 auto-reconnect: detect a "trying to reconnect" banner or a hard net-error
+            # page, and if it persists past the threshold, reload and rejoin. Recording a
+            # closed gap window (start/end/reason/recovered) is the whole point — the reload
+            # itself just reuses the same open + click path used at initial join.
+            try:
+                online = bool(sb.execute_script("return navigator.onLine"))
+            except Exception:
+                online = True
+            reason = detect_trouble(body, online)
+            action, gap = reconnect.tick(reason, now)
+            if action == "reload":
+                emit("reconnect-reload", reason=reconnect.reason, attempt=reconnect.reload_count)
+                try:
+                    sb.uc_open_with_reconnect(a.url, 4)
+                    clicks, extra_click_until = apply_reload(clicks, time.time())
+                    emit("reconnect-rejoined")
+                except Exception as e:
+                    emit("warn", error=f"reload failed: {str(e)[:200]}")
+            elif action == "give-up" and not gave_up_emitted:
+                emit("reconnect-giveup", reason=reconnect.reason, reloads=reconnect.reload_count)
+                gave_up_emitted = True
+            if gap is not None:
+                gave_up_emitted = False
+                emit("gap", **gap)
+
+            if now - last_beat > 30:
+                last_beat = now
+                emit("heartbeat", url=sb.get_current_url(), page_title=real_title)
+            errors = 0
+        except Exception as e:  # page navigating / tab busy — keep holding the window
+            errors += 1
+            emit("warn", error=str(e)[:200])
+            try:  # current handle gone (tab closed) → reattach to whatever tab is left
+                handles = sb.driver.window_handles
+                if handles:
+                    sb.driver.switch_to.window(handles[-1])
+            except Exception:
+                pass
+        time.sleep(2)
+    final_gap = reconnect.close_at_end(time.time())
+    if final_gap is not None:
+        emit("gap", **final_gap)
+    emit("closed")
