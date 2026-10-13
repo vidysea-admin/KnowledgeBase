@@ -35,6 +35,7 @@ import { createJobsRouter, type JobsReadDeps } from "./jobs/router.js";
 import { unavailableJobsReadDeps } from "./jobs/fixture-store.js";
 import { createActivityHealthRouter, unavailableActivityHealthDeps } from "./activity-health/router.js";
 import type { ActivityHealthDeps } from "./activity-health/types.js";
+import { withFileQueueActivity, type FileQueueActivityDeps } from "./activity-health/file-queue-activity.js";
 import { createNotificationsRouter } from "./activity-health/notifications.js";
 import { createWatchRunsRouter, unavailableWatchRunsDeps, type WatchRunsDeps } from "./activity-health/watch-runs.js";
 import { usageRecorder } from "./usage/recorder.js";
@@ -68,6 +69,8 @@ export interface ServerDeps {
   ingest: IngestDeps;
   jobs?: JobsReadDeps;
   activityHealth?: ActivityHealthDeps;
+  /** D-139/D-158: tenant-scoped dead jobs of the packages/core file queue (FileJobQueue.listDead), shown in /activity-health (source job-queue) and /notifications. Optional: absent -> unchanged. Production wiring pending (runner unwired). */
+  fileQueue?: FileQueueActivityDeps;
   /** T-057 D2 watcher run history (GET /watch-runs, scope jobs). Optional: absent -> 503 (fail closed). */
   watchRuns?: WatchRunsDeps;
   /** T-057 D4 usage events: recorded after /ask and /search respond, read by GET /usage (scope jobs). Optional: absent -> nothing recorded, /usage 503. */
@@ -111,10 +114,11 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createSpeakerSuggestionsRouter(deps.speakerSuggestions ?? unavailableSpeakerSuggestionDeps));
   app.use(createBrainRouter(deps.brain));
   app.use(createJobsRouter(deps.jobs ?? unavailableJobsReadDeps));
-  app.use(createActivityHealthRouter(deps.activityHealth ?? unavailableActivityHealthDeps));
+  const activityHealth = deps.fileQueue ? withFileQueueActivity(deps.activityHealth ?? unavailableActivityHealthDeps, deps.fileQueue) : deps.activityHealth ?? unavailableActivityHealthDeps;
+  app.use(createActivityHealthRouter(activityHealth));
   app.use(createWatchRunsRouter(deps.watchRuns ?? unavailableWatchRunsDeps));
   // T-057 D5: read-only aggregation of the three sources above; no store of its own.
-  app.use(createNotificationsRouter({ activityHealth: deps.activityHealth ?? unavailableActivityHealthDeps,
+  app.use(createNotificationsRouter({ activityHealth, fileQueue: deps.fileQueue,
     jobs: deps.jobs ?? unavailableJobsReadDeps, watchRuns: deps.watchRuns ?? unavailableWatchRunsDeps }));
   app.use(createWatchedSourcesRouter(deps.watchedSources));
   app.use(createCitationsRouter(deps.citations));
