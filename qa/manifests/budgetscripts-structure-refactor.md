@@ -1,6 +1,6 @@
 # budgetscripts-structure-refactor
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap/CI unblock, ISS-CIFIX-001, high). Lane: lane/budgetscripts. Class: pure refactor, no behaviour change. Not auth/tenancy/data-write.
 
