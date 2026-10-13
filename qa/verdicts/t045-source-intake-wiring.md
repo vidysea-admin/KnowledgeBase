@@ -16,3 +16,23 @@ NOT verified: the maker's 13-test file and full apps/api suite, tsc, and 3-5 has
 Uncommitted pre-existing lane files (prior checker harness, left untouched): apps/api/src/source-intake/zz-w045-chk.test.ts, apps/api/zz-w045-chk-mut.mjs.
 
 ISSUES-WRITTEN: ISS-W045-001, ISS-W045-002 (qa/issues.W045.jsonl)
+
+---
+
+# Cycle 1
+
+**VERDICT:** PASS
+**Cycle checked:** 1
+
+## EXPLANATION
+Reviewed commit 6668c0b7. Ledger reproductions re-run verbatim: ISS-W045-001 6/6 recorded targets refused with 0 forwarded (plus 12/12 extra spellings); ISS-W045-002 turns variant sources0 media0 sessions0 turns0, media variant the same, other tenant's row untouched. Hardening test file 6/6 pass.
+
+SSRF bypass hunt (unit fakes, no network): 31 spellings all refused: uppercase scheme, hex/octal/decimal/short IPs, trailing dot, fullwidth/circled-digit IDN digits, IPv4-mapped/compat/NAT64/6to4/ULA v6, ::, userinfo, backslash forms, nip.io-style and metadata hostnames via fake DNS, multicast/198.18/192.0.0. The WHATWG URL parser normalizes the literal forms before the address judge. Fails closed on DNS error or empty answer; every resolved address is judged.
+
+Residual (low, notes only, no row): the guard resolves, then passes the ORIGINAL URL string to the inner fetcher, so a rebinding window exists if the fetcher is ever swapped for one that resolves locally. Today the fetch is done by Jina, so the risk is not reachable. Redirects are set to manual.
+
+Suites: apps/api 823 pass / 0 fail (all 77 test files, D2_FIXTURE_PYTHON set); packages/ingest 342/0; tsc --noEmit clean in both. The two maker-reported failures are unrelated: activity-health/router.test.ts passes 3/3 on both lane and main; usage/usage.test.ts fails identically on the main tree (13 pass, 1 fail: "a hanging write ... abandoned at the timeout", timing-sensitive under CPU load).
+
+Mutations (hash-verified, per-mutation restore, final git hash-object equals HEAD blob for both files): 6/6 killed (protocol check, credentials check, some->every, literal-IP branch, turns undo ordering, media undo ordering).
+
+ISSUES-WRITTEN: none (ISS-W045-001 and ISS-W045-002 marked closed)

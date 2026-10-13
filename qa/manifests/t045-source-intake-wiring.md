@@ -1,6 +1,6 @@
 # t045-source-intake-wiring
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: 3 (roadmap task T-045 "More sources"; audit: "Intake planner only; no sink or API; no one-run-per-source live check"). Class: data-write + tenancy: full ceremony.
 Lane: lane/w045 (wiring lane). No new ledger issues.
