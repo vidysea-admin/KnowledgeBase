@@ -1,5 +1,5 @@
 # Manifest: pidreuse
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Lane: lane/pidreuse
 

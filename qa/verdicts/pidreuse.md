@@ -1,0 +1,12 @@
+# Verdict: pidreuse
+VERDICT: PASS
+Cycle checked: 0
+
+## EXPLANATION
+- No assertion weakened. Diff of the S4 test: the original expectations (`{ok:true,value:"enqueued"}`, stored ids [a], no debris; genuine live holder still `conflict` at +31 s and +59 min with the lock bytes unchanged) are intact. Only the wait and the probe timeout scale to a measured probe cost (when the probe takes 1 s or more). Probe is still the real powershell lookup on a real foreign pid. Code change is one optional argument, default 5000, so existing callers are byte-identical.
+- Recorded reproductions (ISS-JOBQSTALL-002 S4 and S5, plus the pid-reuse file's other cases), verbatim in file-job-queue.pid-reuse.test.ts: 20/20 runs of `ℹ pass 8 / ℹ fail 0`.
+- KEY QUESTION, production behaviour: a probe that returns null (timeout over 5 s on a saturated host) means "unknown", so a dead holder with a reused pid is protected until `liveCeilingMs` (1 h). That is fail-safe: bounded, typed `conflict`, no write, no loss, nothing duplicated. The contract (qa/contracts/t050-job-queue.md) has no criterion requiring lock progress or availability under a reused pid: criterion 2 requires "nothing enqueued is lost or duplicated" and criterion 8 never reports success for a job that was not queued, both hold. D-139/D-140 do not touch the lock. The residual is documented in queue-lock.ts header "(c) pid reuse is detected only when the OS start time is available" and was accepted in the ISS-JOBQSTALL-002 PASS verdict (class "availability of data write path, no loss"). So the test fix does not hide a contract violation. Optional hardening (not required): raise the production probe timeout or cache the start time at lock write; a null probe is rare (needs >5 s powershell start-up).
+- Runs: pid-reuse file 20/20 green. Full `packages/core` suite once: 385 tests, pass 385, fail 0. Multi-process files x5 each, all green: lost-update 6/0, stalled-holder 10/0, run-state-lock-interleave 5/0, lock.property 1/0, run-state-lock 20/0, reap-refusal 8/0, revision-recheck 9/0. `tsc --noEmit -p packages/core/tsconfig.json` exit 0. `node scripts/lint-loc.mjs --all` exit 0 (10 stages, 0 failed).
+- Mutations (hash-verified applied, restored, final blob equals HEAD 2131df84): ignore probeTimeoutMs SURVIVED (8/0); null probe treated as dead KILLED (6 pass / 2 fail); reuse never detected KILLED (5/3). 2 of 3 killed. The survivor is a test-strength gap on a host where the probe is fast: filed as low, ledger only (not a pulled unit).
+
+ISSUES-WRITTEN: ISS-PIDREUSE-001 (low, qa/issues.PIDREUSE.jsonl)
