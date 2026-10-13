@@ -1,6 +1,6 @@
 # Manifest: cifix3-meetingbot-cwd-tests
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 **Fix cycle:** 1
 **Lane:** lane/cifix3
 
