@@ -16,7 +16,7 @@
  * completes the job; this module only reports the outcome and never touches the queue.
  */
 import type { WorkflowDef } from "../domain/pipeline-workflow.js";
-import type { GraphNode, GraphRun, NodeHandler, PipelineGraph, RunGraphInput } from "./graph-types.js";
+import type { PipelineGraphNode, GraphRun, NodeHandler, PipelineGraph, RunGraphInput } from "./graph-types.js";
 
 export function buildGraph(def: WorkflowDef, handlers: Record<string, NodeHandler>, opts: { skip?: string[] } = {}): { ok: true; graph: PipelineGraph } | { ok: false; error: string } {
   const names = new Set(def.stages.map((s) => s.name));
@@ -28,7 +28,7 @@ export function buildGraph(def: WorkflowDef, handlers: Record<string, NodeHandle
     if (skip.has(d.name)) continue;
     for (const dep of d.deps) if (skip.has(dep)) return { ok: false, error: `cannot skip stage ${dep}: stage ${d.name} requires it (record-commands.ts:90, --index requires --process-video)` };
   }
-  const nodes: GraphNode[] = [];
+  const nodes: PipelineGraphNode[] = [];
   for (const s of def.stages) {
     const handler = Object.prototype.hasOwnProperty.call(handlers, s.name) ? handlers[s.name] : undefined;
     if (typeof handler !== "function") return { ok: false, error: `missing handler for stage: ${s.name}` };

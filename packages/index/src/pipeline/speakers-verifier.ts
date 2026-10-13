@@ -11,7 +11,7 @@ import type { Turns } from "@lkb/core";
 import type { CompleteResult, Job } from "@lkb/ai";
 import { parseJsonLoose } from "@lkb/ai";
 
-export type Verdict = "yes" | "no" | "unsure";
+export type SpeakerVerdict = "yes" | "no" | "unsure";
 export interface VerifierQuestion {
   label: string;
   name: string;
@@ -25,7 +25,7 @@ export interface VerifierQuestion {
   /** 0..VERIFIER_FRAMINGS-1: each vote uses a different framing (a different prompt, not a different temperature). */
   framing: number;
 }
-export interface VerifierAnswer { verdict: Verdict; turnId?: string }
+export interface VerifierAnswer { verdict: SpeakerVerdict; turnId?: string }
 export type SpeakerVerifier = (q: VerifierQuestion) => Promise<VerifierAnswer>;
 
 export const VERIFIER_FRAMINGS = 3;
