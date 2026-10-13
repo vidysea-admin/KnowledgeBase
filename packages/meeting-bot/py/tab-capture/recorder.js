@@ -42,11 +42,12 @@ async function start(message) {
   starting = true;
   try { await open(message); } catch (error) { if (!recorder) starting = false; throw error; }
 }
+// T-035 lean budget: 500 kbps video + 64 kbps audio = 564 kbps = 253.8 MB/h (decimal), under the 400 MB/h contract.
 async function open(message) {
   config = message.config;
   const media = {mandatory: {chromeMediaSource: "tab", chromeMediaSourceId: message.streamId}};
   stream = await navigator.mediaDevices.getUserMedia({audio: media, video: {
-    mandatory: {...media.mandatory, maxWidth: 1280, maxHeight: 720, maxFrameRate: 20}
+    mandatory: {...media.mandatory, maxWidth: 1280, maxHeight: 720, maxFrameRate: 5}
   }});
   if (!stream.getAudioTracks().length || !stream.getVideoTracks().length) throw new Error("Audio and video tracks are required");
   context = new AudioContext();
@@ -56,7 +57,7 @@ async function open(message) {
   const samples = new Float32Array(analyser.fftSize);
   const mimeType = ["video/webm;codecs=vp8,opus", "video/webm"].find((m) => MediaRecorder.isTypeSupported(m));
   if (!mimeType) throw new Error("This browser cannot record WebM audio/video");
-  recorder = new MediaRecorder(stream, {mimeType, videoBitsPerSecond: 1500000, audioBitsPerSecond: 96000});
+  recorder = new MediaRecorder(stream, {mimeType, videoBitsPerSecond: 500000, audioBitsPerSecond: 64000});
   recorder.ondataavailable = ({data}) => {
     if (!data.size || failed) return;
     queuedBytes += data.size;
