@@ -5,7 +5,7 @@
 **Goal task:** none (post-T-040 lint-loc repair)
 **Date:** 2026-10-13
 **Fix cycle:** 0
-**Status:** ready-for-check
+**Status:** checked-PASS
 
 ## Why
 After the T-040 merge, `node scripts/lint-loc.mjs --all` failed: `apps/api/src/indexing/session.ts` was 306 lines against a 300-line budget.
@@ -25,3 +25,4 @@ After the T-040 merge, `node scripts/lint-loc.mjs --all` failed: `apps/api/src/i
 
 ## For the checker
 Verify the diff is pure motion (moved bodies identical) and that `export {...} from "./chunk-write.js"` preserves the public surface.
+
