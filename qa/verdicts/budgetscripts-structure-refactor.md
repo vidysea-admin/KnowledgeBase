@@ -1,0 +1,14 @@
+# Verdict: budgetscripts-structure-refactor
+
+VERDICT: PASS
+Cycle checked: 0
+Commit checked: a61ec992 (base 6554516b)
+
+## EXPLANATION
+1. Test count: no test dropped. Declared test()/it() titles (queue.test excluded both sides) are identical before and after: 556 vs 556, empty diff. reingest-crash split keeps all cases: 32 test() declarations at base = 17 (reingest-crash.test) + 15 (sibling); the three for-loop generators moved intact. Runtime after: 655 tests, 651 pass, 2 skipped, 2 fail. The 2 failures ("EVERY id in the real union", "real ledger: an append on a temp COPY") are the G5 ledger line, which also fails at base; fixed on main in e713ff6e (not an ancestor of 6554516b), so they clear on merge. The manifest's "0 fail" and "tracker exit=0" are therefore inaccurate for the lane alone. A runtime base run was not possible: the base worktree lacks node_modules and .env, so it gave an env-broken 453. The 662 vs 655 gap is not attributable to any named test.
+2. migrate-mongo: config/migrate-mongo-config.cjs differs from the original only on line 1 (comment). All dbguard2 guards (no-default DB, production flag, lkb_staging) are byte-identical. migrationsDir "migrations" and dotenv/config resolve from cwd, so no path change. docker-compose command `-f config/...` and the bind mount are updated. There are no package.json, Dockerfile or ci.yml invocations (Dockerfile only COPYs config/). dbguard2.test, .env.example and .dockerignore updated. dbguard2 tests pass.
+3. dependency-cruiser: `to.pathNot "^esbuild$"` matches only the specifier "esbuild", and the only importer in the repo is apps/api/scripts/build.mjs. Every other unresolvable import still errors. Note: it is scoped by target, not by `from`, so a future unresolved esbuild import elsewhere would also be exempt (minor). dependencies stage exit=0.
+4. Stale old paths (for the owner, not a FAIL): ARCHITECTURE.md:88 (html), docs/DECISIONS.md:11,34,45 (html; append-only), qa/contracts/{gmail-meeting-candidates-approval,schema-v2,evaluator-calibration,handshake-liveness,recording-gap-tracking}.md, qa/gates/ledger-id-divergence.md, qa/QUEUE.md:147,275, .gitignore:53 comment (scripts/lib/dispatch-state.mjs), and doc-comment headers in scripts/qa/{dispatch-state.test,id-divergence,id-divergence.test,ledger-union.test}.mjs that still name scripts/lib/. .gitignore:79 `HANDOFF.md` matches docs/HANDOFF.md too (the file is tracked, so harmless).
+5. lint-loc --all: root OK (15), dupes OK, migrations OK, codex-hooks OK, snapshot OK, lint-tests OK (18/18), dependencies OK. loc FAIL and dirsize FAIL list only packages/* and apps/api/src (other lanes), with no scripts/ or root entries. tracker FAIL = G5 ledger line only (clears with e713ff6e). test:lint list: 136/136 pass. git diff -M --stat: 39 files, 502+/434-; renames detected.
+
+ISSUES-WRITTEN: none
