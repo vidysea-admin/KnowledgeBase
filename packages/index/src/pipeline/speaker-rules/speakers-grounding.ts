@@ -84,8 +84,12 @@ export interface Candidate {
 }
 
 /** Distinct OTHER person names in a span: mid-sentence capitalised words (or known names) outside `name`. */
-export function otherNamesIn(span: string, name: string, known: Set<string>): string[] {
+export function otherNamesIn(spanRaw: string, nameRaw: string, known: Set<string>): string[] {
+  // ISS-U24SMART5-001: compare in NFC with joiners stripped, so a decomposed or ZWJ-laden Devanagari word equals its composed form.
+  const span = fold(spanRaw);
+  const name = fold(nameRaw);
   const own = new Set(personTokens(name).map((t) => t.toLowerCase()));
+  const knownN = new Set([...known].map((k) => fold(k).toLowerCase()));
   const found = new Set<string>();
   const re = /\p{Lu}[\p{L}'’-]*/gu;
   for (let m = re.exec(span); m; m = re.exec(span)) {
@@ -94,25 +98,46 @@ export function otherNamesIn(span: string, name: string, known: Set<string>): st
     if (own.has(lw) || w === "I" || /^I['’]/.test(w) || isDiscourseOnly(w)) continue;
     const sentenceInitial = /(?:^|[.!?]["')\]]*\s+)$/u.test(span.slice(0, m.index));
     const vocative = /^\s*,/u.test(span.slice(m.index + w.length));   // "Rashi, can you..." opens with a person
-    if (sentenceInitial && !known.has(lw) && !vocative) continue;
+    if (sentenceInitial && !knownN.has(lw) && !vocative) continue;
     if (looksLikeAName(w)) found.add(lw);
   }
   // ISS-U24SMART-005: a second name needs no capital. Any word that is a session candidate name (case-insensitive), or the
   // word after a Hinglish conjunction ("aap aur ruby"), is a second person -> abstain (a false abstain is cheap).
-  const wordRe = /\p{L}[\p{L}'’-]*/gu;
-  for (let m = wordRe.exec(span); m; m = wordRe.exec(span)) {
-    const lw = m[0].toLowerCase();
-    if (!own.has(lw) && lw.length >= 3 && known.has(lw) && !isDiscourseOnly(lw) && !NOT_A_SECOND_NAME.has(lw)) found.add(lw);
+  // ISS-U24SMART5-001: words are letters PLUS combining marks (Devanagari vowel signs/viramas are \p{M}, not \p{L}).
+  const wordRe = /[\p{L}\p{M}][\p{L}\p{M}'’-]*/gu;
+  const words: { w: string; at: number }[] = [];
+  for (let m = wordRe.exec(span); m; m = wordRe.exec(span)) words.push({ w: m[0].toLowerCase(), at: m.index });
+  for (const { w: lw } of words) {
+    if (!own.has(lw) && lw.length >= 3 && knownN.has(lw) && !isDiscourseOnly(lw) && !NOT_A_SECOND_NAME.has(lw)) found.add(lw);
   }
-  const conj = /\b(?:aur|ya|evam|tatha)\s+(\p{L}{3,})/giu;
-  for (let m = conj.exec(span); m; m = conj.exec(span)) {
-    const lw = (m[1] ?? "").toLowerCase();
-    if (!own.has(lw) && !isDiscourseOnly(lw) && !NOT_A_SECOND_NAME.has(lw)) found.add(lw);
+  const isConj = (w: string) => LATIN_CONJ.has(w) || DEVA_CONJ.has(w);
+  const isNameLike = (w: string): boolean => {
+    if (own.has(w) || isDiscourseOnly(w) || NOT_A_SECOND_NAME.has(w)) return false;
+    return DEVANAGARI.test(w) ? w.length >= 2 : w.length >= 3;
+  };
+  for (let i = 0; i + 1 < words.length; i++) {
+    const [cur, nxt] = [words[i]?.w ?? "", words[i + 1]?.w ?? ""];
+    // "<conj> X": X, in any script, is a second person unless it is a function word. The English conjunctions only count
+    // before a Devanagari word ("Rashi and प्रिया"): "and the" / "or if" are ordinary prose, and Latin names already hit the capital rule.
+    if (isConj(cur) && (!ENGLISH_CONJ.has(cur) || DEVANAGARI.test(nxt)) && isNameLike(nxt)) found.add(nxt);
+    // "X <conj> OWN": the Devanagari token BEFORE a Devanagari conjunction is a second person too, when the token after the
+    // conjunction is the proposed name or a known candidate ("प्रिया और Rashi").
+    if (DEVA_CONJ.has(nxt) && words[i + 2] && DEVANAGARI.test(cur) && isNameLike(cur)) {
+      const after = words[i + 2]?.w ?? "";
+      if (own.has(after) || knownN.has(after)) found.add(cur);
+    }
   }
   return [...found];
 }
-/** Hinglish function words that follow "aur"/"ya" without being a person. */
-const NOT_A_SECOND_NAME = new Set(["main", "mein", "hum", "aap", "yeh", "woh", "ese", "kal", "aaj", "sab", "sabhi", "kuch", "koi", "mere", "apne", "hamare", "humare", "unka", "unki", "uska", "uski", "bhi", "phir", "abhi", "ek", "kya", "kaise", "thoda", "zyada", "bahut", "isse", "usse", "isko", "usko", "unko", "inko", "mujhe", "tumhe", "aapko", "humein"]);
+const DEVANAGARI = /[\u0900-\u097F]/u;
+/** NFC + strip zero-width joiners/non-joiners and soft hyphens. */
+const fold = (s: string): string => s.normalize("NFC").replace(/[\u200B-\u200D\u00AD\uFEFF]/gu, "");
+const ENGLISH_CONJ = new Set(["and", "or", "with"]);
+const LATIN_CONJ = new Set(["aur", "ya", "evam", "tatha", ...ENGLISH_CONJ]);
+const DEVA_CONJ = new Set(["और", "या", "एवं", "तथा", "व"].map((c) => c.normalize("NFC")));
+/** Hinglish / Hindi function words that follow a conjunction without being a person. */
+const NOT_A_SECOND_NAME = new Set(["main", "mein", "hum", "aap", "yeh", "woh", "ese", "kal", "aaj", "sab", "sabhi", "kuch", "koi", "mere", "apne", "hamare", "humare", "unka", "unki", "uska", "uski", "bhi", "phir", "abhi", "ek", "kya", "kaise", "thoda", "zyada", "bahut", "isse", "usse", "isko", "usko", "unko", "inko", "mujhe", "tumhe", "aapko", "humein",
+  ...["मैं", "मै", "हम", "आप", "तुम", "यह", "ये", "वह", "वो", "यहाँ", "वहाँ", "कल", "आज", "सब", "सभी", "कुछ", "कोई", "मेरे", "मेरा", "मेरी", "अपने", "अपना", "अपनी", "हमारे", "हमारा", "हमारी", "उनका", "उनकी", "उसका", "उसकी", "भी", "फिर", "अभी", "एक", "क्या", "कैसे", "थोड़ा", "ज़्यादा", "ज्यादा", "बहुत", "इसे", "उसे", "इसको", "उसको", "उनको", "इनको", "मुझे", "तुम्हें", "आपको", "हमें", "यह", "इस", "उस", "तो", "ही", "नहीं", "है", "हैं", "था", "थी", "थे", "को", "से", "में", "पर", "का", "की", "के", "ने", "कि", "जो", "जी", "सर", "मैम", "सवाल", "जवाब", "बात", "काम", "समय", "आगे", "पहले", "बाद", "अब", "अच्छा", "ठीक", "धन्यवाद", "शुक्रिया", "कृपया", "बताइए", "बताइये", "बताओ", "बोलिए", "बोलिये", "सुनिए", "देखिए", "आइए", "चलिए"].map((c) => c.normalize("NFC"))]);
 
 /** A FORWARD cue ("over to X", "hand over", "next speaker", "invite"): a name after it is the NEXT speaker; a name before it is the addressee. */
 const FORWARD_CUE = /\b(?:over to|hand(?:ing|s)? over|pass(?:ing)? (?:it |the mic )?(?:on )?to|next speaker|next presenter|next up|coming up next|welcome our next|invit(?:e|ed|es|ing))\b/iu;
