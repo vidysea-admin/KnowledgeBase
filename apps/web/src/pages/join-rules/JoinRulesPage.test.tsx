@@ -131,6 +131,17 @@ test("sender approval: confirmation names the sender and says no human click; ca
   expect(within(screen.getByRole("region", { name: "Approved senders" })).getByText("New@Example.com")).toBeInTheDocument();
 });
 
+test("ISS-T037UI-002: a zero-width / Cyrillic sender is refused in the real panel: no dialog, no POST", async () => {
+  await ready();
+  for (const v of ["  Foo​@Example.COM ", "foo‮@example.com", "fоo@example.com"]) {
+    fireEvent.change(screen.getByLabelText("Sender to approve"), { target: { value: v } });
+    fireEvent.click(screen.getByRole("button", { name: "Approve sender…" }));
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(screen.getByText(/plain English letters, digits and ASCII punctuation/)).toBeInTheDocument();
+  }
+  expect(writes()).toHaveLength(0);
+});
+
 test("domain approval shows the stronger warning and needs an explicit acknowledgement", async () => {
   await ready();
   fireEvent.change(screen.getByLabelText("Domain to approve"), { target: { value: "newdomain.example" } });
