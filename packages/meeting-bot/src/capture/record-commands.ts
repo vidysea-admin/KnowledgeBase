@@ -6,6 +6,7 @@ import { OBSWebSocket } from "obs-websocket-js";
 import { createBrowserJoiner } from "../joiners/browser-joiner.js";
 import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
+import { createAdmissionGate } from "./admission-gate.js";
 import { createAudioWatchdog, createRealLevelSource } from "./audio-watchdog.js";
 import { type ControllerRecoveryActions, type ControllerRecoveryContext, cleanupOwnedBrowserProfile, finalizeControllerRecording, getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
 import { AUDIO_INPUT, createObsBrowserDeps, type ObsBrowserConfig, type ObsBrowserDepsOverrides, type ObsClientLike } from "./obs/obs-windows.js";
@@ -112,9 +113,12 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   const gaps: GapWindow[] = []; // T-029: filled from "gap" events on sb_join.py's stdout stream
   const telegram = inject.telegram ?? createTelegramNotifier();
   let captureFailure: string | undefined;
+  const gate = createAdmissionGate(); // ISS-CAPTUREFIX-001: the silence watchdog starts only after `admitted`
   const onEvent = (_h: string, ev: Parameters<typeof collectGapEvent>[1]) => {
+    const gateFailure = gate.onEvent(ev as Parameters<typeof gate.onEvent>[0]);
     if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
-    if (ev.event === "capture-error") captureFailure = String(ev.error ?? "capture failed");
+    if (ev.event === "capture-error") captureFailure = gateFailure ?? String(ev.error ?? "capture failed");
+    if (ev.event === "admission_timeout") captureFailure ??= gateFailure;
     if (ev.event === "capture-stopped" && (ev as {failed?: unknown}).failed !== false) captureFailure ??= "capture stopped with failure";
     collectGapEvent(gaps, ev);
     telegram.onBotEvent(ev);
@@ -158,7 +162,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     reconnect: () => bot.triggerReload(sessionHandle),
     log: (m) => console.log(`[bot] ${m}`),
   });
-  audioWatchdog.start();
+  gate.attach(audioWatchdog); // starts now only if `admitted` already arrived; never while in the lobby
   writeControllerState(recordDir, {
     pid: process.pid,
     sessionId,
@@ -190,7 +194,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
         await joiner.stop(sessionHandle);
       } catch (e) {
         console.error(`[bot] stop failed: ${e instanceof Error ? e.message : String(e)}`);
-        if (backend === "tab") throw e;
+        if (backend === "tab") throw gate.failure ? new Error(gate.failure) : e; // ISS-CAPTUREFIX-001: name the reload that killed it
       }
       await bot.disconnect().catch(() => {});
     }

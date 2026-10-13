@@ -132,3 +132,14 @@ walkFrames(document, (doc) => {
 });
 return parts.join(' ');
 """
+
+# ISS-CAPTUREFIX-001: is the Meet call-controls bar on screen? Visible "Leave call" button (aria-label
+# or data-tooltip) or the "Call controls" toolbar. The lobby decision itself is made from body text
+# (sb_join_detect.classify_meet_state) because the waiting screen can show a hang-up control too.
+IN_CALL_JS = """
+const vis = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+const sel = 'button[aria-label*="leave call" i], [role=button][aria-label*="leave call" i], ' +
+  'button[data-tooltip*="leave call" i], [role=toolbar][aria-label*="call controls" i], ' +
+  '[aria-label="Call controls" i]';
+return [...document.querySelectorAll(sel)].some(vis);
+"""

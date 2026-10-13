@@ -1,5 +1,6 @@
 """sb_join: join/end phrases, click gate and the T-029 reconnect state machine (moved verbatim from sb_join.py; browser-free)."""
 import os
+from urllib.parse import urlsplit
 
 JOIN_TEXTS = [
     "join now", "join webinar", "join from browser", "join via browser", "join from your browser",
@@ -125,3 +126,54 @@ def should_force_reload(reload_file):
     but-connected tab shows no banner at all). main() removes the file itself right after acting,
     so this has no side effect and is trivially testable with a real temp file, no browser."""
     return bool(reload_file) and os.path.exists(reload_file)
+
+
+# ISS-CAPTUREFIX-001: admission detection. Meet shows a lobby ("Asking to join...", "Someone in the
+# call will let you in") before the call; only the in-call page has the call-controls bar. Matched
+# as lowercase substrings of the body text (the loop already computes it every tick).
+LOBBY_PHRASES = [
+    "asking to join", "ask to join", "someone will let you in", "waiting for someone to let you in",
+    "you'll join the call when someone lets you in", "waiting for the host to let you in",
+    "waiting to be let in", "your request to join",
+]
+ADMISSION_TIMEOUT_S = 15 * 60  # default lobby wait before giving up (--admission-timeout overrides)
+
+
+def is_meet_url(url):
+    """Admission is only detectable on Google Meet; every other platform keeps the old behaviour."""
+    try:
+        return (urlsplit(url or "").hostname or "").lower() == "meet.google.com"
+    except ValueError:
+        return False
+
+
+def classify_meet_state(in_call_dom, body_lower):
+    """Pure: "lobby" | "in-call" | "unknown". `in_call_dom` is IN_CALL_JS's result (the leave-call
+    button / call-controls bar is visible); `body_lower` is the lowercased body text. Lobby text
+    always wins: the pre-join and waiting screens can render a leave/hang-up control too."""
+    if any(p in (body_lower or "") for p in LOBBY_PHRASES):
+        return "lobby"
+    return "in-call" if in_call_dom else "unknown"
+
+
+class AdmissionState:
+    """Pure state machine. tick(admitted_now, now) -> "admitted" (once, on the first admitted tick)
+    | "timeout" (once, when still not admitted past timeout_s) | None. timeout_s <= 0 disables the
+    timeout. Once admitted it stays admitted (a later reload is not a new lobby wait)."""
+
+    def __init__(self, started, timeout_s=ADMISSION_TIMEOUT_S):
+        self.started = started
+        self.timeout_s = timeout_s
+        self.admitted = False
+        self.timed_out = False
+
+    def tick(self, admitted_now, now):
+        if self.admitted or self.timed_out:
+            return None
+        if admitted_now:
+            self.admitted = True
+            return "admitted"
+        if self.timeout_s and self.timeout_s > 0 and now - self.started > self.timeout_s:
+            self.timed_out = True
+            return "timeout"
+        return None

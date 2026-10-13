@@ -1,9 +1,9 @@
 """sb_join: the hold-the-window polling loop (moved verbatim from main())."""
 import json
 
-from sb_join_detect import (END_PHRASES, JOIN_TEXTS, ReconnectState, apply_reload, click_gate, detect_trouble,
-                            should_force_reload)
-from sb_join_scripts import BODY_TEXT_JS, CLICK_JS
+from sb_join_detect import (ADMISSION_TIMEOUT_S, END_PHRASES, JOIN_TEXTS, AdmissionState, ReconnectState, apply_reload,
+                            classify_meet_state, click_gate, detect_trouble, is_meet_url, should_force_reload)
+from sb_join_scripts import BODY_TEXT_JS, CLICK_JS, IN_CALL_JS
 
 
 def run_session(sb, a, *, os, time, emit):
@@ -16,6 +16,12 @@ def run_session(sb, a, *, os, time, emit):
     reconnect = ReconnectState()  # T-029
     extra_click_until = 0.0  # widened click window after a reload; MAX_CLICKS/JOIN_TEXTS unchanged
     gave_up_emitted = False
+    # ISS-CAPTUREFIX-001: Meet admission. Other platforms have no lobby signal, so they count as
+    # admitted on the first tick (old behaviour: the Node watchdog starts straight away).
+    meet = is_meet_url(a.url)
+    admission = AdmissionState(started, getattr(a, "admission_timeout", None) if meet else 0)
+    if admission.timeout_s is None:
+        admission.timeout_s = ADMISSION_TIMEOUT_S
     while not os.path.exists(a.stop_file):
         if errors >= 10:
             # Only a browser with no windows left ends the run; a page that is merely
@@ -47,6 +53,21 @@ def run_session(sb, a, *, os, time, emit):
             if ended:
                 emit("ended", reason=ended)
 
+            if meet:
+                try:
+                    in_call_dom = bool(sb.execute_script(IN_CALL_JS))
+                except Exception:
+                    in_call_dom = False
+                state = classify_meet_state(in_call_dom, body)
+            else:
+                state = "in-call"
+            verdict = admission.tick(state == "in-call", now)
+            if verdict == "admitted":
+                emit("admitted", platform="meet" if meet else "other", assumed=not meet)
+            elif verdict == "timeout":
+                emit("admission_timeout", seconds=int(now - started), limit=admission.timeout_s)
+                break
+
             # T-031: forced reload from the Node-side audio watchdog — independent of T-029's
             # own DOM-banner detection below (silence has no banner). No gap is recorded here:
             # silence is not necessarily a connectivity gap (the whole "muted tab" case).
@@ -55,13 +76,18 @@ def run_session(sb, a, *, os, time, emit):
                     os.remove(a.reload_file)
                 except OSError:
                     pass
-                emit("watchdog-reload", reason="audio-silence")
-                try:
-                    sb.uc_open_with_reconnect(a.url, 4)
-                    clicks, extra_click_until = apply_reload(clicks, time.time())
-                    emit("watchdog-rejoined")
-                except Exception as e:
-                    emit("warn", error=f"watchdog reload failed: {str(e)[:200]}")
+                if not admission.admitted:
+                    # ISS-CAPTUREFIX-001: never reload while waiting in the lobby -- the reload ends
+                    # the tab's audio track and the host would see a fresh knock.
+                    emit("watchdog-reload-suppressed", reason="not-admitted")
+                else:
+                    emit("watchdog-reload", reason="audio-silence")
+                    try:
+                        sb.uc_open_with_reconnect(a.url, 4)
+                        clicks, extra_click_until = apply_reload(clicks, time.time())
+                        emit("watchdog-rejoined")
+                    except Exception as e:
+                        emit("warn", error=f"watchdog reload failed: {str(e)[:200]}")
 
             # T-029 auto-reconnect: detect a "trying to reconnect" banner or a hard net-error
             # page, and if it persists past the threshold, reload and rejoin. Recording a
