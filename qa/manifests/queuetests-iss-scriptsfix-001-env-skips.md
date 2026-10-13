@@ -1,6 +1,6 @@
 # Unit: queuetests-iss-scriptsfix-001-env-skips
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Lane:** queuetests (branch lane/queuetests)
 **Tier:** medium issue pulled by orchestrator (ISS-SCRIPTSFIX-001); test-only change, no auth/tenancy/data-write code touched.
