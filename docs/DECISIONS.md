@@ -2139,3 +2139,43 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** /ask answers from valid turns with a warning listing excluded ones; all-invalid or foreign rows refuse; new invalid timing is rejected at write.
 **Approved-by:** Umesh
 **Links:** T-043; lane badturns
+
+## D-154 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Tombstone constants confirmed: cancelled-meeting tombstones retained 14 days, match window +/-24 h (Umesh, 2026-10-13). Resolves the owner question in ISS-TOMBSTONE-001/-007 and ISS-T036CAL-011.
+**Why:** The retention and match-window constants were an open owner question on the tombstone issues; the Approver has now fixed them.
+**Result:** Tombstone retention is 14 days and the match window is +/-24 h.
+**Approved-by:** Umesh
+**Links:** D-060; D-129; D-130
+
+## D-155 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Langfuse: hosted Langfuse Cloud (cloud.langfuse.com) Hobby free tier is allowed; traces carry metadata only (model, tokens, cost, tenant tag), no transcript text. If usage would exceed the free tier, switch to self-hosted rather than paying. This amends ONLY the self-hosted-only assertion for T-049: the 'Langfuse self-hosted' wording in the TASKS.md T-049 row and the self-hosted clause of criterion 3 (TENANT ID ruling) in qa/contracts/t049-langfuse-trace-sink.md. No DECISIONS entry required self-hosting, so nothing is superseded and no other part of T-049 changes.
+**Why:** T-049 live evidence ran against a hosted free tier; the Approver allows it provided traces stay metadata-only and the project never pays for overage.
+**Result:** T-049 may use Langfuse Cloud Hobby with metadata-only traces; exceeding the free tier means self-hosting, not paying.
+**Approved-by:** Umesh
+**Links:** T-049; qa/contracts/t049-langfuse-trace-sink.md criterion 3
+
+## D-156 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-021: Umesh ratifies gate condition 4 -- U1.4/U1.5 baselines re-point to the redesigned golden set (semantic leg recall@5 0.935, qa/verdicts/golden-set-semantic-leg.md).
+**Why:** Gate condition 4 required an Approver decision to move the U1.4/U1.5 baselines onto the redesigned golden set.
+**Result:** U1.4/U1.5 baselines now measure against the redesigned golden set; T-021 gate condition 4 is ratified.
+**Approved-by:** Umesh
+**Links:** T-021; qa/gates/golden-set-redesign.md
+
+## D-157 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** U3.1: Umesh accepts the real-Chrome CDP browser proof (qa/verdicts/web-ask-page.md PASS 8/8, qa/evidence/u31-ask-proof-20260921/) in place of a literal Playwright run.
+**Why:** A real Chrome run over CDP exercised the actual page 8 of 8, which the Approver accepts as equivalent proof.
+**Result:** U3.1 browser proof is satisfied by the CDP real-Chrome evidence.
+**Approved-by:** Umesh
+**Links:** U3.1
+
+## D-158 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** /system-status contract (qa/contracts/t057-d2-activity-health.md C1/C4) amended: the DTO may include a `source` field (upload-queue | job-queue) and job-queue failures map to a fixed error-class allow-list; D-139 dead jobs appear tenant-scoped.
+**Why:** D-139 makes terminally failed runs dead jobs in the file job queue, which /system-status must be able to show without leaking raw error text or other tenants' jobs.
+**Result:** Contract C1 and C4 are amended accordingly; the source field and the fixed error-class allow-list are permitted.
+**Approved-by:** Umesh
+**Links:** D-139; ISS-FAILEDJOB-001; T-057
