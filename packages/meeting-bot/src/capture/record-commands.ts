@@ -64,10 +64,10 @@ export async function runLogin(rest: string[]): Promise<void> {
   const child = spawn(process.env.LKB_PYTHON ?? "python", args, { stdio: "inherit" });
   await new Promise((r) => child.on("exit", r));
 }
-export function recordingBackend(rest: string[], env: NodeJS.ProcessEnv = process.env): "obs" | "tab" {
+export function recordingBackend(rest: string[], env: NodeJS.ProcessEnv = process.env, platform: NodeJS.Platform = process.platform): "obs" | "tab" {
   const value = flag(rest, "--backend") ?? env.LKB_CAPTURE_BACKEND ?? "tab";
   if (value !== "obs" && value !== "tab") throw new Error("--backend must be tab or obs");
-  if (value === "obs" && process.platform !== "win32") throw new Error("OBS fallback is Windows-only; use --backend tab");
+  if (value === "obs" && platform !== "win32") throw new Error("OBS fallback is Windows-only; use --backend tab");
   return value;
 }
 /** Test seam: inject the tab backend, finalize, record dir and loop poll interval (defaults are production). */
@@ -77,6 +77,8 @@ export interface RecordInject {
   /** ISS-LEANWIRE-002: OBS-backend seams (fake client, join child, level source) and a notifier; defaults are production. */
   obs?: ObsBrowserDepsOverrides & { config?: Partial<ObsBrowserConfig>; subscribeLevel?: Parameters<typeof createAudioWatchdog>[0]["subscribeLevel"] };
   telegram?: TelegramNotifier;
+  /** Test seam: host platform for the OBS Windows-only gate (default process.platform). */
+  platform?: NodeJS.Platform;
 }
 export async function runRecord(rest: string[], inject: RecordInject = {}): Promise<void> {
   const recordDir = inject.recordDir ?? RECORD_DIR;
@@ -92,7 +94,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   if (rest.includes("--process-video") && !rest.includes("--transcribe")) throw new Error("--process-video requires --transcribe");
   if (existsSync(envFile)) process.loadEnvFile(envFile);
   const profileDirectory = selectedBrowserProfile(rest, BOT_PROFILE_DIR);
-  const backend = recordingBackend(rest);
+  const backend = recordingBackend(rest, process.env, inject.platform);
   const tenantId = captureTenant(rest);
   const obsPassword = process.env.OBS_WS_PASSWORD ?? "";
   if (backend === "obs" && !obsPassword) throw new Error("OBS_WS_PASSWORD missing from .env");
