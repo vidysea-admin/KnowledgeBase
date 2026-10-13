@@ -47,6 +47,7 @@ a client of that API — with the long-range goal of beating top human counsello
   - `qa/contracts/`
   - `qa/debug/`
   - `qa/evidence/`
+  - `qa/fixtures/`
   - `qa/gates/`
   - `qa/manifests/`
   - `qa/packets/`

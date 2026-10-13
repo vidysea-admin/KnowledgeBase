@@ -1,6 +1,6 @@
 # iss-webhigh-002-003-sender-validator-parity
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: ledger issues ISS-WEBHIGH-002 (medium) and -003 (low), requested explicitly by orchestrator. Class: data-write gate (join-rules API) -> full ceremony.
 Lane: lane/senderfix, branched from main HEAD 16d20ec9. Ledger rows (qa/issues.webhigh.jsonl) NOT changed here; checker closes.
