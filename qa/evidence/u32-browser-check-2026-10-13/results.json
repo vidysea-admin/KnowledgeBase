@@ -1,0 +1,122 @@
+[
+  {
+    "id": "A signed-out: no global bar, no /search request",
+    "verdict": "PASS",
+    "detail": "bar=0 searchRequests=0 text=\"\""
+  },
+  {
+    "id": "B global bar present on /, /sessions, /ask, /calendar, /search (exactly one each)",
+    "verdict": "PASS",
+    "detail": "{\"/\":1,\"/sessions\":1,\"/ask\":1,\"/calendar\":1,\"/search\":1}"
+  },
+  {
+    "id": "C submit from / navigates to /search?q= and shows results (one request)",
+    "verdict": "PASS",
+    "detail": "url=http://127.0.0.1:5411/search?q=counselling articles=1 searchRequests=1 reqUrl=http://127.0.0.1:3411/search?q=counselling&k=20 first=\"UniAccess Live: Meet Leeds Arts University 2026-08-24 Speaker: spk:2 1304–1356 s I think the perception that design is limited to only color and paper. From that perspective, it has now evolved, and t\""
+  },
+  {
+    "id": "C2 bar shows current q on /search",
+    "verdict": "PASS",
+    "detail": "bar=\"counselling\""
+  },
+  {
+    "id": "C3 result shows title, date, speaker, time range, quote, Open transcript link",
+    "verdict": "PASS",
+    "detail": "UniAccess Live: Meet Leeds Arts University 2026-08-24 Speaker: spk:2 1304–1356 s I think the perception that design is limited to only color and paper. From tha"
+  },
+  {
+    "id": "G Open transcript lands on the cited turn (rendered, highlighted, in viewport)",
+    "verdict": "PASS",
+    "detail": "href=/sessions/2026-08-24-uniaccess-leeds-arts-university#turn-2026-08-24-uniaccess-leeds-arts-university-t020 visible=true inViewport=true bg=rgb(253, 243, 223)"
+  },
+  {
+    "id": "H Back from transcript returns to results for same q",
+    "verdict": "PASS",
+    "detail": "http://127.0.0.1:5411/search?q=counselling"
+  },
+  {
+    "id": "D blank/whitespace refused: no navigation, no request",
+    "verdict": "PASS",
+    "detail": "url=http://127.0.0.1:5411/sessions reqs=0"
+  },
+  {
+    "id": "M Enter key submits; space encoded as +",
+    "verdict": "PASS",
+    "detail": "url=http://127.0.0.1:5411/search?q=AI+in+counselling reqs=1"
+  },
+  {
+    "id": "E special chars round-trip once (URL q and API q equal input; 1 request)",
+    "verdict": "PASS",
+    "detail": "urlSearch=?q=A%26B+%231+50%25+%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87+%E4%B8%96%E7%95%8C apiQ=A&B #1 50% नमस्ते 世界 n=1"
+  },
+  {
+    "id": "I no-hit query shows 'No passages found' empty state",
+    "verdict": "PASS",
+    "detail": "arch Find passages in your transcripts and open their source. Search transcriptsSearch No passages found for “zzqxjvwk”."
+  },
+  {
+    "id": "F bar input capped at 512 chars",
+    "verdict": "PASS",
+    "detail": "maxlength=512 typedLen=512"
+  },
+  {
+    "id": "F2 hostile ?q= is inert (no dialog, no injected element, API-origin only)",
+    "verdict": "PASS",
+    "detail": "dialog=false injected=0 reqs=1"
+  },
+  {
+    "id": "F3 2000-char ?q= sends <=512 chars",
+    "verdict": "PASS",
+    "detail": "sentLen=512"
+  },
+  {
+    "id": "F4a direct browser load of malformed %-encoding under Vite DEV server",
+    "verdict": "FAIL",
+    "detail": "vite dev server answers HTTP 500 before the app loads (dev-server behaviour, any path; not app code)"
+  },
+  {
+    "id": "F4 malformed percent-encoding (in-app navigation) does not crash page; searched as text",
+    "verdict": "PASS",
+    "detail": "uncaughtPageErrors=0 searchReqs=1 text=\"Search all sessions Go Search Find passages in your transcripts and open their source. Search transcriptsSearch Results for “�%A” Visa Bluep\""
+  },
+  {
+    "id": "C4 direct-URL load runs exactly one request",
+    "verdict": "PASS",
+    "detail": "n=1"
+  },
+  {
+    "id": "H2 Back re-runs earlier query",
+    "verdict": "PASS",
+    "detail": "Results for “counselling”"
+  },
+  {
+    "id": "M2 bar input focusable",
+    "verdict": "PASS",
+    "detail": "activeElement=#global-search-query"
+  },
+  {
+    "id": "L mobile 390px: bar visible, no horizontal page scroll",
+    "verdict": "PASS",
+    "detail": "{\"sw\":390,\"cw\":390} barVisible=true"
+  },
+  {
+    "id": "J other-tenant key sees zero hits for the same query",
+    "verdict": "PASS",
+    "detail": "our transcripts and open their source. Search transcriptsSearch No passages found for “counselling”."
+  },
+  {
+    "id": "K invalid key: no results shown",
+    "verdict": "PASS",
+    "detail": "Living Knowledge Base Paste your API key to continue. Continue"
+  },
+  {
+    "id": "P1 semantic/hybrid-ranked results on the Search page (embeddings)",
+    "verdict": "pending-embeddings",
+    "detail": "GET /search is lexical-only today; lkb_staging holds 751 chunks of an expected 1905 and embeddings finish 14-15 Oct. Re-run after."
+  },
+  {
+    "id": "P2 'Send to Ask' handoff from a result",
+    "verdict": "not built",
+    "detail": "Manifest u3-2-global-search-bar lists it as NOT done (needs an Ask-page ?q= contract first). Not a FAIL of this check."
+  }
+]
