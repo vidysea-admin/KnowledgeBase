@@ -17,3 +17,6 @@ Contract (qa/contracts/meeting-bot-live-capture.md) does not fix watchdog behavi
 - No admission signal exists anywhere. sb_join.py emits only opened/clicked/heartbeat(url,title)/ended/watchdog-reload/gap; `clicked` is the Join click, not admission. TS has no body-text access. browser-joiner.ts has no admitted state. No "admission timeout" setting exists either.
 - Providing one requires a new emit in py/sb_join.py (admission detection from page text, plus not reloading while waiting; the reload is consumed there, `should_force_reload`), which lane budgetmb owns. A TS-only guess (first audible level = admitted) would be a policy choice and fails for silent-but-admitted meetings.
 Options: (a) after budgetmb merges, add `emit("admitted")` in sb_join.py and gate createAudioWatchdog.start() on it in record-commands.ts, with a lobby timeout and a loud "watchdog-reload ended the track" report; (b) heuristic TS-only gate (not recommended).
+
+## Integrator close-out note (2026-10-13)
+Bitrate part checked-PASS; watchdog part pending ISS-CAPTUREFIX-001. Manifest status deliberately left ready-for-check until the watchdog part is delivered and checked.
