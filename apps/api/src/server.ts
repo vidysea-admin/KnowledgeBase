@@ -19,6 +19,7 @@ import { createHealthRouter, type HealthDeps } from "./routes/health.js";
 import { createSetupStatusRouter } from "./activity-health/setup-status.js";
 import { createSystemStatusRouter, unavailableSystemStatusDeps, type SystemStatusDeps } from "./routes/system-status.js";
 import { createSearchRouter, type SearchDeps } from "./routes/search.js";
+import { createSemanticSearchRouter, type SemanticSearchDeps } from "./semantic-search/route.js";
 import { createGraphRouter, type GraphReadDeps } from "./routes/graph.js";
 import { createCalendarRouter, type CalendarReadDeps } from "./routes/calendar.js";
 import { createJoinRulesRouter, unavailableJoinRulesRouter } from "./join-rules/router.js";
@@ -61,6 +62,8 @@ export interface ServerDeps {
   /** Tenant-scoped status counts for the signed-in caller; absent = fail closed (503). */
   systemStatus?: SystemStatusDeps;
   search: SearchDeps;
+  /** T-008 semantic (vector) search. Optional + flag-gated (LKB_SEMANTIC_SEARCH=1): absent -> route not mounted, behaviour unchanged. */
+  semanticSearch?: SemanticSearchDeps;
   graph: GraphReadDeps;
   calendar: CalendarReadDeps;
   meetingCandidates: MeetingCandidatesDeps;
@@ -128,6 +131,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createCitationsRouter(deps.citations));
   app.use(createClaimsListRouter(deps.claims ?? unavailableClaimsListDeps));
   app.use(createSearchRouter(deps.search));
+  if (deps.semanticSearch) app.use(createSemanticSearchRouter(deps.semanticSearch));
   app.use(createGraphRouter(deps.graph));
   app.use(createCalendarRouter(deps.calendar));
   app.use(deps.joinRules ? createJoinRulesRouter(deps.joinRules) : unavailableJoinRulesRouter());
