@@ -425,3 +425,15 @@ test("ISS-U24SMART5-001: otherNamesIn is script- and normalization-aware", () =>
   assert.deepEqual(otherNamesIn("Rashi, José please explain", "Rashi", new Set(["rashi", "josé"])), ["josé"], "NFD Latin matches the NFC candidate name");
   assert.deepEqual(otherNamesIn("राशि और Rashi", "Rashi", k), ["राशि"]);
 });
+
+test("ISS-U24DEVA-001: an NFD candidate name ('José Rao') in the known set still marks a lowercase second name in an NFD quote -> abstain", async () => {
+  const d = (s: string) => s.normalize("NFD");
+  const q = d("Rashi, ask josé about the rules please");
+  const turns = [
+    turn("t0", "spk:0", d("Rashi, ask josé about the rules please.")), turn("t1", "spk:1", d("Sure, the visa process takes a month.")),
+    turn("t2", "spk:3", d("Thanks Rashi for that.")), turn("t3", "spk:4", d("José Rao will close today.")),
+  ];
+  const props = [prop("spk:1", "Rashi", q, "called-on"), prop("spk:1", "Rashi", d("Thanks Rashi for that"), "thanks"), prop("spk:4", d("José Rao"), d("José Rao will close today"), "self-intro")];
+  assert.equal((await shipped(turns, props)).some((r) => r.speakerRef === "spk:1"), false);
+  assert.deepEqual(otherNamesIn(q, "Rashi", new Set(["rashi", d("josé")])), ["josé"]);
+});

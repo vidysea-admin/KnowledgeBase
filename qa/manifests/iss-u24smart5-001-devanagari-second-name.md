@@ -1,7 +1,7 @@
 # iss-u24smart5-001-devanagari-second-name
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 2-adjacent (open medium ISS-U24SMART5-001; attribution of names to speakers, FULL ceremony). Lane: lane/u24deva, branched from lane/u24smart5 7b09a6fd. No model calls.
 
 ## What was wrong
@@ -34,3 +34,6 @@ Mutations (9 run, per-mutation byte backup in finally, harness deleted): 8 KILLE
   KILLED: drop और; skip NFC on span; no \p{M}; stoplist ignored; no pre-conj branch; English conj unrestricted
   SURVIVED: skip NFC on the known-name set only (known names come from NFC transcript text; low value)
 ```
+
+## Cycle 1 (ISS-U24DEVA-001)
+Added the checker's kill test: NFD candidate "José Rao" in the known set + NFD quote "Rashi, ask josé about the rules please" under an always-yes verifier -> spk:1 not shipped. The surviving mutant (skip NFC on the known-name set) now FAILS it (fail 1). Source restored, hash equals HEAD. Full packages/index suite re-run (see commit message).
