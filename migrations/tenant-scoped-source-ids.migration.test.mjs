@@ -10,8 +10,23 @@ const migration = require("./20261012150000-tenant-scoped-source-ids.cjs");
 
 const H1 = "a".repeat(64), H2 = "b".repeat(64), H3 = "c".repeat(64);
 
-const match = (doc, filter) => Object.entries(filter).every(([k, v]) => doc[k] === v);
+// Supports equality plus the {$type:"string", $gt} _id range the migration pages with.
+const matchValue = (actual, cond) => {
+  if (cond !== null && typeof cond === "object") {
+    if ("$type" in cond && !(cond.$type === "string" && typeof actual === "string")) return false;
+    if ("$gt" in cond && !(actual > cond.$gt)) return false;
+    return true;
+  }
+  return actual === cond;
+};
+// Cheap exact-_id rejection first: the 10k-row tests do tens of thousands of lookups.
+const match = (doc, filter) => {
+  if (typeof filter._id === "string" && doc._id !== filter._id) return false;
+  for (const k in filter) if (!matchValue(doc[k], filter[k])) return false;
+  return true;
+};
 function fakeDb(seed, hooks = {}) {
+  const stats = { peakBatch: 0, finds: 0, wholeCollectionLoads: 0 };
   const data = Object.fromEntries(Object.entries(seed).map(([k, v]) => [k, v.map((d) => structuredClone(d))]));
   const coll = (name) => {
     const rows = (data[name] ??= []);
@@ -23,7 +38,23 @@ function fakeDb(seed, hooks = {}) {
       });
     };
     return {
-      find: (f) => ({ toArray: async () => rows.filter((r) => match(r, f)).map((r) => structuredClone(r)) }),
+      find: (f) => {
+        let sorted = false, max = Infinity;
+        const cursor = {
+          sort: () => { sorted = true; return cursor; },
+          limit: (n) => { max = n; return cursor; },
+          toArray: async () => {
+            let out = rows.filter((r) => match(r, f));
+            if (sorted) out = out.sort((a, b) => (a._id < b._id ? -1 : a._id > b._id ? 1 : 0));
+            out = out.slice(0, max).map((r) => structuredClone(r));
+            stats.finds += 1;
+            if (name === "sources" || name === "source_id_migration_journal") stats.peakBatch = Math.max(stats.peakBatch, out.length);
+            if (max === Infinity && out.length > 50) stats.wholeCollectionLoads += 1;
+            return out;
+          },
+        };
+        return cursor;
+      },
       deleteOne: async (f) => { hooks.beforeDelete?.(name, f); const i = rows.findIndex((r) => match(r, f)); if (i >= 0) rows.splice(i, 1); },
       replaceOne: async (f, doc, opt = {}) => {
         hooks.beforeInsert?.(name, doc);
@@ -34,7 +65,7 @@ function fakeDb(seed, hooks = {}) {
       updateMany: async (f, u) => { for (const r of rows.filter((x) => match(x, f))) Object.assign(r, u.$set); },
     };
   };
-  return { data, collection: coll };
+  return { data, stats, collection: coll };
 }
 
 const seed = () => ({
@@ -144,4 +175,66 @@ test("cross-tenant: tenant B's session pointing at a same-valued sourceId is not
   const db = fakeDb(s);
   await migration.migrate(db, () => {});
   assert.equal(db.data.sessions.find((x) => x._id === "sx").sourceId, H1);
+});
+
+// ---- ISS-TENANTSRCID-003: bounded memory, large collection ----
+const hex = (i) => i.toString(16).padStart(64, "0");
+function bigSeed(n) {
+  const sources = [], sessions = [], gaps = [];
+  for (let i = 0; i < n; i++) {
+    const tenantId = i % 2 ? "t-a" : "t:b";
+    sources.push({ _id: hex(i), tenantId, hash: hex(i), kind: "url" });
+    if (i % 10 === 0) { sessions.push({ _id: `s${i}`, tenantId, sourceId: hex(i) }); gaps.push({ _id: `g${i}`, tenantId, sourceRef: hex(i) }); }
+  }
+  return { sources, sessions, gaps, media: [] };
+}
+
+test("large collection (10k rows): every row migrated, no find ever returns more than the batch size", async () => {
+  const N = 10000, B = 250;
+  const db = fakeDb(bigSeed(N));
+  const report = await migration.migrate(db, () => {}, { batchSize: B });
+  assert.equal(report.migrated, N);
+  assert.ok(db.stats.peakBatch <= B, `peak batch ${db.stats.peakBatch} must be <= ${B}`);
+  assert.ok(db.stats.peakBatch > 1, "paging actually used");
+  assert.equal(db.stats.wholeCollectionLoads, 0, "no unbounded find().toArray() over a big collection");
+  assert.equal(db.data.sources.every((s) => s._id === tenantSourceId(s.tenantId, s.hash)), true);
+  assert.equal(db.data.sessions.every((s) => s.sourceId.includes(":")), true);
+  assert.equal(db.data.gaps.every((g) => g.sourceRef.includes(":")), true);
+  assert.equal(db.data.source_id_migration_journal.length, N);
+});
+
+test("default batch size bounds memory too (BATCH_SIZE exported and used by up)", async () => {
+  assert.ok(Number.isInteger(migration.BATCH_SIZE) && migration.BATCH_SIZE > 0 && migration.BATCH_SIZE <= 1000);
+  const db = fakeDb(bigSeed(1300));
+  await migration.up(db);
+  assert.ok(db.stats.peakBatch <= migration.BATCH_SIZE);
+  assert.equal(db.data.sources.filter((s) => s._id === s.hash).length, 0);
+});
+
+test("large collection: idempotent re-run is a no-op and down() restores every row in bounded batches", async () => {
+  const N = 2000, B = 100;
+  const db = fakeDb(bigSeed(N));
+  await migration.migrate(db, () => {}, { batchSize: B });
+  const snap = JSON.stringify([db.data.sources, db.data.sessions, db.data.gaps]);
+  const again = await migration.migrate(db, () => {}, { batchSize: B });
+  assert.equal(again.migrated, 0);
+  assert.equal(JSON.stringify([db.data.sources, db.data.sessions, db.data.gaps]), snap);
+  db.stats.peakBatch = 0;
+  const r = await migration.migrateDown(db, { batchSize: B });
+  assert.equal(r.restored, N);
+  assert.ok(db.stats.peakBatch <= B);
+  assert.equal(db.data.sources.every((s) => s._id === s.hash), true);
+  assert.equal(db.data.sessions.every((s) => !s.sourceId.includes(":")), true);
+  assert.equal((await migration.down(db)).restored, 0, "exported down() re-runnable");
+});
+
+test("crash mid-run in a multi-page collection is repaired by the next run", async () => {
+  const db = fakeDb(bigSeed(300), {
+    beforeInsert(name, doc) { if (name === "sources" && doc._id === tenantSourceId("t-a", hex(151)) && !db.crashed) { db.crashed = true; throw new Error("crash"); } },
+  });
+  await assert.rejects(() => migration.migrate(db, () => {}, { batchSize: 40 }), /crash/);
+  const r = await migration.migrate(db, () => {}, { batchSize: 40 });
+  assert.equal(r.recovered, 1);
+  assert.equal(db.data.sources.length, 300);
+  assert.equal(db.data.sources.filter((s) => s._id === s.hash).length, 0);
 });
