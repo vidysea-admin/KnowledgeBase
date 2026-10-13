@@ -52,15 +52,22 @@ export function createMongoIntakeSink(colls: IntakeCollections = mongoIntakeColl
       assertTurnTimings(plan.turns, plan.session._id);
       const undo: Array<() => Promise<unknown>> = [];
       try {
+        // insertOne is atomic, so its undo is registered after it succeeds (a duplicate-key loss of the source-id
+        // race must NOT delete the winner's row). insertMany can write a prefix and then throw, so its undo is
+        // registered BEFORE the call, keyed by the ids about to be written (ISS-W045-002); a never-written id is a
+        // no-op delete, and every delete is pinned to the tenant by the scoped collection.
         await colls.sources(tenantId).insertOne(plan.source);
         undo.push(() => colls.sources(tenantId).deleteMany({ _id: plan.source._id }));
         if (plan.media.length > 0) {
-          await colls.media(tenantId).insertMany(plan.media);
           undo.push(() => colls.media(tenantId).deleteMany({ _id: { $in: plan.media.map((m) => m._id) } }));
+          await colls.media(tenantId).insertMany(plan.media);
         }
         await colls.sessions(tenantId).insertOne(plan.session);
         undo.push(() => colls.sessions(tenantId).deleteMany({ _id: plan.session._id }));
-        if (plan.turns.length > 0) await colls.turns(tenantId).insertMany(plan.turns);
+        if (plan.turns.length > 0) {
+          undo.push(() => colls.turns(tenantId).deleteMany({ _id: { $in: plan.turns.map((t) => t._id) } }));
+          await colls.turns(tenantId).insertMany(plan.turns);
+        }
       } catch (err) {
         for (const step of undo.reverse()) {
           try { await step(); } catch { /* best effort; the original error is what matters */ }

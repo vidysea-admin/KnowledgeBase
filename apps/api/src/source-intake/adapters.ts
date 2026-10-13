@@ -13,7 +13,8 @@ import { join } from "node:path";
 import type { Transcribe } from "@lkb/ai";
 import {
   buildSourceRegistry, createDocumentSource, createOnairSource, createRecordingSource, createUrlSource,
-  createYoutubeSource, createZoomRecordingSource, defaultYoutubeExec, resolveFfmpegLocation, resolveYtDlpCommand,
+  createYoutubeSource, createZoomRecordingSource, defaultYoutubeExec, isBlockedAddress, resolveAll, resolveFfmpegLocation,
+  resolveYtDlpCommand,
   type HostedRecordingDownloader, type Source, type YoutubeExec,
 } from "@lkb/ingest";
 import { sha256Hex } from "../hash.js";
@@ -27,12 +28,45 @@ export interface SourceIntakeAdapterOptions {
   /** Seams for tests. */
   exec?: YoutubeExec;
   urlFetcher?: (url: string) => Promise<string>;
+  /** DNS seam (default: every address the system resolver returns). Used by the SSRF guard on the url adapter. */
+  lookup?: (hostname: string) => Promise<string[]>;
   reader?: (path: string) => Promise<Uint8Array>;
+}
+
+/**
+ * ISS-W045-001: refuse a target that is not a public http(s) host BEFORE anything is forwarded (to Jina or any swapped
+ * fetcher). Same address judge as watched sources (`isBlockedAddress`), applied to EVERY resolved address; fails closed
+ * on a lookup error or an empty answer. Redirects: the fetch happens on Jina's side, which we cannot observe; the Jina
+ * call itself uses redirect "manual" so a redirect from Jina is an error, never followed here.
+ */
+export function guardUrlFetcher(
+  inner: (url: string) => Promise<string>,
+  lookup: (hostname: string) => Promise<string[]> = resolveAll,
+): (url: string) => Promise<string> {
+  return async (url: string) => {
+    let u: URL;
+    try { u = new URL(url); } catch { throw new Error("url-blocked: not a valid URL"); }
+    if (u.protocol !== "http:" && u.protocol !== "https:") throw new Error("url-blocked: only http(s) URLs are allowed");
+    if (u.username || u.password) throw new Error("url-blocked: URLs with credentials are not allowed");
+    const host = u.hostname.replace(/^\[|\]$/g, "");
+    let addresses: string[];
+    if (/^[0-9.]+$/.test(host) || host.includes(":")) addresses = [host]; // literal IP: judge it directly
+    else {
+      try { addresses = await lookup(host); } catch { throw new Error("url-blocked: host could not be resolved"); }
+    }
+    if (addresses.length === 0 || addresses.some((a) => isBlockedAddress(a))) {
+      throw new Error("url-blocked: host resolves to a private or reserved address");
+    }
+    return inner(url);
+  };
 }
 
 async function jinaReaderFetch(url: string): Promise<string> {
   const apiKey = process.env.JINA_API_KEY;
-  const res = await fetch(`https://r.jina.ai/${url}`, { headers: apiKey ? { authorization: `Bearer ${apiKey}` } : {} });
+  const res = await fetch(`https://r.jina.ai/${url}`, {
+    headers: apiKey ? { authorization: `Bearer ${apiKey}` } : {},
+    redirect: "manual",
+  });
   if (!res.ok) throw new Error(`Jina Reader could not fetch this URL (HTTP ${res.status})`);
   return res.text();
 }
@@ -53,6 +87,6 @@ export function buildSourceIntakeAdapters(opts: SourceIntakeAdapterOptions): Sou
     }),
     onair: createOnairSource(media),
     zoomRecording: createZoomRecordingSource(media),
-    url: createUrlSource({ hasher: sha256Hex, fetcher: opts.urlFetcher ?? jinaReaderFetch }),
+    url: createUrlSource({ hasher: sha256Hex, fetcher: guardUrlFetcher(opts.urlFetcher ?? jinaReaderFetch, opts.lookup) }),
   });
 }

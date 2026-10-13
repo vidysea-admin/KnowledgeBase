@@ -1,7 +1,7 @@
 # t045-source-intake-wiring
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 3 (roadmap task T-045 "More sources"; audit: "Intake planner only; no sink or API; no one-run-per-source live check"). Class: data-write + tenancy: full ceremony.
 Lane: lane/w045 (wiring lane). No new ledger issues.
 Authority: D-135 (re-ingest within a tenant is idempotent), D-136 (tenant-scoped source ids).
@@ -32,3 +32,9 @@ Authority: D-135 (re-ingest within a tenant is idempotent), D-136 (tenant-scoped
 ## Acceptance: met in code vs needs a live run
 - Met in code (fakes): persistence sink; authenticated tenant-scoped API; D-135 idempotence; D-136 tenant-scoped ids; per-source adapter selection and fail-closed behaviour; flag off by default.
 - STILL needs a live run / owner input (not done): one real run per source (YouTube with yt-dlp+ffmpeg, Zoom recording, OnAir). OnAir needs a Google login. No `HostedRecordingDownloader` exists for OnAir/Zoom. No production STT provider is composed, so with the flag on the route answers 503 until one is injected. Real Mongo not touched (tenant-scoped accessors only exercised through fakes; the `media` collection through `scopedCollection` is untested against a real driver). Upload of recording files not built.
+
+## Fix cycle 1 (ISS-W045-001, ISS-W045-002)
+- SSRF: `guardUrlFetcher` (adapters.ts) wraps the url adapter's fetcher (default Jina or injected). Refuses non-http(s), credentials, literal IPs and every resolved address failing `isBlockedAddress` (the repo's guarded-fetch judge, reused from @lkb/ingest), fails closed on lookup error/empty answer; `lookup` injectable. Jina call uses `redirect: "manual"`. Limit: Jina follows redirects on its side, unobservable here.
+- Rollback: media/turns undo registered BEFORE `insertMany` (delete by this call's ids, tenant-scoped); `insertOne` undo stays after success so a lost source-id race never deletes the winner's row.
+- Evidence (new `source-intake-hardening.test.ts`, 6 tests): ISS-W045-001 recorded targets 6/6 refused, zero forwarded (ledger names 6 URLs though the checker text says 7; 127.0.0.1 etc. added as extras 12/12 refused); ISS-W045-002 turns and media variants: 0 rows left, other tenant untouched (2/2). Prior 13 tests still pass.
+- apps/api full suite 823 tests, 821 pass, 2 fail (activity-health/router.test.ts, usage/usage.test.ts: unrelated, not touched). packages/ingest 342/342. tsc exit 0. lint:structure OK.

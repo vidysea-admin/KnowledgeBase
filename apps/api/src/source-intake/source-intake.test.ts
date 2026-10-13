@@ -64,7 +64,7 @@ function rig(opts: { turns?: TestTurn[]; downloader?: boolean; indexer?: (t: str
     transcribe, workDir: WORK, env: {},
     exec: async () => ({ exitCode: 0, stdout: `${WORK}/yt-${ID}.m4a\n` }),
     reader: async (p) => { const f = FILES[p]; if (!f) throw new Error("no such file"); return f; },
-    urlFetcher: async () => "para one\n\npara two",
+    urlFetcher: async () => "para one\n\npara two", lookup: async () => ["93.184.216.34"],
     downloader: opts.downloader === false ? undefined : async (r) => { calls.download++; return { path: `${WORK}/${r.platform}-${r.id}.mp4` }; },
   });
   let n = 0;
