@@ -1,6 +1,6 @@
 # t057next
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap task T-057, feature A4 Sessions Library filters). Lane: lane/t057next, base 99f4fed9. Web-only, client-side, no API/schema/migration change, no dependency added. UI-touching (D-024): source scope only (jsdom); live-browser check owed. No qa/contracts file exists for this slice; the checker supplies one.
 
