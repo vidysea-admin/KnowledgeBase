@@ -1,5 +1,5 @@
 # Manifest: nolkbdefault-api-db-required
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 **Lane:** nolkbdefault (branch lane/nolkbdefault, from lane/legacyseed 129e3146). **Fixes:** ISS-LEGACYSEED-009 (high), ISS-LEGACYSEED-010 (medium). Security / data-write class. No real DB was connected.
 
