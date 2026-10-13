@@ -26,6 +26,7 @@ export { resolveEvidence, extractiveText, citationTimes, auditGroundedNotes } fr
 export type { DroppedNote } from "./pipeline/notes/drop-mode.js";
 export { summarizeSession, type SessionSummaryResult, type SummarizeResult, type SummarizeCompleteFn } from "./pipeline/summarize.js";
 export { extractClaims, type ExtractedClaim, type ClaimsCompleteFn } from "./pipeline/claims.js";
+export { extractDecisions, decisionsEnabled, type ExtractedDecision, type DecisionsResult, type DecisionsCompleteFn } from "./pipeline/notes/decisions.js";
 export { resolveSpeakers, personIdFor, type ResolvedSpeaker, type SpeakerResolution } from "./pipeline/speakers.js";
 export { extractSpeakers, extractSpeakersRuleBased, type SpeakersCompleteFn, type SpeakerExtractionResult } from "./pipeline/speakers-llm.js";
 export { groundSpeakerProposals, extractSpeakersGrounded, selectSuggestions, dropOverriddenByConfirmed, type ConfirmedSpeaker, type EvidenceKind, type SuggestedSpeaker, type RejectedSuggestion } from "./pipeline/speakers-grounded.js";

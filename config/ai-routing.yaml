@@ -5,6 +5,8 @@ transcribe: [gemini, ollama, claude-code]
 namemap: [gemini, claude-code]
 summarize: [gemini, claude-code, ollama]
 claims: [gemini, claude-code]
+# U2.5: decisions extraction (flag LKB_EXTRACT_DECISIONS, off by default); same chain as claims.
+decisions: [gemini, claude-code]
 # speakers: the speaker-segment-identity gate (Option A, phase 2, answered 2026-09-21) pins
 # transcript-derived speaker identity to the LOCAL chain — qwen3:8b first, deterministic options —
 # so nothing model-proposed about a person's identity is adjudicated by a public model. Ollama is
