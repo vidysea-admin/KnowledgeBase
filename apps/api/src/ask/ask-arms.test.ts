@@ -10,8 +10,8 @@ import assert from "node:assert/strict";
 import type { Db } from "mongodb";
 import { createAskArmsFor } from "./ask-arms.js";
 import type { TreeIndexNode } from "@lkb/core";
-import { startTestServer } from "./testUtils.js";
-import { buildTestDeps, fakeKeyStore, fakeTreeStore, fakeAskDeps } from "./fixtures.js";
+import { startTestServer } from "../testUtils.js";
+import { buildTestDeps, fakeKeyStore, fakeTreeStore, fakeAskDeps } from "../fixtures.js";
 
 const TREE: TreeIndexNode = {
   node_id: "tenant:t1", title: "t1", level: "tenant", summary: "", children: [

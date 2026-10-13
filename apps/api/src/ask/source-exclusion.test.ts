@@ -102,3 +102,9 @@ test("ISS-BADTURNS-002: a foreign-tenant or foreign-session CHUNK that covers an
     await assert.rejects(() => createSourceHydrator("toc", { db, embed: async () => ({ vectors: [[1, 0]], dims: 2, provider: "offline", model: "fixture" }) })("visa forms October", [visaN, okN]), BoundedAskError);
   }
 });
+test("ISS-BUDGETAPI-002: scope is checked BEFORE timing exclusion: a row that is foreign AND badly timed refuses the whole request, never an exclusion", async () => {
+  for (const bad of [row(OK, 8, "FOREIGN", 50, 10, { tenantId: "other" }), row("not-admitted", 8, "FOREIGN", 50, 10), row(OK, 9, "FOREIGN", -5, 10, { tenantId: "other" })]) {
+    const db = { collection: () => ({ find: () => ({ toArray: async () => [GOOD_OK, bad] }) }) } as unknown as Pick<Db, "collection">;
+    await assert.rejects(() => createSourceHydrator("toc", { db })("loans", [okN]), BoundedAskError);
+  }
+});

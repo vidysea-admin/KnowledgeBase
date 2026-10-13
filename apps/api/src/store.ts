@@ -17,7 +17,7 @@ import type { WriteJobFn } from "@lkb/ai";
 import { buildKnowledgeGraph, treeIndexRootFilter, type KnowledgeGraph } from "@lkb/index";
 import type { ApiKeyStore, VerifiedKey } from "./auth.js";
 import type { TreeStore } from "./routes/ask/ask.js";
-import type { EvalRunStore } from "./routes/compete.js";
+import type { EvalRunStore } from "./routes/compete/compete.js";
 import { createHash } from "node:crypto";
 import { createWatchedSource, listActive as listActiveWatchedSources, recordFetch as recordWatchedFetch } from "@lkb/db";
 import { createGuardedFetcher, resolveAll, httpRequest, runWatchedSources, type WatchedRunDeps } from "@lkb/ingest";
@@ -29,7 +29,7 @@ import { probeMongoHealth } from "./health-probe.js";
 import type { GraphReadDeps } from "./routes/graph.js";
 import type { ApiKeySummary, KeysDeps } from "./routes/keys.js";
 import type { MeetingCandidatesDeps } from "./routes/meeting-candidates.js";
-import { scanGmailForMeetingCandidates } from "./gws-gmail.js";
+import { scanGmailForMeetingCandidates } from "./gws/gws-gmail.js";
 import { isRefusedWorkDb } from "./db-name.js";
 import { sha256Hex } from "./hash.js";
 
@@ -153,7 +153,7 @@ export function createMongoGraphReadDeps(): GraphReadDeps {
   };
 }
 
-export { createGwsCalendarReadDeps } from "./gws-calendar.js";
+export { createGwsCalendarReadDeps } from "./gws/gws-calendar.js";
 
 /** Real `MeetingCandidatesDeps` (routes/meeting-candidates.ts) — wraps the already-real
  * `@lkb/db` `meeting-candidates`/`trusted-senders` accessors plus the `gws`-backed Gmail scan.

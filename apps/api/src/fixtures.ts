@@ -8,7 +8,7 @@ import type { EvalRuns, TreeIndexNode, WatchedSources } from "@lkb/core";
 import type { AskV2Deps } from "@lkb/ask";
 import type { ApiKeyStore, VerifiedKey } from "./auth.js";
 import type { TreeStore } from "./routes/ask/ask.js";
-import type { EvalRunStore } from "./routes/compete.js";
+import type { EvalRunStore } from "./routes/compete/compete.js";
 import { randomUUID } from "node:crypto";
 import type { WatchedSourceDeps } from "./routes/watched-sources.js";
 import type { BrainReadDeps, SessionDetail } from "./routes/brain.js";

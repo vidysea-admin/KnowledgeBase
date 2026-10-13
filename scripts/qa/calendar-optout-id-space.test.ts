@@ -15,7 +15,7 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import { startTestServer } from "../../apps/api/src/testUtils.js";
 import { buildTestDeps, fakeKeyStore } from "../../apps/api/src/fixtures.js";
-import { createGwsCalendarReadDeps, listUpcomingGwsMeetings } from "../../apps/api/src/gws-calendar.js";
+import { createGwsCalendarReadDeps, listUpcomingGwsMeetings } from "../../apps/api/src/gws/gws-calendar.js";
 import { createJoinRulesDeps } from "../webinar/join-rules-host.js";
 import { selectAutoRecordItems } from "../../packages/meeting-bot/src/calendar/auto-join.js";
 import { applyJoinRules } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules-select.js";

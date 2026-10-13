@@ -147,7 +147,7 @@ async function main() {
 
   // --- 2. Work Gmail ---
   try {
-    const { scanGmailForMeetingCandidates } = await import("../../apps/api/src/gws-gmail.ts");
+    const { scanGmailForMeetingCandidates } = await import("../../apps/api/src/gws/gws-gmail.ts");
     // 60, not the function's own default of 15: the real inbox has ~200 matches for this query
     // (mostly internal Google Calendar invite noise — the query is sender/host-driven, not a
     // topic filter), and the real CBSE recording mail this unit's live check depends on sat at

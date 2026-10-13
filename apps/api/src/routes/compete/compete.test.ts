@@ -11,13 +11,13 @@ import assert from "node:assert/strict";
 import type { Db } from "mongodb";
 import type { TreeIndexNode } from "@lkb/core";
 import { BoundedAskError } from "@lkb/ask";
-import { createServer, type ServerDeps } from "../server.js";
-import { requireAuth } from "../auth.js";
-import { createSourceRequestDepsFor } from "../ask/source-context.js";
-import { unpackContext } from "../../../../packages/ask/src/bounded-refine.js";
+import { createServer, type ServerDeps } from "../../server.js";
+import { requireAuth } from "../../auth.js";
+import { createSourceRequestDepsFor } from "../../ask/source-context.js";
+import { unpackContext } from "../../../../../packages/ask/src/bounded-refine.js";
 
-import { startTestServer } from "../testUtils.js";
-import { buildTestDeps, fakeAskDeps, fakeKeyStore, fakeEvalRunStore } from "../fixtures.js";
+import { startTestServer } from "../../testUtils.js";
+import { buildTestDeps, fakeAskDeps, fakeKeyStore, fakeEvalRunStore } from "../../fixtures.js";
 
 const COMPETE_KEY = { "compete-key": { tenantId: "tenant-1", scopes: ["ask", "compete"] } };
 
