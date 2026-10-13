@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { spawnSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { processVideo, geminiVision, validateVision, validateTurns, buildNotes, mediaCommand, screenEvidenceTurns } from './process-video.mjs';
 
@@ -138,7 +139,8 @@ test('Gemini request sends actual image through Transport; validates actual resp
   assert.equal(request.body.contents[0].parts[1].inlineData.data, Buffer.from('pixels').toString('base64'));
   await assert.rejects(geminiVision(async () => ({ status: 500 }), { apiKey: 'test', model: 'gemini-test' })({ path: image }), /status 500/);
 });
-test('real ffmpeg synthetic video yields timestamped playable frame evidence', async (t) => {
+const hasFfmpeg = ['ffmpeg', 'ffprobe'].every((bin) => !spawnSync(bin, ['-version'], { stdio: 'ignore' }).error);
+test('real ffmpeg synthetic video yields timestamped playable frame evidence', { skip: hasFfmpeg ? false : 'ffmpeg/ffprobe not found on PATH' }, async (t) => {
   const f = fixture(t), path = join(f.root, 'real.webm');
   await mediaCommand('ffmpeg', ['-hide_banner', '-nostdin', '-y', '-f', 'lavfi', '-i', 'color=c=blue:s=320x240:d=2', '-c:v', 'libvpx', path]);
   const state = await processVideo({ ...f.input, recording: 'real.webm', command: mediaCommand });

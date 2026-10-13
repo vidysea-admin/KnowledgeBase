@@ -198,6 +198,21 @@ export const G4_FROZEN = new Set([
   "qa/verdicts/watched-sources-entrypoint.md",
   "qa/verdicts/watched-sources-run.md",
   "qa/verdicts/watched-sources-url-normalisation.md",
+  // Historical verdicts (immutable checker records, D-019) citing bare ids that collide with lane-shard ids.
+  "qa/verdicts/iss-298-ledger-id-allocator.md",
+  "qa/verdicts/lint-tracker-g4-qualify-issue-refs.md",
+  "qa/verdicts/medium-fix-batch-2-2026-10-10.md",
+  "qa/verdicts/r1-alert-title-policy-and-reasons.md",
+  "qa/verdicts/r1-attention-alerts.md",
+  "qa/verdicts/t-031-audio-watchdog.md",
+  "qa/verdicts/t-047-controller.md",
+  "qa/verdicts/t034-tab-capture-extension-logic-tests.md",
+  "qa/verdicts/t036-calendar-description-link-scan.md",
+  "qa/verdicts/t037-join-rules-stale-lock-takeover.md",
+  "qa/verdicts/t039-send-now-command.md",
+  "qa/verdicts/t040-strict-quote-verifier-and-windowing.md",
+  "qa/verdicts/t042-self-introduction-fusion.md",
+  "qa/verdicts/t046-retention-dry-run-report.md",
 ]);
 
 /**
