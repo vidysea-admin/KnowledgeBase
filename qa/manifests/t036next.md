@@ -1,6 +1,6 @@
 # t036next
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Priority tier: 3 - next unblocked roadmap task (T-036 remaining code slice)
 Security class: none - new pure function, no caller wired, flag OFF by default (YouTube link never reaches `meetingUrl`/auto-join)
@@ -26,4 +26,4 @@ Contract: qa/contracts/gmail-meeting-candidates-approval.md (no new criteria cla
 - `node scripts/lint-loc.mjs` -> OK (887 files); `node scripts/lint-dirsize.mjs` -> OK (153 dirs). `lint-loc.mjs --all` run too (exit 0).
 
 ## Handshake
-Status: ready-for-check, Fix cycle 0.
+Status: checked-PASS, Fix cycle 0.
