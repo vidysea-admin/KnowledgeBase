@@ -20,14 +20,15 @@ export interface NoteJudgeBatch { verdicts: NoteJudgeOutput[]; costUsd?: number;
 /** The injectable judge: a batch of (note, sources) in, a verdict per id out. */
 export type NoteJudge = (batch: NoteJudgeInput[]) => Promise<NoteJudgeBatch>;
 
-export interface JudgeSidecarEntry { id: string; kind: string; verdict: "different" | "unsure"; reason: string; note: string; turnIds: string[] }
+/** `dropBy` (D-151, pending append): which layer rejected the note: the judge, the lexical rules, or both. `rule` is the lexical problem when the rules rejected it. A "same" entry exists only when the rules alone dropped the note. */
+export interface JudgeSidecarEntry { id: string; kind: string; verdict: "same" | "different" | "unsure"; reason: string; note: string; turnIds: string[]; dropBy?: "judge" | "rules" | "both"; rule?: string }
 /** Written beside the notes: what the judge dropped, why, and what it cost this session. */
 export interface JudgeSidecar {
-  judged: number; kept: number; dropped: number; unsure: number; calls: number;
+  judged: number; kept: number; dropped: number; unsure: number; calls: number; /** D-151: notes the judge accepted but the lexical rules rejected (not counted in kept) */ rulesDropped: number;
   costUsd: number; /** calls whose cost was estimated from tokens because the provider reported none */ estimatedCostCalls: number; inputTokens: number; outputTokens: number; models: string[];
   entries: JudgeSidecarEntry[];
 }
-export const emptySidecar = (): JudgeSidecar => ({ judged: 0, kept: 0, dropped: 0, unsure: 0, calls: 0, costUsd: 0, estimatedCostCalls: 0, inputTokens: 0, outputTokens: 0, models: [], entries: [] });
+export const emptySidecar = (): JudgeSidecar => ({ judged: 0, kept: 0, dropped: 0, unsure: 0, calls: 0, rulesDropped: 0, costUsd: 0, estimatedCostCalls: 0, inputTokens: 0, outputTokens: 0, models: [], entries: [] });
 export function writeJudgeSidecar(file: string, sidecar: JudgeSidecar): void { writeFileSync(file, JSON.stringify(sidecar, null, 2) + "\n", "utf8"); }
 
 /** What the pipeline threads through: the judge, the sidecar it fills, and an optional per-session cost cap. */
