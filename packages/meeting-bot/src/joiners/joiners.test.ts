@@ -7,9 +7,11 @@ import assert from "node:assert/strict";
 
 import { createVexaJoiner } from "./vexa-joiner.js";
 import { createBrowserJoiner, registerInBrowser, type RegistrationInput } from "./browser-joiner.js";
-import { resolve } from "node:path";
-import { mkdtempSync } from "node:fs";
-import { execFileSync } from "node:child_process";
+import { resolve, dirname, join } from "node:path";
+import { tmpdir } from "node:os";
+import { fileURLToPath } from "node:url";
+import { mkdtempSync, rmSync } from "node:fs";
+import { execFileSync, spawnSync } from "node:child_process";
 import { createSystemAudioJoiner } from "./system-audio-joiner.js";
 
 test("vexa-joiner: join posts to {baseUrl}/bots via the injected transport and returns sessionHandle", async () => {
@@ -62,18 +64,24 @@ test("registration refuses invalid hosts/operator/selectors before execution", a
   ]) await assert.rejects(registerInBrowser({...registration, ...patch}, cfg));
   assert.equal(calls, 0);
 });
-test("registration actual child timeout performs exact owned-profile cleanup", async () => {
-  const profileDir = mkdtempSync(resolve("data/registration-timeout-"));
-  const python = resolve(".venv/Scripts/python.exe");
-  const result = await registerInBrowser({...registration, url: "http://127.0.0.1:1/register",
-    allowedHosts: ["127.0.0.1"], localFixture: true}, {
-    python, joinScript: resolve("packages/meeting-bot/py/sb_join.py"), profileDir,
-    browserExecutable: "cft", timeoutMs: 1000,
-  });
-  assert.deepEqual(result, {status: "uncertain", reason: "browser_timeout"});
-  const probe = "import psutil,sys; target='--user-data-dir='+sys.argv[1]; "
-    + "print(any(target in p.info.get('cmdline',[]) for p in psutil.process_iter(['cmdline']) if p.info.get('cmdline')))";
-  assert.equal(execFileSync(python, ["-c", probe, profileDir], {timeout: 15000, encoding: "utf8"}).trim(), "False");
+test("registration actual child timeout performs exact owned-profile cleanup", async (t) => {
+  const pkgDir = resolve(dirname(fileURLToPath(import.meta.url)), "../.."), repoRoot = resolve(pkgDir, "../..");
+  const configured = process.env.D2_FIXTURE_PYTHON || resolve(repoRoot, process.platform === "win32" ? ".venv/Scripts/python.exe" : ".venv/bin/python");
+  const deps = spawnSync(configured, ["-c", "import psutil, seleniumbase, sys; print(sys.executable)"], {timeout: 30000, encoding: "utf8"});
+  if (deps.status !== 0) { t.skip(`python ${configured} cannot import psutil+seleniumbase (the real bot browser needs the py/requirements.txt venv)`); return; }
+  const python = String(deps.stdout).trim(); // registerInBrowser requires an absolute interpreter path
+  const profileDir = mkdtempSync(join(tmpdir(), "registration-timeout-"));
+  try {
+    const result = await registerInBrowser({...registration, url: "http://127.0.0.1:1/register",
+      allowedHosts: ["127.0.0.1"], localFixture: true}, {
+      python, joinScript: resolve(pkgDir, "py/sb_join.py"), profileDir,
+      browserExecutable: "cft", timeoutMs: 1000,
+    });
+    assert.deepEqual(result, {status: "uncertain", reason: "browser_timeout"});
+    const probe = "import psutil,sys; target='--user-data-dir='+sys.argv[1]; "
+      + "print(any(target in p.info.get('cmdline',[]) for p in psutil.process_iter(['cmdline']) if p.info.get('cmdline')))";
+    assert.equal(execFileSync(python, ["-c", probe, profileDir], {timeout: 15000, encoding: "utf8"}).trim(), "False");
+  } finally { rmSync(profileDir, {recursive: true, force: true}); }
 });
 
 test("vexa-joiner: throws when the transport reports a non-2xx status", async () => {

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import * as cp from "node:child_process";
 import { createRequire, syncBuiltinESMExports } from "node:module";
 import { EventEmitter } from "node:events";
@@ -60,7 +61,7 @@ test("actual login/tab/OBS spawn interfaces preserve parent and carry identical 
     assert.ok(loginCall.args.includes("--no-click"));
     assert.equal(loginCall.args[1],"https://accounts.google.com");
     login=false;
-    const cfg={python:"fixture-python",joinScript:path.resolve("packages/meeting-bot/py/sb_join.py"),
+    const cfg={python:"fixture-python",joinScript:path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../../../py/sb_join.py"),
       profileDir:parent,profileDirectory:"Profile 1",recordDir:records,browserExecutable:"cft",autoClick:false};
     const tab=createTabBrowserDeps({...cfg,sessionId:"profile-test",tenantId:"fixture",log:()=>{}});
     await assert.rejects(tab.deps.launch("https://example.invalid",{tenantId:"fixture",consentNote:"fixture"}),/intercepted/);
