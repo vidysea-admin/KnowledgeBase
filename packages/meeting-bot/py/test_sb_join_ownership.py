@@ -280,12 +280,17 @@ def test_registration_native_same_host_other_port_confinement(tmp_path, case):
         shutil.copytree(pathlib.Path(sb_join.__file__).parent / "tab-capture", root / "tab-capture")
         for module in sorted(pathlib.Path(sb_join.__file__).parent.glob("*.py")):  # the copied main imports its split-out modules (registration_cdp*, sb_join_*)
             if module.name.startswith(("registration_cdp", "sb_join_")): shutil.copy(module, root / module.name)
-        profile = str((root / "profile").resolve()); stop = str((root / "stop").resolve())
+        def attempt_paths(attempt):  # every attempt gets a brand-new, uniquely named profile/stop path; nothing is ever reused
+            return str((root / ("profile-%d" % attempt)).resolve()), str((root / ("stop-%d" % attempt)).resolve())
+        profile, stop = attempt_paths(0)
+        attempt_log = []  # (attempt, returncode, stdout, stderr) so the REAL underlying error is never masked by a retry artifact
         instructions = {"url": f"http://127.0.0.1:{approved.server_port}/register", "localFixture": True,
             "allowedHosts": ["127.0.0.1", "localhost"] if case == "positive-alias" else ["127.0.0.1"],
             "operator": {"firstName": "Fixture", "lastName": "Operator", "email": "fixture@example.test"},
             "form": {"mode": "native-html", "formSelector": "#registration", "submitSelector": "button[type=submit]", "fields": {"firstName": "#first", "lastName": "#last", "email": "#email"}}}
-        command = [sys.executable, str(program), "about:blank", "--profile", profile, "--title", "Fixture", "--stop-file", stop]
+        command = []
+        def build_command(): return [sys.executable, str(program), "about:blank", "--profile", profile, "--title", "Fixture", "--stop-file", stop]
+        command = build_command()
         def run_captured(args, tag, timeout, stdin_text=None):
             # Capture to FILES, not pipes: Chrome (a grandchild) inherits pipe handles and keeps them open after the
             # parent exits, which made communicate() hang to TimeoutExpired and hid the parent's real exit status/stderr.
@@ -304,6 +309,7 @@ def test_registration_native_same_host_other_port_confinement(tmp_path, case):
                     stalled = result.returncode != 0 and '"driver-ready"' not in result.stdout
                 except subprocess.TimeoutExpired:
                     result, stalled = None, not '"driver-ready"' in (root / "main.out").read_text(encoding="utf-8", errors="replace")
+                attempt_log.append((attempt, getattr(result, "returncode", "timeout"), getattr(result, "stdout", (root / "main.out").read_text(encoding="utf-8", errors="replace")), getattr(result, "stderr", "")))
                 if not stalled or attempt == 3: break
                 # Parent is dead; its owned Job (kill-on-close) reaps the stalled browser. Reset only this fixture's own profile.
                 for _ in range(30):
@@ -311,10 +317,12 @@ def test_registration_native_same_host_other_port_confinement(tmp_path, case):
                     if gone: break
                     time.sleep(1)
                 assert gone, (case, "stalled launch not cleanly reapable")
-                shutil.rmtree(root / "profile", ignore_errors=True)
-                (root / "stop").unlink(missing_ok=True)
-            assert result is not None, (case, "browser bring-up stalled in all 4 attempts")
-            assert result.returncode == 0, (case, result.stdout, result.stderr)
+                # No rmtree: a half-deleted profile (Default/ without the ownership ledger) is refused as "Legacy occupied or unproved".
+                # The next attempt uses a brand-new profile directory instead; the old one is reaped above and pytest removes tmp_path.
+                profile, stop = attempt_paths(attempt + 1)
+                command = build_command()
+            assert result is not None, (case, "browser bring-up stalled in all 4 attempts", attempt_log)
+            assert result.returncode == 0, (case, "attempts (attempt, returncode, stdout, stderr):", attempt_log)
             events = [json.loads(line) for line in result.stdout.splitlines() if line.startswith("{")]
             outcome = next(event for event in events if event.get("event") == "registration-result")
             values = next(event["values"] for event in events if event.get("event") == "fixture-values")
@@ -334,7 +342,7 @@ def test_registration_native_same_host_other_port_confinement(tmp_path, case):
             # The parent exited before independent cleanup. Only this fixture's exact Job/profile is eligible.
             # Verify identity, exercise strict owned cleanup, then prove recorded browser death.
             # Load-tolerant: if the run never wrote a browser record (slow Chrome start), skip cleanup so the ORIGINAL failure surfaces.
-            try: record = json.loads((root / "profile" / ".lkb-ownership.json").read_text())
+            try: record = json.loads((pathlib.Path(profile) / ".lkb-ownership.json").read_text())
             except (OSError, ValueError): record = {}
             if "browser" in record:
                 import psutil
@@ -366,7 +374,7 @@ def test_registration_native_same_host_other_port_confinement(tmp_path, case):
                         time.sleep(.2); continue
                     break
                 assert cleanup.returncode == 0, (case, cleanup.stdout, cleanup.stderr)
-                assert json.loads((root / "profile" / ".lkb-ownership.json").read_text())["phase"] == "cleaned"
+                assert json.loads((pathlib.Path(profile) / ".lkb-ownership.json").read_text())["phase"] == "cleaned"
                 print(json.dumps({"fixture_case": case, "cleanup_attempts": cleanup_attempts, "cleanup_seconds": round(time.monotonic() - cleanup_started, 3), "ledger_phase": "cleaned"}))
                 try:
                     process = psutil.Process(record["browser"]["pid"])

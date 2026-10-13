@@ -1,7 +1,7 @@
 # Manifest — regflake
 
 **Contract:** none (test-harness hardening only; no production code changed).
-**Fix cycle:** 0
+**Fix cycle:** 1
 **Status:** ready-for-check
 **Date:** 2026-10-13
 **Files:** `packages/meeting-bot/py/test_sb_join_ownership.py` (`test_registration_native_same_host_other_port_confinement`, 7 real-headed-Chrome cases)
@@ -21,3 +21,9 @@ Command: `.venv\Scripts\python.exe -m pytest <file> -k "native_same_host and wro
 - Before (HEAD), machine loaded: 2 passed / 2 failed (4 runs); full 7-case file: 0/7 (run concurrently with another loop), 1/7 and 0/7 on fixed-timeout variants.
 - After, loaded then quiet: **15/15 pass** (11-130 s each); full 7-case file: **7 passed** (87 s).
 - Before, quiet machine: 15/15 pass — the flake is load-dependent, so the "before" count depends on contention.
+
+## Fix cycle 1 (ISS-REGFLAKE-001)
+- Root cause (per verdict): retry reset the profile with `shutil.rmtree(ignore_errors=True)`; a partial Windows delete left `Default/` without the ledger, so every retry hit "Legacy occupied or unproved profile refused".
+- Fix (test only): each attempt gets a brand-new profile/stop path (`profile-N`, `stop-N`) created by sb_join's own normal setup; no rmtree/ignore_errors anywhere; cleanup/ledger reads follow the current attempt's profile. Assertion failures now carry every attempt's (returncode, stdout, stderr), so the real error is no longer masked. No ledger seeding; no assertions weakened.
+- Evidence (after 15:26 UTC, quiet box, repo .venv python, fresh --basetemp each): wrong-action x5 = 5/5 pass (11-12 s each); `-k native_same_host` (all 7 cases) = 7 passed in 78.27 s; 0 chrome processes left.
+- ISS-REGFLAKE-001 repro (wrong-action x5): 5/5 pass. Caveat: box was quiet, so the load-dependent failure path was not re-exercised; retry-recovery is by construction (fresh profile), not observed.
