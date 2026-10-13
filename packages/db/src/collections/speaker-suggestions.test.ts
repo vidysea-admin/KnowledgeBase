@@ -149,3 +149,15 @@ test("the view carries quote and kind, calls the name `suggestedName`, and has n
   assert.equal(v.suggestedName, "Priya Nair");
   for (const k of ["aliases", "personId", "displayName", "tenantId", "confidence", "evidence", "finalProvenance"]) assert.equal(k in v, false, k);
 });
+
+test("a kind=tile suggestion (T-042, D-160) is stored as suggested, writes no final speaker, and only a human confirm makes it final", async () => {
+  const m = memoryDb();
+  const t: SpeakerSuggestions = { ...doc("tenant-A", "s1", "Asha Rao", "spk:2"), provenance: [{ turnId: "t5", evidenceQuote: 'Meet tile "Asha Rao" was highlighted while spk:2 spoke (tile-only, 0.0s to 40.0s)', evidenceKind: "tile" }] };
+  assert.equal(await insertSuggestionsIfAbsent("tenant-A", "s1", [t], m.db), 1);
+  assert.equal(m.rows("speakers").length, 0);
+  assert.deepEqual((await listSessionSuggestions("tenant-A", "s1", m.db)).map((s) => [s.status, s.quotes[0]!.kind]), [["suggested", "tile"]]);
+  const r = await confirmSpeakerSuggestion("tenant-A", "s1", t._id, m.db, NOW);
+  assert.equal(r.result, "ok");
+  assert.equal(m.rows("speakers").length, 1);
+  assert.equal(m.rows("speakers")[0]!.provenance, HUMAN_CONFIRMED);
+});

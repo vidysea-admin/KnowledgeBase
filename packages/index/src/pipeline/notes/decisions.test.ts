@@ -7,7 +7,7 @@ import { createHash } from "node:crypto";
 import type { Turns } from "@lkb/core";
 import type { CompleteResult, Job } from "@lkb/ai";
 import { extractDecisions, decisionsEnabled, type DecisionsCompleteFn } from "./decisions.js";
-import { evaluateExtractionCase } from "../eval/extraction.js";
+import { evaluateExtractionCase } from "../../eval/extraction.js";
 
 const turn = (id: string, speakerRef: string, text: string, tStart = 0, tEnd = 1): Turns =>
   ({ _id: id, tenantId: "t1", sessionId: "s1", speakerRef, tStart, tEnd, text });

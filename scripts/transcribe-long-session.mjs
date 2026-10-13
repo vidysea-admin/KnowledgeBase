@@ -20,8 +20,15 @@
  * a way identical retries of the same boundary do not.
  *
  * Usage: node scripts/transcribe-long-session.mjs <sessionId> [chunkSeconds=2400] [--allow-partial]
+ *
+ * Opt-in flags (D-162; both OFF unless the env var is exactly "1", output unchanged when off):
+ *   LKB_TRANSCRIPT_QA=1       T-044: clamp merged turns to the real audio duration (no turn ends past the audio),
+ *                             log a QA summary, write <session>/transcript-qa.json.
+ *   LKB_SINGLE_CALL_PATH=1    T-048: chooseTranscriptionPath may route a recording within the single-call limits
+ *                             (GEMINI_STT_MODEL=gemini-3.8-flash, <= 90 min) through ONE span; a failed or incomplete
+ *                             single call falls back to the chunked plan.
  */
-import { readFileSync, writeFileSync, existsSync, mkdtempSync, rmSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdtempSync, rmSync, statSync } from "node:fs";
 import { join, dirname, resolve, extname } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -33,6 +40,10 @@ import { findAudioFile, transcriptTenant } from "./lib/find-audio-file.mjs";
 import { realUploadTransport } from "./lib/real-upload-transport.mjs";
 import { immutableTranscriptTurns, writeTranscriptGeneration } from "./lib/transcript-provenance.mjs";
 import { validateTurns } from "./webinar/process-video.mjs";
+import {
+  SINGLE_CALL_FLAG, TRANSCRIPT_QA_FLAG, flagOn, applyTranscriptQa, summariseQaReport, planTranscriptionPath,
+  boundariesForPlan, isSingleCallComplete,
+} from "./lib/transcription-wiring.mjs";
 
 // 30 min: a single-call transcription of a ~60-min recording can exceed 10 min before headers (2026-09-24).
 setGlobalDispatcher(new Agent({ headersTimeout: 1_800_000, bodyTimeout: 1_800_000 }));
@@ -91,16 +102,31 @@ async function main() {
   const tenantId = transcriptTenant(DATA_DIR, sessionId);
   const { uploadFile, pollFileState, transcribeUploadedAudio } = await import("../packages/ai/src/stt/gemini-file-upload.ts");
   const { computeChunkBoundaries, mergeChunkedTurns, findTimeGaps } = await import("../packages/ai/src/stt/chunk-audio.ts");
+  const qaOn = flagOn(process.env, TRANSCRIPT_QA_FLAG);
+  const singleOn = flagOn(process.env, SINGLE_CALL_FLAG);
+  const clampAndValidateTurns = qaOn ? (await import("../packages/ai/src/stt/transcript-qa.ts")).clampAndValidateTurns : null;
 
   const { path: audioPath, filename } = findAudioFile(DATA_DIR, AUDIO_DIR, sessionId);
   const mimeType = MIME_BY_EXT[extname(filename).toLowerCase()] ?? "audio/mp4";
   const ext = extname(filename);
 
   const durationSeconds = ffprobeDurationSeconds(audioPath);
-  const boundaries = computeChunkBoundaries(durationSeconds, chunkSeconds);
+  const chunkedBoundaries = computeChunkBoundaries(durationSeconds, chunkSeconds);
+  let plan = null;
+  if (singleOn) {
+    const { chooseTranscriptionPath, T048_THRESHOLDS } = await import("../packages/ai/src/stt/transcription-plan.ts");
+    // GEMINI_STT_MODEL unset -> "" (the adapter default is not on the single-call allow-list), so it chunks as today.
+    plan = planTranscriptionPath({
+      enabled: true, durationSeconds, fileBytes: statSync(audioPath).size, modelId: process.env.GEMINI_STT_MODEL || "",
+      choose: chooseTranscriptionPath, thresholds: T048_THRESHOLDS,
+    });
+    console.log(`single-call plan: ${plan.kind} (${plan.reason})`);
+  }
+  const boundaries = boundariesForPlan(plan, durationSeconds, chunkedBoundaries);
   console.log(`${filename}: ${(durationSeconds / 60).toFixed(1)} min real duration -> ${boundaries.length} chunk(s) of up to ${chunkSeconds / 60} min`);
 
   const tmpDir = mkdtempSync(join(tmpdir(), "lkb-chunk-"));
+  const spanQaReports = []; // T-044: per-attempt clamp reports (the merged report no longer sees drift already clamped per span)
 
   async function transcribeSpanOnce(bytes, displayName, mediaDurationSeconds) {
     const { fileUri, name } = await uploadFile(bytes, mimeType, realUploadTransport, apiKey, displayName);
@@ -131,7 +157,15 @@ async function main() {
 
     let best = { turns: [], lastTEnd: 0 };
     for (let attempt = 1; attempt <= MAX_ATTEMPTS_PER_SPAN; attempt++) {
-      const { turns, usage } = await transcribeSpanOnce(bytes, `${filename}-${label}-a${attempt}`, mediaDurationSeconds);
+      const once = await transcribeSpanOnce(bytes, `${filename}-${label}-a${attempt}`, mediaDurationSeconds);
+      const { usage } = once;
+      // T-044 (flag off: same array back, report null): drift past the span is clamped/dropped BEFORE validateTurns would throw on it.
+      const spanQa = applyTranscriptQa({ enabled: qaOn, turns: once.turns, durationSeconds: mediaDurationSeconds, clamp: clampAndValidateTurns });
+      const turns = spanQa.turns;
+      if (spanQa.report) spanQaReports.push({ label, attempt, report: spanQa.report });
+      if (spanQa.report && (spanQa.report.clampedCount > 0 || spanQa.report.dropped.length > 0)) {
+        console.log(`${"  ".repeat(depth + 1)}span ${label} ${summariseQaReport(spanQa.report)}`);
+      }
       if (turns.length) validateTurns(immutableTranscriptTurns(tenantId, sessionId, turns), mediaDurationSeconds, { tenantId, sessionId });
       const localGaps = findTimeGaps(turns, GAP_THRESHOLD_SECONDS);
       const lastTEnd = turns.length > 0 ? turns[turns.length - 1].tEnd : 0;
@@ -168,9 +202,29 @@ async function main() {
   }
 
   const chunkResults = [];
+  let loopBoundaries = boundaries;
   try {
-    for (const [i, { start, end }] of boundaries.entries()) {
-      console.log(`\n=== chunk ${i + 1}/${boundaries.length} [${start}s-${end}s] ===`);
+    if (plan && plan.kind === "single") {
+      try {
+        const turns = await transcribeSpan(0, durationSeconds, 0, "c0");
+        const gaps = findTimeGaps(turns, GAP_THRESHOLD_SECONDS);
+        if (isSingleCallComplete({ turns, durationSeconds, gaps, shortfallThresholdSeconds: SHORTFALL_THRESHOLD_SECONDS })) {
+          chunkResults.push({ offsetSeconds: 0, turns });
+        } else {
+          console.log(`single call incomplete (${turns.length} turns, ${gaps.length} gap(s)) -- falling back to chunked`);
+        }
+      } catch (err) {
+        console.log(`single call failed (${err instanceof Error ? err.message : String(err)}) -- falling back to chunked`);
+      }
+      if (chunkResults.length === 0) {
+        loopBoundaries = plan.fallback.chunks.length > 0 ? plan.fallback.chunks : chunkedBoundaries;
+        console.log(`chunked fallback: ${loopBoundaries.length} chunk(s)`);
+      } else {
+        loopBoundaries = [];
+      }
+    }
+    for (const [i, { start, end }] of loopBoundaries.entries()) {
+      console.log(`\n=== chunk ${i + 1}/${loopBoundaries.length} [${start}s-${end}s] ===`);
       const turns = await transcribeSpan(start, end, 0, `c${i}`);
       chunkResults.push({ offsetSeconds: start, turns });
     }
@@ -178,7 +232,9 @@ async function main() {
     rmSync(tmpDir, { recursive: true, force: true });
   }
 
-  const mergedTurns = mergeChunkedTurns(chunkResults);
+  const qa = applyTranscriptQa({ enabled: qaOn, turns: mergeChunkedTurns(chunkResults), durationSeconds, clamp: clampAndValidateTurns });
+  const mergedTurns = qa.turns;
+  if (qa.report) console.log(summariseQaReport(qa.report));
   console.log(`\nmerged ${chunkResults.length} chunk(s) -> ${mergedTurns.length} total turns`);
 
   const turnsPath = join(DATA_DIR, sessionId, "turns.json");
@@ -217,6 +273,7 @@ async function main() {
   validateTurns(immutableTranscriptTurns(tenantId, sessionId, mergedTurns), durationSeconds, { tenantId, sessionId });
   const realTurns = writeTranscriptGeneration(join(DATA_DIR, sessionId), tenantId, sessionId, mergedTurns);
   console.log(`wrote ${realTurns.length} real diarized turns -> ${turnsPath} (replaced ${existingTurns.length} placeholder turn(s))`);
+  if (qa.report) writeFileSync(join(DATA_DIR, sessionId, "transcript-qa.json"), JSON.stringify({ spans: spanQaReports, merged: qa.report }, null, 2));
 }
 
 main().catch((err) => {

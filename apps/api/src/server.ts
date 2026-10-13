@@ -19,6 +19,7 @@ import { createHealthRouter, type HealthDeps } from "./routes/health.js";
 import { createSetupStatusRouter } from "./activity-health/setup-status.js";
 import { createSystemStatusRouter, unavailableSystemStatusDeps, type SystemStatusDeps } from "./routes/system-status.js";
 import { createSearchRouter, type SearchDeps } from "./routes/search.js";
+import { createSemanticSearchRouter, type SemanticSearchDeps } from "./semantic-search/route.js";
 import { createGraphRouter, type GraphReadDeps } from "./routes/graph.js";
 import { createCalendarRouter, type CalendarReadDeps } from "./routes/calendar.js";
 import { createJoinRulesRouter, unavailableJoinRulesRouter } from "./join-rules/router.js";
@@ -27,6 +28,8 @@ import { createMeetingCandidatesRouter, type MeetingCandidatesDeps } from "./rou
 import { createWhatsAppRouter, type WhatsAppRouteDeps } from "./routes/whatsapp.js";
 import { createKeysRouter, type KeysDeps } from "./routes/keys.js";
 import { createIngestRouter, type IngestDeps } from "./routes/ingest.js";
+import { createSourceIntakeRouter } from "./routes/ingest-source.js";
+import type { SourceIntakeDeps } from "./source-intake/store.js";
 import { createPagesRouter } from "./routes/pages.js";
 import { createStubsRouter } from "./routes/stubs.js";
 import { createRateLimiter, type RateLimitOptions } from "./rate-limit.js";
@@ -59,6 +62,8 @@ export interface ServerDeps {
   /** Tenant-scoped status counts for the signed-in caller; absent = fail closed (503). */
   systemStatus?: SystemStatusDeps;
   search: SearchDeps;
+  /** T-008 semantic (vector) search. Optional + flag-gated (LKB_SEMANTIC_SEARCH=1): absent -> route not mounted, behaviour unchanged. */
+  semanticSearch?: SemanticSearchDeps;
   graph: GraphReadDeps;
   calendar: CalendarReadDeps;
   meetingCandidates: MeetingCandidatesDeps;
@@ -67,6 +72,8 @@ export interface ServerDeps {
   whatsapp: WhatsAppRouteDeps;
   keys: KeysDeps;
   ingest: IngestDeps;
+  /** T-045 `POST /ingest/source` (YouTube / OnAir / Zoom intake). Optional, OFF by default: absent -> the route is not mounted. */
+  sourceIntake?: SourceIntakeDeps;
   jobs?: JobsReadDeps;
   activityHealth?: ActivityHealthDeps;
   /** D-139/D-158: tenant-scoped dead jobs of the packages/core file queue (FileJobQueue.listDead), shown in /activity-health (source job-queue) and /notifications. Optional: absent -> unchanged. Production wiring pending (runner unwired). */
@@ -124,6 +131,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createCitationsRouter(deps.citations));
   app.use(createClaimsListRouter(deps.claims ?? unavailableClaimsListDeps));
   app.use(createSearchRouter(deps.search));
+  if (deps.semanticSearch) app.use(createSemanticSearchRouter(deps.semanticSearch));
   app.use(createGraphRouter(deps.graph));
   app.use(createCalendarRouter(deps.calendar));
   app.use(deps.joinRules ? createJoinRulesRouter(deps.joinRules) : unavailableJoinRulesRouter());
@@ -131,6 +139,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createWhatsAppRouter(deps.whatsapp));
   app.use(createKeysRouter(deps.keys));
   app.use(createIngestRouter(deps.ingest));
+  if (deps.sourceIntake) app.use(createSourceIntakeRouter(deps.sourceIntake));
   app.use(createStubsRouter());
   app.use(bodyParserErrorHandler(log)); // ISS-APILOGGER-001: body-parser errors: structured log, no body echo, production-identical response
   // Terminal handler (ISS-AUTHTENANT-002): an error with no HTTP status (e.g. a tenant guard throwing in a store) gets a fixed 500 body, never

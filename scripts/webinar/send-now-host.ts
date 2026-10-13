@@ -15,7 +15,8 @@ import { randomBytes } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { SendNowDeps, SendNowPlanValue } from "../../apps/api/src/join-rules/send-now.js";
-import { liveRecordingDir } from "../../packages/meeting-bot/src/live-recording/live-recording.js";
+import { readSessionStatus } from "../../packages/meeting-bot/src/live-recording/session-status.js";
+import { liveRecordingDir, type LiveProbes } from "../../packages/meeting-bot/src/live-recording/live-recording.js";
 import { planSendNow, type SendNowJob } from "../../packages/meeting-bot/src/send-now.js";
 import { hostOnly, readAllLiveJobs, REFUSAL_MESSAGES } from "../../packages/meeting-bot/src/send-now-command.js";
 
@@ -34,7 +35,16 @@ export interface SendNowHostOptions {
   /** How long to watch the child for an immediate exit before declaring the launch good. */
   livenessMs?: number;
   logDir?: string;
+  /** Mount the job-status lookup (ISS-SENDNOWAPI-003). Default: env LKB_SEND_NOW_STATUS === "1"; OFF otherwise (route absent, 404). */
+  statusEnabled?: boolean;
+  /** A job id younger than this with no live entry is still "launching" (the child claims the meeting a moment after start). */
+  launchGraceMs?: number;
+  /** Test seam: process-liveness probes for the status lookup (default: the real OS probes). */
+  liveProbes?: LiveProbes;
 }
+
+/** Wall-clock UTC time encoded in a job id (`send-now-YYYYMMDDHHMMSS-xxxxxx`), or NaN. */
+const jobIdTime = (id: string) => { const m = /^send-now-(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})-/.exec(id); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]) : NaN; };
 
 /** Longest recording window the API will start. ASSUMPTION: neither planSendNow, send-now-command nor runRecord bounds `until` above (runRecord only requires it be in the future), so 24 h is this unit's own cap. */
 export const MAX_UNTIL_AHEAD_MS = 24 * 60 * 60 * 1000;
@@ -69,7 +79,22 @@ export function createSendNowDeps(opts: SendNowHostOptions = {}): SendNowDeps {
   const rec = () => (record ??= import("../../packages/meeting-bot/src/capture/record-commands.js"));
   const hostTenant = async () => (opts.hostTenant ? opts.hostTenant() : (await rec()).captureTenant([]));
 
+  const statusOn = opts.statusEnabled ?? process.env.LKB_SEND_NOW_STATUS === "1";
   return {
+    ...(statusOn ? { async status(tenantId: string, jobId: string) {
+      let tenant: string;
+      try { tenant = await hostTenant(); }
+      catch { return { ok: false as const, kind: "unreadable" as const, reason: "tenant-unreadable", message: "the capture tenant of this host cannot be determined" }; }
+      if (tenantId !== tenant) return { ok: false as const, kind: "forbidden" as const, reason: "tenant-not-served", message: "this host does not capture for your tenant" };
+      try {
+        const s = readSessionStatus({ dir: liveRecordingDir(root), tenantId: tenant, sessionId: jobId }, now(), opts.liveProbes);
+        if (s.running) return { ok: true as const, status: "running" as const, meetingKey: s.meetingKey, startedAt: s.startedAt, until: s.until };
+      } catch (e) {
+        return { ok: false as const, kind: "unreadable" as const, reason: "live-recordings-unreadable", message: `cannot read the live-recording state (${e instanceof Error ? e.message.slice(0, 120) : "unreadable"})` };
+      }
+      const age = now().getTime() - jobIdTime(jobId);
+      return { ok: true as const, status: (age >= 0 && age < (opts.launchGraceMs ?? 30_000) ? "launching" : "not-running") as "launching" | "not-running" };
+    } } : {}),
     async plan(tenantId, { meetingUrl, until }) {
       let tenant: string;
       try { tenant = await hostTenant(); }

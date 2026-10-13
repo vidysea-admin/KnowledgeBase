@@ -6,6 +6,7 @@
  * (`ai-transport.ts`). Kept out of `server.ts` so that file stays <=80 LOC and injectable-only.
  * Never imported by tests.
  */
+import { speakerSuggestEnabled } from "../indexing/speaker-suggest.js";
 import { createMongoSystemStatusDeps } from "../system-status-store.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -18,7 +19,9 @@ import type { WatchSilenceDeps } from "../routes/health.js";
 import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, createMongoTreeStore, createMongoBrainReadDeps,
   createMongoWatchedSourceDeps, createMongoCitationsDeps, createMongoHealthDeps, createMongoGraphReadDeps, createGwsCalendarReadDeps, createMeetingCandidatesDeps, createMongoKeysDeps } from "../store.js";
 import { createMongoIngestDeps } from "../ingest-store.js";
+import { buildSourceIntakeDeps } from "../source-intake/wiring.js";
 import { createMongoSearchDeps } from "../search-store.js";
+import { createMongoSemanticSearchDeps, semanticSearchEnabled } from "../semantic-search/semantic-search-store.js";
 import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
 import { createConfiguredWhatsAppOwnerResolver } from "../whatsapp/owner-config.js";
 import { realTransport } from "../ai-transport.js";
@@ -158,11 +161,18 @@ export function buildRouting(): {
  * --index` must index a bot-captured session through EXACTLY the binding the server's ingest
  * routes use, not a second copy of it that could drift.
  */
-export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRouting(), options: { strictWebinar?: boolean } = {}): BoundIndexer {
+/** U2.4 / D-141: an explicit caller choice wins; otherwise OFF unless KB_SPEAKER_SUGGEST=1. */
+export function resolveSuggestSpeakers(option?: boolean, env: Record<string, string | undefined> = process.env): boolean {
+  return option ?? speakerSuggestEnabled(env);
+}
+
+export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRouting(), options: { strictWebinar?: boolean; suggestSpeakers?: boolean } = {}): BoundIndexer {
   const { chains, providers, jobWrite } = routing;
   return (tenantId, sessionId) =>
     indexSession(tenantId, sessionId, {
       strictWebinar: options.strictWebinar,
+      // U2.4 / D-141: speaker NAME SUGGESTIONS (never final), OFF unless KB_SPEAKER_SUGGEST=1 or the caller opts in. Uses the `speakers` route.
+      suggestSpeakers: resolveSuggestSpeakers(options.suggestSpeakers),
       complete: (job) => routeComplete(job.kind, job, { chains, providers, write: jobWrite, tenantId }),
       // Wired only when a chain is configured for it (U1.3). Passing an embedder unconditionally
       // would make every index run fail on an install with no embedding provider, where today it
@@ -195,12 +205,19 @@ export function buildProductionDeps(): ServerDeps {
     // surface GET /watch-state serves (routes/watched-sources.ts).
     watchedSources: { ...createMongoWatchedSourceDeps(), ...createMongoWatchStateReadDeps() },
     search: createMongoSearchDeps(),
+    // T-008: OFF unless LKB_SEMANTIC_SEARCH=1 and an embedding chain exists. Router tenant is "system" only for
+    // cost accounting; the retrieval itself is tenant-scoped per request inside the store.
+    semanticSearch: semanticSearchEnabled() && chains.embedding
+      ? createMongoSemanticSearchDeps({ embed: (job) => routeEmbed("embedding", job, { chains, providers, write: jobWrite, tenantId: ROUTER_TENANT_ID }) })
+      : undefined,
     graph: createMongoGraphReadDeps(),
     calendar: createGwsCalendarReadDeps(),
     meetingCandidates: createMeetingCandidatesDeps(),
     whatsapp: createMongoWhatsAppDeps(boundIndexer, { resolveOwner: createConfiguredWhatsAppOwnerResolver(process.env.WHATSAPP_TENANT_OWNER_MAP) }),
     keys: createMongoKeysDeps(),
     ingest: createMongoIngestDeps(boundIndexer),
+    // T-045: OFF unless LKB_SOURCE_INTAKE=1 (route absent otherwise); see source-intake-wiring.ts.
+    sourceIntake: buildSourceIntakeDeps(process.env, boundIndexer),
     jobs: createMongoJobsReadDeps(),
     activityHealth: createConfiguredActivityHealthDeps(),
     watchRuns: createMongoWatchRunsDeps(),

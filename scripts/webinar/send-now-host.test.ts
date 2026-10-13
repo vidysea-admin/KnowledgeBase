@@ -107,7 +107,9 @@ test("launch: 202 with a job id; the child got the validated URL and flags as se
 });
 
 test("launcher that dies at once -> 502 (not 202); a missing node binary -> 502", async () => {
-  await withHost(fx(), async (post) => {
+  // load-independent: the liveness window is far longer than any node cold start, and the child's exit settles the launch at once
+  // (a short window made this race the child's startup under CPU load and answer 202)
+  await withHost(fx({ livenessMs: 20_000 }), async (post) => {
     process.env.LKB_FIXTURE_EXIT = "1";
     const r = await post("a-key", { meetingUrl: MEET, until: "18:00" });
     assert.deepEqual([r.status, r.json.error, r.json.jobId], [502, "send_now_launch_failed", undefined]);
@@ -153,4 +155,44 @@ test("untilProblem: a non-existent calendar date that would roll into the 24 h w
   const feb28 = new Date(Date.UTC(2026, 1, 28, 12, 0, 0));
   assert.match(untilProblem("2026-02-29T10:00:00Z", feb28)!, /not a real calendar date/);
   assert.equal(untilProblem("2026-03-01T10:00:00Z", feb28), undefined);
+});
+
+// ---- ISS-SENDNOWAPI-003: job status, behind LKB_SEND_NOW_STATUS (default OFF) ----
+import { claimLiveRecording, liveRecordingDir } from "../../packages/meeting-bot/src/live-recording/live-recording.js";
+const JOB_NOW = "send-now-20261012100000-abc123";
+const aliveProbe = { isAlive: () => true, startTime: () => "T0" };
+async function statusOf(opts: SendNowHostOptions, tenant: string, id: string, seed?: (root: string) => void) {
+  const root = mkdtempSync(path.join(os.tmpdir(), "send-now-status-"));
+  try {
+    seed?.(root);
+    const deps = createSendNowDeps({ root, now: () => new Date(Date.UTC(2026, 9, 12, 10, 0, 5)), hostTenant: () => "tenant-a", ...opts });
+    return deps.status ? await deps.status(tenant, id) : "absent";
+  } finally { rmSync(root, { recursive: true, force: true }); }
+}
+test("status: flag OFF by default (env unset) -> no status method; ON by option or env value 1 only", async () => {
+  delete process.env.LKB_SEND_NOW_STATUS;
+  assert.equal(createSendNowDeps({ hostTenant: () => "tenant-a" }).status, undefined);
+  assert.equal(typeof createSendNowDeps({ statusEnabled: true, hostTenant: () => "tenant-a" }).status, "function");
+  process.env.LKB_SEND_NOW_STATUS = "1";
+  try { assert.equal(typeof createSendNowDeps({ hostTenant: () => "tenant-a" }).status, "function"); } finally { delete process.env.LKB_SEND_NOW_STATUS; }
+  process.env.LKB_SEND_NOW_STATUS = "true";
+  try { assert.equal(createSendNowDeps({ hostTenant: () => "tenant-a" }).status, undefined); } finally { delete process.env.LKB_SEND_NOW_STATUS; }
+});
+const seedClaim = (root: string) => { const c = claimLiveRecording({ dir: liveRecordingDir(root), tenantId: "tenant-a", meetingUrl: MEET, sessionId: JOB_NOW, until: new Date(Date.UTC(2026, 9, 12, 15)) }, new Date(Date.UTC(2026, 9, 12, 10, 0, 1)), aliveProbe); assert.equal(c.ok, true); };
+// hermetic: the same fake probes that seeded the claim are injected into the host (no real process-start lookup)
+const hermetic: SendNowHostOptions = { statusEnabled: true, liveProbes: aliveProbe };
+test("status: live claim by that job id = running; none and young = launching; none and old = not-running", async () => {
+  const running = await statusOf(hermetic, "tenant-a", JOB_NOW, seedClaim) as any;
+  assert.equal(running.ok, true); assert.equal(running.status, "running"); assert.equal(running.meetingKey, "meet:abc-defg-hij");
+  assert.equal(((await statusOf(hermetic, "tenant-a", "send-now-20261012100000-ffffff", seedClaim)) as any).status, "launching", "5 s old, no claim");
+  assert.equal(((await statusOf(hermetic, "tenant-a", "send-now-20261012095900-ffffff")) as any).status, "not-running", "66 s old, no claim");
+});
+test("status: a tenant this host does not serve is forbidden, even for a job id that is running for the host tenant", async () => {
+  const other = await statusOf(hermetic, "tenant-b", JOB_NOW, seedClaim) as any;
+  assert.deepEqual([other.ok, other.kind, other.reason], [false, "forbidden", "tenant-not-served"]);
+});
+test("status: unreadable live-recording state is 'unreadable', never not-running", async () => {
+  const bad = (root: string) => { const d = path.join(liveRecordingDir(root), "tenant-a"); mkdirSync(d, { recursive: true }); writeFileSync(path.join(d, "x.json"), "{nope"); };
+  const r = await statusOf({ statusEnabled: true }, "tenant-a", JOB_NOW, bad) as any;
+  assert.deepEqual([r.ok, r.kind, r.reason], [false, "unreadable", "live-recordings-unreadable"]);
 });

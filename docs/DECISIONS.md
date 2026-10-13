@@ -2204,3 +2204,28 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** The pipeline graph moves to @langchain/langgraph (JS 1.x, exact pinned); the /ask graph follows in a later unit.
 **Approved-by:** Umesh
 **Links:** T-050; D-142
+
+## D-162 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Lift the D-119 driver-file hold so T-044 (drift-clamp/QA wiring), T-048 (single-call chooser wiring) and T-040 (grounded notes and Q&A wiring) can be built. The hold covered scripts/transcribe-long-session.mjs, sync-session.mjs, scripts/ingest-chain.mjs, scripts/lib/transcript-provenance*, scripts/upload/* and gemini-file-upload.ts. Each of the three wirings must sit behind a flag that is OFF by default.
+**Why:** D-119 reserved those files until real end-to-end evidence existed. qa/verdicts/u4.1-recording-upload-worker.md now records "Effective U4.1 unit VERDICT: PASS", which supplies that evidence. Umesh approved the lift explicitly on 2026-10-13.
+**Result:** The hold on the listed driver files is lifted for T-044, T-048 and T-040 work only, with default-off flags. The rest of D-119 is unchanged.
+**Supersedes:** D-119 -- only D-119's hold on the listed driver files is superseded, because the U4.1 PASS verdict now provides the end-to-end evidence the hold was waiting for; the remainder of D-119 stands.
+**Approved-by:** Umesh
+**Links:** T-044; T-048; T-040; U4.1; D-119; qa/verdicts/u4.1-recording-upload-worker.md
+
+## D-163 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** U2.2 golden labels: an agent may pre-fill the U2.2 adjudication fields in data/eval/extraction-adjudication-packet.json and data/eval/golden-set-human-review.json, clearly marked as AI drafts and never as humanGold. Each draft becomes gold only after Umesh reviews and approves it individually.
+**Why:** Pre-filling drafts reduces the human adjudication workload while keeping the human as the sole source of gold labels. Umesh gave this answer explicitly on 2026-10-13.
+**Result:** AI-drafted adjudication values are permitted but are not gold; no label counts as humanGold until Umesh approves that item.
+**Approved-by:** Umesh
+**Links:** U2.2; U2.3; U2.5; T-055
+
+## D-164 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** U0.10 real-LLM baseline: spend approved. Run it on Ollama Cloud models first (Umesh: "ollama glm 5.3 flash, deepseek 4.1 flash"), then Gemini at the end, using the keys already in .env.
+**Why:** The real-LLM baseline needs paid model calls; Umesh approved the spend and the run order explicitly on 2026-10-13.
+**Result:** U0.10 may run against Ollama Cloud models first and Gemini last, using existing .env keys.
+**Approved-by:** Umesh
+**Links:** U0.10; T-022; D-156

@@ -5,6 +5,7 @@ export { buildTree, treeIndexRootFilter, type Summarize } from "./tree/build.js"
 export { treeSearch } from "./tree/search.js";
 export { buildChunks, coversAllTurns, type ChunkPlan, type ChunkableTurn, type ChunkOptions } from "./chunk/build-chunks.js";
 export { extractTopicRefs, type ExtractTopicRefs } from "./tree/extract-topics.js";
+export { prepareTopicExtractFn, extractTopicsLlm, isLlmTopicsEnabled, topicPredictedEntities, type TopicsCompleteFn, type TopicExtraction } from "./tree/extract-topics-llm.js";
 export { regenerate } from "./tree/regenerate.js";
 export { promoteTreeEntities, topicRefsForSession, type PromotedEntities, type PromotedTopic, type PromotedOrg } from "./tree/promote-entities.js";
 export { flattenTreeToGraph, type Graph, type GraphNode, type GraphEdge } from "./tree/flatten-graph.js";
@@ -25,11 +26,12 @@ export { resolveEvidence, extractiveText, citationTimes, auditGroundedNotes } fr
 export type { DroppedNote } from "./pipeline/notes/drop-mode.js";
 export { summarizeSession, type SessionSummaryResult, type SummarizeResult, type SummarizeCompleteFn } from "./pipeline/summarize.js";
 export { extractClaims, type ExtractedClaim, type ClaimsCompleteFn } from "./pipeline/claims.js";
-export { extractDecisions, decisionsEnabled, type ExtractedDecision, type DecisionsResult, type DecisionsCompleteFn } from "./pipeline/decisions.js";
+export { extractDecisions, decisionsEnabled, type ExtractedDecision, type DecisionsResult, type DecisionsCompleteFn } from "./pipeline/notes/decisions.js";
 export { resolveSpeakers, personIdFor, type ResolvedSpeaker, type SpeakerResolution } from "./pipeline/speakers.js";
 export { extractSpeakers, extractSpeakersRuleBased, type SpeakersCompleteFn, type SpeakerExtractionResult } from "./pipeline/speakers-llm.js";
 export { groundSpeakerProposals, extractSpeakersGrounded, selectSuggestions, dropOverriddenByConfirmed, type ConfirmedSpeaker, type EvidenceKind, type SuggestedSpeaker, type RejectedSuggestion } from "./pipeline/speakers-grounded.js";
 export { buildSuggestionDocs, suggestionId } from "./pipeline/speaker-suggestions.js";
+export { buildTileSuggestionDocs, parseTileCapture, storeTileSuggestions, type InsertSuggestions, type TileSuggestionOptions } from "./pipeline/speaker-tile-suggestions.js";
 export { llmVerifier, type SpeakerVerifier, type VerifierQuestion } from "./pipeline/speakers-verifier.js";
 export { looksLikeAName, isDiscourseOnly, containsNameVerbatim, citesNameAsAnIntroduction } from "./pipeline/speaker-name-rules.js";
 export { buildSpeakerDocs, writeSpeakerDocs, isHumanConfirmed, type SpeakerWriteTarget, type SessionResolution, type SpeakerCollision, type SpeakerDocsResult } from "./pipeline/speaker-docs.js";

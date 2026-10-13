@@ -32,13 +32,13 @@ export type SpeakerSuggestions = {
       turnId: string;
       evidenceQuote: string;
       evidenceKind:
-        "self-intro" | "called-on" | "address" | "handover" | "thanks" | "role-continuity";
+        "self-intro" | "called-on" | "address" | "handover" | "thanks" | "role-continuity" | "tile";
     },
     ...{
       turnId: string;
       evidenceQuote: string;
       evidenceKind:
-        "self-intro" | "called-on" | "address" | "handover" | "thanks" | "role-continuity";
+        "self-intro" | "called-on" | "address" | "handover" | "thanks" | "role-continuity" | "tile";
     }[]
   ];
   /**

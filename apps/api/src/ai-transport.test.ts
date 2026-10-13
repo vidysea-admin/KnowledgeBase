@@ -42,7 +42,10 @@ test("Deadline kills owned descendant tree",async()=>{
   const script=`const{spawn}=require('node:child_process');const{writeFileSync}=require('node:fs');const child=spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{stdio:'ignore'});writeFileSync(${JSON.stringify(marker)},String(child.pid));setInterval(()=>{},1000)`;
   await assert.rejects(createCliTransport({timeoutMs:1200})(call(script)),/timed out/);
   assert.ok(existsSync(marker));const pid=Number(readFileSync(marker,'utf8'));
-  let alive=true;try{process.kill(pid,0)}catch{alive=false}assert.equal(alive,false,"owned descendant must be gone before rejection settles");
+  let alive=true;try{process.kill(pid,0)}catch{alive=false}
+  // Linux: a killed-but-unreaped orphan stays visible to kill(pid,0) as a zombie (state Z) until its reaper runs; that is dead.
+  if(alive&&process.platform==='linux'){try{alive=!/^\d+ \(.*\) Z/.test(readFileSync(`/proc/${pid}/stat`,'utf8'))}catch{alive=false}}
+  assert.equal(alive,false,"owned descendant must be gone before rejection settles");
  }finally {rmSync(directory,{recursive:true,force:true});}
 });
 // --- ISS-AITRANSPORT-001: cleanup must never replace the primary outcome ---
