@@ -94,12 +94,14 @@ a client of that API — with the long-range goal of beating top human counsello
 | session_pages | _id, tenantId, sessionId, summary, evidence | yes |
 | sessions | _id, tenantId, sourceId, title, date, status | no |
 | sources | _id, tenantId, kind, hash, consent, createdAt, captureMode | no |
+| speaker_suggestions | _id, tenantId, sessionId, speakerRef, personId, displayName, status, provenance, evidence, suggestedAt | yes |
 | speakers | _id, tenantId, personId, aliases, evidence | yes |
 | tenants | _id, name | no |
 | topics | _id, tenantId, name | no |
 | tree_index | tenantId | no |
 | trusted_senders | _id, tenantId, senderDomain, approvalCount, autoApprove | no |
-| turns | _id, tenantId, sessionId, speakerRef, tStart, tEnd, text | no |
+| turns | _id, tenantId, sessionId, speakerRef, tStart, tEnd, text | yes |
+| usage_events | _id, tenantId, kind, at, day, outcome, latencyMs | no |
 | watch_heartbeat | _id, tenantId, sourceType, lastHeartbeatAt | no |
 | watch_reports | _id, tenantId, runAt, mode, digestPath | no |
 | watch_state | _id, tenantId, sourceType, sourceId, status, seenAt | no |

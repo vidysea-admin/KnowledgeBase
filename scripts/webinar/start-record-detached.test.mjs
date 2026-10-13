@@ -32,12 +32,23 @@ function logsBefore() {
   return existsSync(LOG_DIR) ? new Set(readdirSync(LOG_DIR)) : new Set();
 }
 
+// The fixture child keeps its log open for ~8s on Windows, so rmSync can hit EPERM/EBUSY. Bounded
+// retry (up to ~20s) in the test cleanup only; rmSync's own maxRetries does not cover this case.
+function rmWithRetry(p) {
+  for (let i = 0; ; i++) {
+    try { rmSync(p, { force: true }); return; } catch (e) {
+      if (i >= 40 || !["EPERM", "EBUSY", "EACCES"].includes(e.code)) throw e;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 500);
+    }
+  }
+}
+
 function cleanupNewLogs(before) {
   if (!existsSync(LOG_DIR)) return;
   for (const f of readdirSync(LOG_DIR)) {
     if (before.has(f) || !/^record-\d{4}-\d{2}-\d{2}_/.test(f)) continue;
     const p = join(LOG_DIR, f);
-    if (statSync(p).isFile()) rmSync(p, { force: true });
+    if (statSync(p).isFile()) rmWithRetry(p);
   }
 }
 
