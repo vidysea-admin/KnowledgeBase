@@ -1,6 +1,6 @@
 # t041-wire-keyframe-ocr-post-processing
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS (qa/verdicts/t041-wire-keyframe-ocr-post-processing.md, cycle 0)
 Fix cycle: 0
 Tier: 3 (roadmap task T-041, wiring slice). No auth/tenancy; writes one new derived file per session (`slide-alignment.json`) only when the flag is on. T-041 stays OPEN.
 Lane: lane/w041. No ledger issues fixed or filed.
