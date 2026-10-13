@@ -2107,3 +2107,11 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Supersedes:** D-148 -- D-148 required regenerating provenance by running the pipeline over the TOC audio, which is absent on this machine, so that method is infeasible; this entry replaces it in full with the legacy-unbound seeding.
 **Approved-by:** Umesh
 **Links:** T-043; D-143; D-146; D-148
+
+## D-150 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Umesh ruled (2026-10-13) that scripts/mint-key.mjs and the scripts/watch watcher (ingest/reingest) MAY write the production database lkb, but only with the explicit --i-know-this-is-production flag plus an exact MONGODB_DB=lkb; with no DB they refuse; otherwise limited to work/staging DBs.
+**Why:** These scripts legitimately need production access, but production writes must be a deliberate, explicit act rather than a default.
+**Result:** mint-key and the watch ingest/reingest scripts write lkb only with --i-know-this-is-production and MONGODB_DB=lkb; no DB set means refuse; otherwise work/staging DBs only.
+**Approved-by:** Umesh
+**Links:** ISS-LEGACYSEED-002; ISS-LEGACYSEED-003; D-143
