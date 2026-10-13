@@ -2188,3 +2188,11 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Supersedes:** D-154 -- D-154's only assertion was the retention and window constants, and its 14-day figure was wrong; this entry replaces it in full with 30 days and +/-24 h.
 **Approved-by:** Umesh
 **Links:** D-060; D-129; ISS-TOMBSTONE-001; ISS-TOMBSTONE-007; ISS-T036CAL-011
+
+## D-160 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-042: build active-speaker tile capture in the meeting bot; tile-derived names (including tile+intro 'agree') are shown as SUGGESTED only and confirmed by a human, exactly like D-141 model suggestions; tile names never become auto-final. Capture is behind a flag, default off.
+**Why:** Tile names can be wrong or spoofed, so they get the same human-confirmation gate as model suggestions rather than being auto-final.
+**Result:** Tile capture is built behind a default-off flag; tile-derived names are SUGGESTED only until a human confirms.
+**Approved-by:** Umesh
+**Links:** T-042; D-141; ISS-T042FUSION-001
