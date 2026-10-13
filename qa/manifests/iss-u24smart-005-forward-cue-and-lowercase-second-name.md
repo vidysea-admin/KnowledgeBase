@@ -1,6 +1,6 @@
 # iss-u24smart-005-forward-cue-and-lowercase-second-name
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2-adjacent (open medium ISS-U24SMART-005 from the u24 cycle-2 PASS; touches attribution of names to speakers, so FULL ceremony). Lane: lane/u24smart5. No model calls.
 
