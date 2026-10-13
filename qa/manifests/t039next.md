@@ -1,7 +1,7 @@
 # t039next
 
 **Handshake status:** ready-for-check
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 1
 Tier: 3 (next unblocked roadmap task, T-039). Lane: lane/t039next (base 99f4fed9). Class: new authenticated endpoint on the send-now scope, tenant-scoped read of launch state: FULL ceremony.
 Closes (status half only): ISS-SENDNOWAPI-003 "no status endpoint". The 60 s live-join measurement is NOT done.

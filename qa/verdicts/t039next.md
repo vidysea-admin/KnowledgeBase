@@ -16,3 +16,14 @@ Mutations (hash-verified, per-mutation restore, HEAD blob equal after): M1 tenan
 
 Fix direction (cycle 1): make the host test hermetic (omit probes.startTime when seeding, or inject LiveProbes via options) and move the foreign-tenant assertion into its own test; re-run mutation M4, which must then be killed. No product-code change needed.
 ISSUES-WRITTEN: ISS-T039NEXT-001
+
+## Cycle 1
+VERDICT: PASS
+Cycle checked: 1
+Checked commits: 0791518d, 8e723c1f (lane/t039next).
+
+EXPLANATION:
+ISS-T039NEXT-001 reproduction (send-now-host.test.ts) now 15/15 runs green, 16 pass / 0 fail each (cycle 0: 15/15 red). Production default unchanged: liveProbes is optional, the only production caller (join-rules-api-host.ts) calls createSendNowDeps() with no options, and readSessionStatus's `probes = {}` default applies for undefined. The tenant test is its own test, with the host serving tenant-a and the caller tenant-b on a job that is running for tenant-a; it asserts forbidden/tenant-not-served. The livenessMs 20_000 change keeps the meaning: the child's exit settles the launch at once (502), and a staying-alive launcher is still 202 in the "launch: 202 ..." test (livenessMs 400) and the other 202 tests.
+Results: apps/api full 810/810 (D2_FIXTURE_PYTHON set), apps/api tsc 0, meeting-bot session-status.test 4/4, meeting-bot tsc 0, lint-loc --all OK.
+Mutations (hash-verified applied, per-mutation restore, HEAD blob equal after): M1 tenant hardcoded, M2 GET scope removed, M3 jobId anchor dropped, M4 host tenant mismatch ignored (cycle-0 survivor, now killed), M5 reader swallows unreadable, M6 throw->200, L1 exit no longer fails launch, L2 liveness timer rejects, P1 probes not passed: 9/9 killed.
+ISSUES-WRITTEN: none
