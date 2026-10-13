@@ -211,3 +211,9 @@ Env: `LKB_ALLOW_STAGING=lkb_staging MONGO_WORK_DB=lkb_staging MONGODB_DB=lkb_sta
 - Ollama Cloud (OLLAMA_API_KEY): `GET https://ollama.com/api/tags` returns 200 with 18 models, none an embedding model (mistral-large-3, nemotron-3-*, glm-5.2/5.3, kimi-k2.6/k2.7-code/k3, minimax-m2.7/m3, mistral-large-4, gemma4:31b, deepseek-v4-*, gpt-oss:20b/120b, glm-5.3-flash). `/api/embed` with `nomic-embed-text` or `embeddinggemma` returned "not found" / "unauthorized". So no Ollama Cloud embedding model is available with this key. Routing config not changed.
 - Step 2 (vector-arm /ask rerun) NOT done: it needs all 1905 chunks embedded. Still to do: after reset, embed the 12 sessions (1154 chunks; fits under 1000/day only across two days, or use a billed key at about USD 0.06), then re-run 3-5 /ask questions excluding visa-blueprint t141 and ucas t114.
 - Cost today: USD 0. Servers: none started. No temp wrapper needed; scratchpad helper scripts only.
+
+## Follow-up 2 2026-10-13 (main tree, after dbguard2 merge): still 751 of 1905
+
+DB asserted `lkb_staging` (name only, never `lkb`). Guarded CLI `node scripts/backfill.mjs chunks --legacy-unbound --session 2026-07-22-uniaccess-cept-university` ran with no "Mongo not connected" (dbguard2 fix works) and no wrapper. A key probe returned 200 earlier, but the real batch got `429 RESOURCE_EXHAUSTED` (embed_content_free_tier_requests, daily limit 1000, "Please retry in 18h37m"). Retried 3 times with 20s/40s/80s backoff: 429 each time, 0 written, chunks unchanged at 751. Stopped per the rule; later sessions not attempted.
+Note: the remaining 1154 chunks exceed the 1000/day free quota even after reset, so finishing needs two days or a billed key (about USD 0.06).
+Step 2 (5 vector-arm /ask questions) NOT run; needs 1905 embedded. Cost today USD 0. No servers started; no temp files left. Nothing pushed.
