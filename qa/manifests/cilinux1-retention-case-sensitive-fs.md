@@ -1,6 +1,6 @@
 # cilinux1: retention report tests portable to case-sensitive filesystems; outside-root guard made separator-independent
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Lane: cilinux1 (lane/cilinux1). Issue: none new; repairs GitHub CI run 38369705993 (Ubuntu), packages/ingest retention tests.
 
