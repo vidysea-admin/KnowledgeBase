@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeCalendarReadDeps } from "../fixtures.js";
-import { listUpcomingGwsMeetings, runGws } from "../gws-calendar.js";
+import { listUpcomingGwsMeetings, runGws } from "../gws/gws-calendar.js";
 import { createGwsCalendarReadDeps } from "../store.js";
 
 test("GET /calendar/upcoming with the calendar scope returns real meetings", async () => {

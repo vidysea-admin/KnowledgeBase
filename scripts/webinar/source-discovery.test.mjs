@@ -2,8 +2,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { runPipelineWatch } from "./run-pipeline.mjs";
-import { scanGmailForMeetingCandidates } from "../../apps/api/src/gws-gmail.ts";
-import { listUpcomingGwsMeetings } from "../../apps/api/src/gws-calendar.ts";
+import { scanGmailForMeetingCandidates } from "../../apps/api/src/gws/gws-gmail.ts";
+import { listUpcomingGwsMeetings } from "../../apps/api/src/gws/gws-calendar.ts";
 import { createGwsCalendarReadDeps } from "../../apps/api/src/store.ts";
 import { startTestServer } from "../../apps/api/src/testUtils.ts";
 import { buildTestDeps, fakeKeyStore } from "../../apps/api/src/fixtures.ts";

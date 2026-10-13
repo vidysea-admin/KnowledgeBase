@@ -20,8 +20,8 @@
  * as a sanitized error; an unavailable calendar must never look like successful empty coverage.
  */
 import { execFile } from "node:child_process";
-import { resolveEventMeetingLink } from "./join-rules/calendar-link-extract.js";
-import type { UpcomingMeeting, CalendarAcquisition, CalendarReadDeps } from "./routes/calendar.js";
+import { resolveEventMeetingLink } from "../join-rules/calendar-link-extract.js";
+import type { UpcomingMeeting, CalendarAcquisition, CalendarReadDeps } from "../routes/calendar.js";
 
 interface GwsEventListResponse {
   items?: GwsCalendarEvent[];

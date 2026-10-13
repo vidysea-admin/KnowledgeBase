@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeMeetingCandidatesDeps } from "../fixtures.js";
 import { createMeetingCandidatesDeps } from "../store.js";
-import { scanGmailForMeetingCandidates } from "../gws-gmail.js";
+import { scanGmailForMeetingCandidates } from "../gws/gws-gmail.js";
 
 function seededMeetingCandidates() {
   const deps = fakeMeetingCandidatesDeps();

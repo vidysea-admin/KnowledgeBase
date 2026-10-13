@@ -6,7 +6,7 @@ import {join} from 'node:path';
 import {ATTENDANCE_ACCOUNT, rawAttendanceObservation, attendanceFingerprint, selectVerifiedCalendarMeetings} from './calendar-attendance-policy.mjs';
 import {createCalendarAttendanceSource, configureCalendarAttendance, checkCalendarAttendanceReady} from './calendar-attendance-source.mjs';
 import {runPipelineTick, validateRunGate} from './run-pipeline.mjs';
-const {listUpcomingGwsMeetings} = await import('../../apps/api/src/gws-calendar.ts');
+const {listUpcomingGwsMeetings} = await import('../../apps/api/src/gws/gws-calendar.ts');
 const {validateWebinarCalendarAcquisition, prepareWebinarSourceState} = await import('../../packages/meeting-bot/src/calendar/state/schedule-state.ts');
 const {recordingBackend} = await import('../../packages/meeting-bot/src/capture/record-commands.ts');
 const NOW = new Date().toISOString(), START = new Date(Date.parse(NOW) + 60000).toISOString(), END = new Date(Date.parse(NOW) + 3600000).toISOString();
