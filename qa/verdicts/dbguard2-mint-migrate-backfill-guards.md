@@ -13,3 +13,5 @@ EXPLANATION:
 - Tests: scripts guard tests 40/40. apps/api 764 tests, 763 pass; the 1 failure is activity-health router (Python subprocess under load), passes 3/3 in isolation, file untouched by this lane. tsc clean.
 
 ISSUES-WRITTEN: ISS-DBGUARD2-001 (medium)
+
+ISS-DBGUARD2-001 verified at 98de4c27: diff 614d34ea..98de4c27 is the single restored assertion line only; caller-visible.test.ts 7/7; mutation (message includes "tenantId is required") makes the positive control fail (6/7), file hash restored == HEAD. VERDICT remains PASS.
