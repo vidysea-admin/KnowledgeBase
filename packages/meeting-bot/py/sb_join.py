@@ -33,6 +33,7 @@ from sb_join_profile import existing_profile_directory, selected_uc_profile, val
 from sb_join_recorder import recorder_link
 from sb_join_register import REGISTRATION_JS, register_form  # noqa: F401
 from sb_join_scripts import _IFRAME_WALK_JS, BODY_TEXT_JS, CLICK_JS, IN_CALL_JS, IN_CALL_JS_BY_PLATFORM  # noqa: F401
+from sb_join_tiles import tile_clock
 
 
 _EMIT_LOCK = threading.Lock()
@@ -132,7 +133,7 @@ def main():
                     command("Target.activateTarget", {"targetId": tabs[0]["targetId"]})
                     command("Extensions.triggerAction", {"id": extension_id, "targetId": tabs[0]["targetId"]})
                     emit("capture-invoked")
-        run_session(sb, a, os=os, time=time, emit=emit)
+        run_session(sb, a, os=os, time=tile_clock(sb, os, time), emit=emit)
 
 
 if __name__ == "__main__":

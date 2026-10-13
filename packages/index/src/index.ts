@@ -29,6 +29,7 @@ export { resolveSpeakers, personIdFor, type ResolvedSpeaker, type SpeakerResolut
 export { extractSpeakers, extractSpeakersRuleBased, type SpeakersCompleteFn, type SpeakerExtractionResult } from "./pipeline/speakers-llm.js";
 export { groundSpeakerProposals, extractSpeakersGrounded, selectSuggestions, dropOverriddenByConfirmed, type ConfirmedSpeaker, type EvidenceKind, type SuggestedSpeaker, type RejectedSuggestion } from "./pipeline/speakers-grounded.js";
 export { buildSuggestionDocs, suggestionId } from "./pipeline/speaker-suggestions.js";
+export { buildTileSuggestionDocs, parseTileCapture, storeTileSuggestions, type InsertSuggestions, type TileSuggestionOptions } from "./pipeline/speaker-tile-suggestions.js";
 export { llmVerifier, type SpeakerVerifier, type VerifierQuestion } from "./pipeline/speakers-verifier.js";
 export { looksLikeAName, isDiscourseOnly, containsNameVerbatim, citesNameAsAnIntroduction } from "./pipeline/speaker-name-rules.js";
 export { buildSpeakerDocs, writeSpeakerDocs, isHumanConfirmed, type SpeakerWriteTarget, type SessionResolution, type SpeakerCollision, type SpeakerDocsResult } from "./pipeline/speaker-docs.js";
