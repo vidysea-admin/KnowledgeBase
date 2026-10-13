@@ -1,6 +1,6 @@
 # t046-purge-job-schedule
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap, T-046 wiring). Class: data delete path wiring, so FULL ceremony. Lane: lane/w046. No ledger issues filed.
 Authority: D-145 (media purged 90 days after capture; transcripts kept forever; executor honours dry-run vetoes and logs deletions).

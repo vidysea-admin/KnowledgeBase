@@ -1,0 +1,1 @@
+{"id":"ISS-W046-001","severity":"low","status":"open","unit":"t046-purge-job-schedule","summary":"retention-purge-job-cli.ts header names scripts/webinar/schedule-retention-purge.ps1; real path is scripts/retention/. retention-purge.ts strings still say D-145 pending append though D-145 is ACTIVE.","fix_direction":"doc-only; fix inside next unit touching these files"}
