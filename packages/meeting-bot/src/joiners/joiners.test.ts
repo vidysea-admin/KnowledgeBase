@@ -7,8 +7,9 @@ import assert from "node:assert/strict";
 
 import { createVexaJoiner } from "./vexa-joiner.js";
 import { createBrowserJoiner, registerInBrowser, type RegistrationInput } from "./browser-joiner.js";
-import { resolve } from "node:path";
-import { mkdtempSync } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { mkdtempSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { createSystemAudioJoiner } from "./system-audio-joiner.js";
 
@@ -63,11 +64,13 @@ test("registration refuses invalid hosts/operator/selectors before execution", a
   assert.equal(calls, 0);
 });
 test("registration actual child timeout performs exact owned-profile cleanup", async () => {
-  const profileDir = mkdtempSync(resolve("data/registration-timeout-"));
-  const python = resolve(".venv/Scripts/python.exe");
+  const pkgDir = resolve(dirname(fileURLToPath(import.meta.url)), "../.."), repoRoot = resolve(pkgDir, "../..");
+  mkdirSync(resolve(repoRoot, "data"), {recursive: true});
+  const profileDir = mkdtempSync(resolve(repoRoot, "data/registration-timeout-"));
+  const python = resolve(repoRoot, process.platform === "win32" ? ".venv/Scripts/python.exe" : ".venv/bin/python");
   const result = await registerInBrowser({...registration, url: "http://127.0.0.1:1/register",
     allowedHosts: ["127.0.0.1"], localFixture: true}, {
-    python, joinScript: resolve("packages/meeting-bot/py/sb_join.py"), profileDir,
+    python, joinScript: resolve(pkgDir, "py/sb_join.py"), profileDir,
     browserExecutable: "cft", timeoutMs: 1000,
   });
   assert.deepEqual(result, {status: "uncertain", reason: "browser_timeout"});
