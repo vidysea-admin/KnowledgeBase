@@ -29,13 +29,16 @@ test("ISS-JOBQSTALL-002 recorded reproduction S4, verbatim: lock body {pid: a RE
     await new Promise(r => setTimeout(r, 300)); // the unrelated process exists NOW; the lock claims to have been written 10 min ago, i.e. before it was born
     const lockFile = join(dir, QUEUE_LOCK_FILE);
     writeFileSync(lockFile, JSON.stringify({ token: "dead-holder", pid: live.pid, host: hostname(), thread: 0, at: Date.now() - 10 * 60_000 }));
-    const t0 = Date.now(); const r = new FileJobQueue({ dir, now: () => 1 }).enqueue(job("a")), took = Date.now() - t0; // DEFAULT 2000 ms wait, real probe, real clock
+    // Load tolerance: the real foreign-pid probe spawns powershell, which takes 13-21 s on a saturated Windows host (measured) and then hits the 5 s probe timeout -> null -> "cannot tell" -> holder protected.
+    // So measure the probe once on the live child (generous timeout), and only the WAIT and PROBE TIMEOUT scale with that cost; reuse detection itself is still the real probe on a real foreign pid.
+    const c0 = Date.now(); assert.ok(defaultQueueStartTime(live.pid!, 120_000) !== null, "real probe resolves the live child"); const probeMs = Date.now() - c0, cheap = probeMs < 1000;
+    const t0 = Date.now(); const r = new FileJobQueue(cheap ? { dir, now: () => 1 } : { dir, now: () => 1, lockWaitMs: probeMs * 4 + 5000, lockStartTime: p => defaultQueueStartTime(p, 120_000) }).enqueue(job("a")), took = Date.now() - t0; // cheap probe: DEFAULT 2000 ms wait, real probe, real clock
     assert.deepEqual(r, { ok: true, value: "enqueued" }); assert.deepEqual(storedIds(dir), ["a"]); assert.deepEqual(readdirSync(dir), [QUEUE_FILE]);
     console.log(`ISS-JOBQSTALL-002 S4: before = conflict after 2012 ms (taken over only at +1 h+1 s); now = ok in ${took} ms with the real start-time lookup; stored [a], no debris`);
     // the genuine holder (born BEFORE the lock was written) is still protected at +31 s and +59 min (ISS-JOBQLOST-003 side)
     const body = JSON.stringify({ token: "live-holder", pid: live.pid, host: hostname(), thread: 0, at: Date.now() }); writeFileSync(lockFile, body);
     for (const plus of [31_000, CEIL - 60_000]) {
-      const g = new FileJobQueue({ dir, now: () => 1, lockWaitMs: 0, wallNow: () => Date.now() + plus }).enqueue(job("b"));
+      const g = new FileJobQueue({ dir, now: () => 1, lockWaitMs: 0, wallNow: () => Date.now() + plus, ...(cheap ? {} : { lockStartTime: p => defaultQueueStartTime(p, 120_000) }) }).enqueue(job("b"));
       assert.equal(code(g), "conflict", `genuine live holder at +${plus}`); assert.equal(readFileSync(lockFile, "utf8"), body);
     }
     assert.deepEqual(storedIds(dir), ["a"]);
@@ -150,7 +153,7 @@ test("default start-time source: own pid ~ process start, a really live child be
   const spawnedAt = Date.now(); const kid = spawn(process.execPath, ["-e", "setTimeout(()=>{},60000)"], { stdio: "ignore" });
   try {
     await new Promise(r => setTimeout(r, 300));
-    const t0 = Date.now(); const s = defaultQueueStartTime(kid.pid!), cost = Date.now() - t0;
+    const t0 = Date.now(); const s = defaultQueueStartTime(kid.pid!, 120_000), cost = Date.now() - t0; // generous probe timeout: powershell start-up is 13-21 s on a saturated host
     assert.ok(s !== null && s >= spawnedAt - 2000 && s <= Date.now() + 1000, `child start ${s} vs spawn ${spawnedAt}`);
     kid.kill(); await new Promise(r => kid.on("close", r));
     assert.equal(defaultQueueStartTime(kid.pid!), null, "dead pid");
