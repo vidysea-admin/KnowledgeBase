@@ -1,7 +1,7 @@
 # U2.5 decisions extraction (claims.ts template, decisions prompt)
 
-**Handshake status:** ready-for-check
-Status: ready-for-check
+**Handshake status:** checked-PASS
+Status: checked-PASS
 Fix cycle: 0
 Task: U2.5 (deps U2.2 in_progress; extractor is built to be scorable by the U2.2 harness, no quality claim)
 Priority: tier 3 roadmap task (goal.json U2.5 pending, dep U2.2 in progress).
