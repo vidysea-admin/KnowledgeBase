@@ -51,3 +51,8 @@ test("ingestUrl positive control: valid turns are written with their original ti
   assert.deepEqual(db.all("turns").map((r) => [r.tStart, r.tEnd]), [[0, 5], [5, 9]]);
   assert.equal(db.all("sources").length, 1);
 });
+test("ISS-BADTURNS-003: the API writer check also refuses NaN/Infinity tStart and tEnd", () => {
+  for (const [s, e, re] of [[NaN, 5, /tStart is not a finite number/], [Infinity, 9, /tStart is not a finite number/], [0, NaN, /tEnd is not a finite number/], [0, Infinity, /tEnd is not a finite number/]] as const) {
+    assert.match(turnTimingProblem({ tStart: s, tEnd: e }) ?? "", re);
+  }
+});

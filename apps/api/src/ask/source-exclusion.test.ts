@@ -89,3 +89,16 @@ test("validateHydration refuses a hydration that cites an excluded turn", async 
   const citedTurn = quotesOf(good.nodes[0]!)[0]!.turnId;
   assert.throws(() => validateHydration({ ...good, excludedTurns: [{ sessionId: OK, turnId: citedTurn, reason: "x" }] }, [okN]), /excluded turn cited/);
 });
+test("ISS-BADTURNS-003: a negative tStart (with tEnd >= tStart) is excluded with its own reason, not cited", async () => {
+  const neg = row(OK, 8, "Education loans negative start October.", -5, 10);
+  const result = await createSourceHydrator("toc", { db: fakeDb([neg, GOOD_OK]) })("education loans October", [okN]);
+  assert.deepEqual(result.excludedTurns, [{ sessionId: OK, turnId: neg._id, reason: "tStart -5 is negative" }]);
+  assert.ok(!validateHydration(result, [okN]).flatMap(quotesOf).some((q) => q.turnId === neg._id));
+});
+test("ISS-BADTURNS-002: a foreign-tenant or foreign-session CHUNK that covers an excluded turn refuses the request (never dropped)", async () => {
+  const chunk = (fields: Record<string, unknown>) => ({ _id: "c1", tenantId: "toc", sourceRef: OK, turnRefs: [`${VISA}-t141`], chunkIndex: 0, vector: [1, 0], dims: 2, embeddingModel: "fixture", ...fields });
+  for (const bad of [chunk({ tenantId: "other" }), chunk({ sourceRef: "not-admitted" })]) {
+    const db = { collection: (name: string) => ({ find: () => ({ toArray: async () => name === "turns" ? [T141, GOOD_VISA, GOOD_OK] : [bad] }) }) } as unknown as Pick<Db, "collection">;
+    await assert.rejects(() => createSourceHydrator("toc", { db, embed: async () => ({ vectors: [[1, 0]], dims: 2, provider: "offline", model: "fixture" }) })("visa forms October", [visaN, okN]), BoundedAskError);
+  }
+});

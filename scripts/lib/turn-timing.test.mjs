@@ -51,3 +51,9 @@ test("lib: assertTurnTimings lists every bad turn and returns valid input untouc
   assert.throws(() => assertTurnTimings([turn(1, 5, 1), turn(2, 0, 1), turn(3, 9, 2)], "s1"), /\(2 turn\(s\)\).*s1-t1.*s1-t3/);
   assert.equal(turnTimingProblem(turn(1, 1, 1)), null);
 });
+test("ISS-BADTURNS-003: NaN and Infinity are refused for tStart AND tEnd (typeof number is not enough)", () => {
+  for (const [s, e, re] of [[NaN, 5, /tStart is not a finite number/], [Infinity, Infinity, /tStart is not a finite number/], [0, NaN, /tEnd is not a finite number/], [0, Infinity, /tEnd is not a finite number/], [-Infinity, 1, /tStart is not a finite number/]]) {
+    assert.match(turnTimingProblem(turn(1, s, e)), re);
+    assert.throws(() => assertTurnTimings([turn(1, s, e)], "s1"), /invalid turn timing, write refused/);
+  }
+});

@@ -1,7 +1,7 @@
 # badturns-turn-timing-write-refusal
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 3 (roadmap/live-run finding, T-043). Class: data writes (turn writers): FULL ceremony. Lane: lane/badturns. No ledger issue is being fixed; no reproduction corpus in qa/issues*.jsonl.
 
 ## What was wrong
@@ -27,3 +27,10 @@ T-043 live run (lane/t043live f3f3f945, qa/evidence/t043-live-2026-10-12/summary
 - /ask exclusion: `apps/api/src/ask/source-exclusion.test.ts` 8/8 (one bad turn; end-to-end askV2 with warning; no warning when clean; real visa t141 and ucas t114 shapes; fully-excluded session skipped; all rows bad refuses; foreign tenant/session still refuses; excluded turn never cited). Run with a temp tsconfig path mapping @lkb/ask to this worktree.
 - Mutations on /ask (7/7 killed, restored identical): timing check dropped; all-invalid guard removed; scope check disabled; never-cite check removed; warning not emitted; fully-excluded session not skipped; exclusion made per-session.
 - Suites: packages/ask 122/122; apps/api src/ask + routes/ask + compete 131/131 (older store-guards 114/114, turn-timing-write 9/9); tsc clean for packages/ask and apps/api (worktree path mapping).
+
+## Fix cycle 1 (checker FAIL cycle 0, verdict 2076f1b5)
+- ISS-BADTURNS-001: scripts/lib/transcript-provenance.test.mjs now derives its copy list from the listed files plus their relative static imports (transitively) and throws if a file is missing. Test: 15/15 (was 10/15).
+- ISS-BADTURNS-002: apps/api source-context.ts checks every chunk for tenant and admitted session BEFORE any exclusion; a foreign chunk covering an excluded turn now refuses. Tests added (foreign tenant and foreign session chunk).
+- ISS-BADTURNS-003: tests added for NaN/Infinity tStart and tEnd (scripts and API writer) and negative-tStart exclusion in /ask. 4/4 fresh mutations killed.
+- ISS-BADTURNS-004: the two NUL bytes in packages/ask/src/source-context.ts replaced by JSON.stringify([session, turn]) keys; git diff shows text (+9/-0).
+- Suites: packages/ask 122/122; apps/api ask + routes/ask + compete + tenant-guards 285/285; scripts turn-timing, legacy-unbound, session-rows, transcript-provenance 33/33. Types resolved with a temporary tsconfig paths mapping (deleted); the @lkb/ask junction was not touched.

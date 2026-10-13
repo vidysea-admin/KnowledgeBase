@@ -200,6 +200,8 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
     const excludedIds = new Set(excludedTurns.map((e) => e.turnId));
     snapshot.rows = validRows;
     // A vector chunk that covers an excluded turn is dropped with it: its embedded text may contain that turn.
+    // Scope first: a chunk of another tenant or outside the admitted sessions refuses the request whatever else is wrong with it.
+    for (const c of snapshot.chunks) if (c.tenantId !== tenantId || !sessionIds.includes(c.sourceRef)) throw new BoundedAskError("invalid scoped vector evidence");
     snapshot.chunks = snapshot.chunks.filter((c) => !(Array.isArray(c.turnRefs) && c.turnRefs.some((id) => excludedIds.has(id)))
       && !(Array.isArray(c.sourceSpans) && c.sourceSpans.some((s) => excludedIds.has(s.turnId))));
     for (const chunk of snapshot.chunks) validateChunk(chunk, tenantId, byTurn);
