@@ -64,6 +64,7 @@ a client of that API — with the long-range goal of beating top human counsello
   - `scripts/eval/`
   - `scripts/lib/`
   - `scripts/qa/`
+  - `scripts/retention/`
   - `scripts/toc/`
   - `scripts/upload/`
   - `scripts/watch/`
