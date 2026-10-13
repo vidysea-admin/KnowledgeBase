@@ -16,7 +16,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { SendNowDeps, SendNowPlanValue } from "../../apps/api/src/join-rules/send-now.js";
 import { readSessionStatus } from "../../packages/meeting-bot/src/live-recording/session-status.js";
-import { liveRecordingDir } from "../../packages/meeting-bot/src/live-recording/live-recording.js";
+import { liveRecordingDir, type LiveProbes } from "../../packages/meeting-bot/src/live-recording/live-recording.js";
 import { planSendNow, type SendNowJob } from "../../packages/meeting-bot/src/send-now.js";
 import { hostOnly, readAllLiveJobs, REFUSAL_MESSAGES } from "../../packages/meeting-bot/src/send-now-command.js";
 
@@ -39,6 +39,8 @@ export interface SendNowHostOptions {
   statusEnabled?: boolean;
   /** A job id younger than this with no live entry is still "launching" (the child claims the meeting a moment after start). */
   launchGraceMs?: number;
+  /** Test seam: process-liveness probes for the status lookup (default: the real OS probes). */
+  liveProbes?: LiveProbes;
 }
 
 /** Wall-clock UTC time encoded in a job id (`send-now-YYYYMMDDHHMMSS-xxxxxx`), or NaN. */
@@ -85,7 +87,7 @@ export function createSendNowDeps(opts: SendNowHostOptions = {}): SendNowDeps {
       catch { return { ok: false as const, kind: "unreadable" as const, reason: "tenant-unreadable", message: "the capture tenant of this host cannot be determined" }; }
       if (tenantId !== tenant) return { ok: false as const, kind: "forbidden" as const, reason: "tenant-not-served", message: "this host does not capture for your tenant" };
       try {
-        const s = readSessionStatus({ dir: liveRecordingDir(root), tenantId: tenant, sessionId: jobId }, now());
+        const s = readSessionStatus({ dir: liveRecordingDir(root), tenantId: tenant, sessionId: jobId }, now(), opts.liveProbes);
         if (s.running) return { ok: true as const, status: "running" as const, meetingKey: s.meetingKey, startedAt: s.startedAt, until: s.until };
       } catch (e) {
         return { ok: false as const, kind: "unreadable" as const, reason: "live-recordings-unreadable", message: `cannot read the live-recording state (${e instanceof Error ? e.message.slice(0, 120) : "unreadable"})` };

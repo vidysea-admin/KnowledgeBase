@@ -2,7 +2,7 @@
 
 **Handshake status:** ready-for-check
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 3 (next unblocked roadmap task, T-039). Lane: lane/t039next (base 99f4fed9). Class: new authenticated endpoint on the send-now scope, tenant-scoped read of launch state: FULL ceremony.
 Closes (status half only): ISS-SENDNOWAPI-003 "no status endpoint". The 60 s live-join measurement is NOT done.
 
@@ -28,3 +28,10 @@ The 4 full-suite failures are in files this slice does not touch. Confirmed at b
 No real meeting, browser, CLI or API process. No mutation run. `scripts/` has no tsconfig, so send-now-host.ts is typechecked only through tsx execution. The web page does not poll this endpoint yet (needs an Approver-free UI slice next). Wiring: `join-rules-api-host.ts` already calls `createSendNowDeps()`, so the env flag alone turns it on there; apps/api/src/index.ts still answers 503 (ISS-SENDNOWAPI-004).
 ## Remaining for T-039
 Web status polling of this endpoint; 60 s live-join measurement (needs a joined signal, not just process liveness); ISS-SENDNOWAPI-004 (one supported API host, an Approver choice), ISS-T039DUPES-006 (mutant-killing test), ISS-SENDNOWAPI-002.
+
+## Fix cycle 1 (ISS-T039NEXT-001)
+- `send-now-host.ts`: optional `liveProbes?: LiveProbes` option passed to `readSessionStatus` (default undefined = unchanged real probes). `send-now-host.test.ts`: status test injects the same fake probes that seeded the claim (hermetic); foreign-tenant assertion moved to its own test.
+- Evidence: send-now-host.test.ts 15 runs: 4 runs 16/16 green earlier batch pattern; the only failing test in every red run is the pre-existing timing test "launcher that dies at once" (livenessMs 400 vs node cold start under load); the status tests pass in all runs. Not changed (outside verdict).
+- Mutation M4 (`tenantId !== tenant` -> `&& false`): KILLED by the new tenant test (pass 15 / fail 1, hash-verified, restored).
+- ISS-T039NEXT-001 reproduction: "status: live claim ... = running" 0/15 failures (was 15/15).
+- apps/api send-now tests 18/18; session-status 4/4; both tsc 0; lint-loc --all 0.
