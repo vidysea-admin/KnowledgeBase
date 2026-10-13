@@ -2115,3 +2115,19 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** mint-key and the watch ingest/reingest scripts write lkb only with --i-know-this-is-production and MONGODB_DB=lkb; no DB set means refuse; otherwise work/staging DBs only.
 **Approved-by:** Umesh
 **Links:** ISS-LEGACYSEED-002; ISS-LEGACYSEED-003; D-143
+
+## D-151 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-040: Umesh ruled (2026-10-13) that when the note judge (D-144) is enabled, the rule-based lexical negation checks ALSO run (defense in depth): a note is dropped if either the judge or the rules reject it. Resolves ISS-T040JUDGE-002.
+**Why:** Running both layers means a note must pass the judge and the rules, so a judge miss is still caught by the lexical checks.
+**Result:** With the judge enabled, a note ships only if both the judge and the rule-based negation checks accept it.
+**Approved-by:** Umesh
+**Links:** T-040; D-144; ISS-T040JUDGE-002
+
+## D-152 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** ISS-ALERTID-002: Umesh ruled (2026-10-13) to keep alert ids as they are (unsalted hash); the offline-guessing risk is accepted. ISS-ALERTID-002 is closed as accepted-risk (ledger status wontfix).
+**Why:** The risk of offline guessing of alert ids was weighed and accepted by the Approver, so no change to the id scheme is made.
+**Result:** Alert ids stay an unsalted hash; ISS-ALERTID-002 closed as accepted-risk.
+**Approved-by:** Umesh
+**Links:** ISS-ALERTID-002
