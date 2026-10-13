@@ -1,6 +1,6 @@
 # budgetapi-structure-refactor
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: roadmap/CI blocker (ISS-CIFIX-001, lint:structure). Class: pure refactor, no behaviour change, no data write / auth / tenancy logic touched. Umesh chose refactor over raising budgets.
 Lane: lane/budgetapi (from 364cb094).
