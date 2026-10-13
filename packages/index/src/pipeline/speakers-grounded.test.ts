@@ -391,3 +391,49 @@ test("ISS-U24SMART-005 (d): a lowercase / Hinglish second name abstains; the sin
   assert.deepEqual(otherNamesIn("Rashi, aap ruby milkar bataiye", "Rashi", new Set(["rashi", "ruby"])), ["ruby"], "a known candidate name needs no capital");
   assert.deepEqual(otherNamesIn("Rashi, aap aur main milkar bataiye", "Rashi", new Set(["rashi"])), [], "common Hinglish function word is not a name");
 });
+
+// ---------- ISS-U24SMART5-001: Devanagari conjunctions / Devanagari + mixed-script second names ----------
+
+test("ISS-U24SMART5-001: Devanagari and mixed-script second names abstain end-to-end under an always-yes verifier; single-name Devanagari quotes still ship", async () => {
+  const mk = (q: string) => [
+    turn("t0", "spk:0", `${q}.`), turn("t1", "spk:1", "Sure, the visa process takes a month."),
+    turn("t2", "spk:3", "Thanks Rashi for that."), turn("t3", "spk:4", "Okay."),
+  ];
+  const ps = (q: string) => [prop("spk:1", "Rashi", q, "called-on"), prop("spk:1", "Rashi", "Thanks Rashi for that", "thanks")];
+  const legit = ["Rashi, आप बताइए please", "Rashi जी, आप अपना सवाल बताइए अब", "धन्यवाद Rashi आपने बहुत अच्छा बताया", "Rashi, यह सवाल और जवाब आप बताइए", "Rashi, आप और मैं मिलकर बताइए"];
+  for (const q of legit) assert.equal((await shipped(mk(q), ps(q))).length, 1, `legit ships: ${q}`);
+  const attacks = [
+    "Rashi और प्रिया please बताइए अब", "Rashi या प्रिया please बताइए अब",                                   // the checker's two cases
+    "Rashi एवं प्रिया please बताइए अब", "Rashi तथा प्रिया please बताइए अब", "Rashi व प्रिया please बताइए अब",
+    "Rashi and प्रिया please बताइए अब", "Rashi aur प्रिया please बताइए अब", "Rashi और priya please बताइए अब",   // mixed script
+    "Rashi और Priya please बताइए अब", "प्रिया और Rashi please बताइए अब", "Rashi, आप और प्रिया बताइए अब",
+    "Rashi और फ़रहा please बताइए अब",                                      // NBSP separators, nukta decomposed
+    "Rashi और प्र‍िया please बताइए अब",                                                                   // stray ZWJ inside the name
+  ];
+  for (const q of attacks) assert.deepEqual(await shipped(mk(q), ps(q)), [], `abstains: ${q}`);
+});
+
+test("ISS-U24SMART5-001: otherNamesIn is script- and normalization-aware", () => {
+  const k = new Set(["rashi"]);
+  assert.deepEqual(otherNamesIn("Rashi और प्रिया बताइए", "Rashi", k), ["प्रिया"]);
+  assert.deepEqual(otherNamesIn("Rashi या प्रिया बताइए", "Rashi", k), ["प्रिया"]);
+  assert.deepEqual(otherNamesIn("Rashi और फ़रहा बताइए", "Rashi", k), ["फ़रहा"], "NFD input folds to NFC (the composition-excluded nukta stays canonical)");
+  assert.deepEqual(otherNamesIn("Rashi, प्रिया आप बताइए", "Rashi", new Set(["rashi", "प्रिया"])), ["प्रिया"], "a known Devanagari candidate needs no conjunction");
+  assert.deepEqual(otherNamesIn("Rashi, आप और मैं", "Rashi", k), [], "Devanagari function words are not names");
+  assert.deepEqual(otherNamesIn("Rashi, and then please explain", "Rashi", k), [], "English 'and' + Latin word is ordinary prose");
+  assert.deepEqual(otherNamesIn("Rashi, and visa rules or permits please", "Rashi", k), [], "English and/or + a lowercase Latin word is not a second person");
+  assert.deepEqual(otherNamesIn("Rashi, José please explain", "Rashi", new Set(["rashi", "josé"])), ["josé"], "NFD Latin matches the NFC candidate name");
+  assert.deepEqual(otherNamesIn("राशि और Rashi", "Rashi", k), ["राशि"]);
+});
+
+test("ISS-U24DEVA-001: an NFD candidate name ('José Rao') in the known set still marks a lowercase second name in an NFD quote -> abstain", async () => {
+  const d = (s: string) => s.normalize("NFD");
+  const q = d("Rashi, ask josé about the rules please");
+  const turns = [
+    turn("t0", "spk:0", d("Rashi, ask josé about the rules please.")), turn("t1", "spk:1", d("Sure, the visa process takes a month.")),
+    turn("t2", "spk:3", d("Thanks Rashi for that.")), turn("t3", "spk:4", d("José Rao will close today.")),
+  ];
+  const props = [prop("spk:1", "Rashi", q, "called-on"), prop("spk:1", "Rashi", d("Thanks Rashi for that"), "thanks"), prop("spk:4", d("José Rao"), d("José Rao will close today"), "self-intro")];
+  assert.equal((await shipped(turns, props)).some((r) => r.speakerRef === "spk:1"), false);
+  assert.deepEqual(otherNamesIn(q, "Rashi", new Set(["rashi", d("josé")])), ["josé"]);
+});
