@@ -1,6 +1,6 @@
 # Manifest — cifix2-lint-dupes-ask-cycle
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Lane:** lane/cifix2 (base f81c8c13)
 **Issue:** ISS-CIFIX-002 (budget checks ISS-CIFIX-001 are out of scope; ISS-CIFIX-003 is another lane)
