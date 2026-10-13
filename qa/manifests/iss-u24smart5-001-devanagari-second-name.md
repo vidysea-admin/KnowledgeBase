@@ -1,6 +1,6 @@
 # iss-u24smart5-001-devanagari-second-name
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: 2-adjacent (open medium ISS-U24SMART5-001; attribution of names to speakers, FULL ceremony). Lane: lane/u24deva, branched from lane/u24smart5 7b09a6fd. No model calls.
 
