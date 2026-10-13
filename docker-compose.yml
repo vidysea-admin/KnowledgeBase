@@ -10,8 +10,11 @@ services:
   # Run it deliberately, once, with:
   #   docker compose --profile migrate run --rm migrate
   # Running it against the production database needs the owner's approval (D-117: production DB
-  # writes are not authorized). It migrates the database named by MONGODB_URL / MONGODB_DB, the
-  # same one api uses, so check .env first.
+  # writes are not authorized). migrate-mongo-config.cjs has NO default database (ISS-SCRIPTGUARDS-001):
+  # you must pass the target explicitly, and `lkb` additionally needs the production opt-in:
+  #   MONGODB_DB=lkb_work_x docker compose --profile migrate run --rm migrate          # isolated work DB
+  #   MONGODB_DB=lkb LKB_I_KNOW_THIS_IS_PRODUCTION=1 docker compose --profile migrate run --rm migrate   # production, deliberate
+  # (an opt-in alone, or MONGODB_DB=lkb alone, is refused; so is an unset MONGODB_DB).
   # Built from the api Dockerfile's `build` stage (full pnpm install: workspace node_modules incl.
   # migrate-mongo and dotenv at /app/node_modules); the runtime stage ships neither migrations/
   # nor the config, so they are bind-mounted read-only. NOTE: relies on the stage name `build`
@@ -26,9 +29,10 @@ services:
     command: ["npx", "migrate-mongo", "up", "-f", "migrate-mongo-config.cjs"]
     environment:
       MONGODB_URL: ${MONGODB_URL:?set MONGODB_URL (see .env's MONGODB_URL)}
-      # Set EXPLICITLY (ISS-LEGACYSEED-009): the api refuses to start without a database name and has no
-      # default. Production is `lkb`; it is written here, not inherited from a fallback.
-      MONGODB_DB: lkb
+      # No default (ISS-SCRIPTGUARDS-001): the caller names the database every run. `lkb` also needs the opt-in below.
+      MONGODB_DB: ${MONGODB_DB:?set MONGODB_DB explicitly (no default; lkb also needs LKB_I_KNOW_THIS_IS_PRODUCTION=1)}
+      LKB_I_KNOW_THIS_IS_PRODUCTION: ${LKB_I_KNOW_THIS_IS_PRODUCTION:-}
+      LKB_ALLOW_STAGING: ${LKB_ALLOW_STAGING:-}
     volumes:
       - ./migrations:/app/migrations:ro
       - ./migrate-mongo-config.cjs:/app/migrate-mongo-config.cjs:ro

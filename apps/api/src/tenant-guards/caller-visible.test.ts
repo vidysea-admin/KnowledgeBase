@@ -68,7 +68,7 @@ for (const bad of ["   ", " x", "a\tb", "t\u0001A"]) {
     assert.ok(!/MONGODB_URL|\n\s+at /.test(r.err), r.err);
   });
 }
-test("mint-key positive control: a valid tenant passes the guard (and then stops at the empty MONGODB_URL, never connecting)", () => {
+test("mint-key positive control: a valid tenant passes the guard (and then stops at the DB guard, never connecting)", () => {
   const r = mint(["--tenant", "tA", "--label", "unit"]);
-  assert.notEqual(r.code, 0); assert.match(r.err, /MONGODB_URL not set/); assert.ok(!/tenantId is required/.test(r.err));
+  assert.notEqual(r.code, 0); assert.match(r.err, /^mint-key: explicit isolated work database and Mongo URL required/); // ISS-LEGACYSEED-002: refused by requireScriptDatabase before any connect assert.ok(!/tenantId is required/.test(r.err));
 });
