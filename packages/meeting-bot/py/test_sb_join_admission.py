@@ -13,7 +13,8 @@ import pytest
 sys.path.insert(0, os.path.dirname(__file__))
 import sb_join  # noqa: E402,F401
 from sb_join import (  # noqa: E402
-    ADMISSION_TIMEOUT_S, AdmissionState, IN_CALL_JS, BODY_TEXT_JS, CLICK_JS, classify_meet_state, is_meet_url)
+    ADMISSION_TIMEOUT_S, AdmissionState, IN_CALL_JS, IN_CALL_JS_BY_PLATFORM, BODY_TEXT_JS, CLICK_JS, classify_admission,
+    classify_meet_state, is_meet_url, platform_of)
 from sb_join_loop import run_session  # noqa: E402
 
 FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
@@ -95,7 +96,7 @@ class _SB:
         self.reloads = 0
 
     def execute_script(self, script, *args):
-        if script is IN_CALL_JS:
+        if any(script is j for j in IN_CALL_JS_BY_PLATFORM.values()):
             return self.scenario(self.clock.now)[0]
         if script is BODY_TEXT_JS:
             return self.scenario(self.clock.now)[1]
@@ -177,12 +178,12 @@ def test_watchdog_reload_still_happens_after_admission(tmp_path):
     assert sb.reloads >= 1 and "watchdog-reload" in _names(events)
 
 
-def test_non_meet_platform_counts_as_admitted_immediately_and_never_times_out(tmp_path):
+def test_non_meet_platform_is_no_longer_assumed_admitted(tmp_path):
+    # ISS-LOBBYWATCH-001: this used to assert admitted-at-once (assumed=True) for a zoom URL.
     events, _, _, _clock = _run(tmp_path, "https://zoom.us/j/1", lambda now: (False, "welcome to the webinar"),
-                        timeout=10, seconds=200)
+                                timeout=10, seconds=200)
     names = _names(events)
-    assert names.count("admitted") == 1 and dict(events)["admitted"]["assumed"] is True
-    assert "admission_timeout" not in names
+    assert "admitted" not in names and names.count("admission_timeout") == 1
 
 
 def test_cli_flag_default_and_override():
@@ -224,11 +225,12 @@ def sb_browser():
         server.server_close()
 
 
-def _classify(sb_browser, name):
+def _classify(sb_browser, name, platform="meet"):
     sb, port = sb_browser
     sb.driver.get(f"http://localhost:{port}/{name}")
     sb.wait_for_ready_state_complete()
-    return classify_meet_state(bool(sb.execute_script(IN_CALL_JS)), (sb.execute_script(BODY_TEXT_JS) or "").lower())
+    return classify_admission(platform, bool(sb.execute_script(IN_CALL_JS_BY_PLATFORM[platform])),
+                              (sb.execute_script(BODY_TEXT_JS) or "").lower())
 
 
 @pytest.mark.parametrize("name,expected", [
@@ -239,3 +241,22 @@ def _classify(sb_browser, name):
 ])
 def test_dom_fixtures_lobby_vs_in_call(sb_browser, name, expected):
     assert _classify(sb_browser, name) == expected
+
+
+# ISS-LOBBYWATCH-001: Zoom-web / Teams-web / unknown-platform fixtures. Hand-written static HTML;
+# selectors and wording are UNVERIFIED against live Zoom/Teams.
+@pytest.mark.parametrize("name,platform,expected", [
+    ("zoom_lobby.html", "zoom", "lobby"),
+    ("zoom_incall.html", "zoom", "in-call"),
+    ("zoom_denied.html", "zoom", "unknown"),
+    ("zoom_incall_hidden.html", "zoom", "unknown"),
+    ("zoom_ended_with_controls.html", "zoom", "unknown"),
+    ("teams_lobby.html", "teams", "lobby"),
+    ("teams_incall.html", "teams", "in-call"),
+    ("teams_denied.html", "teams", "unknown"),
+    ("other_incall.html", "other", "in-call"),
+    ("other_nosignal.html", "other", "unknown"),
+    ("inner.html", "zoom", "lobby"),  # the repo's pre-existing Zoom waiting-room fixture
+])
+def test_platform_dom_fixtures(sb_browser, name, platform, expected):
+    assert _classify(sb_browser, name, platform) == expected

@@ -22,7 +22,7 @@ def parse_args():
     ap.add_argument("--reload-file", default=None,
                      help="T-031: sentinel; if present, force an immediate reload/rejoin then delete it")
     ap.add_argument("--admission-timeout", type=int, default=_env_admission_timeout(),
-                     help="Meet only: seconds to wait in the lobby before emitting admission_timeout and exiting "
+                     help="seconds to wait in the lobby / for an in-call signal (all platforms) before emitting admission_timeout and exiting "
                           "(0 = never; default 900 or $LKB_ADMISSION_TIMEOUT_S)")
     ap.add_argument("--no-click", action="store_true", help="never auto-click (login/dry-run mode)")
     ap.add_argument("--capture-extension", default=None, help="unpacked tab audio/video recorder extension")

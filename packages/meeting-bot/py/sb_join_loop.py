@@ -2,8 +2,8 @@
 import json
 
 from sb_join_detect import (ADMISSION_TIMEOUT_S, END_PHRASES, JOIN_TEXTS, AdmissionState, ReconnectState, apply_reload,
-                            classify_meet_state, click_gate, detect_trouble, is_meet_url, should_force_reload)
-from sb_join_scripts import BODY_TEXT_JS, CLICK_JS, IN_CALL_JS
+                            classify_admission, click_gate, detect_trouble, platform_of, should_force_reload)
+from sb_join_scripts import BODY_TEXT_JS, CLICK_JS, IN_CALL_JS_BY_PLATFORM
 
 
 def run_session(sb, a, *, os, time, emit):
@@ -16,10 +16,12 @@ def run_session(sb, a, *, os, time, emit):
     reconnect = ReconnectState()  # T-029
     extra_click_until = 0.0  # widened click window after a reload; MAX_CLICKS/JOIN_TEXTS unchanged
     gave_up_emitted = False
-    # ISS-CAPTUREFIX-001: Meet admission. Other platforms have no lobby signal, so they count as
-    # admitted on the first tick (old behaviour: the Node watchdog starts straight away).
-    meet = is_meet_url(a.url)
-    admission = AdmissionState(started, getattr(a, "admission_timeout", None) if meet else 0)
+    # ISS-CAPTUREFIX-001 / ISS-LOBBYWATCH-001: admission for every platform. "admitted" is emitted only
+    # on a positive in-call signal (Meet / Zoom web / Teams web / generic leave control); an unknown
+    # platform is never assumed admitted and ends in admission_timeout like the others.
+    platform = platform_of(a.url)
+    in_call_js = IN_CALL_JS_BY_PLATFORM[platform]
+    admission = AdmissionState(started, getattr(a, "admission_timeout", None))
     if admission.timeout_s is None:
         admission.timeout_s = ADMISSION_TIMEOUT_S
     while not os.path.exists(a.stop_file):
@@ -53,17 +55,14 @@ def run_session(sb, a, *, os, time, emit):
             if ended:
                 emit("ended", reason=ended)
 
-            if meet:
-                try:
-                    in_call_dom = bool(sb.execute_script(IN_CALL_JS))
-                except Exception:
-                    in_call_dom = False
-                state = classify_meet_state(in_call_dom, body)
-            else:
-                state = "in-call"
+            try:
+                in_call_dom = bool(sb.execute_script(in_call_js))
+            except Exception:
+                in_call_dom = False
+            state = classify_admission(platform, in_call_dom, body)
             verdict = admission.tick(state == "in-call", now)
             if verdict == "admitted":
-                emit("admitted", platform="meet" if meet else "other", assumed=not meet)
+                emit("admitted", platform=platform, assumed=False)
             elif verdict == "timeout":
                 emit("admission_timeout", seconds=int(now - started), limit=admission.timeout_s)
                 break
