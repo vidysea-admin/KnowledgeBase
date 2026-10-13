@@ -1,6 +1,6 @@
 # Manifest: iss-failedjobstatus-001-router-test-load-timeout
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 **Lane:** actflake (branch lane/actflake, base 16d20ec9)
 **Issue:** ISS-FAILEDJOBSTATUS-001 (medium, test-stability)
