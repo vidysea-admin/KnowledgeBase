@@ -176,7 +176,7 @@ test("writeScheduledJob: a DIFFERENT sessionId at the same jobKey (a genuine col
 async function withNativeRunner(body: (fixture: any) => Promise<void>) {
   const {startTestServer} = await import(new URL("../../../../../apps/api/src/testUtils.ts", import.meta.url).href);
   const {buildTestDeps, fakeKeyStore} = await import(new URL("../../../../../apps/api/src/fixtures.ts", import.meta.url).href);
-  const {createGwsCalendarReadDeps, listUpcomingGwsMeetings} = await import(new URL("../../../../../apps/api/src/gws-calendar.ts", import.meta.url).href);
+  const {createGwsCalendarReadDeps, listUpcomingGwsMeetings} = await import(new URL("../../../../../apps/api/src/gws/gws-calendar.ts", import.meta.url).href);
   const {runPipelineTick} = await import(new URL("../../../../../scripts/webinar/run-pipeline.mjs", import.meta.url).href);
   const root = mkdtempSync(path.join(tmpdir(), "lkb-native-runner-")), stateDir = path.join(root, "data/webinar-release");
   mkdirSync(stateDir, {recursive: true}); writeFileSync(path.join(root, "proof.webm"), "fixture media only");

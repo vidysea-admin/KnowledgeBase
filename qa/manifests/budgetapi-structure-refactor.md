@@ -1,7 +1,7 @@
 # budgetapi-structure-refactor
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: roadmap/CI blocker (ISS-CIFIX-001, lint:structure). Class: pure refactor, no behaviour change, no data write / auth / tenancy logic touched. Umesh chose refactor over raising budgets.
 Lane: lane/budgetapi (from 364cb094).
 
@@ -18,3 +18,8 @@ Lane: lane/budgetapi (from 364cb094).
 - FULL apps/api suite (D2_FIXTURE_PYTHON = main .venv python): before (main tree HEAD) tests 784 / pass 783 / fail 1; after tests 784 / pass 783 / fail 1. The one failure is identical in both: activity-health/router.test.ts "actual producer -> Python first/reclaim/fences -> real production Mongo binding..." ("upload queue operation timeout", pre-existing, environment).
 - Touched script importers: calendar-optout-id-space.test.ts 5/5, calendar-attendance.test.mjs 33/33, source-discovery.test.mjs 10/10.
 - No test expectations changed (renames + import specifier edits only).
+
+## Cycle 1 (fix of ISS-BUDGETAPI-001 and -002)
+- ISS-BUDGETAPI-001: `packages/meeting-bot/src/calendar/state/schedule-state.test.ts:179` now imports `apps/api/src/gws/gws-calendar.ts`. Whole-repo re-grep (packages, scripts, workers, Python, docs, config) for every moved file found no other stale import or path string (remaining hits are comments/history). schedule-state.test.ts 18/18.
+- ISS-BUDGETAPI-002: new test in `source-exclusion.test.ts` (foreign tenant + bad timing, foreign session + bad timing, foreign tenant + negative tStart): whole request refused. Order-swap mutant (assertInScope after rowProblem) FAILS it (11 tests, 10 pass, 1 fail); restored, hash == HEAD, test 11/11.
+- tsc clean. Full apps/api: 785 tests, 784 pass, 1 fail (same pre-existing activity-health router failure).
