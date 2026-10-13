@@ -10,7 +10,7 @@
 import { randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import { spawn } from "node:child_process";
 import path from "node:path";
-import type { BotEvent } from "./obs-windows.js";
+import type { BotEvent } from "./obs/obs-windows.js";
 
 export interface GapWindow {
   start: number; // epoch seconds, as sb_join.py's time.time() emits

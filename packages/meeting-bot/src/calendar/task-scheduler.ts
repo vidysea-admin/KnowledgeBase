@@ -9,7 +9,7 @@
  * poller is a separate, later unit per docs/plan.md).
  *
  * Real-by-default-but-fakeable, same pattern as every other adapter in this codebase
- * (`joiners/*.ts`, `capture/obs-windows.ts`'s injectable clients): `createWindowsTaskScheduler`'s
+ * (`joiners/*.ts`, `capture/obs/obs-windows.ts`'s injectable clients): `createWindowsTaskScheduler`'s
  * `execFileFn` defaults to a real `child_process.execFile` call to `schtasks.exe`, but tests
  * inject a fake and never invoke the real binary.
  *

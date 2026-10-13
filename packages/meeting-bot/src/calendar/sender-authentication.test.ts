@@ -11,7 +11,7 @@ import { assessSender } from "@lkb/core";
 import type { AutoRecordCandidateInput } from "@lkb/core";
 import { selectAutoRecordItems } from "./auto-join.js";
 import { loadTrustedSenderConfig } from "./auto-record-policy.js";
-import { parseStrictEmail } from "./join-rules.js";
+import { parseStrictEmail } from "./join-rules/join-rules.js";
 import { reconcileWebinarSources } from "./calendar-client.js";
 
 const cfg = loadTrustedSenderConfig({} as NodeJS.ProcessEnv); // the 4 default entries ISS-322 names

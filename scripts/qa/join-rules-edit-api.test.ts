@@ -15,8 +15,8 @@ import path from "node:path";
 import { startTestServer } from "../../apps/api/src/testUtils.js";
 import { buildTestDeps, fakeKeyStore } from "../../apps/api/src/fixtures.js";
 import type { JoinRulesDeps } from "../../apps/api/src/join-rules/deps.js";
-import { loadJoinRules, saveJoinRules, loadJoinRulesWithValidator, saveJoinRulesIf, joinRulesValidator, recordTenantApproval, recordTenantOptOut, joinRulesFilePath } from "../../packages/meeting-bot/src/calendar/join-rules-store.js";
-import { validateJoinRuleSet } from "../../packages/meeting-bot/src/calendar/join-rules.js";
+import { loadJoinRules, saveJoinRules, loadJoinRulesWithValidator, saveJoinRulesIf, joinRulesValidator, recordTenantApproval, recordTenantOptOut, joinRulesFilePath } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules-store.js";
+import { validateJoinRuleSet } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules.js";
 import { createJoinRulesDeps } from "../webinar/join-rules-host.js";
 
 const KEYS: Record<string, { tenantId: string; scopes: string[] }> = {

@@ -11,10 +11,10 @@ const {selectAutoRecordItems} = await import('../../packages/meeting-bot/src/cal
 const {loadWebinarSourcesWithHealth} = await import('../../packages/meeting-bot/src/calendar/schedule-tick.ts');
 const {validateIndexProof} = await import('../../packages/meeting-bot/src/capture/record-commands.ts');
 const {loadTrustedSenderConfig, activeWebinarStopReason, runWebinarRegistrations, reconcileWebinarRegistrationState, projectWebinarSelection} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
-const {createOperationNotifications} = await import('../../packages/meeting-bot/src/capture/telegram-channel.ts');
-const {readWebinarOperationState, writeWebinarOperationState, prepareWebinarSourceState, webinarCompletionState, validateWebinarRegistration, confirmWebinarRegistration} = await import('../../packages/meeting-bot/src/calendar/schedule-state.ts');
+const {createOperationNotifications} = await import('../../packages/meeting-bot/src/capture/notify/telegram-channel.ts');
+const {readWebinarOperationState, writeWebinarOperationState, prepareWebinarSourceState, webinarCompletionState, validateWebinarRegistration, confirmWebinarRegistration} = await import('../../packages/meeting-bot/src/calendar/state/schedule-state.ts');
 const {createPipelineDeps, safeText} = await import('./run-pipeline-deps.mjs');
-const {SKIP_REASON_MEANING} = await import('../../packages/meeting-bot/src/calendar/skip-describe.ts');
+const {SKIP_REASON_MEANING} = await import('../../packages/meeting-bot/src/calendar/state/skip-describe.ts');
 // Operation reasons that are not skip reasons; every skip reason is derived from the total SKIP_REASON_MEANING record, so a new one is covered automatically.
 const OPERATION_ONLY_REASONS = ['retry-limit', 'interrupted-no-recording-artifact', 'missed-while-processing', 'missed-coverage', 'controller-disconnected',
   'coverage-review', 'source-discontinuity', 'unproven-calendar-history', 'rejected', 'rescheduled', 'rescheduled-completed', 'recurring-series',

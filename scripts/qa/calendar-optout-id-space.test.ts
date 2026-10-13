@@ -18,7 +18,7 @@ import { buildTestDeps, fakeKeyStore } from "../../apps/api/src/fixtures.js";
 import { createGwsCalendarReadDeps, listUpcomingGwsMeetings } from "../../apps/api/src/gws-calendar.js";
 import { createJoinRulesDeps } from "../webinar/join-rules-host.js";
 import { selectAutoRecordItems } from "../../packages/meeting-bot/src/calendar/auto-join.js";
-import { applyJoinRules } from "../../packages/meeting-bot/src/calendar/join-rules-select.js";
+import { applyJoinRules } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules-select.js";
 
 const require = createRequire(import.meta.url);
 const ts = require("typescript") as typeof import("typescript");

@@ -7,7 +7,7 @@ register();
 const {createHttpCalendarLoader, createHttpCandidateLoader} = await import('../../packages/meeting-bot/src/calendar/schedule-tick.ts');
 const {redactJoinLink} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
 const {launchControlledRecording} = await import('../../packages/meeting-bot/src/capture/reconnect-gaps.ts');
-const {createTelegramChannel} = await import('../../packages/meeting-bot/src/capture/telegram-channel.ts');
+const {createTelegramChannel} = await import('../../packages/meeting-bot/src/capture/notify/telegram-channel.ts');
 const {createBrowserRegistrationExecutor} = await import('../../packages/meeting-bot/src/joiners/browser-joiner.ts');
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export function safeText(text) {

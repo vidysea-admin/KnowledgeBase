@@ -11,8 +11,8 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { JoinRulesDeps } from "../../apps/api/src/join-rules/deps.js";
-import { loadJoinRules, saveJoinRules, loadJoinRulesWithValidator, saveJoinRulesIf, recordTenantApproval, recordTenantOptOut, recordTenantUnOptOut } from "../../packages/meeting-bot/src/calendar/join-rules-store.js";
-import { validateJoinRuleSet } from "../../packages/meeting-bot/src/calendar/join-rules.js";
+import { loadJoinRules, saveJoinRules, loadJoinRulesWithValidator, saveJoinRulesIf, recordTenantApproval, recordTenantOptOut, recordTenantUnOptOut } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules-store.js";
+import { validateJoinRuleSet } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules.js";
 
 export const HOST_PID_FILE = "join-rules-host.pid";
 

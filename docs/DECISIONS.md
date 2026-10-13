@@ -2131,3 +2131,11 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** Alert ids stay an unsalted hash; ISS-ALERTID-002 closed as accepted-risk.
 **Approved-by:** Umesh
 **Links:** ISS-ALERTID-002
+
+## D-153 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** /ask with invalid source rows: Umesh chose (2026-10-13) to exclude invalid turns per-turn (e.g. tEnd<tStart legacy rows), record them in a warning, and answer from the remaining sessions; an excluded turn is never cited; if all rows are invalid the request is refused; foreign-tenant/foreign-session rows still refuse the whole request. New invalid timing is refused at write time.
+**Why:** A few bad legacy turns should not take down /ask (503) for every session, but cross-tenant rows remain a hard refusal and bad data must not be cited or newly written.
+**Result:** /ask answers from valid turns with a warning listing excluded ones; all-invalid or foreign rows refuse; new invalid timing is rejected at write.
+**Approved-by:** Umesh
+**Links:** T-043; lane badturns

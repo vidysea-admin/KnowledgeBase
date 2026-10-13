@@ -12,8 +12,8 @@ import os from "node:os";
 import path from "node:path";
 import { startTestServer } from "../../apps/api/src/testUtils.js";
 import { buildTestDeps, fakeKeyStore } from "../../apps/api/src/fixtures.js";
-import { joinRulesFilePath, loadJoinRules } from "../../packages/meeting-bot/src/calendar/join-rules-store.js";
-import { applyJoinRules } from "../../packages/meeting-bot/src/calendar/join-rules-select.js";
+import { joinRulesFilePath, loadJoinRules } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules-store.js";
+import { applyJoinRules } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules-select.js";
 import { acquireHostLock, BOOT_JITTER_MS, createJoinRulesDeps, currentBootTimeMs, HOST_PID_FILE, prepareStateDir, resolveStateDir } from "./join-rules-host.js";
 
 const KEYS: Record<string, { tenantId: string; scopes: string[] }> = {

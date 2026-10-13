@@ -12,8 +12,8 @@ import { fileURLToPath } from "node:url";
 
 import { applyLeanVideoToObs, leanRestorePath, restoreLeanVideoInObs } from "./lean-video-obs.js";
 import { runFinalize, runRecord } from "./capture/record-commands.js";
-import { createObsBrowserDeps, type ObsClientLike, type ObsBrowserConfig } from "./capture/obs-windows.js";
-import type { TelegramNotifier } from "./capture/telegram-alerts.js";
+import { createObsBrowserDeps, type ObsClientLike, type ObsBrowserConfig } from "./capture/obs/obs-windows.js";
+import type { TelegramNotifier } from "./capture/notify/telegram-alerts.js";
 
 const FIXTURE = join(dirname(fileURLToPath(import.meta.url)), "capture", "fake-join-fixture.mjs");
 type Call = { name: string; args?: any };

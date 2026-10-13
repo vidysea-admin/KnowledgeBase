@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { todayAt } from "./capture/record-commands.js";
-import { readWebinarOperationState } from "./calendar/schedule-state.js";
+import { readWebinarOperationState } from "./calendar/state/schedule-state.js";
 import { hostOnly, readLiveJobs, REFUSAL_MESSAGES, runSendNow, type SendNowDeps } from "./send-now-command.js";
 import type { SendNowJob, SendNowRefusal } from "./send-now.js";
 

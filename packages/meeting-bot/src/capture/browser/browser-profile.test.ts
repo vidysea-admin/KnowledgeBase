@@ -8,7 +8,7 @@ import { createRequire, syncBuiltinESMExports } from "node:module";
 import { EventEmitter } from "node:events";
 import { browserProfileArgs, selectedBrowserProfile } from "./browser-profile.js";
 import { createTabBrowserDeps } from "../tab-browser.js";
-import { createObsBrowserDeps } from "../obs-windows.js";
+import { createObsBrowserDeps } from "../obs/obs-windows.js";
 
 test("explicit existing profile boundary and CLI/environment precedence", () => {
   const root = mkdtempSync(path.join(tmpdir(), "lkb-profile-"));

@@ -1,5 +1,5 @@
 /**
- * packages/meeting-bot/src/calendar/join-rules-store-lock-guards.test.ts — unit `t037-join-rules-stale-lock-takeover`, fix cycle 1.
+ * packages/meeting-bot/src/calendar/join-rules-lock/join-rules-store-lock-guards.test.ts — unit `t037-join-rules-stale-lock-takeover`, fix cycle 1.
  * One named test per guard of the claim-then-rename takeover (each is the kill for a mutation recorded in the manifest). Real files in a temp
  * dir, injected clock / probe / host; the protocol is driven step by step through the generators where a step must be interrupted.
  */
@@ -9,8 +9,8 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, readdirSyn
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { acquireSteps, releaseSteps, realFs, LockFailure, type Ctx, type LockFs } from "../join-rules-store-lock-steps.js";
-import { acquireLock, releaseLock } from "../join-rules-store-lock.js";
+import { acquireSteps, releaseSteps, realFs, LockFailure, type Ctx, type LockFs } from "../join-rules/join-rules-store-lock-steps.js";
+import { acquireLock, releaseLock } from "../join-rules/join-rules-store-lock.js";
 
 const HOST = "h1", DEAD = 424242, NOW = 1_760_000_000_000;
 const iso = (t: number) => new Date(t).toISOString();
@@ -133,7 +133,7 @@ test("ISS-LOCKTAKE-003 (release gap): releasing a lock that is not ours reads it
 test("no hard link anywhere: the takeover works on a volume without link support because it never calls link (ISS-LOCKTAKE-004: nothing shares the dead lock's inode)", () => {
   const here = path.dirname(fileURLToPath(import.meta.url));
   for (const f of ["join-rules-store-lock.ts", "join-rules-store-lock-steps.ts", "join-rules-store.ts"])
-    assert.ok(!/(?<![A-Za-z])linkSync|\bfs\.link\b|\.link\(/.test(readFileSync(path.join(here, "..", f), "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "")), `${f} must not call link`);
+    assert.ok(!/(?<![A-Za-z])linkSync|\bfs\.link\b|\.link\(/.test(readFileSync(path.join(here, "..", "join-rules", f), "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "")), `${f} must not call link`);
 });
 
 test("takeover through the public API reports the dead holder (pid, age) once and the lock then belongs to us", () => withDir((dir, lock) => {

@@ -9,7 +9,7 @@ import test from "node:test";
 import type { SkippedItem } from "@lkb/core";
 import type { CalendarEvent } from "./calendar/calendar-client.js";
 import { runScheduleTickOnce } from "./calendar/schedule-tick.js";
-import { SkippedStateCorrupt, readSkippedRecords, recordSkipped, skippedStateFilePath } from "./calendar/skipped-state.js";
+import { SkippedStateCorrupt, readSkippedRecords, recordSkipped, skippedStateFilePath } from "./calendar/state/skipped-state.js";
 
 const NOW = "2026-10-10T10:00:00.000Z";
 const DAY = 86_400_000;

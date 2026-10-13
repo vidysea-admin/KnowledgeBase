@@ -11,7 +11,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 import type { AutoRecordCandidateInput } from "./auto-join.js";
-import { readScheduledKeys, readScheduledJob, writeScheduledJob } from "./schedule-state.js";
+import { readScheduledKeys, readScheduledJob, writeScheduledJob } from "./state/schedule-state.js";
 import { createHttpCandidateLoader, runScheduleTickOnce, type ScheduleTickDeps } from "./schedule-tick.js";
 const TEN = "ten-t";
 import { JOB_KEY_RE, deriveJobKey, type TaskScheduler, type ScheduleOnceOptions } from "./task-scheduler.js";

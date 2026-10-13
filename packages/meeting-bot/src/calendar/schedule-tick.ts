@@ -8,12 +8,12 @@ import {
   selectAutoRecordItems, loadTrustedSenderConfig, redactJoinLink,
   type AutoRecordCandidateInput, type AutoRecordItem,
 } from "./auto-join.js";
-import { describeSkip } from "./skip-describe.js";
-import { requireStateTenant } from "./state-tenant-tag.js";
-import { recordSkipped } from "./skipped-state.js";
+import { describeSkip } from "./state/skip-describe.js";
+import { requireStateTenant } from "./state/state-tenant-tag.js";
+import { recordSkipped } from "./state/skipped-state.js";
 import { createKeyTenantLoader } from "./join-rules-wiring/key-tenant.js";
-import { enforceJoinRules, parseJoinRulesEnforce, type JoinRulesEnforceIo } from "./join-rules-enforce.js";
-import { loadScheduledKeysForTick, recordScheduled, writeScheduledJob, validateWebinarCalendarAcquisition, type WebinarCalendarAcquisition } from "./schedule-state.js";
+import { enforceJoinRules, parseJoinRulesEnforce, type JoinRulesEnforceIo } from "./join-rules/join-rules-enforce.js";
+import { loadScheduledKeysForTick, recordScheduled, writeScheduledJob, validateWebinarCalendarAcquisition, type WebinarCalendarAcquisition } from "./state/schedule-state.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));

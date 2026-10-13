@@ -8,10 +8,12 @@
 import type { Turns, CitedItem, QaEntry } from "@lkb/core";
 import { runtimeArray, runtimeDigest, runtimeEvidenceOrigin, runtimeVerdicts, verdictPasses, type RuntimeComplete, type RuntimeSpan, type RuntimeVerdict } from "../grounded.js";
 import { resolveEvidence, extractiveText } from "./evidence.js";
-import { judgeCandidates, type JudgeContext } from "./judge.js";
+import { judgeCandidates, type JudgeCandidate, type JudgeContext } from "./judge.js";
 
 export interface DroppedNote { what: "insight" | "decision" | "action" | "qa" | "qa-answer" | "claim" | "unknown"; reason: string; excerpt: string }
 const jopts = (judged: boolean, extra: { allowQuestion?: boolean } = {}) => ({ ...extra, ...(judged ? { judged: true } : {}) });
+/** D-151 (pending append): lexical negation problems found in judged mode, keyed by the built note object; settled together with the judge verdict. */
+export const lexicalHits = new WeakMap<object, string>();
 const KINDS = new Set(["insight", "decision", "action"]);
 const rec = (v: unknown): Record<string, unknown> | undefined => (typeof v === "object" && v !== null && !Array.isArray(v) ? (v as Record<string, unknown>) : undefined);
 const excerpt = (v: unknown) => (typeof v === "string" ? v.slice(0, 120) : "");
@@ -29,7 +31,9 @@ export function tryItem(raw: unknown, turns: Turns[], spans: RuntimeSpan[] | und
   const text = extractiveText(r.text, ev);
   if (text === undefined) return drop("display text is not the verified quotes");
   const kind = r.kind as CitedItem["kind"];
-  return { id: runtimeDigest([kind, ev.evidence]), kind, text, origin, verification: "unverified", evidence: ev.evidence };
+  const item: CitedItem = { id: runtimeDigest([kind, ev.evidence]), kind, text, origin, verification: "unverified", evidence: ev.evidence };
+  if (ev.lexical) lexicalHits.set(item, ev.lexical);
+  return item;
 }
 
 /** Build one Q&A entry. A bad question drops it; a bad or incoherent answer leaves it unanswered. */
@@ -38,6 +42,7 @@ export function tryQA(raw: unknown, turns: Turns[], questionSpans: RuntimeSpan[]
   if (!r) return drop("qa", "not an object");
   const q = resolveEvidence(r.questionEvidence, turns, questionSpans, jopts(judged, { allowQuestion: true }));
   if (!q.ok) return drop("qa", `question: ${q.reason}`);
+  if (q.lexical) return drop("qa", `question: rules: ${q.lexical}`); // D-151: the lexical rules also gate a question when a judge is injected
   const question = extractiveText(r.question, q);
   if (question === undefined) return drop("qa", "question text is not the verified quotes");
   const base = { id: runtimeDigest(["question", q.evidence]), question, questionEvidence: q.evidence };
@@ -48,7 +53,9 @@ export function tryQA(raw: unknown, turns: Turns[], questionSpans: RuntimeSpan[]
   }
   const a = resolveEvidence(r.answerEvidence, turns, answerSpans, jopts(judged)), answer = a.ok ? extractiveText(r.answer, a) : undefined;
   if (!a.ok || answer === undefined) { drop("qa-answer", a.ok ? "answer text is not the verified quotes" : `answer: ${a.reason}`); return unanswered(); }
-  return { ...base, answer, answerEvidence: a.evidence, status: "answered" };
+  const entry: QaEntry = { ...base, answer, answerEvidence: a.evidence, status: "answered" };
+  if (a.lexical) lexicalHits.set(entry, a.lexical);
+  return entry;
 }
 
 export const unansweredCopy = (q: QaEntry): QaEntry => ({ id: q.id, question: q.question, questionEvidence: q.questionEvidence, answer: null, answerEvidence: [], status: "unanswered" });
@@ -70,11 +77,26 @@ async function applyNoteJudge(jc: JudgeContext, turns: Turns[], items: CitedItem
     ...items.map((i) => ({ id: i.id, kind: i.kind, note: i.text, evidence: i.evidence })),
     ...answered.map((q) => ({ id: q.id, kind: "qa-answer", note: q.answer ?? "", evidence: q.answerEvidence })),
   ]);
-  const why = (id: string) => jc.sidecar.entries.filter((e) => e.id === id).map((e) => `${e.verdict}: ${e.reason}`).at(-1) ?? "not same";
   return {
-    items: items.filter((i) => keep.has(i.id) || (log.push({ what: i.kind, reason: `note judge ${why(i.id)}`, excerpt: i.text.slice(0, 120) }), false)),
-    qa: qa.map((q) => (q.status === "answered" && !keep.has(q.id) ? (log.push({ what: "qa-answer", reason: `note judge ${why(q.id)}`, excerpt: q.question.slice(0, 120) }), unansweredCopy(q)) : q)),
+    items: items.filter((i) => { const r = settleDrop(jc, keep, i.id, i.kind, i.text, i.evidence, i); return r === undefined || (log.push({ what: i.kind, reason: r, excerpt: i.text.slice(0, 120) }), false); }),
+    qa: qa.map((q) => { const r = q.status === "answered" ? settleDrop(jc, keep, q.id, "qa-answer", q.answer ?? "", q.answerEvidence, q) : undefined; return r === undefined ? q : (log.push({ what: "qa-answer", reason: r, excerpt: q.question.slice(0, 120) }), unansweredCopy(q)); }),
   };
+}
+
+/**
+ * D-151 (pending append): a note ships only if the judge said "same" AND the lexical rules found nothing. Returns the drop reason (undefined = ships) and
+ * records in the sidecar which layer dropped it: "judge", "rules" or "both". The default (no judge) path never reaches this.
+ */
+export function settleDrop(jc: JudgeContext, keep: Set<string>, id: string, kind: string, note: string, evidence: JudgeCandidate["evidence"], obj: object, judgeOnly?: string): string | undefined {
+  const rule = lexicalHits.get(obj), judgeRejected = !keep.has(id), sc = jc.sidecar;
+  if (!rule && !judgeRejected) return undefined;
+  const last = sc.entries.filter((e) => e.id === id).at(-1);
+  const why = last ? `${last.verdict}: ${last.reason}` : "not same";
+  if (!rule) { if (last) last.dropBy = "judge"; return judgeOnly ?? `note judge ${why}`; }
+  if (judgeRejected) { if (last) { last.dropBy = "both"; last.rule = rule; } return `note judge+rules ${why}; rules ${rule}`; }
+  sc.kept--; sc.rulesDropped++;
+  sc.entries.push({ id, kind, verdict: "same", reason: `judge accepted; lexical rules rejected: ${rule}`, note: note.slice(0, 200), turnIds: [...new Set(evidence.map((e) => e.turnId))], dropBy: "rules", rule });
+  return `note rules ${rule}`;
 }
 
 function applyVerdicts(verdicts: RuntimeVerdict[], items: Map<string, CitedItem>, qa: Map<string, QaEntry>, log: DroppedNote[]): { items: CitedItem[]; qa: QaEntry[] } {
@@ -97,5 +119,5 @@ export async function judgePendingCandidates(complete: RuntimeComplete, turns: T
   if (!jc) return passed;
   const answered = passed.filter((c) => c.status === "answered");
   const keep = await judgeCandidates(jc, turns, answered.map((c) => ({ id: c.id, kind: "qa-answer", note: c.answer ?? "", evidence: c.answerEvidence })));
-  return passed.filter((c) => c.status === "unanswered" || keep.has(c.id) || (log.push({ what: "qa-answer", reason: "note judge: late answer not same as its source", excerpt: c.question.slice(0, 120) }), false));
+  return passed.filter((c) => { if (c.status === "unanswered") return true; const r = settleDrop(jc, keep, c.id, "qa-answer", c.answer ?? "", c.answerEvidence, c, "note judge: late answer not same as its source"); return r === undefined || (log.push({ what: "qa-answer", reason: r, excerpt: c.question.slice(0, 120) }), false); });
 }

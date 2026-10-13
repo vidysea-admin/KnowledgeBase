@@ -24,8 +24,8 @@ import { fileURLToPath } from "node:url";
 import { resolveAlertId, type AlertCandidate } from "./calendar/alerts/alert-resolve.js";
 import { canonicalStart, renderStart, neutralizeText } from "./calendar/alerts/attention-alerts.js";
 import { detectPlatform } from "./platform.js";
-import { readSkippedRecords } from "./calendar/skipped-state.js";
-import { assertTenantTag, StateTenantRefusal } from "./calendar/state-tenant-tag.js";
+import { readSkippedRecords } from "./calendar/state/skipped-state.js";
+import { assertTenantTag, StateTenantRefusal } from "./calendar/state/state-tenant-tag.js";
 
 const USAGE = "usage: lkb alert-who <alert-id> [--tenant T] [--tz ZONE]";
 export const LIMITS = { fileBytes: 5 * 1024 * 1024, jobBytes: 64 * 1024, jobFiles: 5000, rows: 20000 } as const;
@@ -217,7 +217,7 @@ export function runAlertWho(rest: string[], deps: AlertWhoDeps): number {
 /** Real wiring for cli.ts. Dynamic imports keep this module's tests free of the OBS/browser dependency graph. */
 export async function defaultAlertWhoDeps(): Promise<AlertWhoDeps> {
   const [{ captureTenant }, { readWebinarOperationState }] = await Promise.all([
-    import("./capture/record-commands.js"), import("./calendar/schedule-state.js"),
+    import("./capture/record-commands.js"), import("./calendar/state/schedule-state.js"),
   ]);
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
   return {

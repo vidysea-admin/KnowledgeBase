@@ -1,5 +1,5 @@
 /**
- * packages/meeting-bot/src/calendar/join-rules-store-lock-explore.test.ts — unit `t037-join-rules-stale-lock-takeover`, fix cycle 1.
+ * packages/meeting-bot/src/calendar/join-rules-lock/join-rules-store-lock-explore.test.ts — unit `t037-join-rules-stale-lock-takeover`, fix cycle 1.
  * Interleaving explorer: several actors run the REAL acquire / takeover / release generators (join-rules-store-lock-steps.ts), one yield at a
  * time, over an in-memory file system (exhaustive + seeded) or a real temp directory (directed plan + seeded subset). Injected clock and probe.
  * Invariants after EVERY step: at most one believer; a believer's token is in the lock file; the lock file exists from the start until the last
@@ -11,7 +11,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { acquireSteps, releaseSteps, realFs, parseHolder, type LockFs, type Ctx } from "../join-rules-store-lock-steps.js";
+import { acquireSteps, releaseSteps, realFs, parseHolder, type LockFs, type Ctx } from "../join-rules/join-rules-store-lock-steps.js";
 
 const HOST = "h1", DEAD_PID = 424242, T0 = 1_760_000_000_000, STALE = 30000;
 interface Backend { fs: LockFs; peek(p: string): string | null; list(): string[]; reset(seed: Record<string, string>): void }

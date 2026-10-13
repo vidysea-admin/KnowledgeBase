@@ -17,7 +17,7 @@ import type { AutoRecordCandidateInput } from "./calendar/auto-join.js";
 import { alertIdFor, buildAttentionAlerts } from "./calendar/alerts/attention-alerts.js";
 import { webinarSessionKey } from "./calendar/auto-record-policy.js";
 import type { CalendarEvent } from "./calendar/calendar-client.js";
-import { prepareWebinarSourceState, readWebinarOperationState, writeWebinarOperationState, type WebinarCalendarAcquisition } from "./calendar/schedule-state.js";
+import { prepareWebinarSourceState, readWebinarOperationState, writeWebinarOperationState, type WebinarCalendarAcquisition } from "./calendar/state/schedule-state.js";
 import { runScheduleTickOnce } from "./calendar/schedule-tick.js";
 import { runAlertWho, type AlertWhoDeps } from "./alert-who-command.js";
 
