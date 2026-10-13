@@ -1,6 +1,6 @@
 # iss-t037ui-002-sender-approval-nonascii
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Status: ready-for-check
 Fix cycle: 0
 Tier: 4 (open medium ledger issue ISS-T037UI-002). Lane: lane/webhigh (base 613028be). Class: data write (approval POST value). No lane ledger file needed (no new issues filed).
