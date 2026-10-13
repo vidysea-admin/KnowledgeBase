@@ -1,6 +1,6 @@
 # capadmit
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: 2 (open high issue ISS-CAPTUREFIX-001, T-035). Class: capture integrity. Full ceremony. Verdict by the checker only.
 Lane: lane/capadmit (from 42abecde). Ledger row status NOT changed here.
