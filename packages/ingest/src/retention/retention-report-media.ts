@@ -39,6 +39,19 @@ const ev = (state: MediaState, relPath?: string, sizeBytes: number | null = null
   state, sizeBytes, mtimeMs, ...(relPath !== undefined ? { relPath } : {}), ...(keys ? { keys } : {}),
 });
 const escapes = (back: string): boolean => back === "" || back === ".." || back.startsWith(`..${sep}`) || isAbsolute(back);
+/**
+ * Lexical escape test that does not depend on the platform's separator: BOTH `/` and `\` split segments, so a stored
+ * Windows-style `..\..\x` is refused on Linux too (where `\` is an ordinary filename character and the path would
+ * otherwise resolve inside the root and report "not found"). An outside-root path is refused whether or not a file exists.
+ */
+export function climbsOut(rel: string): boolean {
+  let depth = 0;
+  for (const seg of rel.split(/[\\/]/)) {
+    if (seg === "" || seg === ".") continue;
+    if (seg === "..") { depth -= 1; if (depth < 0) return true; } else depth += 1;
+  }
+  return depth <= 0;
+}
 const code = (e: unknown): string | undefined => (e as NodeJS.ErrnoException).code;
 const BLOCK = 4096;
 
@@ -78,6 +91,7 @@ export function probeMedia(mediaRoot: string | undefined, rel: string | undefine
   if (!mediaRoot) return ev("no-root");
   if (!rel) return ev("not-found");
   if (rel.includes("\0") || isAbsolute(rel) || /^[a-z]:/i.test(rel) || rel.startsWith("\\\\")) return ev("outside-root");
+  if (climbsOut(rel)) return ev("outside-root");
   const full = resolve(mediaRoot, rel);
   const back = relative(resolve(mediaRoot), full);
   if (escapes(back)) return ev("outside-root");

@@ -5,7 +5,7 @@ import { tmpdir, userInfo } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import { REAL_IO, type MediaIo } from "../retention-report-media.js";
-import { DAY, NOW, baseArgs, iso, runCmd, snapshot, tempRoot, writeSession } from "../retention-report.fixtures.js";
+import { DAY, NOW, baseArgs, fsCaseInsensitive, iso, runCmd, snapshot, tempRoot, writeSession } from "../retention-report.fixtures.js";
 import { block, guardOf, line, runIo, verdict } from "./helpers.js";
 
 function withRoots(fn: (root: string, media: string, scratch: string) => void): void {
@@ -86,9 +86,18 @@ test("pipeline operation rows: every non-terminal or unknown status keeps; only 
   writeSession(root, media, { name: "by-src", ...old, mediaPath: "m/by-src.webm" });
   writeSession(root, media, { name: "by-art", ...old, mediaPath: "m/by-art.webm" });
   writeSession(root, media, { name: "free", ...old, mediaPath: "m/free.webm" });
-  const file = opsFile(scratch, { "BY-SRC-SRC": { status: "recording" }, other: { status: "processing", artifact: join(media, "M", ".", "BY-ART.WEBM") }, bad: "not-an-object" });
+  // The artifact is spelled with a "." segment; on a case-insensitive filesystem also in another case (the same file there).
+  // On a case-sensitive one a different-case spelling names ANOTHER file and must not veto it: "case-only" is the probe.
+  const ci = fsCaseInsensitive();
+  writeSession(root, media, { name: "case-only", ...old, mediaPath: "m/case-only.webm" });
+  const file = opsFile(scratch, {
+    "BY-SRC-SRC": { status: "recording" },
+    other: { status: "processing", artifact: ci ? join(media, "M", ".", "BY-ART.WEBM") : join(media, "m", ".", "by-art.webm") },
+    other2: { status: "processing", artifact: join(media, "M", ".", "CASE-ONLY.WEBM") },
+    bad: "not-an-object",
+  });
   const r2 = runCmd(args(root, media, file));
-  assert.deepEqual(["by-src", "by-art", "free"].map((x) => verdict(r2.out, x)), ["KEEP", "KEEP", "ELIGIBLE"]);
+  assert.deepEqual(["by-src", "by-art", "free", "case-only"].map((x) => verdict(r2.out, x)), ["KEEP", "KEEP", "ELIGIBLE", ci ? "KEEP" : "ELIGIBLE"], `case-insensitive=${ci}`);
   assert.equal(guardOf(r2.out, "by-src"), "operation-in-progress");
   assert.equal(guardOf(r2.out, "by-art"), "operation-in-progress");
 }));
