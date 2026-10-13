@@ -1,6 +1,6 @@
 # badturns-turn-timing-write-refusal
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: 3 (roadmap/live-run finding, T-043). Class: data writes (turn writers): FULL ceremony. Lane: lane/badturns. No ledger issue is being fixed; no reproduction corpus in qa/issues*.jsonl.
 
