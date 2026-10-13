@@ -27,6 +27,7 @@
 import { Router, type Request, type Response } from "express";
 import { requireScope } from "../auth.js";
 import type { JoinRulesDeps, JoinRulesStoreCode } from "./deps.js";
+import { isPrintableAsciiSender, ruleEmailMatchers, SENDER_NOT_ASCII, SENDER_NOT_ASCII_MESSAGE } from "./sender-ascii.js";
 
 /** Dedicated write scope (sibling mutating routes use their own scope: gmail, sources, ingest, keys, compete). */
 export const WRITE_SCOPE = "join-rules";
@@ -34,6 +35,8 @@ export const WRITE_SCOPE = "join-rules";
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 
 class BadRequest extends Error {}
+/** 400 with the typed code `sender_not_printable_ascii` (ISS-WEBHIGH-001): a sender value outside printable ASCII; nothing is written. */
+class NonAsciiSender extends Error {}
 /** 412: carries the stored validator ("absent" or hex) so the response can tell the client the current ETag. */
 class PreconditionFailed extends Error {
   constructor(public readonly currentValidator: string) { super("precondition failed"); }
@@ -151,6 +154,7 @@ export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
         const cv = (e as { currentValidator?: unknown }).currentValidator;
         return preconditionFailed(res, typeof cv === "string" ? cv : ABSENT);
       }
+      if (e instanceof NonAsciiSender) return fail(res, 400, SENDER_NOT_ASCII, SENDER_NOT_ASCII_MESSAGE);
       if (e instanceof BadRequest) return fail(res, 400, "bad_request", e.message);
       if (e instanceof StatusError) return fail(res, e.status, e.error, e.message);
       storeFailure(res, e);
@@ -187,6 +191,7 @@ export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
       const pre = preconditionOf(req);
       if (pre === null) throw new PreconditionRequired();
       if (!isObj(input)) throw new BadRequest("body must be a JSON object");
+      if (!ruleEmailMatchers(input).every(isPrintableAsciiSender)) throw new NonAsciiSender(); // before any store read: nothing can be written
       // Read-only look FIRST (as before): a corrupt / wrong-tenant stored file refuses the request with a 5xx before any 400. It is NOT the
       // compare: the compare-and-write below is the store's atomic saveIf. It also names the current validator for an unsupported-form 412.
       const current = await deps.loadWithValidator(tenantId);
@@ -211,6 +216,7 @@ export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
       if ((body.kind !== "sender" && body.kind !== "domain") || typeof body.value !== "string" || body.value === "" || body.value.length > 320) {
         throw new BadRequest('body must be { kind: "sender" | "domain", value: <non-empty string> }');
       }
+      if (body.kind === "sender" && !isPrintableAsciiSender(body.value)) throw new NonAsciiSender();
       await deps.load(tenantId); // a bad stored file is a 5xx, so a later "invalid" can only be the value
       try { return { state: await deps.recordApproval(tenantId, { kind: body.kind, value: body.value }) }; }
       catch (e) {
