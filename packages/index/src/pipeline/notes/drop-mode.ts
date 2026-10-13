@@ -13,7 +13,7 @@ import { judgeCandidates, type JudgeCandidate, type JudgeContext } from "./judge
 export interface DroppedNote { what: "insight" | "decision" | "action" | "qa" | "qa-answer" | "claim" | "unknown"; reason: string; excerpt: string }
 const jopts = (judged: boolean, extra: { allowQuestion?: boolean } = {}) => ({ ...extra, ...(judged ? { judged: true } : {}) });
 /** D-151 (pending append): lexical negation problems found in judged mode, keyed by the built note object; settled together with the judge verdict. */
-const lexicalHits = new WeakMap<object, string>();
+export const lexicalHits = new WeakMap<object, string>();
 const KINDS = new Set(["insight", "decision", "action"]);
 const rec = (v: unknown): Record<string, unknown> | undefined => (typeof v === "object" && v !== null && !Array.isArray(v) ? (v as Record<string, unknown>) : undefined);
 const excerpt = (v: unknown) => (typeof v === "string" ? v.slice(0, 120) : "");
@@ -87,7 +87,7 @@ async function applyNoteJudge(jc: JudgeContext, turns: Turns[], items: CitedItem
  * D-151 (pending append): a note ships only if the judge said "same" AND the lexical rules found nothing. Returns the drop reason (undefined = ships) and
  * records in the sidecar which layer dropped it: "judge", "rules" or "both". The default (no judge) path never reaches this.
  */
-function settleDrop(jc: JudgeContext, keep: Set<string>, id: string, kind: string, note: string, evidence: JudgeCandidate["evidence"], obj: object, judgeOnly?: string): string | undefined {
+export function settleDrop(jc: JudgeContext, keep: Set<string>, id: string, kind: string, note: string, evidence: JudgeCandidate["evidence"], obj: object, judgeOnly?: string): string | undefined {
   const rule = lexicalHits.get(obj), judgeRejected = !keep.has(id), sc = jc.sidecar;
   if (!rule && !judgeRejected) return undefined;
   const last = sc.entries.filter((e) => e.id === id).at(-1);

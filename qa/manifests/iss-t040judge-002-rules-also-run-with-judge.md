@@ -12,7 +12,10 @@ Lane: lane/t040both. Authority: D-151 (pending append), Umesh 2026-10-13: with t
 - `judge.ts`: sidecar entry gains `dropBy: judge|rules|both`, `rule`, verdict may be "same" (rules-only drop); sidecar gains `rulesDropped`.
 - `judge-rules.test.ts` (new, 7 tests).
 
-## Not covered (outside the allowed paths)
+## Claims (added in fix pass, coordinator-authorized)
+`claims.ts` now records the lexical hit per claim and gates through the shared `settleDrop` (exported from drop-mode.ts): judge OR rules drops, sidecar `dropBy`; no-judge path unchanged. Tests: 2 claim tests in judge-rules.test.ts (9 total). Mutations C1 (hit not recorded), C2 (judge-only gate): 2/2 killed. Full packages/index suite: 628/628 pass. The gap below is CLOSED.
+
+## (closed) Not covered
 `claims.ts` calls `resolveEvidence(..., {judged:true})` and ignores `lexical`, so judged CLAIMS still skip the lexical rules. Needs a follow-up edit to claims.ts (and grounded-summary.ts passes no state, which is fine: the WeakMap travels with the entry).
 
 ## Evidence

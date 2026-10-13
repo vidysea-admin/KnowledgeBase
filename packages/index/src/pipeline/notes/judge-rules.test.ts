@@ -110,3 +110,38 @@ test("D-151: replay every recorded ISS-T040GEN-* case (incl. -012) against an AL
   console.log(lines.join("\n") + `\nTOTAL: ${laxBefore} shipped before, rules now catch ${caughtNow}`);
   assert.equal(laxBefore, 11, "the 11 recorded cases that shipped only because the judge was lax");
 });
+
+// ---------------- claims (D-151 covers notes AND claims) ----------------
+import { extractClaims } from "../claims.js";
+const claimOf = (turnId: string, quote: string) => ({ text: quote, origin: "speaker-statement", verification: "unverified", evidence: [{ turnId, sessionId: SID, quote }] });
+async function runClaim(text: string, quote: string, judge?: NoteJudge) {
+  const turns = [turn("c0", "spk:0", FEE, 0), turn("a1", "spk:1", text, 10)];
+  const r = await extractClaims(turns, model(() => ({ claims: [claimOf("c0", FEE), claimOf("a1", quote)] })), { strictWebinar: true, dropUnverified: true, ...(judge ? { noteJudge: judge } : {}) });
+  assert.equal(r.degraded, null);
+  assert.ok(r.claims.some((c) => c.text === FEE), "the faithful control ships");
+  return { r, shipped: r.claims.some((c) => c.evidenceTurnIds.includes("a1")), entry: r.judgeSidecar?.entries.find((e) => e.note.startsWith(quote.slice(0, 20))) };
+}
+
+test("D-151 claims: judge says same but the rules reject: dropped, dropBy rules; judge-only dropped; both recorded; both accept ships", async () => {
+  for (const [text, quote] of RULE_ONLY) {
+    const o = await runClaim(text, quote, judgeOf(() => "same").judge);
+    assert.equal(o.shipped, false, text); assert.equal(o.entry?.dropBy, "rules"); assert.equal(o.r.judgeSidecar!.rulesDropped, 1);
+    assert.ok(o.r.dropped!.some((d) => /^note rules /.test(d.reason)));
+  }
+  const ok = "We decided to open the intake in March.";
+  const jo = await runClaim(ok, ok, judgeOf((i) => (i.note === ok ? "different" : "same")).judge);
+  assert.equal(jo.shipped, false); assert.equal(jo.entry?.dropBy, "judge");
+  const [t, q] = RULE_ONLY[0]!;
+  const both = await runClaim(t, q, judgeOf((i) => (i.note === q ? "different" : "same")).judge);
+  assert.equal(both.shipped, false); assert.equal(both.entry?.dropBy, "both");
+  const fine = await runClaim(ok, ok, judgeOf(() => "same").judge);
+  assert.equal(fine.shipped, true); assert.deepEqual(fine.r.judgeSidecar!.entries, []);
+});
+
+test("D-151 claims: the no-judge path is unchanged", async () => {
+  for (const [text, quote] of RULE_ONLY) {
+    const o = await runClaim(text, quote);
+    assert.equal(o.shipped, false); assert.equal(o.r.judgeSidecar, undefined);
+    assert.ok(o.r.dropped!.some((d) => /quote is not a whole sentence or clause/.test(d.reason)));
+  }
+});

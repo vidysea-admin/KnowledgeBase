@@ -16,7 +16,7 @@ import type { CompleteResult, Job } from "@lkb/ai";
 import { parseJsonLoose } from "@lkb/ai";
 import { resolveEvidence, extractiveText } from "./notes/evidence.js";
 import { runtimeVerdicts, verdictPasses } from "./grounded.js";
-import type { DroppedNote } from "./notes/drop-mode.js";
+import { lexicalHits, settleDrop, type DroppedNote } from "./notes/drop-mode.js";
 import { makeJudgeContext, judgeCandidates, type JudgeContext, type JudgeSidecar, type NoteJudge } from "./notes/judge.js";
 import { runtimeChronologicalTurns, runtimeWindows, runtimeComplete, runtimeRecord, runtimeArray, assertRuntimeCoverage, runtimeInventory, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin, runtimeDigest, runtimeJudge, type RuntimeEvidence, type RuntimeOrigin } from "./grounded.js";
 
@@ -139,7 +139,8 @@ async function strictRuntimeClaims(turns: Turns[], complete: ClaimsCompleteFn, d
       accepted = proposed.filter((c) => verdictPasses(verdicts.find((v) => v.id === c.id)) || (dropped.push({ what: "claim", reason: "independent judge rejected the claim", excerpt: c.text.slice(0, 120) }), false));
       if (jc) {
         const keep = await judgeCandidates(jc, turns, accepted.map((c) => ({ id: c.id, kind: "claim", note: c.text, evidence: c.evidence })));
-        accepted = accepted.filter((c) => keep.has(c.id) || (dropped.push({ what: "claim", reason: `note judge ${jc.sidecar.entries.filter((e) => e.id === c.id).map((e) => `${e.verdict}: ${e.reason}`).at(-1) ?? "not same"}`, excerpt: c.text.slice(0, 120) }), false));
+        // D-151 (pending append): the judge AND the lexical rules both gate a claim; the sidecar records which dropped it.
+        accepted = accepted.filter((c) => { const r = settleDrop(jc, keep, c.id, "claim", c.text, c.evidence, c); return r === undefined || (dropped.push({ what: "claim", reason: r, excerpt: c.text.slice(0, 120) }), false); });
       }
     } else await runtimeJudge(complete, "claims", turns, spans, proposed);
     for (const c of accepted) result.set(c.id, { text: c.text, evidenceTurnIds: c.evidence.map((e) => e.turnId), evidence: c.evidence, origin: c.origin, verification: c.verification });
@@ -161,7 +162,9 @@ function dropUnverifiedClaims(raws: unknown[], turns: Turns[], spans: ReturnType
     if (c.origin !== origin || c.verification !== "unverified") { drop("claim source origin mismatch"); continue; }
     if (text === undefined) { drop("claim text is not the verified quotes"); continue; }
     const id = runtimeDigest(["claim", ev.evidence]);
-    out.set(id, { id, text, origin, verification: "unverified", evidence: ev.evidence });
+    const claim = { id, text, origin, verification: "unverified" as const, evidence: ev.evidence };
+    if (ev.lexical) lexicalHits.set(claim, ev.lexical);
+    out.set(id, claim);
   }
   return [...out.values()];
 }
