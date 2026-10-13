@@ -15,6 +15,7 @@ import { collectGapEvent, installCaptureControl, type GapWindow } from "./reconn
 import { createTelegramNotifier, type TelegramNotifier } from "./notify/telegram-alerts.js";
 import { finalizeRecordingWith, normalizeCapture, processRecordingArtifacts } from "./record-finalize.js";
 import { createTabBrowserDeps } from "./tab-browser.js";
+import { tabReceiverGuardFromEnv } from "./tab-receiver-guard.js";
 import { browserProfileArgs, selectedBrowserProfile } from "./browser/browser-profile.js";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, "..", "..", "..", "..");
@@ -131,6 +132,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     browserExecutable: process.env.LKB_BROWSER_EXECUTABLE,
     profileDirectory,
     autoClick: shouldAutoClick(platform), onEvent,
+    ...(tabReceiverGuardFromEnv() ? {guard: tabReceiverGuardFromEnv()} : {}), // T-034: LKB_TAB_RECEIVER_GUARD=1; absent = unchanged
   })) : undefined;
   const bot = tab ?? createObsBrowserDeps({
     obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455",
