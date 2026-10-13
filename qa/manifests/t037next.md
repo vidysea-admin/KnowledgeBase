@@ -1,7 +1,7 @@
 # t037next
 
-**Handshake status:** ready-for-check
-Status: ready-for-check
+**Handshake status:** checked-PASS
+Status: checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap T-037; the single-writer half of the scheduler switch-over, `qa/contracts/t037-join-rules-api-host.md` criterion 9).
 Security class: decides which meetings the bot records and guards the tenant join-rules document (data write) - FULL ceremony, never round-capped.
