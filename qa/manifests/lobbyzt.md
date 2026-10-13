@@ -1,7 +1,7 @@
 # lobbyzt
 
-**Handshake status:** ready-for-check
-Status: ready-for-check
+**Handshake status:** checked-PASS
+Status: checked-PASS
 Fix cycle: 0
 Issue: ISS-LOBBYWATCH-001 (high). Lane lane/lobbyzt, code commit 93b4c65c.
 
