@@ -23,6 +23,24 @@ const { createHash } = require("crypto");
 
 const JOURNAL = "source_id_migration_journal";
 const SHA256_HEX = /^[0-9a-f]{64}$/;
+// ISS-TENANTSRCID-003: collections are walked in _id-ordered pages of this many rows, never loaded whole, so memory
+// stays bounded on a large `sources` / journal. Rows are string-id only here (non-string ids are never touched).
+const BATCH_SIZE = 500;
+
+// Yields rows of `coll` matching `filter` one bounded page at a time, ordered and resumed by _id. Resuming by _id (not by
+// a live cursor) is safe while the loop deletes/inserts rows: a moved row's new _id is never the content hash, and a
+// row whose state changed is simply not re-matched by the filter or already behind the resume point.
+async function* pages(coll, filter, size) {
+  let last;
+  for (;;) {
+    const idFilter = last === undefined ? { $type: "string" } : { $type: "string", $gt: last };
+    const batch = await coll.find({ ...filter, _id: idFilter }).sort({ _id: 1 }).limit(size).toArray();
+    if (batch.length === 0) return;
+    yield* batch;
+    last = batch[batch.length - 1]._id;
+    if (batch.length < size) return;
+  }
+}
 
 // Must stay identical to tenantSourceId() in packages/ingest/src/source.ts (the migration test asserts equality).
 function tenantSourceId(tenantId, contentHash) {
@@ -48,13 +66,13 @@ async function moveSourceId(db, tenantId, fromId, toId, doc, counts) {
   await sources.replaceOne({ _id: toId, tenantId }, { ...doc, _id: toId }, { upsert: true });
 }
 
-async function migrate(db, log) {
+async function migrate(db, log, { batchSize = BATCH_SIZE } = {}) {
   const sources = db.collection("sources");
   const journal = db.collection(JOURNAL);
   const report = { migrated: 0, untenanted: [], skippedNonContentHash: 0, recovered: 0, media: 0 };
 
   // Recovery: a previous run journaled a row and died before the new row existed.
-  for (const j of await journal.find({ state: "pending" }).toArray()) {
+  for await (const j of pages(journal, { state: "pending" }, batchSize)) {
     const present = await sources.find({ _id: j.newId, tenantId: j.tenantId }).toArray();
     const counts = { media: 0 };
     if (present.length === 0) {
@@ -68,7 +86,7 @@ async function migrate(db, log) {
     await journal.updateOne({ _id: j._id }, { $set: { state: "done" } });
   }
 
-  for (const row of await sources.find({}).toArray()) {
+  for await (const row of pages(sources, {}, batchSize)) {
     if (typeof row._id !== "string" || row._id !== row.hash || !SHA256_HEX.test(row.hash)) {
       if (typeof row._id === "string" && row._id.length && !String(row._id).includes(":")) report.skippedNonContentHash += 1;
       continue;
@@ -95,12 +113,12 @@ async function migrate(db, log) {
   return report;
 }
 
-async function down(db) {
+async function down(db, { batchSize = BATCH_SIZE } = {}) {
   const sources = db.collection("sources");
   const journal = db.collection(JOURNAL);
   const counts = { media: 0 };
   let restored = 0;
-  for (const j of await journal.find({ state: "done" }).toArray()) {
+  for await (const j of pages(journal, { state: "done" }, batchSize)) {
     const current = await sources.find({ _id: j.newId, tenantId: j.tenantId }).toArray();
     if (current.length === 0) continue; // already rolled back
     await moveSourceId(db, j.tenantId, j.newId, j.oldId, current[0], counts);
@@ -113,5 +131,8 @@ async function down(db) {
 async function up(db) {
   return migrate(db, console.warn); // migrate-mongo passes (db, client): never take a second argument from it
 }
+async function downEntry(db) {
+  return down(db); // same: migrate-mongo's second argument is not options
+}
 
-module.exports = { up, down, migrate, tenantSourceId };
+module.exports = { up, down: downEntry, migrate, migrateDown: down, tenantSourceId, BATCH_SIZE };
