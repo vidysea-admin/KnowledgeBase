@@ -1,6 +1,6 @@
 # cicase: transcript-qa-report alias test portable to case-sensitive filesystems
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Lane: cicase (lane/cicase). Issue: none new; repairs CI run 38368689367 (Linux) failure of the ISS-T044W-001 test.
 
