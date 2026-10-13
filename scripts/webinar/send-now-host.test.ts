@@ -107,7 +107,9 @@ test("launch: 202 with a job id; the child got the validated URL and flags as se
 });
 
 test("launcher that dies at once -> 502 (not 202); a missing node binary -> 502", async () => {
-  await withHost(fx(), async (post) => {
+  // load-independent: the liveness window is far longer than any node cold start, and the child's exit settles the launch at once
+  // (a short window made this race the child's startup under CPU load and answer 202)
+  await withHost(fx({ livenessMs: 20_000 }), async (post) => {
     process.env.LKB_FIXTURE_EXIT = "1";
     const r = await post("a-key", { meetingUrl: MEET, until: "18:00" });
     assert.deepEqual([r.status, r.json.error, r.json.jobId], [502, "send_now_launch_failed", undefined]);

@@ -35,3 +35,4 @@ Web status polling of this endpoint; 60 s live-join measurement (needs a joined 
 - Mutation M4 (`tenantId !== tenant` -> `&& false`): KILLED by the new tenant test (pass 15 / fail 1, hash-verified, restored).
 - ISS-T039NEXT-001 reproduction: "status: live claim ... = running" 0/15 failures (was 15/15).
 - apps/api send-now tests 18/18; session-status 4/4; both tsc 0; lint-loc --all 0.
+- Timing test "launcher that dies at once" made load-independent (test-only): its host uses `livenessMs: 20_000`; the child's exit settles the launch immediately, so the test stays fast and the assertion is unchanged (dead launcher -> 502). send-now-host.test.ts 15 runs after the change: 15/15 at pass 16 / fail 0 (was red in 10/15).
