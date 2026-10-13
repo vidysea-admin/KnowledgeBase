@@ -1,6 +1,6 @@
 # iss-webhigh-001-join-rules-api-nonascii-sender
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2-equivalent (open ledger issue ISS-WEBHIGH-001, filed by the ISS-T037UI-002 checker; labelled medium there). Class: data write on the join-rules API (trust-list input) -> FULL ceremony.
 Lane: lane/webhigh2, branched from lane/webhigh 3fbc5a6e. Ledger row ISS-WEBHIGH-001 status NOT changed here (checker closes).
