@@ -18,6 +18,7 @@ import type { WatchSilenceDeps } from "../routes/health.js";
 import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, createMongoTreeStore, createMongoBrainReadDeps,
   createMongoWatchedSourceDeps, createMongoCitationsDeps, createMongoHealthDeps, createMongoGraphReadDeps, createGwsCalendarReadDeps, createMeetingCandidatesDeps, createMongoKeysDeps } from "../store.js";
 import { createMongoIngestDeps } from "../ingest-store.js";
+import { buildSourceIntakeDeps } from "../source-intake/wiring.js";
 import { createMongoSearchDeps } from "../search-store.js";
 import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
 import { createConfiguredWhatsAppOwnerResolver } from "../whatsapp/owner-config.js";
@@ -201,6 +202,8 @@ export function buildProductionDeps(): ServerDeps {
     whatsapp: createMongoWhatsAppDeps(boundIndexer, { resolveOwner: createConfiguredWhatsAppOwnerResolver(process.env.WHATSAPP_TENANT_OWNER_MAP) }),
     keys: createMongoKeysDeps(),
     ingest: createMongoIngestDeps(boundIndexer),
+    // T-045: OFF unless LKB_SOURCE_INTAKE=1 (route absent otherwise); see source-intake-wiring.ts.
+    sourceIntake: buildSourceIntakeDeps(process.env, boundIndexer),
     jobs: createMongoJobsReadDeps(),
     activityHealth: createConfiguredActivityHealthDeps(),
     watchRuns: createMongoWatchRunsDeps(),
