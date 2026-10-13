@@ -1,7 +1,7 @@
 # capadmit
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 2 (open high issue ISS-CAPTUREFIX-001, T-035). Class: capture integrity. Full ceremony. Verdict by the checker only.
 Lane: lane/capadmit (from 42abecde). Ledger row status NOT changed here.
 
@@ -33,3 +33,9 @@ Mutation (untracked harness in the worktree, per-mutation byte backup restored i
 - The OBS backend has no per-capture status file; its Joined notice is gated, its recording state is OBS's own.
 - The tab recorder still records the lobby silence from join; starting capture only after admission is a larger change.
 - T-029 reconnect-reload can still fire in the lobby.
+
+## Fix cycle 1 (ISS-CAPADMIT-001) -- test-only; production code untouched
+Cause: the fake bot emitted `admitted` after a fixed 1500 ms sleep and the run ended on a wall-clock `--until` (9-10 s) computed before join; sampling depended on controller poll timing, and slow startup under suite load consumed `--until` (the ~10.3 s failures).
+Fix (admission-status.test.ts only): the fake holds at the lobby behind a `release` file that the wait hook writes only after it has SEEN status "starting"; it quits only on a `quit` file the hook writes after seeing "recording" (admitted) or 25 "starting" samples (lobby). `--until` is now 120 s so it can never end the run. All assertions kept.
+Evidence: solo x20: pass 4 fail 0 in 20/20 runs. Full meeting-bot suite x2 (`node --test --import tsx "src/**/*.test.ts" "py/tab-capture/*.test.mjs"`): 867 tests, pass 863 fail 2 both runs; the 2 = known Windows failures (symlink EPERM "owned status retains...", "interrupted recovery binds..."). tsc --noEmit clean. lint-loc --all: all stages OK after `node scripts/snapshot.mjs` regenerated docs/SNAPSHOT.md.
+Mutant M4 (admitted no longer promotes; hash-verified applied 2f2cce57, restored to HEAD blob 020b3a0c): admitted test fails (times out at 60 s, "recording" never observed): KILLED. M1-M3 unchanged by this cycle.
