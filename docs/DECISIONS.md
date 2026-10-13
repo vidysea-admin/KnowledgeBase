@@ -2196,3 +2196,11 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** Tile capture is built behind a default-off flag; tile-derived names are SUGGESTED only until a human confirms.
 **Approved-by:** Umesh
 **Links:** T-042; D-141; ISS-T042FUSION-001
+
+## D-161 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-050: Umesh chose (2026-10-13) to use the real LangGraph library (official @langchain/langgraph, JS 1.x, exact pinned version) for the pipeline graph, replacing the minimal typed executor; behaviour, tests and the LKB_PIPELINE_GRAPH flag stay the same. The /ask graph (D-142) follows in a later unit.
+**Why:** The Approver prefers the official library over a hand-rolled executor, with identical behaviour, tests and flag so the swap is a pure replacement.
+**Result:** The pipeline graph moves to @langchain/langgraph (JS 1.x, exact pinned); the /ask graph follows in a later unit.
+**Approved-by:** Umesh
+**Links:** T-050; D-142
