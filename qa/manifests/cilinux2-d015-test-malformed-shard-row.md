@@ -1,6 +1,6 @@
 # cilinux2-d015-test-malformed-shard-row
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: CI break (main red on GitHub run 38369705993). Class: test-only change, no auth/tenancy/data write. Lane: lane/cilinux2, shard `qa/issues.cilinux2.jsonl`.
 
