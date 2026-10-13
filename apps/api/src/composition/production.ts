@@ -19,6 +19,7 @@ import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, 
   createMongoWatchedSourceDeps, createMongoCitationsDeps, createMongoHealthDeps, createMongoGraphReadDeps, createGwsCalendarReadDeps, createMeetingCandidatesDeps, createMongoKeysDeps } from "../store.js";
 import { createMongoIngestDeps } from "../ingest-store.js";
 import { createMongoSearchDeps } from "../search-store.js";
+import { createMongoSemanticSearchDeps, semanticSearchEnabled } from "../semantic-search/semantic-search-store.js";
 import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
 import { createConfiguredWhatsAppOwnerResolver } from "../whatsapp/owner-config.js";
 import { realTransport } from "../ai-transport.js";
@@ -195,6 +196,11 @@ export function buildProductionDeps(): ServerDeps {
     // surface GET /watch-state serves (routes/watched-sources.ts).
     watchedSources: { ...createMongoWatchedSourceDeps(), ...createMongoWatchStateReadDeps() },
     search: createMongoSearchDeps(),
+    // T-008: OFF unless LKB_SEMANTIC_SEARCH=1 and an embedding chain exists. Router tenant is "system" only for
+    // cost accounting; the retrieval itself is tenant-scoped per request inside the store.
+    semanticSearch: semanticSearchEnabled() && chains.embedding
+      ? createMongoSemanticSearchDeps({ embed: (job) => routeEmbed("embedding", job, { chains, providers, write: jobWrite, tenantId: ROUTER_TENANT_ID }) })
+      : undefined,
     graph: createMongoGraphReadDeps(),
     calendar: createGwsCalendarReadDeps(),
     meetingCandidates: createMeetingCandidatesDeps(),
