@@ -1,6 +1,6 @@
 # dbguard2-mint-migrate-backfill-guards
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2 (high: ISS-SCRIPTGUARDS-001) + ISS-LEGACYSEED-002 (high, D-150) + ISS-NOLKBDEFAULT-001 (medium) + one live-run defect. Class: SECURITY / DATA-WRITE: FULL ceremony. Verdict by the checker only.
 Lane: lane/dbguard2 (base 8961ddd1, then fast-forwarded to main dcddfedb so the nolkbdefault code is present). No new ledger shard rows; ledger statuses of the three issues are NOT changed here.
