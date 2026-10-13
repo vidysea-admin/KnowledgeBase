@@ -1,16 +1,15 @@
 # Verdict: u24-wire-speaker-suggest
 
 VERDICT: PASS
-Cycle checked: 0
-Commit checked: 2d036804 (lane/wu24). No model calls; fakes only.
+Cycle checked: 1
+Commits checked: 4d04e205, e0569bc5 (lane/wu24). Fakes only, no model calls.
 
 EXPLANATION:
-1. No path writes a final speaker from the model. The hook calls extractSpeakersGrounded({suggest:true}) and uses only `suggested` through buildSuggestionDocs and insertSuggestionsIfAbsent (status must be "suggested", $setOnInsert); `resolved` is never read. The hook runs after indexing is complete and status.index=done, so earlier indexSession error paths never reach it, and every error inside it is caught; a partial insert failure leaves only suggestion rows. Mutation "also write a speakers row" is KILLED. The only path to `speakers` remains the human confirm function.
-2. Tenant scope: every read and write goes through scopedCollection (speaker-suggestions.ts); the model route is the existing `speakers` kind with tenantId. Confirmed labels are not given a second AI name (mutation ignore-confirmed KILLED); a rejected row is never resurrected and a confirmed row is untouched (deterministic _id plus $setOnInsert, test covers it). Mutation ignore-rejected survives only because the deterministic _id already protects the same pair; equivalent in practice.
-3. Flag off: no call, no collection touched, no `speakerSuggestions` key in the result (test); default-ON mutations in speaker-suggest.ts and session.ts KILLED. The production default itself (production.ts) has no test: mutation `?? true` SURVIVES (ISS-WU24-002, low).
-4. "Never throws" is correct but the swallow is silent in practice: the error goes only into the returned result, nobody reads it, nothing is logged (ISS-WU24-001, medium). The catch itself is untested (rethrow mutant survives).
-5. tsc clean. Full apps/api suite with D2_FIXTURE_PYTHON set: 813 pass, 0 fail on the rerun; one earlier run showed 2 transient failures (811/813), noted in ISS-WU24-002. Mutations: 8 run, 5 killed, 3 survived (above).
+1. ISS-WU24-001 fixed: catch and timeout both call log.warn with tenantId, sessionId and error class only (errorName) or timeoutMs. No message, no transcript, no key. Mutations "catch unlogged", "timeout branch unlogged", "log leaks message" all KILLED. Still never throws (rethrow mutant KILLED).
+2. ISS-WU24-002 fixed: the 300000 ms race exists and returns error:"timeout"; resolveSuggestSpeakers defaults OFF unless KB_SPEAKER_SUGGEST=1 (mutant `?? true` KILLED), buildIndexer uses it. Ignore-rejected mutant KILLED.
+3. D-141 holds: only `suggested` is used, via buildSuggestionDocs and insertSuggestionsIfAbsent; no speakers write, nothing auto-confirmed. D-132 intent unchanged.
+4. Full apps/api suite (D2_FIXTURE_PYTHON set): tests 817 pass 817 fail 0. tsc --noEmit exit 0.
+5. Mutations, hash-verified (applied, then git hash-object == HEAD blob): 8 run, 7 killed (flag ON, rethrow, ignore-rejected, opts timeout ignored, 2 unlogged, log leak). Survivor: constant 300_000 -> 3_000_000 (tests inject timeoutMs).
+6. Bypass hunt: Promise.race does not cancel run(); after a timeout the work continues and may still insert suggested-only rows. Not a safety breach. Filed, not fixed.
 
-Safe to merge as an opt-in. Fix ISS-WU24-001 (add a console.warn) before turning KB_SPEAKER_SUGGEST on anywhere.
-
-ISSUES-WRITTEN: ISS-WU24-001 (medium), ISS-WU24-002 (low) in qa/issues.wu24.jsonl
+ISSUES-WRITTEN: ISS-WU24-003 (low) in qa/issues.wu24.jsonl

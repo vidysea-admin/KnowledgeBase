@@ -1,6 +1,6 @@
 # u24-wire-speaker-suggest
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: roadmap U2.4 wiring (D-141). Class: data write (new production caller of speaker_suggestions): FULL ceremony. Lane: lane/wu24. No ledger issue fixed; no new issue filed. Edits no qa/contracts or docs/DECISIONS.md.
 
