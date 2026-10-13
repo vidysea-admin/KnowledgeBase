@@ -1,6 +1,6 @@
 # iss-capturefix-001-lobby-admission-watchdog
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2 (open high issue ISS-CAPTUREFIX-001; T-031 / T-034). Class: capture integrity (a lobby reload destroyed the recording). Severity high: FULL ceremony. Verdict by the checker only.
 Lane: lane/lobbywatch (branched from 16d20ec9). Ledger row ISS-CAPTUREFIX-001 status NOT changed here.

@@ -20,3 +20,6 @@ Options: (a) after budgetmb merges, add `emit("admitted")` in sb_join.py and gat
 
 ## Integrator close-out note (2026-10-13)
 Bitrate part checked-PASS; watchdog part pending ISS-CAPTUREFIX-001. Manifest status deliberately left ready-for-check until the watchdog part is delivered and checked.
+
+## Integrator close-out note (2026-10-13, update)
+Watchdog part: checked-PASS for Meet scope by lane/lobbywatch (verdict qa/verdicts/iss-capturefix-001-lobby-admission-watchdog.md); ISS-CAPTUREFIX-001 verified for Meet. Zoom/Teams are tracked as ISS-LOBBYWATCH-001. Bitrate part checked-PASS earlier.
