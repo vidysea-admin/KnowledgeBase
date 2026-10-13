@@ -6,6 +6,7 @@
  * (`ai-transport.ts`). Kept out of `server.ts` so that file stays <=80 LOC and injectable-only.
  * Never imported by tests.
  */
+import { speakerSuggestEnabled } from "../indexing/speaker-suggest.js";
 import { createMongoSystemStatusDeps } from "../system-status-store.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -158,11 +159,13 @@ export function buildRouting(): {
  * --index` must index a bot-captured session through EXACTLY the binding the server's ingest
  * routes use, not a second copy of it that could drift.
  */
-export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRouting(), options: { strictWebinar?: boolean } = {}): BoundIndexer {
+export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRouting(), options: { strictWebinar?: boolean; suggestSpeakers?: boolean } = {}): BoundIndexer {
   const { chains, providers, jobWrite } = routing;
   return (tenantId, sessionId) =>
     indexSession(tenantId, sessionId, {
       strictWebinar: options.strictWebinar,
+      // U2.4 / D-141: speaker NAME SUGGESTIONS (never final), OFF unless KB_SPEAKER_SUGGEST=1 or the caller opts in. Uses the `speakers` route.
+      suggestSpeakers: options.suggestSpeakers ?? speakerSuggestEnabled(),
       complete: (job) => routeComplete(job.kind, job, { chains, providers, write: jobWrite, tenantId }),
       // Wired only when a chain is configured for it (U1.3). Passing an embedder unconditionally
       // would make every index run fail on an install with no embedding provider, where today it

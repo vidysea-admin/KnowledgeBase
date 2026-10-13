@@ -4,6 +4,7 @@ import type { Db } from "mongodb";
 import { getDb, scopedCollection } from "@lkb/db";
 import type { SessionPages, Chunks, Claims, Sessions, TreeIndexRootDocument, Turns, CitedItem, QaEntry } from "@lkb/core";
 import { summarizeSession, extractClaims, buildChunks, buildTree, regenerate, treeIndexRootFilter, type SummarizeCompleteFn, runtimeChronologicalTurns, assertGroundedTurns, validateRuntimePage, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin } from "@lkb/index";
+import { suggestSpeakersForSession, type SpeakerSuggestOutcome } from "./speaker-suggest.js";
 import { recordVectorGap } from "./vector-gap.js";
 import { promoteAndPersistEntities, type PromotionResult } from "./promote-entities.js";
 import type { IndexEmbedFn, ChunkWriteResult, IndexSessionResult } from "./types.js";
@@ -38,6 +39,9 @@ export interface IndexSessionDeps {
   dropUnverified?: boolean;
 
   embed?: IndexEmbedFn;
+
+  /** U2.4 / D-141: OFF unless true. Writes `speaker_suggestions` rows only (never `speakers`); see ./speaker-suggest.ts. */
+  suggestSpeakers?: boolean;
 
   db?: Pick<Db, "collection">;
 }
@@ -295,7 +299,12 @@ export async function indexSession(
 
   await sessionsColl(tenantId).updateOne({ _id: sessionId }, { $set: { "status.index": "done" } });
 
-  return { sessionId, chunks, entities, summary: { degraded: summaryDegraded?.reason ?? null, ...(summarizeResult.dropped ? { dropped: summarizeResult.dropped.length } : {}) },
+  // U2.4 / D-141: suggestions only, behind the opt-in flag; absent flag = no call, no result key (byte-identical output).
+  const speakerSuggestions: SpeakerSuggestOutcome | undefined = deps.suggestSpeakers === true
+    ? await suggestSpeakersForSession(tenantId, sessionId, turns, deps.complete as never, db as Db)
+    : undefined;
+
+  return { sessionId, chunks, entities, ...(speakerSuggestions ? { speakerSuggestions } : {}), summary: { degraded: summaryDegraded?.reason ?? null, ...(summarizeResult.dropped ? { dropped: summarizeResult.dropped.length } : {}) },
     claims: { degraded: claimsDegraded?.reason ?? null, ...(claimsResult.dropped ? { dropped: claimsResult.dropped.length } : {}) },
     completion: { version: 2, strict, complete: !summaryDegraded && !claimsDegraded && !chunks.skipped && Boolean(newRoot), generation: randomUUID(), turnCount: turns.length, treeWritten: Boolean(newRoot) } };
 }
