@@ -53,13 +53,13 @@ test("mint-key guard (as invoked) accepts lkb only with flag + exact MONGODB_DB=
 });
 
 // ISS-SCRIPTGUARDS-001 ------------------------------------------------------------------------------------------------
-const cfg = root + "migrate-mongo-config.cjs";
+const cfg = root + "config/migrate-mongo-config.cjs";
 const load = (env, argv = []) => {
   const r = run(["-e", `process.argv.push(...${JSON.stringify(argv)});const c=require(${JSON.stringify(cfg)});console.log(JSON.stringify(c.mongodb))`], env);
   return {status: r.status, err: r.stderr, out: r.status === 0 ? JSON.parse(r.stdout) : null};
 };
 test("ISS-SCRIPTGUARDS-001 replay: migrate-mongo-config.cjs:6-7 defaults are gone (source)", () => {
-  const s = strip(src("migrate-mongo-config.cjs"));
+  const s = strip(src("config/migrate-mongo-config.cjs"));
   assert.doesNotMatch(s, /(\?\?|\|\|)\s*["']lkb["']/);
   assert.doesNotMatch(s, /(\?\?|\|\|)\s*["']mongodb:\/\/localhost/);
 });

@@ -43,8 +43,8 @@ import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import "dotenv/config";
 import { register } from "tsx/esm/api";
-import { tokenize } from "./lib/golden-set-diagnostics.mjs";
-import { loadCorpora, buildPinTokens, writeProvenance, refilter, judgeCandidate } from "./lib/golden-set-build.mjs";
+import { tokenize } from "./eval/golden-set-diagnostics.mjs";
+import { loadCorpora, buildPinTokens, writeProvenance, refilter, judgeCandidate } from "./eval/golden-set-build.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA_DIR = join(ROOT, "data", "toc-migrated");

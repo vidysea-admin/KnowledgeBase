@@ -1,5 +1,5 @@
 /**
- * scripts/lib/eval-recall.test.mjs — ISS-271 regression: `computeFilterBias` must never fall back
+ * scripts/eval/eval-recall.test.mjs — ISS-271 regression: `computeFilterBias` must never fall back
  * to a bare `null`/ambiguous shape when `data/eval/golden-set-rejected.json` is absent. The ledger
  * row for ISS-271 has an empty `fix_direction` and `reproductions: null` (no recorded cases to
  * re-run), so this corpus is authored fresh from the condition named in the issue title: does the
@@ -15,7 +15,7 @@
  * entry for that). scripts/lib/ has headroom (20/30 default budget) and is an existing sibling
  * directory already scanned by pnpm test:lint. See the manifest's "Declared regression avoided"
  * note for the reasoning in full.
- * Run: node --test scripts/lib/eval-recall.test.mjs
+ * Run: node --test scripts/eval/eval-recall.test.mjs
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";

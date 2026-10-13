@@ -1,4 +1,4 @@
-// migrate-mongo-config.cjs — T-018 C5. CommonJS (repo package.json is "type": "module";
+// config/migrate-mongo-config.cjs — T-018 C5. CommonJS (repo package.json is "type": "module";
 // migrate-mongo's CLI loads this file directly with require(), so it must stay .cjs).
 // MONGODB_URL / MONGODB_DB come from .env (see .env.example) — never hard-coded here.
 //

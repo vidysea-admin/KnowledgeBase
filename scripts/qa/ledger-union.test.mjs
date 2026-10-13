@@ -11,7 +11,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, rmSync, readFileSy
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, relative } from "node:path";
-import { ledgerFiles, readLedgerRows, auditIssueRefs, G4_FROZEN, ROOT } from "./tracker-audit.mjs";
+import { ledgerFiles, readLedgerRows, auditIssueRefs, G4_FROZEN, ROOT } from "../lib/tracker-audit.mjs";
 
 // D-019 said "every reader treats the union of qa/issues.jsonl and qa/issues.*.jsonl as the
 // ledger", and then no reader did: both opened the single file by name, so a lane shard whose id

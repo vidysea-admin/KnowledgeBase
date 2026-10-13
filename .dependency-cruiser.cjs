@@ -67,10 +67,10 @@ module.exports = {
     },
     {
       name: "no-unresolvable-workspace-import",
-      comment: "an @lkb/* import that does not resolve is still a workspace import — never silently ok",
+      comment: "an @lkb/* import that does not resolve is still a workspace import — never silently ok. Sole exemption: the declared devDependency esbuild (apps/api/package.json), imported by the tooling script apps/api/scripts/build.mjs, which has its own fallback loader for checkouts whose node_modules predate it.",
       severity: "error",
       from: {},
-      to: { couldNotResolve: true },
+      to: { couldNotResolve: true, pathNot: "^esbuild$" },
     },
   ],
   options: {

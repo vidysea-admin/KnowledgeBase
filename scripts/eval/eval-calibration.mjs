@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * scripts/eval-calibration.mjs — T-022 C4. Builds the real tree from `data/toc-migrated/*` (same
+ * scripts/eval/eval-calibration.mjs — T-022 C4. Builds the real tree from `data/toc-migrated/*` (same
  * `tsx/esm/api` pattern as `scripts/eval-recall.mjs`), resolves each calibration-set pair's
  * `sessionId` to its tree node, runs `computeMAE` against the local heuristic scorer, prints MAE
  * + every pair's detail, writes `data/eval/calibration-report.json`. No live network call.
@@ -10,7 +10,7 @@ import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { register } from "tsx/esm/api";
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const DATA_DIR = join(ROOT, "data", "toc-migrated");
 const CALIBRATION_SET_PATH = join(ROOT, "data", "eval", "evaluator-calibration-set.json");
 const REPORT_PATH = join(ROOT, "data", "eval", "calibration-report.json");
@@ -22,9 +22,9 @@ function loadJson(path) {
 }
 
 async function main() {
-  const { buildTree } = await import("../packages/index/src/tree/build.ts");
-  const { computeMAE } = await import("../packages/ask/src/eval/calibration.ts");
-  const { heuristicScorer } = await import("../packages/ask/src/eval/heuristic-scorer.ts");
+  const { buildTree } = await import("../../packages/index/src/tree/build.ts");
+  const { computeMAE } = await import("../../packages/ask/src/eval/calibration.ts");
+  const { heuristicScorer } = await import("../../packages/ask/src/eval/heuristic-scorer.ts");
 
   const sessionDirs = readdirSync(DATA_DIR, { withFileTypes: true })
     .filter((d) => d.isDirectory()).map((d) => d.name);

@@ -71,7 +71,7 @@ try {
   const { embed: routeEmbed } = await import("../packages/ai/src/index.ts");
   const { buildRouting } = await import("../apps/api/src/composition/production.ts");
 
-  // Same env vars as migrate-mongo-config.cjs and seed-toc.mjs — one convention, not a third.
+  // Same env vars as config/migrate-mongo-config.cjs and seed-toc.mjs — one convention, not a third.
   // No default database (the old fallback was lkb): refuses unless an isolated work DB, or lkb_staging under the --legacy-unbound double opt-in.
   const target = requireBackfillDatabase(process.env, { legacyUnbound: has("--legacy-unbound") });
   await connect(target.url, target.dbName);

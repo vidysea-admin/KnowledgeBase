@@ -1,5 +1,5 @@
 /** Insert-only initialization of reviewed source recovery into an explicit isolated work DB. */
-import {requireWorkDatabase} from "./transcript-provenance.mjs";
+import {requireWorkDatabase} from "../lib/transcript-provenance.mjs";
 import {assertRecoveryPacketVerified} from "./toc-recovery.mjs";
 export const RECOVERY_COLLECTIONS = ["sources", "sessions", "turns", "session_pages", "claims", "gaps", "tree_index"];
 function requireTrue(test, message) {if (!test) throw new Error(message);}

@@ -60,8 +60,10 @@ a client of that API — with the long-range goal of beating top human counsello
   - `schema/fixtures/`
 - `scripts/`
   - `scripts/demo/`
+  - `scripts/eval/`
   - `scripts/lib/`
   - `scripts/qa/`
+  - `scripts/toc/`
   - `scripts/upload/`
   - `scripts/watch/`
   - `scripts/webinar/`

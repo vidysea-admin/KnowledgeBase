@@ -8,8 +8,8 @@ import {register} from "tsx/esm/api";
 register();
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const {buildTree} = await import("../packages/index/src/tree/build.ts");
-const {readRecoveryInputs, buildRecoveryPacket, writeRecoveryPacket, readRecoveryPacket} = await import("./lib/toc-recovery.mjs");
-const {requireRecoveryDatabase, importRecoveryPacket} = await import("./lib/toc-recovery-import.mjs");
+const {readRecoveryInputs, buildRecoveryPacket, writeRecoveryPacket, readRecoveryPacket} = await import("./toc/toc-recovery.mjs");
+const {requireRecoveryDatabase, importRecoveryPacket} = await import("./toc/toc-recovery-import.mjs");
 const args = process.argv.slice(2);
 const allowed = new Set(["--build", "--dry-run", "--import", "--packet", "--receipt"]);
 function option(name) {
