@@ -1,6 +1,6 @@
 # t034next
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap T-034). Class: data write path (receiver) + path validation. Lane: lane/t034next.
 
