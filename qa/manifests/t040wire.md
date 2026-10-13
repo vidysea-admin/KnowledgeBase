@@ -1,6 +1,6 @@
 # t040wire
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (next unblocked roadmap task: T-040). Class: data write (session_pages, claims via indexSession): full ceremony. Verdict by the checker only.
 Lane: lane/t040wire (base ed7ff578). No lane ledger rows filed.
