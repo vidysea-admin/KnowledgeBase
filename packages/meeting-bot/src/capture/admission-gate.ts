@@ -21,6 +21,7 @@ export function createAdmissionGate(now: () => number = Date.now) {
   let watchdog: GateWatchdog | undefined;
   let lastReload: { at: number; kind: string } | undefined;
   let failure: string | undefined;
+  let timedOut = false;
 
   function decide(ev: GateEvent): string | undefined {
     switch (ev.event) {
@@ -29,6 +30,7 @@ export function createAdmissionGate(now: () => number = Date.now) {
         watchdog?.start();
         return undefined;
       case "admission_timeout":
+        timedOut = !admitted;
         return `admission_timeout: the bot was not admitted to the meeting within ${String(ev.limit ?? "?")}s (waited ${String(ev.seconds ?? "?")}s in the lobby); no recording made`;
       case "watchdog-reload":
       case "reconnect-reload":
@@ -47,6 +49,8 @@ export function createAdmissionGate(now: () => number = Date.now) {
 
   return {
     get admitted(): boolean { return admitted; },
+    /** "lobby" until `admitted`; "failed" once an admission_timeout was reported; a capture is "recording" only in "admitted". */
+    get state(): "lobby" | "admitted" | "failed" { return admitted ? "admitted" : timedOut ? "failed" : "lobby"; },
     /** The most recent failure message this gate produced (the tab backend's own stop error is terser). */
     get failure(): string | undefined { return failure; },
     /** Registers the watchdog; starts it at once if `admitted` already arrived (join() can emit it first). */
