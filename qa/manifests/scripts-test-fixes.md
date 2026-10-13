@@ -1,6 +1,6 @@
 # scripts-test-fixes
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: test-side / audit-config only (no product behaviour change, no data writes). Lane: lane/scriptsfix. No ledger issue fixed; no ledger rows touched.
 
