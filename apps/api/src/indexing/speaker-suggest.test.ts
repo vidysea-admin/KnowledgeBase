@@ -8,6 +8,8 @@ import type { Turns } from "@lkb/core";
 import type { CompleteResult, Job } from "@lkb/ai";
 import { memoryDb } from "../../../../packages/db/src/collections/speaker-suggestions.testdb.js";
 import { confirmSpeakerSuggestion, rejectSpeakerSuggestion } from "../../../../packages/db/src/collections/speaker-suggestions.js";
+import { createLogger } from "../composition/logger.js";
+import { resolveSuggestSpeakers } from "../composition/production.js";
 import { suggestSpeakersForSession, speakerSuggestEnabled } from "./speaker-suggest.js";
 import { indexSession } from "./session.js";
 import { fakeDb, completeWith } from "./testutils.js";
@@ -42,7 +44,7 @@ test("flag helper: OFF unless exactly KB_SPEAKER_SUGGEST=1", () => {
 test("suggest writes a status=suggested row with its quote, and NEVER a speakers row", async () => {
   const m = memoryDb();
   const { complete, kinds } = scripted("yes");
-  const r = await suggestSpeakersForSession(T, S, TURNS, complete, m.db, new Date("2026-10-13T00:00:00Z"));
+  const r = await suggestSpeakersForSession(T, S, TURNS, complete, m.db, { now: new Date("2026-10-13T00:00:00Z") });
   assert.deepEqual([r.suggested, r.inserted, r.error], [1, 1, undefined]);
   const rows = m.rows("speaker_suggestions");
   assert.equal(rows.length, 1);
@@ -79,6 +81,7 @@ test("re-run is idempotent, a REJECTED name is not resurrected, a CONFIRMED row 
   const afterReject = JSON.stringify(m.rows("speaker_suggestions"));
   const r2 = await suggestSpeakersForSession(T, S, TURNS, scripted().complete, m.db);
   assert.equal(r2.inserted, 0);
+  assert.equal(r2.suggested, 0, "a rejected (label, person) is filtered out before docs are even built");
   assert.equal(JSON.stringify(m.rows("speaker_suggestions")), afterReject, "rejection tombstone byte-identical");
 
   const m2 = memoryDb();
@@ -130,4 +133,50 @@ test("a confirmed label is not given a second AI name on re-index (confirmed lis
   const turns = [turn("t0", "spk:0", "Rohan Gupta, what do you think about the new rules?", 0), ...TURNS.slice(1)];
   const r = await suggestSpeakersForSession(T, S, turns, scripted("yes", "Rohan Gupta", "Rohan Gupta, what do you think about the new rules").complete, m.db);
   assert.deepEqual([r.suggested, r.inserted, m.rows("speaker_suggestions").length], [0, 0, 1]);
+});
+
+const capture = () => { const lines: string[] = []; return { lines, log: createLogger({ level: "warn", write: (l) => lines.push(l) }) }; };
+
+test("ISS-WU24-001: a failing generation is logged as a structured warning with ids only, and does not throw", async () => {
+  const { lines, log } = capture();
+  const secret = "SECRET-TRANSCRIPT-TEXT";
+  const bad = [turn("t0", "spk:0", secret, 0), turn("t1", "spk:1", "hi", 1)];
+  const brokenDb = { collection: () => { throw new Error(`db down ${secret}`); } } as never;
+  const r2 = await suggestSpeakersForSession(T, S, bad, scripted().complete, brokenDb, { log });
+  assert.equal(r2.suggested, 0);
+  assert.ok(r2.error);
+  assert.equal(lines.length, 1);
+  const rec = JSON.parse(lines[0]!);
+  assert.equal(rec.level, "warn");
+  assert.equal(rec.tenantId, T);
+  assert.equal(rec.sessionId, S);
+  assert.ok(!lines[0]!.includes(secret), "no transcript text or provider message in the log");
+});
+
+test("ISS-WU24-002: a hung hook times out, logs, and returns so indexing continues", async () => {
+  const m = memoryDb();
+  const { lines, log } = capture();
+  const t0 = Date.now();
+  const r = await suggestSpeakersForSession(T, S, TURNS, () => new Promise<CompleteResult>(() => {}), m.db, { log, timeoutMs: 50 });
+  assert.ok(Date.now() - t0 < 5000);
+  assert.equal(r.error, "timeout");
+  assert.equal(lines.length, 1);
+  assert.equal(JSON.parse(lines[0]!).timeoutMs, 50);
+  assert.equal(m.rows("speaker_suggestions").length, 0);
+});
+
+test("indexSession still completes when the suggestion hook fails", async () => {
+  const { db } = fakeDb();
+  const inner = completeWith();
+  const complete = async (job: { kind: string }) => { if (job.kind === "speakers") throw new Error("ollama down"); return inner(job); };
+  const res = await indexSession("t", "s1", { complete: complete as never, db, suggestSpeakers: true });
+  assert.ok(res.completion);
+});
+
+test("production default: suggestions OFF unless KB_SPEAKER_SUGGEST=1; an explicit caller option wins", () => {
+  assert.equal(resolveSuggestSpeakers(undefined, {}), false);
+  assert.equal(resolveSuggestSpeakers(undefined, { KB_SPEAKER_SUGGEST: "0" }), false);
+  assert.equal(resolveSuggestSpeakers(undefined, { KB_SPEAKER_SUGGEST: "1" }), true);
+  assert.equal(resolveSuggestSpeakers(false, { KB_SPEAKER_SUGGEST: "1" }), false);
+  assert.equal(resolveSuggestSpeakers(true, {}), true);
 });
