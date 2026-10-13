@@ -220,10 +220,14 @@ test("obs-windows stop(): StopRecord rejecting still restores this run's mutes a
 // Reproduction on the ledger row: `lkb record` failed with "bot browser did not open the page
 // (timeout)" on the live Ashoka run with correct argv, 5 GB RAM free and no leftover bot Chrome.
 // The child was alive and still inside SB()'s opaque browser bring-up when the fixed 120 s budget
-// expired. These scale that shape down: the stall window is 400 ms and the bring-up 1.2 s.
+// expired. These scale that shape down: the stall window is 3 s and the bring-up 3.5 s.
+
+// Load-tolerant: spawning even a bare node child takes ~0.3 s on a loaded box, so 400 ms fired the
+// stall timer before the child printed "starting" (flake: "no progress for 0s; last stage: spawned").
+const STALL_MS = 3_000;
 
 function stagesCfg(onOpened: (pid: number) => void, over: Partial<ObsBrowserConfig> = {}) {
-  return makeCfg({ onOpened, joinScript: STAGES_FIXTURE, openStallMs: 400, openCapMs: 20_000, ...over });
+  return makeCfg({ onOpened, joinScript: STAGES_FIXTURE, openStallMs: STALL_MS, openCapMs: 20_000, ...over });
 }
 
 function withFixtureMode<T>(mode: string, extra: Record<string, string>, fn: () => Promise<T>): Promise<T> {
@@ -246,11 +250,11 @@ test("obs-windows launch(): ISS-324 — a bring-up that keeps reporting progress
   // this file) — this test is about launch(), and the poll would add a minute for nothing.
   const { obs } = makeFakeObs({ specialInputs: { m: "Mic/Aux" }, stopRecordFails: true });
   try {
-    await withFixtureMode("progress-then-open", { LKB_FIXTURE_TICK_MS: "100", LKB_FIXTURE_TICKS: "12" }, async () => {
+    await withFixtureMode("progress-then-open", { LKB_FIXTURE_TICK_MS: "100", LKB_FIXTURE_TICKS: "35" }, async () => {
       const { deps } = createObsBrowserDeps(cfg, {
         obs, connectObs: async () => undefined, confirmBotWindow: async () => true,
       });
-      // 1.2 s of bring-up against a 400 ms stall window: the pre-fix fixed budget would have
+      // 3.5 s of bring-up against a 3 s stall window: the pre-fix fixed budget would have
       // killed this child and blamed the page. Progress resets the budget, so it must succeed.
       const { sessionHandle } = await deps.launch("https://example.com/meet", { tenantId: "t1" });
       assert.ok(pid > 0, "fixture must reach 'opened' despite outlasting the stall window");
@@ -289,7 +293,7 @@ test("obs-windows launch(): ISS-324 — a genuinely wedged bring-up fails naming
 // and it is precisely the branch that stops a CHATTY but never-opening bring-up from resetting the
 // stall budget forever. A cap that only exists on inspection is a cap that can be deleted silently.
 test("obs-windows launch(): ISS-324 — a child that reports progress forever cannot outlive the absolute cap", async () => {
-  const cfg = stagesCfg(() => {}, { openStallMs: 400, openCapMs: 1_200 });
+  const cfg = stagesCfg(() => {}, { openStallMs: STALL_MS, openCapMs: 4_000 });
   const { obs } = makeFakeObs({ specialInputs: { m: "Mic/Aux" } });
   try {
     // ticks far exceed the cap, at an interval well inside the stall window: every tick resets
