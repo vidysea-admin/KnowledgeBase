@@ -14,6 +14,7 @@ import type { Sources, Sessions, Turns } from "@lkb/core";
 import { createUrlSource, type ConsentContext, type Turn } from "@lkb/ingest";
 import type { IngestDeps, IngestResult } from "./routes/ingest.js";
 import { sha256Hex } from "./hash.js";
+import { assertTurnTimings } from "./turn-timing.js";
 import type { BoundIndexer } from "./indexing/session.js";
 
 async function jinaReaderFetch(url: string): Promise<string> {
@@ -30,8 +31,9 @@ async function jinaReaderFetch(url: string): Promise<string> {
  * call is logged and swallowed: the ingest itself already succeeded (source/session/turns are
  * safely stored), so it still returns 201 with the real result rather than failing the whole
  * request over the searchability step. */
-export function createMongoIngestDeps(indexSession?: BoundIndexer): IngestDeps {
-  const urlSource = createUrlSource({ hasher: sha256Hex, fetcher: jinaReaderFetch });
+/** `urlSource` is a test seam only (a fake adapter that yields invalid turn timing); production passes none. */
+export function createMongoIngestDeps(indexSession?: BoundIndexer, seams: { urlSource?: ReturnType<typeof createUrlSource> } = {}): IngestDeps {
+  const urlSource = seams.urlSource ?? createUrlSource({ hasher: sha256Hex, fetcher: jinaReaderFetch });
 
   return {
     async ingestUrl(tenantId, url): Promise<IngestResult> {
@@ -40,11 +42,11 @@ export function createMongoIngestDeps(indexSession?: BoundIndexer): IngestDeps {
       // D-008 "silent" last-resort mode -- the caller explicitly handed us this URL to fetch.
       const consent: ConsentContext = { captureMode: "public", given: true, recordedBy: "web-ingest" };
       const { source } = await urlSource.fetch({ kind: "url", url, tenantId }, consent);
-      await sourcesColl(tenantId).insertOne(source);
-
       const turns = await urlSource.toTurns(source);
-
       const sessionId = randomUUID();
+      // Refuse invalid turn timing BEFORE the first write: /ask refuses the whole request on one bad row.
+      assertTurnTimings(turns.map((t: Turn, i: number) => ({ _id: `${sessionId}-t${String(i + 1).padStart(3, "0")}`, sessionId, tStart: t.tStart, tEnd: t.tEnd })), sessionId);
+      await sourcesColl(tenantId).insertOne(source);
       const session: Sessions = {
         _id: sessionId,
         tenantId,

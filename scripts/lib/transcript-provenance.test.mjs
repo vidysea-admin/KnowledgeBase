@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync, readdirSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync, readdirSync, existsSync } from "node:fs";
+import { join, resolve, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -119,11 +119,27 @@ registerHooks({resolve(specifier,context,next){
  }
  return next(specifier,context);
 }});`;
+/** Copy list = the listed files plus every file they statically import by a relative path inside scripts/ (transitively), so a new import never silently goes missing. */
+function copyClosure(seed) {
+  const scriptsDir = resolve(import.meta.dirname, ".."), out = new Set();
+  const visit = (name) => {
+    if (out.has(name)) return; out.add(name);
+    const src = readFileSync(join(scriptsDir, name), "utf8");
+    for (const m of src.matchAll(/^\s*(?:import|export)\b[^'"]*?\bfrom\s+["'](\.\.?\/[^"']+\.mjs)["']/gm)) {
+      const rel = join(dirname(name), m[1]).replaceAll("\\", "/");
+      if (!rel.startsWith("..") && existsSync(join(scriptsDir, rel))) visit(rel);
+    }
+  };
+  seed.forEach(visit);
+  return [...out];
+}
 function cliFixture(scriptName, hook = NODE_HOOK) {
   const root = mkdtempSync(join(tmpdir(), "lkb-provenance-cli-")), scripts = join(root, "scripts");
   mkdirSync(join(scripts, "lib"), {recursive: true}); mkdirSync(join(scripts, "webinar"), {recursive: true});
-  for (const name of [scriptName, "lib/transcript-provenance.mjs", "lib/find-audio-file.mjs", "lib/real-upload-transport.mjs", "webinar/session-rows.mjs", "webinar/process-video.mjs"])
-    copyFileSync(resolve(import.meta.dirname, "..", name), join(scripts, name));
+  for (const name of copyClosure([scriptName, "lib/transcript-provenance.mjs", "lib/find-audio-file.mjs", "lib/real-upload-transport.mjs", "webinar/session-rows.mjs", "webinar/process-video.mjs"])) {
+    mkdirSync(dirname(join(scripts, name)), {recursive: true});
+    copyFileSync(resolve(import.meta.dirname, "..", name), join(scripts, name)); // throws loudly if a listed or imported file is missing
+  }
   writeFileSync(join(root, "hook.mjs"), hook);
   const dir = join(root, "data", "toc-migrated", "session1"); mkdirSync(dir, {recursive: true});
   put(dir, "source.json", {_id: "source1", tenantId: "tenant2", audioPath: "fixture.m4a"});

@@ -103,10 +103,19 @@ export interface PassageDiagnostic {
   turnId: string; charStart: number; charEnd: number; lexical: number; semantic: number; score: number;
   textContribution: number; speakerContribution: number; selected: boolean;
 }
-function validTurn(turn: Turns, tenantId: string, refs: Set<string>): void {
-  if (turn.tenantId !== tenantId || !refs.has(turn.sessionId) || !nonempty(turn._id) || !nonempty(turn.speakerRef)
-    || typeof turn.text !== "string" || !Number.isFinite(turn.tStart) || !Number.isFinite(turn.tEnd)
-    || turn.tStart < 0 || turn.tEnd < turn.tStart) throw new BoundedAskError("invalid scoped source row");
+/** Scope breach (foreign tenant or a session outside the admitted set): NEVER excluded, always refuses the request. */
+function assertInScope(turn: Turns, tenantId: string, refs: Set<string>): void {
+  if (turn.tenantId !== tenantId || !refs.has(turn.sessionId)) throw new BoundedAskError("invalid scoped source row");
+}
+/** D-153 (pending append): a row of the right tenant and session that is itself malformed is EXCLUDED, per turn, with a warning. */
+function rowProblem(turn: Turns): string | null {
+  if (!nonempty(turn._id)) return "turn id is empty";
+  if (!nonempty(turn.speakerRef)) return "speakerRef is empty";
+  if (typeof turn.text !== "string") return "text is not a string";
+  if (!Number.isFinite(turn.tStart) || !Number.isFinite(turn.tEnd)) return "tStart/tEnd is not a finite number";
+  if (turn.tStart < 0) return `tStart ${turn.tStart} is negative`;
+  if (turn.tEnd < turn.tStart) return `tEnd ${turn.tEnd} is before tStart ${turn.tStart}`;
+  return null;
 }
 function quote(node: TreeIndexNode, turn: Turns, span: Span): SourceQuote {
   const text = turn.text.slice(span.charStart, span.charEnd);
@@ -176,11 +185,25 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
     const snapshot = JSON.parse(bytes) as { rows: Turns[]; chunks: BoundChunk[] };
     const snapshotSHA256 = sha(bytes);
     const byTurn = new Map<string, Turns>();
+    const excludedTurns: { sessionId: string; turnId: string; reason: string }[] = [];
+    const validRows: Turns[] = [];
     for (const turn of snapshot.rows) {
-      validTurn(turn, tenantId, new Set(sessionIds));
+      assertInScope(turn, tenantId, new Set(sessionIds));
+      const problem = rowProblem(turn);
+      if (problem) { excludedTurns.push({ sessionId: turn.sessionId, turnId: nonempty(turn._id) ? turn._id : "(no id)", reason: problem }); continue; }
       if (byTurn.has(turn._id)) throw new BoundedAskError("duplicate source turn identity");
       byTurn.set(turn._id, turn);
+      validRows.push(turn);
     }
+    // Every row in scope invalid: the existing refusal, never an empty success.
+    if (snapshot.rows.length > 0 && validRows.length === 0) throw new BoundedAskError("invalid scoped source row");
+    const excludedIds = new Set(excludedTurns.map((e) => e.turnId));
+    snapshot.rows = validRows;
+    // A vector chunk that covers an excluded turn is dropped with it: its embedded text may contain that turn.
+    // Scope first: a chunk of another tenant or outside the admitted sessions refuses the request whatever else is wrong with it.
+    for (const c of snapshot.chunks) if (c.tenantId !== tenantId || !sessionIds.includes(c.sourceRef)) throw new BoundedAskError("invalid scoped vector evidence");
+    snapshot.chunks = snapshot.chunks.filter((c) => !(Array.isArray(c.turnRefs) && c.turnRefs.some((id) => excludedIds.has(id)))
+      && !(Array.isArray(c.sourceSpans) && c.sourceSpans.some((s) => excludedIds.has(s.turnId))));
     for (const chunk of snapshot.chunks) validateChunk(chunk, tenantId, byTurn);
     let embedding: EmbedResult | undefined;
     let degraded: string | undefined;
@@ -198,7 +221,11 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
     for (const node of nodes) {
       const turns = snapshot.rows.filter((t) => t.sessionId === node.evidence!.sessionRef)
         .sort((a, b) => a.tStart - b.tStart || a.tEnd - b.tEnd || a._id.localeCompare(b._id));
-      if (!turns.length) throw new BoundedAskError("admitted session has no source rows");
+      if (!turns.length) {
+        // No rows at all stays a refusal; a session whose every row was excluded is skipped (it is named in the warning).
+        if (excludedTurns.some((e) => e.sessionId === node.evidence!.sessionRef)) continue;
+        throw new BoundedAskError("admitted session has no source rows");
+      }
       const lexicalScore = passageLexicalScorer(query, turns);
       const choices = turns.flatMap((turn) => slices(turn.text).map((span) => {
         const text = turn.text.slice(span.charStart, span.charEnd);
@@ -248,7 +275,7 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
           sourceSnapshotSHA256: snapshotSHA256, sourceMode: "exact-scoped-turn-excerpts" },
       });
     }
-    return { nodes: result, snapshotSHA256, sourceBytes: Buffer.byteLength(bytes, "utf8"), ...(degraded ? { degraded } : {}) };
+    return { nodes: result, snapshotSHA256, sourceBytes: Buffer.byteLength(bytes, "utf8"), ...(degraded ? { degraded } : {}), ...(excludedTurns.length ? { excludedTurns } : {}) };
   };
 }
 

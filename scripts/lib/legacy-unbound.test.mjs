@@ -64,9 +64,14 @@ test("seed-toc --dry-run: refuses without --legacy-unbound, succeeds with it (no
   const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
   const run = (...a) => spawnSync(process.execPath, ["--import", "tsx", "scripts/seed-toc.mjs", "--dry-run", ...a], {cwd: root, encoding: "utf8", env: {...process.env, MONGODB_URL: ""}});
   const a = run(); assert.notEqual(a.status, 0); assert.match(a.stderr, /provenance absent/);
-  const one = ["--sessions", "2026-04-21-visa-blueprint-part2-italy-france-nz"];
+  const one = ["--sessions", "2026-05-08-funding-dreams-loans-forex"]; // a session with valid turn timing (visa-blueprint-part2 has t141 tEnd<tStart and is now refused)
   const a2 = spawnSync(process.execPath, ["--import", "tsx", "scripts/seed-toc.mjs", "--dry-run", ...one], {cwd: root, encoding: "utf8"}); assert.notEqual(a2.status, 0);
   const b = run("--legacy-unbound", ...one); assert.equal(b.status, 0, b.stderr); assert.match(b.stdout, /No Mongo connection attempted/);
+  // Real data (T-043 live finding): the two legacy sessions with tEnd<tStart are REFUSED at seed time, naming session and turn.
+  const bad = run("--legacy-unbound", "--sessions", "2026-04-21-visa-blueprint-part2-italy-france-nz");
+  assert.notEqual(bad.status, 0); assert.match(bad.stderr, /session 2026-04-21-visa-blueprint-part2-italy-france-nz turn 2026-04-21-visa-blueprint-part2-italy-france-nz-t141: tEnd 213 is before tStart 2008/);
+  const bad2 = run("--legacy-unbound", "--sessions", "2026-08-10-ucas-what-changed-what-matters");
+  assert.notEqual(bad2.status, 0); assert.match(bad2.stderr, /turn 2026-08-10-ucas-what-changed-what-matters-t114: tEnd 1868 is before tStart 1883/);
 });
 import { requireBackfillDatabase } from "./transcript-provenance.mjs";
 import { readFileSync } from "node:fs";

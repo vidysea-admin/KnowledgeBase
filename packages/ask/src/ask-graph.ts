@@ -103,6 +103,10 @@ const retrieveNode: AskGraphNode = {
         await recordJob({ tenantId, kind: "ask.retrieval_degraded", status: "failed", error: hydrated.degraded }, write);
         auditLog.push({ jobKind: "ask.retrieval_degraded", step: hydrated.degraded });
       }
+      if (hydrated.excludedTurns?.length) {
+        auditLog.push({ jobKind: "ask.source_rows_excluded", excludedTurns: hydrated.excludedTurns,
+          step: `warning: ${hydrated.excludedTurns.length} invalid source turn(s) excluded from this answer: ` + hydrated.excludedTurns.map((e) => `session ${e.sessionId} turn ${e.turnId} (${e.reason})`).join("; ") });
+      }
       auditLog.push({ jobKind: "ask.source_hydrated", step: `${candidates.length} source nodes; snapshot ${hydrated.snapshotSHA256}; ${hydrated.sourceBytes} source bytes` });
     }
     s.candidates = candidates;
