@@ -1,6 +1,6 @@
 # failedjobstatus-dead-file-queue-jobs
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (open medium ISS-FAILEDJOB-001, D-139 follow-up). Class: observability, read-only, tenant-scoped (tenancy touched: FULL ceremony). Lane: lane/failedjobstatus (from 613028be; main merged to pick up D-158 and the amended contract at 60b8e5fc).
 Authority: D-139 (dead job on terminal run failure), D-158 (Approver amended t057-d2-activity-health C1/C4: `source` field upload-queue|job-queue, job-queue error-class allow-list, tenant-scoped). Ledger row ISS-FAILEDJOB-001 status NOT changed here. D-139's "/system-status" part is now done under D-158; the earlier option-(b) ordering (notifications first) is also delivered.
