@@ -1,7 +1,7 @@
 # cilinux1: retention report tests portable to case-sensitive filesystems; outside-root guard made separator-independent
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Lane: cilinux1 (lane/cilinux1). Issue: none new; repairs GitHub CI run 38369705993 (Ubuntu), packages/ingest retention tests.
 
 ## Scope
@@ -20,3 +20,6 @@ Files (all under packages/ingest/src/retention/):
 - Retention files, Windows (case-insensitive branch): 25/25 pass.
 - Case-sensitive branch NOT run on real Linux. A case-sensitive NTFS dir (fsutil setCaseSensitiveInfo) was tried: probe returned case-sensitive, but production gates folding on `process.platform === "win32"`, so Windows still merges there (conservative direction, safe); that setup cannot emulate Linux. CI re-run is the confirmation.
 - Mutations (per-mutation byte backup, restored in finally, hash == final blob 0aadb65a): `depth <= 0` -> `depth < 0`: caught (1 fail). Backslash split broken: caught. Drop the `climbsOut` call in probeMedia: NOT caught on Windows, because `path.relative` already catches `\` there; only a Linux run exercises it (stated honestly).
+
+## Fix cycle 1
+Added rows "../a/b.webm", "..\a\b.webm", "a/../../b/c.webm", "a\..\..\b\c.webm" to the climbsOut table. Mutants (Node script, byte backup restored in finally, hash == HEAD blob 0aadb65a): depth-check deleted -> 1 fail (killed); split without backslash -> 1 fail (killed).

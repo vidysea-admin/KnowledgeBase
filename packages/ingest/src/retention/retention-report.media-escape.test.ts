@@ -8,7 +8,7 @@ import { tempRoot } from "./retention-report.fixtures.js";
 // Outside-root must be decided lexically BEFORE the existence check, on every platform: on Linux "\" is an ordinary filename
 // character, so "..\..\x" used to resolve inside the root and report "media-not-found" instead of "media-path-outside-root".
 test("climbsOut: both separators, any platform", () => {
-  const out = ["..\\..\\outside.webm", "../outside.webm", "a/../../x.webm", "a\\..\\..\\x.webm", "a/..\\..", "..", ".", "", "a/..", "./", "x/../../y"];
+  const out = ["..\\..\\outside.webm", "../outside.webm", "a/../../x.webm", "a\\..\\..\\x.webm", "a/..\\..", "..", ".", "", "a/..", "./", "x/../../y", "../a/b.webm", "..\\a\\b.webm", "a/../../b/c.webm", "a\\..\\..\\b\\c.webm"];
   const inside = ["a.webm", "a/b.webm", "a\\b.webm", "./a/../b.webm", "a/./b/../c.webm", "dir/..name.webm", "a/b/../c"];
   for (const p of out) assert.equal(climbsOut(p), true, `outside: ${JSON.stringify(p)}`);
   for (const p of inside) assert.equal(climbsOut(p), false, `inside: ${JSON.stringify(p)}`);
