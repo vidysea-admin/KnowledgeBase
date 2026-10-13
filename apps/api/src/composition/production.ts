@@ -11,7 +11,7 @@ import { createMongoSystemStatusDeps } from "../system-status-store.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { complete as routeComplete, embed as routeEmbed, parseRoutingYaml, GeminiProvider, ClaudeCodeProvider, OllamaProvider, type Provider } from "@lkb/ai";
-import { treeSearch } from "@lkb/index";
+import { treeSearch, createLlmNoteJudge } from "@lkb/index";
 import { listHeartbeats, listWatchState } from "@lkb/db";
 import { createTelegramAlertSink } from "@lkb/core";
 import type { ServerDeps } from "../server.js";
@@ -166,11 +166,27 @@ export function resolveSuggestSpeakers(option?: boolean, env: Record<string, str
   return option ?? speakerSuggestEnabled(env);
 }
 
-export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRouting(), options: { strictWebinar?: boolean; suggestSpeakers?: boolean } = {}): BoundIndexer {
+/** T-040 (D-162): grounded notes + Q&A with the note judge. An explicit caller choice wins; otherwise OFF unless KB_GROUNDED_NOTES=1. */
+export function resolveGroundedNotes(option?: boolean, env: Record<string, string | undefined> = process.env): boolean {
+  return option ?? env.KB_GROUNDED_NOTES === "1";
+}
+
+/** Optional per-session judge cost cap (USD) from KB_NOTE_JUDGE_MAX_USD; anything not a finite number >= 0 is ignored. */
+export function resolveJudgeMaxCostUsd(env: Record<string, string | undefined> = process.env): number | undefined {
+  const raw = env.KB_NOTE_JUDGE_MAX_USD?.trim();
+  if (!raw) return undefined;
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? n : undefined;
+}
+
+export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRouting(), options: { strictWebinar?: boolean; suggestSpeakers?: boolean; groundedNotes?: boolean } = {}): BoundIndexer {
   const { chains, providers, jobWrite } = routing;
+  const grounded = resolveGroundedNotes(options.groundedNotes);
   return (tenantId, sessionId) =>
     indexSession(tenantId, sessionId, {
       strictWebinar: options.strictWebinar,
+      // T-040: OFF -> none of these keys is set, so indexSession runs exactly as before.
+      ...(grounded ? { dropUnverified: true, noteJudge: createLlmNoteJudge((job) => routeComplete(job.kind, job, { chains, providers, write: jobWrite, tenantId })), judgeMaxCostUsd: resolveJudgeMaxCostUsd() } : {}),
       // U2.4 / D-141: speaker NAME SUGGESTIONS (never final), OFF unless KB_SPEAKER_SUGGEST=1 or the caller opts in. Uses the `speakers` route.
       suggestSpeakers: resolveSuggestSpeakers(options.suggestSpeakers),
       complete: (job) => routeComplete(job.kind, job, { chains, providers, write: jobWrite, tenantId }),

@@ -24,6 +24,7 @@ export { lexicalSearchTurns, lexicalQueryTokens, type LexicalHit, type Searchabl
 export { runtimeChronologicalTurns, assertGroundedTurns, validateRuntimePage, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin } from "./pipeline/grounded.js";
 export { resolveEvidence, extractiveText, citationTimes, auditGroundedNotes } from "./pipeline/notes/evidence.js";
 export type { DroppedNote } from "./pipeline/notes/drop-mode.js";
+export { createLlmNoteJudge, NOTE_JUDGE_JOB_KIND, type NoteJudge, type JudgeSidecar } from "./pipeline/notes/judge.js";
 export { summarizeSession, type SessionSummaryResult, type SummarizeResult, type SummarizeCompleteFn } from "./pipeline/summarize.js";
 export { extractClaims, type ExtractedClaim, type ClaimsCompleteFn } from "./pipeline/claims.js";
 export { extractDecisions, decisionsEnabled, type ExtractedDecision, type DecisionsResult, type DecisionsCompleteFn } from "./pipeline/notes/decisions.js";

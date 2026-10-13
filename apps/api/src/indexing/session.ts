@@ -3,13 +3,14 @@ import { randomUUID } from "node:crypto";
 import type { Db } from "mongodb";
 import { getDb, scopedCollection } from "@lkb/db";
 import type { SessionPages, Chunks, Claims, Sessions, TreeIndexRootDocument, Turns, CitedItem, QaEntry } from "@lkb/core";
-import { summarizeSession, extractClaims, buildChunks, buildTree, regenerate, treeIndexRootFilter, type SummarizeCompleteFn, runtimeChronologicalTurns, assertGroundedTurns, validateRuntimePage, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin } from "@lkb/index";
+import { summarizeSession, extractClaims, buildChunks, buildTree, regenerate, treeIndexRootFilter, type SummarizeCompleteFn, type NoteJudge, runtimeChronologicalTurns, assertGroundedTurns, validateRuntimePage, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin } from "@lkb/index";
 import { suggestSpeakersForSession, type SpeakerSuggestOutcome } from "./speaker-suggest.js";
 import { recordVectorGap } from "./vector-gap.js";
 import { decisionsEnabled } from "@lkb/index";
 import { extractAndPersistDecisions } from "./decisions-persist.js";
 import { promoteAndPersistEntities, type PromotionResult } from "./promote-entities.js";
 import type { IndexEmbedFn, ChunkWriteResult, IndexSessionResult } from "./types.js";
+import { replacePageInsertFirst, replaceClaimsPreserving, judgeTotals } from "./grounded-write.js";
 
 // Re-exported so existing importers keep one import site for the indexing surface.
 export type { IndexEmbedFn, ChunkSkipReason, ChunkWriteResult, IndexSessionResult } from "./types.js";
@@ -39,6 +40,10 @@ export interface IndexSessionDeps {
   strictWebinar?: boolean;
   /** T-040: with strictWebinar, a proposal that fails strict quote verification or the judge is dropped (and counted) instead of degrading the whole page. */
   dropUnverified?: boolean;
+  /** T-040 / D-144 / D-151: injectable note judge (effective only with strictWebinar + dropUnverified). Fails closed per note. */
+  noteJudge?: NoteJudge;
+  /** Per-session judge cost cap in USD (optional). */
+  judgeMaxCostUsd?: number;
 
   embed?: IndexEmbedFn;
 
@@ -159,11 +164,14 @@ export async function indexSession(
     catch (error) { await sessionsColl(tenantId).updateOne({ _id: sessionId }, { $set: { "status.index": "failed" } }); throw new Error(`strict webinar index incomplete: ${error instanceof Error ? error.message : String(error)}`); }
   }
   const [summarizeResult, claimsResult] = await Promise.all([
-    summarizeSession(turns, deps.complete, { strictWebinar: strict, dropUnverified: deps.dropUnverified }),
-    extractClaims(turns, deps.complete, { strictWebinar: strict, dropUnverified: deps.dropUnverified }),
+    summarizeSession(turns, deps.complete, { strictWebinar: strict, dropUnverified: deps.dropUnverified, ...(deps.noteJudge ? { noteJudge: deps.noteJudge, judgeMaxCostUsd: deps.judgeMaxCostUsd } : {}) }),
+    extractClaims(turns, deps.complete, { strictWebinar: strict, dropUnverified: deps.dropUnverified, ...(deps.noteJudge ? { noteJudge: deps.noteJudge, judgeMaxCostUsd: deps.judgeMaxCostUsd } : {}) }),
   ]);
   const { page: summary, degraded: summaryDegraded } = summarizeResult;
   const { claims: extractedClaims, degraded: claimsDegraded } = claimsResult;
+  // T-040: grounded-notes mode (strict + dropUnverified) uses the insert-first / preserve-reviewed write path below.
+  const grounded = strict && deps.dropUnverified === true;
+  let claimWrite: { preserved: number; replaced: number; inserted: number } | undefined;
   let preparedTree: ReturnType<typeof regenerate> | undefined;
   let candidatePage: SessionPages | undefined;
   let preparedEmbed: Awaited<ReturnType<IndexEmbedFn>> | undefined;
@@ -222,7 +230,7 @@ export async function indexSession(
   if (summaryDegraded && existingPage) {
     console.warn(`indexSession(${tenantId}/${sessionId}): summary degraded — existing session_pages left unchanged: ${summaryDegraded.reason}`);
   } else {
-    await sessionPagesColl(tenantId).deleteMany({ sessionId });
+    if (!grounded) await sessionPagesColl(tenantId).deleteMany({ sessionId });
     if (turns.length > 0) {
       const page: SessionPages = candidatePage ?? {
         _id: randomUUID(),
@@ -234,7 +242,8 @@ export async function indexSession(
         actionItems: summary.actionItems,
         evidence: toEvidenceTuple(turns.map((t) => ({ turnId: t._id, sessionId }))),
       };
-      await sessionPagesColl(tenantId).insertOne(page);
+      if (grounded) await replacePageInsertFirst(sessionPagesColl(tenantId) as never, sessionId, page);
+      else await sessionPagesColl(tenantId).insertOne(page);
     }
   }
 
@@ -245,7 +254,7 @@ export async function indexSession(
   // (ISS-056). On degradation the prior claims are left exactly as they were.
   if (claimsDegraded) {
     console.warn(`indexSession(${tenantId}/${sessionId}): claims left unchanged — ${claimsDegraded.reason}`);
-  } else {
+  } else if (!grounded) {
     await claimsColl(tenantId).deleteMany({ "evidence.sessionId": sessionId } as never);
   }
   if (!claimsDegraded && extractedClaims.length > 0) {
@@ -260,7 +269,8 @@ export async function indexSession(
       evidence: toEvidenceTuple(c.evidence ?? c.evidenceTurnIds.map((turnId) => ({ turnId, sessionId }))),
       ...(strict ? { origin: c.origin, verification: c.verification } : {}),
     }));
-    await claimsColl(tenantId).insertMany(claimDocs);
+    if (grounded) claimWrite = await replaceClaimsPreserving(claimsColl(tenantId) as never, sessionId, claimDocs);
+    else await claimsColl(tenantId).insertMany(claimDocs);
   }
 
   // U2.5 (flag-gated, OFF by default): flag-off reaches no decisions code, no collection, no job.
@@ -319,6 +329,7 @@ export async function indexSession(
   return { sessionId, chunks, entities, ...(speakerSuggestions ? { speakerSuggestions } : {}), summary: { degraded: summaryDegraded?.reason ?? null, ...(summarizeResult.dropped ? { dropped: summarizeResult.dropped.length } : {}) },
     claims: { degraded: claimsDegraded?.reason ?? null, ...(claimsResult.dropped ? { dropped: claimsResult.dropped.length } : {}) },
     ...(decisionsOut ? { decisions: decisionsOut } : {}),
+    ...(grounded ? { groundedNotes: { claims: claimWrite ?? null, judge: judgeTotals(summarizeResult.judgeSidecar, claimsResult.judgeSidecar) ?? null } } : {}),
     completion: { version: 2, strict, complete: !summaryDegraded && !claimsDegraded && !chunks.skipped && Boolean(newRoot), generation: randomUUID(), turnCount: turns.length, treeWritten: Boolean(newRoot) } };
 }
 
