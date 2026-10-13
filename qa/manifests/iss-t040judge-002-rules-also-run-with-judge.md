@@ -1,6 +1,6 @@
 # iss-t040judge-002-rules-also-run-with-judge
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap T-040, owner decision). Class: notes pipeline, no auth/tenancy/data write. Verdict by the checker only.
 Lane: lane/t040both. Authority: D-151 (pending append), Umesh 2026-10-13: with the note judge (D-144) enabled the rule-based lexical negation checks ALSO run; a note is dropped if either rejects it. Resolves ISS-T040JUDGE-002 (ledger row status NOT changed here).
