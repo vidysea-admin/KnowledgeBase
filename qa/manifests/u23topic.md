@@ -1,7 +1,7 @@
 # U2.3 LLM topic extractor via the extractFn seam
 
-**Handshake status:** ready-for-check
-Status: ready-for-check
+**Handshake status:** checked-PASS
+Status: checked-PASS
 Fix cycle: 0
 Task: U2.3 (roadmap tier 3). Deps: U2.2 harness (eval/extraction.ts) wired, NOT accepted.
 Lane: lane/u23topic
