@@ -1,0 +1,120 @@
+{
+  "_doc": "ISS-WEBHIGH-002. Shared fixture: sender value -> expected accept/reject. Read via fs by apps/api (isPrintableAsciiSender) and packages/meeting-bot (parseStrictEmail); each test asserts its validator matches every row exactly. Rows are structurally valid emails apart from the property under test, so both validators must agree. Surrounding-ASCII-whitespace tolerance is an API-only trim and is deliberately not a row.",
+  "cases": [
+    {
+      "name": "plain ascii",
+      "value": "ann@x.example",
+      "accept": true
+    },
+    {
+      "name": "mixed case + plus tag",
+      "value": "Ann.Smith+tag@Sub.X.Example",
+      "accept": true
+    },
+    {
+      "name": "punycode IDN domain",
+      "value": "ann@xn--bcher-kva.example",
+      "accept": true
+    },
+    {
+      "name": "punycode tld",
+      "value": "ann@xn--80ak6aa92e.xn--p1ai",
+      "accept": true
+    },
+    {
+      "name": "exactly 320 chars",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@x.example",
+      "accept": true
+    },
+    {
+      "name": "321 chars",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@x.example",
+      "accept": false
+    },
+    {
+      "name": "U+200B inside local",
+      "value": "a​b@x.example",
+      "accept": false
+    },
+    {
+      "name": "U+200B trailing",
+      "value": "ann@x.example​",
+      "accept": false
+    },
+    {
+      "name": "U+202E RLO",
+      "value": "ann‮@x.example",
+      "accept": false
+    },
+    {
+      "name": "U+0430 Cyrillic a local",
+      "value": "аnn@x.example",
+      "accept": false
+    },
+    {
+      "name": "Cyrillic a in domain",
+      "value": "ann@а.example",
+      "accept": false
+    },
+    {
+      "name": "U+00A0 NBSP",
+      "value": "ann @x.example",
+      "accept": false
+    },
+    {
+      "name": "U+FEFF BOM",
+      "value": "﻿ann@x.example",
+      "accept": false
+    },
+    {
+      "name": "less-than",
+      "value": "a<b@x.example",
+      "accept": false
+    },
+    {
+      "name": "greater-than",
+      "value": "a>b@x.example",
+      "accept": false
+    },
+    {
+      "name": "open paren",
+      "value": "a(b@x.example",
+      "accept": false
+    },
+    {
+      "name": "close paren",
+      "value": "a)b@x.example",
+      "accept": false
+    },
+    {
+      "name": "comma",
+      "value": "a,b@x.example",
+      "accept": false
+    },
+    {
+      "name": "semicolon",
+      "value": "a;b@x.example",
+      "accept": false
+    },
+    {
+      "name": "colon",
+      "value": "a:b@x.example",
+      "accept": false
+    },
+    {
+      "name": "double quote",
+      "value": "a\"b@x.example",
+      "accept": false
+    },
+    {
+      "name": "backslash",
+      "value": "a\b@x.example",
+      "accept": false
+    },
+    {
+      "name": "angle-bracket display form",
+      "value": "Ann <ann@x.example>",
+      "accept": false
+    }
+  ]
+}

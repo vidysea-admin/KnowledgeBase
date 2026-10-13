@@ -100,3 +100,42 @@ test("ETag behaviour unchanged: 428 without precondition, 412 on stale, 200 on m
     void s; void empty;
   });
 });
+
+// ---- ISS-WEBHIGH-002: shared fixture parity with the engine's parseStrictEmail (same file read by packages/meeting-bot) ----
+import { readFileSync } from "node:fs";
+import { isPrintableAsciiSender } from "./sender-ascii.js";
+const FIXTURE: { cases: { name: string; value: string; accept: boolean }[] } = JSON.parse(readFileSync(new URL("../../../../qa/fixtures/sender-validation.json", import.meta.url), "utf8"));
+
+test("shared fixture: isPrintableAsciiSender matches every accept/reject row exactly", () => {
+  assert.ok(FIXTURE.cases.length >= 20);
+  assert.ok(FIXTURE.cases.some(c => c.accept) && FIXTURE.cases.some(c => !c.accept));
+  for (const c of FIXTURE.cases) assert.equal(isPrintableAsciiSender(c.value), c.accept, c.name);
+});
+
+test("shared fixture over HTTP: PUT match.email and approvals agree with the rows (accept 200, reject 400 + nothing written)", async () => {
+  await withServer(async (call, s) => {
+    let etag: string | null = null;
+    for (const c of FIXTURE.cases) {
+      const put = await call("PUT", P, ruleSet(c.value), etag ? { "if-match": etag } : { "if-none-match": "*" });
+      const appr = await call("POST", `${P}/approvals`, { kind: "sender", value: c.value });
+      if (c.accept) { assert.equal(put.status, 200, c.name); assert.equal(appr.status, 200, c.name); etag = put.etag; }
+      else { assert.equal(put.status, 400, c.name); assert.equal(appr.status, 400, c.name); assert.ok(["sender_not_printable_ascii", "bad_request"].includes(appr.json.error), c.name); } // bad_request: the approvals body schema also caps value length
+    }
+    void s;
+  });
+});
+
+// ---- ISS-WEBHIGH-003: a bad email in a LATER rule must be refused (kills a first-rule-only ruleEmailMatchers) ----
+test("PUT rule set: a bad match.email in rule 2 or 3 (clean rule 1) is 400 and nothing is written", async () => {
+  await withServer(async (call, s) => {
+    const clean = (id: string, email: string) => ({ id, effect: "allow", match: { email } });
+    for (const [pos, bad] of [[1, "a​b@x.example"], [2, "a<b@x.example"], [2, "аnn@x.example"]] as [number, string][]) {
+      const rules = [clean("r0", "ann@x.example"), clean("r1", "bob@x.example"), clean("r2", "cy@x.example")];
+      rules[pos] = clean(`r${pos}`, bad);
+      const r = await call("PUT", P, { version: 1, ownDomains: [], rules }, { "if-none-match": "*" });
+      assert.equal(r.status, 400, `${pos}:${bad}`);
+      assert.equal(r.json.error, "sender_not_printable_ascii");
+    }
+    assert.equal(writes(s).length, 0);
+  });
+});

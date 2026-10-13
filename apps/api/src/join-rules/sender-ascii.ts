@@ -9,11 +9,15 @@
  * (the engine's normalizeEmail trims it); anything else outside `!`..`~` is refused.
  */
 const PRINTABLE_ASCII = /^[!-~]+$/;
+/** Same as the engine's parseStrictEmail (ISS-WEBHIGH-002): at most 320 chars and none of `<>(),;:"` or backslash. */
+const MAX_SENDER_LENGTH = 320;
+const FORBIDDEN_SENDER_CHARS = /[<>(),;:"\\]/;
 const ASCII_PAD = /^[ \t\r\n]+|[ \t\r\n]+$/g;
 
 /** True when `value` (trimmed of ASCII whitespace only) consists solely of printable ASCII. Non-strings are not this gate's concern. */
 export function isPrintableAsciiSender(value: string): boolean {
-  return PRINTABLE_ASCII.test(value.replace(ASCII_PAD, ""));
+  const v = value.replace(ASCII_PAD, "");
+  return v.length <= MAX_SENDER_LENGTH && PRINTABLE_ASCII.test(v) && !FORBIDDEN_SENDER_CHARS.test(v);
 }
 
 /** Typed error code for the 400 body: `{ error: "sender_not_printable_ascii", message }`. */
