@@ -27,6 +27,8 @@ import { createMeetingCandidatesRouter, type MeetingCandidatesDeps } from "./rou
 import { createWhatsAppRouter, type WhatsAppRouteDeps } from "./routes/whatsapp.js";
 import { createKeysRouter, type KeysDeps } from "./routes/keys.js";
 import { createIngestRouter, type IngestDeps } from "./routes/ingest.js";
+import { createSourceIntakeRouter } from "./routes/ingest-source.js";
+import type { SourceIntakeDeps } from "./source-intake/store.js";
 import { createPagesRouter } from "./routes/pages.js";
 import { createStubsRouter } from "./routes/stubs.js";
 import { createRateLimiter, type RateLimitOptions } from "./rate-limit.js";
@@ -67,6 +69,8 @@ export interface ServerDeps {
   whatsapp: WhatsAppRouteDeps;
   keys: KeysDeps;
   ingest: IngestDeps;
+  /** T-045 `POST /ingest/source` (YouTube / OnAir / Zoom intake). Optional, OFF by default: absent -> the route is not mounted. */
+  sourceIntake?: SourceIntakeDeps;
   jobs?: JobsReadDeps;
   activityHealth?: ActivityHealthDeps;
   /** D-139/D-158: tenant-scoped dead jobs of the packages/core file queue (FileJobQueue.listDead), shown in /activity-health (source job-queue) and /notifications. Optional: absent -> unchanged. Production wiring pending (runner unwired). */
@@ -131,6 +135,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createWhatsAppRouter(deps.whatsapp));
   app.use(createKeysRouter(deps.keys));
   app.use(createIngestRouter(deps.ingest));
+  if (deps.sourceIntake) app.use(createSourceIntakeRouter(deps.sourceIntake));
   app.use(createStubsRouter());
   app.use(bodyParserErrorHandler(log)); // ISS-APILOGGER-001: body-parser errors: structured log, no body echo, production-identical response
   // Terminal handler (ISS-AUTHTENANT-002): an error with no HTTP status (e.g. a tenant guard throwing in a store) gets a fixed 500 body, never
