@@ -1,6 +1,6 @@
 # budgetindex-structure-refactor
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 2 (ISS-CIFIX-001 high, CI lint:structure). Class: pure refactor, no data write / auth / tenancy. Owner chose refactor over raising budgets.
 Lane: lane/budgetindex. No new issues filed.
