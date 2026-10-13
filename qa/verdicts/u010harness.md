@@ -15,3 +15,24 @@ BLOCKING: the cost cap is inert. Both OllamaProvider (ollama.ts:93) and GeminiPr
 Notes (not blocking): the results JSON has no explicit top-level warning field when heuristicFallbacks > 0; the count is present at calls.heuristicFallbacks and per-pair/question but a reader must look. Add a `warning` string when > 0 as the brief expects. Untracked full-run result files (calibration-*-2026-10-13.json, non-smoke) appeared in the worktree during the check; not mine, not committed (30 pairs, 0 fallbacks, MAE 0.044 glm).
 
 ## ISSUES-WRITTEN: ISS-U010HARNESS-001 (high), ISS-U010HARNESS-002 (low)
+
+---
+
+# Cycle 1
+
+**VERDICT:** PASS
+**Cycle checked:** 1
+**Commit checked:** 9183ee95 (lane/u010harness)
+
+## EXPLANATION
+
+1. ISS-U010HARNESS-001 reproduction (`--llm --model m --max-cost-usd 5`): refused for both `--provider ollama` and `--provider gemini` with the message naming `--max-calls`; 2/2 refused. Variants also refused: `--max-calls 0`, `--max-calls abc`, bare `--max-calls`, no cap (10/10 refused across both providers). Real scripts `eval-recall.mjs` and `eval/eval-calibration.mjs` exit code 2 on the repro.
+2. No live path without an effective cap: parseLlmArgs is the single gate (both scripts return exit 2 on `.error`), and the only accepted shapes carry a finite positive `maxCalls`, which is the binding cap (calls++ is synchronous, checked before each call). Gemini goes through the same gate and the same capHit. Cost cap is now only an additional stop alongside maxCalls.
+3. Boundary tests: capHit at costUsd === maxCostUsd true, 0.4999 false; calls === maxCalls true, one below false; no caps false.
+4. Warning: `fallbackWarning` spread top-level in both recall and calibration results; absent when fallbacks = 0, present with "NOT a pure LLM number" when > 0 (unit-tested).
+5. scripts/eval tests 14/14 (3 runs, 0 fail); packages/ai 220/220; tsc exit 0; lint-loc OK (10 stages).
+6. Mutations on llm-eval.mjs (hash-verified applied, restored, HEAD blob 204d5fed == worktree): cost `>=`->`>` KILLED (cycle-0 survivor now dead), cost-only refusal disabled KILLED, warning threshold `>0`->`>1` KILLED. 3/3 killed.
+
+No real API calls made; untracked data/eval/results files untouched.
+
+## ISSUES-WRITTEN: none (ISS-U010HARNESS-001 closed; ISS-U010HARNESS-002 low warning-field note also addressed by this cycle)
