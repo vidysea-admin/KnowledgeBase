@@ -14,6 +14,7 @@ const {loadTrustedSenderConfig, activeWebinarStopReason, runWebinarRegistrations
 const {createOperationNotifications} = await import('../../packages/meeting-bot/src/capture/notify/telegram-channel.ts');
 const {readWebinarOperationState, writeWebinarOperationState, prepareWebinarSourceState, webinarCompletionState, validateWebinarRegistration, confirmWebinarRegistration} = await import('../../packages/meeting-bot/src/calendar/state/schedule-state.ts');
 const {createPipelineDeps, safeText} = await import('./run-pipeline-deps.mjs');
+const {graphEnabled, runSessionGraph} = await import('./graph/graph-finalize.mjs'); // T-050: LKB_PIPELINE_GRAPH=1 only; off by default
 const {SKIP_REASON_MEANING} = await import('../../packages/meeting-bot/src/calendar/state/skip-describe.ts');
 // Operation reasons that are not skip reasons; every skip reason is derived from the total SKIP_REASON_MEANING record, so a new one is covered automatically.
 const OPERATION_ONLY_REASONS = ['retry-limit', 'interrupted-no-recording-artifact', 'missed-while-processing', 'missed-coverage', 'controller-disconnected',
@@ -210,7 +211,13 @@ export async function runPipelineTick(deps, run = false) {
       if (!artifact || !existsSync(artifact)) { update(id, {status: 'action_required', reason: 'interrupted-no-recording-artifact'}); continue; }
       artifact = confined(root, artifact);
       update(id, {status: 'processing', attempts: (row.attempts ?? 0) + 1});
-      try { await execute(id, ['finalize', '--video', artifact, '--session-id', id, '--title', row.title ?? 'Webinar', '--transcribe', '--process-video', '--index']); }
+      try {
+        if (graphEnabled(env)) {
+          await (deps.runSessionGraph ?? runSessionGraph)({deps, tenantId, id, title: row.title ?? 'Webinar', artifact, env: {...env, MONGO_WORK_DB: work, LKB_CAPTURE_BACKEND: 'tab'}, validateIndexProof, runScript: deps.runScript});
+          if (!complete(id)) throw new Error('Pipeline graph finished without a completed index marker; session is not ready');
+          finishOperation(id);
+        } else await execute(id, ['finalize', '--video', artifact, '--session-id', id, '--title', row.title ?? 'Webinar', '--transcribe', '--process-video', '--index']);
+      }
       catch (error) { update(id, {status: 'failed', reason: safeText(error.message)}); }
     }
     for (const initial of selection.toSchedule) {
