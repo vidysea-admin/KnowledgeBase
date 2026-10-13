@@ -2179,3 +2179,12 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** Contract C1 and C4 are amended accordingly; the source field and the fixed error-class allow-list are permitted.
 **Approved-by:** Umesh
 **Links:** D-139; ISS-FAILEDJOB-001; T-057
+
+## D-159 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Tombstone constants corrected: retention is 30 days (code MATCHED_HORIZON_MS, unchanged) and match window +/-24 h. D-154 stated 14 days because the owner question quoted the wrong current value; Umesh confirmed 30 days (2026-10-13).
+**Why:** D-154 recorded 14 days from a mis-quoted current value; the owner chose to keep the shipped 30-day horizon, so the record must match.
+**Result:** Tombstone retention is 30 days and the match window is +/-24 h; no code change.
+**Supersedes:** D-154 -- D-154's only assertion was the retention and window constants, and its 14-day figure was wrong; this entry replaces it in full with 30 days and +/-24 h.
+**Approved-by:** Umesh
+**Links:** D-060; D-129; ISS-TOMBSTONE-001; ISS-TOMBSTONE-007; ISS-T036CAL-011
