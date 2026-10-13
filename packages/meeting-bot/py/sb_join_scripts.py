@@ -143,3 +143,25 @@ const sel = 'button[aria-label*="leave call" i], [role=button][aria-label*="leav
   '[aria-label="Call controls" i]';
 return [...document.querySelectorAll(sel)].some(vis);
 """
+
+
+# ISS-LOBBYWATCH-001: in-call controls for Zoom web / Teams web / unknown platforms. Text- and
+# aria-based first (class names churn); the data-tid hooks are Teams' own test ids. UNVERIFIED
+# against live Zoom/Teams -- they need a live check. Visible = non-zero size, as for Meet.
+_VIS = "const vis = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; };\n"
+ZOOM_IN_CALL_JS = _VIS + """
+const sel = 'button[aria-label^="leave" i], [role=button][aria-label^="leave" i], button[aria-label*="end meeting" i], ' +
+  '[role=toolbar][aria-label*="meeting" i]';
+return [...document.querySelectorAll(sel)].some(vis);
+"""
+TEAMS_IN_CALL_JS = _VIS + """
+const sel = 'button#hangup-button, button[data-tid="hangup-main-btn"], [data-tid="calling-unified-bar"], ' +
+  'button[aria-label^="leave" i], button[aria-label^="hang up" i], [role=toolbar][aria-label*="meeting controls" i]';
+return [...document.querySelectorAll(sel)].some(vis);
+"""
+GENERIC_IN_CALL_JS = _VIS + """
+const sel = 'button[aria-label^="leave" i], [role=button][aria-label^="leave" i], button[aria-label^="hang up" i], ' +
+  'button[aria-label^="end call" i]';
+return [...document.querySelectorAll(sel)].some(vis);
+"""
+IN_CALL_JS_BY_PLATFORM = {"meet": IN_CALL_JS, "zoom": ZOOM_IN_CALL_JS, "teams": TEAMS_IN_CALL_JS, "other": GENERIC_IN_CALL_JS}

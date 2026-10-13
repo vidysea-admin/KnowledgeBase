@@ -156,6 +156,69 @@ def classify_meet_state(in_call_dom, body_lower):
     return "in-call" if in_call_dom else "unknown"
 
 
+# ISS-LOBBYWATCH-001: Zoom-web / Teams-web admission. Same shape as Meet: waiting-room text means
+# "lobby"; a visible in-call control (the per-platform *_IN_CALL_JS in sb_join_scripts) means
+# "in-call"; a denied / removed / ended page means "unknown" (never admitted). Phrases are lowercase
+# substrings of the body text. ALL PHRASES AND SELECTORS HERE ARE UNVERIFIED AGAINST LIVE Zoom/Teams
+# (hand-written from the clients' public wording and the repo fixture) and need a live check.
+ZOOM_LOBBY_PHRASES = [
+    "please wait, the meeting host will let you in soon", "please wait, the host will let you in soon",
+    "the host will let you in soon", "host will let you in", "waiting for the host", "waiting room",
+    "this meeting has a waiting room", "please wait for the host",
+]
+TEAMS_LOBBY_PHRASES = [
+    "someone in the meeting should let you in soon", "someone in the meeting will let you in",
+    "we've let people in the meeting know you're waiting", "when the meeting starts, we'll let people know you're waiting",
+    "waiting for someone to let you in", "you're in the lobby", "waiting in the lobby", "let you in soon",
+]
+# A page that says the host refused / removed us, or the meeting is over, is never "admitted".
+DENIED_PHRASES = [
+    "you have been removed", "you've been removed", "you were removed", "removed from the meeting",
+    "removed you from", "host denied", "denied your request", "denied entry", "request to join was declined",
+    "request was declined", "was denied", "you can't join this meeting", "you cannot join this meeting",
+    "unable to join", "meeting has ended", "meeting ended", "meeting is over", "the host has ended",
+    "has ended the meeting", "you left the meeting", "you've left the meeting", "you have left the meeting",
+    "rejoin meeting",
+]
+_PLATFORM_HOSTS = {
+    "zoom": ("zoom.us", "zoom.com", "zoomgov.com"),
+    "teams": ("teams.microsoft.com", "teams.live.com", "teams.cloud.microsoft"),
+}
+
+
+def platform_of(url):
+    """"meet" | "zoom" | "teams" | "other" from the URL host (exact host, or a subdomain of a known
+    Zoom/Teams host; look-alike hosts such as meet.google.com.evil.example are "other")."""
+    if is_meet_url(url):
+        return "meet"
+    try:
+        host = (urlsplit(url or "").hostname or "").lower()
+    except ValueError:
+        return "other"
+    for name, hosts in _PLATFORM_HOSTS.items():
+        if any(host == h or host.endswith("." + h) for h in hosts):
+            return name
+    return "other"
+
+
+def classify_admission(platform, in_call_dom, body_lower):
+    """Pure: "lobby" | "in-call" | "unknown" for any platform. `in_call_dom` is that platform's
+    in-call JS result. Order: denied/ended -> unknown; lobby text -> lobby (the waiting room can
+    render a leave control); visible in-call control -> in-call; otherwise unknown. An unknown
+    platform ("other") is in-call ONLY on a positive generic control, and any known lobby text wins;
+    nothing is ever assumed admitted."""
+    body = body_lower or ""
+    if platform == "meet":
+        return classify_meet_state(in_call_dom, body)
+    if any(p in body for p in DENIED_PHRASES):
+        return "unknown"
+    lobby = {"zoom": ZOOM_LOBBY_PHRASES, "teams": TEAMS_LOBBY_PHRASES}.get(
+        platform, ZOOM_LOBBY_PHRASES + TEAMS_LOBBY_PHRASES + LOBBY_PHRASES)
+    if any(p in body for p in lobby):
+        return "lobby"
+    return "in-call" if in_call_dom else "unknown"
+
+
 class AdmissionState:
     """Pure state machine. tick(admitted_now, now) -> "admitted" (once, on the first admitted tick)
     | "timeout" (once, when still not admitted past timeout_s) | None. timeout_s <= 0 disables the
