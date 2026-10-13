@@ -15,7 +15,7 @@ import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
 import { extractSpeakersRuleBased as laneExtract, type SpeakersCompleteFn } from "./speakers-llm.js";
 import { citesNameAsSelfIdentification } from "./speaker-relation-rules.js";
-import { selfIntroductionCandidates, turnHoldsOtherSelfIntroduction } from "./speaker-selfid-rules.js";
+import { selfIntroductionCandidates, turnHoldsOtherSelfIntroduction } from "./speaker-rules/speaker-selfid-rules.js";
 
 const baseExtract = (await import(new URL("./frozen-base-536a56a/speakers-llm.mts", import.meta.url).href)).extractSpeakers as typeof laneExtract;
 const mk = (rows: [string, string][]): Turns[] => rows.map(([ref, text], i) => ({ _id: `t${i + 1}`, tenantId: "t", sessionId: "s", speakerRef: ref, tStart: 0, tEnd: 0, text }) as Turns);

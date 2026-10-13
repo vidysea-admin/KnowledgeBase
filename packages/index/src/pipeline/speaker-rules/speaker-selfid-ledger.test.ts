@@ -14,9 +14,9 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
-import { extractSpeakersRuleBased as extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
-import { looksLikeAName, isDiscourseOnly, nameOccurrences } from "./speaker-name-rules.js";
-import { citesNameAsSelfIdentification, citesNameAsHandover, citesNameAsThanks, occurrenceAccepted, relationGate, RELATION_ROUTES, type RelationRoute } from "./speaker-relation-rules.js";
+import { extractSpeakersRuleBased as extractSpeakers, type SpeakersCompleteFn } from "../speakers-llm.js";
+import { looksLikeAName, isDiscourseOnly, nameOccurrences } from "../speaker-name-rules.js";
+import { citesNameAsSelfIdentification, citesNameAsHandover, citesNameAsThanks, occurrenceAccepted, relationGate, RELATION_ROUTES, type RelationRoute } from "../speaker-relation-rules.js";
 
 const PH3_004 = ["He said I am {N}.", "She told us, I'm {N}.", "He said: I am {N}, and left.", "People go, I am {N}, and stall.", "I was told my name is {N}.",
   "Do you think I am {N}?", "I am, {N}, still waiting for the slides."];
@@ -109,7 +109,7 @@ test("forced ON (the seam ignores the switch): quoted, reported, place-governed 
 
 test("ISS-PH3-005: no production module imports the test seam, and the predicates and the gate take no route override", () => {
   const walk = (d: string): string[] => readdirSync(d).flatMap((f) => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : [p]; });
-  const root = new URL("..", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
+  const root = new URL("../..", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
   const users = walk(root).filter((p) => /\.(ts|mts)$/.test(p) && !/\.test\.ts$/.test(p) && !p.includes("frozen-base") && readFileSync(p, "utf8").includes("occurrenceAccepted"));
   assert.deepEqual(users.map((p) => p.replace(/\\/g, "/").split("/").pop()), ["speaker-relation-rules.ts"]);
   assert.equal(citesNameAsSelfIdentification.length, 2); assert.equal(citesNameAsHandover.length, 2); assert.equal(citesNameAsThanks.length, 2);

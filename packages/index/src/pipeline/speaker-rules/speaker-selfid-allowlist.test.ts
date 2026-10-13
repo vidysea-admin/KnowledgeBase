@@ -11,8 +11,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
-import { extractSpeakersRuleBased as extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
-import { citesNameAsSelfIdentification, namingTurns } from "./speaker-relation-rules.js";
+import { extractSpeakersRuleBased as extractSpeakers, type SpeakersCompleteFn } from "../speakers-llm.js";
+import { citesNameAsSelfIdentification, namingTurns } from "../speaker-relation-rules.js";
 
 const mk = (rows: [string, string][]): Turns[] => rows.map(([ref, text], i) => ({ _id: `t${i + 1}`, tenantId: "t", sessionId: "s", speakerRef: ref, tStart: 0, tEnd: 0, text }) as Turns);
 const replies = (json: unknown): SpeakersCompleteFn => async () => ({ text: "", json, usage: { inputTokens: 1, outputTokens: 1 }, provider: "fake", model: "fake", costUsd: 0 }) as CompleteResult;
@@ -32,7 +32,7 @@ const shipsAny = async (rows: [string, string][], label: string, N: string): Pro
 };
 
 // --- (1) the ledger's own recorded reproductions ---------------------------------------------------------------------
-const ROW = readFileSync(new URL("../../../../qa/issues.ph3.jsonl", import.meta.url), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)).find((r) => r.id === "ISS-PH3-006");
+const ROW = readFileSync(new URL("../../../../../qa/issues.ph3.jsonl", import.meta.url), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)).find((r) => r.id === "ISS-PH3-006");
 const FORMS: string[] = [...(ROW.evidence as string).matchAll(/"([^"]*\{N\}[^"]*)"/g)].map((m) => m[1]!);
 const NAMES = ["Nikhil", "Rashi", "Priya", "Makrand Rajadhyaksha", "Paris", "Moderator", "Mumbai Sharma"];
 
