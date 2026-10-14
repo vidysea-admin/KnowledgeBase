@@ -2229,3 +2229,11 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** U0.10 may run against Ollama Cloud models first and Gemini last, using existing .env keys.
 **Approved-by:** Umesh
 **Links:** U0.10; T-022; D-156
+
+## D-165 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Enable automatic meeting discovery and auto-join (T-036, T-037, T-038). The bot joins webinars automatically. Career counselling and career guidance content has the highest priority, including on scheduling conflicts. Other webinars, e.g. Google Cloud OnAir, are test data and go to staging. Alerts go by email to umeshsugara@vidysea.com via gws AND appear on the web dashboard. This authorizes enabling the T-038 scheduler consent gate, and setting the relevant default flags ON for this deployment.
+**Why:** Umesh answered directly on 2026-10-14. Q: "Should the bot join meetings on its own? Which ones?" A: "webinars and all . most high priority should be given to career counselling, career guidance and all these kind of data . humko ussi ka knowlege base bnnana hai . ye google wala tho for testing and all hai". Q: "When the scheduler finds a meeting, how should it tell you?" A: "email, and web dashbaord both".
+**Result:** Auto-discovery and auto-join are authorized for this deployment, with career counselling and guidance webinars first, other webinars staged as test data, and alerts sent by email and shown on the dashboard.
+**Approved-by:** Umesh
+**Links:** T-036; T-037; T-038
