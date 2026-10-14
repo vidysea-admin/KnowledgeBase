@@ -1,0 +1,16 @@
+# Verdict: iss-capturefix-001-lobby-admission-watchdog
+
+VERDICT: PASS (scope: Google Meet, as stated by ISS-CAPTUREFIX-001)
+Cycle checked: 0
+Commit checked: 073a4a07 (lane/lobbywatch, from 16d20ec9)
+
+EXPLANATION:
+1. Guards: `git diff 16d20ec9 HEAD` shows no change to sb_join_ownership.py, sb_join_recorder.py, sb_join_register.py, sb_join_profile.py, registration_cdp.py, registration_cdp_page.py. sb_join.py changed only in re-export imports. Claim holds.
+2. Detection: lobby text always wins over the leave control (classify_meet_state), so a lobby that renders a Leave button is "lobby". In-call needs a VISIBLE "Leave call" button or "Call controls" toolbar. A "You can't join this call"/denied page has no leave control and no lobby phrase -> "unknown", never admitted (it then runs to the 900 s timeout; acceptable). Pre-join "Ask to join" -> lobby. Risks, not defects: the fixtures are hand-written static HTML, not captured Meet DOM, so real selectors and phrases are unverified (the manifest says so); English locale only; if Meet shows the call-controls bar under a lobby phrase not in LOBBY_PHRASES, it would be marked admitted. Fixture lobby text "Someone in the call will let you in" is matched only via "asking to join", not via the phrase list entry "someone will let you in" (harmless).
+3. NON-MEET admitted immediately: this is a real gap. runRecord routes meet, teams and zoom (strategy "vexa", no Vexa deployed) through the same local sb_join browser bot, and the Zoom lobby ("Please wait, the host will let you in soon") is in the repo's own fixture. The silence watchdog would reload there exactly as it did in Meet. Meet was the stated scope, so no FAIL, but filed ISS-LOBBYWATCH-001 (high).
+4. Timeout: py loop breaks and emits `closed` (not fatal); Node sets captureFailure "admission_timeout: ... no recording made", the loop throws, the finally stops the joiner and bot. Exit status is reported via the thrown typed error. NOT verified: whether the tab recorder leaves a silent lobby .webm on disk after timeout (the test deletes its record dir). Noted, low, not filed. The recorder also records the lobby from join (maker-disclosed limit); T-029 reconnect-reload can still fire in the lobby (maker-disclosed).
+5. Runs: new py test file passes; py suite -k "not native_same_host" 311 passed, 7 deselected; admission-gate.test.ts 9/9; full meeting-bot TS suite 862 tests, 856 pass, 3 fail (2x EPERM symlink on Windows, 1 ffmpeg remux; environmental, files untouched), 2 skipped; tsc --noEmit clean.
+   Mutations (harness untracked in worktree, per-mutation byte backup restored in finally, git hash-object == HEAD blob after each, harness deleted): 8/8 killed across two batches: admitted emitted in lobby (DOM beats lobby text); watchdog starts before admitted (attach -> start); reload not suppressed; no exit after admission_timeout; non-Meet treated as Meet; hidden Leave button counts; admitted never starts watchdog; lobby phrase list trimmed. (The first batch's 3 patterns missed on CRLF; rerun with CRLF-aware replacement, all killed.)
+Not verified: real Meet lobby/admission, real 60-minute run.
+
+ISSUES-WRITTEN: ISS-LOBBYWATCH-001 (high) in qa/issues.lobbywatch.jsonl

@@ -8,7 +8,7 @@
     "testMax": 400,
     "testPatterns": ["\\.test\\.ts$", "^test_.*\\.py$", "\\.test\\.mjs$"]
   },
-  "dirsize": { "maxFiles": 30, "overrides": { "scripts": 32, "apps/api/src": 31 } },
+  "dirsize": { "$comment": "schema/ budget raised 30 -> 40 by D-147 (pending append): one schema file per collection is the convention.", "maxFiles": 30, "overrides": { "scripts": 32, "apps/api/src": 31, "schema": 40 } },
   "root": {
     "maxLooseFiles": 15,
     "architectureFile": "ARCHITECTURE.md",

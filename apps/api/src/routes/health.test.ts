@@ -49,36 +49,44 @@ const fresh = (tenantId: string, sourceType: string): HeartbeatRow => ({
 const allFresh = (tenantId: string): HeartbeatRow[] =>
   ["drive", "gmail", "calendar"].map((s) => fresh(tenantId, s));
 
-test("GET /health with no Authorization header returns 200 with a real report shape", async () => {
+test("GET /health with no Authorization header returns 200 and EXACTLY {db: ok} (ISS-T057SCREEN-001)", async () => {
   const server = await startTestServer(buildTestDeps());
   try {
     const res = await fetch(`${server.baseUrl}/health`);
     assert.equal(res.status, 200);
-    const body = (await res.json()) as { db: string; collections: Record<string, number> };
-    assert.equal(body.db, "ok");
-    assert.equal(body.collections.sessions, 1);
-    assert.equal(body.collections.claims, 1);
+    const raw = await res.text();
+    assert.deepEqual(JSON.parse(raw), { db: "ok" });
+    for (const leak of ["collections", "sessions", "claims", "watchSilent", "watchUnreadable"]) {
+      assert.equal(raw.includes(leak), false, `leaked ${leak}`);
+    }
   } finally {
     await server.close();
   }
 });
 
-test("GET /health reports 503, not 200, when the db is unhealthy", async () => {
+test("GET /health never serialises extra keys a checkHealth fake returns (body is whitelisted)", async () => {
+  const sneaky = { db: "ok", collections: { secret_tenant_coll: 99 }, tenantId: "t1" } as unknown as { db: "ok" };
+  const server = await startTestServer(buildTestDeps({ health: fakeHealthDeps({ checkHealth: async () => sneaky }) }));
+  try {
+    const res = await fetch(`${server.baseUrl}/health`);
+    assert.deepEqual(await res.json(), { db: "ok" });
+  } finally {
+    await server.close();
+  }
+});
+
+test("GET /health reports 503 with EXACTLY {db: error} when the db is unhealthy", async () => {
   const server = await startTestServer(
-    buildTestDeps({ health: fakeHealthDeps({ checkHealth: async () => ({ db: "error", collections: {} }) }) }),
+    buildTestDeps({ health: fakeHealthDeps({ checkHealth: async () => ({ db: "error" }) }) }),
   );
   try {
     const res = await fetch(`${server.baseUrl}/health`);
     assert.equal(res.status, 503);
-    const body = (await res.json()) as { db: string; collections: Record<string, number> };
-    assert.equal(body.db, "error");
-    assert.deepEqual(body.collections, {});
+    assert.deepEqual(await res.json(), { db: "error" });
   } finally {
     await server.close();
   }
 });
-
-// --- U4b/R2: the watcher-silence detector -------------------------------------------------
 
 test("R2: a watcher whose heartbeat is older than the interval produces exactly one alert", async () => {
   const stale = { tenantId: "toc", sourceType: "drive", lastHeartbeatAt: new Date(NOW.getTime() - 3 * HOUR).toISOString() };
@@ -159,16 +167,16 @@ test("R2: a throwing alert sink is swallowed — the probe must not die of its o
   assert.deepEqual(await detectSilentWatchers(deps), {silent: 3, unreadable: 0});
 });
 
-test("R2: /health reports watchSilent as an aggregate count and names no tenant or source type", async () => {
-  const { deps } = fakeWatchSilence({ toc: [] });
+test("R2: /health runs the detector (alerts fire) but exposes NO watcher counts, tenant or source type in the body", async () => {
+  const { deps, alerts } = fakeWatchSilence({ toc: [] });
   const server = await startTestServer(buildTestDeps({ health: fakeHealthDeps({ watchSilence: deps }) }));
   try {
     const res = await fetch(`${server.baseUrl}/health`);
     assert.equal(res.status, 200);
     const raw = await res.text();
-    assert.equal((JSON.parse(raw) as { watchSilent: number }).watchSilent, 3);
-    // Unauthenticated route: the body must carry no tenant id and no source type, only the count.
-    for (const leak of ["toc", "drive", "gmail", "calendar"]) {
+    assert.deepEqual(JSON.parse(raw), { db: "ok" });
+    assert.equal(alerts.length, 3);
+    for (const leak of ["toc", "drive", "gmail", "calendar", "watchSilent", "watchUnreadable"]) {
       assert.equal(raw.includes(leak), false, `leaked ${leak}`);
     }
   } finally {
@@ -176,12 +184,13 @@ test("R2: /health reports watchSilent as an aggregate count and names no tenant 
   }
 });
 
-test("R2: /health with an all-fresh watcher set reports watchSilent: 0", async () => {
+test("R2: /health with an all-fresh watcher set is 200 {db: ok}", async () => {
   const { deps } = fakeWatchSilence({ toc: allFresh("toc") });
   const server = await startTestServer(buildTestDeps({ health: fakeHealthDeps({ watchSilence: deps }) }));
   try {
-    const body = (await (await fetch(`${server.baseUrl}/health`)).json()) as { watchSilent: number };
-    assert.equal(body.watchSilent, 0);
+    const res = await fetch(`${server.baseUrl}/health`);
+    assert.equal(res.status, 200);
+    assert.deepEqual(await res.json(), { db: "ok" });
   } finally {
     await server.close();
   }
@@ -191,15 +200,13 @@ test("R2: when the db ping fails the detector does not run — every watcher wou
   const { deps, alerts, reads } = fakeWatchSilence({ toc: [] });
   const server = await startTestServer(
     buildTestDeps({
-      health: fakeHealthDeps({ checkHealth: async () => ({ db: "error", collections: {} }), watchSilence: deps }),
+      health: fakeHealthDeps({ checkHealth: async () => ({ db: "error" }), watchSilence: deps }),
     }),
   );
   try {
     const res = await fetch(`${server.baseUrl}/health`);
     assert.equal(res.status, 503);
-    const body = await res.json() as {watchSilent?: number; watchUnreadable?: number};
-    assert.equal(body.watchSilent, undefined);
-    assert.equal(body.watchUnreadable, undefined);
+    assert.deepEqual(await res.json(), { db: "error" });
     assert.deepEqual(alerts, []);
     assert.deepEqual(reads, []);
   } finally {
@@ -207,25 +214,23 @@ test("R2: when the db ping fails the detector does not run — every watcher wou
   }
 });
 
-test("R2: two probes in a row do not accumulate watchSilent on a shared health report object", async () => {
+test("R2: two probes in a row give the same body and each re-runs the detector", async () => {
   const { deps } = fakeWatchSilence({ toc: [] });
   const server = await startTestServer(buildTestDeps({ health: fakeHealthDeps({ watchSilence: deps }) }));
   try {
-    const first = (await (await fetch(`${server.baseUrl}/health`)).json()) as { watchSilent: number };
-    const second = (await (await fetch(`${server.baseUrl}/health`)).json()) as { watchSilent: number };
-    assert.equal(first.watchSilent, 3);
-    assert.equal(second.watchSilent, 3);
+    const first = await (await fetch(`${server.baseUrl}/health`)).json();
+    const second = await (await fetch(`${server.baseUrl}/health`)).json();
+    assert.deepEqual(first, { db: "ok" });
+    assert.deepEqual(second, { db: "ok" });
   } finally {
     await server.close();
   }
 });
 
-test("R2: with no watchSilence wired, /health behaves exactly as before U4b (no watchSilent field)", async () => {
+test("R2: with no watchSilence wired, /health is exactly {db: ok}", async () => {
   const server = await startTestServer(buildTestDeps());
   try {
-    const body = (await (await fetch(`${server.baseUrl}/health`)).json()) as Record<string, unknown>;
-    assert.equal("watchSilent" in body, false);
-    assert.equal("watchUnreadable" in body, false);
+    assert.deepEqual(await (await fetch(`${server.baseUrl}/health`)).json(), { db: "ok" });
   } finally {
     await server.close();
   }
@@ -288,7 +293,7 @@ test("ISS-368: HTTP distinguishes unreadable watchers from readable fresh watche
       const res = await fetch(`${server.baseUrl}/health`);
       assert.equal(res.status, unreadable ? 503 : 200);
       const raw = await res.text();
-      assert.deepEqual(JSON.parse(raw), {db: "ok", collections: {sessions: 1, claims: 1}, watchSilent: 0, watchUnreadable: unreadable ? 1 : 0});
+      assert.deepEqual(JSON.parse(raw), {db: "ok"});
       assert.deepEqual(reads, ["private-tenant"]);
       assert.deepEqual(alerts, []);
       for (const secret of ["private-tenant", "private database credential failure", "drive", "gmail", "calendar"])
@@ -310,7 +315,7 @@ test("ISS-368: partial reads still alert only known silent tenants and report 50
     const res = await fetch(`${server.baseUrl}/health`);
     assert.equal(res.status, 503);
     const raw = await res.text();
-    assert.deepEqual(JSON.parse(raw), {db: "ok", collections: {sessions: 1, claims: 1}, watchSilent: 3, watchUnreadable: 1});
+    assert.deepEqual(JSON.parse(raw), {db: "ok"});
     assert.deepEqual(reads, ["broken", "toc"]);
     assert.deepEqual(alerts, ["drive", "gmail", "calendar"].map(source => ["toc", source, null, HOUR]));
     for (const secret of ["broken", "toc", "sensitive read failure", "drive", "gmail", "calendar"])
@@ -318,7 +323,7 @@ test("ISS-368: partial reads still alert only known silent tenants and report 50
   } finally { await server.close(); }
 });
 
-test("ISS-368: recovery uses fresh counts without mutating a cached health report", async () => {
+test("ISS-368: recovery re-reads heartbeats (503 then 200) without mutating a cached health report", async () => {
   const cached = Object.freeze({db: "ok" as const, collections: Object.freeze({sessions: 1})});
   let failed = true;
   const {deps, reads, alerts} = fakeWatchSilence({toc: []}, {
@@ -332,13 +337,83 @@ test("ISS-368: recovery uses fresh counts without mutating a cached health repor
   try {
     const first = await fetch(`${server.baseUrl}/health`);
     assert.equal(first.status, 503);
-    assert.deepEqual(await first.json(), {db: "ok", collections: {sessions: 1}, watchSilent: 0, watchUnreadable: 1});
+    assert.deepEqual(await first.json(), {db: "ok"});
     failed = false;
     const recovered = await fetch(`${server.baseUrl}/health`);
     assert.equal(recovered.status, 200);
-    assert.deepEqual(await recovered.json(), {db: "ok", collections: {sessions: 1}, watchSilent: 0, watchUnreadable: 0});
-    assert.deepEqual(cached, {db: "ok", collections: {sessions: 1}});
+    assert.deepEqual(await recovered.json(), {db: "ok"});
+    assert.deepEqual(cached, {db: "ok", collections: {sessions: 1}}); // untouched by the probe
     assert.deepEqual(reads, ["toc", "toc"]);
     assert.deepEqual(alerts, []);
   } finally { await server.close(); }
+});
+
+// ---- ISS-T057SCREEN-001 (Approver ruling 2026-10-12: liveness only) ----
+
+test("ISS-T057SCREEN-001 reproduction 1 replayed: an anonymous caller gets no counts or collection names from /health", async () => {
+  // The recorded reproduction: unauthenticated GET /health used to return every collection name -> all-tenant count.
+  const server = await startTestServer(buildTestDeps());
+  try {
+    const res = await fetch(`${server.baseUrl}/health`, { headers: {} });
+    assert.equal(res.status, 200);
+    const body = (await res.json()) as Record<string, unknown>;
+    assert.deepEqual(Object.keys(body), ["db"]);
+    assert.equal(JSON.stringify(body).match(/\d/), null, "no numbers at all in the public body");
+  } finally {
+    await server.close();
+  }
+});
+
+test("ISS-T057SCREEN-001: no countDocuments anywhere on the public /health path (source pin)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const strip = (f: string) => readFileSync(new URL(f, import.meta.url), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+  assert.doesNotMatch(strip("./health.ts"), /countDocuments|estimatedDocumentCount|\.collection\(/);
+  assert.doesNotMatch(strip("../health-probe.ts"), /countDocuments|estimatedDocumentCount|\.collection\(/);
+  const store = strip("../store.ts");
+  const fn = store.slice(store.indexOf("export function createMongoHealthDeps"), store.indexOf("export function createMongoHealthDeps") + 400);
+  assert.doesNotMatch(fn, /countDocuments|\.collection\(|schema\/index/);
+});
+
+test("Dockerfile HEALTHCHECK command still passes against a live /health (200) and fails when the server is down", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { spawn } = await import("node:child_process");
+  // ASYNC spawn: the test server lives in this process, so a blocking spawnSync would starve it.
+  const run = (args: string[], port: string) => new Promise<number | null>((resolve) => {
+    const c = spawn(process.execPath, args, { env: { ...process.env, PORT: port }, stdio: "ignore" });
+    const t = setTimeout(() => c.kill(), 15000);
+    c.on("exit", (code) => { clearTimeout(t); resolve(code); });
+  });
+  const df = readFileSync(new URL("../../Dockerfile", import.meta.url), "utf8");
+  const m = df.match(/^\s*CMD (\["node", "-e", .*\])\s*$/m);
+  assert.ok(m, "HEALTHCHECK CMD found");
+  const cmd = JSON.parse(m![1]!) as string[];
+  assert.equal(cmd[0], "node");
+  const server = await startTestServer(buildTestDeps());
+  try {
+    const port = new URL(server.baseUrl).port;
+    assert.equal(await run(cmd.slice(1), port), 0);
+  } finally {
+    await server.close();
+  }
+  // Server closed: the probe must now exit 1 (connection refused), proving it is not vacuous.
+  assert.equal(await run(cmd.slice(1), new URL(server.baseUrl).port), 1);
+});
+
+test("Dockerfile HEALTHCHECK goes red (exit 1) when the db is down (503)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { spawn } = await import("node:child_process");
+  // ASYNC spawn: the test server lives in this process, so a blocking spawnSync would starve it.
+  const run = (args: string[], port: string) => new Promise<number | null>((resolve) => {
+    const c = spawn(process.execPath, args, { env: { ...process.env, PORT: port }, stdio: "ignore" });
+    const t = setTimeout(() => c.kill(), 15000);
+    c.on("exit", (code) => { clearTimeout(t); resolve(code); });
+  });
+  const df = readFileSync(new URL("../../Dockerfile", import.meta.url), "utf8");
+  const cmd = JSON.parse(df.match(/^\s*CMD (\["node", "-e", .*\])\s*$/m)![1]!) as string[];
+  const server = await startTestServer(buildTestDeps({ health: fakeHealthDeps({ checkHealth: async () => ({ db: "error" }) }) }));
+  try {
+    assert.equal(await run(cmd.slice(1), new URL(server.baseUrl).port), 1);
+  } finally {
+    await server.close();
+  }
 });

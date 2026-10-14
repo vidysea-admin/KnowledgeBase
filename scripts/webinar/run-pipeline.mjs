@@ -4,16 +4,18 @@ import { existsSync, mkdirSync, openSync, closeSync, readFileSync, writeFileSync
 import { dirname, join, resolve, relative, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {randomUUID} from 'node:crypto';
+import {isProtectedWorkDbName} from '../lib/transcript-provenance.mjs';
 import { register } from 'tsx/esm/api';
 register();
 const {selectAutoRecordItems} = await import('../../packages/meeting-bot/src/calendar/auto-join.ts');
 const {loadWebinarSourcesWithHealth} = await import('../../packages/meeting-bot/src/calendar/schedule-tick.ts');
 const {validateIndexProof} = await import('../../packages/meeting-bot/src/capture/record-commands.ts');
 const {loadTrustedSenderConfig, activeWebinarStopReason, runWebinarRegistrations, reconcileWebinarRegistrationState, projectWebinarSelection} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
-const {createOperationNotifications} = await import('../../packages/meeting-bot/src/capture/telegram-channel.ts');
-const {readWebinarOperationState, writeWebinarOperationState, prepareWebinarSourceState, webinarCompletionState, validateWebinarRegistration, confirmWebinarRegistration} = await import('../../packages/meeting-bot/src/calendar/schedule-state.ts');
+const {createOperationNotifications} = await import('../../packages/meeting-bot/src/capture/notify/telegram-channel.ts');
+const {readWebinarOperationState, writeWebinarOperationState, prepareWebinarSourceState, webinarCompletionState, validateWebinarRegistration, confirmWebinarRegistration} = await import('../../packages/meeting-bot/src/calendar/state/schedule-state.ts');
 const {createPipelineDeps, safeText} = await import('./run-pipeline-deps.mjs');
-const {SKIP_REASON_MEANING} = await import('../../packages/meeting-bot/src/calendar/skip-describe.ts');
+const {graphEnabled, runSessionGraph} = await import('./graph/graph-finalize.mjs'); // T-050: LKB_PIPELINE_GRAPH=1 only; off by default
+const {SKIP_REASON_MEANING} = await import('../../packages/meeting-bot/src/calendar/state/skip-describe.ts');
 // Operation reasons that are not skip reasons; every skip reason is derived from the total SKIP_REASON_MEANING record, so a new one is covered automatically.
 const OPERATION_ONLY_REASONS = ['retry-limit', 'interrupted-no-recording-artifact', 'missed-while-processing', 'missed-coverage', 'controller-disconnected',
   'coverage-review', 'source-discontinuity', 'unproven-calendar-history', 'rejected', 'rescheduled', 'rescheduled-completed', 'recurring-series',
@@ -38,7 +40,7 @@ function confined(root, file) {
 }
 export function validateRunGate(root, env) {
   const work = env.MONGO_WORK_DB?.trim();
-  if (!work || ['lkb', 'global_university_db'].includes(work)) throw new Error('MONGO_WORK_DB must identify an isolated work database; production writes refused');
+  if (isProtectedWorkDbName(work, env)) throw new Error('MONGO_WORK_DB must identify an isolated work database; production writes refused');
   const file = join(root, 'data/webinar-release/live-proof.json');
   if (!existsSync(file)) throw new Error('Manual live audio/video proof is required before unattended --run; see docs/webinar-release.md');
   const proof = load(file);
@@ -209,7 +211,13 @@ export async function runPipelineTick(deps, run = false) {
       if (!artifact || !existsSync(artifact)) { update(id, {status: 'action_required', reason: 'interrupted-no-recording-artifact'}); continue; }
       artifact = confined(root, artifact);
       update(id, {status: 'processing', attempts: (row.attempts ?? 0) + 1});
-      try { await execute(id, ['finalize', '--video', artifact, '--session-id', id, '--title', row.title ?? 'Webinar', '--transcribe', '--process-video', '--index']); }
+      try {
+        if (graphEnabled(env)) {
+          await (deps.runSessionGraph ?? runSessionGraph)({deps, tenantId, id, title: row.title ?? 'Webinar', artifact, env: {...env, MONGO_WORK_DB: work, LKB_CAPTURE_BACKEND: 'tab'}, validateIndexProof, runScript: deps.runScript});
+          if (!complete(id)) throw new Error('Pipeline graph finished without a completed index marker; session is not ready');
+          finishOperation(id);
+        } else await execute(id, ['finalize', '--video', artifact, '--session-id', id, '--title', row.title ?? 'Webinar', '--transcribe', '--process-video', '--index']);
+      }
       catch (error) { update(id, {status: 'failed', reason: safeText(error.message)}); }
     }
     for (const initial of selection.toSchedule) {

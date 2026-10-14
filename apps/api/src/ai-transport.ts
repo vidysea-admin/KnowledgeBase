@@ -32,6 +32,13 @@ async function removeEphemeral(dir: string, c: CliLimits["cleanup"] = {}): Promi
   }
   try { c.onFailure?.(code); } catch { /* reporting must not alter the outcome */ }
 }
+/** POSIX: SIGKILL to the group is asynchronous, so wait (bounded) until the group has no members left
+ *  before the caller sees the rejection. No-op on win32 (taskkill /T handles the tree there). */
+async function groupGone(pid: number | undefined, boundMs = 2_000): Promise<void> {
+  if (process.platform === "win32" || !pid) return;
+  for (const end = Date.now() + boundMs; Date.now() < end; await new Promise((r) => setTimeout(r, 10)))
+    try { process.kill(-pid, 0); } catch { return; }
+}
 export function resolveCliCommand(command: string): string {
   if (process.platform !== "win32") return command;
   if (/\.(cmd|bat)$/i.test(command)) throw new Error("CLI shell shims are unsupported");
@@ -77,7 +84,7 @@ export function createCliTransport(options: CliLimits = {}): Transport {
         let settled = false; let timer: ReturnType<typeof setTimeout>;
         const finish = (error?: string, code?: number | null) => {
           if (settled) return; settled = true; clearTimeout(timer);
-          if (error) reject(new Error(error));
+          if (error) void groupGone(child.pid).then(() => reject(new Error(error)));
           else { const text = Buffer.concat(stdout).toString("utf8"); resolve({status: code ?? 1, body: tryParseJson(text), text}); }
         };
         const terminate = (reason: string) => {

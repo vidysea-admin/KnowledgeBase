@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /** Local video → scene evidence + cited notes. No Mongo writes; dry-run never calls a provider. */
 import { createHash, randomUUID } from 'node:crypto';
-import { createReadStream, existsSync, mkdirSync, readFileSync, writeFileSync, renameSync, realpathSync, unlinkSync, readdirSync } from 'node:fs';
+import { createReadStream, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, renameSync, realpathSync, unlinkSync, readdirSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { resolve, relative, join, dirname, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
@@ -131,8 +132,33 @@ export function screenEvidenceTurns(sessionId, tenantId, evidence) {
   }
   return rows;
 }
+/** T-041: optional keyframe -> OCR -> slide/turn alignment stage (flag-gated by the caller; absent = nothing runs).
+ * Writes slide-alignment.json (ids and ranges only, never slide text). A failing stage never fails the video stage. */
+async function runSlideAlignment(slideAlignment, { dir, media, sessionId, turns }) {
+  const outDir = mkdtempSync(join(tmpdir(), 'lkb-keyframes-'));
+  try {
+    const alignTurns = turns.map((t) => ({ id: t._id, tStart: t.tStart, tEnd: t.tEnd, ...(t.speakerRef ? { speakerRef: t.speakerRef } : {}) }));
+    let outcome;
+    try { outcome = await slideAlignment({ video: media, outDir, turns: alignTurns }); }
+    catch { outcome = { status: 'failed', code: 'stage-failed' }; }
+    if (outcome.status === 'disabled') return { status: 'disabled' };
+    atomic(join(dir, 'slide-alignment.json'), { version: 1, sessionId, ...outcome });
+    return { status: outcome.status, ...(outcome.status === 'done' ? { keyframeCount: outcome.keyframeCount, ocrErrorCount: outcome.ocrErrors.length } : {}) };
+  } finally { rmSync(outDir, { recursive: true, force: true }); }
+}
+/** T-041: builds the flag-on slideAlignment hook. Primary OCR = Gemini vision (WEBINAR_VISION_MODEL); optional
+ * fallback engine = LKB_KEYFRAME_OCR_FALLBACK_MODEL on the same route (D-137). Core is loaded lazily so the flag-off
+ * path imports nothing new. */
+export async function keyframeOcrHook(env, transport, load = () => Promise.all([
+  import('../../packages/core/src/keyframes/post-process.ts'), import('../../packages/core/src/keyframes/vision-ocr.ts')])) {
+  const [{ runKeyframeOcrPostProcess }, { createGeminiVisionOcr }] = await load();
+  const make = (model) => createGeminiVisionOcr({ transport, apiKey: env.GEMINI_API_KEY, model });
+  const ocr = make(env.WEBINAR_VISION_MODEL);
+  const fallback = env.LKB_KEYFRAME_OCR_FALLBACK_MODEL ? make(env.LKB_KEYFRAME_OCR_FALLBACK_MODEL) : undefined;
+  return ({ video, outDir, turns }) => runKeyframeOcrPostProcess({ env, video, outDir, turns, ocr, ocrRetry: { fallback } });
+}
 export async function processVideo({ root, sessionId, recording, tenantId, dryRun = false, vision,
-  visionModel = 'injected', command = mediaCommand }) {
+  visionModel = 'injected', command = mediaCommand, slideAlignment }) {
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(sessionId ?? '')) throw new Error('invalid sessionId');
   root = realpathSync(root);
   const dir = confined(root, join(root, 'data', 'toc-migrated', sessionId));
@@ -166,7 +192,10 @@ export async function processVideo({ root, sessionId, recording, tenantId, dryRu
     if (state.status === 'done' && state.inputHash === inputHash && OUTPUTS.every((f) =>
       existsSync(join(dir, f)) && digest(readFileSync(confined(root, join(dir, f)))) === state.outputs?.[f]) &&
       load(join(dir, 'screen-evidence.json')).frames.every((f) => existsSync(join(dir, f.file)) &&
-        digest(readFileSync(confined(root, join(dir, f.file)))) === f.hash)) return { ...state, reused: true };
+        digest(readFileSync(confined(root, join(dir, f.file)))) === f.hash)) {
+      if (!slideAlignment) return { ...state, reused: true };
+      return { ...state, reused: true, slideAlignment: await runSlideAlignment(slideAlignment, { dir, media, sessionId, turns }) };
+    }
   }
   const lock = join(dir, '.video-stage.lock');
   if (existsSync(lock)) {
@@ -210,7 +239,8 @@ export async function processVideo({ root, sessionId, recording, tenantId, dryRu
     const state = { status: 'done', sessionId, inputHash, frameCount: frames.length,
       outputs: Object.fromEntries(OUTPUTS.map((f) => [f, digest(readFileSync(join(dir, f)))])) };
     atomic(statePath, state);
-    return state;
+    if (!slideAlignment) return state;
+    return { ...state, slideAlignment: await runSlideAlignment(slideAlignment, { dir, media, sessionId, turns }) };
   } catch (error) {
     atomic(statePath, { status: 'failed', sessionId, inputHash, error: error.message });
     throw error;
@@ -221,17 +251,18 @@ if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.m
     const args = process.argv.slice(2), sessionId = args[0], pos = args.indexOf('--recording');
     if (pos < 0 || !args[pos + 1]) throw new Error('usage: process-video.mjs sessionId --recording project-relative-path [--dry-run]');
     const dryRun = args.includes('--dry-run');
-    let vision;
+    let vision, slideAlignment;
     if (!dryRun) {
       await import('dotenv/config');
       if (process.env.GEMINI_API_KEY && process.env.WEBINAR_VISION_MODEL) {
         const { register } = await import('tsx/esm/api'); register();
         const { realTransport } = await import('../../apps/api/src/ai-transport.ts');
         vision = geminiVision(realTransport, { apiKey: process.env.GEMINI_API_KEY, model: process.env.WEBINAR_VISION_MODEL });
+        if (process.env.LKB_KEYFRAME_OCR === '1') slideAlignment = await keyframeOcrHook(process.env, realTransport);
       }
     }
     console.log(JSON.stringify(await processVideo({ root: resolve(dirname(fileURLToPath(import.meta.url)), '../..'),
       sessionId, recording: args[pos + 1], tenantId: args.includes('--tenant') ? args[args.indexOf('--tenant') + 1] : undefined,
-      dryRun, vision, visionModel: process.env.WEBINAR_VISION_MODEL ?? 'unconfigured' }), null, 2));
+      dryRun, vision, slideAlignment, visionModel: process.env.WEBINAR_VISION_MODEL ?? 'unconfigured' }), null, 2));
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

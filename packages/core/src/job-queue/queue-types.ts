@@ -20,13 +20,13 @@ export interface QueueJob {
   workerId: string | null;
   leaseExpiresAt: number | null;
   errorCode: string | null;
-  /** ISS-JOBQLOST-001: queue-clock time the job was first seen terminal (done/dead). Written ONLY when pruning is enabled (FileJobQueueOptions.pruneTerminalAfterMs); absent otherwise. */
+  /** ISS-JOBQLOST-001: queue-clock time the job was first seen terminal (done/dead). Written ONLY when pruning is enabled (the default, 30 days; FileJobQueueOptions.pruneTerminalAfterMs: null disables); absent otherwise. */
   terminalAt?: number;
 }
 
 /** What a worker holds after a claim; every later call must present it (fences a stale handler of an older attempt). */
-/** `tenantId` is optional for compatibility: when present it MUST own the job or the call is refused as "not-found" (BEFORE WIRING: production callers must pass it). */
-export interface LeaseRef { id: string; workerId: string; attempt: number; tenantId?: string }
+/** ISS-JOBQTENANT-001: `tenantId` is REQUIRED. It MUST own the job or the call is refused as "not-found". A missing, empty or malformed tenant is refused as "invalid-input"; it is never a wildcard. */
+export interface LeaseRef { id: string; workerId: string; attempt: number; tenantId: string }
 
 export type QueueErrorCode =
   | "invalid-input" | "corrupt" | "io-error" | "conflict" | "id-conflict" | "payload-mismatch" | "not-found" | "not-leased" | "stale-lease" | "terminal";
@@ -38,12 +38,12 @@ export interface EnqueueInput { id: string; tenantId: string; payload: unknown; 
 export interface JobQueue {
   /** Idempotent on `id`. Same id + same tenant + equal payload (canonical JSON): "exists". Same id, other tenant: error "id-conflict" (fixed message, same for every job state). Same tenant, different payload: error "payload-mismatch". Never overwrites. */
   enqueue(input: EnqueueInput): QueueResult<"enqueued" | "exists">;
-  /** Oldest ready job (or leased job whose lease expired and attempts remain), restricted to `tenantId` when given. null = none. */
-  claim(workerId: string, opts?: { tenantId?: string }): QueueResult<QueueJob | null>;
+  /** Oldest ready job (or leased job whose lease expired and attempts remain), of `opts.tenantId` (REQUIRED, ISS-JOBQTENANT-001: a missing/empty tenant is "invalid-input", never "any tenant"). null = none. */
+  claim(workerId: string, opts: { tenantId: string }): QueueResult<QueueJob | null>;
   heartbeat(ref: LeaseRef): QueueResult<QueueJob>;
   complete(ref: LeaseRef): QueueResult<QueueJob>;
-  /** Back to ready while attempts remain, else terminal "dead". */
-  fail(ref: LeaseRef, errorCode: string): QueueResult<QueueJob>;
+  /** Back to ready while attempts remain, else terminal "dead". `opts.terminal: true` (D-139) marks it "dead" at once whatever the attempts left: for a failure that retrying cannot fix (the run itself failed terminally). */
+  fail(ref: LeaseRef, errorCode: string, opts?: { terminal?: boolean }): QueueResult<QueueJob>;
 }
 
 export const MAX_QUEUE_ID_LENGTH = 64;

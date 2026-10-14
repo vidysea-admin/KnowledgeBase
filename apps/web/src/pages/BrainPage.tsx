@@ -246,7 +246,7 @@ export function BrainPage(): React.ReactElement {
             <button type="button" onClick={refresh} style={{ cursor: "pointer", fontSize: "0.75rem" }}>Refresh</button>
           </div>
 
-          <div className="card" style={{ display: "flex", gap: "1rem", padding: 0, overflow: "hidden" }}>
+          <div className="card brain-split">
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="row-meta" style={{ padding: "0.5rem 0.75rem 0" }} data-testid="graph-counts">
                 showing {shown.nodes.length} of {graph.nodes.length} node(s) · {shown.edges.length} of {graph.edges.length} relationship(s)
@@ -275,7 +275,7 @@ export function BrainPage(): React.ReactElement {
                 />
               )}
             </div>
-            <div style={{ width: 340, flexShrink: 0, borderLeft: "1px solid var(--line)", padding: "1rem", overflowY: "auto", maxHeight: 560 }}>
+            <div className="brain-panel">
               {!selectedNode && (
                 <div className="empty-note">
                   Click any node — or tab to one and press Enter — to see what it connects to and the

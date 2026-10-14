@@ -19,9 +19,9 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { captureTenant, finalizeRecordingWith, isSilentCapture, runFinalize, runRecord, shouldAutoClick, todayAt, validateIndexProof } from "./record-commands.js";
-import type { ObsClientLike } from "./obs-windows.js";
+import type { ObsClientLike } from "./obs/obs-windows.js";
 import {finalizeControllerRecording} from "./controller-state.js";
-import {webinarCompletionState} from "../calendar/schedule-state.js";
+import {webinarCompletionState} from "../calendar/state/schedule-state.js";
 import { createTabBrowserDeps } from "./tab-browser.js";
 
 // Same derivation record-commands.ts uses for its own REPO_ROOT (this file lives in the same

@@ -5,7 +5,7 @@
  * `launch`/`stop` are injected as a Playwright-shaped interface
  * (`(url, opts) => Promise<{sessionHandle, mediaStream}>`) so this file never imports a browser
  * driver directly. As of T-024b (2026-09-24, D-027/D-028) the real implementation satisfying
- * that interface is `createObsBrowserDeps` in `../capture/obs-windows.ts`: it spawns
+ * that interface is `createObsBrowserDeps` in `../capture/obs/obs-windows.ts`: it spawns
  * `py/sb_join.py` (a headed SeleniumBase-UC Chrome on a persistent profile) for the actual
  * join-page automation, then drives OBS over obs-websocket v5 (window_capture +
  * wasapi_process_output_capture matched by window title) for per-process audio/video capture —

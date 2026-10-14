@@ -1,7 +1,7 @@
 /** ISS-JOBQLOST-001: opt-in pruning of terminal jobs, inside the existing lock and the operation's single atomic save. */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { FileJobQueue } from "./file-job-queue.js";
+import { FileJobQueue, DEFAULT_PRUNE_TERMINAL_AFTER_MS } from "./file-job-queue.js";
 import { QUEUE_FILE, decodeQueue } from "./queue-store.js";
 import { MemQueueFs, SimulatedCrash } from "./mem-queue-fs.testkit.js";
 
@@ -9,7 +9,7 @@ const KEEP = 1000;
 const FILE = `/q/${QUEUE_FILE}`;
 function mk(prune: number | null = KEEP) {
   const fs = new MemQueueFs(); const c = { t: 10_000 };
-  const q = new FileJobQueue({ dir: "/q", now: () => c.t, leaseMs: 100, fs, pruneTerminalAfterMs: prune ?? undefined });
+  const q = new FileJobQueue({ dir: "/q", now: () => c.t, leaseMs: 100, fs, pruneTerminalAfterMs: prune });
   const state = () => JSON.parse(fs.files.get(FILE)!) as { nextSeq: number; jobs: any[] };
   const ids = () => state().jobs.map(j => j.id);
   /** enqueue + claim + complete (or fail to dead) one job for `tenant`. */
@@ -22,7 +22,7 @@ function mk(prune: number | null = KEEP) {
   return { fs, c, q, state, ids, finish };
 }
 
-test("default (option unset): nothing is ever removed or stamped, file format unchanged", () => {
+test("disabled with null: nothing is ever removed or stamped, file format unchanged", () => {
   const { fs, c, q, finish, state } = mk(null);
   for (let i = 0; i < 5; i++) finish(`a${i}`, "ta", i % 2 ? "dead" : "done");
   c.t += 10 ** 12; q.enqueue({ id: "z", tenantId: "ta", payload: 1 });
@@ -39,7 +39,7 @@ test("a terminal job is kept until it has been terminal for the retention, then 
 test("retention counts from when the job became terminal, not from when it was enqueued", () => {
   const { c, q, ids } = mk();
   q.enqueue({ id: "old", tenantId: "ta", payload: 1 }); c.t += 50 * KEEP;
-  const j = (q.claim("w") as any).value; q.complete({ id: "old", workerId: "w", attempt: j.attempt, tenantId: "ta" });
+  const j = (q.claim("w", { tenantId: "ta" }) as any).value; q.complete({ id: "old", workerId: "w", attempt: j.attempt, tenantId: "ta" });
   q.enqueue({ id: "n", tenantId: "ta", payload: 1 }); assert.deepEqual(ids(), ["old", "n"], "completed just now: not pruned although enqueued long ago");
 });
 test("ready, leased and lease-expired jobs are never pruned, however old", () => {
@@ -51,10 +51,10 @@ test("ready, leased and lease-expired jobs are never pruned, however old", () =>
   assert.deepEqual(ids(), ["r", "l", "n"]); assert.deepEqual(state().jobs.map(j => j.status), ["leased", "ready", "ready"]);
   assert.ok(state().jobs.every(j => !("terminalAt" in j)));
 });
-test("tenant scope: an operation prunes only its own tenant's terminal jobs; a tenant-less claim prunes nothing", () => {
+test("tenant scope: an operation prunes only its own tenant's terminal jobs; a tenant-less claim is refused and prunes nothing", () => {
   const { c, q, finish, ids } = mk();
   finish("a", "ta", "done"); finish("b", "tb", "done"); c.t += 10 * KEEP;
-  assert.deepEqual(q.claim("w"), { ok: true, value: null }); assert.deepEqual(ids(), ["a", "b"], "no tenant named: nothing pruned");
+  assert.equal((q.claim("w", {} as never) as any).error.code, "invalid-input"); assert.deepEqual(ids(), ["a", "b"], "no tenant named: refused, nothing pruned");
   q.enqueue({ id: "n", tenantId: "ta", payload: 1 }); assert.deepEqual(ids(), ["b", "n"], "ta's old job gone, tb's untouched");
   q.claim("w2", { tenantId: "tb" }); assert.deepEqual(ids(), ["n"], "tb's own claim prunes tb");
 });
@@ -124,4 +124,49 @@ test("option validation, and strict decode: a stamp on a non-terminal job is cor
   const mkJob = (extra: object) => JSON.stringify({ version: 1, nextSeq: 1, jobs: [{ id: "a", tenantId: "t", payload: 1, status: "ready", seq: 0, enqueuedAt: 0, attempt: 0, maxAttempts: 1, workerId: null, leaseExpiresAt: null, errorCode: null, ...extra }] });
   assert.equal(decodeQueue(mkJob({ terminalAt: 5 })).ok, false); assert.equal(decodeQueue(mkJob({})).ok, true);
   assert.equal(decodeQueue(mkJob({ status: "done", terminalAt: -1 })).ok, false); assert.equal(decodeQueue(mkJob({ status: "done", terminalAt: 5 })).ok, true);
+});
+
+/** ISS-JOBQPRUNE-001 (Approver ruling 2026-10-12 (2)): the default retention is 30 days, ON when the option is unset. */
+const D30 = 30 * 24 * 60 * 60 * 1000;
+function mkDefault(extra: { pruneTerminalAfterMs?: number | null } = {}) {
+  const fs = new MemQueueFs(); const c = { t: 1_000 };
+  const q = new FileJobQueue({ dir: "/q", now: () => c.t, leaseMs: 100, fs, ...extra });
+  const ids = () => (JSON.parse(fs.files.get(FILE)!).jobs as any[]).map(j => j.id);
+  const finish = (id: string, tenant = "ta") => {
+    q.enqueue({ id, tenantId: tenant, payload: id, maxAttempts: 1 });
+    const j = (q.claim("w", { tenantId: tenant }) as any).value; assert.equal(j.id, id);
+    assert.equal((q.complete({ id, workerId: "w", attempt: j.attempt, tenantId: tenant }) as any).ok, true);
+  };
+  return { fs, c, q, ids, finish };
+}
+test("the default retention constant is exactly 30 days", () => assert.equal(DEFAULT_PRUNE_TERMINAL_AFTER_MS, D30));
+test("default (option unset): a terminal job is kept just under 30 days and pruned at 30 days; younger kept", () => {
+  const { c, q, ids, finish } = mkDefault(); finish("a");
+  c.t += D30 - 1; q.enqueue({ id: "n1", tenantId: "ta", payload: 1 }); assert.deepEqual(ids(), ["a", "n1"]);
+  c.t += 1; q.enqueue({ id: "n2", tenantId: "ta", payload: 1 }); assert.deepEqual(ids(), ["n1", "n2"]);
+});
+test("default: a dead job is pruned too; ready and leased jobs never are, however old", () => {
+  const { c, q, ids } = mkDefault();
+  q.enqueue({ id: "d", tenantId: "ta", payload: 1, maxAttempts: 1 }); const d = (q.claim("w", { tenantId: "ta" }) as any).value;
+  q.fail({ id: "d", workerId: "w", attempt: d.attempt, tenantId: "ta" }, "boom");
+  q.enqueue({ id: "r", tenantId: "ta", payload: 1 }); q.enqueue({ id: "l", tenantId: "ta", payload: 1 });
+  (q.claim("w", { tenantId: "ta" }) as any); // r is leased now, l is ready
+  c.t += 5 * D30; q.enqueue({ id: "n", tenantId: "ta", payload: 1 });
+  assert.deepEqual(ids().sort(), ["l", "n", "r"]);
+});
+test("default: another tenant's terminal job is not pruned by this tenant's operation", () => {
+  const { c, q, ids, finish } = mkDefault(); finish("b", "tb"); c.t += 2 * D30; q.enqueue({ id: "n", tenantId: "ta", payload: 1 });
+  assert.deepEqual(ids(), ["b", "n"]);
+});
+test("explicit override replaces the default (1 hour), and null disables pruning entirely", () => {
+  const hour = mkDefault({ pruneTerminalAfterMs: 3_600_000 }); hour.finish("a"); hour.c.t += 3_600_000; hour.q.enqueue({ id: "n", tenantId: "ta", payload: 1 });
+  assert.deepEqual(hour.ids(), ["n"]);
+  const off = mkDefault({ pruneTerminalAfterMs: null }); off.finish("a"); off.c.t += 100 * D30; off.q.enqueue({ id: "n", tenantId: "ta", payload: 1 });
+  assert.deepEqual(off.ids(), ["a", "n"]); assert.ok(!off.fs.files.get(FILE)!.includes("terminalAt"));
+  const long = mkDefault({ pruneTerminalAfterMs: 2 * D30 }); long.finish("a"); long.c.t += D30 + 1; long.q.enqueue({ id: "n", tenantId: "ta", payload: 1 });
+  assert.deepEqual(long.ids(), ["a", "n"]);
+});
+test("0 is not a disable switch (still invalid); only null disables", () => {
+  assert.throws(() => new FileJobQueue({ dir: "/q", now: () => 1, pruneTerminalAfterMs: 0 }), RangeError);
+  assert.doesNotThrow(() => new FileJobQueue({ dir: "/q", now: () => 1, pruneTerminalAfterMs: null }));
 });

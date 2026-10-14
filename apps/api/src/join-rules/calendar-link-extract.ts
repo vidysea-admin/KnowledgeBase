@@ -145,6 +145,13 @@ function judge(candidate: string): Rec {
   return q ? recognise(q) : undefined;
 }
 
+/** Candidate URLs (anchor hrefs first, then bare URLs) of a free-text field; same bounds as scan(). Pure. */
+export function candidateUrls(field: unknown): string[] {
+  if (typeof field !== "string" || !field) return [];
+  const { hrefs, text } = splitHtml(field.slice(0, MAX_SCAN_CHARS));
+  return [...hrefs.slice(0, MAX_CANDIDATES).map(h => decodeEntities(h).trim()), ...bareUrls(decodeEntities(text))].slice(0, MAX_CANDIDATES);
+}
+
 function scan(field: unknown): { joins: Join[]; regs: string[]; hosts: string[]; platforms: Set<string> } {
   const res = { joins: [] as Join[], regs: [] as string[], hosts: [] as string[], platforms: new Set<string>() };
   if (typeof field !== "string" || !field) return res;

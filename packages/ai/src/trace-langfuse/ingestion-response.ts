@@ -55,7 +55,7 @@ export function parseIngestionResponse(text: unknown): IngestionResult | null {
   return { successes: successes ?? [], errors: errors ?? [], hasSuccesses: !!successes, hasErrors: !!errors };
 }
 
-export interface Assessment {
+export interface IngestionAssessment {
   sent: number;
   rejected: number;
   unconfirmed: number;
@@ -75,7 +75,7 @@ export interface Assessment {
  * "unconfirmed" and dropped, never success. A non-207 2xx with no readable body is trusted on its
  * status, as before. Pure; never throws for any input.
  */
-export function assessIngestion(groups: { events: { id: string }[] }[], recs: number, status: number, text: unknown): Assessment {
+export function assessIngestion(groups: { events: { id: string }[] }[], recs: number, status: number, text: unknown): IngestionAssessment {
   const strict = status === 207;
   const parsed = parseIngestionResponse(text);
   if (!parsed) {

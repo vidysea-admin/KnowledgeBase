@@ -2,8 +2,8 @@
 import {createHash, randomUUID} from "node:crypto";
 import {readFileSync, writeFileSync, renameSync, rmSync, mkdirSync, existsSync, statfsSync} from "node:fs";
 import {resolve, join, dirname, basename} from "node:path";
-import {assertRecoveryPacketVerified, readRecoveryInputs, readRecoveryPacket} from "../toc-recovery.mjs";
-import {requireRecoveryDatabase, RECOVERY_COLLECTIONS} from "../toc-recovery-import.mjs";
+import {assertRecoveryPacketVerified, readRecoveryInputs, readRecoveryPacket} from "../../toc/toc-recovery.mjs";
+import {requireRecoveryDatabase, RECOVERY_COLLECTIONS} from "../../toc/toc-recovery-import.mjs";
 export const PACKET_ID = "477255b83bb0f001a7fce53d48af7631bdc8a92c2e24e85b3108a3c9ece749ef";
 export const MODEL_DIGEST = "sha256:0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f";
 export const WORK_DB = "lkb_work_20261009_01a11f9c";

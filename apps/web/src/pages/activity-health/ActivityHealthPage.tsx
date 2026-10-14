@@ -48,9 +48,9 @@ export function ActivityHealthPage(): React.ReactElement {
         <label>Status <select value={status} onChange={event => setStatus(event.target.value)}><option value="all">All statuses</option>{activityStatuses.map(value => <option key={value} value={value}>{value}</option>)}</select></label>
         <p role="status">Showing {visible.length} of {model.returned} returned upload operations.</p>
         {model.returned === 0 ? <p className="card empty-note">No upload operations were returned. This does not establish complete knowledge.</p> : visible.length === 0 ? <p className="card empty-note">No returned operations match this status.</p> : <ul className="card" aria-label="Upload operations">{visible.map(job => <li key={job.id}>
-          <p>Operation {job.id}</p><p>Status: {job.status}; attempts: {job.attempts}/{job.maxAttempts}; observed automatic retries: {job.automaticRetryCount}.</p>
-          <p>Created: {job.createdAt}; worker update: {job.updatedAt ?? "Not recorded"}; deadline: {job.deadlineAt}.</p>
-          <p>Queue creation age at snapshot: {Date.parse(job.createdAt) > Date.parse(snapshot.observedAt) ? "Unknown (future recorded timestamp)" : `${Math.floor((Date.parse(snapshot.observedAt) - Date.parse(job.createdAt)) / 1000)} seconds`}; deadline at snapshot: {Date.parse(job.deadlineAt) <= Date.parse(snapshot.observedAt) ? "elapsed" : "upcoming"}.</p>
+          <p>Operation {job.id}{job.source === "job-queue" ? " (source: job queue)" : ""}</p><p>Status: {job.status}; attempts: {job.attempts}/{job.maxAttempts}; observed automatic retries: {job.automaticRetryCount}.</p>
+          <p>Created: {job.createdAt}; worker update: {job.updatedAt ?? "Not recorded"}; deadline: {job.deadlineAt ?? "Not recorded"}.</p>
+          <p>Queue creation age at snapshot: {Date.parse(job.createdAt) > Date.parse(snapshot.observedAt) ? "Unknown (future recorded timestamp)" : `${Math.floor((Date.parse(snapshot.observedAt) - Date.parse(job.createdAt)) / 1000)} seconds`}; deadline at snapshot: {job.deadlineAt === null ? "not recorded" : Date.parse(job.deadlineAt) <= Date.parse(snapshot.observedAt) ? "elapsed" : "upcoming"}.</p>
           {job.errorClass && <p>Error class: {job.errorClass}.</p>}
         </li>)}</ul>}
       </>}

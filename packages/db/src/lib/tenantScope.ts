@@ -6,7 +6,7 @@
 // at every call site — `coll(tenantId).find(filter)` — so a tenant-less query is a TS
 // compile error, not a runtime bug. Every packages/db/src/collections/<coll>.ts file
 // wraps this once; it is the only place the tenant-scoping logic itself is written.
-import type { Collection, Db, Filter, OptionalUnlessRequiredId, UpdateFilter, UpdateOptions } from "mongodb";
+import type { AnyBulkWriteOperation, BulkWriteOptions, Collection, Db, Filter, OptionalUnlessRequiredId, ReplaceOptions, UpdateFilter, UpdateOptions } from "mongodb";
 
 export type TenantId = string;
 
@@ -30,6 +30,29 @@ export function withTenant<T extends { tenantId: string }>(
   assertValidTenantId(tenantId, "withTenant");
   return { ...filter, tenantId } as Filter<T>;
 }
+
+
+/** Pins `tenantId` inside an update document so a caller cannot move a row to another tenant. Where a body already
+ * names it (`$set` / `$setOnInsert` — callers carry it as belt-and-braces) its value is OVERRIDDEN with the scoped
+ * tenant; every other mention (`$unset`, `$rename`, `$inc`, ...) is dropped. The filter already pins the tenant, which
+ * also fills an upsert's inserted document. Pipeline-style (array) updates cannot be inspected safely and are refused. */
+function pinUpdate<U>(update: U, tenantId: TenantId, where: string): U {
+  if (Array.isArray(update) || update === null || typeof update !== "object") {
+    throw new Error(`${where}: only operator-style update documents are accepted (aggregation-pipeline updates cannot be tenant-pinned)`);
+  }
+  const out: Record<string, unknown> = {};
+  for (const [op, body] of Object.entries(update as Record<string, unknown>)) {
+    if (body !== null && typeof body === "object" && !Array.isArray(body)) {
+      const entries = Object.entries(body as Record<string, unknown>);
+      const kept = Object.fromEntries(entries.filter(([k, v]) => k !== "tenantId" && v !== "tenantId" && !k.startsWith("tenantId.")));
+      const stamps = (op === "$set" || op === "$setOnInsert") && entries.some(([k]) => k === "tenantId");
+      out[op] = stamps ? { ...kept, tenantId } : kept;
+    } else out[op] = body;
+  }
+  return out as U;
+}
+
+const BULK_OPS = ["insertOne", "updateOne", "updateMany", "replaceOne", "deleteOne", "deleteMany"] as const;
 
 /**
  * Returns a `coll(tenantId): TenantScopedCollection<T>` accessor for one Mongo collection.
@@ -77,7 +100,35 @@ export function scopedCollection<T extends { tenantId: string; _id: string }>(
        * it reaches the driver, so an upsert's inserted document is built from a filter that
        * already carries the tenantId. Passing options is not an escape hatch — `raw` stays gone. */
       updateOne: (filter: Filter<T>, update: UpdateFilter<T>, options?: UpdateOptions) =>
-        raw.updateOne(withTenant<T>(tenantId, filter), update, options ?? {}),
+        raw.updateOne(withTenant<T>(tenantId, filter), pinUpdate(update, tenantId, `scopedCollection(${name}).updateOne`), options ?? {}),
+      /** Tenant-scoped replaceOne (ISS-AUTHTENANT2-001). The filter gets `tenantId` ANDed in and the replacement gets it
+       * stamped LAST, so a caller-supplied `tenantId` on the replacement cannot win; an upsert therefore inserts under
+       * this tenant and can only ever match this tenant's rows. */
+      replaceOne: (filter: Filter<T>, replacement: Omit<T, "tenantId"> & Partial<Pick<T, "tenantId">>, options?: ReplaceOptions) =>
+        raw.replaceOne(withTenant<T>(tenantId, filter), { ...replacement, tenantId } as never, options ?? {}),
+      /** Tenant-scoped bulkWrite (ISS-AUTHTENANT2-001). EVERY op is rewritten: filters get `tenantId` merged,
+       * inserted/replacement documents get it stamped last, update documents lose any `tenantId` mention. An op type
+       * outside insertOne/updateOne/updateMany/replaceOne/deleteOne/deleteMany (or an op with several keys) throws
+       * before anything reaches the driver. */
+      bulkWrite: (ops: AnyBulkWriteOperation<T>[], options?: BulkWriteOptions) => {
+        const scoped = ops.map((op, i): AnyBulkWriteOperation<T> => {
+          const where = `scopedCollection(${name}).bulkWrite[${i}]`;
+          const keys = op !== null && typeof op === "object" ? Object.keys(op) : [];
+          const kind = keys[0] as (typeof BULK_OPS)[number] | undefined;
+          if (keys.length !== 1 || !kind || !(BULK_OPS as readonly string[]).includes(kind)) {
+            throw new Error(`${where}: unsupported bulk operation (${keys.join(",") || "none"}); allowed: ${BULK_OPS.join(", ")}`);
+          }
+          const body = (op as unknown as Record<string, Record<string, unknown>>)[kind]!;
+          switch (kind) {
+            case "insertOne": return { insertOne: { ...body, document: { ...(body.document as object), tenantId } } } as never;
+            case "replaceOne": return { replaceOne: { ...body, filter: withTenant<T>(tenantId, body.filter as Filter<T>), replacement: { ...(body.replacement as object), tenantId } } } as never;
+            case "updateOne":
+            case "updateMany": return { [kind]: { ...body, filter: withTenant<T>(tenantId, body.filter as Filter<T>), update: pinUpdate(body.update, tenantId, where) } } as never;
+            default: return { [kind]: { ...body, filter: withTenant<T>(tenantId, body.filter as Filter<T>) } } as never;
+          }
+        });
+        return raw.bulkWrite(scoped, options ?? {});
+      },
     };
   };
 }

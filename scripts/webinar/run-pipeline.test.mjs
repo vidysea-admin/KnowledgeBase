@@ -4,7 +4,7 @@ import {writeFileSync, readFileSync, existsSync} from 'node:fs';
 import {join} from 'node:path';
 import {runPipelineTick, validateRunGate, createPipelineDeps} from './run-pipeline.mjs';
 const {runWebinarRegistrations, activeWebinarStopReason, webinarSessionKey, webinarIdentity} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
-const {prepareWebinarSourceState} = await import('../../packages/meeting-bot/src/calendar/schedule-state.ts');
+const {prepareWebinarSourceState} = await import('../../packages/meeting-bot/src/calendar/state/schedule-state.ts');
 
 import {NOW, event, withFixture, proof, completed} from './run-pipeline-fixtures.mjs';
 test('registration persistence rejection prevents any browser side effect', async () => {

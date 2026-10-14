@@ -1,5 +1,7 @@
 # Contract — health-route (plan §10 U0.7, first half)
 
+> **AMENDED by D-129 (2026-10-12, Approver Umesh): `/health` returns liveness only; no collection counts. See Amendment log. Criteria C1, C2, C3, C6 and I1 below are read through that amendment.**
+>
 > Ground truth for `GET /health` — `apps/api/src/routes/health.ts`,
 > `createMongoHealthDeps()` in `apps/api/src/store.ts`, and `fakeHealthDeps()` in
 > `apps/api/src/fixtures.ts`. Created and adopted by /checker in the same action: the manifest
@@ -34,7 +36,7 @@ hand-maintained duplicate).
    exactly two fields: `db: "ok" | "error"` and `collections: Record<string, number>`. Verified
    by reading the interface in `health.ts`; any additional field added in a future edit is a
    contract violation regardless of what it contains (see I1).
-2. **[C2] Counts are aggregate only — no per-tenant breakdown, no document content.**
+2. **[C2] AMENDED by D-129: NO counts, liveness only.** `createMongoHealthDeps()` calls only `db.command({ping:1})`; no `countDocuments`, `find`, or aggregation, and the body carries no `collections` field (tenant-scoped counts live on authenticated `GET /system-status`). [Superseded text: Counts are aggregate only — no per-tenant breakdown, no document content.**
    `createMongoHealthDeps()` calls only `db.command({ping:1})` and
    `db.collection(name).countDocuments()` with no filter argument (a bare, unscoped count), never
    `findOne`/`find`/an aggregation pipeline that could return document fields or tenant-keyed
@@ -111,3 +113,4 @@ counts, or gating behind network-level restriction rather than an API key).
   confirmed 2/2 green), an independent live-database reproduction via a throwaway deleted script
   (confirmed `db: "ok"` with real non-trivial counts matching the manifest's pasted figures), and
   independently re-derived typecheck/test/lint:structure results. START stands on plan §10 U0.7.
+- 2026-10-12 · Approver ruling (D-129, Umesh: "Counts hatao, sirf liveness") · C2 replaced: `/health` must stop returning all-tenant collection counts and keeps only liveness (API up, DB reachable). Any criterion requiring a `collections` field in the /health body (C1 `{db, collections}`, C3 `collections: {}` on failure, C6 index-derived collection list, I1 aggregate-counts wording) is void; the body is `{db}` only. C4 (503 when unhealthy) and C5 (unauthenticated, mounted before requireAuth) stand. Closes the open part of ISS-T057SCREEN-001. Code/test changes still need their own unit.

@@ -20,7 +20,7 @@ test("T-034: package.json test script runs the extension logic tests (CI runs `p
   assert.match(pkg.scripts.test, /py\/tab-capture\/\*\.test\.mjs/);
   assert.match(pkg.scripts.test, /src\/\*\*\/\*\.test\.ts/, "TS tests (this file) are still discovered");
   const found = readdirSync(EXT_DIR).filter((f) => f.endsWith(".test.mjs")).sort();
-  assert.deepEqual(found, ["background.test.mjs", "recorder.test.mjs"], "a new *.test.mjs is picked up by the glob; update this list on purpose");
+  assert.deepEqual(found, ["background.test.mjs", "recorder-bitrate.test.mjs", "recorder.test.mjs"], "a new *.test.mjs is picked up by the glob; update this list on purpose");
   const ci = readFileSync(new URL("../../../../.github/workflows/ci.yml", import.meta.url), "utf8");
   assert.match(ci, /run:\s*pnpm -r test/);
 });
@@ -142,7 +142,9 @@ const fake = [
   'if (S === "exit-before-start") process.exit(3);',
   'await ev({event: "capture-started"});',
   'for (let i = 0; i < 20; i++) { await post("/chunk?seq=" + i, TAG + i + ";"); await new Promise((r) => setTimeout(r, 5)); }',
-  'if (S === "crash-exit-code-only") process.exit(7);',
+  // Crash only once the test drops a sentinel (after launch() has returned): exiting on a fixed delay raced launch()'s 250ms startup poll,
+  // which rejects launch when the child is already dead (seen on fast Linux CI). Dies with an exit code only, no capture-stopped.
+  'if (S === "crash-exit-code-only") { const {existsSync} = await import("node:fs"); const sentinel = ext + "/../.crash-now"; while (!existsSync(sentinel)) await new Promise((r) => setTimeout(r, 10)); process.exit(7); }',
   'for (;;) { if ((await (await post("/control", "{}")).json()).stop) break; await new Promise((r) => setTimeout(r, 30)); }',
   'if (S === "error-then-clean-stop") await ev({event: "capture-error", error: "track lost"});',
   'await ev({event: "capture-stopped", failed: S === "failed-stop"});',
@@ -197,6 +199,7 @@ for (const [scenario, reason] of FAILURES) {
     try {
       const t = makeDeps(dir, "tab", scenario, "F");
       const h = (await t.deps.launch("http://127.0.0.1/", launchOpts)).sessionHandle;
+      if (scenario === "crash-exit-code-only") writeFileSync(path.join(dir, "tab", "record", ".crash-now"), "1");   // child dies only now, after launch succeeded
       await new Promise((r) => setTimeout(r, 300));
       let outcome = "resolved";
       await t.deps.stop!(h).catch((e: Error) => { outcome = e.message; });

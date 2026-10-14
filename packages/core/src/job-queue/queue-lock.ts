@@ -65,7 +65,7 @@ export function defaultQueueIsAlive(pid: number): QueueLiveness {
 }
 
 /** Process start time (epoch ms) of a live pid, or null when it cannot be had (no permission, no tool, timeout). Never throws. Own pid: free. */
-export function defaultQueueStartTime(pid: number): number | null {
+export function defaultQueueStartTime(pid: number, probeTimeoutMs = 5000): number | null {
   try {
     if (!Number.isSafeInteger(pid) || pid <= 0) return null;
     if (pid === process.pid) return Date.now() - process.uptime() * 1000;
@@ -74,7 +74,7 @@ export function defaultQueueStartTime(pid: number): number | null {
       const ticks = Number(f[19]), bt = /^btime (\d+)/m.exec(readFileSync("/proc/stat", "utf8"));
       return Number.isFinite(ticks) && bt ? Number(bt[1]) * 1000 + (ticks / 100) * 1000 : null; // CLK_TCK is 100 on every Linux we run on
     }
-    const run = (exe: string, args: string[]) => spawnSync(exe, args, { encoding: "utf8", timeout: 5000, windowsHide: true, env: { ...process.env, LC_ALL: "C" } });
+    const run = (exe: string, args: string[]) => spawnSync(exe, args, { encoding: "utf8", timeout: probeTimeoutMs, windowsHide: true, env: { ...process.env, LC_ALL: "C" } });
     let out: string | undefined;
     if (process.platform === "win32") {
       const ps = join(process.env.SystemRoot ?? "C:\\Windows", "System32", "WindowsPowerShell", "v1.0", "powershell.exe");

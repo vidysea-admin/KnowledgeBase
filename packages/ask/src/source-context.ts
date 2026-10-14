@@ -19,7 +19,10 @@ export interface SourceQuote {
   quote: string;
   origin: "speech" | "screen-ocr-unverified" | "visual-observation-unverified";
 }
+/** D-153 (pending append): a scoped turn that failed row validation was EXCLUDED from the hydration (never cited). */
+export interface ExcludedSourceTurn { sessionId: string; turnId: string; reason: string }
 export interface SourceHydration {
+  excludedTurns?: ExcludedSourceTurn[];
   nodes: TreeIndexNode[];
   snapshotSHA256: string;
   sourceBytes: number;
@@ -86,6 +89,11 @@ export function validateHydration(result: SourceHydration, admitted: TreeIndexNo
     throw new BoundedAskError("invalid source snapshot proof");
   }
   if (result.degraded !== undefined && !text(result.degraded)) throw new BoundedAskError("invalid source degradation status");
+  const excluded = result.excludedTurns ?? [];
+  if (!Array.isArray(excluded) || excluded.some((e) => !text(e?.sessionId) || !text(e?.turnId) || !text(e?.reason))) {
+    throw new BoundedAskError("invalid excluded-turn warning");
+  }
+  const excludedKeys = new Set(excluded.map((e) => JSON.stringify([e.sessionId, e.turnId])));
   const originals = new Map(admitted.map((n) => [n.node_id, n]));
   const nodeIds = new Set<string>();
   const quoteIds = new Set<string>();
@@ -99,6 +107,7 @@ export function validateHydration(result: SourceHydration, admitted: TreeIndexNo
     const quotes = sourceQuotes(node);
     if (quotes.length === 0) throw new BoundedAskError("empty hydrated evidence");
     for (const q of quotes) {
+      if (excludedKeys.has(JSON.stringify([q.sessionRef, q.turnId]))) throw new BoundedAskError("excluded turn cited");
       if (!text(q.id) || quoteIds.has(q.id) || q.nodeId !== node.node_id || q.sessionRef !== node.evidence?.sessionRef
         || !text(q.turnId) || !text(q.speakerRef) || !text(q.quote) || !hash(q.turnTextSHA256) || !hash(q.sliceSHA256)
         || !Number.isFinite(q.tStart) || !Number.isFinite(q.tEnd) || q.tStart < 0 || q.tEnd < q.tStart

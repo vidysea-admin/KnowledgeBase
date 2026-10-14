@@ -41,5 +41,5 @@ reference
 .claude
 tmp
 *.log
-HANDOFF.md
+docs/HANDOFF.md
 **/__pycache__

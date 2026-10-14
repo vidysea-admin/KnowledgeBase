@@ -11,7 +11,7 @@ import assert from "node:assert/strict";
 import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
 
-import { extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
+import { extractSpeakersRuleBased as extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
 import { citesNameAsSelfIdentification } from "./speaker-relation-rules.js";
 
 const turn = (id: string, speakerRef: string, text: string): Turns =>

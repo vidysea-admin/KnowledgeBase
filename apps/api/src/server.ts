@@ -9,15 +9,17 @@ import type { Server } from "node:http";
 import type { ApiKeyStore } from "./auth.js";
 import { requireAuth } from "./auth.js";
 import { createAskRouter, type AskRouteDeps } from "./routes/ask/ask.js";
-import { createCompeteRouter, type EvalRunStore } from "./routes/compete.js";
-import { createCompetePageRouter } from "./routes/compete-page.js";
+import { createCompeteRouter, type EvalRunStore } from "./routes/compete/compete.js";
+import { createCompetePageRouter } from "./routes/compete/compete-page.js";
 import { createBrainRouter, type BrainReadDeps } from "./routes/brain.js";
 import { createWatchedSourcesRouter, type WatchedSourceDeps } from "./routes/watched-sources.js";
 import { createCitationsRouter, type CitationsDeps } from "./routes/citations.js";
 import { createClaimsListRouter, unavailableClaimsListDeps, type ClaimsListDeps } from "./claims/router.js";
 import { createHealthRouter, type HealthDeps } from "./routes/health.js";
+import { createSetupStatusRouter } from "./activity-health/setup-status.js";
 import { createSystemStatusRouter, unavailableSystemStatusDeps, type SystemStatusDeps } from "./routes/system-status.js";
 import { createSearchRouter, type SearchDeps } from "./routes/search.js";
+import { createSemanticSearchRouter, type SemanticSearchDeps } from "./semantic-search/route.js";
 import { createGraphRouter, type GraphReadDeps } from "./routes/graph.js";
 import { createCalendarRouter, type CalendarReadDeps } from "./routes/calendar.js";
 import { createJoinRulesRouter, unavailableJoinRulesRouter } from "./join-rules/router.js";
@@ -26,6 +28,8 @@ import { createMeetingCandidatesRouter, type MeetingCandidatesDeps } from "./rou
 import { createWhatsAppRouter, type WhatsAppRouteDeps } from "./routes/whatsapp.js";
 import { createKeysRouter, type KeysDeps } from "./routes/keys.js";
 import { createIngestRouter, type IngestDeps } from "./routes/ingest.js";
+import { createSourceIntakeRouter } from "./routes/ingest-source.js";
+import type { SourceIntakeDeps } from "./source-intake/store.js";
 import { createPagesRouter } from "./routes/pages.js";
 import { createStubsRouter } from "./routes/stubs.js";
 import { createRateLimiter, type RateLimitOptions } from "./rate-limit.js";
@@ -34,8 +38,13 @@ import { createJobsRouter, type JobsReadDeps } from "./jobs/router.js";
 import { unavailableJobsReadDeps } from "./jobs/fixture-store.js";
 import { createActivityHealthRouter, unavailableActivityHealthDeps } from "./activity-health/router.js";
 import type { ActivityHealthDeps } from "./activity-health/types.js";
+import { withFileQueueActivity, type FileQueueActivityDeps } from "./activity-health/file-queue-activity.js";
 import { createNotificationsRouter } from "./activity-health/notifications.js";
 import { createWatchRunsRouter, unavailableWatchRunsDeps, type WatchRunsDeps } from "./activity-health/watch-runs.js";
+import { usageRecorder } from "./usage/recorder.js";
+import { createUsageRouter, unavailableUsageReadDeps } from "./usage/router.js";
+import type { UsageDeps } from "./usage/store.js";
+import { createSpeakerSuggestionsRouter, unavailableSpeakerSuggestionDeps, type SpeakerSuggestionDeps } from "./speaker-suggestions/router.js";
 import { logger as defaultLogger, type Logger } from "./composition/logger.js";
 import { requestLogger } from "./composition/request-log.js";
 import { bodyParserErrorHandler } from "./composition/body-parser-error.js";
@@ -53,6 +62,8 @@ export interface ServerDeps {
   /** Tenant-scoped status counts for the signed-in caller; absent = fail closed (503). */
   systemStatus?: SystemStatusDeps;
   search: SearchDeps;
+  /** T-008 semantic (vector) search. Optional + flag-gated (LKB_SEMANTIC_SEARCH=1): absent -> route not mounted, behaviour unchanged. */
+  semanticSearch?: SemanticSearchDeps;
   graph: GraphReadDeps;
   calendar: CalendarReadDeps;
   meetingCandidates: MeetingCandidatesDeps;
@@ -61,10 +72,18 @@ export interface ServerDeps {
   whatsapp: WhatsAppRouteDeps;
   keys: KeysDeps;
   ingest: IngestDeps;
+  /** T-045 `POST /ingest/source` (YouTube / OnAir / Zoom intake). Optional, OFF by default: absent -> the route is not mounted. */
+  sourceIntake?: SourceIntakeDeps;
   jobs?: JobsReadDeps;
   activityHealth?: ActivityHealthDeps;
+  /** D-139/D-158: tenant-scoped dead jobs of the packages/core file queue (FileJobQueue.listDead), shown in /activity-health (source job-queue) and /notifications. Optional: absent -> unchanged. Production wiring pending (runner unwired). */
+  fileQueue?: FileQueueActivityDeps;
   /** T-057 D2 watcher run history (GET /watch-runs, scope jobs). Optional: absent -> 503 (fail closed). */
   watchRuns?: WatchRunsDeps;
+  /** T-057 D4 usage events: recorded after /ask and /search respond, read by GET /usage (scope jobs). Optional: absent -> nothing recorded, /usage 503. */
+  usage?: UsageDeps;
+  /** U2.4 suggested speaker names (D-141): list/confirm/reject. Optional: absent -> 503. */
+  speakerSuggestions?: SpeakerSuggestionDeps;
   rateLimit?: RateLimitOptions;
   /** apps/web's real origin(s) in dev/prod (e.g. "http://localhost:5173") — no default, an
    * empty list means no cross-origin browser call succeeds, which is the safe default until a
@@ -93,20 +112,26 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createHealthRouter(deps.health));
   app.use(requireAuth(deps.keyStore));
   app.use(createRateLimiter(deps.rateLimit));
+  app.use(usageRecorder(deps.usage, log)); // T-057 D4: fire-and-forget, after the response; never fails or delays a request
+  app.use(createUsageRouter(deps.usage ?? unavailableUsageReadDeps));
   app.use(createSystemStatusRouter(deps.systemStatus ?? unavailableSystemStatusDeps));
+  app.use(createSetupStatusRouter()); // T-057 E4: booleans only, authenticated
   app.use(createAskRouter(deps.ask));
   app.use(createCompeteRouter({ ...deps.ask, evalRuns: deps.evalRuns }));
+  app.use(createSpeakerSuggestionsRouter(deps.speakerSuggestions ?? unavailableSpeakerSuggestionDeps));
   app.use(createBrainRouter(deps.brain));
   app.use(createJobsRouter(deps.jobs ?? unavailableJobsReadDeps));
-  app.use(createActivityHealthRouter(deps.activityHealth ?? unavailableActivityHealthDeps));
+  const activityHealth = deps.fileQueue ? withFileQueueActivity(deps.activityHealth ?? unavailableActivityHealthDeps, deps.fileQueue) : deps.activityHealth ?? unavailableActivityHealthDeps;
+  app.use(createActivityHealthRouter(activityHealth));
   app.use(createWatchRunsRouter(deps.watchRuns ?? unavailableWatchRunsDeps));
   // T-057 D5: read-only aggregation of the three sources above; no store of its own.
-  app.use(createNotificationsRouter({ activityHealth: deps.activityHealth ?? unavailableActivityHealthDeps,
+  app.use(createNotificationsRouter({ activityHealth, fileQueue: deps.fileQueue,
     jobs: deps.jobs ?? unavailableJobsReadDeps, watchRuns: deps.watchRuns ?? unavailableWatchRunsDeps }));
   app.use(createWatchedSourcesRouter(deps.watchedSources));
   app.use(createCitationsRouter(deps.citations));
   app.use(createClaimsListRouter(deps.claims ?? unavailableClaimsListDeps));
   app.use(createSearchRouter(deps.search));
+  if (deps.semanticSearch) app.use(createSemanticSearchRouter(deps.semanticSearch));
   app.use(createGraphRouter(deps.graph));
   app.use(createCalendarRouter(deps.calendar));
   app.use(deps.joinRules ? createJoinRulesRouter(deps.joinRules) : unavailableJoinRulesRouter());
@@ -114,6 +139,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createWhatsAppRouter(deps.whatsapp));
   app.use(createKeysRouter(deps.keys));
   app.use(createIngestRouter(deps.ingest));
+  if (deps.sourceIntake) app.use(createSourceIntakeRouter(deps.sourceIntake));
   app.use(createStubsRouter());
   app.use(bodyParserErrorHandler(log)); // ISS-APILOGGER-001: body-parser errors: structured log, no body echo, production-identical response
   // Terminal handler (ISS-AUTHTENANT-002): an error with no HTTP status (e.g. a tenant guard throwing in a store) gets a fixed 500 body, never

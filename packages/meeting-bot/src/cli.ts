@@ -47,6 +47,7 @@ import { runFinalize, runLogin, runRecord } from "./capture/record-commands.js";
 import { runWatchdog } from "./capture/watchdog.js";
 import { runScheduleTick } from "./calendar/schedule-tick.js";
 import { defaultSendNowDeps, runSendNow } from "./send-now-command.js";
+import { claimedRecordWithDefaults } from "./live-recording/claimed-record.js";
 import { defaultAlertWhoDeps, runAlertWho } from "./alert-who-command.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -160,7 +161,7 @@ function buildFakeJoiners(fixturePath: string): Record<JoinStrategy, Joiner> {
 
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
-  if (argv[0] === "record") return runRecord(argv.slice(1));
+  if (argv[0] === "record") return claimedRecordWithDefaults(argv.slice(1), runRecord); // ISS-T039CMD-001/-002: claim the meeting in the live-recording view
   if (argv[0] === "send-now") { process.exitCode = await runSendNow(argv.slice(1), await defaultSendNowDeps()); return; }
   if (argv[0] === "alert-who") { process.exitCode = runAlertWho(argv.slice(1), await defaultAlertWhoDeps()); return; }
   if (argv[0] === "finalize") return runFinalize(argv.slice(1));

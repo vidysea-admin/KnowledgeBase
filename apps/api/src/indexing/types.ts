@@ -24,8 +24,14 @@ export interface IndexSessionResult {
   sessionId: string;
   summary?: { degraded: string | null; dropped?: number };
   claims?: { degraded: string | null; dropped?: number };
+  /** U2.5: present only when decisions extraction ran (flag on). */
+  decisions?: { count: number; degraded: string | null };
   completion?: { version: 2; strict: boolean; complete: boolean; generation: string; turnCount: number; treeWritten: boolean };
   chunks: ChunkWriteResult;
+  /** T-040: present only in grounded-notes mode (strict + dropUnverified): how existing claims were treated and what the judge cost. */
+  groundedNotes?: { claims: { preserved: number; replaced: number; inserted: number } | null; judge: { judged: number; kept: number; dropped: number; unsure: number; rulesDropped: number; calls: number; costUsd: number } | null };
+  /** U2.4: present only when speaker suggestion was opted into. */
+  speakerSuggestions?: { suggested: number; inserted: number; degraded: string | null; error?: string };
   /** U2.1 entity promotion. `null` when no tree root was produced, so there was nothing to promote
    * — distinct from a promotion that ran and failed, which reports `skipped`. */
   entities: { topics: number; orgs: number; claimsTagged: number; skipped: "promotion-failed" | null } | null;

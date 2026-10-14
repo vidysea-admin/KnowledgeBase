@@ -17,6 +17,7 @@ import { parseJsonLoose } from "@lkb/ai";
 import { personIdFor, resolveSpeakers, type ResolvedSpeaker } from "./speakers.js";
 import { looksLikeAName, isDiscourseOnly } from "./speaker-name-rules.js";
 import { namingTurns } from "./speaker-relation-rules.js";
+import { SPEAKERS_SYSTEM_PROMPT } from "./speaker-rules/speakers-llm-prompt.js";
 
 export type SpeakersCompleteFn = (job: Job) => Promise<CompleteResult>;
 
@@ -53,20 +54,6 @@ interface WindowFailure {
 function distinctWindowCount(failures: WindowFailure[]): number {
   return new Set(failures.map((f) => `${f.label}@${f.startTurnIndex}`)).size;
 }
-
-const SPEAKERS_SYSTEM_PROMPT = [
-  "You identify who each anonymous speaker in a transcript actually is. Each line is one turn,",
-  "prefixed with its real turn id and its anonymous speaker label, e.g. [id:t12] [spk:0] ...",
-  "Some speakers introduce themselves, are greeted by name, or are handed over to by name.",
-  'Respond with ONLY a JSON array: [{"speakerRef": "<the exact spk:N label>",',
-  '"displayName": "<the person\'s name EXACTLY as it is spelled in the transcript>",',
-  '"turnIds": ["<turn ids that show this person is that speaker>"]}, ...].',
-  "Copy the name character-for-character from the transcript -- never correct, normalise or",
-  "complete a spelling, and never supply a name the transcript does not contain. Copy every",
-  "turnId exactly from the [id:...] prefixes. If you cannot tell who a speaker is, leave them out",
-  "entirely -- an unnamed speaker is correct, a guessed one is a serious error. If no speaker can",
-  "be identified, respond with an empty array [].",
-].join(" ");
 
 function buildCitableTranscript(turns: Turns[]): string {
   return turns.map((t) => `[id:${t._id}] [${t.speakerRef}] ${t.text}`).join("\n");
@@ -162,13 +149,16 @@ export function buildSpeakerWindows(turns: Turns[]): SpeakerWindow[] {
 }
 
 /**
+ * LEGACY rule-gated extractor (self-naming evidence only), kept as the measurable baseline (D-132, pending append:
+ * production `extractSpeakers` is the model-judged grounding gate in speakers-grounded.ts).
+ *
  * Speaker identities for one session's positional labels, via the injected LLM `complete`.
  *
  * Never throws. Every returned `displayName` is verbatim-present in every turn it cites, every
  * cited turn id is real, and a label the model names two different ways is left unresolved rather
  * than settled by a coin flip.
  */
-export async function extractSpeakers(turns: Turns[], complete: SpeakersCompleteFn): Promise<SpeakerExtractionResult> {
+export async function extractSpeakersRuleBased(turns: Turns[], complete: SpeakersCompleteFn): Promise<SpeakerExtractionResult> {
   if (turns.length === 0) return { resolved: [], unresolved: [], degraded: null };
 
   const labels = new Set(positionalLabels(turns));
@@ -327,3 +317,4 @@ export async function extractSpeakers(turns: Turns[], complete: SpeakersComplete
   };
 }
 
+export { extractSpeakersGrounded as extractSpeakers } from "./speakers-grounded.js";

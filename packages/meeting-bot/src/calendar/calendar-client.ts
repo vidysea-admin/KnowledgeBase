@@ -1,6 +1,7 @@
 /** Calendar source seam and pure, tenant-bound webinar occurrence reconciliation. */
 import type { AutoRecordCandidateInput, CalendarEvent, ReconciliationCalendarEvent, WebinarReconciliationState, WebinarReconciliationResult, WebinarSnapshot as Snapshot, WebinarAlias as Alias, WebinarOccurrence as Occurrence } from "@lkb/core";
 import { classifyWebinarInvite, webinarIdentity, webinarSessionKey } from "./auto-record-policy.js";
+import { reachesUnlinkedGmail, unknownTombstoneReach } from "./tombstone/unknown-tombstone-reach.js";
 
 export type { CalendarEvent, CalendarClient, ReconciliationCalendarEvent, WebinarReconciliationState, WebinarReconciliationResult } from "@lkb/core";
 const fail = (): never => { throw new Error("Invalid webinar reconciliation input or state"); };
@@ -203,6 +204,8 @@ export function reconcileWebinarSources(input: {
         if (matches.length <= 1 && (matches.length || children.length)) targets = [...new Set([...matches, ...children].map(([target]) => target))];
         else row.unresolved = matches.length ? "ambiguous-provider" : "unknown-tombstone";
       } else if (source === "calendar" && row.snapshot.cancelled && !previous.occurrences[key]?.accepted) row.unresolved = "unknown-tombstone";
+      // ISS-TOMBSTONE-004: a NEW unknown tombstone that Google sent no `updated` for is stamped with the first tick that saw it, so its hold can lapse (tombstone/unknown-tombstone-reach.ts).
+      if (row.unresolved === "unknown-tombstone" && row.snapshot.providerUpdated === undefined && !previous.occurrences[key]) { row.snapshot.providerUpdated = input.checkedAt; row.revision = input.checkedAt; }
       if (row.unresolved) { row.accepted = false; row.providerIds = []; row.aliases = []; }
       for (const target of targets) {
         const current = JSON.parse(JSON.stringify(row)) as Occurrence;
@@ -228,11 +231,12 @@ export function reconcileWebinarSources(input: {
   if (available) state.coverageScope = input.acquisition.scope; else delete state.coverageScope;
   state = validateReconciliationState(state, input.tenantId, input.checkedAt);
   const calendarEvents: CalendarEvent[] = [], candidates: AutoRecordCandidateInput[] = [], inventory: WebinarReconciliationResult["inventory"] = [], transitions: WebinarReconciliationResult["transitions"] = [];
-  const orphan = Object.values(state.occurrences).some(row => row.unresolved === "unknown-tombstone");
+  // ISS-T036CAL-011: an unknown tombstone is recorded and listed but scoped to what it can plausibly refer to (see tombstone/unknown-tombstone-reach.ts).
+  const reach = unknownTombstoneReach(Object.values(state.occurrences));
   for (const [key, row] of Object.entries(state.occurrences).sort(([a], [b]) => a.localeCompare(b))) {
     const linked = row.linkedCalendar ? state.occurrences[row.linkedCalendar] : undefined;
     const unresolved = row.unresolved ?? linked?.unresolved ??
-      (available && orphan && row.source === "gmail" && !linked ? "unproven-calendar-history" : undefined);
+      (row.source === "gmail" && !linked && reachesUnlinkedGmail(reach, row) ? "unproven-calendar-history" : undefined);
     const snapshot: Snapshot = linked ? {...row.snapshot, title: linked.snapshot.title, startTime: linked.snapshot.startTime, endTime: linked.snapshot.endTime,
       meetingUrl: linked.snapshot.meetingUrl, cancelled: linked.snapshot.cancelled,
       ...(linked.snapshot.meetingUrlSource !== undefined ? {meetingUrlSource: linked.snapshot.meetingUrlSource} : {})} : row.snapshot;
@@ -246,10 +250,10 @@ export function reconcileWebinarSources(input: {
     const classification = classifyWebinarInvite(snapshot.title ?? ""), future = !snapshot.endTime || snapshot.endTime > input.checkedAt;
     if ((classification !== "meeting" && future) || unresolved) inventory.push({occurrenceKey: key, reviewKey: webinarSessionKey(`source-review|${key}`),
       sessionKey: current && !untrustedSnapshot(snapshot) ? webinarSessionKey(current) : undefined, classification, snapshot, reason: unresolved ?? linked?.reviewReason ?? row.reviewReason ?? (snapshot.cancelled ? "cancelled" : undefined)});
-    if (available && unresolved) continue;
+    if (unresolved) continue; // a legacy-scope block empties both feeds below anyway
     if (row.source === "calendar") calendarEvents.push({...snapshot, title: snapshot.title ?? "", startTime: snapshot.startTime ?? "", endTime: snapshot.endTime ?? ""} as CalendarEvent);
     else candidates.push(snapshot as AutoRecordCandidateInput);
   }
-  const newStartsBlocked = !available && (!state.historyComplete || Object.values(state.occurrences).some(row => Boolean(row.unresolved)));
+  const newStartsBlocked = !available && (!state.historyComplete || Object.values(state.occurrences).some(row => Boolean(row.unresolved) && row.unresolved !== "unknown-tombstone"));
   return {state, inventory, transitions, newStartsBlocked, calendarEvents: newStartsBlocked ? [] : calendarEvents, candidates: newStartsBlocked ? [] : candidates};
 }

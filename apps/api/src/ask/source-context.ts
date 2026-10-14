@@ -3,19 +3,19 @@ import { createHash } from "node:crypto";
 import type { Db } from "mongodb";
 import { getDb, scopedCollection } from "@lkb/db";
 import type { Chunks, TreeIndexNode, Turns } from "@lkb/core";
-import { cosineSimilarity, lexicalQueryTokens } from "@lkb/index";
+import { cosineSimilarity } from "@lkb/index";
 import type { EmbedResult, WriteJobFn, Job } from "@lkb/ai";
 import { BoundedAskError, payloadBytes, type AskV2Deps, type CompleteFn, type NodeSearchFn,
   type SourceQuote, type HydrateSourcesFn } from "@lkb/ask";
-import { createAskArmsFor, type ArmsEmbedFn } from "../ask-arms.js";
+import { createAskArmsFor, type ArmsEmbedFn } from "./ask-arms.js";
 import { createLlmScorer } from "../score.js";
+import { passageLexicalScorer, slices, type Span } from "./passage-lexical.js";
 
 type ReadDb = Pick<Db, "collection">;
 const sha = (text: string) => createHash("sha256").update(text, "utf8").digest("hex");
 const nonempty = (value: unknown): value is string => typeof value === "string" && value.trim().length > 0;
 const NOMIC_DIGEST = "sha256:0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f";
 const digest = (value: unknown): value is string => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
-interface Span { charStart: number; charEnd: number }
 interface BoundChunk extends Chunks {
   vector: [number, ...number[]];
   dims: number;
@@ -23,90 +23,23 @@ interface BoundChunk extends Chunks {
   sourceSpans?: { spanId: string; turnId: string; charStart: number; charEnd: number; byteStart: number; byteEnd: number;
     turnTextSHA256: string; sliceSHA256: string }[];
 }
-/** Unicode-safe half-open slices; no new turns or invented sub-turn timestamps. */
-function slices(text: string): Span[] {
-  const result: Span[] = [];
-  let start = 0, end = 0, bytes = 0;
-  for (const char of text) {
-    const next = Buffer.byteLength(char, "utf8");
-    if (bytes + next > 1024) { result.push({ charStart: start, charEnd: end }); start = end; bytes = 0; }
-    bytes += next; end += char.length;
-  }
-  if (end > start) result.push({ charStart: start, charEnd: end });
-  return result;
-}
-const QUERY_FUNCTION_WORDS = new Set(("a an and are as at be before by can could did do does for from had has have how "
-  + "i if in is it its of on or our that the their them these they this to was were what when where which who why "
-  + "will with would you your say said describe described recommend recommended explain explained tell told").split(" "));
-// Retrieval-only English inflection families; these never rewrite quoted source text.
-// Explicit families avoid stripping suffixes from nouns such as business, news, or physics.
-const VERB_FORMS = new Map([
-  "lead leads leading led", "choose chooses choosing chose chosen", "teach teaches teaching taught",
-  "buy buys buying bought", "sell sells selling sold", "send sends sending sent",
-  "pay pays paying paid", "grow grows growing grew grown", "speak speaks speaking spoke spoken",
-  "write writes writing wrote written", "run runs running ran", "take takes taking took taken",
-  "give gives giving gave given", "make makes making made", "know knows knowing knew known",
-  "think thinks thinking thought", "bring brings bringing brought", "build builds building built",
-  "find finds finding found", "hold holds holding held", "meet meets meeting met",
-].flatMap((family) => { const forms = family.split(" "); return forms.map((form) => [form, forms[0]!] as const); }));
-const term = (word: string) => VERB_FORMS.get(word) ??
-  (word.length > 4 && word.endsWith("s") && !/(ss|us|is|ics)$/.test(word) ? word.slice(0, -1) : word);
-/** Only explicit, calendrical apostrophe shorthand may match a unique query year.
- * Bare quantities, percentages, quoted numbers, and ambiguous centuries stay literal.
- * A match guides retrieval; it never resolves the century or edits a source assertion. */
-function passageTokenizer(query: string) {
-  const years = new Map<string, string | null>();
-  for (const full of lexicalQueryTokens(query).filter((word) => /^(?:19|20)\d{2}$/.test(word))) {
-    const short = full.slice(-2), prior = years.get(short);
-    years.set(short, prior === undefined || prior === full ? full : null);
-  }
-  return (text: string) => {
-    const expanded = text.replace(/['’](\d{2})(?![\d'’%])(?=\s+(?:placements?|admissions?|intakes?|cohorts?|batches?|graduates?|graduation|classes?|academic\s+years?)\b)/gi,
-      (literal, short: string) => years.get(short) ?? literal)
-      .replace(/\b(year|class of|cohort of|batch of|intake of|spring|summer|autumn|fall|winter)\s+['’](\d{2})(?![\d'’%])\b/gi,
-        (literal, prefix: string, short: string) => years.get(short) ? prefix + " " + years.get(short) : literal);
-    // Same lexical token boundaries as lexicalQueryTokens, with actual frequencies retained.
-    return expanded.split(/\W+/).filter(Boolean).map((word) => word === "LED" ? "led-device" : term(word.toLowerCase()));
-  };
-}
-/** Query-independent document frequencies reduce boilerplate overlap; source labels remain unverified metadata. */
-function passageLexicalScorer(query: string, turns: Turns[]) {
-  const wordsFor = passageTokenizer(query);
-  const all = wordsFor(query);
-  const content = all.filter((word) => !QUERY_FUNCTION_WORDS.has(word));
-  const terms = [...new Set((content.length ? content : all).map(term))];
-  const docs = turns.map((turn) => new Set(wordsFor(turn.text + " " + turn.speakerRef)));
-  const weights = new Map(terms.map((word) => {
-    const count = docs.filter((words) => words.has(word)).length;
-    return [word, count ? Math.log(1 + (turns.length - count + 0.5) / (count + 0.5)) : 0];
-  }));
-  const denominator = [...weights.values()].reduce((a, b) => a + b, 0);
-  const lengths = turns.flatMap((turn) => slices(turn.text).map((span) => wordsFor(turn.text.slice(span.charStart, span.charEnd)).length));
-  const average = lengths.reduce((a, b) => a + b, 0) / Math.max(1, lengths.length);
-  return (text: string, speakerRef: string) => {
-    const words = wordsFor(text), speakers = new Set(wordsFor(speakerRef));
-    const counts = new Map<string, number>();
-    for (const word of words) counts.set(word, (counts.get(word) ?? 0) + 1);
-    let textContribution = 0, speakerContribution = 0;
-    const lengthFactor = 1.2 * (0.25 + 0.75 * words.length / Math.max(1, average));
-    for (const [word, weight] of weights) {
-      const tf = counts.get(word) ?? 0;
-      const contribution = weight * tf / (tf + lengthFactor);
-      textContribution += contribution;
-      if (!tf && speakers.has(word)) speakerContribution += weight / (1 + lengthFactor);
-    }
-    return { textContribution: textContribution / Math.max(1e-9, denominator),
-      speakerContribution: speakerContribution / Math.max(1e-9, denominator) };
-  };
-}
 export interface PassageDiagnostic {
   turnId: string; charStart: number; charEnd: number; lexical: number; semantic: number; score: number;
   textContribution: number; speakerContribution: number; selected: boolean;
 }
-function validTurn(turn: Turns, tenantId: string, refs: Set<string>): void {
-  if (turn.tenantId !== tenantId || !refs.has(turn.sessionId) || !nonempty(turn._id) || !nonempty(turn.speakerRef)
-    || typeof turn.text !== "string" || !Number.isFinite(turn.tStart) || !Number.isFinite(turn.tEnd)
-    || turn.tStart < 0 || turn.tEnd < turn.tStart) throw new BoundedAskError("invalid scoped source row");
+/** Scope breach (foreign tenant or a session outside the admitted set): NEVER excluded, always refuses the request. */
+function assertInScope(turn: Turns, tenantId: string, refs: Set<string>): void {
+  if (turn.tenantId !== tenantId || !refs.has(turn.sessionId)) throw new BoundedAskError("invalid scoped source row");
+}
+/** D-153 (pending append): a row of the right tenant and session that is itself malformed is EXCLUDED, per turn, with a warning. */
+function rowProblem(turn: Turns): string | null {
+  if (!nonempty(turn._id)) return "turn id is empty";
+  if (!nonempty(turn.speakerRef)) return "speakerRef is empty";
+  if (typeof turn.text !== "string") return "text is not a string";
+  if (!Number.isFinite(turn.tStart) || !Number.isFinite(turn.tEnd)) return "tStart/tEnd is not a finite number";
+  if (turn.tStart < 0) return `tStart ${turn.tStart} is negative`;
+  if (turn.tEnd < turn.tStart) return `tEnd ${turn.tEnd} is before tStart ${turn.tStart}`;
+  return null;
 }
 function quote(node: TreeIndexNode, turn: Turns, span: Span): SourceQuote {
   const text = turn.text.slice(span.charStart, span.charEnd);
@@ -176,11 +109,25 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
     const snapshot = JSON.parse(bytes) as { rows: Turns[]; chunks: BoundChunk[] };
     const snapshotSHA256 = sha(bytes);
     const byTurn = new Map<string, Turns>();
+    const excludedTurns: { sessionId: string; turnId: string; reason: string }[] = [];
+    const validRows: Turns[] = [];
     for (const turn of snapshot.rows) {
-      validTurn(turn, tenantId, new Set(sessionIds));
+      assertInScope(turn, tenantId, new Set(sessionIds));
+      const problem = rowProblem(turn);
+      if (problem) { excludedTurns.push({ sessionId: turn.sessionId, turnId: nonempty(turn._id) ? turn._id : "(no id)", reason: problem }); continue; }
       if (byTurn.has(turn._id)) throw new BoundedAskError("duplicate source turn identity");
       byTurn.set(turn._id, turn);
+      validRows.push(turn);
     }
+    // Every row in scope invalid: the existing refusal, never an empty success.
+    if (snapshot.rows.length > 0 && validRows.length === 0) throw new BoundedAskError("invalid scoped source row");
+    const excludedIds = new Set(excludedTurns.map((e) => e.turnId));
+    snapshot.rows = validRows;
+    // A vector chunk that covers an excluded turn is dropped with it: its embedded text may contain that turn.
+    // Scope first: a chunk of another tenant or outside the admitted sessions refuses the request whatever else is wrong with it.
+    for (const c of snapshot.chunks) if (c.tenantId !== tenantId || !sessionIds.includes(c.sourceRef)) throw new BoundedAskError("invalid scoped vector evidence");
+    snapshot.chunks = snapshot.chunks.filter((c) => !(Array.isArray(c.turnRefs) && c.turnRefs.some((id) => excludedIds.has(id)))
+      && !(Array.isArray(c.sourceSpans) && c.sourceSpans.some((s) => excludedIds.has(s.turnId))));
     for (const chunk of snapshot.chunks) validateChunk(chunk, tenantId, byTurn);
     let embedding: EmbedResult | undefined;
     let degraded: string | undefined;
@@ -198,7 +145,11 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
     for (const node of nodes) {
       const turns = snapshot.rows.filter((t) => t.sessionId === node.evidence!.sessionRef)
         .sort((a, b) => a.tStart - b.tStart || a.tEnd - b.tEnd || a._id.localeCompare(b._id));
-      if (!turns.length) throw new BoundedAskError("admitted session has no source rows");
+      if (!turns.length) {
+        // No rows at all stays a refusal; a session whose every row was excluded is skipped (it is named in the warning).
+        if (excludedTurns.some((e) => e.sessionId === node.evidence!.sessionRef)) continue;
+        throw new BoundedAskError("admitted session has no source rows");
+      }
       const lexicalScore = passageLexicalScorer(query, turns);
       const choices = turns.flatMap((turn) => slices(turn.text).map((span) => {
         const text = turn.text.slice(span.charStart, span.charEnd);
@@ -248,7 +199,7 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
           sourceSnapshotSHA256: snapshotSHA256, sourceMode: "exact-scoped-turn-excerpts" },
       });
     }
-    return { nodes: result, snapshotSHA256, sourceBytes: Buffer.byteLength(bytes, "utf8"), ...(degraded ? { degraded } : {}) };
+    return { nodes: result, snapshotSHA256, sourceBytes: Buffer.byteLength(bytes, "utf8"), ...(degraded ? { degraded } : {}), ...(excludedTurns.length ? { excludedTurns } : {}) };
   };
 }
 

@@ -6,11 +6,12 @@
  * (`ai-transport.ts`). Kept out of `server.ts` so that file stays <=80 LOC and injectable-only.
  * Never imported by tests.
  */
+import { speakerSuggestEnabled } from "../indexing/speaker-suggest.js";
 import { createMongoSystemStatusDeps } from "../system-status-store.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { complete as routeComplete, embed as routeEmbed, parseRoutingYaml, GeminiProvider, ClaudeCodeProvider, OllamaProvider, type Provider } from "@lkb/ai";
-import { treeSearch } from "@lkb/index";
+import { treeSearch, createLlmNoteJudge } from "@lkb/index";
 import { listHeartbeats, listWatchState } from "@lkb/db";
 import { createTelegramAlertSink } from "@lkb/core";
 import type { ServerDeps } from "../server.js";
@@ -18,17 +19,21 @@ import type { WatchSilenceDeps } from "../routes/health.js";
 import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, createMongoTreeStore, createMongoBrainReadDeps,
   createMongoWatchedSourceDeps, createMongoCitationsDeps, createMongoHealthDeps, createMongoGraphReadDeps, createGwsCalendarReadDeps, createMeetingCandidatesDeps, createMongoKeysDeps } from "../store.js";
 import { createMongoIngestDeps } from "../ingest-store.js";
+import { buildSourceIntakeDeps } from "../source-intake/wiring.js";
 import { createMongoSearchDeps } from "../search-store.js";
+import { createMongoSemanticSearchDeps, semanticSearchEnabled } from "../semantic-search/semantic-search-store.js";
 import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
 import { createConfiguredWhatsAppOwnerResolver } from "../whatsapp/owner-config.js";
 import { realTransport } from "../ai-transport.js";
 import { createLlmScorer } from "../score.js";
-import { createTavilySearchFn } from "../ask-web-fallback.js";
+import { createTavilySearchFn } from "../ask/ask-web-fallback.js";
 import { indexSession, type BoundIndexer } from "../indexing/session.js";
-import { createAskArmsFor } from "../ask-arms.js";
+import { createAskArmsFor } from "../ask/ask-arms.js";
 import { createSourceRequestDepsFor } from "../ask/source-context.js";
 import { withSessionArtifacts } from "../routes/brain.js";
 import { createMongoJobsReadDeps } from "../jobs/store.js";
+import { createMongoUsageDeps } from "../usage/store.js";
+import { createMongoSpeakerSuggestionDeps } from "../speaker-suggestions/store.js";
 import { createMongoWatchRunsDeps } from "../activity-health/watch-runs.js";
 import { createMongoClaimsListDeps } from "../claims/store.js";
 import { createConfiguredActivityHealthDeps } from "../activity-health/queue-reader.js";
@@ -156,11 +161,34 @@ export function buildRouting(): {
  * --index` must index a bot-captured session through EXACTLY the binding the server's ingest
  * routes use, not a second copy of it that could drift.
  */
-export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRouting(), options: { strictWebinar?: boolean } = {}): BoundIndexer {
+/** U2.4 / D-141: an explicit caller choice wins; otherwise OFF unless KB_SPEAKER_SUGGEST=1. */
+export function resolveSuggestSpeakers(option?: boolean, env: Record<string, string | undefined> = process.env): boolean {
+  return option ?? speakerSuggestEnabled(env);
+}
+
+/** T-040 (D-162): grounded notes + Q&A with the note judge. An explicit caller choice wins; otherwise OFF unless KB_GROUNDED_NOTES=1. */
+export function resolveGroundedNotes(option?: boolean, env: Record<string, string | undefined> = process.env): boolean {
+  return option ?? env.KB_GROUNDED_NOTES === "1";
+}
+
+/** Optional per-session judge cost cap (USD) from KB_NOTE_JUDGE_MAX_USD; anything not a finite number >= 0 is ignored. */
+export function resolveJudgeMaxCostUsd(env: Record<string, string | undefined> = process.env): number | undefined {
+  const raw = env.KB_NOTE_JUDGE_MAX_USD?.trim();
+  if (!raw) return undefined;
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? n : undefined;
+}
+
+export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRouting(), options: { strictWebinar?: boolean; suggestSpeakers?: boolean; groundedNotes?: boolean } = {}): BoundIndexer {
   const { chains, providers, jobWrite } = routing;
+  const grounded = resolveGroundedNotes(options.groundedNotes);
   return (tenantId, sessionId) =>
     indexSession(tenantId, sessionId, {
       strictWebinar: options.strictWebinar,
+      // T-040: OFF -> none of these keys is set, so indexSession runs exactly as before.
+      ...(grounded ? { dropUnverified: true, noteJudge: createLlmNoteJudge((job) => routeComplete(job.kind, job, { chains, providers, write: jobWrite, tenantId })), judgeMaxCostUsd: resolveJudgeMaxCostUsd() } : {}),
+      // U2.4 / D-141: speaker NAME SUGGESTIONS (never final), OFF unless KB_SPEAKER_SUGGEST=1 or the caller opts in. Uses the `speakers` route.
+      suggestSpeakers: resolveSuggestSpeakers(options.suggestSpeakers),
       complete: (job) => routeComplete(job.kind, job, { chains, providers, write: jobWrite, tenantId }),
       // Wired only when a chain is configured for it (U1.3). Passing an embedder unconditionally
       // would make every index run fail on an install with no embedding provider, where today it
@@ -193,15 +221,24 @@ export function buildProductionDeps(): ServerDeps {
     // surface GET /watch-state serves (routes/watched-sources.ts).
     watchedSources: { ...createMongoWatchedSourceDeps(), ...createMongoWatchStateReadDeps() },
     search: createMongoSearchDeps(),
+    // T-008: OFF unless LKB_SEMANTIC_SEARCH=1 and an embedding chain exists. Router tenant is "system" only for
+    // cost accounting; the retrieval itself is tenant-scoped per request inside the store.
+    semanticSearch: semanticSearchEnabled() && chains.embedding
+      ? createMongoSemanticSearchDeps({ embed: (job) => routeEmbed("embedding", job, { chains, providers, write: jobWrite, tenantId: ROUTER_TENANT_ID }) })
+      : undefined,
     graph: createMongoGraphReadDeps(),
     calendar: createGwsCalendarReadDeps(),
     meetingCandidates: createMeetingCandidatesDeps(),
     whatsapp: createMongoWhatsAppDeps(boundIndexer, { resolveOwner: createConfiguredWhatsAppOwnerResolver(process.env.WHATSAPP_TENANT_OWNER_MAP) }),
     keys: createMongoKeysDeps(),
     ingest: createMongoIngestDeps(boundIndexer),
+    // T-045: OFF unless LKB_SOURCE_INTAKE=1 (route absent otherwise); see source-intake-wiring.ts.
+    sourceIntake: buildSourceIntakeDeps(process.env, boundIndexer),
     jobs: createMongoJobsReadDeps(),
     activityHealth: createConfiguredActivityHealthDeps(),
     watchRuns: createMongoWatchRunsDeps(),
+    usage: createMongoUsageDeps(),
+    speakerSuggestions: createMongoSpeakerSuggestionDeps(),
     // CORS_ORIGINS is a comma-separated allowlist (e.g. "http://localhost:5173" in dev, the real
     // apps/web deployment origin in prod) — no default beyond "" -> empty list, matching
     // server.ts's safe-by-default stance.

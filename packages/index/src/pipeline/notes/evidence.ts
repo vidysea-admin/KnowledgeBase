@@ -10,20 +10,22 @@
  */
 import type { Turns, QuotedEvidence, CitedItem, QaEntry } from "@lkb/core";
 import { verifyQuote, normaliseForQuote } from "../quote/quote-verify.js";
-import { sentenceSpanProblem } from "./sentence-span.js";
+import { sentenceSpanProblem, lexicalNegationProblem, type SpanProblem } from "./sentence-span.js";
 import { runtimeOrigin, type RuntimeSpan } from "../grounded.js";
 
 export type NonEmptyEvidence = [QuotedEvidence, ...QuotedEvidence[]];
-export type Resolved = { ok: true; evidence: NonEmptyEvidence; claimed: string[] } | { ok: false; reason: string };
+/** `lexical` (judged mode only, D-151 pending append): the first lexical negation problem the rules found; the caller drops the note, after the judge has also seen it. */
+export type Resolved = { ok: true; evidence: NonEmptyEvidence; claimed: string[]; lexical?: SpanProblem } | { ok: false; reason: string };
 export const MAX_EVIDENCE_PER_ITEM = 8;
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 
 /** Resolve model-claimed evidence against the source turns; never throws. */
-export function resolveEvidence(value: unknown, turns: Turns[], spans?: RuntimeSpan[], opts: { allowQuestion?: boolean } = {}): Resolved {
+export function resolveEvidence(value: unknown, turns: Turns[], spans?: RuntimeSpan[], opts: { allowQuestion?: boolean; judged?: boolean } = {}): Resolved {
   if (!Array.isArray(value) || value.length === 0) return { ok: false, reason: "no evidence" };
   if (value.length > MAX_EVIDENCE_PER_ITEM) return { ok: false, reason: "too many evidence entries" };
   const evidence: QuotedEvidence[] = [], claimed: string[] = [], seen = new Set<string>();
+  let lexical: SpanProblem | undefined;
   for (const raw of value) {
     if (!isObj(raw) || typeof raw.turnId !== "string" || typeof raw.sessionId !== "string" || typeof raw.quote !== "string") return { ok: false, reason: "malformed evidence entry" };
     const turn = turns.find((t) => t._id === raw.turnId && t.sessionId === raw.sessionId);
@@ -34,7 +36,12 @@ export function resolveEvidence(value: unknown, turns: Turns[], spans?: RuntimeS
     if (!inSpan.length) return { ok: false, reason: "quote lies outside the submitted spans" };
     // ISS-T040GEN-002: sentence/clause-span rule (manifest t040-strict-quote-verifier-and-windowing.md:82) + omitted-qualifier floor.
     const problems = inSpan.map((l) => sentenceSpanProblem(turn.text, l.start, l.end, opts));
-    const where = inSpan[problems.indexOf(null)];
+    // D-151: in judged mode the structural rules above still gate; the lexical rules are evaluated too, preferring a location they accept.
+    const structural = inSpan.filter((_, i) => problems[i] === null);
+    const lex = opts.judged ? structural.map((l) => lexicalNegationProblem(turn.text, l.start, l.end)) : [];
+    const pick = opts.judged ? Math.max(0, lex.indexOf(null)) : 0;
+    const where = opts.judged ? structural[pick] : inSpan[problems.indexOf(null)];
+    if (where && opts.judged && lex[pick] && !lexical) lexical = lex[pick]!;
     if (!where) return { ok: false, reason: `quote is not a whole sentence or clause: ${problems[0]}` };
     const quote = turn.text.slice(where.start, where.end);
     const key = JSON.stringify([turn._id, quote]);
@@ -43,7 +50,7 @@ export function resolveEvidence(value: unknown, turns: Turns[], spans?: RuntimeS
     evidence.push({ turnId: turn._id, sessionId: turn.sessionId, quote });
     claimed.push(raw.quote);
   }
-  return { ok: true, evidence: evidence as NonEmptyEvidence, claimed };
+  return { ok: true, evidence: evidence as NonEmptyEvidence, claimed, ...(lexical ? { lexical } : {}) };
 }
 
 /** Extractive display text: equals the joined verified quotes (or the joined claimed quotes) modulo normalisation. */
@@ -63,11 +70,12 @@ export function citationTimes(evidence: ReadonlyArray<QuotedEvidence>, turns: Tu
  * verifier, checks extractiveness, the origin, the answered/unanswered coupling and id uniqueness.
  * Returns problems (empty = clean). Legacy pages (no citedItems/qa) audit clean.
  */
-export function auditGroundedNotes(page: { citedItems?: CitedItem[]; qa?: QaEntry[] }, turns: Turns[]): string[] {
+export function auditGroundedNotes(page: { citedItems?: CitedItem[]; qa?: QaEntry[] }, turns: Turns[], auditOpts: { judged?: boolean } = {}): string[] {
   const problems: string[] = [], ids = new Set<string>();
   const check = (label: string, text: string, ev: ReadonlyArray<QuotedEvidence>, allowQuestion = false) => {
-    const r = resolveEvidence(ev, turns, undefined, { allowQuestion });
+    const r = resolveEvidence(ev, turns, undefined, { allowQuestion, ...(auditOpts.judged ? { judged: true } : {}) });
     if (!r.ok) return void problems.push(`${label}: ${r.reason}`);
+    if (r.lexical) problems.push(`${label}: lexical negation check: ${r.lexical}`);
     if (r.evidence.some((e, i) => e.quote !== ev[i]!.quote) || r.evidence.length !== ev.length) problems.push(`${label}: quote is not the verbatim source slice`);
     if (extractiveText(text, r) !== text) problems.push(`${label}: text is not the joined quotes`);
     return r;

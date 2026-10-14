@@ -26,6 +26,8 @@ export interface OllamaConfig {
   model?: string;
   /** Overrides DEFAULT_EMBED_MODEL; `model` selects the chat model and is unrelated. */
   embedModel?: string;
+  /** Ollama Cloud key (U0.10). When set, requests carry `authorization: Bearer <key>`; when unset or blank, headers are byte-identical to the local-only adapter. */
+  apiKey?: string;
 }
 
 export class OllamaProvider implements Provider {
@@ -37,6 +39,12 @@ export class OllamaProvider implements Provider {
     private readonly config: OllamaConfig = {},
   ) {
     this.baseUrl = config.baseUrl ?? DEFAULT_BASE_URL;
+  }
+
+  /** Request headers: the original content-type pair, plus authorization only when an apiKey is configured. */
+  private headers(): Record<string, string> {
+    const key = this.config.apiKey?.trim();
+    return key ? { "content-type": "application/json", authorization: `Bearer ${key}` } : { "content-type": "application/json" };
   }
 
   async complete(job: Job): Promise<CompleteResult> {
@@ -53,7 +61,7 @@ export class OllamaProvider implements Provider {
       kind: "http",
       url: `${this.baseUrl}/api/chat`,
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: this.headers(),
       body: {
         model,
         stream: false,
@@ -106,7 +114,7 @@ export class OllamaProvider implements Provider {
       kind: "http",
       url: `${this.baseUrl}/api/embed`,
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: this.headers(),
       body: { model, input: ollamaEmbeddingInputs(job, model), truncate: false, options: { num_thread: 1 } },
     });
 

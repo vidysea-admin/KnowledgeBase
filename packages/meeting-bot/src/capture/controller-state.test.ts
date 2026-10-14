@@ -24,7 +24,7 @@ import {
 
 import {writeOwnedTabStatus} from "./tab-browser.js";
 import {finalizeRecordingWith} from "./record-commands.js";
-import {webinarCompletionState} from "../calendar/schedule-state.js";
+import {webinarCompletionState} from "../calendar/state/schedule-state.js";
 
 function tmpDir(): string {
   return mkdtempSync(path.join(tmpdir(), "lkb-controller-state-"));

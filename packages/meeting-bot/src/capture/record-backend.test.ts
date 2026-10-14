@@ -11,6 +11,10 @@ test("portable tab backend is default, invalid backend never falls through to OB
   assert.equal(recordingBackend([], {}), "tab");
   assert.equal(recordingBackend(["--backend", "tab"], {LKB_CAPTURE_BACKEND:"obs"}), "tab");
   assert.throws(() => recordingBackend(["--backend", "unknown"], {}), /tab or obs/);
+  // The Windows-only gate, exercised on every host through the injected platform.
+  assert.equal(recordingBackend(["--backend", "obs"], {}, "win32"), "obs");
+  assert.throws(() => recordingBackend(["--backend", "obs"], {}, "linux"), /Windows-only; use --backend tab/);
+  assert.throws(() => recordingBackend([], { LKB_CAPTURE_BACKEND: "obs" }, "darwin"), /Windows-only/);
 });
 test("finalize refuses unsafe session paths before creating or remuxing anything", async () => {
   await assert.rejects(runFinalize(["--session-id", "../../escape", "--title", "x", "--video", "missing.webm"]), /session-id/);

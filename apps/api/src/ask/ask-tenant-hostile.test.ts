@@ -17,7 +17,7 @@ import assert from "node:assert/strict";
 import express from "express";
 import type { TreeIndexNode } from "@lkb/core";
 import { scopedCollection } from "@lkb/db";
-import { createAskArmsFor } from "../ask-arms.js";
+import { createAskArmsFor } from "./ask-arms.js";
 import { createSourceHydrator, createSourceRequestDepsFor } from "./source-context.js";
 import { createAskRouter, type TreeStore } from "../routes/ask/ask.js";
 import { BlindDb, realTreeStore, type Row } from "./tenant-test-kit.js";

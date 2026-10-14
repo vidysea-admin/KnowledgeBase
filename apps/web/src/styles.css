@@ -29,7 +29,7 @@ body {
 
 .app-shell {
   display: grid;
-  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
   min-height: 100vh;
 }
 
@@ -41,6 +41,10 @@ body {
   flex-direction: column;
   gap: 0.25rem;
 }
+
+.nav-links { display: flex; flex-direction: column; gap: 0.25rem; }
+.nav-topbar { display: block; }
+.nav-toggle { display: none; }
 
 .nav-sidebar .brand {
   font-size: 0.78rem;
@@ -238,3 +242,56 @@ body {
 .global-search { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1rem; }
 .global-search label { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
 .global-search input { flex: 1; min-width: 0; }
+
+.brain-split { display: flex; gap: 1rem; padding: 0; overflow: hidden; }
+.brain-panel { width: 340px; flex-shrink: 0; border-left: 1px solid var(--line); padding: 1rem; overflow-y: auto; max-height: 560px; }
+
+/* Responsive: phones. Desktop (>640px) is untouched by everything below. */
+.app-main { min-width: 0; }
+.app-main pre { max-width: 100%; overflow-x: auto; }
+/* A select sizes to its longest option; cap it at its container (ISS-WEBRESPONSIVE-001). No effect unless it would overflow. */
+.app-main label { max-width: 100%; }
+.app-main select { max-width: min(100%, 40rem); min-width: 0; text-overflow: ellipsis; }
+
+@media (max-width: 640px) {
+  .app-shell { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .nav-sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    padding: 0.6rem 16px;
+    gap: 0;
+  }
+  .nav-topbar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+  .nav-sidebar .brand { margin-bottom: 0; padding: 0; }
+  .nav-toggle {
+    display: inline-block;
+    min-height: 40px;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .nav-links { display: none; margin-top: 0.6rem; }
+  .nav-sidebar[data-open="true"] .nav-links { display: flex; }
+  .app-main { padding: 1rem 16px; max-width: 100%; }
+  .card { padding: 1rem; }
+  .global-search { flex-wrap: wrap; }
+  .login-card { max-width: calc(100% - 32px); }
+  .brain-split { flex-direction: column; gap: 0; }
+  .brain-panel { width: auto; border-left: none; border-top: 1px solid var(--line); max-height: none; }
+  /* Form controls and long text never widen the page (ISS-WEBRESPONSIVE-001). */
+  .app-main { overflow-wrap: anywhere; }
+  .app-main select, .app-main input:not([type="checkbox"]):not([type="radio"]), .app-main textarea {
+    max-width: 100%; min-width: 0; text-overflow: ellipsis;
+  }
+  .app-main label { max-width: 100%; }
+  .app-main button, .app-main a { max-width: 100%; }
+  .app-main button { white-space: normal; }
+  /* Wide tables scroll inside their own box, not the page. */
+  .app-main table { display: block; max-width: 100%; overflow-x: auto; }
+}

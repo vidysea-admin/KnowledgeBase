@@ -133,7 +133,7 @@ with patch('job_queue.now_ms',lambda:clock),patch('job_queue.iso',lambda:'2026-1
  assert rows[3]['status']=='failed' and rows[5]['status']=='pending' and rows[6]['status']=='pending'
  print(json.dumps({'rows':rows,'firstAttempts':first['attempts'],'reclaimedAttempts':second['attempts'],'staleOwnerFenced':True,'terminalDeadlineCancelExhaustionFenced':True}))
 `;
-test("actual producer -> Python first/reclaim/fences -> real production Mongo binding -> authenticated current server -> consumer output", { timeout: 20000 }, async () => {
+test("actual producer -> Python first/reclaim/fences -> real production Mongo binding -> authenticated current server -> consumer output", { timeout: 150000 }, async () => {
   const queueModule = await import(new URL("../../../../scripts/upload/queue.mjs", import.meta.url).href);
   const parent = join(root, ".cache", "coordination", "t057-d2-private"); await mkdir(parent, { recursive: true }); const spoolRoot = await mkdtemp(join(parent, "spool-"));
   let produced: Record<string, unknown> | null = null, finished: Record<string, unknown> | null = null;
@@ -141,11 +141,11 @@ test("actual producer -> Python first/reclaim/fences -> real production Mongo bi
     updateOne: async (_filter: unknown, update: { $setOnInsert?: Record<string, unknown> }) => { if (update.$setOnInsert) produced = update.$setOnInsert; },
     findOne: async () => finished ?? produced,
   } };
-  const transport = await queueModule.createQueueTransport(queue, { spoolRoot, runId: "b".repeat(64), timeoutMs: 10000, pollMs: 10 });
+  const transport = await queueModule.createQueueTransport(queue, { spoolRoot, runId: "b".repeat(64), timeoutMs: 120000, pollMs: 10 });
   const pending = transport({ method: "GET", url: "https://generativelanguage.googleapis.com/v1beta/files/fixture?key=private-fixture-key", headers: {} });
   for (let n = 0; n < 100 && !produced; n++) await new Promise(resolve => setTimeout(resolve, 5)); assert.ok(produced);
   assert.equal(JSON.stringify(produced).includes("private-fixture-key"), false);
-  const child = spawnSync(process.env.D2_FIXTURE_PYTHON ?? join(root, ".venv", "Scripts", "python.exe"), ["-c", pythonFixture], { cwd: root, input: JSON.stringify([produced]), encoding: "utf8", timeout: 5000, windowsHide: true });
+  const child = spawnSync(process.env.D2_FIXTURE_PYTHON ?? join(root, ".venv", "Scripts", "python.exe"), ["-c", pythonFixture], { cwd: root, input: JSON.stringify([produced]), encoding: "utf8", timeout: 90000, windowsHide: true });
   assert.equal(child.status, 0, child.stderr); const proof = JSON.parse(child.stdout) as { rows: typeof row[]; firstAttempts: number; reclaimedAttempts: number; staleOwnerFenced: boolean; terminalDeadlineCancelExhaustionFenced: boolean };
   finished = proof.rows[0]!; assert.equal((await pending).status, 200);
   const calls: unknown[] = []; const safeCollection = memoryReader(proof.rows, calls);

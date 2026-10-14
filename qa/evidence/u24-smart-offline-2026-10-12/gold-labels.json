@@ -1,0 +1,1900 @@
+{
+  "_meta": {
+    "unit": "u2-4-phase3-precision-regate",
+    "ground_truth_rule": "what the transcript text says; a block's person is the name the text binds to that block's speaker (self-naming, direct address by the next/previous speaker, or a called-on chain). Blocks with no naming evidence are gold 'unnamed' — no identity claim is possible from the text.",
+    "provenance_kinds": {
+      "self-naming": "the block's own turn contains an explicit self-naming cue",
+      "address-adjacent": "an immediately adjacent turn addresses the block's speaker by name (greeting/thanks before, or reply after)",
+      "called-on": "the host names the person and the block's turns answer that call",
+      "speech-continuity": "the block continues a named speaker's speech mid-sentence or mid-argument across a label change",
+      "handover-next": "a handover in an adjacent turn names the FOLLOWING speaker (never the speaking label)",
+      "none": "no naming evidence; gold unnamed"
+    },
+    "labeller": "claude-sonnet-subagent (U2.4 phase-3 re-gate), 2026-09-22, from data/toc-migrated/*/turns.json"
+  },
+  "sessions": [
+    {
+      "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "blocks": [
+        {
+          "block": 1,
+          "label": "spk:0",
+          "person": "Rashi",
+          "prov": "address-adjacent",
+          "evidence": "t036 [Kshitij] 'Thank you, Rashi' + t145 [Shagun] 'Thank you so much, Rashi, for inviting me' — both address the block's speaker (TOC moderator, 'chair of a guidance counselor' t014)",
+          "confidence": "inferred"
+        },
+        {
+          "block": 2,
+          "label": "spk:1",
+          "person": "Kshitij",
+          "prov": "speech-continuation",
+          "evidence": "block continues the named [Kshitij] turns (t036-t080) mid-topic (offer->visa NZ); t141 'Rashi, I\\'ll pass it on back to you'; t142 spk:0 'Thank you, Kshitij, and I think Kshitij has done a fabulous job'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 3,
+          "label": "spk:0",
+          "person": "Rashi",
+          "prov": "address-adjacent",
+          "evidence": "t145 [Shagun] 'Thank you so much, Rashi, for inviting me' — addresses the preceding spk:0 turns",
+          "confidence": "inferred"
+        },
+        {
+          "block": 4,
+          "label": "spk:1",
+          "person": "Shagun",
+          "prov": "speech-continuation",
+          "evidence": "block continues the named [Shagun] turns (t145-t180, Campus France); t205 spk:0 'Thank you, Shagun'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 5,
+          "label": "spk:0",
+          "person": "Rashi",
+          "prov": "address-adjacent",
+          "evidence": "t205 is the moderator's handover turn ('I invite our next speaker, Ruby'); the SAME label hosts blocks 1/3 (Rashi)",
+          "confidence": "inferred",
+          "note": "ISS-255 handover turn"
+        },
+        {
+          "block": 6,
+          "label": "spk:2",
+          "person": "Ruby",
+          "prov": "self-naming",
+          "evidence": "t206 'My name is Ruby'; t233 'the education that Ruby Thomas has done is authentic' (self-reference); t032 introduction 'Ms. Ruby Thomas'",
+          "confidence": "direct"
+        },
+        {
+          "block": 7,
+          "label": "spk:0",
+          "person": "Ruby",
+          "prov": "speech-continuation",
+          "evidence": "t247 continues t246 (spk:2=Ruby) mid-sentence ('have to take this insurance...'); Uni-Italia content; t265 spk:1 'Thank you, Ruby, for doing such a fabulous job of explaining'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 8,
+          "label": "spk:1",
+          "person": "Rashi",
+          "prov": "role-continuity",
+          "evidence": "Q&A host voice (asks the apostille question to Ruby); same spk:1 cluster as blocks 10-13/16 where t274 [Shitij] addresses the asker 'like I mentioned, Rashi' and t288 [Bhakti] says 'Rashi, over to you'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 9,
+          "label": "spk:0",
+          "person": "Ruby",
+          "prov": "speech-continuation",
+          "evidence": "t266 answers the apostille question put to Ruby ('Yes, uh so, the Ministry of External Affairs...'); same Italy/Uni-Italia voice as block 7",
+          "confidence": "inferred"
+        },
+        {
+          "block": 10,
+          "label": "spk:1",
+          "person": "Rashi",
+          "prov": "role-continuity",
+          "evidence": "Q&A host ('I have another question for Shagun'); cluster = blocks 8/11/12/16",
+          "confidence": "inferred"
+        },
+        {
+          "block": 11,
+          "label": "spk:1",
+          "person": "Rashi",
+          "prov": "role-continuity",
+          "evidence": "Q&A host follow-up to Shagun",
+          "confidence": "inferred"
+        },
+        {
+          "block": 12,
+          "label": "spk:1",
+          "person": "Rashi",
+          "prov": "address-adjacent",
+          "evidence": "t274 [Shitij] 'Uh so, like I mentioned, Rashi, uh when it comes to the universities...' — answers this block's question by addressing its speaker",
+          "confidence": "direct"
+        },
+        {
+          "block": 13,
+          "label": "spk:1",
+          "person": "Rashi",
+          "prov": "role-continuity",
+          "evidence": "t275 'Thank you, Shitij' + t276 addresses Bhakti ('Bhakti, what do you say?') — host, not Bhakti",
+          "confidence": "inferred"
+        },
+        {
+          "block": 14,
+          "label": "spk:0",
+          "person": "Ruby",
+          "prov": "address-adjacent",
+          "evidence": "t282 [Kanchan] 'Yes, thank you, Ru- Ruby.' — answers this block's MAECI answer",
+          "confidence": "direct"
+        },
+        {
+          "block": 15,
+          "label": "spk:0",
+          "person": "Ruby",
+          "prov": "address-adjacent",
+          "evidence": "t284 [Kanchan] 'Thank you so much, Ruby.'",
+          "confidence": "direct"
+        },
+        {
+          "block": 16,
+          "label": "spk:1",
+          "person": "Rashi",
+          "prov": "called-on",
+          "evidence": "t288 [Bhakti] 'Rashi, over to you for the final comments.' -> t289 delivers the final comments",
+          "confidence": "direct"
+        },
+        {
+          "block": 17,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "t291 'Thank you, thank you so much.' — no naming evidence for this closing turn",
+          "confidence": "direct"
+        }
+      ]
+    },
+    {
+      "session": "2026-05-20-telling-your-brand-story-better",
+      "blocks": [
+        {
+          "block": 1,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "host introduces 'Mr. Mitul Shah'; no turn names the host"
+        },
+        {
+          "block": 2,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'The audio is not coming.' — attendee"
+        },
+        {
+          "block": 3,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'We cannot hear the audio.'"
+        },
+        {
+          "block": 4,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "host tech-help turn"
+        },
+        {
+          "block": 5,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "host tech-help turn"
+        },
+        {
+          "block": 6,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yes, absolutely. Yes.'"
+        },
+        {
+          "block": 7,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Hi.'"
+        },
+        {
+          "block": 8,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Uh, no, it's still there. We can see it.'"
+        },
+        {
+          "block": 9,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'I am thoroughly enjoying it, Mitul...' — addresses Mitul; speaker unnamed"
+        },
+        {
+          "block": 10,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'We are not quiet, we are diligent.'"
+        },
+        {
+          "block": 11,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Wonderful, wonderful. We just want to listen.'"
+        },
+        {
+          "block": 12,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "'This is a true advertising class going on.'"
+        },
+        {
+          "block": 13,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yes.'"
+        }
+      ]
+    },
+    {
+      "session": "2026-05-23-uniaccess-atlas-skilltech",
+      "blocks": [
+        {
+          "block": 1,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "Atlas SkillTech presenter; names Dr. Indu Shahani (chancellor) and Sonal (attendee), never themself"
+        },
+        {
+          "block": 2,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "co-host relaying Sonal's reply"
+        },
+        {
+          "block": 3,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "presenter closing ('Thank you, Sonal...')"
+        }
+      ]
+    },
+    {
+      "session": "2026-05-28-in-focus-1",
+      "blocks": [
+        {
+          "block": 1,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "host tech-help turn"
+        },
+        {
+          "block": 2,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Amrita, I think we also have a few guests with Makrand...' — speaker addresses Amrita; unnamed"
+        },
+        {
+          "block": 3,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'It would be grave injustice to not give it to him...'"
+        },
+        {
+          "block": 4,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Amrita, I'm sorry, I just need to say one thing.'"
+        },
+        {
+          "block": 5,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "follow-up email announcement"
+        },
+        {
+          "block": 6,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Thank you so much. Thank you.'"
+        }
+      ]
+    },
+    {
+      "session": "2026-07-15-creative-futures",
+      "blocks": [
+        {
+          "block": 1,
+          "label": "spk:0",
+          "person": "Priyanka",
+          "prov": "address-adjacent",
+          "evidence": "t002 [Emily Lee] 'Thank you so much for the introduction Priyanka' — Emily thanks the introducer (spk:0's t001); host self-identifies at t267 'I am Priyanka Roy'",
+          "confidence": "direct"
+        },
+        {
+          "block": 2,
+          "label": "spk:0",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "same host voice as block 1",
+          "confidence": "inferred"
+        },
+        {
+          "block": 3,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "SCAD promotional VIDEO playback (SCADpro/Google/CBS/Deloitte speakers); t028 [Emily Lee] 'I hope the video did a better introduction to SCADpro'",
+          "confidence": "direct"
+        },
+        {
+          "block": 4,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "CoverGirl video continuation (same playback)",
+          "confidence": "direct"
+        },
+        {
+          "block": 5,
+          "label": "spk:0",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "host Q&A with Emily ('Well, thank you so much, Emily')",
+          "confidence": "inferred"
+        },
+        {
+          "block": 6,
+          "label": "spk:0",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "host question",
+          "confidence": "inferred"
+        },
+        {
+          "block": 7,
+          "label": "spk:0",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "host question",
+          "confidence": "inferred"
+        },
+        {
+          "block": 8,
+          "label": "spk:0",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "host question",
+          "confidence": "inferred"
+        },
+        {
+          "block": 9,
+          "label": "spk:0",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "host question",
+          "confidence": "inferred"
+        },
+        {
+          "block": 10,
+          "label": "spk:0",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "host question",
+          "confidence": "inferred"
+        },
+        {
+          "block": 11,
+          "label": "spk:0",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "host question",
+          "confidence": "inferred"
+        },
+        {
+          "block": 12,
+          "label": "spk:0",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "host wrap of Emily Q&A",
+          "confidence": "inferred"
+        },
+        {
+          "block": 13,
+          "label": "spk:1",
+          "person": "Priyanka",
+          "prov": "address-adjacent",
+          "evidence": "t203-205 (spk:0) 'Priyanka, you should consider becoming a news anchor' — addressed to the segment-2 host flow; t267 [Priyanka] 'I am Priyanka Roy'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 14,
+          "label": "spk:1",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "introduces Sumit Saurabh; t093 [Sumit Saurabh] 'Thank you so much, ma'am, for your lovely introduction'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 15,
+          "label": "spk:1",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "host question to Sumit ('How many slides of, uh, per project is permissible?')",
+          "confidence": "inferred"
+        },
+        {
+          "block": 16,
+          "label": "spk:1",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "'Uh Sumit, thank you so much for that...'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 17,
+          "label": "spk:1",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "'Makes sense... We have a question here from Arushi'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 18,
+          "label": "spk:1",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "host question",
+          "confidence": "inferred"
+        },
+        {
+          "block": 19,
+          "label": "spk:1",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "host question",
+          "confidence": "inferred"
+        },
+        {
+          "block": 20,
+          "label": "spk:1",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "'Okay, I think we might have lost Sumit there...'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 21,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'I don't have any questions, but I do have a comment. Priyanka, you should consider becoming a news anchor.' — an attendee ADDRESSES Priyanka; speaker unnamed"
+        },
+        {
+          "block": 22,
+          "label": "spk:1",
+          "person": "Priyanka",
+          "prov": "address-adjacent",
+          "evidence": "accepts the compliment ('Oh, thank you. It's fun.')",
+          "confidence": "inferred"
+        },
+        {
+          "block": 23,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'We didn't have those.' — attendee echo"
+        },
+        {
+          "block": 24,
+          "label": "spk:1",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "host voice ('We were so stuck to our...')",
+          "confidence": "inferred"
+        },
+        {
+          "block": 25,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yeah, I think he's back.' — attendee"
+        },
+        {
+          "block": 26,
+          "label": "spk:1",
+          "person": "Priyanka",
+          "prov": "role-continuity",
+          "evidence": "'He's back.' 'Hi, Sumit. Can you' — the host resumes; named [Priyanka] turns follow at t213-214",
+          "confidence": "inferred"
+        },
+        {
+          "block": 27,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "called-on",
+          "evidence": "answers Priyanka's t214 pre-screening question; t216 [Priyanka] interprets the answer; t215's speaker is the Design Circle founder (t093 named block: 'my name is Sumit')",
+          "confidence": "inferred"
+        },
+        {
+          "block": 28,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "'Am I audible now, ma'am?' — Sumit rejoining after the dropout (t201 'we might have lost Sumit')",
+          "confidence": "direct"
+        },
+        {
+          "block": 29,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "advisory answer continues",
+          "confidence": "inferred"
+        },
+        {
+          "block": 30,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "'Ma'am, see, to create a competitive portfolio...'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 31,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "portfolio answer",
+          "confidence": "inferred"
+        },
+        {
+          "block": 32,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "portfolio answer",
+          "confidence": "inferred"
+        },
+        {
+          "block": 33,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "portfolio answer",
+          "confidence": "inferred"
+        },
+        {
+          "block": 34,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "portfolio answer",
+          "confidence": "inferred"
+        },
+        {
+          "block": 35,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "'Yeah. For the- Am I audible?' then answers",
+          "confidence": "inferred"
+        },
+        {
+          "block": 36,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "postgrad answer",
+          "confidence": "inferred"
+        },
+        {
+          "block": 37,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "postgrad answer",
+          "confidence": "inferred"
+        },
+        {
+          "block": 38,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "study-proposal answer",
+          "confidence": "inferred"
+        },
+        {
+          "block": 39,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "Indian design schools answer",
+          "confidence": "inferred"
+        },
+        {
+          "block": 40,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "'No, ma'am. For India, if a student...'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 41,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "'Taking the risk...' (answers t256)",
+          "confidence": "inferred"
+        },
+        {
+          "block": 42,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "'Yes, ma'am.'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 43,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "final-words answer to t260",
+          "confidence": "inferred"
+        },
+        {
+          "block": 44,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Um, hi, uh, can I ask Priyanka a question?' — attendee ADDRESSES Priyanka; speaker unnamed"
+        },
+        {
+          "block": 45,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "same attendee's question to Sumit"
+        },
+        {
+          "block": 46,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "speech-continuation",
+          "evidence": "answers the attendee's portfolio question",
+          "confidence": "inferred"
+        },
+        {
+          "block": 47,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Sure. Thank you.'"
+        },
+        {
+          "block": 48,
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "prov": "role-continuity",
+          "evidence": "'Thank you so much.' after Priyanka's t267 close",
+          "confidence": "inferred"
+        }
+      ]
+    },
+    {
+      "session": "2026-07-22-uniaccess-cept-university",
+      "blocks": [
+        {
+          "block": 1,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yeah, I think it was quite self-explanatory... thank you, Nilesh, for that.' — attendee counselor; no name"
+        }
+      ]
+    },
+    {
+      "session": "2026-07-28-metrics-and-mingling",
+      "blocks": [
+        {
+          "block": 1,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yeah.' — co-host/facilitator; Bhakti is separately named and is NOT this label"
+        },
+        {
+          "block": 2,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Deepak, I think you are...' — addresses Deepak; speaker unnamed"
+        },
+        {
+          "block": 3,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'See you guys on the first.'"
+        }
+      ]
+    },
+    {
+      "session": "2026-07-30-in-focus-3",
+      "blocks": [
+        {
+          "block": 1,
+          "label": "spk:1",
+          "person": "Nikhil",
+          "prov": "address-adjacent",
+          "evidence": "t002 [Anisha] 'Thank you so much for the warm introduction. Nikhil, can I just share my screen?' — thanks the introducer (spk:0/spk:1 host)",
+          "confidence": "direct"
+        },
+        {
+          "block": 2,
+          "label": "spk:1",
+          "person": "Nikhil",
+          "prov": "role-continuity",
+          "evidence": "host voice",
+          "confidence": "inferred"
+        },
+        {
+          "block": 3,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yeah, I have given her the co-host access.'"
+        },
+        {
+          "block": 4,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "parent-testimonial voice"
+        },
+        {
+          "block": 5,
+          "label": "spk:4",
+          "person": null,
+          "prov": "none",
+          "evidence": "parent-testimonial voice"
+        },
+        {
+          "block": 6,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "'And I think what's most amazing about this is that did all of this in 5 days.'"
+        },
+        {
+          "block": 7,
+          "label": "spk:4",
+          "person": null,
+          "prov": "none",
+          "evidence": "'You know, I think this will work...'"
+        },
+        {
+          "block": 8,
+          "label": "spk:5",
+          "person": null,
+          "prov": "none",
+          "evidence": "video-testimonial student ('Before, I was just a student studying at BIS...')"
+        },
+        {
+          "block": 9,
+          "label": "spk:1",
+          "person": "Nikhil",
+          "prov": "role-continuity",
+          "evidence": "host ('Anisha, sorry to barge in. You've only 2 minutes left.')",
+          "confidence": "inferred"
+        },
+        {
+          "block": 10,
+          "label": "spk:1",
+          "person": "Nikhil",
+          "prov": "role-continuity",
+          "evidence": "host; t015 [Shithij] 'Hi, Nikhil.' follows",
+          "confidence": "direct"
+        },
+        {
+          "block": 11,
+          "label": "spk:1",
+          "person": "Nikhil",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "inferred"
+        },
+        {
+          "block": 12,
+          "label": "spk:1",
+          "person": "Nikhil",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "inferred"
+        },
+        {
+          "block": 13,
+          "label": "spk:1",
+          "person": "Nikhil",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "inferred"
+        },
+        {
+          "block": 14,
+          "label": "spk:1",
+          "person": "Nikhil",
+          "prov": "address-adjacent",
+          "evidence": "t023 [Shithij] 'Thank you, Nikhil, for a very, uh, warm welcome.' — thanks the introducer (t022)",
+          "confidence": "direct"
+        },
+        {
+          "block": 15,
+          "label": "spk:1",
+          "person": "Nikhil",
+          "prov": "role-continuity",
+          "evidence": "'Thank you, Shithij. It was perfectly timed... Questions?'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 16,
+          "label": "spk:6",
+          "person": "Bhakti",
+          "prov": "address-adjacent",
+          "evidence": "t032 [Anisha] 'So, honestly, Bhakti, it's a very relevant question.' — answers this block's question by addressing its speaker",
+          "confidence": "direct"
+        },
+        {
+          "block": 17,
+          "label": "spk:6",
+          "person": "Bhakti",
+          "prov": "role-continuity",
+          "evidence": "continuation ('So, Anisha is officially, Nikhil, said on record...')",
+          "confidence": "inferred"
+        },
+        {
+          "block": 18,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "questioner ('...insights into the Indian sentiment... how much is that helping New Zealand?') + 'You're on mute.' — no name"
+        },
+        {
+          "block": 19,
+          "label": "spk:1",
+          "person": "Shithij",
+          "prov": "address-adjacent",
+          "evidence": "NZ visa/PSW answer content (Astero); t049 addresses 'Nikhil'; t094 spk:2 'Perfect. Thank you, Kshitij.' thanks the NZ presenter [t094 spells him Kshitij (co-host thank-you); t001/t014/t015 spell Shithij]",
+          "confidence": "direct"
+        },
+        {
+          "block": 20,
+          "label": "spk:0",
+          "person": "Nikhil",
+          "prov": "inferred-chain",
+          "evidence": "InFocus/TOC host voice; cluster chain to blocks 1-14 host",
+          "confidence": "inferred"
+        },
+        {
+          "block": 21,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'So, yep. Sorry. Yep. So, I think, hello?'"
+        },
+        {
+          "block": 22,
+          "label": "spk:0",
+          "person": "Nikhil",
+          "prov": "address-adjacent",
+          "evidence": "t049 [Kshitij] 'Uh, Nikhil, ... like you mentioned, is one of the most complicated...' — refers to this block's financing question",
+          "confidence": "inferred"
+        },
+        {
+          "block": 23,
+          "label": "spk:2",
+          "person": "Nikhil",
+          "prov": "address-adjacent",
+          "evidence": "same as block 22 — 'financing is one area...' continues t047's 'in terms o...'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 24,
+          "label": "spk:1",
+          "person": "Shithij",
+          "prov": "role-continuity",
+          "evidence": "NZ visa answer continuing block 19 [t094 spells him Kshitij (co-host thank-you); t001/t014/t015 spell Shithij]",
+          "confidence": "inferred"
+        },
+        {
+          "block": 25,
+          "label": "spk:2",
+          "person": "Nikhil",
+          "prov": "speech-continuation",
+          "evidence": "'pick some of them...' continues t048's financing question mid-sentence",
+          "confidence": "inferred"
+        },
+        {
+          "block": 26,
+          "label": "spk:1",
+          "person": "Shithij",
+          "prov": "role-continuity",
+          "evidence": "PSW/job-sectors answer [t094 spells him Kshitij (co-host thank-you); t001/t014/t015 spell Shithij]",
+          "confidence": "inferred"
+        },
+        {
+          "block": 27,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "questioner ('how do the kids decide a career after the experience?') — no name"
+        },
+        {
+          "block": 28,
+          "label": "spk:0",
+          "person": null,
+          "prov": "none",
+          "evidence": "entrepreneurship answer (likely Anisha) — no name in text"
+        },
+        {
+          "block": 29,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "t070 asker unnamed; NOTE t071 in this block is a mid-sentence join into Kshitij's answer (handled per-turn in scoring)"
+        },
+        {
+          "block": 30,
+          "label": "spk:1",
+          "person": "Shithij",
+          "prov": "role-continuity",
+          "evidence": "'individual who is from Dubai. He was 53...' NZ answer continues [t094 spells him Kshitij (co-host thank-you); t001/t014/t015 spell Shithij]",
+          "confidence": "inferred"
+        },
+        {
+          "block": 31,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "medicine question — no name"
+        },
+        {
+          "block": 32,
+          "label": "spk:1",
+          "person": "Shithij",
+          "prov": "role-continuity",
+          "evidence": "dentists/medical-schools answer [t094 spells him Kshitij (co-host thank-you); t001/t014/t015 spell Shithij]",
+          "confidence": "inferred"
+        },
+        {
+          "block": 33,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Any further questions, everyone.'"
+        },
+        {
+          "block": 34,
+          "label": "spk:1",
+          "person": "Shithij",
+          "prov": "role-continuity",
+          "evidence": "'Got a question over here, Nikhil, regarding...' — addresses Nikhil, answers [t094 spells him Kshitij (co-host thank-you); t001/t014/t015 spell Shithij]",
+          "confidence": "inferred"
+        },
+        {
+          "block": 35,
+          "label": "spk:3",
+          "person": "Shithij",
+          "prov": "speech-continuation",
+          "evidence": "t088-t089 form one mid-sentence speech ('The entry requirement is the same for' + 'to get into any of those eight universities') [t094 spells him Kshitij (co-host thank-you); t001/t014/t015 spell Shithij]",
+          "confidence": "inferred"
+        },
+        {
+          "block": 36,
+          "label": "spk:1",
+          "person": "Shithij",
+          "prov": "role-continuity",
+          "evidence": "end of the same answer [t094 spells him Kshitij (co-host thank-you); t001/t014/t015 spell Shithij]",
+          "confidence": "inferred"
+        },
+        {
+          "block": 37,
+          "label": "spk:4",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Can I just ask one question? Do they have a quota...' — asker unnamed (Kshitij's answer bleeds into the same turn)"
+        },
+        {
+          "block": 38,
+          "label": "spk:1",
+          "person": "Shithij",
+          "prov": "role-continuity",
+          "evidence": "'Uh, the third medical school will be...' [t094 spells him Kshitij (co-host thank-you); t001/t014/t015 spell Shithij]",
+          "confidence": "inferred"
+        },
+        {
+          "block": 39,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Okay, gentlemen, uh counselors, any further questions?'"
+        },
+        {
+          "block": 40,
+          "label": "spk:1",
+          "person": "Shithij",
+          "prov": "role-continuity",
+          "evidence": "'Uh, Abha, the minimum IB score...' [t094 spells him Kshitij (co-host thank-you); t001/t014/t015 spell Shithij]",
+          "confidence": "inferred"
+        },
+        {
+          "block": 41,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "session close ('Perfect. Thank you, Kshitij. Thanks, Anisha...') — no name for the speaker"
+        }
+      ]
+    },
+    {
+      "session": "2026-08-03-uk-beyond-offer-letters",
+      "blocks": [
+        {
+          "block": 1,
+          "label": "spk:4",
+          "person": "Bhakti",
+          "prov": "inferred-chain",
+          "evidence": "t029 [Bhavya] reads out 'Bhakti asks, \"I applied when the offer letter was the milestone...\"' -> t030 (spk:4) 'I'm sorry. I'm going to stop you there... when I put in the question, I felt it was relevant' — the question's author",
+          "confidence": "inferred"
+        },
+        {
+          "block": 2,
+          "label": "spk:4",
+          "person": "Bhakti",
+          "prov": "role-continuity",
+          "evidence": "same spk:4 moderator voice",
+          "confidence": "inferred"
+        },
+        {
+          "block": 3,
+          "label": "spk:4",
+          "person": "Bhakti",
+          "prov": "role-continuity",
+          "evidence": "same spk:4 host voice closing the session",
+          "confidence": "inferred"
+        }
+      ]
+    },
+    {
+      "session": "2026-08-24-uniaccess-leeds-arts-university",
+      "blocks": [
+        {
+          "block": 1,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'my screen?'"
+        },
+        {
+          "block": 2,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "self-naming+address",
+          "evidence": "t006 (spk:0) self-names: \"My name is Jubin Thakkar. I am the South Asia representative for Leeds Arts University\"; t022/t043/t083/t088/t090/t091/t094 all address the host as Jubin",
+          "confidence": "direct"
+        },
+        {
+          "block": 3,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yeah, it's blank right now. It's black.'"
+        },
+        {
+          "block": 4,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 5,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Absolutely center stage, man.'"
+        },
+        {
+          "block": 6,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "self-naming",
+          "evidence": "t006 (spk:0, this block) \"My name is Jubin Thakkar. I am the South Asia representative for Leeds Arts University\"",
+          "confidence": "direct"
+        },
+        {
+          "block": 7,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'That's a yes.'"
+        },
+        {
+          "block": 8,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 9,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'It will always be an integral part...'"
+        },
+        {
+          "block": 10,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Like what would you replace it with?'"
+        },
+        {
+          "block": 11,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 12,
+          "label": "spk:2",
+          "person": "Alka",
+          "prov": "called-on",
+          "evidence": "t011 (spk:0) \"let me take this question with Alka ma'am... So, Alka ma'am, what do you feel where design is going\" -> t012 answers",
+          "confidence": "direct"
+        },
+        {
+          "block": 13,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "called-on",
+          "evidence": "host calls Sheetal ('how about, if I may ask this question to Sheetal. Sheetal, ...')",
+          "confidence": "direct"
+        },
+        {
+          "block": 14,
+          "label": "spk:3",
+          "person": "Sheetal",
+          "prov": "called-on",
+          "evidence": "answers the Sheetal call ('Yeah, yeah. Can you hear me?' then answers)",
+          "confidence": "direct"
+        },
+        {
+          "block": 15,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host ('Yes, I can hear you.')",
+          "confidence": "direct"
+        },
+        {
+          "block": 16,
+          "label": "spk:3",
+          "person": "Sheetal",
+          "prov": "called-on",
+          "evidence": "Sheetal's answer continues",
+          "confidence": "direct"
+        },
+        {
+          "block": 17,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "called-on",
+          "evidence": "host calls Sangeeta ('proceed with this question with Sangeeta ma'am...')",
+          "confidence": "direct"
+        },
+        {
+          "block": 18,
+          "label": "spk:1",
+          "person": "Sangeeta",
+          "prov": "called-on",
+          "evidence": "answers the Sangeeta call",
+          "confidence": "direct"
+        },
+        {
+          "block": 19,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "called-on",
+          "evidence": "host calls Nupur",
+          "confidence": "direct"
+        },
+        {
+          "block": 20,
+          "label": "spk:2",
+          "person": "Nupur",
+          "prov": "called-on",
+          "evidence": "answers the Nupur call",
+          "confidence": "direct"
+        },
+        {
+          "block": 21,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "address-adjacent",
+          "evidence": "t022 'It's quite stable, Jubin.' answers this Dehradun question",
+          "confidence": "direct"
+        },
+        {
+          "block": 22,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yes, we are. It's quite stable, Jubin.' — addresses Jubin; speaker unnamed"
+        },
+        {
+          "block": 23,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host (diamond-skull screen)",
+          "confidence": "direct"
+        },
+        {
+          "block": 24,
+          "label": "spk:3",
+          "person": "Bhakti",
+          "prov": "cluster+address",
+          "evidence": "same spk:3 cluster as t031 which the host addresses 'I think, Bhakti, you very well said that' (t032); art-question voice",
+          "confidence": "inferred"
+        },
+        {
+          "block": 25,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yeah, how?'"
+        },
+        {
+          "block": 26,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host ('They are 8,061 real diamonds...')",
+          "confidence": "direct"
+        },
+        {
+          "block": 27,
+          "label": "spk:3",
+          "person": "Bhakti",
+          "prov": "cluster+address",
+          "evidence": "'Can you show the picture again?' — same thread",
+          "confidence": "inferred"
+        },
+        {
+          "block": 28,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 29,
+          "label": "spk:3",
+          "person": "Bhakti",
+          "prov": "address-adjacent",
+          "evidence": "'I think, Jubin, it's not about the diamonds...' — followed by t032 'I think, Bhakti, you very well said that'",
+          "confidence": "direct"
+        },
+        {
+          "block": 30,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 31,
+          "label": "spk:3",
+          "person": "Bhakti",
+          "prov": "address-adjacent",
+          "evidence": "t032 (spk:0) 'I think, Bhakti, you very well said that' — directly follows this critique",
+          "confidence": "direct"
+        },
+        {
+          "block": 32,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 33,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'when a student comes to me... first thing that I do is listen' — a counselor; no name in/near the turn"
+        },
+        {
+          "block": 34,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 35,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "same unnamed counselor's continuation"
+        },
+        {
+          "block": 36,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 37,
+          "label": "spk:2",
+          "person": "Poonam",
+          "prov": "called-on",
+          "evidence": "'Yeah, I'm here.' — the person Jubin then addresses 'So, Miss Poonam, if I have to ask you...' (t038)",
+          "confidence": "inferred"
+        },
+        {
+          "block": 38,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "called-on",
+          "evidence": "host calls Poonam",
+          "confidence": "direct"
+        },
+        {
+          "block": 39,
+          "label": "spk:2",
+          "person": "Poonam",
+          "prov": "called-on",
+          "evidence": "answers the Poonam call",
+          "confidence": "direct"
+        },
+        {
+          "block": 40,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "called-on",
+          "evidence": "host calls Ritu",
+          "confidence": "direct"
+        },
+        {
+          "block": 41,
+          "label": "spk:2",
+          "person": "Sangeeta",
+          "prov": "address-adjacent",
+          "evidence": "t042 (spk:0) 'Oh, that's absolutely fine, Sangeeta. It's a conversation.' — addresses this interrupter",
+          "confidence": "direct"
+        },
+        {
+          "block": 42,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 43,
+          "label": "spk:2",
+          "person": "Ritu",
+          "prov": "called-on",
+          "evidence": "Ritu answers Jubin's Ritu questions (t046 'So, Ritu ma'am, this was...')",
+          "confidence": "inferred"
+        },
+        {
+          "block": 44,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 45,
+          "label": "spk:2",
+          "person": "Ritu",
+          "prov": "called-on",
+          "evidence": "'So, your question was, if you can just repeat once, please.' — Ritu",
+          "confidence": "inferred"
+        },
+        {
+          "block": 46,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "called-on",
+          "evidence": "host repeats for Ritu",
+          "confidence": "direct"
+        },
+        {
+          "block": 47,
+          "label": "spk:2",
+          "person": "Ritu",
+          "prov": "called-on",
+          "evidence": "Ritu's answer",
+          "confidence": "direct"
+        },
+        {
+          "block": 48,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 49,
+          "label": "spk:3",
+          "person": "Supriya",
+          "prov": "called-on",
+          "evidence": "t050 host: 'Yes. So, Supriya, you tell me...' — the same spk:3 voice that just answered 'Hello. Yes, I'm here.'",
+          "confidence": "inferred"
+        },
+        {
+          "block": 50,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "called-on",
+          "evidence": "host calls Supriya",
+          "confidence": "direct"
+        },
+        {
+          "block": 51,
+          "label": "spk:3",
+          "person": "Supriya",
+          "prov": "called-on",
+          "evidence": "Supriya's answer",
+          "confidence": "direct"
+        },
+        {
+          "block": 52,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 53,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Archana ma'am, can you hear me?' — speaker asks Archana; speaker unnamed"
+        },
+        {
+          "block": 54,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "called-on",
+          "evidence": "host calls Ankit",
+          "confidence": "direct"
+        },
+        {
+          "block": 55,
+          "label": "spk:2",
+          "person": "Ankit",
+          "prov": "called-on",
+          "evidence": "'Yeah. Uh, Jubin, I can, yes, I can hear you.' — answers the Ankit call",
+          "confidence": "direct"
+        },
+        {
+          "block": 56,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 57,
+          "label": "spk:2",
+          "person": "Ankit",
+          "prov": "speech-continuation",
+          "evidence": "Ankit's answer continues",
+          "confidence": "inferred"
+        },
+        {
+          "block": 58,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "called-on",
+          "evidence": "host: 'this question is for Miss Bhakti'",
+          "confidence": "direct"
+        },
+        {
+          "block": 59,
+          "label": "spk:3",
+          "person": "Bhakti",
+          "prov": "called-on",
+          "evidence": "answers the Bhakti call",
+          "confidence": "direct"
+        },
+        {
+          "block": 60,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host ('So, Venky, thank you so much for coming in...')",
+          "confidence": "direct"
+        },
+        {
+          "block": 61,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Jubin, we can't see your screen now.'"
+        },
+        {
+          "block": 62,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yeah, I think, Jubin, there's some disturbance in his background.'"
+        },
+        {
+          "block": 63,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yeah.'"
+        },
+        {
+          "block": 64,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yeah. But, uh, I think he's sitting in the office...'"
+        },
+        {
+          "block": 65,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'But what's up guys? How is everyone doing?'"
+        },
+        {
+          "block": 66,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'You all enjoyed, had fun. I missed the fun.'"
+        },
+        {
+          "block": 67,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'It was super good, man. It was awesome.'"
+        },
+        {
+          "block": 68,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Just a few pictures and I was like, oh my god...'"
+        },
+        {
+          "block": 69,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Jubin Jubin, pause your video...' — addresses Jubin; speaker unnamed"
+        },
+        {
+          "block": 70,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "LinkedIn-collage chatter; no name"
+        },
+        {
+          "block": 71,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "address-adjacent",
+          "evidence": "the video-paused person explains ('I popped up because the video was playing...')",
+          "confidence": "direct"
+        },
+        {
+          "block": 72,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Finish finish fast.'"
+        },
+        {
+          "block": 73,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Play the video.'"
+        },
+        {
+          "block": 74,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Finish. Finish.'"
+        },
+        {
+          "block": 75,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host",
+          "confidence": "direct"
+        },
+        {
+          "block": 76,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Jubin, um how is the current scenario... design schools?' — addresses Jubin; speaker unnamed"
+        },
+        {
+          "block": 77,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "address-adjacent",
+          "evidence": "answers t076's question ('Yes, yes, why not? And I will break this into two...')",
+          "confidence": "direct"
+        },
+        {
+          "block": 78,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yeah.'"
+        },
+        {
+          "block": 79,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yes.'"
+        },
+        {
+          "block": 80,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'You're getting school.'"
+        },
+        {
+          "block": 81,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yes, you are.'"
+        },
+        {
+          "block": 82,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Let you go. Let you go. Let him go.'"
+        },
+        {
+          "block": 83,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Let him go, Jubin. Let him go.' — addresses Jubin; speaker unnamed"
+        },
+        {
+          "block": 84,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host ('So, Bhakti, my personal apologies...')",
+          "confidence": "direct"
+        },
+        {
+          "block": 85,
+          "label": "spk:3",
+          "person": "Bhakti",
+          "prov": "address-adjacent",
+          "evidence": "'I don't think you need my permission...' — Bhakti's reply to Jubin's direct apology",
+          "confidence": "direct"
+        },
+        {
+          "block": 86,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Kshitij, oh my god, I see Kshitij.' — speaker unnamed"
+        },
+        {
+          "block": 87,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Hi.'"
+        },
+        {
+          "block": 88,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Hi. Hi. Hi. Hi, Jubin, go now.'"
+        },
+        {
+          "block": 89,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "address-adjacent",
+          "evidence": "'My personal apologies.' — the person t088 addresses ('Hi, Jubin, go now. You're literally holding the school.')",
+          "confidence": "direct"
+        },
+        {
+          "block": 90,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'No no. No no, Jubin.'"
+        },
+        {
+          "block": 91,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'In fact, Jubin, we really enjoyed your session.'"
+        },
+        {
+          "block": 92,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "'I agree.'"
+        },
+        {
+          "block": 93,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Thank you so much.'"
+        },
+        {
+          "block": 94,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'We really loved your presentation, Jubin.'"
+        },
+        {
+          "block": 95,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host ('Thank you so much. Looking forward to connect with you.')",
+          "confidence": "direct"
+        },
+        {
+          "block": 96,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Okay, now go. Bye.'"
+        },
+        {
+          "block": 97,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host ('Now, I have to leave. Bye.')",
+          "confidence": "direct"
+        },
+        {
+          "block": 98,
+          "label": "spk:2",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Bye.'"
+        },
+        {
+          "block": 99,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Bye.'"
+        },
+        {
+          "block": 100,
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "prov": "role-continuity",
+          "evidence": "host ('Bye.')",
+          "confidence": "direct"
+        },
+        {
+          "block": 101,
+          "label": "spk:1",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Bye.'"
+        },
+        {
+          "block": 102,
+          "label": "spk:3",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Bye.'"
+        }
+      ]
+    },
+    {
+      "session": "2026-08-27-in-focus-4",
+      "blocks": [
+        {
+          "block": 1,
+          "label": "spk:0",
+          "person": "Bhakti",
+          "prov": "address-adjacent",
+          "evidence": "t003 [Priyambada] 'Thank you, Bhakti.' — thanks the immediately preceding spk:0 turn",
+          "confidence": "direct"
+        },
+        {
+          "block": 2,
+          "label": "spk:0",
+          "person": "Bhakti",
+          "prov": "role-continuity",
+          "evidence": "same voice continuing",
+          "confidence": "inferred"
+        },
+        {
+          "block": 3,
+          "label": "spk:4",
+          "person": null,
+          "prov": "none",
+          "evidence": "'Yeah, I think the first one, complete 13 eligible courses...' — course-content voice (likely Devesh, echoed at t028), no direct name"
+        }
+      ]
+    }
+  ]
+}

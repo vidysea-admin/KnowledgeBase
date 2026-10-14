@@ -65,7 +65,7 @@ export function GraphSvg(props: GraphSvgProps): React.ReactElement {
       width={props.width}
       height={props.height}
       viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`}
-      style={{ display: "block", background: "var(--card)" }}
+      style={{ display: "block", maxWidth: "100%", background: "var(--card)" }}
     >
       <g data-testid="graph-edges">
         {edges.map((e) => {

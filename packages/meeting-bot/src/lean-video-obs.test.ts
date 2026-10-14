@@ -12,8 +12,8 @@ import { fileURLToPath } from "node:url";
 
 import { applyLeanVideoToObs, leanRestorePath, restoreLeanVideoInObs } from "./lean-video-obs.js";
 import { runFinalize, runRecord } from "./capture/record-commands.js";
-import { createObsBrowserDeps, type ObsClientLike, type ObsBrowserConfig } from "./capture/obs-windows.js";
-import type { TelegramNotifier } from "./capture/telegram-alerts.js";
+import { createObsBrowserDeps, type ObsClientLike, type ObsBrowserConfig } from "./capture/obs/obs-windows.js";
+import type { TelegramNotifier } from "./capture/notify/telegram-alerts.js";
 
 const FIXTURE = join(dirname(fileURLToPath(import.meta.url)), "capture", "fake-join-fixture.mjs");
 type Call = { name: string; args?: any };
@@ -325,7 +325,7 @@ async function driveObsRecord(fake: ReturnType<typeof fakeObs>, alerts: string[]
     await runRecord(["https://meet.google.com/abc-defg-hij", "--until", new Date(Date.now() + 2500).toISOString(), "--backend", "obs",
       "--session-id", "lean-rr", "--tenant", "fixture", "--title", "fixture"], {
       recordDir, wait: () => new Promise((r) => setTimeout(r, 50)), finalize: async (...a) => { finalized.push(a); },
-      telegram: silentTelegram(alerts),
+      telegram: silentTelegram(alerts), platform: "win32", // OBS flow is platform-independent once the Windows-only gate is satisfied
       obs: { obs: fake.obs, connectObs: async () => undefined, confirmBotWindow: async () => true, subscribeLevel: () => () => {},
         config: { python: process.execPath, joinScript: FIXTURE, profileDir: join(dir, "profile"), log: () => {} } },
     });

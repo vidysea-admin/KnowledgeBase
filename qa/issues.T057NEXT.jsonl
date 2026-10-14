@@ -1,0 +1,1 @@
+{"id":"ISS-T057NEXT-001","severity":"low","status":"open","seam":"sessions-filter-model","title":"overallStatus index=failed (transcribe done) path unasserted; mutation dropping it survives","repro":"mutate overallStatus to only test transcribe===failed; vitest src/pages/sessions still passes","fix_direction":"add row with transcribe done / index failed expecting failed"}

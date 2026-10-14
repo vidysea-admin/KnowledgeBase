@@ -7,7 +7,7 @@
  * the caller's).
  */
 import type { Transcribe } from "@lkb/ai";
-import type { Source, SourceDoc, MediaDoc, ConsentContext, Turn } from "../source.js";
+import { tenantSourceId, type Source, type SourceDoc, type MediaDoc, type ConsentContext, type Turn } from "../source.js";
 
 const AUDIO_VIDEO_EXTENSIONS = [
   ".mp3",
@@ -85,7 +85,7 @@ export function createRecordingSource(deps: RecordingAdapterDeps): Source {
       const hash = await deps.hasher(bytes);
 
       const source: SourceDoc = {
-        _id: hash,
+        _id: tenantSourceId(tenantId, hash),
         tenantId,
         kind: "recording",
         captureMode: consent.captureMode,
@@ -101,7 +101,7 @@ export function createRecordingSource(deps: RecordingAdapterDeps): Source {
 
       const media: MediaDoc[] = [
         {
-          _id: `${hash}-media`,
+          _id: `${source._id}-media`,
           tenantId,
           sourceRef: source._id,
           kind: "recording",

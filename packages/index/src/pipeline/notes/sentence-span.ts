@@ -98,7 +98,12 @@ const isEdgeMark = (t: string, i: number) => MARKS.has(t[i]!) && (t[i] !== "." |
 export type SpanProblem = "starts-mid-sentence" | "ends-mid-sentence" | "omits-qualifier" | "negated-by-reply" | "is-question" | "retracted-by-reply" | "unconfirmed-by-short-reply";
 
 /** `null` = the slice text[start,end) is a whole sentence/clause and its sentence has no omitted marker. */
-export function sentenceSpanProblem(text: string, start: number, end: number, opts: { allowQuestion?: boolean; shortFollowWords?: number } = {}): SpanProblem | null {
+/**
+ * `opts.judged` (D-144): a negation JUDGE gates this note downstream, so the lexical negation heuristics ("omits-qualifier",
+ * "negated-by-reply") are not applied HERE. The deterministic span rules stay: whole-sentence edges and question quotes.
+ * D-151 (pending append): the judge does not replace the lexical rules; `resolveEvidence` runs `lexicalNegationProblem` separately in judged mode.
+ */
+export function sentenceSpanProblem(text: string, start: number, end: number, opts: { allowQuestion?: boolean; judged?: boolean; shortFollowWords?: number } = {}): SpanProblem | null {
   let i = start - 1;
   while (i >= 0 && (WS.test(text[i]!) || OPENERS.has(text[i]!))) i--;
   if (i >= 0 && !isEdgeMark(text, i)) return "starts-mid-sentence";
@@ -109,6 +114,15 @@ export function sentenceSpanProblem(text: string, start: number, end: number, op
   }
   // ISS-T040GEN-009: a question is not a statement of fact. A quote inside a sentence that contains a "?" can be evidence only for a question item.
   if (!opts.allowQuestion && text.slice(sentenceStart(text, start), sentenceEnd(text, Math.max(start, end - 1))).includes("?")) return "is-question";
+  if (opts.judged) return null;
+  return lexicalNegationProblem(text, start, end, opts);
+}
+
+/**
+ * D-151 (pending append): the rule-based lexical negation checks ("omits-qualifier", "negated-by-reply"), split out so they also run
+ * when a judge is injected. `null` = no lexical negation problem for this slice.
+ */
+export function lexicalNegationProblem(text: string, start: number, end: number, opts: { shortFollowWords?: number } = {}): SpanProblem | null {
   const endsSentence = end > 0 && isBoundary(text, end - 1);
   const before = text.slice(sentenceStart(text, start), start), after = endsSentence ? "" : text.slice(end, sentenceEnd(text, end));
   if (MARKER.test(before) || MARKER.test(after)) return "omits-qualifier";

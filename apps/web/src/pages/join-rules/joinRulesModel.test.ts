@@ -93,6 +93,21 @@ describe("parseView", () => {
 });
 
 describe("approval / opt-out inputs and confirmation text", () => {
+  // ISS-T037UI-002 recorded reproductions, verbatim from qa/issues.t037ui.jsonl (+ the fix_direction's three measures).
+  test("ISS-T037UI-002: invisible / look-alike characters in a sender local part are refused", () => {
+    const attacks = [
+      "  Foo​@Example.COM ", // recorded reproduction: zero-width space
+      "foo​@example.com", "foo‮@example.com", "fоo@example.com", "а@example.com", // U+200B, U+202E, Cyrillic a
+      "foo bar@example.com", "foo﻿@example.com", "foo⁠@example.com", "fé@example.com", "foo@example.com",
+    ];
+    for (const a of attacks) {
+      const r = checkPendingValue("sender", a);
+      expect(r, JSON.stringify(a)).toHaveProperty("error");
+      expect((r as { error: string }).error).toMatch(/plain English letters|valid sender/);
+    }
+    expect(checkPendingValue("sender", "  Foo@Example.COM ")).toEqual({ value: "Foo@Example.COM" }); // plain ASCII still confirms unchanged
+    expect(checkPendingValue("sender", "a.b+c_d-e@example.com")).toEqual({ value: "a.b+c_d-e@example.com" });
+  });
   test("value checks", () => {
     expect(checkPendingValue("sender", " a@example.com ")).toEqual({ value: "a@example.com" });
     expect(checkPendingValue("sender", "example.com")).toHaveProperty("error");

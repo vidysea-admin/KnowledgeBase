@@ -48,7 +48,7 @@ test("id-conflict is the same fixed answer for every state of the other tenant's
   const answers = new Set<string>();
   for (const step of ["ready", "leased", "done", "dead"]) {
     const id = `j-${step}`; q.enqueue({ id, tenantId: "ta", payload: { secret: step }, maxAttempts: 1 });
-    if (step !== "ready") { const j = q.claim("w1", { tenantId: "ta" }) as any; const ref = { id, workerId: "w1", attempt: j.value.attempt };
+    if (step !== "ready") { const j = q.claim("w1", { tenantId: "ta" }) as any; const ref = { id, workerId: "w1", attempt: j.value.attempt, tenantId: "ta" };
       if (step === "done") q.complete(ref); if (step === "dead") q.fail(ref, "x"); }
     const before = raw(fs);
     answers.add(JSON.stringify(q.enqueue({ id, tenantId: "tb", payload: { secret: step }, maxAttempts: 5 })));
@@ -57,10 +57,10 @@ test("id-conflict is the same fixed answer for every state of the other tenant's
   assert.equal(answers.size, 1, [...answers].join("|"));
   assert.ok(![...answers][0]!.includes("secret"));
 });
-test("ref with a tenant: the owner works, another tenant gets not-found (same as a missing job) and nothing is written; no tenant = unchanged behaviour", () => {
+test("ref with a tenant: the owner works, another tenant gets not-found (same as a missing job) and nothing is written; a missing/empty tenant is refused", () => {
   const { q, fs } = setup();
-  q.enqueue({ id: "a", tenantId: "ta", payload: 1 }); const j = (q.claim("w1") as any).value as QueueJob;
-  const ref = { id: "a", workerId: "w1", attempt: j.attempt }; const before = raw(fs);
+  q.enqueue({ id: "a", tenantId: "ta", payload: 1 }); const j = (q.claim("w1", { tenantId: "ta" }) as any).value as QueueJob;
+  const ref = { id: "a", workerId: "w1", attempt: j.attempt, tenantId: "ta" }; const before = raw(fs);
   const missing = q.complete({ id: "nope", workerId: "w1", attempt: 1, tenantId: "tb" });
   for (const op of [(r: any) => q.heartbeat(r), (r: any) => q.complete(r), (r: any) => q.fail(r, "x")]) {
     const r = op({ ...ref, tenantId: "tb" });
@@ -70,6 +70,7 @@ test("ref with a tenant: the owner works, another tenant gets not-found (same as
   assert.equal(code(missing), "not-found");
   assert.equal(code(q.heartbeat({ ...ref, tenantId: "../x" })), "invalid-input");
   assert.equal(q.heartbeat({ ...ref, tenantId: "ta" }).ok, true);
+  { const { tenantId: _t, ...noTenant } = ref; assert.equal(code(q.heartbeat(noTenant as never)), "invalid-input"); } // ISS-JOBQTENANT-001 (was: omitted tenant matched any job)
   assert.equal(q.heartbeat(ref).ok, true);
   assert.equal(q.complete({ ...ref, tenantId: "ta" }).ok, true);
 });
@@ -81,11 +82,11 @@ test("property: 1,000 seeded cases: tenant B learns nothing about tenant A's ids
     const { q, fs, clock } = setup();
     const SECRET = `SECRET-${seed}`, ids = ["a1", "a2", "a3", "a4"];
     for (const id of ids) q.enqueue({ id, tenantId: "ta", payload: { [SECRET]: id, n: Math.floor(r() * 9) }, maxAttempts: 1 + Math.floor(r() * 3) });
-    const refs: { id: string; workerId: string; attempt: number }[] = [];
+    const refs: { id: string; workerId: string; attempt: number; tenantId: string }[] = [];
     for (let i = 0; i < 3 + Math.floor(r() * 6); i++) { // drive A's jobs into mixed states
       clock.t += Math.floor(r() * 150);
       const c = (q.claim(pick(["wa", "wb"]), { tenantId: "ta" }) as any).value as QueueJob | null;
-      if (!c) continue; const ref = { id: c.id, workerId: c.workerId!, attempt: c.attempt }; refs.push(ref);
+      if (!c) continue; const ref = { id: c.id, workerId: c.workerId!, attempt: c.attempt, tenantId: "ta" }; refs.push(ref);
       const k = r(); if (k < 0.3) q.complete(ref); else if (k < 0.6) q.fail(ref, "e");
     }
     const conflict = JSON.stringify({ ok: false, error: { code: "id-conflict", message: "job id is not available" } });

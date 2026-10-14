@@ -6,7 +6,7 @@
  * -> paragraph turns" shape is identical for a document and a URL). No live HTTP call required to
  * satisfy this contract; real Jina/Firecrawl wiring is a later composition-root concern.
  */
-import type { Source, SourceDoc, MediaDoc, ConsentContext, Turn } from "../source.js";
+import { tenantSourceId, type Source, type SourceDoc, type MediaDoc, type ConsentContext, type Turn } from "../source.js";
 import { splitIntoParagraphTurns } from "./document.js";
 
 /** Injected content hasher — hashes the extracted text (no `crypto` call baked in). */
@@ -68,7 +68,7 @@ export function createUrlSource(deps: UrlAdapterDeps): Source {
       const hash = await deps.hasher(text);
 
       const source: SourceDoc = {
-        _id: hash,
+        _id: tenantSourceId(tenantId, hash),
         tenantId,
         kind: "url",
         captureMode: consent.captureMode,

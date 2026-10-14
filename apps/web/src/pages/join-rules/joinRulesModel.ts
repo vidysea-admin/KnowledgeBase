@@ -1,6 +1,6 @@
 /**
  * Pure model for the join-rules editor. The rule-set shape and every refusal below mirror the engine's
- * `validateJoinRuleSet` (packages/meeting-bot/src/calendar/join-rules.ts) and its normalisers
+ * `validateJoinRuleSet` (packages/meeting-bot/src/calendar/join-rules/join-rules.ts) and its normalisers
  * (join-rules-normalize.ts). apps/web may not import packages/meeting-bot, so the rules are re-stated here;
  * this is a CONVENIENCE for the form only. The server re-validates and stays the authority.
  */
@@ -131,7 +131,12 @@ export interface Pending { kind: PendingKind; value: string; hints?: MeetingHint
 /** Client-side value check for the three add forms (the server re-checks). Returns the trimmed value or an error. */
 export function checkPendingValue(kind: PendingKind, raw: string): { value: string } | { error: string } {
   const value = raw.trim();
-  if (kind === "sender") return normalizeEmail(value) && value.length <= 320 ? { value } : { error: "Enter a valid sender email address, for example speaker@example.com." };
+  if (kind === "sender") {
+    // ISS-T037UI-002: normalizeEmail accepts any non-whitespace local part, so zero-width, bidi-override and look-alike
+    // (e.g. Cyrillic) characters would be approved as typed and be invisible in the confirmation. Printable ASCII only.
+    if (/[^\x21-\x7e]/.test(value)) return { error: "The sender address may only use plain English letters, digits and ASCII punctuation. Invisible or look-alike characters (for example zero-width or Cyrillic letters) are not accepted." };
+    return normalizeEmail(value) && value.length <= 320 ? { value } : { error: "Enter a valid sender email address, for example speaker@example.com." };
+  }
   if (kind === "domain") return normalizeDomain(value) && value.length <= 320 ? { value } : { error: "Enter a valid domain such as example.com (no wildcard, no @)." };
   return value !== "" && value.length <= 1024 ? { value } : { error: "Enter the event id to opt out of." };
 }

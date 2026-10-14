@@ -14,7 +14,7 @@
  * `loadTrustedSenderConfig` does this). */
 import { createHash } from "node:crypto";
 import { detectPlatform } from "../platform.js";
-import { parseStrictEmail, normalizeDomain } from "./join-rules.js";
+import { parseStrictEmail, normalizeDomain } from "./join-rules/join-rules.js";
 import type { WebinarReconciliationResult, WebinarReconciliationState, CalendarEvent } from "@lkb/core";
 import type { TrustedSenderConfig, AutoRecordCandidateInput, AutoRecordItem, SkippedItem } from "@lkb/core";
 

@@ -13,7 +13,7 @@ export type { RefinableDoc } from "./refine.js";
 export { answer } from "./answer.js";
 export type { AnswerResult } from "./answer.js";
 export { askV2 } from "./ask-v2.js";
-export type { AskV2Deps, AskV2Result, AuditEntry } from "./ask-v2.js";
+export type { AskV2Deps, AskV2Result, AuditEntry } from "./ask-shared.js";
 
 // T-022 — evaluator calibration harness (MAE against an injected ScoreFn, no I/O).
 export { computeMAE } from "./eval/calibration.js";
@@ -22,4 +22,4 @@ export { heuristicScorer } from "./eval/heuristic-scorer.js";
 
 // Runtime-only bounded source hydration and production-caller boundaries.
 export { BoundedAskError, SOURCE_LIMITS, payloadBytes, sourceCatalog, sourceQuotes, validateHydration, completionBudget } from "./source-context.js";
-export type { SourceQuote, SourceHydration, HydrateSourcesFn, SourceContextDeps } from "./source-context.js";
+export type { SourceQuote, SourceHydration, ExcludedSourceTurn, HydrateSourcesFn, SourceContextDeps } from "./source-context.js";

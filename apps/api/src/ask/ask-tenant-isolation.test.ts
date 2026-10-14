@@ -17,7 +17,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { TreeIndexNode } from "@lkb/core";
 import { BoundedAskError } from "@lkb/ask";
-import { createAskArmsFor } from "../ask-arms.js";
+import { createAskArmsFor } from "./ask-arms.js";
 import { createSourceHydrator, createSourceRequestDepsFor } from "./source-context.js";
 import { BlindDb, realTreeStore, type Query, type Row } from "./tenant-test-kit.js";
 import { startTestServer } from "../testUtils.js";

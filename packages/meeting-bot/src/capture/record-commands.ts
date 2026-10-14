@@ -6,14 +6,16 @@ import { OBSWebSocket } from "obs-websocket-js";
 import { createBrowserJoiner } from "../joiners/browser-joiner.js";
 import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
+import { createAdmissionGate } from "./admission-gate.js";
 import { createAudioWatchdog, createRealLevelSource } from "./audio-watchdog.js";
 import { type ControllerRecoveryActions, type ControllerRecoveryContext, cleanupOwnedBrowserProfile, finalizeControllerRecording, getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
-import { AUDIO_INPUT, createObsBrowserDeps, type ObsBrowserConfig, type ObsBrowserDepsOverrides, type ObsClientLike } from "./obs-windows.js";
+import { AUDIO_INPUT, createObsBrowserDeps, type ObsBrowserConfig, type ObsBrowserDepsOverrides, type ObsClientLike } from "./obs/obs-windows.js";
 import { leanRestorePath, restoreLeanVideoInObs } from "../lean-video-obs.js";
 import { collectGapEvent, installCaptureControl, type GapWindow } from "./reconnect-gaps.js";
-import { createTelegramNotifier, type TelegramNotifier } from "./telegram-alerts.js";
+import { createTelegramNotifier, type TelegramNotifier } from "./notify/telegram-alerts.js";
 import { finalizeRecordingWith, normalizeCapture, processRecordingArtifacts } from "./record-finalize.js";
 import { createTabBrowserDeps } from "./tab-browser.js";
+import { tabReceiverGuardFromEnv } from "./tab-receiver-guard.js";
 import { browserProfileArgs, selectedBrowserProfile } from "./browser/browser-profile.js";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, "..", "..", "..", "..");
@@ -63,10 +65,10 @@ export async function runLogin(rest: string[]): Promise<void> {
   const child = spawn(process.env.LKB_PYTHON ?? "python", args, { stdio: "inherit" });
   await new Promise((r) => child.on("exit", r));
 }
-export function recordingBackend(rest: string[], env: NodeJS.ProcessEnv = process.env): "obs" | "tab" {
+export function recordingBackend(rest: string[], env: NodeJS.ProcessEnv = process.env, platform: NodeJS.Platform = process.platform): "obs" | "tab" {
   const value = flag(rest, "--backend") ?? env.LKB_CAPTURE_BACKEND ?? "tab";
   if (value !== "obs" && value !== "tab") throw new Error("--backend must be tab or obs");
-  if (value === "obs" && process.platform !== "win32") throw new Error("OBS fallback is Windows-only; use --backend tab");
+  if (value === "obs" && platform !== "win32") throw new Error("OBS fallback is Windows-only; use --backend tab");
   return value;
 }
 /** Test seam: inject the tab backend, finalize, record dir and loop poll interval (defaults are production). */
@@ -76,6 +78,8 @@ export interface RecordInject {
   /** ISS-LEANWIRE-002: OBS-backend seams (fake client, join child, level source) and a notifier; defaults are production. */
   obs?: ObsBrowserDepsOverrides & { config?: Partial<ObsBrowserConfig>; subscribeLevel?: Parameters<typeof createAudioWatchdog>[0]["subscribeLevel"] };
   telegram?: TelegramNotifier;
+  /** Test seam: host platform for the OBS Windows-only gate (default process.platform). */
+  platform?: NodeJS.Platform;
 }
 export async function runRecord(rest: string[], inject: RecordInject = {}): Promise<void> {
   const recordDir = inject.recordDir ?? RECORD_DIR;
@@ -91,7 +95,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   if (rest.includes("--process-video") && !rest.includes("--transcribe")) throw new Error("--process-video requires --transcribe");
   if (existsSync(envFile)) process.loadEnvFile(envFile);
   const profileDirectory = selectedBrowserProfile(rest, BOT_PROFILE_DIR);
-  const backend = recordingBackend(rest);
+  const backend = recordingBackend(rest, process.env, inject.platform);
   const tenantId = captureTenant(rest);
   const obsPassword = process.env.OBS_WS_PASSWORD ?? "";
   if (backend === "obs" && !obsPassword) throw new Error("OBS_WS_PASSWORD missing from .env");
@@ -112,9 +116,14 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   const gaps: GapWindow[] = []; // T-029: filled from "gap" events on sb_join.py's stdout stream
   const telegram = inject.telegram ?? createTelegramNotifier();
   let captureFailure: string | undefined;
+  let joinedNotified = false;
+  const gate = createAdmissionGate(); // ISS-CAPTUREFIX-001: the silence watchdog starts only after `admitted`
   const onEvent = (_h: string, ev: Parameters<typeof collectGapEvent>[1]) => {
+    const gateFailure = gate.onEvent(ev as Parameters<typeof gate.onEvent>[0]);
+    if (ev.event === "admitted" && !joinedNotified) { joinedNotified = true; telegram.notifyJoined(title, platform); } // T-030, now only once admitted (ISS-CAPTUREFIX-001)
     if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
-    if (ev.event === "capture-error") captureFailure = String(ev.error ?? "capture failed");
+    if (ev.event === "capture-error") captureFailure = gateFailure ?? String(ev.error ?? "capture failed");
+    if (ev.event === "admission_timeout") captureFailure ??= gateFailure;
     if (ev.event === "capture-stopped" && (ev as {failed?: unknown}).failed !== false) captureFailure ??= "capture stopped with failure";
     collectGapEvent(gaps, ev);
     telegram.onBotEvent(ev);
@@ -125,6 +134,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     browserExecutable: process.env.LKB_BROWSER_EXECUTABLE,
     profileDirectory,
     autoClick: shouldAutoClick(platform), onEvent,
+    ...(tabReceiverGuardFromEnv() ? {guard: tabReceiverGuardFromEnv()} : {}), // T-034: LKB_TAB_RECEIVER_GUARD=1; absent = unchanged
   })) : undefined;
   const bot = tab ?? createObsBrowserDeps({
     obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455",
@@ -144,7 +154,6 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   }, inject.obs);
   const joiner = createBrowserJoiner(bot.deps);
   const { sessionHandle } = await joiner.join(url, { tenantId, consentNote: title });
-  telegram.notifyJoined(title, platform); // T-030
   let gone = false;
   void bot.browserExited(sessionHandle)?.then(() => (gone = true));
   const audioWatchdog = createAudioWatchdog({
@@ -158,7 +167,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     reconnect: () => bot.triggerReload(sessionHandle),
     log: (m) => console.log(`[bot] ${m}`),
   });
-  audioWatchdog.start();
+  gate.attach(audioWatchdog); // starts now only if `admitted` already arrived; never while in the lobby
   writeControllerState(recordDir, {
     pid: process.pid,
     sessionId,
@@ -190,7 +199,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
         await joiner.stop(sessionHandle);
       } catch (e) {
         console.error(`[bot] stop failed: ${e instanceof Error ? e.message : String(e)}`);
-        if (backend === "tab") throw e;
+        if (backend === "tab") throw gate.failure ? new Error(gate.failure) : e; // ISS-CAPTUREFIX-001: name the reload that killed it
       }
       await bot.disconnect().catch(() => {});
     }

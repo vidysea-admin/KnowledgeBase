@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { App } from "../../App.js";
 import { AuthProvider } from "../../auth/AuthContext.js";
+import { API_BASE_URL } from "../../api/client.js";
 import { AnalyticsPage } from "./AnalyticsPage.js";
 
 const fetchMock = vi.fn();
@@ -17,10 +18,15 @@ const graph = { nodes: [], edges: [{ source: "a", target: "b", type: "t", inferr
 const gaps = { gaps: [{ _id: "g1", kind: "k", status: "open" }, { _id: "g2", kind: "k", status: "received" }] };
 const jobs = { jobs: [{ _id: "j1", kind: "k", status: "done", createdAt: "2026-10-01T00:00:00Z" }, { _id: "j2", kind: "k", status: "failed", createdAt: "2026-10-01T00:00:00Z" }], limit: 50, truncated: false };
 
+const fig = (total: number, errors: number) => ({ total, errors, errorRate: total ? errors / total : null });
+const usageDays = (n: number, patch: Record<number, [ReturnType<typeof fig>, ReturnType<typeof fig>]> = {}) => Array.from({ length: n }, (_, i) => ({ day: new Date(Date.UTC(2026, 8, 13 + i)).toISOString().slice(0, 10), ask: patch[i]?.[0] ?? fig(0, 0), search: patch[i]?.[1] ?? fig(0, 0) }));
+const usage = { days: 30, from: "2026-09-13", to: "2026-10-12", byDay: usageDays(30, { 28: [fig(4, 1), fig(2, 0)], 29: [fig(1, 0), fig(0, 0)] }), totals: { ask: fig(5, 1), search: fig(2, 0) }, truncated: false };
+const noUsage = { ...usage, byDay: usageDays(30), totals: { ask: fig(0, 0), search: fig(0, 0) } };
+
 function route(overrides: Record<string, unknown> = {}) {
   fetchMock.mockImplementation(async (url: string) => {
     const path = new URL(url, "http://x").pathname;
-    const body = overrides[path] ?? ({ "/sessions": sessions, "/sessions/s1": detail, "/sessions/s2": { ...detail, claims: [], turns: [] }, "/graph": graph, "/gaps": gaps, "/jobs": jobs } as Record<string, unknown>)[path];
+    const body = overrides[path] ?? ({ "/sessions": sessions, "/sessions/s1": detail, "/sessions/s2": { ...detail, claims: [], turns: [] }, "/graph": graph, "/gaps": gaps, "/jobs": jobs, "/usage": usage } as Record<string, unknown>)[path];
     return body instanceof Error ? Promise.reject(body) : typeof body === "number" ? ok({}, body) : ok(body);
   });
 }
@@ -35,7 +41,7 @@ test("renders every figure from the fetched data with its source line", async ()
   expect(screen.getByRole("region", { name: "Citation coverage" })).toHaveTextContent("Graph edges with evidence: 50% (1 of 2)");
   expect(screen.getByRole("region", { name: "Knowledge gaps" })).toHaveTextContent("2 returned: 1 open; 1 received; 0 expired");
   expect(screen.getByRole("region", { name: "Recent provider jobs" })).toHaveTextContent("2 returned: 0 pending; 0 processing; 1 done; 1 failed");
-  expect(screen.getAllByText(/^Source: GET /)).toHaveLength(5);
+  expect(screen.getAllByText(/^Source: GET /)).toHaveLength(6);
   expect(fetchMock.mock.calls.every(c => c[1].headers.authorization === "Bearer sample-key" && (c[1].method ?? "GET") === "GET")).toBe(true);
   expect(screen.queryByRole("textbox")).toBeNull();
 });
@@ -68,4 +74,40 @@ test("registered in the protected router and navigation", async () => {
 test("direct route without a key shows the login gate and performs no read", () => {
   localStorage.clear(); window.history.replaceState(null, "", "/analytics"); render(<App />);
   expect(screen.getByLabelText("API key")).toBeInTheDocument(); expect(fetchMock).not.toHaveBeenCalled();
+});
+
+test("usage panel: totals, per-error-rate, active days only, honest source and no content claims", async () => {
+  route(); mount(); await screen.findByText(/2 sessions;/);
+  const panel = await screen.findByRole("region", { name: "Usage: questions and searches" });
+  expect(panel).toHaveTextContent("5 /ask calls and 2 /search calls");
+  expect(panel).toHaveTextContent("/ask 20% (1 of 5); /search 0% (0 of 2)");
+  expect(panel.querySelectorAll('ul[aria-label="Calls per day"] li')).toHaveLength(2);
+  expect(panel).toHaveTextContent("4 ask, 2 search, 1 failed");
+  expect(panel).toHaveTextContent("Source: GET /usage?days=30");
+  expect(panel).toHaveTextContent("neither question text nor answers are stored");
+  expect(panel.textContent).not.toMatch(/NaN|Infinity|undefined/);
+  expect(fetchMock.mock.calls.map(c => c[0] as string)).toContain(`${API_BASE_URL}/usage?days=30`);
+});
+test("usage panel: an empty window is stated, with no invented rates", async () => {
+  route({ "/usage": noUsage }); mount();
+  const panel = await screen.findByRole("region", { name: "Usage: questions and searches" });
+  await screen.findByText(/2 sessions;/);
+  expect(panel).toHaveTextContent("No /ask or /search calls were recorded between 2026-09-13 and 2026-10-12.");
+  expect(panel).toHaveTextContent("earlier calls were not recorded");
+  expect(panel.textContent).not.toMatch(/NaN|Infinity|undefined|%/);
+});
+test("usage panel: truncation is disclosed as a lower bound", async () => {
+  route({ "/usage": { ...usage, truncated: true } }); mount(); await screen.findByText(/2 sessions;/);
+  expect(await screen.findByRole("note")).toHaveTextContent("lower bound");
+});
+test.each([[403, "This API key lacks permission to read usage."], [503, "Unable to load usage."], [500, "Unable to load usage."]])("usage panel: %s shows its own alert and leaves other panels intact", async (status, message) => {
+  route({ "/usage": status }); mount(); await screen.findByText(/2 sessions;/);
+  expect(await screen.findByRole("region", { name: "Usage: questions and searches" })).toHaveTextContent(message);
+  expect(screen.getByRole("region", { name: "Knowledge gaps" })).toHaveTextContent("2 returned");
+});
+test("usage panel: a malformed or network-failed response is an error, never a figure", async () => {
+  route({ "/usage": { ...usage, totals: { ask: { total: 5, errors: 9, errorRate: 1.8 }, search: fig(0, 0) } } }); mount(); await screen.findByText(/2 sessions;/);
+  expect(await screen.findByRole("region", { name: "Usage: questions and searches" })).toHaveTextContent("Unable to load usage.");
+  cleanup(); route({ "/usage": new Error("network down") }); mount(); await screen.findByText(/2 sessions;/);
+  expect(await screen.findByRole("region", { name: "Usage: questions and searches" })).toHaveTextContent("Unable to load usage.");
 });
