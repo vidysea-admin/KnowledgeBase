@@ -5,7 +5,9 @@
  *
  * Rate limits (persisted in <stateDir>/autojoin-alert-state.<tenant>.json, so they hold across 5-minute ticks):
  *  - each (session, event kind, channel) fires at most once; a failed attempt is retried on later ticks up to MAX_ATTEMPTS;
- *  - email: at most `emailPerHour` per rolling hour (failure events bypass the cap, they are the ones that matter);
+ *  - email: at most `emailPerHour` per rolling hour for ordinary events; failure events (stopped early / failed) have their own cap of
+ *    `failureEmailPerHour` individual emails per hour, and the rest are rolled into ONE digest email per hour (sent once the oldest has
+ *    waited DIGEST_AFTER_MS). Hard bound per hour: emailPerHour + failureEmailPerHour + 1. Dashboard and calendar record every failure;
  *    non-career test-data webinars email only on failure unless `emailTestData` is on;
  *  - calendar: updates to one session's marker event are at least `calendarMinGapSeconds` apart.
  */
@@ -23,9 +25,10 @@ export interface AlertDeps { cfg: AutojoinConfig; stateDir: string; tenantId: st
 
 interface AlertState {
   version: 1; done: Record<string, string>; failed: Record<string, number>; emailLog: string[];
+  failLog: string[]; digestLog: string[]; pending: { sessionKey: string; kind: AlertKind; title: string; at: string }[];
   calendar: Record<string, { eventId: string; lastAt: string; lines: string[] }>;
 }
-const MAX_ATTEMPTS = 3, HOUR = 3_600_000, KEEP_MS = 14 * 24 * HOUR;
+const MAX_ATTEMPTS = 3, HOUR = 3_600_000, KEEP_MS = 14 * 24 * HOUR, DIGEST_AFTER_MS = 5 * 60_000;
 const FAILURE: ReadonlySet<AlertKind> = new Set(["capture-stopped-early", "capture-failed"]);
 const LABEL: Record<AlertKind, string> = {
   "about-to-join": "Bot will join", "capture-started": "Recording started", "capture-stopped-early": "Recording stopped EARLY",
@@ -39,13 +42,15 @@ function statePath(stateDir: string, tenantId: string): string {
   return path.join(stateDir, `autojoin-alert-state.${tenantId}.json`);
 }
 function loadState(file: string, now: number): AlertState {
-  const fresh: AlertState = { version: 1, done: {}, failed: {}, emailLog: [], calendar: {} };
+  const fresh: AlertState = { version: 1, done: {}, failed: {}, emailLog: [], failLog: [], digestLog: [], pending: [], calendar: {} };
   if (!existsSync(file)) return fresh;
   try {
     const p = JSON.parse(readFileSync(file, "utf8")) as Partial<AlertState>;
     if (p.version !== 1 || typeof p.done !== "object" || p.done === null) throw new Error("shape");
     const done = Object.fromEntries(Object.entries(p.done).filter(([, at]) => now - Date.parse(String(at)) < KEEP_MS));
-    return { version: 1, done, failed: p.failed ?? {}, emailLog: (p.emailLog ?? []).filter((t) => now - Date.parse(t) < HOUR), calendar: p.calendar ?? {} };
+    return { version: 1, done, failed: p.failed ?? {}, emailLog: (p.emailLog ?? []).filter((t) => now - Date.parse(t) < HOUR),
+      failLog: (p.failLog ?? []).filter((t) => now - Date.parse(t) < HOUR), digestLog: (p.digestLog ?? []).filter((t) => now - Date.parse(t) < HOUR),
+      pending: Array.isArray(p.pending) ? p.pending.slice(-50) : [], calendar: p.calendar ?? {} };
   } catch {
     try { renameSync(file, `${file}.corrupt-${now}`); } catch { /* keep going with fresh state */ }
     return fresh; // a corrupt file is kept aside, never silently deleted; worst case one alert repeats
@@ -90,10 +95,14 @@ export async function raiseAlert(deps: AlertDeps, a: AlertInput): Promise<{ emai
   if (cfg.alerts.email) {
     if (!fresh("email")) res.email = "duplicate";
     else if (a.testData && !cfg.alerts.emailTestData && !FAILURE.has(a.kind)) { st.done[key("email")] = nowIso; res.email = "skipped-test-data"; }
+    else if (FAILURE.has(a.kind) && st.failLog.length >= cfg.rateLimit.failureEmailPerHour) {
+      st.pending.push({ sessionKey: a.sessionKey, kind: a.kind, title: cleanBotText(a.title, 120), at: nowIso }); st.done[key("email")] = nowIso; res.email = "digest-queued";
+      log(`  alert email: failure cap (${cfg.rateLimit.failureEmailPerHour}/hour) reached; ${a.kind} queued for the hourly digest`);
+    }
     else if (!FAILURE.has(a.kind) && st.emailLog.length >= cfg.rateLimit.emailPerHour) { res.email = "rate-limited"; log(`  alert email rate-limited (${cfg.rateLimit.emailPerHour}/hour): ${a.kind} not emailed this tick`); }
     else try {
       await sendAlertEmail(deps.gws, cfg.alerts.emailTo, `[LKB bot] ${LABEL[a.kind]}: ${cleanBotText(a.title, 120)}`, text + "\n\n-- LKB bot (automatic alert)\n");
-      st.done[key("email")] = nowIso; st.emailLog.push(nowIso); res.email = "sent";
+      st.done[key("email")] = nowIso; (FAILURE.has(a.kind) ? st.failLog : st.emailLog).push(nowIso); res.email = "sent";
     } catch (e) { fail("email", e); res.email = "failed"; }
   }
   if (cfg.alerts.calendar) {
@@ -111,6 +120,29 @@ export async function raiseAlert(deps: AlertDeps, a: AlertInput): Promise<{ emai
       st.done[key("calendar")] = nowIso; res.calendar = prev ? "updated" : "created";
     } catch (e) { fail("calendar", e); res.calendar = "failed"; }
   }
+  await sendDigestIfDue(deps, st, now);
   try { saveState(file, st); } catch (e) { log(`  alert state not saved (${cleanBotText(e instanceof Error ? e.message : e, 120)}); alerts may repeat next tick`); }
   return res;
+}
+
+/** One digest email listing the failures that exceeded the per-hour cap; at most one per rolling hour, and only once the oldest has waited DIGEST_AFTER_MS. */
+async function sendDigestIfDue(deps: AlertDeps, st: AlertState, now: number): Promise<boolean> {
+  const { cfg } = deps;
+  if (!cfg.alerts.email || st.pending.length === 0 || st.digestLog.length > 0 || now - Date.parse(st.pending[0]!.at) < DIGEST_AFTER_MS) return false;
+  const lines = st.pending.map((p) => `- ${LABEL[p.kind]}: ${p.title} (${p.at})`);
+  try {
+    const text = [`These failures exceeded the ${cfg.rateLimit.failureEmailPerHour}/hour individual email limit. Each is also on the dashboard and calendar.`, "", ...lines, "", "-- LKB bot (automatic alert)", ""].join("\n");
+    await sendAlertEmail(deps.gws, cfg.alerts.emailTo, `[LKB bot] ${st.pending.length} more recording problem(s) (digest)`, text);
+    st.digestLog.push(new Date(now).toISOString()); st.pending = [];
+    return true;
+  } catch (e) { deps.log(`  alert digest email failed: ${cleanBotText(e instanceof Error ? e.message : e, 160)}`); return false; }
+}
+
+/** Sends the pending failure digest if due, without raising a new alert (called by the tick after the capture watch). */
+export async function flushFailureDigest(deps: AlertDeps): Promise<boolean> {
+  if (!deps.cfg.alerts.email) return false;
+  const file = statePath(deps.stateDir, deps.tenantId), now = Date.parse(deps.now()), st = loadState(file, now);
+  const sent = await sendDigestIfDue(deps, st, now);
+  if (sent) saveState(file, st);
+  return sent;
 }

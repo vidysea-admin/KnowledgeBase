@@ -14,13 +14,13 @@ export interface AutojoinConfig {
   careerPriority: boolean;
   testDataRouting: boolean;
   alerts: { email: boolean; dashboard: boolean; calendar: boolean; emailTo: string; emailTestData: boolean };
-  rateLimit: { emailPerHour: number; calendarMinGapSeconds: number };
+  rateLimit: { emailPerHour: number; failureEmailPerHour: number; calendarMinGapSeconds: number };
 }
 
 export const AUTOJOIN_OFF: AutojoinConfig = {
   present: false, discovery: false, webinarAutoJoin: false, careerPriority: false, testDataRouting: false,
   alerts: { email: false, dashboard: false, calendar: false, emailTo: "", emailTestData: false },
-  rateLimit: { emailPerHour: 6, calendarMinGapSeconds: 60 },
+  rateLimit: { emailPerHour: 6, failureEmailPerHour: 3, calendarMinGapSeconds: 60 },
 };
 
 const EMAIL_RE = /^[^\s@<>",;]+@[^\s@<>",;]+\.[^\s@<>",;]+$/;
@@ -69,6 +69,6 @@ export function loadAutojoinConfig(repoRoot: string, env: NodeJS.ProcessEnv = pr
       dashboard: bool(a.dashboard, env.LKB_ALERT_DASHBOARD, false), calendar: bool(a.calendar, env.LKB_ALERT_CALENDAR, false),
       emailTestData: bool(a.emailTestData, env.LKB_ALERT_EMAIL_TEST_DATA, false),
     },
-    rateLimit: { emailPerHour: posInt(r.emailPerHour, env.LKB_ALERT_EMAIL_PER_HOUR, 6), calendarMinGapSeconds: posInt(r.calendarMinGapSeconds, undefined, 60) },
+    rateLimit: { emailPerHour: posInt(r.emailPerHour, env.LKB_ALERT_EMAIL_PER_HOUR, 6), failureEmailPerHour: posInt(r.failureEmailPerHour, env.LKB_ALERT_FAILURE_EMAIL_PER_HOUR, 3), calendarMinGapSeconds: posInt(r.calendarMinGapSeconds, undefined, 60) },
   };
 }

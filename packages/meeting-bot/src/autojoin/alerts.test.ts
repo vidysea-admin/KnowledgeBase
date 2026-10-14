@@ -168,3 +168,29 @@ test("config: file defaults, env overrides, absent file = legacy", () => {
     assert.deepEqual([o.webinarAutoJoin, o.alerts.email, o.alerts.emailTo], [false, false, ""]);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+import { flushFailureDigest } from "./alerts.js";
+
+test("ISS-AUTOJOIN-001 verbatim repro: 12 about-to-join then 12 capture-failed on separate sessions stays bounded; every failure is still on the dashboard and calendar", async () => {
+  const s = setup({ rateLimit: { emailPerHour: 6, failureEmailPerHour: 3, calendarMinGapSeconds: 60 } });
+  try {
+    const emails = () => s.calls.filter((c) => c[0] === "gmail").length;
+    for (let i = 0; i < 12; i++) await raiseAlert(s.deps, { kind: "about-to-join", ...A, sessionKey: `j${i}` });
+    assert.equal(emails(), 6);
+    for (let i = 0; i < 12; i++) await raiseAlert(s.deps, { kind: "capture-failed", ...A, sessionKey: `f${i}`, detail: "no recording" });
+    assert.equal(emails(), 9, "6 ordinary + 3 individual failure emails");
+    assert.equal(readBotEvents(s.stateDir, "ten-a", 200).filter((e) => e.kind === "capture-failed").length, 12, "dashboard records every failure");
+    assert.equal(s.calls.filter((c) => c[0] === "calendar" && c[2] === "insert").length, 24, "calendar marker for every session");
+    s.tick(6 * 60_000);
+    assert.equal(await flushFailureDigest(s.deps), true);
+    assert.equal(emails(), 10, "plus exactly ONE digest");
+    const digest = s.calls.filter((c) => c[0] === "gmail").at(-1)!;
+    const mime = Buffer.from(JSON.parse(digest[digest.indexOf("--json") + 1]!).raw, "base64url").toString("utf8");
+    const bodyB64 = mime.split("\r\n\r\n")[1]!.replace(/\r\n/g, "");
+    assert.equal((Buffer.from(bodyB64, "base64").toString().match(/Recording FAILED/g) ?? []).length, 9, "digest lists the 9 failures beyond the cap");
+    s.tick(60_000);
+    assert.equal(await flushFailureDigest(s.deps), false, "no second digest within the hour");
+    for (let i = 0; i < 5; i++) { s.tick(60_000); await raiseAlert(s.deps, { kind: "capture-failed", ...A, sessionKey: `g${i}` }); }
+    assert.equal(emails(), 10, "later failures in the same hour are queued, not emailed");
+  } finally { s.done(); }
+});

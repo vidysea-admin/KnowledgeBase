@@ -1,11 +1,16 @@
 # autojoin
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Priority tier: 3 (roadmap T-036 / T-037 / T-038, enabled by D-165, commit a5e6df58)
 Security class: decides which meetings the bot records and sends outward email and calendar writes - FULL ceremony.
 Lane: `lane/autojoin` (worktree `KnowledgeBase-lanes/autojoin`, from 29416b51). No ledger shard needed: no issue filed.
 Authority: D-165 (2026-10-14, Approved-by Umesh): auto-discovery and auto-join on, webinars joined automatically, career counselling/guidance first (also on conflicts), other webinars are test data to staging (D-143), alerts by email to umeshsugara@vidysea.com AND on the web dashboard. Calendar marker channel added by the coordinator the same day.
+
+## Fix cycle 1 (verdict qa/verdicts/autojoin.md, cycle 0 FAIL)
+- ISS-AUTOJOIN-001: failure emails no longer bypass the cap. Failures have their own cap (`rateLimit.failureEmailPerHour`, default 3, env `LKB_ALERT_FAILURE_EMAIL_PER_HOUR`); beyond it they are queued and sent as ONE digest email per rolling hour (once the oldest has waited 5 minutes; sent by the next alert or by the tick via `flushFailureDigest`). Dashboard and calendar still record every failure. Hard bound per hour: 6 + 3 + 1 = 10 emails. Checker repro verbatim (12 about-to-join, then 12 capture-failed on separate sessions): 9 emails immediately (6 + 3), 10 after the digest; 12 failure rows on the dashboard; 24 calendar markers. Test: alerts.test.ts "ISS-AUTOJOIN-001 verbatim repro".
+- ISS-AUTOJOIN-003: removed the ambiguous keywords `sop` and `campus` from config/career-topics.json, added `statement of purpose`; matching was already whole-word. Cases tested: career = Career Counselling Masterclass, Study Abroad Webinar, SOP writing for MS admissions, Statement of Purpose workshop; not career = Weekly SOP review, Campus security training, Gemini at Work, Weekly sync.
+- ISS-AUTOJOIN-002 (KNOWN, ACCEPTED LIMITATION, Umesh/coordinator ruling): a session with no testData tag syncs to the configured work database (never `lkb`, which isolated-work-db checks refuse). Behaviour deliberately unchanged.
 
 ## Survey (what already existed, what needed turning on)
 - Discovery (Gmail/Calendar link scan, `youtube-live-extract.ts`) has NO flag: it runs whenever the tick calls the API. YouTube Live extraction is flag-off and not wired into gws-calendar.ts, and a YouTube watch link cannot be joined by the bot (platform `unknown`); YouTube capture is T-045 and is NOT done here.
@@ -48,4 +53,5 @@ Requires `LKB_API_KEY` and `LKB_TENANT_ID` in the main-tree `.env` (not committe
 - Capture alerts have 5-minute resolution (derived from the controller state file each tick), not instant.
 - YouTube Live capture and non-webinar meeting joining are unchanged (see Survey).
 - `testData` routing is enforced in `sync-session.mjs` (the DB writer) and covered by a helper test; there was no live Mongo run.
+- Email hard bound is 10 per hour (6 ordinary + 3 failure + 1 digest).
 - Windows PowerShell 5.1 redirect `*>>` writes the poller log as UTF-16.

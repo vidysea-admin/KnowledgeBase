@@ -103,3 +103,9 @@ test("classifyInvite hook admits a masterclass the built-in classifier leaves in
   assert.equal(base(events).skipped[0]?.reason, "needs-review");
   assert.deepEqual(base(events, { classifyInvite: classifyInviteExtended }).toSchedule.map((i) => i.sourceId), ["e3"]);
 });
+
+test("fix cycle 1 (ISS-AUTOJOIN-003): ambiguous words do not make an event career guidance", () => {
+  const is = (title: string) => classifyTopic({ title }, cfg).careerGuidance;
+  for (const t of ["Career Counselling Masterclass", "Study Abroad Webinar", "SOP writing for MS admissions", "Statement of Purpose workshop"]) assert.equal(is(t), true, t);
+  for (const t of ["Weekly SOP review", "Campus security training", "Gemini at Work", "Weekly sync"]) assert.equal(is(t), false, t);
+});

@@ -11,7 +11,7 @@ import type { SelectAutoRecordItemsInput } from "@lkb/core";
 import type { AutojoinConfig } from "./config.js";
 import { classifyTopic, type TopicConfig, type TopicVerdict } from "./topic-priority.js";
 import { classifyInviteExtended } from "./webinar-kind.js";
-import { raiseAlert, type AlertInput } from "./alerts.js";
+import { flushFailureDigest, raiseAlert, type AlertInput } from "./alerts.js";
 import { loadAutojoinConfig } from "./config.js";
 import { loadTopicConfig } from "./topic-priority.js";
 import { createGwsRunner } from "./gws-channels.js";
@@ -85,7 +85,8 @@ export function buildAutojoinTickDeps(repoRoot: string, stateDir: string, env: N
   const raise = (a: AlertInput) => raiseAlert(alertDeps, a);
   return {
     cfg, topic, raise, tagsDir: path.join(stateDir, "capture-tags"),
-    watchCaptures: () => watchCaptures({ stateDir, tenantId, now: alertDeps.now, log, raise,
-      outputFor: (sid) => (/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(sid) && existsSync(path.join(repoRoot, "data", "toc-migrated", sid, "source.json")) ? `data/toc-migrated/${sid}` : undefined) }),
+    watchCaptures: async () => { const n = await watchCaptures({ stateDir, tenantId, now: alertDeps.now, log, raise,
+      outputFor: (sid) => (/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(sid) && existsSync(path.join(repoRoot, "data", "toc-migrated", sid, "source.json")) ? `data/toc-migrated/${sid}` : undefined) });
+      await flushFailureDigest(alertDeps).catch(() => false); return n; },
   };
 }
