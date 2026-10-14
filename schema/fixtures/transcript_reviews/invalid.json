@@ -1,0 +1,1 @@
+{"_id":"x","tenantId":"toc","sessionId":"sess1","revision":"has space","parentRevision":"base-abc123","overlay":[],"audit":{"actorRef":"apikey:toc","reviewedAt":"2026-10-14T09:00:00.000Z","reason":"r","changes":[]},"refresh":{"status":"done","revision":"r","targets":[],"completed":[]},"committedAt":"2026-10-14T09:00:00.000Z"}
