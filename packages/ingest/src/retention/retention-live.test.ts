@@ -3,7 +3,9 @@
  * Temp dirs, injected ffmpeg / unlink / report writers. No real ffmpeg, no real raw/ media, no network.
  */
 import assert from "node:assert/strict";
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, utimesSync, writeFileSync } from "node:fs";
+import type { EvidenceClipWindow } from "@lkb/core";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import test from "node:test";
@@ -11,7 +13,7 @@ import { DAY, NOW, iso, tempRoot, writeSession, baseArgs } from "./retention-rep
 import { tenantSegment } from "./retention-report-state.js";
 import { runRetentionPurge, REAL_PURGE_IO, type PurgeIo } from "./retention-purge.js";
 import { runPurgeJob, type JobReport } from "./retention-purge-job.js";
-import { markSessionProcessed, type MarkIo } from "./retention-processed.js";
+import { makeMarkIo, markSessionProcessed, type MarkIo } from "./retention-processed.js";
 import { clipArgs, clipFileName, extractEvidenceClips, resolveFfmpegCommand, type ClipIo } from "./retention-clips.js";
 import { buildLastRun, type LastRun } from "./retention-last-run.js";
 
@@ -39,22 +41,29 @@ function session(e: Env, name: string, ageDays: number, extra: Record<string, un
 }
 const mediaFile = (e: Env, name: string): string => join(e.media, "m", `${name}.webm`);
 
-/** fake ffmpeg: records argv, writes `bytes` bytes to the output (last arg) unless told to fail */
-function fakeClipIo(log: string[][], opts: { exit?: number; bytes?: number; spawnError?: string } = {}): ClipIo {
-  const files = new Map<string, number>();
-  return {
+/** fake ffmpeg/ffprobe: records argv; the "file system" is a map path -> {size, dur}; the source file is any path not in it */
+interface Fake { io: ClipIo; files: Map<string, { size: number; dur: number }>; renames: string[][] }
+function fakeClip(log: string[][], opts: { exit?: number; bytes?: number; spawnError?: string; srcDur?: number; shortBy?: number } = {}): Fake {
+  const files = new Map<string, { size: number; dur: number }>();
+  const renames: string[][] = [];
+  const io: ClipIo = {
     run: (_c, args) => {
       log.push([...args]);
       if (opts.spawnError) return { code: null, error: opts.spawnError };
       if (opts.exit) return { code: opts.exit };
-      files.set(args[args.length - 1] as string, opts.bytes ?? 5);
+      files.set(args[args.length - 1] as string, { size: opts.bytes ?? 5, dur: Number(args[args.indexOf("-t") + 1]) - (opts.shortBy ?? 0) });
       return { code: 0 };
     },
+    probe: (_c, p) => { const f = files.get(p); return f ? (f.dur >= 0 ? { duration: f.dur, streams: ["video"] } : null) : { duration: opts.srcDur ?? 3600, streams: ["video"] }; },
     mkdirp: () => undefined,
-    sizeOf: (p) => files.get(p) ?? null,
+    isLinkOrNotDir: () => false,
+    sizeOf: (p) => files.get(p)?.size ?? null,
+    rename: (a, b) => { renames.push([a, b]); const f = files.get(a); if (f) { files.set(b, f); files.delete(a); } },
     remove: (p) => { files.delete(p); },
   };
+  return { io, files, renames };
 }
+const fakeClipIo = (log: string[][], opts: Parameters<typeof fakeClip>[1] = {}): ClipIo => fakeClip(log, opts).io;
 
 // ---- processedAt writer ----------------------------------------------------------------------------------------
 test("markSessionProcessed stamps processedAt only when transcribe and index are done, atomically, changing nothing else", () => {
@@ -250,4 +259,142 @@ test("a last-run write failure is reported (exit 5) without changing the purge o
     assert.match(errs.join("\n"), /last-run summary \(EACCES\)/);
     assert.ok(existsSync(mediaFile(e, "s")));
   } finally { e.done(); }
+});
+
+// ---- fix cycle 1: ffprobe validation, atomic clips, links (ISS-T046LIVE-001/002/004) ----------------------------
+test("ISS-T046LIVE-001 (fake probe): a window beyond the source end FAILS; a clip shorter than the window FAILS; nothing is left behind", () => {
+  const f = fakeClip([], { srcDur: 10 });
+  const r = extractEvidenceClips("/m/s.mp4", [{ ...WIN, tStart: 50, tEnd: 60 }], "/o", "ffmpeg", f.io);
+  assert.equal(r.ok, false);
+  assert.equal(r.outcomes[0]?.why, "window-beyond-media");
+  const short = fakeClip([], { shortBy: 30 });
+  const r2 = extractEvidenceClips("/m/s.mp4", [WIN], "/o", "ffmpeg", short.io);
+  assert.equal(r2.outcomes[0]?.why, "clip-failed-validation");
+  assert.equal(short.files.size, 0, "failed partial removed, no final name");
+  const unprobeable = fakeClip([]); unprobeable.io.probe = () => null;
+  assert.equal(extractEvidenceClips("/m/s.mp4", [WIN], "/o", "ffmpeg", unprobeable.io).outcomes[0]?.why, "source-unprobeable");
+});
+
+test("ISS-T046LIVE-001: a window straddling the source end is clamped (valid), not rejected", () => {
+  const f = fakeClip([], { srcDur: 100, shortBy: 25 }); // asked 85..125 (40 s), only 15 s exist
+  assert.equal(extractEvidenceClips("/m/s.mp4", [WIN], "/o", "ffmpeg", f.io).ok, true);
+});
+
+test("ISS-T046LIVE-002 (fake): ffmpeg writes to a .partial name and the final name appears only by rename after validation", () => {
+  const log: string[][] = []; const f = fakeClip(log);
+  assert.equal(extractEvidenceClips("/m/s.webm", [WIN], "/o", "ffmpeg", f.io).ok, true);
+  const outArg = (log[0] as string[]).at(-1) as string;
+  assert.match(outArg, /\.partial\.webm$/);
+  assert.deepEqual(f.renames, [[outArg, outArg.replace(".partial", "")]]);
+  assert.ok(!f.files.has(outArg));
+});
+
+test("ISS-T046LIVE-002 (fake): an existing junk clip is re-validated, treated as missing and re-extracted", () => {
+  const log: string[][] = []; const f = fakeClip(log);
+  const final = join("/o", clipFileName(WIN, ".webm"));
+  f.files.set(final, { size: 18, dur: -1 }); // probe -> null
+  const r = extractEvidenceClips("/m/s.webm", [WIN], "/o", "ffmpeg", f.io);
+  assert.equal(r.ok, true);
+  assert.equal(r.outcomes[0]?.status, "extracted");
+  assert.equal(log.length, 1);
+});
+
+test("ISS-T046LIVE-004: an evidence-clips directory that is a link / not a directory is refused and ffmpeg never runs", () => {
+  const log: string[][] = []; const f = fakeClip(log);
+  f.io.isLinkOrNotDir = () => true;
+  const r = extractEvidenceClips("/m/s.webm", [WIN], "/o", "ffmpeg", f.io);
+  assert.equal(r.ok, false);
+  assert.equal(r.outcomes[0]?.why, "clips-dir-is-link-or-not-a-directory");
+  assert.equal(log.length, 0);
+});
+
+test("ISS-T046LIVE-004: markSessionProcessed writes a temp file then renames it over session.json (non-atomic write is killed)", () => {
+  const calls: string[][] = [];
+  const io = makeMarkIo({ writeFileSync: (p) => { calls.push(["write", p]); }, renameSync: (a, b) => { calls.push(["rename", a, b]); } });
+  io.writeAtomic("/d/session.json", "{}");
+  assert.equal(calls[0]?.[0], "write");
+  assert.notEqual(calls[0]?.[1], "/d/session.json");
+  assert.deepEqual(calls[1], ["rename", calls[0]?.[1], "/d/session.json"]);
+});
+
+test("ISS-T046LIVE-003: the job refuses a --report-file equal to the last-run summary path", () => {
+  const errs: string[] = [];
+  const code = runPurgeJob(["--report-file", "/tmp/same.json"], { now: () => NOW, write: () => undefined, error: (l) => errs.push(l), lastRunFile: "/tmp/same.json" });
+  assert.equal(code, 2);
+  assert.match(errs.join(), /must differ/);
+});
+
+// ---- real ffmpeg / ffprobe (lavfi media in a temp dir); skipped cleanly when the binaries are absent ----------------
+const FF_DIR = process.env.LKB_TEST_FFMPEG_DIR
+  ?? "C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin";
+const FFMPEG = join(FF_DIR, "ffmpeg.exe");
+const HAVE_FF = existsSync(FFMPEG) && existsSync(join(FF_DIR, "ffprobe.exe"));
+const real = { skip: HAVE_FF ? false : "ffmpeg/ffprobe not found" };
+
+function realSource(dir: string, secs: number): string {
+  const out = join(dir, "src.mp4");
+  const r = spawnSync(FFMPEG, ["-v", "error", "-f", "lavfi", "-i", `testsrc=duration=${secs}:size=64x64:rate=10`, "-f", "lavfi", "-i", `sine=duration=${secs}`,
+    "-c:v", "libx264", "-g", "10", "-c:a", "aac", "-shortest", "-y", out], { encoding: "utf8" });
+  assert.equal(r.status, 0, r.stderr);
+  return out;
+}
+
+test("REAL ffmpeg ISS-T046LIVE-001: 10 s mp4 with a 50-60 s window fails; an in-range window yields a probe-valid clip", real, () => {
+  const d = mkdtempSync(join(tmpdir(), "t046live-real-"));
+  try {
+    const src = realSource(d, 10);
+    const out = join(d, "clips");
+    const bad = extractEvidenceClips(src, [{ sessionId: "S1", turnId: "t9", tStart: 50, tEnd: 60 }], out, FFMPEG);
+    assert.equal(bad.ok, false);
+    assert.equal(bad.outcomes[0]?.why, "window-beyond-media");
+    assert.ok(!existsSync(join(out, "S1__t9.mp4")));
+    const good = extractEvidenceClips(src, [{ sessionId: "S1", turnId: "t1", tStart: 2, tEnd: 6 }], out, FFMPEG);
+    assert.equal(good.ok, true, JSON.stringify(good));
+    assert.deepEqual(readdirSync(out), ["S1__t1.mp4"], "no .partial left");
+    const clamped = extractEvidenceClips(src, [{ sessionId: "S1", turnId: "t2", tStart: 7, tEnd: 20 }], out, FFMPEG);
+    assert.equal(clamped.ok, true, JSON.stringify(clamped));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+test("REAL ffprobe ISS-T046LIVE-002: 18-byte junk at the clip name and a truncated clip are rejected and replaced by a valid one", real, () => {
+  const d = mkdtempSync(join(tmpdir(), "t046live-real-"));
+  try {
+    const src = realSource(d, 10);
+    const out = join(d, "clips"); mkdirSync(out);
+    const w = { sessionId: "S1", turnId: "t4", tStart: 1, tEnd: 7 };
+    const final = join(out, "S1__t4.mp4");
+    writeFileSync(final, Buffer.alloc(18, 0x41));
+    const r1 = extractEvidenceClips(src, [w], out, FFMPEG);
+    assert.equal(r1.outcomes[0]?.status, "extracted", "junk is not accepted as 'exists'");
+    const full = readFileSync(final);
+    writeFileSync(final, full.subarray(0, Math.floor(full.length * 0.4))); // a killed ffmpeg's truncation
+    const r2 = extractEvidenceClips(src, [w], out, FFMPEG);
+    assert.equal(r2.outcomes[0]?.status, "extracted", "truncated clip is replaced");
+    assert.equal(readFileSync(final).length, full.length);
+    assert.equal(extractEvidenceClips(src, [w], out, FFMPEG).outcomes[0]?.status, "exists");
+    writeFileSync(join(out, "S1__t5.partial.mp4"), Buffer.alloc(18, 0x41)); // stale partial from a killed run
+    const r3 = extractEvidenceClips(src, [{ ...w, turnId: "t5" }], out, FFMPEG);
+    assert.equal(r3.ok, true);
+    assert.deepEqual(readdirSync(out).sort(), ["S1__t4.mp4", "S1__t5.mp4"]);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+test("REAL purge end to end: execute keeps the media when the window is beyond it, deletes it after valid clips otherwise", real, () => {
+  const e = env();
+  const srcDir = mkdtempSync(join(tmpdir(), "t046live-real-"));
+  try {
+    const dir = session(e, "r", 120, { mediaPath: "m/r.mp4" });
+    const target = join(e.media, "m", "r.mp4");
+    writeFileSync(target, readFileSync(realSource(srcDir, 10)));
+    utimesSync(target, new Date(NOW - 120 * DAY), new Date(NOW - 120 * DAY));
+    const clips = { extract: (m: string, w: readonly EvidenceClipWindow[], o: string) => extractEvidenceClips(m, w, o, FFMPEG) };
+    const run = (): string => { const out: string[] = []; runRetentionPurge([...baseArgs(e.root, e.media, ASOF), "--execute"], { now: () => NOW, write: (l) => out.push(l), error: (l) => out.push(l), clips }); return out.join("\n"); };
+    const o1 = run(); // cited turn 100-110 s in a 10 s file
+    assert.ok(existsSync(target), o1);
+    assert.match(o1, /clip-extraction-failed: window-beyond-media/);
+    writeFileSync(join(dir, "turns.json"), JSON.stringify([{ _id: "r-t1", tenantId: "toc", sessionId: "r", speakerRef: "a", tStart: 3, tEnd: 5, text: "x" }]));
+    const o2 = run();
+    assert.ok(!existsSync(target), o2);
+    assert.ok(existsSync(join(dir, "evidence-clips", "r__r-t1.mp4")));
+  } finally { e.done(); rmSync(srcDir, { recursive: true, force: true }); }
 });

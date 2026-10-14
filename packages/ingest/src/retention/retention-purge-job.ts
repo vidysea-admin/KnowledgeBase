@@ -69,6 +69,10 @@ export function splitJobArgs(argv: readonly string[]): { ok: true; reportFile: s
 export function runPurgeJob(argv: readonly string[], deps: JobDeps): number {
   const split = splitJobArgs(argv);
   if (!split.ok) { deps.error(`retention-purge-job: ${split.message}`); return 2; }
+  if (deps.lastRunFile !== undefined && resolve(deps.lastRunFile) === split.reportFile) {
+    deps.error("retention-purge-job: --report-file and the last-run summary path must differ (the summary would overwrite the full report)");
+    return 2;
+  }
   const lines: string[] = [];
   const startedAt = new Date(deps.now()).toISOString();
   const capture = (line: string): void => { lines.push(line); };

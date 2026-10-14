@@ -1,7 +1,7 @@
 # t046-retention-live
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 3 (roadmap T-046, closes the gaps the executor and schedule manifests listed). Class: DATA DELETE path (clip-before-purge gate), FULL ceremony. Lane: lane/t046-retention-live (branched from lane/codexwave1). No ledger issue is fixed or filed.
 Authority: D-008 (clip of +/-15 s per cited turn retained permanently before media purge), D-145 (90 days).
 
@@ -24,3 +24,12 @@ Deletions remain DRY RUN by default; `--execute` still the only delete path. No 
 
 ## Not delivered / not verified
 Real ffmpeg never run (injected); no clip made from a real recording. Integrator hook not applied. processedAt for already-indexed historical sessions is not backfilled. Clip retention policy for the evidence-clips directory (tenant isolation, serving) is a follow-up. Endpoint/UI for last-run.json.
+
+## Fix cycle 1 (checker FAIL cycle 0, commit 5573522c). Measured against each issue's recorded reproductions (D-015)
+Real ffmpeg/ffprobe 9.0.2 (Gyan build; lavfi-generated 10 s mp4 in a temp dir; tests skip cleanly if absent) plus fake-probe unit tests.
+- **ISS-T046LIVE-001 (high): 1/1 recorded repro refused.** 10 s mp4, window 50-60 s: `ok:false, window-beyond-media`, no clip written. The source is ffprobed first; every clip is ffprobed (parseable, has audio/video, duration within max(1.5 s, 15%) below and 60 s above the window clamped to the source). A window straddling the end is clamped and accepted (real and fake test). In the end-to-end real purge test the raw media is KEPT for a beyond-media window and deleted only after valid clips.
+- **ISS-T046LIVE-002 (high): 2/2 recorded repros refused** (18-byte junk at the clip name; killed-run truncation to 40%): both rejected by ffprobe, treated as missing and re-extracted to a valid clip; a stale `.partial` is overwritten, never promoted; an intact clip is accepted as `exists` only after re-probe. ffmpeg now writes `<name>.partial<ext>` and the final name appears only by rename after validation. Mutation M12 (existing clip trusted): KILLED.
+- **ISS-T046LIVE-003 (medium): fixed.** Scheduler `-ReportFile` default is now `data/retention/report.json` (scripts/retention/schedule-retention-purge.ps1 + its test, 7/7 pass); the job CLI last-run default stays `data/retention/last-run.json`; the job also refuses equal paths (exit 2, tested). Note: this touches scripts/retention, outside packages/ingest/src/retention, at the coordinator's instruction.
+- **ISS-T046LIVE-004 (low): done.** M10 (non-atomic write) now killed by a test over `makeMarkIo` (temp write, then rename over the target). An evidence-clips directory that is a symlink/junction/non-directory is refused (`clips-dir-is-link-or-not-a-directory`, ffmpeg never runs); existing clip entries are lstat'd, never followed. NOT done: index-proof check for processedAt, lock on read-modify-write, mandatory clips for library callers without `deps.clips` (CLIs always pass them).
+- Mutations this cycle (per-mutation byte backup, restore in finally, hash verified; harness deleted): M12 exists-trusted, beyond-media check dropped, post-extract probe dropped, ffmpeg writing the final name directly: 4/4 KILLED. A "link check removed" mutant survived because the second post-mkdir check is redundant; the redundant first check was removed.
+- Evidence: retention-live.test.ts 23/23 pass (0 skipped, real ffmpeg used); full packages/ingest suite tests 374 / pass 374 / fail 0; tsc exit 0; lint-loc: only inherited `test_sb_join_ownership.py:408` and stale SNAPSHOT.md fail (same as baseline); dependency-cruiser clean.

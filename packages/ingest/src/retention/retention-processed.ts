@@ -28,17 +28,19 @@ export interface MarkIo {
   read: (path: string) => string;
   writeAtomic: (path: string, text: string) => void;
 }
-export const REAL_MARK_IO: MarkIo = {
+export interface FsOps { writeFileSync: (p: string, t: string, enc: "utf8") => void; renameSync: (a: string, b: string) => void }
+export const makeMarkIo = (fs: FsOps = { writeFileSync, renameSync }): MarkIo => ({
   read: (p) => {
     if (!lstatSync(p).isFile()) throw new Error("not a regular file");
     return readFileSync(p, "utf8");
   },
   writeAtomic: (p, text) => {
     const tmp = `${p}.${process.pid}.tmp`;
-    writeFileSync(tmp, text, "utf8");
-    renameSync(tmp, p);
+    fs.writeFileSync(tmp, text, "utf8");
+    fs.renameSync(tmp, p);
   },
-};
+});
+export const REAL_MARK_IO: MarkIo = makeMarkIo();
 
 export function markSessionProcessed(sessionDir: string, now: number, io: MarkIo = REAL_MARK_IO): MarkResult {
   if (!Number.isFinite(now)) return { ok: false, reason: "invalid-clock" };

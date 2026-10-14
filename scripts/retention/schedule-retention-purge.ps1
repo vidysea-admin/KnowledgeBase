@@ -26,7 +26,7 @@ $launcherPath = $PSCommandPath
 $cliPath = Join-Path $projectRoot 'packages/ingest/src/retention/retention-purge-job-cli.ts'
 $taskName = 'Vidysea-Retention-Purge'
 if (-not $OperationsState) { $OperationsState = Join-Path $projectRoot 'data/webinar-release/operations.json' }
-if (-not $ReportFile) { $ReportFile = Join-Path $projectRoot 'data/retention/last-run.json' }
+if (-not $ReportFile) { $ReportFile = Join-Path $projectRoot 'data/retention/report.json' }
 
 function Assert-AbsolutePath([string]$Value) {
     if ($Value -notmatch '^[A-Za-z]:[\\/]' -or $Value -match '[\x00-\x1f\x7f"%]' -or $Value.Contains('..')) {
