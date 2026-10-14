@@ -28,10 +28,14 @@ export interface UploadTransportResponse {
 
 export type UploadTransport = (req: UploadTransportRequest) => Promise<UploadTransportResponse>;
 
+import { detectGeminiFreeTier } from "../gemini-quota.js";
+
 const DEFAULT_MODEL = "gemini-3.5-flash";
 
 function assertOk(res: UploadTransportResponse, step: string): void {
   if (res.status < 200 || res.status >= 300) {
+    const quota = detectGeminiFreeTier(res.status, res.body, `gemini file upload: ${step} failed with status ${res.status}`);
+    if (quota) throw quota;
     throw new Error(`gemini file upload: ${step} failed with status ${res.status}: ${JSON.stringify(res.body)}`);
   }
 }

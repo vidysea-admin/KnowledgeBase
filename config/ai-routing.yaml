@@ -27,3 +27,7 @@ embedding: [gemini, ollama]
 # polarity and negation included. claude-code first so the judge is a different model family from the generator;
 # gemini is the fallback. Job kind "note-judge" (packages/index/src/pipeline/notes/judge.ts). No existing route changed.
 note-judge: [claude-code, gemini]
+# ollamafirst: webinar slide/frame vision (scripts/webinar/process-video.mjs, flag LKB_VISION_ROUTED=1). Ollama Cloud first
+# (models: OLLAMA_VISION_MODELS, default glm-5.3-flash then deepseek-v4.1-flash), Gemini (WEBINAR_VISION_MODEL) as fallback.
+# STT has no Ollama entry on purpose: no Ollama Cloud model reports an audio capability (measured 2026-10-14).
+vision: [ollama, gemini]

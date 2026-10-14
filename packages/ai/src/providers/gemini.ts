@@ -4,6 +4,7 @@
  * `generateContent` REST endpoint through the injected `transport`; no real network call in
  * tests (C2).
  */
+import { detectGeminiFreeTier } from "../gemini-quota.js";
 import type { CompleteResult, EmbedJob, EmbedResult, Job, ModelInfo, Provider, Transport } from "../provider.js";
 
 /** Static-but-labeled manifest (C3) — refresh via https://ai.google.dev/gemini-api/docs/models. */
@@ -65,6 +66,8 @@ export class GeminiProvider implements Provider {
     });
 
     if (res.status < 200 || res.status >= 300) {
+      const quota = detectGeminiFreeTier(res.status, res.body, `gemini API error ${res.status}`);
+      if (quota) throw quota;
       throw new Error(`gemini API error ${res.status}: ${JSON.stringify(res.body)}`);
     }
 
