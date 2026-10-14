@@ -12,6 +12,7 @@ import { getProcessStartTime } from "./controller-state.js";
 import { browserProfileArgs } from "./browser/browser-profile.js";
 import type { BotEvent } from "./obs/obs-windows.js";
 import { assertInsideDir, assertSafeCaptureFileName, assertSafeCaptureId, type TabReceiverGuard } from "./tab-receiver-guard.js";
+import {createSilenceHealth, silenceHealthEnabled} from "./tab-silence-health.js";
 import {remuxRecoveryEnabled, remuxWebmInPlace} from "./tab-remux.js";
 import {validateCaptureControlGaps, validateCaptureStatusIdentity, type GapWindow} from "./reconnect-gaps.js";
 
@@ -173,6 +174,10 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
       const identity={output,pid:process.pid,handle,sessionId:cfg.sessionId,tenantId:cfg.tenantId,profileDir:path.resolve(cfg.profileDir),recordDir:path.resolve(cfg.recordDir),controllerStartedAt};
       const status = (state: string, error?: string) => writeOwnedTabStatus(statusPath, identity,
         {state,captureStartedAt,error,controlGaps:runs.get(handle)?.controlGaps ?? []});
+      const health = silenceHealthEnabled() ? createSilenceHealth({onChange: (h) => {
+        log(`audio-health: ${h.note}`);
+        try {writeOwnedTabStatus(statusPath, identity, {audioHealth: h});} catch {}
+      }}) : undefined;
       try {
         if (existsSync(recoveryLock)) throw new Error("Profile recovery active or requires inspection");
         if (existsSync(lock)) {
@@ -207,6 +212,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
           if (run && failure) run.failure = failure;
           if (event.event === "capture-level" && typeof event.db === "number" && Number.isFinite(event.db)) {
             for (const listener of levels) listener(event.db);
+            health?.onLevel(event.db);
           }
           cfg.onEvent?.(handle, event);
         }, cfg.guard);
