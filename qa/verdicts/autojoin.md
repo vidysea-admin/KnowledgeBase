@@ -23,3 +23,20 @@ ISS-AUTOJOIN-001: the 6 emails/hour cap does not hold. Failure kinds bypass it (
 ## Suites
 meeting-bot: tests 914 pass 910 fail 2 (the 2 EPERM symlink record-backend tests, same as main). apps/api: 874/874 pass. apps/web vitest: 723 passed (70 files). tsc clean apps/api and apps/web (meeting-bot tsc not rerun; tests ran under tsx). lint-loc --all: 10 stages OK. test-data-route + install-tasks: 7/7.
 No real Gmail/Calendar/Mongo/browser calls.
+
+---
+
+Cycle checked: 1
+Commit checked: 831d1c7e
+VERDICT: PASS
+ISSUES-WRITTEN: ISS-AUTOJOIN-004 (low, file-don't-fix). Closed: ISS-AUTOJOIN-001, ISS-AUTOJOIN-003. ISS-AUTOJOIN-002 accepted (documented).
+
+## ISS-AUTOJOIN-001
+Cycle-0 reproduction re-run verbatim: 12 about-to-join + 12 failures on distinct sessions -> 9 emails immediately (6 + 3), 10 after the digest (flush at +6 min). Storm of 100 more failures in the same hour: still 10, pending queued. After an hour: one more digest (11). Digest send failure: pending kept (7), retried each flush, delivered once the transport recovered (state is persisted in the alert-state file, so a restart does not lose it). Hour-boundary burst: 4 failures queued inside the hour, 3 individual + 1 digest after it. Bound 6+3+1 per hour holds. Caveat: pending is truncated to the last 50 (ISS-AUTOJOIN-004).
+Mutations (mutate.mjs, per mutation, timeout, HEAD hash verified, assert-clean OK): failure cap off, digest wait off, failures counted in ordinary log, digest not queued: all killed. Digest once-per-hour guard (`st.digestLog.length > 0`) SURVIVED: test gap, behaviour correct by probe -> ISS-AUTOJOIN-004 low.
+
+## ISS-AUTOJOIN-003
+Weekly SOP review, Campus security training -> not career. SOP workshop for MBA admission, Statement of Purpose workshop, Campus placement guidance, Careers in AI, scholarships webinar, Career-Counselling -> career. Universitycareer day, Subcareer, Incollege -> not (whole-word confirmed).
+
+## Suites
+meeting-bot 916 tests, 912 pass, 2 fail (same EPERM symlink record-backend tests as main); apps/api 874/874; apps/web 723/723; tsc clean api+web; lint-loc 10 stages OK.

@@ -1,6 +1,6 @@
 # autojoin
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 1
 Priority tier: 3 (roadmap T-036 / T-037 / T-038, enabled by D-165, commit a5e6df58)
 Security class: decides which meetings the bot records and sends outward email and calendar writes - FULL ceremony.
