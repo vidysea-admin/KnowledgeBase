@@ -31,3 +31,19 @@ Commit 0d9d6ccd touches only test_sb_join_ownership.py and the manifest; product
 
 ## ISSUES-WRITTEN
 none (ISS-REGFLAKE-001 closed)
+
+## Cycle 2
+
+**VERDICT:** PASS
+**Cycle checked:** 2
+
+## EXPLANATION
+Commit 6f3081db changes only test_sb_join_ownership.py and the manifest (diff vs cycle 1: deadline/reserve/env knobs, remaining-budget timeouts, attempt_log in failures). No production code changed; no assertion removed or weakened (post-driver-ready asserts, cleanup identity checks, phase == cleaned, post-cleanup death proof all intact).
+- No hang, mutation A (every attempt replaced by a 9999 s sleep; BRINGUP 15, HARD 90, RESERVE 30): FAILED in 62 s (< 90) with 'hard deadline exceeded during bring-up attempt 2' and attempt_log [(0,'timeout'),(1,'timeout'),(2,'timeout')].
+- Cleanup bounded, mutation B (real Chrome, cleanup command replaced by a 9999 s sleep; HARD 150, RESERVE 60): FAILED in 149.7 s with subprocess.TimeoutExpired after 90 s, no hang. Worst case at defaults is about 480 s plus the 20 s floors.
+- Mutations: per-mutation byte backup, restore in finally, applied-check, timeout 450; hash after each == HEAD blob 06d50280. (A first attempt raced with a stray duplicate harness and left mutation A applied; detected by hash-object, restored via git checkout in this lane, then re-run cleanly. Results above are the clean re-run.)
+- Runs: wrong-action x8 = 8 passed (13-53 s); full file = 52 passed in 261.7 s. Fresh --basetemp each, headless Chrome from pytest only. No strays from my runs.
+- Open maker failure (1 of 8, Chrome outlived owner >190 s, then 'Reused owner PID refused'): not reproduced here. It is a PRODUCTION cleanup defect, not a test artifact. Mechanism in ISS-REGFLAKE-002: sb_join_ownership.py checks owner liveness before the Job section, so a recycled owner PID aborts cleanup before TerminateJobObject, though the named Job plus membership check would be safe. Why kill-on-close lagged >190 s is unexplained.
+
+## ISSUES-WRITTEN
+ISS-REGFLAKE-002 (medium, open, qa/issues.REGFLAKE.jsonl): production, not part of this unit.
