@@ -19,7 +19,12 @@
  * span's end) as its own independent request — a different audio boundary breaks the stall in
  * a way identical retries of the same boundary do not.
  *
- * Usage: node scripts/transcribe-long-session.mjs <sessionId> [chunkSeconds=2400] [--allow-partial]
+ * Usage: node scripts/transcribe-long-session.mjs <sessionId> [chunkSeconds=2400] [--allow-partial] [--range START:END]
+ *
+ * --range START:END (seconds): transcribe only that window of the audio (e.g. `--range 0:360` for a recording with a
+ *   silent tail), so no calls are spent on the silence. Turn times stay absolute. The result is partial against the full
+ *   audio; run scripts/webinar/validate/validate-session.mjs afterwards, which records the coverage explicitly. START > 0
+ *   leaves a leading gap, which needs --allow-partial. The single-call path is not used with --range.
  *
  * Opt-in flags (D-162; both OFF unless the env var is exactly "1", output unchanged when off):
  *   LKB_TRANSCRIPT_QA=1       T-044: clamp merged turns to the real audio duration (no turn ends past the audio),
@@ -42,7 +47,7 @@ import { immutableTranscriptTurns, writeTranscriptGeneration } from "./lib/trans
 import { validateTurns } from "./webinar/process-video.mjs";
 import {
   SINGLE_CALL_FLAG, TRANSCRIPT_QA_FLAG, flagOn, applyTranscriptQa, summariseQaReport, planTranscriptionPath,
-  boundariesForPlan, isSingleCallComplete,
+  boundariesForPlan, isSingleCallComplete, GAP_THRESHOLD_SECONDS, SHORTFALL_THRESHOLD_SECONDS,
 } from "./lib/transcription-wiring.mjs";
 
 // 30 min: a single-call transcription of a ~60-min recording can exceed 10 min before headers (2026-09-24).
@@ -56,9 +61,13 @@ const DEFAULT_CHUNK_SECONDS = 2400; // 40 minutes — headroom under the observe
 const sessionId = process.argv[2];
 const rawArgs = process.argv.slice(3);
 const allowPartial = rawArgs.includes("--allow-partial");
-const chunkSeconds = Number(rawArgs.find((a) => !a.startsWith("--"))) || DEFAULT_CHUNK_SECONDS;
-if (!sessionId) {
-  console.error("usage: node scripts/transcribe-long-session.mjs <sessionId> [chunkSeconds] [--allow-partial]");
+const rangeAt = rawArgs.indexOf("--range");
+const rangeMatch = rangeAt >= 0 ? /^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/.exec(rawArgs[rangeAt + 1] ?? "") : null;
+const range = rangeMatch ? { start: Number(rangeMatch[1]), end: Number(rangeMatch[2]) } : null;
+const positional = rawArgs.filter((a, i) => !a.startsWith("--") && !(rangeAt >= 0 && i === rangeAt + 1));
+const chunkSeconds = Number(positional[0]) || DEFAULT_CHUNK_SECONDS;
+if (!sessionId || (rangeAt >= 0 && (!range || range.end <= range.start))) {
+  console.error("usage: node scripts/transcribe-long-session.mjs <sessionId> [chunkSeconds] [--allow-partial] [--range START:END]");
   process.exit(1);
 }
 
@@ -87,9 +96,7 @@ function ffmpegExtractChunk(audioPath, start, end, outPath) {
   ], { stdio: ["ignore", "ignore", "pipe"] });
 }
 
-const GAP_THRESHOLD_SECONDS = 30; // normal turn-to-turn silence is much shorter than this
 const MAX_ATTEMPTS_PER_SPAN = 3; // 1 initial + 2 identical retries, before trying a different boundary
-const SHORTFALL_THRESHOLD_SECONDS = 45; // a span's own last turn must land within this of its own length
 // Real bug found live (2026-09-04): a 180s floor meant a genuine small tail gap right at a
 // chunk boundary (54s, reproduced identically across all 3 top-level attempts) never got a
 // real recursive retry at all -- the script just gave up and correctly refused to write,
@@ -111,9 +118,13 @@ async function main() {
   const ext = extname(filename);
 
   const durationSeconds = ffprobeDurationSeconds(audioPath);
-  const chunkedBoundaries = computeChunkBoundaries(durationSeconds, chunkSeconds);
+  const windowStart = range ? range.start : 0;
+  const windowEnd = range ? Math.min(range.end, durationSeconds) : durationSeconds;
+  if (windowEnd <= windowStart) throw new Error(`--range ${range?.start}:${range?.end} is outside the ${durationSeconds.toFixed(1)}s recording`);
+  const chunkedBoundaries = computeChunkBoundaries(windowEnd - windowStart, chunkSeconds)
+    .map((b) => ({ start: b.start + windowStart, end: b.end + windowStart }));
   let plan = null;
-  if (singleOn) {
+  if (singleOn && !range) {
     const { chooseTranscriptionPath, T048_THRESHOLDS } = await import("../packages/ai/src/stt/transcription-plan.ts");
     // GEMINI_STT_MODEL unset -> "" (the adapter default is not on the single-call allow-list), so it chunks as today.
     plan = planTranscriptionPath({

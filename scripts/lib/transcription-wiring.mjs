@@ -11,6 +11,11 @@ export const TRANSCRIPT_QA_FLAG = "LKB_TRANSCRIPT_QA";
 /** T-048: try one generateContent call for recordings within the single-call limits; chunking is the fallback. */
 export const SINGLE_CALL_FLAG = "LKB_SINGLE_CALL_PATH";
 
+/** Completeness thresholds shared by transcribe-long-session.mjs (its retry/accept logic) and
+ * scripts/webinar/validate/validate-session.mjs (the re-validation gate), so the two can never drift. */
+export const GAP_THRESHOLD_SECONDS = 30; // normal turn-to-turn silence is much shorter than this
+export const SHORTFALL_THRESHOLD_SECONDS = 45; // the last turn must land within this of the audio end
+
 export function flagOn(env, name) {
   return env != null && env[name] === "1";
 }
