@@ -29,6 +29,8 @@ Root structure budget is consumed by scripts/lint-root.mjs check() through scrip
 
 Dockerfile build calls packages/apps workspace manifests and @lkb/api build; API bundle consumer is node /app/apps/api/dist/server.js. Production bundle runtime consumers include schema/index.json and config/ai-routing.yaml. Compose service api consumes target api, web consumes target web, and opt-in migrate consumes build with three existing read-only mounts. Migration remains behind its profile and is not an API dependency. Web nginx consumer is apps/web/nginx.conf; build-time VITE_API_BASE_URL stays browser-reachable rather than Compose-private, with CORS_ORIGINS documented separately.
 
+Pre-verdict documentation correction: docs/docker-deployment.md now requires MONGODB_URL, MONGODB_DB and GEMINI_API_KEY before every Compose command, including build/up with the migration profile inactive. Compose still interpolates that inactive service's required MONGODB_DB. The API's explicit lkb database remains unchanged. Documentation-only correction changes no Docker, Compose, workflow or runtime source bytes.
+
 Remote workflow uses an ephemeral Docker network/Mongo and dummy credentials, no persistent volume or production URI, no schema migration or provider request. Smoke health/auth consumers are GET /health (200) and unauthenticated POST /ask (401); frontend consumers are / and /settings (same SPA). Missing MONGODB_DB must fail before connecting; non-root user and required/excluded runtime paths are asserted. Build, loop and job waits are bounded; EXIT/INT/TERM cleanup removes containers/network and preserves artifacts. Packaging does not supply Python/capture workers, Claude or gws binaries/auth, or Ollama service.
 
 ## Baseline and unrelated work
@@ -55,18 +57,21 @@ Git warned about two unreadable pytest-cache-files directories. Unrelated eval/m
 - A direct node --input-type=module check that called execFileSync(git show ...) hit spawnSync git EPERM; this is incomplete evidence. Corrected PowerShell comparison using native git show 305c856e799a0f99d74a60d2a86822e317d3edfa:structure.config.json, ConvertFrom-Json and deep JSON equality after changing only the expected old root.maxLooseFiles to 16: exit 0; PASS: only root.maxLooseFiles changed, 15 -> 16; all other config unchanged.
 - powershell -NoProfile -ExecutionPolicy Bypass -File scripts/append_decision.ps1 -EntryFile <temporary root-docker-devops-D169-entry.md> -RepoRoot C:\Users\product\Desktop\KnowledgeBase: exit 0, APPENDED D-169. SHA256 of the old-byte prefix matched all 350590 prior bytes; 1702 bytes appended. No prior decision bytes changed.
 - git diff --check -- structure.config.json docs/DECISIONS.md: exit 0, no whitespace violations; Git emitted its existing LF-to-CRLF working-copy warning for the decision file.
-- Packaging owner reports attributed static audit exit 0: eight stages/default api, three Compose targets, opt-in migrate with three read-only mounts, 19 COPY source checks, all workspace manifests, USER node/CMD/two healthchecks and frozen production installation. Exact partner command/artifact pending; this summary is not a build or runtime claim.
+- Packaging owner's attributed PowerShell here-string piped to node: exit 0, combined static/diff-check tool call 2.36 seconds (individual audit duration unmeasured). Exact executed code is recorded below. Output: PASS: 8 stages; API default; 3 Compose targets resolve; migrations opt-in with 3 readonly mounts; 19 local COPY sources present; all workspace manifests included; nonroot API, 2 healthchecks, frozen production install. `git diff --check -- docker-compose.yml` also exit 0. This static audit is not a build or runtime claim.
 - CI owner's attributed exact YAML check (exit 0, output `workflow YAML parse: PASS; steps=6`; individual duration unmeasured, combined tool batch 1.1 seconds):
 ```sh
 node -e 'const fs=require("node:fs"); const yaml=require("./node_modules/.pnpm/js-yaml@4.3.2/node_modules/js-yaml"); const w=yaml.load(fs.readFileSync(".github/workflows/docker.yml","utf8")); for(const event of ["push","pull_request","workflow_dispatch"]) if(!Object.hasOwn(w.on,event)) throw Error("missing "+event); if(w.jobs.images["timeout-minutes"]!==35) throw Error("missing timeout"); fs.writeFileSync(require("node:path").join(require("node:os").tmpdir(),"lkb-docker-ci-syntax.sh"),w.jobs.images.steps.find(s=>s.name==="Build and smoke-test isolated images").run); console.log("workflow YAML parse: PASS; steps="+w.jobs.images.steps.length);'
 ```
 - CI owner's attributed final `C:/Program Files/Git/bin/bash.exe --noprofile --norc -n C:/Users/product/AppData/Local/Temp/lkb-docker-ci-syntax.sh`: exit 0, 1.1074606 seconds. Bash required escalation after a sandbox Win32 shared-memory failure. The exact YAML command above was rerun on the final candidate with exit 0 and six steps, regenerating the checked script after the independent checker corrected the unauthorized JSON assertion to require error=unauthorized while allowing its real message field. No local Docker exists; no image execution is represented by these static checks.
-- CI source includes `python3 contracts/verify_contracts.py`, clean-checkout `node scripts/lint-root.mjs`, bounded default/API/web/build image builds, Compose dummy-value validation and isolated runtime probes. These remote commands have not run yet; required actual remote full CI and Docker CI evidence remains pending.
-- Required independent checker, root image build, container downstream smoke and actual remote full-CI results: pending. No PASS inferred from static preparation or absent runtime evidence.
+- CI source includes `python3 contracts/verify_contracts.py`, clean-checkout `node scripts/lint-root.mjs`, bounded default/API/web/build image builds, Compose dummy-value validation and isolated runtime probes. Parent reports initial Docker CI run 38607346649 for published commit 766be00fddae086414336096d6397f50af69fe3e SUCCESS: root budgets, frozen validator, all image builds/smoke and evidence upload green. Initial run: https://github.com/vidysea-admin/KnowledgeBase/actions/runs/38607346649. This is attributed prior-candidate execution evidence; the documentation correction and this revised packet require a new candidate CI run.
+- Documentation owner: `git diff --check -- docs/docker-deployment.md`, exit 0; combined diff/hash call 1.2765 seconds. Corrected docs raw SHA256 independently reread and matches the pin below.
+- Required new-candidate Docker CI, full CI and independent same-cycle checker verdict: pending. No PASS inferred from initial candidate success or missing final-source evidence.
 
 Do not close this manifest until an independent same-slug cycle-0 PASS covers unchanged candidate bytes and required actual CI evidence.
 
 Source candidate and static packet are ready for independent review/publication to obtain remote execution evidence. This ready-for-check state requests the check; it does not represent executed Docker/full-CI success. Checker must HOLD if required remote evidence is unavailable.
+
+Pre-verdict resubmission retains Fix cycle 0: no cycle-0 verdict has been persisted. Independent checker explicitly confirmed that the maker's increment rule applies after a FAIL/HOLD verdict; the earlier 766be00 packet is withdrawn and replaced by this pinned corrected-document packet. Final verdict must review the new publication SHA and its actual CI results. This is not close-out of the prior packet.
 
 ## Candidate provenance
 
@@ -78,10 +83,52 @@ Raw-byte SHA256 pins (CRLF-to-LF normalization may change checkout byte hashes; 
 | --- | --- |
 | Dockerfile | c5e1ba0859c763d2b4534fc6a19a183d29994022c1e02caf0910c898a2b8019b |
 | docker-compose.yml | fb262e68eb9127bdd73785a91b34e34bdf07b2cbc9c43af57a54158db1336e24 |
-| docs/docker-deployment.md | cc40cb82e21648c03e04f3234d5a6114c3d1794a313b634ab24565f6491c7058 |
+| docs/docker-deployment.md | 016db881b6d4b4fe0103c78e72c46b92a7b01772d47f5194058c7af4e8cc84e3 |
 | .github/workflows/docker.yml | c248a020c986532470167bd8d07d667fd92466f2d254562a8794970c73d4bb71 |
 | structure.config.json | e1e3ccbdd32fb6be246a022256fd8f1ae88d2ead99746f36853154a51d59ae23 |
 | docs/DECISIONS.md | 9e3ab1d1f4630956b1ec2d3a7803a55a20065d435b0d3e9977539bf044964ad5 |
 | qa/contracts/root-docker-devops.md | 0811c165cdeedae533687a62afc80c36811a4257224ee7c79402ce349c69e721 |
 
 Manifest self-hash is supplied separately at dispatch to avoid recursive hashing. Existing local gitIgnored anomaly stays a disclosed environment fact; remote root lint is the acceptance gate.
+
+## Attributed packaging audit command
+
+Executed by the packaging owner as a PowerShell here-string piped to node, exit 0:
+```powershell
+@'
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+const yaml = require('./node_modules/.pnpm/js-yaml@4.3.2/node_modules/js-yaml');
+const dockerfile = fs.readFileSync('Dockerfile', 'utf8');
+const stages = [...dockerfile.matchAll(/^FROM .+ AS ([\w-]+)$/gm)].map(m => m[1]);
+assert.equal(stages.at(-1), 'api');
+const compose = yaml.load(fs.readFileSync('docker-compose.yml', 'utf8'));
+for (const [service, target] of [['api','api'],['web','web'],['migrate','build']]) {
+  assert.equal(compose.services[service].build.dockerfile, 'Dockerfile');
+  assert.equal(compose.services[service].build.target, target);
+  assert.ok(stages.includes(target));
+}
+assert.deepEqual(compose.services.migrate.profiles, ['migrate']);
+assert.equal(compose.services.api.depends_on, undefined);
+for (const mount of ['./migrations:/app/migrations:ro','./config/migrate-mongo-config.cjs:/app/config/migrate-mongo-config.cjs:ro','./schema:/app/schema:ro']) assert.ok(compose.services.migrate.volumes.includes(mount));
+let localCopies=0;
+for (const match of dockerfile.matchAll(/^COPY (.+)$/gm)) {
+  if (match[1].startsWith('--from=')) continue;
+  for (const source of match[1].trim().split(/\s+/).slice(0,-1)) {
+    assert.ok(fs.existsSync(source), 'missing COPY source '+source); localCopies++;
+  }
+}
+for (const directory of ['packages','apps','workers']) {
+  for (const entry of fs.readdirSync(directory,{withFileTypes:true})) {
+    if (!entry.isDirectory()) continue;
+    const manifest = directory+'/'+entry.name+'/package.json';
+    if (fs.existsSync(manifest)) assert.ok(dockerfile.includes('COPY '+manifest+' '+manifest), 'missing workspace manifest '+manifest);
+  }
+}
+assert.ok(dockerfile.includes('USER node'));
+assert.ok(dockerfile.includes('CMD ["node", "apps/api/dist/server.js"]'));
+assert.equal([...dockerfile.matchAll(/^HEALTHCHECK /gm)].length, 2);
+assert.ok(dockerfile.includes('--frozen-lockfile --prod --filter "@lkb/api..."'));
+console.log('PASS: 8 stages; API default; 3 Compose targets resolve; migrations opt-in with 3 readonly mounts; '+localCopies+' local COPY sources present; all workspace manifests included; nonroot API, 2 healthchecks, frozen production install');
+'@ | node
+```

@@ -7,7 +7,11 @@ is `api` (Node 24, port 3300); target `web` serves the compiled React SPA throug
 
 ## Build and start
 
-Run from the repository root on a Docker-equipped host:
+Run from the repository root on a Docker-equipped host. Before **any Compose command**,
+supply `MONGODB_URL`, `MONGODB_DB` and `GEMINI_API_KEY` in a private `.env` file or the
+deployment system's environment. Compose interpolates the migration service's required
+`MONGODB_DB` even when the `migrate` profile is inactive. The API service still explicitly
+uses `lkb`; setting `MONGODB_DB` does not change the API's database.
 
 ```sh
 docker build --target api -t lkb-api .
@@ -17,14 +21,14 @@ docker compose up -d api web
 docker compose ps
 ```
 
-Before the Compose commands, supply operator-managed environment values, using a
-private `.env` file or the deployment system's secret store. `.env.example` documents
-available names. Never commit credentials or pass them as Docker build arguments.
+`.env.example` documents available names. Supply credentials through operator-managed
+environment values or the deployment system's secret store. Never commit credentials
+or pass them as Docker build arguments.
 
 | Value | Deployment use |
 | --- | --- |
 | `MONGODB_URL` | Reachable external MongoDB connection URI; Compose requires it. |
-| `MONGODB_DB` | Explicit database name for standalone API containers and opt-in migration commands. Compose's API explicitly uses `lkb`; never omit the standalone value. |
+| `MONGODB_DB` | Required before every Compose command, including build/up with migration disabled, because the migration service is interpolated. Also required for standalone API containers and migrations. Compose's API explicitly uses `lkb` regardless of this variable. |
 | `GEMINI_API_KEY` | Runtime AI credential; required by Compose. |
 | `VITE_API_BASE_URL` | Public API URL the user's browser can reach, e.g. `https://api.example.com`; baked into the frontend during build. Rebuild web when it changes. |
 | `CORS_ORIGINS` | Comma-separated frontend origins including scheme and port, e.g. `https://kb.example.com`; must match the browser's frontend origin. |
