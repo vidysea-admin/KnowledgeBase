@@ -34,3 +34,23 @@ SURVIVED (ISS-WA-REVIEW-WIRE-003): claim status verified->needs-review; personal
 
 ISSUES-WRITTEN: ISS-WA-REVIEW-WIRE-001..007
 Maker may close out this cycle as scoped PASS. Do not mount until -001, -005 (Umesh) and -006 are resolved.
+
+---
+
+# Cycle 1
+
+VERDICT: PASS (scoped to write-side; unmounted; ISS-006 read-side quarantine remains open and blocks mounting)
+Cycle checked: 1
+Commit checked: 2ddc33f2
+
+Measured by issue id (my own probes and mutants on throwaway copies):
+- ISS-001: ledger repro replayed verbatim: claims 2->1, turns 2->1, pending candidate of the deleted message gone, repeat ingest idempotent. FIXED.
+- ISS-002: induced invalidation failure: marker retained, audit reports "approved claim evidence no longer matches its source turn", repairPendingInvalidations repaired the group, second call no-op. FIXED.
+- ISS-003: the 6 cycle-0 survivors: 6/6 now KILLED (status label, excluded guard, non-approved guard, invalidate find unscoped, revoke unscoped; the maker-removed tenant guard is gone). New mutants: source dropped, audit source off, audit quote off, marker not cleared, turn not deleted, log plaintext all KILLED. Survivors: n8 snapshot guard off, s6 affected find unscoped, n6 (equivalent).
+- ISS-005 (Umesh: "mark it verified with soruce as whatsapp"): status and source come from two constants in materializer.ts only; test claims all verified plus source whatsapp; audit flags a claim whose source differs (verified by edit). Schema has no source field: filed ISS-012 (low) to add it formally.
+- Deletion log: row holds sessionId, sourceId, turnId, textSha256, candidateIds only; deleted text absent from the log. But the approved candidate row keeps the verbatim text (ISS-010, low, policy), and a plain SHA-256 is dictionary-guessable.
+
+New issues: ISS-WA-REVIEW-WIRE-008 (medium: marker _id not tenant-scoped, unique-_id collision across tenants in real Mongo), -009 (medium: empty upstream snapshot wipes all turns and claims silently), -010, -011, -012 (low). Not blocking this write-side PASS but -008 and -009 should be fixed before mount.
+
+Numbers: WhatsApp tests 51, pass 50, fail 0, skipped 1. Full apps/api: tests 948, pass 947, fail 0, skipped 1 (D2_FIXTURE_PYTHON set). tsc (temporary absolute paths tsconfig, deleted): exit 0. lint-loc: only the same 2 pre-existing stage failures (meeting-bot py 408 lines, SNAPSHOT stale). Real Mongo still unrun.
+Closed: ISS-WA-REVIEW-WIRE-001, 002, 003, 005. Still open: 004, 006, 007, 008-012.

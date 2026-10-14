@@ -1,7 +1,7 @@
 # Manifest — wa-review-wire
 
-**Handshake status:** ready-for-check (fix cycle 1)
-Status: ready-for-check
+**Handshake status:** checked-PASS (cycle 1, scoped to write-side; ISS-006 read-side quarantine still blocks mounting)
+Status: checked-PASS
 Fix cycle: 1
 Task: T-007 (parent stays open; this is a scoped wiring unit)
 Lane: lane/wa-review-wire, branched from lane/codexwave1 (Codex foundation, pending merge)
