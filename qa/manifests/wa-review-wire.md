@@ -1,8 +1,8 @@
 # Manifest — wa-review-wire
 
-**Handshake status:** ready-for-check
+**Handshake status:** ready-for-check (fix cycle 1)
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Task: T-007 (parent stays open; this is a scoped wiring unit)
 Lane: lane/wa-review-wire, branched from lane/codexwave1 (Codex foundation, pending merge)
 Priority tier: 3 — dependency-ready roadmap feature, assigned by orchestrator.
@@ -48,3 +48,17 @@ Do NOT mount until the read-side gap below is closed.
 4. Not mounted; no UI (criterion 13); approved knowledge is a claim only, not yet chunked/embedded/in the tree, so approved `/ask` citation (criterion 9/12 positive path) is unproven.
 5. Edit-then-revert of a source turn leaves an approved candidate without its claim (no automatic re-materialisation).
 6. Full-suite status and the two pre-existing lint failures are listed above; no tracker (TASKS.md, goal.json) edited.
+
+## Fix cycle 1 (responds to qa/verdicts/wa-review-wire.md, cycle 0 scoped PASS, issues ISS-WA-REVIEW-WIRE-001..007)
+
+Counts by issue id (all tests in `wire-fix1.test.ts` unless stated; ledger reproduction replayed verbatim):
+- ISS-001 (HIGH) FIXED 2/2. Verbatim repro (approve both, drop m1 upstream, re-ingest): claims 2 -> 1, turns 3 -> 1, pending candidate of the deleted message gone, never re-proposed, idempotent on repeat. The ingest captures the authoritative fetched snapshot (AsyncLocalStorage around the fetcher, fail-closed if absent); `invalidate.ts` removes absent turns, revokes/deletes derived claims/candidates and writes a `whatsapp_review_log` history row (`kind: upstream-deleted`, text SHA-256 only, never the deleted text) in ONE transaction.
+- ISS-002 (medium) FIXED 1/1. A durable `pending-invalidation` marker is written before any raw write and cleared after invalidation. Failure leaves the marker, and the audit now flags any approved claim whose quote no longer equals its live turn. `wiring.repairPendingInvalidations(tenantId)` converges (claim revoked, marker cleared) and a second call is a no-op.
+- ISS-003 (medium) FIXED. All 6 cycle-0 survivors now killed, plus the new code: `qa/evidence/wa-review-wire-mutate-cycle1.mjs` 9/9 KILLED (status label, personal-excluded guard, non-approved guard, unscoped invalidate find, unscoped revoke, deleted-turn removal, marker clearing, source field, stale-quote audit). Mutants run on a throwaway copy dir only. The redundant `row.tenantId` guard in invalidate was removed because the scoped query makes it unreachable. A first run showed the non-approved guard surviving; test sharpened, then killed.
+- ISS-005 (HIGH policy) DECIDED by Umesh, relayed by the coordinator, verbatim: "mark it verified with soruce as whatsapp". Implemented in one place (`materializer.ts`: `WA_APPROVED_CLAIM_STATUS = "verified"`, `WA_CLAIM_SOURCE = "whatsapp"`). Every WhatsApp-materialised claim carries `source: "whatsapp"` and its tenantId; claims has no existing `source` field (only `origin`), the schema allows additional properties, so no schema edit (core types untouched). Audit flags an approved claim lacking it. Asserted in 2 tests.
+- ISS-004 (low) NOT FIXED, listed: edit-then-revert leaves an approved candidate without its claim.
+- ISS-007 (low) NOT FIXED, listed: needs indexing-path changes outside this lane's paths.
+- ISS-006 (HIGH tenancy, read-side quarantine) unchanged and still blocks mounting.
+
+Cycle-1 evidence: WhatsApp tests (`node --test --import tsx src/whatsapp/review/*.test.ts src/whatsapp/*.test.ts`, TSX_TSCONFIG_PATH set to the absolute temporary paths tsconfig, deleted afterwards): tests 51, pass 50, fail 0, skipped 1 (gated real Mongo). Scoped tsc with that tsconfig: exit 0. Full apps/api and lint-loc: see line below.
+Full apps/api (TSX_TSCONFIG_PATH absolute temp tsconfig): tests 948, pass 947, fail 0, skipped 1. lint-loc: no violation in any new/changed file; `lint-loc --all` fails only on the two pre-existing stages (meeting-bot py test 408 lines, stale SNAPSHOT.md).

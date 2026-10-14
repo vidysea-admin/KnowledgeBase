@@ -4,10 +4,14 @@ import type { Sources, Sessions, Turns } from "@lkb/core";
 import { withTenant } from "@lkb/db";
 import type { WhatsAppRouteDeps } from "../../routes/whatsapp.js";
 import { detectWhatsAppReviewCandidates, type KnownWhatsAppContent } from "./detection.js";
-import { invalidateStaleWhatsAppCandidates } from "./invalidate.js";
+import { sha256Hex } from "../../hash.js";
+import { invalidateStaleWhatsAppCandidates, WHATSAPP_REVIEW_LOG } from "./invalidate.js";
 import type { WhatsAppReviewRepository } from "./store.js";
 
-export interface ReviewIngestOptions { base: WhatsAppRouteDeps; appDb: () => Db; repository: WhatsAppReviewRepository; now?: () => string }
+export interface ReviewIngestOptions { base: WhatsAppRouteDeps; appDb: () => Db; repository: WhatsAppReviewRepository; now?: () => string;
+  /** Runs one upstream ingest and reports the message ids of the authoritative fetched snapshot (undefined = unknown, fails closed). */
+  withSnapshot: <T>(run: () => Promise<T>) => Promise<{ value: T; messageIds: ReadonlySet<string> | undefined }>;
+}
 
 /** `base` MUST be built without an indexer: indexSession would write claims, chunks and tree material before review. */
 export function createReviewedWhatsAppDeps(options: ReviewIngestOptions): WhatsAppRouteDeps {
@@ -15,15 +19,23 @@ export function createReviewedWhatsAppDeps(options: ReviewIngestOptions): WhatsA
   return {
     listGroups: options.base.listGroups,
     async ingestGroup(tenantId, groupJid) {
-      const result = await options.base.ingestGroup(tenantId, groupJid);
       const db = options.appDb();
+      // Durable marker written BEFORE any raw write: if this run dies before invalidation completes, the marker survives
+      // and repairPendingWhatsAppInvalidations / the next ingest finishes the job (ISS-WA-REVIEW-WIRE-002).
+      const markerId = `pending-invalidation:${groupJid}`;
+      await db.collection(WHATSAPP_REVIEW_LOG).updateOne({ _id: markerId, tenantId } as never, { $set: { kind: "pending-invalidation", groupJid, at: now() } } as never, { upsert: true });
+      const { value: result, messageIds } = await options.withSnapshot(() => options.base.ingestGroup(tenantId, groupJid));
+      if (!messageIds) throw new Error("WhatsApp review: upstream snapshot unavailable; deletions cannot be verified");
       const source = await db.collection<Sources>("sources").findOne(withTenant<Sources>(tenantId, { _id: result.sourceId }));
       const session = await db.collection<Sessions>("sessions").findOne(withTenant<Sessions>(tenantId, { _id: result.sessionId }));
       if (!source || !session) throw new Error("WhatsApp review: ingested source/session unavailable");
+      // Edited/removed source turns must lose trust before new proposals are made.
+      const presentTurnIds = new Set([...messageIds].map(id => sha256Hex(`${result.sessionId}:${id}`)));
+      await invalidateStaleWhatsAppCandidates(db, tenantId, source._id, { sessionId: result.sessionId, presentTurnIds, at: now() });
+      await db.collection(WHATSAPP_REVIEW_LOG).deleteOne({ _id: markerId, tenantId } as never);
+      // Loaded only AFTER upstream-deleted turns are gone, so a deleted message can never be re-proposed.
       const turns = (await db.collection<Turns>("turns").find(withTenant<Turns>(tenantId, { sessionId: result.sessionId })).toArray())
         .filter(turn => turn.tenantId === tenantId).sort((a, b) => a.tStart - b.tStart || a._id.localeCompare(b._id));
-      // Edited/removed source turns must lose trust before new proposals are made.
-      await invalidateStaleWhatsAppCandidates(db, tenantId, source._id);
       const claims = await db.collection<{ _id: string; tenantId: string; text: string; evidence?: { sessionId?: string }[] }>("claims")
         .find(withTenant(tenantId, {})).toArray();
       const knownContent: KnownWhatsAppContent[] = claims

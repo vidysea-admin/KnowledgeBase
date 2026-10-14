@@ -4,6 +4,11 @@ import { withTenant } from "@lkb/db";
 import type { WhatsAppReviewCandidate } from "./detection.js";
 import type { WhatsAppReviewMaterializer } from "./store.js";
 
+/** ISS-WA-REVIEW-WIRE-005, decided by Umesh 2026-10-14: "mark it verified with soruce as whatsapp".
+ * The ONE place that decides how an approved chat claim is labelled; `source` lets consumers tell chat-verified from webinar-verified. */
+export const WA_CLAIM_SOURCE = "whatsapp" as const;
+export const WA_APPROVED_CLAIM_STATUS: "verified" | "needs-review" | "conflicting" = "verified";
+
 export const whatsAppClaimId = (candidateId: string): string => `wa-claim:${candidateId.replace(/^wa-review:/u, "")}`;
 
 export const materializeWhatsAppClaim: WhatsAppReviewMaterializer = async ({ candidate, db, session }) => {
@@ -11,7 +16,7 @@ export const materializeWhatsAppClaim: WhatsAppReviewMaterializer = async ({ can
   if (candidate.flags.some(flag => flag.kind === "personal-excluded")) throw new Error("WhatsApp review: excluded candidate cannot be materialised");
   const _id = whatsAppClaimId(candidate._id);
   const body = {
-    text: candidate.text, status: "verified", origin: "speaker-statement",
+    text: candidate.text, status: WA_APPROVED_CLAIM_STATUS, source: WA_CLAIM_SOURCE, origin: "speaker-statement",
     evidence: candidate.evidence.map(e => ({ turnId: e.turnId, sessionId: e.sessionId, quote: e.quote })),
     waReview: { candidateId: candidate._id, kind: candidate.kind, approvedBy: candidate.decision.actor, approvedAt: candidate.decision.at },
   };

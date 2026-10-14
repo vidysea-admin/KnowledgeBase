@@ -25,6 +25,16 @@ export async function auditWhatsAppQuarantine(db: Db, tenantId: string): Promise
   const approved = await db.collection<{ _id: string; status: string }>("whatsapp_candidates").find(scoped(tenantId, { status: "approved" })).toArray();
   const allowed = new Map(approved.map(c => [whatsAppClaimId(c._id), c._id]));
   const out: QuarantineViolation[] = [];
+  // An approved claim is only trusted while its exact quote still equals the live source turn (ISS-WA-REVIEW-WIRE-002).
+  const approvedClaims = await db.collection<Row & { source?: string; evidence?: { turnId: string; sessionId: string; quote?: string }[] }>("claims")
+    .find(scoped(tenantId, { "waReview.candidateId": { $in: [...allowed.values()] } })).toArray();
+  for (const c of approvedClaims) {
+    if (c.source !== "whatsapp") out.push({ collection: "claims", id: c._id, reason: "approved WhatsApp claim lacks source=whatsapp provenance" });
+    for (const e of c.evidence ?? []) {
+      const turn = await db.collection<{ text: string }>("turns").findOne(scoped(tenantId, { _id: e.turnId, sessionId: e.sessionId }));
+      if (!turn || turn.text !== e.quote) out.push({ collection: "claims", id: c._id, reason: "approved claim evidence no longer matches its source turn" });
+    }
+  }
   const claims = await db.collection<Row>("claims").find(scoped(tenantId, { "evidence.sessionId": { $in: sessionIds } })).toArray();
   for (const c of claims) if (allowed.get(c._id) !== c.waReview?.candidateId || !c.waReview?.candidateId) out.push({ collection: "claims", id: c._id, reason: "unapproved WhatsApp claim" });
   const chunks = await db.collection<Row>("chunks").find(scoped(tenantId, { sourceRef: { $in: [...sessionIds, ...sourceIds] } })).toArray();
