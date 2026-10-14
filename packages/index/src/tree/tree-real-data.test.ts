@@ -62,7 +62,7 @@ function inProgressLabel(dir: string): string | null {
   if (names.includes("session.json") || names.includes("session_page.json") || !names.includes("validation.json")) return null;
   try {
     const validation = JSON.parse(readFileSync(join(dir, "validation.json"), "utf8"));
-    if (validation === null || typeof validation !== "object") return null;
+    if (validation === null || typeof validation !== "object" || Array.isArray(validation)) return null;
     return validation.status === "passed" ? "validated, awaiting finalize" : `validation ${String(validation.status)}`;
   } catch { return null; }
 }
@@ -302,3 +302,14 @@ test("both session files present and valid are loaded, not skipped", () => withC
   const data = loadRealData(root); assertReadyCorpus(data, 1);
   assert.deepEqual(data.inProgress, []); assert.deepEqual(data.completed, ["both"]);
 }));
+
+test("neither session file but unparseable or non-object validation.json is corruption: fails loudly, never in-progress", () => {
+  const shapes: Record<string, string>[] = [{}, { "source.json": "{}" }, { "turns.json": "[]", "source.json": "{}" }];
+  for (const bytes of ["{", "", "   ", "5", '"x"', "null", "[]", "true", '["passed"]'])
+  for (const extra of shapes) withCorpus((root, put) => {
+    put("candidate", { "validation.json": bytes, ...extra }); const data = loadRealData(root);
+    assert.deepEqual(data.inProgress, [], JSON.stringify(bytes)); assert.equal(data.missing.length, 1, JSON.stringify(bytes));
+    assert.deepEqual(data.captureOnly, []); assert.deepEqual(data.completed, []);
+    assert.throws(() => assertReadyCorpus(data, 1), /every migrated output/);
+  });
+});
