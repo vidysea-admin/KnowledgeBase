@@ -22,7 +22,7 @@ export type WhatsAppReviewMaterializer = (context: {
 
 export const isWhatsAppReviewId = (id: unknown): id is string => typeof id === "string" && /^wa-review:[a-f0-9]{64}$/u.test(id);
 
-async function checkEvidence(db: Db, tenantId: string, row: WhatsAppReviewCandidate, session?: ClientSession): Promise<void> {
+export async function checkEvidence(db: Db, tenantId: string, row: WhatsAppReviewCandidate, session?: ClientSession): Promise<void> {
   assertWhatsAppReviewCandidateSchema(row);
   if (row.tenantId !== tenantId || !isWhatsAppReviewId(row._id)
       || row._id !== whatsAppReviewCandidateId(row) || row.contentHash !== whatsAppReviewContentHash(row.text)
