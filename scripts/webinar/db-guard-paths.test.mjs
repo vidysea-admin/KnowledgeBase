@@ -62,14 +62,30 @@ test('Gmail preflight: isolated or opted-in lkb_staging passes; a mismatching AP
 });
 
 // M3b / M5 (side-effecting entry points, asserted on source: the guard must be the shared one and precede connect) ------
-test('sync-session.mjs gates MONGO_WORK_DB with isProtectedWorkDbName(workDb, process.env) before connecting, with no lkb literal list', () => {
+test('sync-session.mjs resolves the work DB through resolveWorkDb, then gates the RESOLVED name with isProtectedWorkDbName before connecting, with no lkb literal list', () => {
   const s = code('scripts/webinar/sync-session.mjs');
-  assert.match(s, /const workDb = process\.env\.MONGO_WORK_DB\?\.trim\(\);/);
+  assert.match(s, /import \{ resolveWorkDb \} from "\.\.\/watch\/test-data-route\.mjs";/);
+  const route = s.search(/const route = resolveWorkDb\(\{[^}]*workDb: process\.env\.MONGO_WORK_DB\?\.trim\(\)[^}]*env: process\.env \}\);/);
+  assert.ok(route > 0, 'the work DB must come from resolveWorkDb fed with MONGO_WORK_DB and process.env');
+  assert.match(s, /const workDb = route\.workDb;/);
   const guard = s.search(/if \(isProtectedWorkDbName\(workDb, process\.env\)\) throw new Error\(/);
-  assert.ok(guard > 0, 'guard call missing or its env argument dropped');
+  assert.ok(guard > route, 'guard call missing, its env argument dropped, or it runs before the route is resolved');
   assert.ok(guard < s.indexOf('await connect('), 'guard must precede connect()');
-  assert.match(s, /await connect\([^)]*,\s*workDb\)/, 'connects to the guarded name');
+  assert.match(s, /await connect\([^)]*,\s*workDb\)/, 'connects to the guarded (resolved) name');
   assert.doesNotMatch(s, /["']lkb["']|\?\?\s*["']lkb|\|\|\s*["']lkb/);
+});
+test('resolveWorkDb returns only the configured DB or lkb_staging (staging needs the exact opt-in); the shared guard still refuses protected names', async () => {
+  const {resolveWorkDb, STAGING_DB} = await import('../watch/test-data-route.mjs');
+  const {isProtectedWorkDbName} = await import('../lib/transcript-provenance.mjs');
+  for (const flag of [undefined, false, 'true', 1, null]) assert.deepEqual(resolveWorkDb({testData: flag, workDb: 'lkb', env: {}}), {workDb: 'lkb', testData: false});
+  for (const env of [{}, {LKB_ALLOW_STAGING: 'yes'}, {LKB_ALLOW_STAGING: 'LKB_STAGING'}])
+    assert.throws(() => resolveWorkDb({testData: true, workDb: 'lkb_work_x', env}), /refusing to write it anywhere but lkb_staging/);
+  assert.equal(resolveWorkDb({testData: true, workDb: 'lkb', env: OPT_IN}).workDb, STAGING_DB);
+  assert.equal(resolveWorkDb({testData: true, workDb: 'lkb_work_x', env: OPT_IN}).workDb, STAGING_DB);
+  // sync-session applies the guard to whatever came back: production names stay refused, staging only with the opt-in
+  for (const name of ['lkb', 'LKB', 'global_university_db', undefined, '']) assert.equal(isProtectedWorkDbName(name, OPT_IN), true, String(name));
+  assert.equal(isProtectedWorkDbName(STAGING_DB, {}), true);
+  assert.equal(isProtectedWorkDbName(STAGING_DB, OPT_IN), false);
 });
 test('join-rules-api-host.ts connects through requireDatabaseName() with no MONGODB_DB / lkb fallback', () => {
   const s = code('scripts/webinar/join-rules-api-host.ts');

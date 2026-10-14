@@ -125,15 +125,23 @@ export async function validateSession({ root = DEFAULT_ROOT, sessionId, duration
   return { report, passed, gate, path, written: !dryRun };
 }
 
+/** CLI parsing: the session id is the first positional (not a flag, not the value of --root), wherever it sits. */
+export function parseCliArgs(args, defaultRoot = DEFAULT_ROOT) {
+  const at = args.indexOf("--root");
+  const rootValue = at >= 0 ? args[at + 1] : undefined;
+  const rootMissing = at >= 0 && (!rootValue || rootValue.startsWith("--"));
+  const sessionId = args.find((a, i) => !a.startsWith("--") && !(at >= 0 && i === at + 1));
+  return { sessionId, root: at >= 0 && !rootMissing ? resolve(rootValue) : defaultRoot, rootMissing,
+    acceptPartial: args.includes("--accept-partial"), dryRun: args.includes("--dry-run") };
+}
+
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
-  const args = process.argv.slice(2), at = args.indexOf("--root");
-  const root = at >= 0 ? resolve(args[at + 1] ?? "") : DEFAULT_ROOT;
-  const sessionId = args.filter((a, i) => !a.startsWith("--") && i !== at + 1)[0];
-  if (!sessionId || (at >= 0 && !args[at + 1])) {
+  const { sessionId, root, rootMissing, acceptPartial, dryRun } = parseCliArgs(process.argv.slice(2));
+  if (!sessionId || rootMissing) {
     console.error("usage: node scripts/webinar/validate/validate-session.mjs <sessionId> [--accept-partial] [--dry-run] [--root <repoRoot>]");
     process.exit(1);
   }
-  import("dotenv/config").then(() => validateSession({ root, sessionId, acceptPartial: args.includes("--accept-partial"), dryRun: args.includes("--dry-run") }))
+  import("dotenv/config").then(() => validateSession({ root, sessionId, acceptPartial, dryRun }))
     .then((r) => {
       console.log(JSON.stringify(r.report, null, 2));
       console.log(`${r.written ? "wrote" : "dry-run, not written:"} ${r.path}`);

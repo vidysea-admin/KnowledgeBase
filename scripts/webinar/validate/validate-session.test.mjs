@@ -3,7 +3,10 @@ import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { validateSession } from "./validate-session.mjs";
+import { spawnSync } from "node:child_process";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { validateSession, parseCliArgs } from "./validate-session.mjs";
 import { writeTranscriptGeneration } from "../../lib/transcript-provenance.mjs";
 import { loadWebinarSession } from "../session-rows.mjs";
 
@@ -135,4 +138,37 @@ test("--dry-run reports but writes nothing", () => fixture(async ({ dir, transcr
 
 test("unsafe sessionId is refused", async () => {
   await assert.rejects(validateSession({ root: tmpdir(), sessionId: "../x", durationSec: 1 }), /invalid sessionId/);
+});
+
+// CLI argument parsing (webinarfix): a bare session id used to be dropped when --root was absent, so the tool always printed usage.
+const DEF = resolve("default-root");
+test("parseCliArgs: bare id, id with --root (either order), --dry-run, --accept-partial", () => {
+  assert.deepEqual(parseCliArgs(["s1"], DEF), { sessionId: "s1", root: DEF, rootMissing: false, acceptPartial: false, dryRun: false });
+  const after = parseCliArgs(["s1", "--root", "R"], DEF);
+  assert.equal(after.sessionId, "s1"); assert.equal(after.root, resolve("R"));
+  const before = parseCliArgs(["--root", "R", "s1"], DEF);
+  assert.equal(before.sessionId, "s1"); assert.equal(before.root, resolve("R"));
+  assert.equal(parseCliArgs(["--dry-run", "s1"], DEF).dryRun, true);
+  assert.equal(parseCliArgs(["s1", "--dry-run"], DEF).sessionId, "s1");
+  const ap = parseCliArgs(["--accept-partial", "s1", "--dry-run"], DEF);
+  assert.equal(ap.acceptPartial, true); assert.equal(ap.dryRun, true); assert.equal(ap.sessionId, "s1");
+});
+test("parseCliArgs: no id or a dangling --root is a usage error", () => {
+  assert.equal(parseCliArgs([], DEF).sessionId, undefined);
+  assert.equal(parseCliArgs(["--dry-run"], DEF).sessionId, undefined);
+  assert.equal(parseCliArgs(["--root", "R"], DEF).sessionId, undefined);
+  assert.equal(parseCliArgs(["s1", "--root"], DEF).rootMissing, true);
+  assert.equal(parseCliArgs(["s1", "--root", "--dry-run"], DEF).rootMissing, true);
+});
+test("CLI: a bare session id reaches validation instead of printing usage (end to end)", () => {
+  const script = fileURLToPath(new URL("./validate-session.mjs", import.meta.url));
+  const empty = mkdtempSync(join(tmpdir(), "vs-cli-"));
+  try {
+    for (const argv of [["no-such-session"], ["no-such-session", "--root", empty], ["--root", empty, "no-such-session", "--dry-run", "--accept-partial"]]) {
+      const r = spawnSync(process.execPath, ["--import", "tsx", script, ...argv], { encoding: "utf8", timeout: 60000 });
+      assert.doesNotMatch(r.stderr, /usage:/, argv.join(" "));
+      assert.match(r.stderr, /validation could not run/, argv.join(" "));
+    }
+    assert.match(spawnSync(process.execPath, ["--import", "tsx", script], { encoding: "utf8", timeout: 60000 }).stderr, /usage:/);
+  } finally { rmSync(empty, { recursive: true, force: true }); }
 });
