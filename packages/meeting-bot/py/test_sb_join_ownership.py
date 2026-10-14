@@ -8,6 +8,7 @@ import pytest
 from types import SimpleNamespace
 sys.path.insert(0, os.path.dirname(__file__))
 import sb_join
+from _sb_join_test_harness import replay_owned_cleanup, run_captured as _run_captured
 
 def test_linux_orphan_cleanup_exact_identity_and_refusals(monkeypatch, tmp_path):
     import builtins
@@ -299,13 +300,7 @@ def test_registration_native_same_host_other_port_confinement(tmp_path, case):
         command = []
         def build_command(): return [sys.executable, str(program), "about:blank", "--profile", profile, "--title", "Fixture", "--stop-file", stop]
         command = build_command()
-        def run_captured(args, tag, timeout, stdin_text=None):
-            # Capture to FILES, not pipes: Chrome (a grandchild) inherits pipe handles and keeps them open after the
-            # parent exits, which made communicate() hang to TimeoutExpired and hid the parent's real exit status/stderr.
-            out_path, err_path = root / (tag + ".out"), root / (tag + ".err")
-            with open(out_path, "wb") as out, open(err_path, "wb") as err:
-                done = subprocess.run(args, input=stdin_text, stdout=out, stderr=err, text=True, timeout=timeout)
-            return SimpleNamespace(returncode=done.returncode, stdout=out_path.read_text(encoding="utf-8", errors="replace"), stderr=err_path.read_text(encoding="utf-8", errors="replace"))
+        run_captured = lambda *args, **kwargs: _run_captured(root, *args, **kwargs)  # harness helper bound to this case's root
         try:
             # Browser bring-up (SeleniumBase uc connect: a chromedriver HTTP call with no read timeout) intermittently stalls for
             # minutes on a loaded machine, before any registration code runs. That is environment, not behaviour under test, so a
@@ -352,50 +347,7 @@ def test_registration_native_same_host_other_port_confinement(tmp_path, case):
                 assert posts == [{"path": path, "values": expected_values} for path in paths]
                 assert cookies == ["auth=fixture"] * len(paths)
         finally:
-            # The parent exited before independent cleanup. Only this fixture's exact Job/profile is eligible.
-            # Verify identity, exercise strict owned cleanup, then prove recorded browser death.
-            # Load-tolerant: if the run never wrote a browser record (slow Chrome start), skip cleanup so the ORIGINAL failure surfaces.
-            try: record = json.loads((pathlib.Path(profile) / ".lkb-ownership.json").read_text())
-            except (OSError, ValueError): record = {}
-            if "browser" in record:
-                import psutil
-                try:
-                    process = psutil.Process(record["browser"]["pid"])
-                    assert process.create_time() == record["browser"]["created"]
-                    assert os.path.normcase(os.path.realpath(process.exe())) == record["browser"]["exe"]
-                except psutil.NoSuchProcess: pass
-                # Owned-Job teardown after the parent exits is asynchronous and measured at 13-18 s on an idle box (Chrome flushes
-                # before dying), far longer under load. Poll the recorded browser's death cheaply (no Python start per probe)
-                # BEFORE the strict cleanup replay, so spawn cost on a busy CPU cannot burn the retry budget.
-                # Bounded by the remaining hard budget, but never below a small floor so cleanup is always attempted.
-                death_deadline = time.monotonic() + max(10, min(150, remaining() / 2))
-                while time.monotonic() < death_deadline:
-                    try:
-                        if psutil.Process(record["browser"]["pid"]).create_time() != record["browser"]["created"]: break
-                    except psutil.NoSuchProcess: break
-                    time.sleep(.5)
-                cleanup_started, cleanup_attempts = time.monotonic(), 0
-                deadline = cleanup_started + max(20, min(90, remaining()))
-                while True:
-                    cleanup_attempts += 1
-                    try:
-                        cleanup = run_captured(command + ["--cleanup-only"], "cleanup%d" % cleanup_attempts, max(20, min(120, deadline - time.monotonic())))
-                    except subprocess.TimeoutExpired:
-                        if time.monotonic() >= deadline: raise
-                        continue
-                    # Replay only the exact ledger after asynchronous owned Job teardown; never repair on refusal.
-                    if cleanup.returncode and "Cannot inspect owned Job" in cleanup.stdout + cleanup.stderr and time.monotonic() < deadline:
-                        time.sleep(.2); continue
-                    break
-                assert cleanup.returncode == 0, (case, cleanup.stdout, cleanup.stderr)
-                assert json.loads((pathlib.Path(profile) / ".lkb-ownership.json").read_text())["phase"] == "cleaned"
-                print(json.dumps({"fixture_case": case, "cleanup_attempts": cleanup_attempts, "cleanup_seconds": round(time.monotonic() - cleanup_started, 3), "ledger_phase": "cleaned"}))
-                try:
-                    process = psutil.Process(record["browser"]["pid"])
-                    assert process.create_time() == record["browser"]["created"]
-                    assert os.path.normcase(os.path.realpath(process.exe())) == record["browser"]["exe"]
-                    process.wait(timeout=10)
-                except psutil.NoSuchProcess: pass
+            replay_owned_cleanup(case, root, profile, command, remaining)
     finally:
         for server in (approved, foreign_server): server.shutdown(); server.server_close()
 

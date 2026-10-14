@@ -194,9 +194,12 @@ def kill_orphans(profile, launch=False, expected_exe=None, profile_directory=Non
         except psutil.NoSuchProcess:
             owner = None
         if owner is not None:
-            if owner != record["owner"]:
-                raise RuntimeError("Reused owner PID refused")
-            raise RuntimeError("Owned browser parent is still alive")
+            if owner == record["owner"]:
+                raise RuntimeError("Owned browser parent is still alive")
+            # Recycled owner PID: the recorded owner is gone and the live process is a stranger, which is never
+            # signalled. Cleanup continues to the named Job, whose nonce name, kill-on-close flag and recorded
+            # browser membership are verified below before TerminateJobObject (ISS-REGFLAKE-002).
+            owner = None
         browser_alive = False
         if "browser" in record:
             if not isinstance(record["browser"], dict) or set(record["browser"]) != {"pid", "created", "exe"}:
