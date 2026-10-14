@@ -1,7 +1,7 @@
 """sb_join: the hold-the-window polling loop (moved verbatim from main())."""
 import json
 
-from sb_join_detect import (ADMISSION_TIMEOUT_S, END_PHRASES, JOIN_TEXTS, AdmissionState, ReconnectState, apply_reload,
+from sb_join_detect import (ADMISSION_TIMEOUT_S, END_PHRASES, FLUSH_GRACE_S, JOIN_TEXTS, AdmissionState, ReconnectState, apply_reload,
                             classify_admission, click_gate, detect_trouble, platform_of, should_force_reload)
 from sb_join_scripts import BODY_TEXT_JS, CLICK_JS, IN_CALL_JS_BY_PLATFORM
 
@@ -16,6 +16,7 @@ def run_session(sb, a, *, os, time, emit):
     reconnect = ReconnectState()  # T-029
     extra_click_until = 0.0  # widened click window after a reload; MAX_CLICKS/JOIN_TEXTS unchanged
     gave_up_emitted = False
+    hold_for_flush = False
     # ISS-CAPTUREFIX-001 / ISS-LOBBYWATCH-001: admission for every platform. "admitted" is emitted only
     # on a positive in-call signal (Meet / Zoom web / Teams web / generic leave control); an unknown
     # platform is never assumed admitted and ends in admission_timeout like the others.
@@ -65,6 +66,7 @@ def run_session(sb, a, *, os, time, emit):
                 emit("admitted", platform=platform, assumed=False)
             elif verdict == "timeout":
                 emit("admission_timeout", seconds=int(now - started), limit=admission.timeout_s)
+                hold_for_flush = True
                 break
 
             # T-031: forced reload from the Node-side audio watchdog — independent of T-029's
@@ -127,6 +129,15 @@ def run_session(sb, a, *, os, time, emit):
             except Exception:
                 pass
         time.sleep(2)
+    if hold_for_flush:
+        # zoomwebinar: leaving now closes Chrome and kills the tab recorder BEFORE the controller can ask it
+        # to flush (live run 2026-10-13: "Recorder did not acknowledge final flush; media requires recovery").
+        # The controller reacts to admission_timeout by stopping the recorder and then writing the stop file,
+        # so hold the browser open (bounded) until that stop file shows up.
+        waited = 0
+        while waited < FLUSH_GRACE_S and not os.path.exists(a.stop_file):
+            time.sleep(1)
+            waited += 1
     final_gap = reconnect.close_at_end(time.time())
     if final_gap is not None:
         emit("gap", **final_gap)

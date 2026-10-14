@@ -15,6 +15,7 @@ import sb_join  # noqa: E402,F401
 from sb_join import (  # noqa: E402
     ADMISSION_TIMEOUT_S, AdmissionState, IN_CALL_JS, IN_CALL_JS_BY_PLATFORM, BODY_TEXT_JS, CLICK_JS, classify_admission,
     classify_meet_state, is_meet_url, platform_of)
+from sb_join_detect import FLUSH_GRACE_S  # noqa: E402
 from sb_join_loop import run_session  # noqa: E402
 
 FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
@@ -157,7 +158,8 @@ def test_lobby_then_admitted_emits_admitted_once(tmp_path):
 
 def test_admission_timeout_emits_typed_event_and_exits_cleanly(tmp_path):
     events, _, _, clock = _run(tmp_path, MEET, _lobby, timeout=300, seconds=100000)
-    assert clock.now - 1000 < 310, "loop must exit at the timeout, not keep holding the lobby"
+    assert clock.now - 1000 < 310 + FLUSH_GRACE_S, "loop must exit at the timeout (plus the bounded flush grace), not keep holding the lobby"
+    assert clock.now - 1000 >= 300 + FLUSH_GRACE_S - 3, "browser must stay open for the controller's flush grace"
     names = _names(events)
     assert "admitted" not in names
     assert names.count("admission_timeout") == 1
@@ -257,6 +259,26 @@ def test_dom_fixtures_lobby_vs_in_call(sb_browser, name, expected):
     ("other_incall.html", "other", "in-call"),
     ("other_nosignal.html", "other", "unknown"),
     ("inner.html", "zoom", "lobby"),  # the repo's pre-existing Zoom waiting-room fixture
+    # zoomwebinar lane: Zoom web-client WEBINAR attendee view (no mic/camera controls). Modelled DOM.
+    ("zoom_webinar/zoom_webinar_attendee.html", "zoom", "in-call"),
+    ("zoom_webinar/zoom_webinar_text_leave_only.html", "zoom", "in-call"),
+    ("zoom_webinar/zoom_webinar_footer_hidden.html", "zoom", "in-call"),
+    ("zoom_webinar/zoom_webinar_iframe_host.html", "zoom", "in-call"),
+    ("zoom_webinar/zoom_webinar_joinpage.html", "zoom", "unknown"),
+    ("zoom_webinar/zoom_webinar_waiting.html", "zoom", "lobby"),
+    ("zoom_webinar/zoom_webinar_hidden_media.html", "zoom", "unknown"),
 ])
 def test_platform_dom_fixtures(sb_browser, name, platform, expected):
     assert _classify(sb_browser, name, platform) == expected
+
+
+def test_admission_timeout_holds_browser_until_stop_file_so_the_recorder_can_flush(tmp_path):
+    # zoomwebinar: the controller writes the stop file after the recorder acknowledges its flush; the loop
+    # must still be open (Chrome alive) until then. Stop file appears 12 s after the timeout.
+    def scenario(now):
+        return (False, "asking to join... someone will let you in")
+    stop_at = 300 + 12
+    events, _, _, clock = _run(tmp_path, MEET, scenario, timeout=300, seconds=stop_at)
+    names = _names(events)
+    assert names.count("admission_timeout") == 1 and names[-1] == "closed"
+    assert stop_at <= clock.now - 1000 < stop_at + 3, "closed as soon as the stop file appeared, not after the full grace"

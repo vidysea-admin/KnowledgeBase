@@ -12,6 +12,7 @@ import { getProcessStartTime } from "./controller-state.js";
 import { browserProfileArgs } from "./browser/browser-profile.js";
 import type { BotEvent } from "./obs/obs-windows.js";
 import { assertInsideDir, assertSafeCaptureFileName, assertSafeCaptureId, type TabReceiverGuard } from "./tab-receiver-guard.js";
+import {remuxRecoveryEnabled, remuxWebmInPlace} from "./tab-remux.js";
 import {validateCaptureControlGaps, validateCaptureStatusIdentity, type GapWindow} from "./reconnect-gaps.js";
 
 const MAX_CHUNK = 8 * 1024 * 1024;
@@ -150,7 +151,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
   const levels = new Set<(db: number) => void>();
   const runs = new Map<string, {child: ChildProcess; exited: Promise<number | null>; output: string;
     receiver: Awaited<ReturnType<typeof createTabCaptureReceiver>>; stopFile: string;
-    reloadFile: string; lock: string; done: boolean; failure?: string; stopped?: boolean; controlGaps: GapWindow[]; identity: Record<string, any>}>();
+    reloadFile: string; lock: string; done: boolean; failure?: string; recovered?: string; stopped?: boolean; controlGaps: GapWindow[]; identity: Record<string, any>}>();
   let active = false;
   const deps: BrowserJoinerDeps = {
     async launch(url) {
@@ -262,10 +263,16 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
       writeFileSync(run.stopFile, "stop");
       await Promise.race([run.exited, sleep(5000)]); if (!run.done) run.child.kill();
       await run.receiver.close();
+      if (run.failure?.startsWith("Recorder did not acknowledge") && run.receiver.bytes() && remuxRecoveryEnabled()) {
+        // zoomwebinar fallback (LKB_TAB_REMUX_RECOVERY=1, default off): `ffmpeg -c copy` the received bytes into a playable file.
+        const r = remuxWebmInPlace(run.output);
+        if (r.ok) { log("final flush not acknowledged; recovered media with ffmpeg -c copy (raw kept as .raw)"); run.failure = undefined; run.recovered = "final flush not acknowledged; media recovered by ffmpeg -c copy remux (tail after the last delivered chunk is lost)"; }
+        else log(`remux recovery failed: ${r.error}`);
+      }
       if (existsSync(run.lock) && !lstatSync(run.lock).isSymbolicLink() && readFileSync(run.lock, "utf8") === String(process.pid)) rmSync(run.lock);
       rmSync(run.stopFile, {force: true}); rmSync(run.reloadFile, {force: true});
       rmSync(path.join(cfg.recordDir, `.extension-${handle}`), {recursive: true, force: true});
-      writeOwnedTabStatus(`${run.output}.status.json`,run.identity,{state:run.failure ? "failed" : "stopped",error:run.failure,bytes:run.receiver.bytes(),controlGaps:run.controlGaps});
+      writeOwnedTabStatus(`${run.output}.status.json`,run.identity,{state:run.failure ? "failed" : "stopped",error:run.failure ?? run.recovered,bytes:run.receiver.bytes(),controlGaps:run.controlGaps});
       active = false;
       if (run.failure || !run.receiver.bytes()) throw new Error(run.failure ?? "Tab capture produced no media bytes");
     },
