@@ -1,7 +1,7 @@
 # Manifest - root-docker-devops
 
-**Handshake status:** ready-for-check
-Status: ready-for-check
+**Handshake status:** checked-PASS
+Status: checked-PASS
 Fix cycle: 1
 Date: 2026-10-14
 Goal task: T-051 (packaging foundation only; parent operational release remains incomplete)
@@ -72,12 +72,12 @@ node -e 'const fs=require("node:fs"); const yaml=require("./node_modules/.pnpm/j
 - CI owner's final YAML parse: exit 0, output `workflow YAML parse: PASS; steps=6`. All step run scripts concatenated into C:/Users/product/AppData/Local/Temp/lkb-docker-ci-syntax.sh and `C:/Program Files/Git/bin/bash.exe --noprofile --norc -n C:/Users/product/AppData/Local/Temp/lkb-docker-ci-syntax.sh`: exit 0, wall 0.4650134 seconds. `git diff --check -- scripts/lint.test.mjs .github/workflows/docker.yml`: exit 0. No second local container run; focused test evidence above covers unchanged pinned test bytes.
 - Cycle 0 independently FAILed C3 on candidate 9b02375356ef88c966a58c83cde01ffa7bb8c614. Actual Docker run https://github.com/vidysea-admin/KnowledgeBase/actions/runs/38609031571 passed root lint at 16 files, then `node --test --test-timeout=30000 --test-name-pattern='^lint-root:' scripts/lint.test.mjs` exited 1 before either focused fixture ran: `Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'json-schema-to-typescript' imported from .../scripts/gen-types.mjs`. Host dependencies were absent; frozen-validator/image-smoke steps were skipped. Independent checker persisted qa/verdicts/root-docker-devops.md with VERDICT: FAIL, Cycle checked: 0; raw SHA256 9616411bec830d83890a41c836989df9f1eb0a74a673fd79b8f35d54d9b18763. This history is retained by checker and is not modified by maker.
 - Cycle 1 fixes only the workflow prerequisite: pnpm/action-setup@v4 with version 10.33.0, then `timeout 300 pnpm install --frozen-lockfile --ignore-scripts` before unchanged root lint and focused tests. scripts/lint.test.mjs imports gen-types.mjs, whose JavaScript schema compiler needs json-schema-to-typescript; frozen host dev dependencies supply it without lifecycle/native hooks. No local install or new local test execution is claimed. No product/test assertion, lint enforcement, package manifest or lockfile changed in this fix.
-- Cycle 1 CI owner's attributed static evidence: same js-yaml parse command on final workflow, exit 0, `workflow YAML parse: PASS; steps=8`, all run scripts captured; same Git Bash `--noprofile --norc -n C:/Users/product/AppData/Local/Temp/lkb-docker-ci-syntax.sh`, exit 0, wall 0.505822 seconds; `git diff --check -- .github/workflows/docker.yml`, exit 0. New complete actual Docker-workflow execution on cycle-1 publication candidate remains pending.
-- Required new-candidate complete Docker workflow and independent same-cycle checker verdict: pending. General platform CI is reported separately and is not a gate for this unit. No PASS inferred from initial candidate success or missing final-source evidence. D-169's full-CI phrase means the full Docker workflow under this accepted plan and C3/C4; no whole T-051 acceptance is inferred.
+- Cycle 1 CI owner's attributed static evidence: same js-yaml parse command on final workflow, exit 0, `workflow YAML parse: PASS; steps=8`, all run scripts captured; same Git Bash `--noprofile --norc -n C:/Users/product/AppData/Local/Temp/lkb-docker-ci-syntax.sh`, exit 0, wall 0.505822 seconds; `git diff --check -- .github/workflows/docker.yml`, exit 0. Remote execution was pending at submission and is established in the matching-cycle close-out below.
+- Complete cycle-1 Docker workflow and independent same-cycle checker PASS are established below. General platform CI is reported separately and is not a gate for this unit. D-169's full-CI phrase means the full Docker workflow under this accepted plan and C3/C4; no whole T-051 acceptance is inferred.
 
-Do not close this manifest until an independent same-slug cycle-1 PASS covers unchanged candidate bytes and required actual CI evidence.
+Close-out requirement met: independent same-slug Cycle checked: 1 PASS covers unchanged candidate bytes and actual complete Docker-workflow evidence.
 
-Source candidate and static packet are ready for independent review/publication to obtain remote execution evidence. This ready-for-check state requests the check; it does not represent final-candidate complete Docker-workflow success. Checker must HOLD if required remote evidence is unavailable.
+The submitted ready-for-check packet requested independent review and remote execution; it did not itself certify success. The checked-PASS state now records the independent cycle-1 verdict and actual reviewed-candidate Docker-workflow success below.
 
 Earlier pre-verdict resubmissions retained cycle 0 with checker confirmation. After the formal current-candidate C3 FAIL was persisted, this repaired submission increments to Fix cycle 1. Earlier 766be00 and documentation-only 0bdf3572d816734a784a1e3ea0d693e2a7e36ef8 packets remain prior candidates. The latter's Docker run https://github.com/vidysea-admin/KnowledgeBase/actions/runs/38607933307 is prior-candidate success, not final acceptance of the changed contract/workflow/test. The 9b023753 cycle-0 FAIL remains an independent historical verdict, not a PASS or withdrawn finding. Final cycle-1 verdict must review the new publication SHA and its actual complete Docker-workflow results.
 
@@ -99,6 +99,50 @@ Raw-byte SHA256 pins (CRLF-to-LF normalization may change checkout byte hashes; 
 | qa/contracts/root-docker-devops.md | 4e07d1b6426e010d06722648f6e3f524da76664047410b85848f80fb64aa5e6c |
 
 Manifest self-hash is supplied separately at dispatch to avoid recursive hashing. Existing local gitIgnored anomaly stays a disclosed environment fact; remote root lint is the acceptance gate.
+
+## Cycle 1 matching-verdict close-out
+
+Independent verdict: qa/verdicts/root-docker-devops.md, VERDICT: PASS, Cycle checked: 1, Commit checked: c7b4c60157e9b03642ea964df15192e7eeb0ccf7. The checker appended cycle 1 while preserving the cycle-0 FAIL. Final verdict raw SHA256: 6232a0ede178afe0eaf3a6af6ef05c740e5843c9055fdb19e208d0cd7357bff8. Before flipping status, maker independently reread the matching verdict, confirmed HEAD c7b4c601 and all eight source pins unchanged; that pin check exited 0. Reviewed manifest self-hash was 631b606addc3ef1190edfd27d870b73db7327f8b6c64a4c93c03100dc34a8ef8. Only this close-out changes the manifest after the check; product, workflow, contract and remaining source pins remain unchanged.
+
+Actual complete Docker workflow: [run 38609853426](https://github.com/vidysea-admin/KnowledgeBase/actions/runs/38609853426), SUCCESS for the exact checked candidate. All eight workflow steps succeeded; job 17:49:02Z-17:50:10Z (68 seconds), image build/smoke step 17:49:12Z-17:50:07Z (55 seconds). Independent checker read downloaded actual job/smoke evidence, rather than inferring execution from the workflow source.
+
+Exact executed focused host commands and recorded outputs:
+```sh
+timeout 300 pnpm install --frozen-lockfile --ignore-scripts
+node scripts/lint-root.mjs
+node --test --test-timeout=30000 --test-name-pattern='^lint-root:' scripts/lint.test.mjs
+python3 contracts/verify_contracts.py
+```
+```text
+Done in 3.6s using pnpm v10.33.0
+lint-root: OK (16 loose root file(s), 0 gitignored excluded)
+lint-root: passes on a clean fixture (44.788215ms)
+lint-root: fails on a violating fixture (41.453968ms)
+tests 2; pass 2; fail 0; cancelled 0; skipped 0
+duration_ms 239.158117
+verify_contracts: no frozen contracts yet (research phase) -- PASS by vacuity
+```
+
+Principal image build commands ran with the workflow's ephemeral image tags:
+```sh
+timeout 900 docker build --progress plain -t "$api_image" .
+timeout 900 docker build --progress plain --target web --build-arg VITE_API_BASE_URL=http://localhost:3300 -t "$web_image" .
+timeout 120 docker build --progress plain --target build -t "$build_image" .
+```
+The complete Compose dummy-value validation, Node runtime assertions, bounded waits and cleanup commands are the reviewed .github/workflows/docker.yml run block (hash pinned above). Actual smoke outputs:
+```text
+Opt-in migration build target dependencies: PASS
+API user, runtime assets and exclusions: PASS
+Missing database name startup refusal: PASS
+API health and unauthenticated refusal: PASS
+Web root and settings SPA fallback: PASS
+Docker image smoke: PASS
+```
+Default/API container health was HTTP 200/db=ok; unauthenticated POST /ask was HTTP 401/error=unauthorized; missing MONGODB_DB startup exited 1 with its guard message. API USER=node, bundled server/schema/routing assets and prohibited secret/data/raw/source/dev-dependency exclusions were asserted. Migration build dependencies resolved without a migration. Web / and /settings produced identical SPA content; independent downloaded-file comparison SHA256 f4cb424f481d4b311aab7d0355dfa9099be9e689a2646b0f40b8d4306c640cdc. Runtime used only ephemeral Mongo/network, dummy key and empty watcher tenants; no production connection, provider request, migrations, seed, persistent volume or published Mongo port.
+
+Evidence: [artifact 11917248485](https://github.com/vidysea-admin/KnowledgeBase/actions/runs/38609853426/artifacts/11917248485); downloaded zip SHA256 fab9267979c0279d45de8fbd563ce403510bbebed746360a64bc4d4127b1837b. Local attributed evidence at C:/Users/product/AppData/Local/Temp/root-docker-38609853426/job.log and evidence/smoke.log, missing-db.log, index.html, settings.html and service logs. Independent checker recorded final artifact/hash review at 17:51:50Z and persisted PASS at 17:53:04Z.
+
+Scope is packaging and its immediate consumers under C1-C4. Frozen validation remains vacuous because no contracts are frozen. General platform/tracker CI has a separately identified baseline failure; it is reported independently and is not claimed green. T-051 full operational release, production deployment/host activation, real capture/provider/database acceptance and the remaining roadmap tasks remain unclaimed. No task tracker was closed by this manifest.
 
 ## Attributed packaging audit command
 
