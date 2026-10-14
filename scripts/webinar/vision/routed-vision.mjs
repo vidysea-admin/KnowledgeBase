@@ -4,11 +4,11 @@
  * `validate` counts as failed and the chain moves on. */
 import { readFileSync } from 'node:fs';
 
-export function routedVision(lib, backends, { prompt, validate, tally, log } = {}) {
+export function routedVision(lib, backends, { prompt, validate, tally, log, schema } = {}) {
   return async (frame) => {
     const { value } = await lib.runVisionChain(backends, {
-      imageBase64: readFileSync(frame.path).toString('base64'), mimeType: 'image/jpeg', prompt,
-    }, { tally, log, validate: (text) => validate(JSON.parse(text)) });
+      imageBase64: readFileSync(frame.path).toString('base64'), mimeType: 'image/jpeg', prompt, schema,
+    }, { tally, log, validateJson: validate });
     return value;
   };
 }

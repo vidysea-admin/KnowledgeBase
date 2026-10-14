@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { fakeTransport } from "../testUtils.js";
-import { buildVisionBackends, newVisionTally, runVisionChain, VisionAllProvidersFailedError, type VisionImageRequest } from "./chain.js";
+import { buildVisionBackends, createGeminiVisionBackend, createOllamaVisionBackend, extractJsonObject, newVisionTally, runVisionChain, VisionAllProvidersFailedError, type VisionImageRequest } from "./chain.js";
 import { detectGeminiFreeTier, GeminiFreeTierQuotaError } from "../gemini-quota.js";
 import { createGeminiSttAdapter } from "../stt/gemini.js";
 import { parseRoutingYaml } from "../routing-config.js";
@@ -116,4 +116,80 @@ test("order lives in config: unconfigured providers are skipped; gemini-first or
 
 test("no configured backend -> clear error, no call", async () => {
   await assert.rejects(runVisionChain([], REQ), /no configured backend/);
+});
+
+// ---- visionfix: ISS-OLLAMAFIRST-001 / 002 and the two empty-reply branches ----
+const strict = (v: any) => { if (!v || typeof v.readable !== "boolean" || typeof v.ocrText !== "string") throw new Error("bad schema"); return v; };
+
+test("empty Ollama reply (missing, blank, non-string content) throws 'returned no content'", async () => {
+  for (const body of [{ message: {} }, { message: { content: "   " } }, { message: { content: 5 } }, null]) {
+    const b = createOllamaVisionBackend({ transport: async () => ({ status: 200, body }), model: "m", baseUrl: "https://ollama.com" });
+    await assert.rejects(b.call(REQ), /ollama vision m returned no content/);
+  }
+});
+
+test("empty Gemini reply (no candidates, blank text) throws 'returned no text'", async () => {
+  for (const body of [{ candidates: [] }, { candidates: [{ content: { parts: [{ text: "  " }] } }] }, null]) {
+    const b = createGeminiVisionBackend({ transport: async () => ({ status: 200, body }), model: "g", apiKey: "k" });
+    await assert.rejects(b.call(REQ), /gemini vision g returned no text/);
+  }
+});
+
+test("timeout ABORTS the request signal (the fetch is really cancelled)", async () => {
+  let sig: AbortSignal | undefined;
+  const t = async (r: TransportRequest) => { sig = r.signal; return new Promise<TransportResponse>(() => {}); };
+  const b = createOllamaVisionBackend({ transport: t, model: "m", baseUrl: "https://ollama.com", timeoutMs: 20 });
+  await assert.rejects(b.call(REQ), /timed out after 20ms/);
+  assert.ok(sig, "signal passed to transport"); assert.equal(sig!.aborted, true);
+  const g = createGeminiVisionBackend({ transport: t, model: "g", apiKey: "k", timeoutMs: 20 });
+  await assert.rejects(g.call(REQ), /timed out/); assert.equal(sig!.aborted, true);
+});
+
+test("overall deadline: backends get the remaining budget, later ones are skipped when it is spent", async () => {
+  const seen: (AbortSignal | undefined)[] = [];
+  const t = async (r: TransportRequest) => { seen.push(r.signal); return new Promise<TransportResponse>(() => {}); };
+  const backends = [1, 2, 3].map((n) => createOllamaVisionBackend({ transport: t, model: `m${n}`, baseUrl: "https://ollama.com", timeoutMs: 10_000 }));
+  const started = Date.now();
+  await assert.rejects(runVisionChain(backends, REQ, { deadlineMs: 120 }), (e: unknown) =>
+    e instanceof VisionAllProvidersFailedError && e.attempts.length === 3 && /timed out/.test(e.attempts[0]!.error) && /deadline exceeded/.test(e.attempts[1]!.error) && /deadline exceeded/.test(e.attempts[2]!.error));
+  assert.ok(Date.now() - started < 1500, "bounded by the deadline, not 3 x per-backend timeout");
+  assert.equal(seen.length, 1, "first backend consumed the whole budget"); assert.ok(seen.every((s) => s?.aborted));
+});
+
+test("default deadline is 90 s and LKB_VISION_DEADLINE_MS overrides it", async () => {
+  const { visionDeadlineMs } = await import("./chain.js");
+  assert.equal(visionDeadlineMs({}), 90_000); assert.equal(visionDeadlineMs({ LKB_VISION_DEADLINE_MS: "5000" }), 5000);
+  assert.equal(visionDeadlineMs({ LKB_VISION_DEADLINE_MS: "junk" }), 90_000);
+});
+
+test("Ollama request uses structured output: format json by default, the schema when given, think false", async () => {
+  const bodies: any[] = [];
+  const t = async (r: TransportRequest) => { bodies.push(r.body); return ollamaOk(); };
+  const b = createOllamaVisionBackend({ transport: t, model: "m", baseUrl: "https://ollama.com" });
+  await b.call(REQ); await b.call({ ...REQ, schema: { type: "object" } });
+  assert.equal(bodies[0].format, "json"); assert.deepEqual(bodies[1].format, { type: "object" });
+  assert.equal(bodies[0].think, false);
+});
+
+test("extractJsonObject: bare, fenced, prose-wrapped, nested/braces-in-strings, think-block; strict validator still applies", () => {
+  const o = { readable: true, ocrText: "a {b} \"c\"" };
+  assert.deepEqual(extractJsonObject(JSON.stringify(o), strict), o);
+  assert.deepEqual(extractJsonObject("```json\n" + JSON.stringify(o) + "\n```", strict), o);
+  assert.deepEqual(extractJsonObject("The user wants JSON. Here: " + JSON.stringify(o) + " done.", strict), o);
+  assert.deepEqual(extractJsonObject('<think>try {"x":1} maybe</think>' + JSON.stringify(o), strict), o, "skips a valid-JSON candidate the validator rejects");
+  assert.throws(() => extractJsonObject('{"readable":"yes","ocrText":1}', strict), /no valid JSON object/);
+  assert.throws(() => extractJsonObject("The user wants me to describe the image {", strict), /no valid JSON object/);
+});
+
+test("extractor error never echoes the model reply (ISS-OLLAMAFIRST-002 leak)", async () => {
+  const t = split({ ollama: () => ({ status: 200, body: { message: { content: "SECRETREPLY The user w..." } } }), gemini: geminiOk });
+  const tally = newVisionTally();
+  await runVisionChain(buildVisionBackends(ENV, t), REQ, { tally, validateJson: strict });
+  assert.ok(tally.failures.length >= 1 && tally.failures.every((f) => !/SECRETREPLY|The user/.test(f.error)));
+});
+
+test("validateJson: reasoning prose around valid JSON is served by the first ollama model", async () => {
+  const t = split({ ollama: () => ({ status: 200, body: { message: { content: "The user wants JSON.\n```json\n" + OK_JSON + "\n```" } } }), gemini: geminiOk });
+  const r = await runVisionChain(buildVisionBackends(ENV, t), REQ, { validateJson: strict });
+  assert.equal(r.provider, "ollama"); assert.equal(r.attempts, 1);
 });

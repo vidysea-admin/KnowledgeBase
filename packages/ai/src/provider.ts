@@ -97,6 +97,8 @@ export interface TransportRequest {
   command?: string;
   args?: string[];
   stdin?: string;
+  /** http: aborts the underlying request when fired (a timeout must really cancel the fetch). Optional; fakes ignore it. */
+  signal?: AbortSignal;
 }
 
 export interface TransportResponse {
