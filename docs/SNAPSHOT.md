@@ -103,6 +103,8 @@ a client of that API — with the long-range goal of beating top human counsello
 | speakers | _id, tenantId, personId, aliases, evidence | yes |
 | tenants | _id, name | no |
 | topics | _id, tenantId, name | no |
+| transcript_review_revisions | _id, tenantId, sessionId, revision, parentRevision, actorRef, reviewedAt, reason, changes, refreshTargets | no |
+| transcript_reviews | _id, tenantId, sessionId, revision, parentRevision, overlay, audit, refresh, committedAt | no |
 | tree_index | tenantId | no |
 | trusted_senders | _id, tenantId, senderDomain, approvalCount, autoApprove | no |
 | turns | _id, tenantId, sessionId, speakerRef, tStart, tEnd, text | yes |
