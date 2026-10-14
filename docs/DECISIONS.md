@@ -2261,3 +2261,10 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** T-054 and T-056 stores can work live on lkb under the explicit opt-in; the default remains a 503 refusal.
 **Approved-by:** Umesh
 **Links:** D-150; D-143; T-054; T-056; ISS-WAVE2MOUNT-002
+
+## D-169 | 2026-10-14 | type: decision | status: ACTIVE
+**What:** Authorize the user-requested root Docker/DevOps packaging unit: a root Dockerfile consumed by docker-compose.yml, focused deployment documentation and remote container CI. Set structure.config.json root.maxLooseFiles from 15 to 16 solely to accommodate the additional root Dockerfile.
+**Why:** The explicit rootDocker execution request selects deployable application packaging ahead of unrelated backlog. A root image entry point makes the Compose build discoverable from the repository root; its added root file must fit a reasoned declared budget instead of silently bypassing structure checks. This is a new packaging behavior and is not another polish round on previously capped lint or deployment seams.
+**Result:** The packaging source unit may proceed under maker/checker discipline. Existing test and structure gates remain binding; actual remote full CI and independent checker evidence are required for scoped PASS. This entry does not close T-051 or authorize enforcement changes, frozen-contract changes, live production deployment, host activation, additional data writes or secret disclosure. Local Windows ignore-probe behavior must be reported, with the root budget checked against the clean CI checkout.
+**Changes-authorized:** Dockerfile; docker-compose.yml; docs/docker-deployment.md; .github/workflows/docker.yml; structure.config.json root.maxLooseFiles only; qa/manifests/root-docker-devops.md. Checker-owned qa/contracts/root-docker-devops.md and qa/verdicts/root-docker-devops.md follow their independent workflow.
+**Links:** T-051; qa/manifests/root-docker-devops.md; docs/docker-deployment.md; D-003; D-168

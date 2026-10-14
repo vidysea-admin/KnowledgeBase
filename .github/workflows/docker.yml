@@ -1,0 +1,173 @@
+name: docker
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Check root budget from the clean checkout
+        run: node scripts/lint-root.mjs
+
+      - name: Verify frozen contracts
+        run: python3 contracts/verify_contracts.py
+
+      - name: Build and smoke-test isolated images
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p docker-evidence
+          exec > >(tee docker-evidence/smoke.log) 2>&1
+          suffix="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          network="lkb-docker-${suffix}"
+          mongo="lkb-mongo-${suffix}"
+          api="lkb-api-${suffix}"
+          web="lkb-web-${suffix}"
+          refusal="lkb-refusal-${suffix}"
+          api_image="lkb-api:ci-${suffix}"
+          web_image="lkb-web:ci-${suffix}"
+          build_image="lkb-build:ci-${suffix}"
+          cleanup() {
+            result=$?
+            trap - EXIT INT TERM
+            for container in "$api" "$web" "$mongo" "$refusal"; do
+              if docker inspect "$container" >/dev/null 2>&1; then
+                docker logs "$container" > "docker-evidence/${container}.log" 2>&1 || true
+                docker rm -f "$container" >/dev/null 2>&1 || true
+              fi
+            done
+            docker network rm "$network" >/dev/null 2>&1 || true
+            exit "$result"
+          }
+          trap cleanup EXIT
+          trap 'exit 130' INT
+          trap 'exit 143' TERM
+
+          # Explicit fake values; never read a developer .env or contact a live database.
+          MONGODB_URL=mongodb://docker-smoke-mongo:27017 \
+          MONGODB_DB=lkb_work_docker_smoke \
+          GEMINI_API_KEY=ci-not-a-real-key \
+          VITE_API_BASE_URL=http://localhost:3300 \
+            docker compose --env-file /dev/null config --quiet
+          timeout 900 docker build --progress plain -t "$api_image" .
+          timeout 900 docker build --progress plain --target web \
+            --build-arg VITE_API_BASE_URL=http://localhost:3300 -t "$web_image" .
+          timeout 120 docker build --progress plain --target build -t "$build_image" .
+          docker run --rm --entrypoint node "$build_image" -e '
+            const fs = require("node:fs");
+            require.resolve("migrate-mongo");
+            require.resolve("dotenv/config");
+            if (!fs.existsSync("/app/node_modules/.bin/migrate-mongo"))
+              throw Error("missing migration CLI");
+            console.log("Opt-in migration build target dependencies: PASS");
+          '
+
+          test "$(docker image inspect "$api_image" --format '{{.Config.User}}')" = node
+          docker run --rm --entrypoint node "$api_image" -e '
+            const fs = require("node:fs");
+            for (const p of ["/app/apps/api/dist/server.js", "/app/schema/index.json", "/app/config/ai-routing.yaml"])
+              if (!fs.existsSync(p)) throw Error("missing runtime asset: " + p);
+            for (const p of ["/app/.env", "/app/config/client_secret.json", "/app/data", "/app/raw", "/app/recordings", "/app/apps/api/src", "/app/apps/api/node_modules/tsx", "/app/apps/api/node_modules/typescript"])
+              if (fs.existsSync(p)) throw Error("unexpected runtime content: " + p);
+            console.log("API user, runtime assets and exclusions: PASS");
+          '
+          docker network create "$network" >/dev/null
+          docker run -d --name "$mongo" --network "$network" \
+            --network-alias docker-smoke-mongo mongo:7 >/dev/null
+          mongo_ready=false
+          for attempt in $(seq 1 30); do
+            if docker exec "$mongo" mongosh --quiet --eval \
+              'quit(db.adminCommand({ping:1}).ok === 1 ? 0 : 1)' >/dev/null 2>&1; then
+              mongo_ready=true
+              break
+            fi
+            sleep 2
+          done
+          test "$mongo_ready" = true
+          if timeout 15 docker run --rm --name "$refusal" --network "$network" \
+            -e MONGODB_URL=mongodb://docker-smoke-mongo:27017 \
+            -e WATCH_HEARTBEAT_TENANTS= -e GEMINI_API_KEY=ci-not-a-real-key \
+            "$api_image" > docker-evidence/missing-db.log 2>&1; then
+            echo "API unexpectedly accepted an unset MONGODB_DB"
+            exit 1
+          else
+            refusal_status=$?
+            test "$refusal_status" -eq 1
+            grep -q 'MONGODB_DB is required' docker-evidence/missing-db.log
+            echo "Missing database name startup refusal: PASS"
+          fi
+          # Empty watcher tenant list prevents notifications. Only health/auth probes run;
+          # no API keys, migrations, seed, model calls, persistent volumes or host DB ports.
+          docker run -d --name "$api" --network "$network" \
+            -e MONGODB_URL=mongodb://docker-smoke-mongo:27017 \
+            -e MONGODB_DB=lkb_work_docker_smoke -e PORT=3300 \
+            -e WATCH_HEARTBEAT_TENANTS= \
+            -e CORS_ORIGINS=http://localhost:8080 \
+            -e GEMINI_API_KEY=ci-not-a-real-key "$api_image" >/dev/null
+          api_ready=false
+          for attempt in $(seq 1 60); do
+            if test "$(docker inspect "$api" --format '{{.State.Health.Status}}')" = healthy; then
+              api_ready=true
+              break
+            fi
+            if test "$(docker inspect "$api" --format '{{.State.Running}}')" != true; then
+              break
+            fi
+            sleep 2
+          done
+          test "$api_ready" = true
+          docker exec "$api" node --input-type=module -e '
+            import assert from "node:assert/strict";
+            const health = await fetch("http://127.0.0.1:3300/health");
+            assert.equal(health.status, 200);
+            assert.deepEqual(await health.json(), {db:"ok"});
+            const denied = await fetch("http://127.0.0.1:3300/ask", {
+              method:"POST", headers:{"content-type":"application/json"},
+              body:JSON.stringify({query:"container smoke"})
+            });
+            assert.equal(denied.status, 401);
+            assert.equal((await denied.json()).error, "unauthorized");
+            console.log("API health and unauthenticated refusal: PASS");
+          '
+          docker run -d --name "$web" --network "$network" \
+            -p 127.0.0.1:18080:80 "$web_image" >/dev/null
+          web_ready=false
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18080/ \
+              -o docker-evidence/index.html; then
+              web_ready=true
+              break
+            fi
+            sleep 2
+          done
+          test "$web_ready" = true
+          curl --fail --silent http://127.0.0.1:18080/settings \
+            -o docker-evidence/settings.html
+          grep -q 'id="root"' docker-evidence/index.html
+          cmp docker-evidence/index.html docker-evidence/settings.html
+          echo "Web root and settings SPA fallback: PASS"
+          echo "Docker image smoke: PASS"
+
+      - name: Upload isolated smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-smoke-${{ github.run_id }}-${{ github.run_attempt }}
+          path: docker-evidence/
+          if-no-files-found: ignore
+          retention-days: 7

@@ -15,15 +15,14 @@ services:
   #   MONGODB_DB=lkb_work_x docker compose --profile migrate run --rm migrate          # isolated work DB
   #   MONGODB_DB=lkb LKB_I_KNOW_THIS_IS_PRODUCTION=1 docker compose --profile migrate run --rm migrate   # production, deliberate
   # (an opt-in alone, or MONGODB_DB=lkb alone, is refused; so is an unset MONGODB_DB).
-  # Built from the api Dockerfile's `build` stage (full pnpm install: workspace node_modules incl.
-  # migrate-mongo and dotenv at /app/node_modules); the runtime stage ships neither migrations/
-  # nor the config, so they are bind-mounted read-only. NOTE: relies on the stage name `build`
-  # in apps/api/Dockerfile (ISS-DEPLOYCOMPOSE-001).
+  # Built from the root Dockerfile's `build` stage (full pnpm install: workspace node_modules incl.
+  # migrate-mongo and dotenv at /app/node_modules). Migration scripts, config and schema are
+  # bind-mounted read-only. NOTE: relies on the stage name `build` (ISS-DEPLOYCOMPOSE-001).
   migrate:
     profiles: ["migrate"]
     build:
       context: .
-      dockerfile: apps/api/Dockerfile
+      dockerfile: Dockerfile
       target: build
     working_dir: /app
     command: ["npx", "migrate-mongo", "up", "-f", "config/migrate-mongo-config.cjs"]
@@ -44,7 +43,8 @@ services:
   api:
     build:
       context: .
-      dockerfile: apps/api/Dockerfile
+      dockerfile: Dockerfile
+      target: api
     ports:
       - "3300:3300"
     environment:
@@ -59,13 +59,14 @@ services:
       PORT: 3300
     restart: unless-stopped
 
-  # Static SPA behind nginx (apps/web/Dockerfile). VITE_API_BASE_URL is BAKED INTO THE BUNDLE at
+  # Static SPA behind nginx (root Dockerfile's `web` target). VITE_API_BASE_URL is BAKED INTO THE BUNDLE at
   # build time, so it must be the URL the BROWSER uses to reach api (not the compose-internal name).
   # OWNER DECISIONS (placeholders, not decided here): public hostnames, exposed ports, TLS.
   web:
     build:
       context: .
-      dockerfile: apps/web/Dockerfile
+      dockerfile: Dockerfile
+      target: web
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3300}
     depends_on:
