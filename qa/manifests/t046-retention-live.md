@@ -1,6 +1,6 @@
 # t046-retention-live
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: 3 (roadmap T-046, closes the gaps the executor and schedule manifests listed). Class: DATA DELETE path (clip-before-purge gate), FULL ceremony. Lane: lane/t046-retention-live (branched from lane/codexwave1). No ledger issue is fixed or filed.
 Authority: D-008 (clip of +/-15 s per cited turn retained permanently before media purge), D-145 (90 days).

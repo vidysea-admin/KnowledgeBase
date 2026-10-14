@@ -12,3 +12,20 @@ EXPLANATION:
 5. Evidence. packages/ingest suite: tests 364 / pass 364 / fail 0. tsc exit 0. lint-loc: only the inherited LOC (408) and stale SNAPSHOT failures. 13 mutations, per-mutation byte backup, restore in finally, each hash equal to the HEAD blob; the harness was deleted. Real ffmpeg was run once on a temp 10 s file outside the repo.
 
 ISSUES-WRITTEN: ISS-T046LIVE-001, -002 (high), -003 (medium), -004 (low), in qa/issues.t046-retention-live.jsonl.
+
+---
+
+# Cycle 1
+
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: 5bb3a5e0 (lane/t046-retention-live)
+
+EXPLANATION:
+1. D-015 reproductions re-run verbatim with real ffmpeg/ffprobe 9.0.2 on a generated 10 s mp4. ISS-T046LIVE-001: window 50-60 s => ok:false window-beyond-media, no clip (10-12 s also refused). ISS-T046LIVE-002: 18-byte junk clip and a clip truncated to half its bytes => both re-probed, rejected, re-extracted to valid 2.2 s / 3.2 s clips; a leftover garbage .partial is overwritten, never promoted. A partial set (one beyond-media window) => ok:false, so the raw is kept.
+2. Partial/rename flow: ffmpeg writes <name>.partial<ext>, the clip is ffprobed, then renamed. A crash before rename leaves no final clip, so the next run re-extracts and the unlink never ran. Clamping: windows straddling the end are clamped to the source (8-20 s gave 2.0 s, 9.8-30 s gave 0.2 s, i.e. exactly the part of the window that exists); the clip always starts at or before tStart and covers the whole existing window within tolerance max(1.5 s, 15%). No case found where the cited moment exists in the media but is missing from the clip.
+3. Scheduler -ReportFile now defaults to data/retention/report.json; the job refuses equal report and last-run paths (exit 2). Notes only: the equality check is a string compare of resolved paths, so a case-variant path on Windows would evade it; an existing valid clip with the same name is accepted by duration only, not by content.
+4. Mutations (10, per-mutation byte backup, restore in finally, hash equal to the HEAD blob each time): M10, M12, beyond-media off, post-extract probe off, lower bound off, write-to-final, clamp removed, unlink-before-clips, equal-path off and clip-failure ignored were all KILLED. The harness was deleted.
+5. packages/ingest suite: tests 374 / pass 374 / fail 0. tsc exit 0. lint-loc: only the inherited LOC and stale SNAPSHOT failures. Not done by the maker and left as follow-ups (named in the manifest): an index-proof check for processedAt, a lock, mandatory clips for library callers.
+
+ISSUES-WRITTEN: none. ISS-T046LIVE-001..004 closed.
