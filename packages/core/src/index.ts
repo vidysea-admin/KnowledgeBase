@@ -21,6 +21,8 @@ export * from "./generated/speaker_suggestions.js";
 export * from "./generated/speakers.js";
 export * from "./generated/tenants.js";
 export * from "./generated/topics.js";
+export * from "./generated/transcript_review_revisions.js";
+export * from "./generated/transcript_reviews.js";
 export * from "./generated/tree_index.js";
 export * from "./generated/trusted_senders.js";
 export * from "./generated/turns.js";

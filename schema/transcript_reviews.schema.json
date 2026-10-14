@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://transcript_reviews",
+  "title": "transcript_reviews",
+  "description": "T-054 head of a session's human transcript corrections: ONE row per (tenantId, sessionId), the only mutable row of the review layer. It holds the current revision, the overlay of corrected turns (text/speaker only), the audit entry of the head revision and the downstream-refresh state. The original `turns` rows are never written by a review: effective transcript = turns + overlay. A commit is a compare-and-set of this row on `revision`.",
+  "type": "object",
+  "required": ["_id", "tenantId", "sessionId", "revision", "parentRevision", "overlay", "audit", "refresh", "committedAt"],
+  "properties": {
+    "_id": { "type": "string", "minLength": 1, "description": "sha256 hex of JSON [\"head\", tenantId, sessionId]; collision-free across tenants." },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "sessionId": { "type": "string", "minLength": 1 },
+    "revision": { "type": "string", "pattern": "^[A-Za-z0-9._:-]{1,400}$", "description": "Deterministic planner revision; the ETag of the transcript." },
+    "parentRevision": { "type": "string", "pattern": "^[A-Za-z0-9._:-]{1,400}$", "description": "Revision this one was committed over (base-<hash> for the first review)." },
+    "overlay": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["turnId", "text", "speakerRef"],
+        "properties": {
+          "turnId": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 },
+          "speakerRef": { "type": "string", "minLength": 1 },
+          "speakerLabel": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "audit": {
+      "type": "object",
+      "required": ["actorRef", "reviewedAt", "reason", "changes"],
+      "properties": {
+        "actorRef": { "type": "string", "minLength": 1 },
+        "reviewedAt": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 },
+        "changes": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["turnId", "before", "after"], "additionalProperties": true } }
+      },
+      "additionalProperties": false
+    },
+    "refresh": {
+      "type": "object",
+      "required": ["status", "revision", "targets", "completed"],
+      "properties": {
+        "status": { "type": "string", "enum": ["pending", "complete", "failed"] },
+        "revision": { "type": "string", "minLength": 1 },
+        "targets": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "completed": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "failedTarget": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "committedAt": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

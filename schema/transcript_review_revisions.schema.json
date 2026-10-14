@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://transcript_review_revisions",
+  "title": "transcript_review_revisions",
+  "description": "T-054 append-only history of transcript corrections: one immutable row per committed revision (who, when, why, and the before/after of every changed turn). Written idempotently ($setOnInsert on a deterministic _id) and healed from the head's embedded audit entry; never updated or deleted by the API.",
+  "type": "object",
+  "required": ["_id", "tenantId", "sessionId", "revision", "parentRevision", "actorRef", "reviewedAt", "reason", "changes", "refreshTargets"],
+  "properties": {
+    "_id": { "type": "string", "minLength": 1, "description": "sha256 hex of JSON [\"rev\", tenantId, sessionId, revision]." },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "sessionId": { "type": "string", "minLength": 1 },
+    "revision": { "type": "string", "pattern": "^[A-Za-z0-9._:-]{1,400}$" },
+    "parentRevision": { "type": "string", "pattern": "^[A-Za-z0-9._:-]{1,400}$" },
+    "actorRef": { "type": "string", "minLength": 1 },
+    "reviewedAt": { "type": "string", "minLength": 1 },
+    "reason": { "type": "string", "minLength": 1 },
+    "changes": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["turnId", "before", "after"], "additionalProperties": true } },
+    "refreshTargets": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  },
+  "additionalProperties": false
+}
