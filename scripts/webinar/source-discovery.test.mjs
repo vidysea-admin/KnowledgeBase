@@ -1,4 +1,8 @@
 /** Cross-layer source discovery integration; fixtures only, no provider requests. */
+// PRECONDITION: run under the tsx loader: `node --test --import tsx scripts/webinar/source-discovery.test.mjs` (or `pnpm test:webinar`).
+// packages/core/src/index.ts re-exports "./generated/*.js"; the files are committed as generated/*.ts (scripts/gen-types.mjs, `pnpm gen:types`,
+// not gitignored), so no codegen step is needed. The ".js" specifier only resolves under tsx; plain `node --test` fails with
+// ERR_MODULE_NOT_FOUND on packages/core/src/generated/api_keys.js, which is a loader problem, not a missing file.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { runPipelineWatch } from "./run-pipeline.mjs";
