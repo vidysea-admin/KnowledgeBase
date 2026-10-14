@@ -11,6 +11,7 @@ import pytest
 sys.path.insert(0, os.path.dirname(__file__))
 from sb_join import classify_admission, classify_meet_state, platform_of  # noqa: E402
 from test_sb_join_admission import _names, _run  # noqa: E402
+from sb_join_detect import FLUSH_GRACE_S  # noqa: E402
 
 ZOOM = "https://us02web.zoom.us/wc/join/123456"
 TEAMS = "https://teams.microsoft.com/v2/?meetingjoin=true"
@@ -90,7 +91,7 @@ def test_silent_lobby_suppresses_watchdog_reload_and_times_out(tmp_path, url):
     (tmp_path / "b").mkdir()
     events, _, _, clock = _run(tmp_path / "b", url, lambda now: (False, _lobby_text(url)), timeout=300, seconds=100000)
     names = _names(events)
-    assert clock.now - 1000 < 310 and "admitted" not in names
+    assert clock.now - 1000 < 310 + FLUSH_GRACE_S and "admitted" not in names
     assert names.count("admission_timeout") == 1 and names[-1] == "closed"
 
 
@@ -108,7 +109,7 @@ def test_unknown_platform_without_a_signal_is_not_admitted_and_times_out(tmp_pat
     events, _, _, clock = _run(tmp_path, OTHER, lambda now: (False, "welcome to the webinar"), timeout=300, seconds=100000)
     names = _names(events)
     assert "admitted" not in names and names.count("admission_timeout") == 1
-    assert clock.now - 1000 < 310 and names[-1] == "closed"
+    assert clock.now - 1000 < 310 + FLUSH_GRACE_S and names[-1] == "closed"
 
 
 def test_unknown_platform_admits_only_on_a_positive_in_call_signal(tmp_path):

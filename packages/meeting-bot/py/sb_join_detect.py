@@ -136,6 +136,8 @@ LOBBY_PHRASES = [
     "you'll join the call when someone lets you in", "waiting for the host to let you in",
     "waiting to be let in", "your request to join",
 ]
+# After admission_timeout the browser stays open this long for the controller's flush + stop file.
+FLUSH_GRACE_S = 45
 ADMISSION_TIMEOUT_S = 15 * 60  # default lobby wait before giving up (--admission-timeout overrides)
 
 

@@ -149,10 +149,49 @@ return [...document.querySelectorAll(sel)].some(vis);
 # aria-based first (class names churn); the data-tid hooks are Teams' own test ids. UNVERIFIED
 # against live Zoom/Teams -- they need a live check. Visible = non-zero size, as for Meet.
 _VIS = "const vis = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; };\n"
+# Zoom web client, MEETING + WEBINAR attendee view (zoomwebinar lane). A webinar attendee has no mic or
+# camera buttons and the footer may carry a text-only "Leave" (no aria-label) or be auto-hidden, so the
+# old aria-label^="leave" probe never fired and a bot that WAS in the webinar timed out after 900 s.
+# Signals (any one visible, searched in the top document AND every same-origin iframe, like CLICK_JS):
+#   strong: a Leave control (aria-label, visible text "Leave [meeting|webinar]", or .footer__leave-btn);
+#           the footer toolbar (#wc-footer, footer[role=toolbar], or footer buttons for Q&A / Chat /
+#           Raise Hand / Reactions / Participants / Attendees / More).
+#   weak (need ALL of: a large visible share/video canvas or <video>, a participant name-tag overlay or
+#           the share container, and NO join-page controls): the attendee view with the footer hidden.
+# Join-page guard: a visible name input / "Join" button means this is the pre-join page, never in-call.
+# DOM class names are modelled from the public client and the live capture of 2026-10-13 (UNVERIFIED
+# against live markup beyond that screenshot); aria/text probes come first because classes churn.
 ZOOM_IN_CALL_JS = _VIS + """
-const sel = 'button[aria-label^="leave" i], [role=button][aria-label^="leave" i], button[aria-label*="end meeting" i], ' +
-  '[role=toolbar][aria-label*="meeting" i]';
-return [...document.querySelectorAll(sel)].some(vis);
+const FRAME_LIMIT = 6;
+const docs = [];
+const walk = (doc, depth) => {
+  docs.push(doc);
+  if (depth >= FRAME_LIMIT) return;
+  for (const f of doc.querySelectorAll('iframe')) {
+    let d = null; try { d = f.contentDocument; } catch (e) { d = null; }
+    if (d && vis(f)) walk(d, depth + 1);
+  }
+};
+walk(document, 0);
+const all = (sel) => docs.flatMap((d) => [...d.querySelectorAll(sel)]);
+const anyVis = (sel) => all(sel).some(vis);
+const bigVis = (el) => { const r = el.getBoundingClientRect(); return r.width >= 160 && r.height >= 90; };
+const txt = (el) => ((el.getAttribute('aria-label') || '') + ' ' + (el.textContent || '')).trim().toLowerCase();
+// Join-page guard: a visible name input or a "Join" button means the pre-join page.
+if (anyVis('input#input-for-name, input[placeholder*="name" i]') ||
+    all('button').some((b) => vis(b) && /^(join|join webinar|join meeting)$/.test((b.textContent || '').trim().toLowerCase()))) return false;
+const leaveRe = /^leave( meeting| webinar)?$/;
+const footerRe = /^(q&a|chat|raise hand|reactions|participants|attendees|more)\b/;
+const leave = all('button, [role=button], .footer__leave-btn').some((b) => vis(b) &&
+  (/^leave/i.test(b.getAttribute('aria-label') || '') || leaveRe.test((b.textContent || '').trim().toLowerCase()) ||
+   b.classList.contains('footer__leave-btn')));
+if (leave) return true;
+if (anyVis('#wc-footer, footer[role=toolbar], [role=toolbar][aria-label*="meeting" i], [role=toolbar][aria-label*="webinar" i]')) return true;
+if (all('footer button, #wc-footer button, [role=toolbar] button').some((b) => vis(b) && footerRe.test(txt(b)))) return true;
+
+const media = all('canvas, video').some((el) => vis(el) && bigVis(el));
+const tag = anyVis('.video-avatar__avatar-footer, .video-avatar__avatar-name, [class*="avatar-footer"], [class*="name-tag"], .sharee-container, #sharee-container, .share-content-viewer, [class*="sharing-canvas"], [class*="share-canvas"]');
+return media && tag;
 """
 TEAMS_IN_CALL_JS = _VIS + """
 const sel = 'button#hangup-button, button[data-tid="hangup-main-btn"], [data-tid="calling-unified-bar"], ' +

@@ -12,6 +12,8 @@ import { getProcessStartTime } from "./controller-state.js";
 import { browserProfileArgs } from "./browser/browser-profile.js";
 import type { BotEvent } from "./obs/obs-windows.js";
 import { assertInsideDir, assertSafeCaptureFileName, assertSafeCaptureId, type TabReceiverGuard } from "./tab-receiver-guard.js";
+import {createSilenceHealth, silenceHealthEnabled} from "./tab-silence-health.js";
+import {remuxRecoveryEnabled, remuxWebmInPlace} from "./tab-remux.js";
 import {validateCaptureControlGaps, validateCaptureStatusIdentity, type GapWindow} from "./reconnect-gaps.js";
 
 const MAX_CHUNK = 8 * 1024 * 1024;
@@ -150,7 +152,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
   const levels = new Set<(db: number) => void>();
   const runs = new Map<string, {child: ChildProcess; exited: Promise<number | null>; output: string;
     receiver: Awaited<ReturnType<typeof createTabCaptureReceiver>>; stopFile: string;
-    reloadFile: string; lock: string; done: boolean; failure?: string; stopped?: boolean; controlGaps: GapWindow[]; identity: Record<string, any>}>();
+    reloadFile: string; lock: string; done: boolean; failure?: string; recovered?: string; stopped?: boolean; controlGaps: GapWindow[]; identity: Record<string, any>}>();
   let active = false;
   const deps: BrowserJoinerDeps = {
     async launch(url) {
@@ -172,6 +174,10 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
       const identity={output,pid:process.pid,handle,sessionId:cfg.sessionId,tenantId:cfg.tenantId,profileDir:path.resolve(cfg.profileDir),recordDir:path.resolve(cfg.recordDir),controllerStartedAt};
       const status = (state: string, error?: string) => writeOwnedTabStatus(statusPath, identity,
         {state,captureStartedAt,error,controlGaps:runs.get(handle)?.controlGaps ?? []});
+      const health = silenceHealthEnabled() ? createSilenceHealth({onChange: (h) => {
+        log(`audio-health: ${h.note}`);
+        try {writeOwnedTabStatus(statusPath, identity, {audioHealth: h});} catch {}
+      }}) : undefined;
       try {
         if (existsSync(recoveryLock)) throw new Error("Profile recovery active or requires inspection");
         if (existsSync(lock)) {
@@ -206,6 +212,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
           if (run && failure) run.failure = failure;
           if (event.event === "capture-level" && typeof event.db === "number" && Number.isFinite(event.db)) {
             for (const listener of levels) listener(event.db);
+            health?.onLevel(event.db);
           }
           cfg.onEvent?.(handle, event);
         }, cfg.guard);
@@ -262,10 +269,16 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
       writeFileSync(run.stopFile, "stop");
       await Promise.race([run.exited, sleep(5000)]); if (!run.done) run.child.kill();
       await run.receiver.close();
+      if (run.failure?.startsWith("Recorder did not acknowledge") && run.receiver.bytes() && remuxRecoveryEnabled()) {
+        // zoomwebinar fallback (LKB_TAB_REMUX_RECOVERY=1, default off): `ffmpeg -c copy` the received bytes into a playable file.
+        const r = remuxWebmInPlace(run.output);
+        if (r.ok) { log("final flush not acknowledged; recovered media with ffmpeg -c copy (raw kept as .raw)"); run.failure = undefined; run.recovered = "final flush not acknowledged; media recovered by ffmpeg -c copy remux (tail after the last delivered chunk is lost)"; }
+        else log(`remux recovery failed: ${r.error}`);
+      }
       if (existsSync(run.lock) && !lstatSync(run.lock).isSymbolicLink() && readFileSync(run.lock, "utf8") === String(process.pid)) rmSync(run.lock);
       rmSync(run.stopFile, {force: true}); rmSync(run.reloadFile, {force: true});
       rmSync(path.join(cfg.recordDir, `.extension-${handle}`), {recursive: true, force: true});
-      writeOwnedTabStatus(`${run.output}.status.json`,run.identity,{state:run.failure ? "failed" : "stopped",error:run.failure,bytes:run.receiver.bytes(),controlGaps:run.controlGaps});
+      writeOwnedTabStatus(`${run.output}.status.json`,run.identity,{state:run.failure ? "failed" : "stopped",error:run.failure ?? run.recovered,bytes:run.receiver.bytes(),controlGaps:run.controlGaps});
       active = false;
       if (run.failure || !run.receiver.bytes()) throw new Error(run.failure ?? "Tab capture produced no media bytes");
     },
