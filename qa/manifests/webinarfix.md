@@ -3,7 +3,7 @@
 **Contract:** none specific (three test/tooling defects in scripts/webinar found 2026-10-14).
 **Date:** 2026-10-14
 **Fix cycle:** 1
-**Status:** ready-for-check
+**Status:** checked-PASS
 
 ## Fix 1 — validate-session.mjs argument parsing
 `args.filter((a,i) => !a.startsWith("--") && i !== at + 1)` with `at = -1` excluded index 0, so a bare session id was dropped and usage printed. Replaced by exported `parseCliArgs` (first positional that is not a flag and not the `--root` value; a `--root` with no value or followed by a flag is a usage error). Tests (validate-session.test.mjs): bare id; id + `--root` before and after; `--dry-run`; `--accept-partial`; no id / dangling `--root`; end-to-end spawn proving a bare id reaches validation ("validation could not run") rather than usage.
