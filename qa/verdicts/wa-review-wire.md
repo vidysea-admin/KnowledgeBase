@@ -54,3 +54,21 @@ New issues: ISS-WA-REVIEW-WIRE-008 (medium: marker _id not tenant-scoped, unique
 
 Numbers: WhatsApp tests 51, pass 50, fail 0, skipped 1. Full apps/api: tests 948, pass 947, fail 0, skipped 1 (D2_FIXTURE_PYTHON set). tsc (temporary absolute paths tsconfig, deleted): exit 0. lint-loc: only the same 2 pre-existing stage failures (meeting-bot py 408 lines, SNAPSHOT stale). Real Mongo still unrun.
 Closed: ISS-WA-REVIEW-WIRE-001, 002, 003, 005. Still open: 004, 006, 007, 008-012.
+
+---
+
+# Cycle 2
+
+VERDICT: PASS (scoped to write-side; unmounted; ISS-006 read-side quarantine remains open and blocks mounting)
+Cycle checked: 2
+Commit checked: 611b1703
+
+By issue id (own probes plus 12 mutants on a throwaway copy, control exit 0):
+- ISS-008: ids tenant-structured and length-prefixed; boundary pair distinct; dropping the prefix is KILLED. Pre-existing and out of lane: two tenants with the same owner+group share the bare session hash.
+- ISS-009: empty snapshot refused (no writes, alert + snapshot-refused row, marker kept); 10 stored: delete 5 ok, delete 6 refused; threshold, empty clause, force, refusal logging and rethrow mutants all KILLED. forceIngestGroup appears only in compose/ingest/tests; routes/whatsapp.ts calls deps.ingestGroup and wiring.whatsapp exposes only listGroups+ingestGroup: unreachable from any route. Slow drain: 8 messages deleted 1 per run were accepted down to 1; only the last is refused. Accepted by design, filed low (ISS-013).
+- ISS-010: deleted text and quote redacted on approved and rejected rows; no leak in candidates, log, claims or turns; audit clean. Redaction-removed and approved-only mutants KILLED. Survivor: redaction updateOne tenant scope (redundant, ids tenant-namespaced).
+- ISS-011: missing snapshot throws with turns untouched; guard-off mutant KILLED.
+- ISS-012: schema/validate.py PASS (30 schemas); gen-types --check OK (30 files).
+
+Numbers: WhatsApp tests 57, pass 56, fail 0, skipped 1. Full apps/api: tests 954, pass 953, fail 0, skipped 1 (D2_FIXTURE_PYTHON set). tsc with temporary paths tsconfig (deleted): exit 0. lint-loc: only the same 2 pre-existing stage failures. Real Mongo still unrun.
+Closed: ISS-WA-REVIEW-WIRE-008, 009, 010, 011, 012. Open: 004, 006 (blocks mount), 007, 013.

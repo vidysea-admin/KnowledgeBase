@@ -1,6 +1,6 @@
 # Manifest — wa-review-wire
 
-**Handshake status:** checked-PASS (cycle 1, scoped to write-side; ISS-006 read-side quarantine still blocks mounting)
+**Handshake status:** checked-PASS (cycle 2, scoped to write-side; ISS-006 read-side quarantine still blocks mounting)
 Status: checked-PASS
 Fix cycle: 2
 Task: T-007 (parent stays open; this is a scoped wiring unit)
