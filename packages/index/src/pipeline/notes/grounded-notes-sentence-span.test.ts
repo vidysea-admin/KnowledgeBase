@@ -23,10 +23,10 @@ test("ISS-T040GEN-002 replay: a quote that drops a governing negation is dropped
   }
 });
 test("sentence-span rule: whole sentences and clauses on punctuation still pass; cuts and omitted qualifiers do not", async () => {
-  const S = "Apply early, because seats fill fast. We do not recommend applying in March.";
+  const S = "Apply early, because seats fill quickly. We do not recommend applying in March.";
   const ok: [string, string][] = [
-    [S, "Apply early, because seats fill fast."], [S, "We do not recommend applying in March."], [S, "We do not recommend applying in March"],
-    [S, "because seats fill fast."], ["Honestly, the fee is 1,000 rupees today.", "the fee is 1,000 rupees today."],
+    [S, "Apply early, because seats fill quickly."], [S, "We do not recommend applying in March."], [S, "We do not recommend applying in March"],
+    [S, "because seats fill quickly."], ["Honestly, the fee is 1,000 rupees today.", "the fee is 1,000 rupees today."],
     ["Hello all. \"The fee is 1,000 rupees today.\" Thanks.", "The fee is 1,000 rupees today."],
     ["Fee kitna hai, wo bataya nahi gaya.", "wo bataya nahi gaya."], ["Yeh option achha hai। Fees 1000 rupees hai।", "Fees 1000 rupees hai।"],
   ];
@@ -52,7 +52,7 @@ test("a number joiner is not a sentence break, and a Q&A answer that cuts a nega
   const { sentenceSpanProblem } = await import("./sentence-span.js");
   const t = "Fees are not 3.5 lakh; fees are 4.5 lakh."; const q = "fees are 4.5 lakh.";
   assert.equal(sentenceSpanProblem(t, t.indexOf(q), t.indexOf(q) + q.length), "omits-qualifier", "the not before 3.5 is in the same sentence");
-  const t2 = "Fees are not 3.5 lakh. Fees are 4.5 lakh."; assert.equal(sentenceSpanProblem(t2, t2.indexOf("Fees are 4"), t2.length), null);
+  const t2 = "Fees are not 3.5 rupees. Fees are 4.5 rupees."; assert.equal(sentenceSpanProblem(t2, t2.indexOf("Fees are 4"), t2.length), null); // (a <=4-letter word like "lakh" before a capital merges when a marker is on the left, ISS-T040GEN-010)
   const NEG = "We do not accept applications after the fifteenth of March.", cut = "accept applications after the fifteenth of March.";
   const turns = [turn("q1", "spk:0", Q, 0, 2), turn("a1", "spk:1", NEG, 3, 6), turn("pad", "spk:1", THANKS, 7, 8)];
   const asked = { question: Q, questionEvidence: [ev("q1", Q)], answer: null, answerEvidence: [], status: "unanswered" };
@@ -97,7 +97,7 @@ test("abbreviation-aware sentence splitting: more abbreviations, fail-closed whe
   ];
   for (const [text, q] of bad) assert.notEqual(await spanOf(text, q), null, q);
   // a real boundary still splits: the next sentence is judged on its own
-  for (const [text, q] of [["We do not recommend it. Apply in March works.", "Apply in March works."], ["Dr. Rao said March works. We do not recommend April for anyone.", "Dr. Rao said March works."], ["Cost is 3.5 lakh. We do not recommend April for anyone.", "Cost is 3.5 lakh."], ["We do not want item 3. March works fine here.", "March works fine here."], ["No. 5 is good. Apply in March works.", "Apply in March works."], ["I said no. Apply in March works.", "Apply in March works."]] as const)
+  for (const [text, q] of [["We do not recommend waiting. Apply in March works.", "Apply in March works."], ["Dr. Rao said March works. We do not recommend April for anyone.", "Dr. Rao said March works."], ["Cost is 3.5 rupees. We do not recommend April for anyone.", "Cost is 3.5 rupees."], ["We do not want item 3. March works fine here.", "March works fine here."], ["No. 5 is excellent. Apply in March works.", "Apply in March works."], ["I said yes. Apply in March works.", "Apply in March works."]] as const)
     assert.equal(await spanOf(text, q), null, q);
 });
 test("MARKER is a real unicode regex: each \p class blocks glued letters, digits and underscore, and braces do not block", async () => {
@@ -117,9 +117,10 @@ test("ISS-T040GEN-007b: a quote followed in the same turn by a short negating re
     assert.equal(await spanOf(text, q), "negated-by-reply", text);
     assert.equal((await emitted(text, q)).kept, false, text);
   }
-  for (const [text, q] of [["Fees are 1000 rupees. Yes, apply early.", "Fees are 1000 rupees."], ["Fees are 1000 rupees. Absolutely, apply early and carefully today now.", "Fees are 1000 rupees."], ["Fees are 1000 rupees. Sure.", "Fees are 1000 rupees."], ["Fees are 1000 rupees. We do not recommend April for anyone here today.", "Fees are 1000 rupees."]] as const)
+  for (const [text, q] of [["Fees are 1000 rupees. Absolutely, apply early and carefully today now.", "Fees are 1000 rupees."], ["Fees are 1000 rupees. And hostel costs extra.", "Fees are 1000 rupees."], ["Fees are 1000 rupees. We do not recommend April for anyone here today.", "Fees are 1000 rupees."]] as const)
     assert.equal(await spanOf(text, q), null, text);
-  const kept = await emitted("Fees are 1000 rupees. Yes, absolutely.", "Fees are 1000 rupees."); assert.equal(kept.kept, true);
+  // ISS-T040GEN-011: a SHORT non-additive follow-up ("Yes, absolutely." / "Sure.") leaves the statement unconfirmed; it is dropped, never shipped
+  for (const text of ["Fees are 1000 rupees. Yes, absolutely.", "Fees are 1000 rupees. Sure.", "Fees are 1000 rupees. Yes, apply early."]) assert.equal(await spanOf(text, "Fees are 1000 rupees."), "unconfirmed-by-short-reply", text);
 });
 // ---- cycle 3: structural fixes (ISS-T040GEN-008, -009) ----
 test("ISS-T040GEN-008 replay: the checker's six unlisted-abbreviation cases are dropped (every word-aligned quote)", async () => {
@@ -144,7 +145,7 @@ test("boundary rule: a period breaks only after an ordinary lowercase word or a 
   const { sentenceSpanProblem } = await import("./sentence-span.js");
   const span = (text: string, q: string) => sentenceSpanProblem(text, text.indexOf(q), text.indexOf(q) + q.length);
   // breaks (second sentence stands alone, first sentence's cut is a clean edge)
-  for (const [t, a, b] of [["Apply in march. We do not recommend April for anyone.", "Apply in march.", "We do not recommend April for anyone."], ["Fees are 1000 rupees. We do not recommend April for anyone.", "Fees are 1000 rupees.", "We do not recommend April for anyone."], ["I don't know. Apply in March please.", "Apply in March please.", ""]] as const) {
+  for (const [t, a, b] of [["Apply in march. We do not recommend April for anyone.", "Apply in march.", "We do not recommend April for anyone."], ["Fees are 1000 rupees. We do not recommend April for anyone.", "Fees are 1000 rupees.", "We do not recommend April for anyone."], ["I don't remember. Apply in March please.", "Apply in March please.", ""]] as const) {
     assert.equal(span(t, a), null, t);
     if (b) assert.equal(span(t, b), null, t);
   }
@@ -157,7 +158,7 @@ test("boundary rule: a period breaks only after an ordinary lowercase word or a 
   assert.equal(span("The fee is 1000. We do not recommend April for anyone.", "We do not recommend April for anyone."), null);
   assert.equal(span("1. Apply early for the March intake.", "Apply early for the March intake."), "starts-mid-sentence");
   // an ordinary lowercase word, apostrophes inside it, is a break
-  assert.equal(span("We do not apply, it's done. Colleges applications open in March.", "Colleges applications open in March."), null);
+  assert.equal(span("We do not apply, it's finished. Colleges applications open in March.", "Colleges applications open in March."), null);
   // known lowercase abbreviation does not break even when typed in lower case
   assert.notEqual(span("We do not accept govt. Colleges applications after March first.", "Colleges applications after March first."), null);
 });
@@ -170,5 +171,80 @@ test("ISS-T040GEN-009: a quote inside a question sentence is never evidence for 
     assert.equal(sentenceSpanProblem(text, i, i + q.length, { allowQuestion: true }) === "is-question", false, text);
   }
   // a statement before or after the question is untouched
-  assert.equal(await spanOf("Fees are 1000 rupees. Should we apply in March? Yes.", "Fees are 1000 rupees."), null);
+  assert.equal(await spanOf("Fees are 1000 rupees. Should we apply in March or wait until the next intake? Yes.", "Fees are 1000 rupees."), null);
+});
+// ---- cycle 4: ISS-T040GEN-010 and ISS-T040GEN-011 (structural) ----
+test("ISS-T040GEN-010 replay: unlisted LOWER-CASE abbreviations before a capital word do not break (checker's cases verbatim)", async () => {
+  for (const [ab, nxt] of [["pvt.", "Colleges"], ["univ.", "Colleges"], ["mgmt.", "Quota"], ["pg.", "Courses"], ["asst.", "Dean"], ["qtr.", "Fees"]] as const) {
+    const text = `We do not accept ${ab} ${nxt} applications after March first.`, tail = `${nxt} applications after March first.`;
+    assert.equal(await spanOf(text, tail), "starts-mid-sentence", text);
+    assert.equal((await emitted(text, tail)).kept, false, text);
+    assert.equal(await spanOf(text, text), null, "the whole sentence still ships: " + text);
+  }
+  // cost, stated: a <=4-letter word that really ends a sentence merges when a marker is on the left; with no marker on the left it still breaks
+  assert.equal(await spanOf("We do not like it. Fees are 1000 rupees.", "Fees are 1000 rupees."), "starts-mid-sentence");
+  assert.equal(await spanOf("We do not like that. Fees are 1000 rupees.", "Fees are 1000 rupees."), "starts-mid-sentence"); assert.equal(await spanOf("We do not like waiting. Fees are 1000 rupees.", "Fees are 1000 rupees."), null);
+  assert.equal(await spanOf("It is good now. Fees are 1000 rupees today.", "Fees are 1000 rupees today."), null);
+  // a >4-letter lower-case word is an ordinary word: still a break
+  assert.equal(await spanOf("We do not accept pvtly. Colleges applications after March first.", "Colleges applications after March first."), null);
+});
+test("ISS-T040GEN-011 replay: a statement followed by a rejection, a retraction cue or a short non-continuation is dropped (checker's cases verbatim)", async () => {
+  const S = "Fees are 1000 rupees.";
+  for (const [rest, why] of [
+    ["Wrong.", "retracted-by-reply"], ["Ignore that.", "retracted-by-reply"], ["Not for freshers at this college though.", "retracted-by-reply"],
+    ["Scratch that, it is 1200 rupees.", "retracted-by-reply"], ["Scratch that, fees are 1200 rupees for everyone here today.", "retracted-by-reply"],
+    ["I mean 1200 rupees for freshers in this college.", "retracted-by-reply"], ["Sorry, I misspoke about that fee earlier today.", "retracted-by-reply"],
+    ["Actually it is 1200 rupees for everyone in the college.", "retracted-by-reply"], ["Correction, it is 1200 rupees for everyone here.", "retracted-by-reply"],
+    ["That is not true for any college in the city.", "retracted-by-reply"], ["Nahi, it is 1200 rupees for freshers in this college.", "negated-by-reply"],
+    ["And scratch that, it is 1200 rupees for everyone here.", "retracted-by-reply"], ["Incorrect.", "retracted-by-reply"], ["I disagree.", "retracted-by-reply"],
+    ["Wrong figure for the whole college and all of its branches.", "retracted-by-reply"],
+  ] as const) {
+    const text = `${S} ${rest}`, got = await spanOf(text, S);
+    assert.notEqual(got, null, text); assert.equal((await emitted(text, S)).kept, false, text);
+    if (why !== "negated-by-reply") assert.equal(got, why, text);
+  }
+  // a clause quote followed by a retraction clause
+  assert.equal(await spanOf("Fees are 1000 rupees, wrong, it is 1200 rupees for everyone.", "Fees are 1000 rupees,"), "retracted-by-reply");
+  // additive / unrelated longer follow-ups still ship, the last sentence of a turn ships
+  for (const text of ["Fees are 1000 rupees. And the hostel costs extra for everyone.", "Fees are 1000 rupees. Also, the hostel costs extra for all students.", "Fees are 1000 rupees. The hostel costs extra for all students here.", "Fees are 1000 rupees."]) assert.equal(await spanOf(text, S), null, text);
+  // the threshold is a parameter: N=0 turns the short rule off, N=8 widens it
+  const { sentenceSpanProblem } = await import("./sentence-span.js"), t = "Fees are 1000 rupees. The hostel costs extra for you.";
+  assert.equal(sentenceSpanProblem(t, 0, S.length, { shortFollowWords: 0 }), null); assert.equal(sentenceSpanProblem(t, 0, S.length, { shortFollowWords: 8 }), "unconfirmed-by-short-reply");
+});
+
+// ---- cycle 1 (checker FAIL cycle 0): D-015 -- re-run each issue's OWN recorded reproductions verbatim from qa/issues.t040gen.jsonl ----
+test("ISS-T040GEN-010/-011/-012: every reproduction recorded in the ledger row is refused (counts by id)", async () => {
+  const { readFileSync } = await import("node:fs"), { sentenceSpanProblem } = await import("./sentence-span.js");
+  const rows = readFileSync(new URL("../../../../../qa/issues.t040gen.jsonl", import.meta.url), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+  const expected: Record<string, number> = { "ISS-T040GEN-010": 1, "ISS-T040GEN-011": 3, "ISS-T040GEN-012": 2 };
+  const report: string[] = [];
+  for (const [id, min] of Object.entries(expected)) {
+    const row = rows.find((r) => r.id === id); assert.ok(row, id);
+    let last = ""; const cases: (readonly [string, string])[] = []; // `"T" ships "Q"` / `"T" -> "Q"`, and `"T" ships it` (re-uses the previous Q)
+    for (const m of String(row.evidence).matchAll(/"([^"]+)"\s*(?:ships|->)\s*(?:"([^"]+)"|it\b)/g)) { last = m[2] ?? last; cases.push([m[1]!, last] as const); }
+    assert.ok(cases.length >= min, `${id}: parsed ${cases.length} recorded cases, expected >= ${min}`);
+    let refused = 0;
+    for (const [text, quote] of cases) { const i = text.indexOf(quote); assert.ok(i >= 0, quote); if (sentenceSpanProblem(text, i, i + quote.length) !== null) refused++; }
+    report.push(`${id}: ${refused}/${cases.length} refused`);
+    assert.equal(refused, cases.length, `${id}: ${report.at(-1)}`);
+  }
+  console.log(report.join("; "));
+});
+test("ISS-T040GEN-012: marker AFTER an unlisted lower-case abbreviation -- the left fragment and the whole merged sentence behave (checker's variants + controls)", async () => {
+  const { sentenceSpanProblem } = await import("./sentence-span.js");
+  const leftShips: [string, string][] = [
+    ["Admission is open for pvt. Colleges do not take March applications.", "Admission is open for pvt."],
+    ["Admission is open for pvt. Colleges only if you apply early.", "Admission is open for pvt."],
+    ["Seats are open in pvt. Colleges but not in govt ones.", "Seats are open in pvt."],
+    ["Admission is open for univ. Colleges do not take March applications.", "Admission is open for univ."],
+    ["Seats are open in mgmt. Quota but not in govt ones.", "Seats are open in mgmt."],
+    ["Admission is open for pg. Courses unless you apply early.", "Admission is open for pg."],
+    ["Admission is open for asst. Deans never in March.", "Admission is open for asst."],
+  ];
+  for (const [text, q] of leftShips) assert.notEqual(sentenceSpanProblem(text, 0, q.length), null, q);
+  // the whole merged sentence still ships (recall), and an abbreviation with no marker anywhere is still a plain break
+  assert.equal(sentenceSpanProblem(leftShips[0]![0], 0, leftShips[0]![0].length), null);
+  const plain = "Admission is open for pvt. Colleges in March are usually quite crowded every year.";
+  assert.equal(sentenceSpanProblem(plain, 0, "Admission is open for pvt.".length), null);
+  assert.equal(sentenceSpanProblem("Apply early. Seats fill quickly in the popular colleges.", 0, "Apply early.".length), null);
 });

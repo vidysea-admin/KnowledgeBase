@@ -22,6 +22,21 @@ const MARKER = /(?<![\p{L}\p{N}_])(?:not|never|no|none|nobody|nothing|nowhere|ne
 /** A SHORT reply that negates the sentence before it ("Absolutely not.", "No.", "Nahi."): the next sentence is a negation, not a marker like "if". */
 const NEG_REPLY = /(?<![\p{L}\p{N}_])(?:not|no|never|nope|nah|none|nothing|nowhere|neither|nor|cannot|nahi|nahin)(?![\p{L}\p{N}_])|n['’]t(?![\p{L}\p{N}_])/iu;
 const MAX_REPLY_WORDS = 5;
+/**
+ * ISS-T040GEN-011: a statement is "unconfirmed" when the NEXT sentence of the same turn is short (<= SHORT_FOLLOW_WORDS words) and is not an additive
+ * continuation, or when that next sentence (or the next clause) OPENS with a retraction cue or negator, whatever its length. Fail closed.
+ * The additive conjunctions are a closed grammatical class; the cue set is retraction vocabulary, matched only at the START of the following segment.
+ */
+export const SHORT_FOLLOW_WORDS = 5;
+const CONTINUATION = /^(?:and|also|plus|then|so|because|which|or)(?![\p{L}\p{N}_])/iu;
+const RETRACT_CUE = /^(?:ignore|scratch|wrong|incorrect|correction|i\s+mean|sorry|actually|not|no|never|nope|nah|nahi|nahin|false|disregard|forget|retract|cancel|rather|oops|mistake|that['’]?s\s+(?:wrong|not|false)|that\s+is\s+(?:wrong|not|false)|i\s+(?:disagree|take\s+that\s+back|was\s+wrong)|take\s+that\s+back|bad\s+idea)(?![\p{L}\p{N}_])|^\p{L}+n['’]t(?![\p{L}\p{N}_])/iu;
+const LEAD = /^[\s"'“‘«‹(\[{\-–—]+/u;
+function retractsPrevious(seg: string): boolean {
+  const s = seg.replace(LEAD, "");
+  if (RETRACT_CUE.test(s)) return true;
+  const c = CONTINUATION.exec(s);
+  return c ? RETRACT_CUE.test(s.slice(c[0].length).replace(LEAD, "")) : false;
+}
 
 /**
  * Known LOWER-CASE abbreviations (no dot). This list is NOT the safety mechanism any more (cycle 3, ISS-T040GEN-008): a "." breaks a sentence only
@@ -33,6 +48,7 @@ const LOWER_ABBREVIATIONS = new Set([
   "min", "max", "avg", "sec", "hrs", "yrs", "rs", "jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "sept", "oct", "nov", "dec", "mon", "tue", "wed", "thu", "fri", "sat", "sun",
 ]);
 const LOWER = /\p{Ll}/u;
+const SHORT_TOKEN_LETTERS = 4;
 const APOS = new Set(["'", "’"]);
 const OPEN_OR_WS = (c: string) => WS.test(c) || OPENERS.has(c);
 
@@ -44,6 +60,11 @@ const OPEN_OR_WS = (c: string) => WS.test(c) || OPENERS.has(c);
  * AND the next word does not start in lower case. Anything else (capitalised, mixed case, digits with letters, single letter, dotted) NEVER breaks:
  * an unknown token fails closed, the sentence just gets longer and the negation floor sees more of it.
  */
+/** Text from `from` to the next strong mark followed by whitespace/end (a plain forward scan: it must NOT call isBoundary, which would recurse with sentenceStart). */
+function tailToStrongMark(t: string, from: number): string {
+  let e = from; while (e < t.length && !(STRONG.has(t[e]!) && (e + 1 >= t.length || WS.test(t[e + 1]!)))) e++;
+  return t.slice(from, e);
+}
 function isBoundary(t: string, i: number): boolean {
   if (!STRONG.has(t[i]!) || !(i + 1 >= t.length || WS.test(t[i + 1]!))) return false;
   if (t[i] !== ".") return true;
@@ -58,6 +79,11 @@ function isBoundary(t: string, i: number): boolean {
     if (p < 0 || STRONG.has(t[p]!) || OPENERS.has(t[p]!)) return false;
   }
   let n = i + 1; while (n < t.length && OPEN_OR_WS(t[n]!)) n++;
+  // ISS-T040GEN-010: a lower-case token of <= 4 letters before a capitalised word may be an unlisted abbreviation ("pvt. Colleges", "univ.", "mgmt.", "pg."), and no
+  // dictionary is available in node_modules. Fail closed WHERE IT MATTERS: do not break when the sentence so far holds a negation/qualifier marker (a wrong break there
+  // would hide the marker from a quote that starts after it). ISS-T040GEN-012: the same holds for a marker AFTER the dot (up to the next strong mark): the left fragment would ship
+  // and drop it, so that case merges too. With no marker on either side a wrong break cannot drop a negation, so it stays a break (recall).
+  if (!number && [...letters].length <= SHORT_TOKEN_LETTERS && n < t.length && /\p{Lu}/u.test(t[n]!) && (MARKER.test(t.slice(sentenceStart(t, i), i)) || MARKER.test(tailToStrongMark(t, n)))) return false;
   if (word === "no" && n < t.length && /\p{N}/u.test(t[n]!)) return false;
   if (n < t.length && LOWER.test(t[n]!)) return false;
   return true;
@@ -75,7 +101,7 @@ function sentenceEnd(t: string, at: number): number {
 /** Is the mark at t[i] acceptable as a quote edge? Clause marks and real boundaries yes; a "." after an abbreviation no. */
 const isEdgeMark = (t: string, i: number) => MARKS.has(t[i]!) && (t[i] !== "." || i + 1 >= t.length || !WS.test(t[i + 1]!) || isBoundary(t, i));
 
-export type SpanProblem = "starts-mid-sentence" | "ends-mid-sentence" | "omits-qualifier" | "negated-by-reply" | "is-question";
+export type SpanProblem = "starts-mid-sentence" | "ends-mid-sentence" | "omits-qualifier" | "negated-by-reply" | "is-question" | "retracted-by-reply" | "unconfirmed-by-short-reply";
 
 /** `null` = the slice text[start,end) is a whole sentence/clause and its sentence has no omitted marker. */
 /**
@@ -83,7 +109,7 @@ export type SpanProblem = "starts-mid-sentence" | "ends-mid-sentence" | "omits-q
  * "negated-by-reply") are not applied HERE. The deterministic span rules stay: whole-sentence edges and question quotes.
  * D-151 (pending append): the judge does not replace the lexical rules; `resolveEvidence` runs `lexicalNegationProblem` separately in judged mode.
  */
-export function sentenceSpanProblem(text: string, start: number, end: number, opts: { allowQuestion?: boolean; judged?: boolean } = {}): SpanProblem | null {
+export function sentenceSpanProblem(text: string, start: number, end: number, opts: { allowQuestion?: boolean; judged?: boolean; shortFollowWords?: number } = {}): SpanProblem | null {
   let i = start - 1;
   while (i >= 0 && (WS.test(text[i]!) || OPENERS.has(text[i]!))) i--;
   if (i >= 0 && !isEdgeMark(text, i)) return "starts-mid-sentence";
@@ -95,14 +121,14 @@ export function sentenceSpanProblem(text: string, start: number, end: number, op
   // ISS-T040GEN-009: a question is not a statement of fact. A quote inside a sentence that contains a "?" can be evidence only for a question item.
   if (!opts.allowQuestion && text.slice(sentenceStart(text, start), sentenceEnd(text, Math.max(start, end - 1))).includes("?")) return "is-question";
   if (opts.judged) return null;
-  return lexicalNegationProblem(text, start, end);
+  return lexicalNegationProblem(text, start, end, opts);
 }
 
 /**
  * D-151 (pending append): the rule-based lexical negation checks ("omits-qualifier", "negated-by-reply"), split out so they also run
  * when a judge is injected. `null` = no lexical negation problem for this slice.
  */
-export function lexicalNegationProblem(text: string, start: number, end: number): SpanProblem | null {
+export function lexicalNegationProblem(text: string, start: number, end: number, opts: { shortFollowWords?: number } = {}): SpanProblem | null {
   const endsSentence = end > 0 && isBoundary(text, end - 1);
   const before = text.slice(sentenceStart(text, start), start), after = endsSentence ? "" : text.slice(end, sentenceEnd(text, end));
   if (MARKER.test(before) || MARKER.test(after)) return "omits-qualifier";
@@ -110,6 +136,11 @@ export function lexicalNegationProblem(text: string, start: number, end: number)
     let k = end; while (k < text.length && (WS.test(text[k]!) || CLOSERS.has(text[k]!))) k++;
     const reply = text.slice(k, sentenceEnd(text, k)), words = reply.trim().split(/\s+/u).filter(Boolean).length;
     if (words > 0 && words <= MAX_REPLY_WORDS && NEG_REPLY.test(reply)) return "negated-by-reply";
+    if (words > 0 && retractsPrevious(reply)) return "retracted-by-reply";
+    if (words > 0 && words <= (opts.shortFollowWords ?? SHORT_FOLLOW_WORDS) && !CONTINUATION.test(reply.replace(LEAD, ""))) return "unconfirmed-by-short-reply";
+  } else if (end > 0 && MARKS.has(text[end - 1]!)) { // a clause quote: the next clause must not open with a retraction either
+    let m = end; while (m < text.length && !MARKS.has(text[m]!)) m++;
+    if (retractsPrevious(text.slice(end, m))) return "retracted-by-reply";
   }
   return null;
 }

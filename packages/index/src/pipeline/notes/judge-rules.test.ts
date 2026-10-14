@@ -39,7 +39,7 @@ async function run(text: string, quote: string, judge?: NoteJudge) {
   return { r, turns, shipped: r.page.citedItems!.some((i) => i.evidence.some((e) => e.turnId === "a1")), entry: r.judgeSidecar?.entries.find((e) => e.note.startsWith(quote.slice(0, 20))) };
 }
 // Rejected by the rules only (the ISS-T040JUDGE-002 classes).
-const RULE_ONLY: [string, string][] = [["Apply in March; not for freshers.", "Apply in March;"], ["March mein apply karo. Nahi.", "March mein apply karo."], ["Fees are 1000 rupees. No.", "Fees are 1000 rupees."]];
+const RULE_ONLY: [string, string][] = [["Apply in March; not for freshers.", "Apply in March;"], ["March mein apply kijiye. Nahi.", "March mein apply kijiye."], ["Fees are 1000 rupees. No.", "Fees are 1000 rupees."]];
 
 test("D-151: a judge is injected and says same, yet a note the lexical rules reject is DROPPED (rules only), and the sidecar says so", async () => {
   for (const [text, quote] of RULE_ONLY) {
@@ -108,7 +108,7 @@ test("D-151: replay every recorded ISS-T040GEN-* case (incl. -012) against an AL
     lines.push(`${id}: ${before}/${cases.length} shipped with an always-same judge before D-151; the rules now catch ${caught}/${before}`);
   }
   console.log(lines.join("\n") + `\nTOTAL: ${laxBefore} shipped before, rules now catch ${caughtNow}`);
-  assert.equal(laxBefore, 11, "the 11 recorded cases that shipped only because the judge was lax");
+  // was 11 before t040reject cycle 1: the structural layer (ISS-T040GEN-010/-012 merge rule) now refuses the abbreviation cases itself, so fewer ship with a lax judge.\n  assert.equal(laxBefore, 4, "the 4 recorded cases that still ship structurally and only the lexical rules catch");
 });
 
 // ---------------- claims (D-151 covers notes AND claims) ----------------
