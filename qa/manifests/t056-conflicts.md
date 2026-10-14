@@ -10,12 +10,13 @@
 
 ## Scope (apps/api/src/answer-policy/** only)
 - `types.ts`, `rules.ts`: policy shape (questionClass, mode, style, onInsufficient, citations fixed to "required"), strict input validation.
-- `store.ts`: `AnswerPolicyStore` seam plus in-memory reference implementation. Every method takes the tenant; revisions are append-only with an atomic expected-version check.
+- `store.ts`: `AnswerPolicyStore` seam plus in-memory implementation (test double only).
+- `mongo-store.ts`: Mongo-backed store (collections `answer_policy_revisions` append-only, `answer_policy_review_items`). Append atomicity: revision `_id` = tenant|policy|version, so racing writers of one version collide on E11000 and exactly one wins, with or without indexes; items use a deterministic hash `_id`; closing an item is a filtered update on `status: open`. `ensureAnswerPolicyIndexes` adds tenant-leading unique indexes. Refuses protected work-DB names (db-name.ts `isRefusedWorkDb`: lkb, global_university_db, lkb_staging) unless `production: true`. `latest()` reads a tenant's full revision list (fine at policy scale; an aggregate is a later optimisation). Every method takes the tenant; revisions are append-only with an atomic expected-version check.
 - `service.ts`: versioned save and retire, history (who/what/when/note/previousVersion), conflict reconciliation, review queue and resolution.
 - `conflicts.ts`: detector for live policies of one tenant with the same normalized question class that differ in `mode` (high), `onInsufficient` or `style` (medium); each finding carries a plain-language explanation. No wildcard or precedence rule exists, so only exact class matches overlap.
 - `evaluate.ts`: applies a persisted policy through the existing `simulateAnswerPolicy`; a policy may only tighten (review to refuse), never loosen.
 - `admin-router.ts`: HTTP API plus `mountAnswerPolicyAdmin(app, service)`. server.ts is NOT edited. Wiring: call it after `requireAuth`, rate limits and `express.json()`, e.g. `mountAnswerPolicyAdmin(app, createAnswerPolicyService(store))`.
-- Tests: `service.test.ts` (10), `admin-router.test.ts` (3); existing `routes.test.ts` untouched.
+- Tests: `mongo-store.test.ts` (8, in-memory fake Db in the speaker-suggestions.testdb.ts style; no real MongoDB), `service.test.ts` (10), `admin-router.test.ts` (3); existing `routes.test.ts` untouched.
 
 ## Evidence-override rule
 Citations stay mandatory: `citations` can only be "required"; any other value or any field matching cit/evidence/ground/source/provenance/uncited is refused with `policy_cannot_override_evidence` (tested with 7 variants). Evaluation of a result with no sources or missing provenance is refused/reviewed under every policy (tested).
@@ -34,5 +35,11 @@ Citations stay mandatory: `citations` can only be "required"; any other value or
 - Cross-tenant tests: service level (history, list, conflicts, queue, resolve, retire, store tenant-mismatch) and HTTP level (read, resolve, retire, version collision with another tenant's same policy id).
 - Not done: mutation run, concurrency stress repetition beyond the single `Promise.allSettled` race test, `contracts/verify_contracts.py`.
 
+## Mongo update (same Fix cycle 0)
+- answer-policy tests: pass 27 / fail 0; mongo-store.test.ts repeated 15/15 pass (4-way same-version race x15 rounds: exactly one winner each).
+- Full apps/api suite: one run showed tests 955 / pass 954 / fail 1 (failing test not captured), the immediate rerun showed pass 955 / fail 0; the flake is not attributed.
+- tsc: with a temporary tsconfig mapping @lkb/* to lane sources, 0 errors; default tsconfig still 11 errors in src/whatsapp/review/*, 0 in answer-policy. Cause is junctions resolving @lkb/core to the main tree (ISS-CODEXWAVE1-007). Temp tsconfig deleted.
+- The Mongo store is tested only against the fake Db; no real MongoDB run, no index build against a real server.
+
 ## Remaining for full T-056 (not claimed)
-Dependencies U3.2, T-007, T-008, T-022 are all still `in_progress` in TASKS.md, so full acceptance is blocked. Open: Mongo-backed store (needs packages/db collection and schema), server.ts mount and key-scope issuance, applying a stored policy inside `/ask`, YAML authoring, web UI for the review queue, per-person actor identity, interactive browser evidence.
+Dependencies U3.2, T-007, T-008, T-022 are all still `in_progress` in TASKS.md, so full acceptance is blocked. Open: wiring the Mongo store with the real Db and `ensureAnswerPolicyIndexes` at startup, a real-Mongo run, schema files for the two collections, server.ts mount and key-scope issuance, applying a stored policy inside `/ask`, YAML authoring, web UI for the review queue, per-person actor identity, interactive browser evidence.
