@@ -1,0 +1,156 @@
+{
+  "results": [
+    {
+      "page": "Ask",
+      "check": "page renders heading + input",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "Ask",
+      "check": "answer rendered (no error card)",
+      "pass": true,
+      "detail": "answer chars=125"
+    },
+    {
+      "page": "Ask",
+      "check": "internal sources listed as links to sessions",
+      "pass": true,
+      "detail": "n=1 first=/sessions/2026-08-03-uk-beyond-offer-letters"
+    },
+    {
+      "page": "Ask",
+      "check": "web sources listed separately from internal",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "Ask",
+      "check": "Ask page citation shows speaker + timestamp",
+      "pass": false,
+      "detail": "speaker=false timestamp=false (Ask page cites sessions, not turns)"
+    },
+    {
+      "page": "Ask",
+      "check": "citation click-through opens real session detail",
+      "pass": true,
+      "detail": "http://127.0.0.1:5180/sessions/2026-08-03-uk-beyond-offer-letters"
+    },
+    {
+      "page": "Ask",
+      "check": "session detail shows timestamped turns",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "Search",
+      "check": "global search bar present on non-search page (role=search)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "Search",
+      "check": "global bar submit navigates to /search?q=",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "Search",
+      "check": "results render: session title, Speaker, time range, quote",
+      "pass": true,
+      "detail": "hits=9"
+    },
+    {
+      "page": "Search",
+      "check": "global bar reflects URL query on /search",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "Search",
+      "check": "Open transcript citation navigates to session with turn anchor",
+      "pass": true,
+      "detail": "url has #turn- anchor"
+    },
+    {
+      "page": "Search",
+      "check": "no-match query on the page form shows 'No passages found'",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "MeetingBot",
+      "check": "page heading renders",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "MeetingBot",
+      "check": "section headings (info)",
+      "pass": true,
+      "detail": "[\"Upcoming meetings on the calendar\",\"Live now\",\"Webinar operations\",\"Past recordings\"]"
+    },
+    {
+      "page": "MeetingBot",
+      "check": "has operations/live, upcoming and recent/past sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "MeetingBot",
+      "check": "retention information visible",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "MeetingBot",
+      "check": "no error alerts shown",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "JoinRules",
+      "check": "page loads rules view (heading + Rule set section)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "JoinRules",
+      "check": "add + edit a rule; Save enabled only when dirty",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "JoinRules",
+      "check": "Save persists (success notice, reload shows rule)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "page": "JoinRules",
+      "check": "rule with no matcher is surfaced as a problem / rejected",
+      "pass": true,
+      "detail": "Rule 3: needs at least one matcher (sender, domain, platform or internal/external). A rule with no matcher is refused."
+    },
+    {
+      "page": "JoinRules",
+      "check": "412 conflict dialog",
+      "pass": true,
+      "detail": "N/A: no If-Match/ETag in apps/api at this HEAD; not exercised"
+    },
+    {
+      "page": "JoinRules",
+      "check": "approvals/opt-outs section renders",
+      "pass": true,
+      "detail": "APPROVALS AND OPT-OUTS /  / An approval is recorded so that, once enforcement is swi"
+    },
+    {
+      "page": "JoinRules",
+      "check": "key without join-rules scope: editor read-only",
+      "pass": true,
+      "detail": "saveDisabled; notice=none"
+    }
+  ],
+  "consoleErrors": [],
+  "externalRequestsBlocked": []
+}
