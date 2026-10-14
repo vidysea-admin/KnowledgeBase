@@ -2,7 +2,7 @@
 
 **Contract:** none specific (three test/tooling defects in scripts/webinar found 2026-10-14).
 **Date:** 2026-10-14
-**Fix cycle:** 0
+**Fix cycle:** 1
 **Status:** ready-for-check
 
 ## Fix 1 — validate-session.mjs argument parsing
@@ -20,3 +20,9 @@ Not generated at test time and not missing: `packages/core/src/generated/*.ts` i
 - validate-session.test.mjs x3 -> pass 11 / fail 0 each; source-discovery.test.mjs under tsx -> pass 10 / fail 0; plain node -> ERR_MODULE_NOT_FOUND (documented)
 - `node scripts/lint-loc.mjs --all` -> OK (10 stages, 0 failed); `node scripts/lint-dirsize.mjs` -> OK (164 dirs)
 - No package source touched (scripts/ and root package.json only), so no package tests apply. groundbudget / indextests files untouched.
+
+## Fix cycle 1 (main merged first: lane contains ce85fad9)
+- **ISS-WEBINARFIX-001:** new behavioural test in db-guard-paths.test.mjs runs the real sync-session.mjs with MONGO_WORK_DB in {lkb, LKB, global_university_db} against a local TCP listener standing in for Mongo (fixture session created under data/toc-migrated/zz-dbguard-*, removed in finally). Asserts non-zero exit, the "production writes refused" message, and zero connections. Mutants, each applied (hash differs), run, restored and verified (`git hash-object` == HEAD blob): guard wrapped in try/catch -> pass 7 / fail 1 (killed); raw MongoClient (packages/db mongodb) opened before the guard -> pass 7 / fail 1, "a Mongo connection was attempted" (killed). Unmutated: pass 8 / fail 0 on 3 consecutive runs.
+- **ISS-WEBINARFIX-002:** `pnpm test:webinar` now also globs `scripts/webinar/*.test.ts`: 44 tests pass.
+- **ISS-WEBINARFIX-003:** parseCliArgs returns `error` for a second positional id or a repeated `--root`; the CLI prints `error: ...` plus usage and exits 1. Unit + spawn tests added.
+- Evidence: `node --test --import tsx scripts/webinar/*.test.mjs scripts/webinar/*/*.test.mjs scripts/webinar/*.test.ts` -> tests 183 / pass 183 / fail 0; lint-loc OK (0 failed); lint-dirsize OK.

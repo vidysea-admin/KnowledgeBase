@@ -8,7 +8,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "test:webinar": "node --test --import tsx scripts/webinar/*.test.mjs scripts/webinar/*/*.test.mjs",
+    "test:webinar": "node --test --import tsx scripts/webinar/*.test.mjs scripts/webinar/*/*.test.mjs scripts/webinar/*.test.ts",
     "webinar:setup": "node scripts/webinar/setup.mjs",
     "webinar:run": "node scripts/webinar/run-pipeline.mjs",
     "webinar:record": "node --import tsx packages/meeting-bot/src/cli.ts record",
