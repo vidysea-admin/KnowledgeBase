@@ -17,7 +17,7 @@ test('default preview is a dry run that registers nothing and names the job CLI 
   const v = JSON.parse(r.stdout);
   assert.equal(v.mode, 'preview'); assert.equal(v.deletes, false); assert.equal(v.taskRegistered, false);
   assert.match(v.cli, /retention-purge-job-cli\.ts$/);
-  assert.match(v.reportFile, /data\\retention\\last-run\.json$/);
+  assert.match(v.reportFile, /data\\retention\\report\.json$/);
 });
 test('thresholds have no default: run and install refuse without them, before anything starts', () => {
   for (const flag of ['-Run', '-InstallTask']) {

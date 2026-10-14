@@ -10,7 +10,9 @@
  *     in-progress state, shared file, cross-tenant file, incomplete scope, unconfirmed clock, ...), AND
  *   - captured (source.json `createdAt`) strictly more than 90 days before `now`, AND
  *   - a media file by extension. Anything else (json, txt, md, vtt, srt ...) is never deleted.
- * Nothing under the data root (session.json, source.json, claims.json, turns.json) is ever touched.
+ * Nothing under the data root (session.json, source.json, claims.json, turns.json) is ever modified. The one write is
+ * additive: when `deps.clips` is set, execute mode first writes the D-008 evidence clips to <session>/evidence-clips/
+ * and keeps the media if any clip is missing.
  *
  * DRY RUN BY DEFAULT. Deleting needs the explicit `--execute` flag. In execute mode the whole
  * evaluation (gather, plan, guards) is RE-RUN from disk immediately before EACH item, so a
@@ -22,8 +24,10 @@
  * input, 3 unreadable state or media root, 4 one or more items failed to delete.
  */
 import { unlinkSync } from "node:fs";
-import { extname, resolve } from "node:path";
+import { extname, join, resolve } from "node:path";
+import type { EvidenceClipWindow } from "@lkb/core";
 import { planRetentionSweep } from "./retention-sweep.js";
+import type { ClipResult } from "./retention-clips.js";
 import { parseIsoInstant } from "../strict-record.js";
 import { parseArgs, USAGE, type ReportOptions } from "./retention-report-args.js";
 import { gatherState, tenantSegment, type SessionInfo } from "./retention-report-state.js";
@@ -51,9 +55,14 @@ export interface PurgeDeps {
   purgeIo?: PurgeIo;
   /** test seam: called once after the first (planning) evaluation and before any deletion */
   afterPlan?: () => void;
+  /**
+   * D-008 evidence clips. When set, EXECUTE mode extracts every retained window into `outDir` BEFORE the unlink and
+   * keeps the media (VETOED clip-extraction-failed) unless all clips exist. Unset = previous behaviour, unchanged.
+   */
+  clips?: { extract: (mediaAbs: string, windows: readonly EvidenceClipWindow[], outDir: string) => ClipResult };
 }
 
-export interface PurgeCandidate { key: string; relPath: string; absPath: string; sizeBytes: number; ageDays: number }
+export interface PurgeCandidate { key: string; relPath: string; absPath: string; sizeBytes: number; ageDays: number; windows: EvidenceClipWindow[]; clipsDir: string }
 type Evaluation =
   | { ok: true; candidates: PurgeCandidate[]; vetoes: Map<string, string>; inScope: number }
   | { ok: false; code: 2 | 3; message: string };
@@ -112,6 +121,7 @@ export function evaluatePurge(opts: ReportOptions, io: MediaIo, now: number): Ev
     candidates.push({
       key: info.dir, relPath: rel, absPath: resolve(opts.mediaRoot, rel),
       sizeBytes: info.media.sizeBytes as number, ageDays: (now - (parseIsoInstant(info.capturedAt) as number)) / DAY_MS,
+      windows: item.retainWindows, clipsDir: join(opts.dataRoot, tenantSegment(opts.tenant), info.dir, "evidence-clips"),
     });
   }
   return { ok: true, candidates, vetoes, inScope: rows.length };
@@ -132,10 +142,12 @@ export function executePurge(opts: ReportOptions, execute: boolean, deps: PurgeD
   deps.afterPlan?.();
 
   const s: PurgeSummary = { candidates: first.candidates.length, deleted: 0, bytes: 0, vetoed: 0, failed: 0 };
+  let clipsKept = 0;
   for (const planned of first.candidates) {
     const where = `path=${cleanText(planned.relPath, 200)}`;
     if (!execute) {
       deps.write(`WOULD-PURGE ${where} age_days=${planned.ageDays.toFixed(1)} size_bytes=${planned.sizeBytes}`);
+      if (deps.clips) deps.write(`WOULD-EXTRACT-CLIPS ${where} windows=${planned.windows.length}`);
       continue;
     }
     try {
@@ -147,6 +159,15 @@ export function executePurge(opts: ReportOptions, execute: boolean, deps: PurgeD
         deps.write(`VETOED ${where} reason=${cleanText(fresh.vetoes.get(planned.key) ?? "no longer eligible at execution time", 160)}`);
         continue;
       }
+      if (deps.clips) {
+        const cr = deps.clips.extract(c.absPath, c.windows, c.clipsDir);
+        if (!cr.ok) {
+          s.vetoed++;
+          deps.write(`VETOED ${where} reason=clip-extraction-failed: ${cleanText(cr.outcomes.filter((o) => o.status === "failed").map((o) => o.why).join(","), 160)}`);
+          continue;
+        }
+        clipsKept += cr.outcomes.length;
+      }
       purgeIo.unlink(c.absPath);
       s.deleted++;
       s.bytes += c.sizeBytes;
@@ -157,6 +178,7 @@ export function executePurge(opts: ReportOptions, execute: boolean, deps: PurgeD
       deps.write(`FAILED ${where} error=${cleanText(why, 120)}`);
     }
   }
+  if (deps.clips) deps.write(`CLIPS retained=${clipsKept}`);
   deps.write(`SUMMARY mode=${execute ? "execute" : "dry-run"} candidates=${s.candidates} deleted=${s.deleted} bytes=${s.bytes} vetoed=${s.vetoed} failed=${s.failed}`);
   return { code: s.failed > 0 ? 4 : 0, summary: s };
 }
