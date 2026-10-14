@@ -8,7 +8,7 @@ import type { Transport, TransportRequest, TransportResponse } from "@lkb/ai";
 function tryParseJson(text: string): unknown { try { return JSON.parse(text); } catch { return text; } }
 async function httpTransport(req: TransportRequest): Promise<TransportResponse> {
   const res = await fetch(req.url!, { method: req.method ?? "GET", headers: req.headers,
-    body: req.body !== undefined ? JSON.stringify(req.body) : undefined });
+    body: req.body !== undefined ? JSON.stringify(req.body) : undefined, signal: req.signal });
   const text = await res.text();
   return { status: res.status, body: tryParseJson(text), text };
 }

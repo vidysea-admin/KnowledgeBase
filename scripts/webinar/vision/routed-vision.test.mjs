@@ -35,3 +35,15 @@ test('visionOrderFromYaml reads the vision chain, defaults to ollama then gemini
   assert.deepEqual(visionOrderFromYaml('a: [x]\nvision: [gemini, ollama]\n'), ['gemini', 'ollama']);
   assert.deepEqual(visionOrderFromYaml('a: [x]\n'), ['ollama', 'gemini']);
 });
+
+test('routedVision: reasoning prose + fenced JSON is accepted by the first ollama model (ISS-OLLAMAFIRST-002); schema is sent', async (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'lkb-rv-')); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  writeFileSync(join(dir, 'f.jpg'), 'pixels');
+  const seen = [];
+  const transport = async (r) => { seen.push(r.body); return { status: 200, body: { message: { content: `The user wants JSON.\n\`\`\`json\n${OK}\n\`\`\`` } } }; };
+  const tally = newVisionTally();
+  const vision = routedVision({ runVisionChain }, buildVisionBackends(env, transport), { tally });
+  assert.deepEqual(await vision({ path: join(dir, 'f.jpg') }), JSON.parse(OK));
+  assert.equal(tally.fallbacks, 0); assert.equal(seen.length, 1);
+  assert.equal(seen[0].format.additionalProperties, false); assert.equal(seen[0].think, false);
+});
