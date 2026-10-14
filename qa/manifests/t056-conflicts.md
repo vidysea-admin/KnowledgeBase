@@ -2,7 +2,7 @@
 
 **Handshake status:** ready-for-check
 **Status:** ready-for-check
-**Fix cycle:** 0
+**Fix cycle:** 1
 **Task:** T-056 (scoped slice; task remains open)
 **Priority tier:** 3 (roadmap); full ceremony because it is a tenancy and data-write area.
 **Lane:** lane/t056-conflicts, branched from lane/codexwave1 (cd843b26).
@@ -40,6 +40,14 @@ Citations stay mandatory: `citations` can only be "required"; any other value or
 - Full apps/api suite: one run showed tests 955 / pass 954 / fail 1 (failing test not captured), the immediate rerun showed pass 955 / fail 0; the flake is not attributed.
 - tsc: with a temporary tsconfig mapping @lkb/* to lane sources, 0 errors; default tsconfig still 11 errors in src/whatsapp/review/*, 0 in answer-policy. Cause is junctions resolving @lkb/core to the main tree (ISS-CODEXWAVE1-007). Temp tsconfig deleted.
 - The Mongo store is tested only against the fake Db; no real MongoDB run, no index build against a real server.
+
+## Fix cycle 1 (answers verdict e3c12c2f; ledger qa/issues.T056CONFLICTS.jsonl)
+- **ISS-001 (high, tenancy):** revision `_id` is now the object `{tenantId, policyId, version}`; service and store validate tenant (`isValidTenantId`) and policy id (`validPolicyId`). Checker reproduction (tenant `t|a`/policy `1` vs tenant `t`/policy `a|1`): the second is refused as an invalid policy id (400 `invalid_policy` at service), and four valid neighbours of the old encoding (`t`/`a-1`, `t|a|1`/`1`, `t|a`/`1b`, `t`/`1`) all write independently. Test: `ISS-001`. Mutation M10 (delimiter `_id` restored) killed.
+- **ISS-002 (medium):** change items are now reconstructable from history: `repairChangeItems` (idempotent, deterministic content, dedupe by key so resolved items are not reopened) runs on `queue()` and on every reconcile. Test `ISS-002` simulates the crash after the revision write, shows 1 revision / 0 items, then repair on read, idempotence, and no reopening of a resolved item. No transaction is used (not assumed available).
+- **ISS-003 (medium):** store-level tests for both stores: cross-tenant `closeItem` returns false (M1), version gap v1 to v3 refused (M9), expected 2 with no v2 refused (M8), duplicate version refused. Per-mutation run on mongo-store.ts with byte backup, restore in finally and hash check: M1, M8, M9, M10 all killed; file restored (hash equal).
+- **ISS-004 (low):** `classKey` folds case, `_`/`-`/space/`:`/`.`/`/` separators and simple plurals (`s`, `ies`). Conflict key is now class+policy ids+dimension+both values (no versions), so a version bump with unchanged values does not reopen an acknowledged conflict, and a changed value does. KNOWN LIMITATION: broad vs narrow classes (`career` vs `career:switch`) still do not overlap (tested as such); an acknowledged conflict that disappears and later recurs with identical values stays acknowledged.
+- **ISS-005 (low):** `usage.test.ts` timing flake is unrelated to this lane and left alone; it explains the one-off 954/955 full-suite failure in cycle 0.
+- Counts: answer-policy tests pass 32 / fail 0. Full apps/api suite with temporary paths tsconfig as `TSX_TSCONFIG_PATH`: ℹ tests 960, pass 960, fail 0. tsc with temporary paths tsconfig: 0 errors (file deleted). lint-loc: only the pre-existing `packages/meeting-bot/py/test_sb_join_ownership.py:408`.
 
 ## Remaining for full T-056 (not claimed)
 Dependencies U3.2, T-007, T-008, T-022 are all still `in_progress` in TASKS.md, so full acceptance is blocked. Open: wiring the Mongo store with the real Db and `ensureAnswerPolicyIndexes` at startup, a real-Mongo run, schema files for the two collections, server.ts mount and key-scope issuance, applying a stored policy inside `/ask`, YAML authoring, web UI for the review queue, per-person actor identity, interactive browser evidence.

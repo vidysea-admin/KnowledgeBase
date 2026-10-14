@@ -140,3 +140,22 @@ test("evaluation: citations stay mandatory whatever the policy says; policies on
   const retired = (await svc.retire("tenant-a", "web", { note: "x", expectedVersion: 1 }, A)).revision;
   assert.throws(() => evaluatePolicy("tenant-a", retired, result()), /retired/);
 });
+
+test("ISS-004: question classes fold case, separators and plurals; acknowledged conflicts survive a version bump", async () => {
+  const { svc } = setup();
+  await svc.save("tenant-a", "p1", body({ questionClass: "Course_Selection" }), A);
+  const r = await svc.save("tenant-a", "p2", body({ questionClass: "course-selections", mode: "internal-and-web" }), A);
+  assert.deepEqual(r.conflicts.map((c) => c.dimension), ["mode"]);
+  for (const [x, y] of [["scholarship", "Scholarships"], ["policy", "policies"], ["course selection", "course   selection"]]) {
+    const s = setup(); await s.svc.save("tenant-a", "a", body({ questionClass: x }), A);
+    assert.equal((await s.svc.save("tenant-a", "b", body({ questionClass: y, mode: "internal-and-web" }), A)).conflicts.length, 1, `${x} ~ ${y}`);
+  }
+  const s2 = setup(); await s2.svc.save("tenant-a", "a", body({ questionClass: "career" }), A);
+  assert.equal((await s2.svc.save("tenant-a", "b", body({ questionClass: "career:switch", mode: "internal-and-web" }), A)).conflicts.length, 0, "known limitation: broad vs narrow");
+  const open = (await svc.queue("tenant-a", "open")).find((i) => i.kind === "conflict")!;
+  await svc.resolve("tenant-a", open.id, { decision: "acknowledged", note: "known" }, A);
+  await svc.save("tenant-a", "p1", body({ questionClass: "Course_Selection", expectedVersion: 1, note: "bump, same values" }), A);
+  assert.equal((await svc.queue("tenant-a", "open")).filter((i) => i.kind === "conflict").length, 0, "no reopen");
+  await svc.save("tenant-a", "p1", body({ questionClass: "Course_Selection", style: "detailed", expectedVersion: 2, note: "style now differs" }), A);
+  assert.deepEqual((await svc.queue("tenant-a", "open")).filter((i) => i.kind === "conflict").map((i) => i.conflict!.dimension), ["style"]);
+});

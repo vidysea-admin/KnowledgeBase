@@ -3,7 +3,7 @@
  * deleted) and `answer_policy_review_items`. Every query ANDs `tenantId` into its filter; the tenant is validated by the
  * shared assertValidTenantId.
  *
- * Atomicity by construction, not by index alone: a revision's `_id` is `tenant|policy|version`, so two writers racing to
+ * Atomicity by construction, not by index alone: a revision's `_id` is the structured object `{tenantId, policyId, version}` (no delimiter, so no id can collide with another tenant's), so two writers racing to
  * append the same version collide on `_id` (E11000) and exactly one wins even if ensureAnswerPolicyIndexes was never run.
  * Review items use a deterministic `_id` (hash of tenant+kind+key) so dedupe is likewise atomic. Closing an item is a
  * filtered update (`status: "open"`), so it can only succeed once.
@@ -15,6 +15,7 @@ import { createHash } from "node:crypto";
 import type { Db, Document } from "mongodb";
 import { assertValidTenantId } from "../../../../packages/db/src/lib/tenantScope.js";
 import { isRefusedWorkDb } from "../db-name.js";
+import { validPolicyId } from "./rules.js";
 import type { AnswerPolicyStore } from "./store.js";
 import type { PolicyRevision, ReviewItem } from "./types.js";
 
@@ -29,7 +30,7 @@ export async function ensureAnswerPolicyIndexes(db: Db): Promise<void> {
   await db.collection(ITEMS).createIndex({ tenantId: 1, status: 1, createdAt: 1 });
 }
 
-const revisionId = (r: { tenantId: string; policyId: string; version: number }) => `${r.tenantId}|${r.policyId}|${r.version}`;
+const revisionId = (r: { tenantId: string; policyId: string; version: number }) => ({ tenantId: r.tenantId, policyId: r.policyId, version: r.version });
 const itemId = (tenantId: string, kind: string, key: string) => createHash("sha256").update(`${tenantId}\0${kind}\0${key}`).digest("hex");
 function revisionOut(doc: Document): PolicyRevision { const { _id, ...rest } = doc; void _id; return rest as unknown as PolicyRevision; }
 function itemOut(doc: Document): ReviewItem { const { _id, ...rest } = doc; return { ...rest, id: String(_id) } as unknown as ReviewItem; }
@@ -43,6 +44,7 @@ export function createMongoAnswerPolicyStore(db: Db, opts: { production?: boolea
     async appendRevision(tenantId, rev, expectedLatest) {
       tenant(tenantId, "appendRevision");
       if (rev.tenantId !== tenantId) throw new Error("answer policy tenant mismatch");
+      if (!validPolicyId(rev.policyId)) throw new Error("answer policy: invalid policy id");
       if (rev.version !== expectedLatest + 1) return false;
       if (expectedLatest > 0 && !(await revisions.findOne({ _id: revisionId({ tenantId, policyId: rev.policyId, version: expectedLatest }) as never, tenantId }))) return false;
       try { await revisions.insertOne({ ...rev, _id: revisionId(rev) as never }); return true; }
@@ -50,6 +52,7 @@ export function createMongoAnswerPolicyStore(db: Db, opts: { production?: boolea
     },
     async history(tenantId, policyId) {
       tenant(tenantId, "history");
+      if (!validPolicyId(policyId)) throw new Error("answer policy: invalid policy id");
       return (await revisions.find({ tenantId, policyId }).sort({ version: 1 }).toArray()).map(revisionOut);
     },
     async latest(tenantId) {

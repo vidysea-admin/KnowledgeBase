@@ -12,9 +12,12 @@ const CLASS = /^[a-z0-9][a-z0-9 _:./-]{0,79}$/;
 export function validPolicyId(id: unknown): id is string { return typeof id === "string" && POLICY_ID.test(id); }
 export function normalizeQuestionClass(v: unknown): string | null {
   if (typeof v !== "string") return null;
-  const n = v.trim().toLowerCase().replace(/\s+/g, " ");
+  const n = v.trim().toLowerCase().replace(/[\s_-]+/g, " ");
   return CLASS.test(n) ? n : null;
 }
+const foldWord = (w: string): string => w.length > 3 && w.endsWith("ies") ? `${w.slice(0, -3)}y` : w.length > 3 && w.endsWith("s") && !w.endsWith("ss") ? w.slice(0, -1) : w;
+/** Comparison key for overlap: separators, case and simple plurals folded ("Course_Selection" ~ "course selection", "scholarships" ~ "scholarship"). */
+export function classKey(questionClass: string): string { return questionClass.split(/[ :./]+/).map(foldWord).join(" ").trim(); }
 function oneOf<T extends string>(list: readonly T[], v: unknown): v is T { return typeof v === "string" && (list as readonly string[]).includes(v); }
 
 export interface ParsedSave { body: PolicyBody; note: string; expectedVersion: number | null; claimedBy?: string }

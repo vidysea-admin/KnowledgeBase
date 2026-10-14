@@ -10,7 +10,8 @@ type Row = Record<string, unknown>;
 function fakeDb(databaseName = "lkb_t056_test") {
   const data = new Map<string, Row[]>(); const uniques = new Map<string, string[][]>(); const calls: string[] = [];
   const rows = (n: string) => { let r = data.get(n); if (!r) { r = []; data.set(n, r); } return r; };
-  const match = (r: Row, f: Row) => Object.entries(f).every(([k, v]) => r[k] === v);
+  const same = (x: unknown, y: unknown) => JSON.stringify(x) === JSON.stringify(y);
+  const match = (r: Row, f: Row) => Object.entries(f).every(([k, v]) => same(r[k], v));
   const dup = () => Object.assign(new Error("E11000 duplicate key"), { code: 11000 });
   const collection = (name: string) => ({
     async createIndex(spec: Row, o: { unique?: boolean } = {}) { calls.push(`index:${name}`); if (o.unique) uniques.set(name, [...(uniques.get(name) ?? []), Object.keys(spec)]); },
@@ -20,7 +21,7 @@ function fakeDb(databaseName = "lkb_t056_test") {
     async findOne(f: Row) { await Promise.resolve(); const r = rows(name).find((x) => match(x, f)); return r ? structuredClone(r) : null; },
     async insertOne(doc: Row) {
       calls.push(`insert:${name}`); await Promise.resolve(); // yield so racing writers interleave their reads first
-      if (rows(name).some((r) => r._id === doc._id || (uniques.get(name) ?? []).some((cols) => cols.every((c) => r[c] === doc[c])))) throw dup();
+      if (rows(name).some((r) => same(r._id, doc._id) || (uniques.get(name) ?? []).some((cols) => cols.every((c) => r[c] === doc[c])))) throw dup();
       rows(name).push(structuredClone(doc)); return { acknowledged: true };
     },
     async updateOne(f: Row, u: { $set: Row }) {
@@ -113,3 +114,60 @@ test("ensureAnswerPolicyIndexes creates tenant-leading unique indexes", async ()
   const f = fakeDb(); await ensureAnswerPolicyIndexes(f.db);
   assert.deepEqual(f.calls, [`index:${REVISIONS}`, `index:${ITEMS}`, `index:${ITEMS}`]);
 });
+
+// ---- fix cycle 1 ----
+import { createInMemoryAnswerPolicyStore, type AnswerPolicyStore } from "./store.js";
+import type { PolicyRevision, ReviewItem } from "./types.js";
+const rev = (tenantId: string, policyId: string, version: number, over: Partial<PolicyRevision> = {}): PolicyRevision => ({ tenantId, policyId, version, action: "save", retired: false,
+  questionClass: "fees", mode: "internal-only", style: "concise", onInsufficient: "review", citations: "required", changedBy: { actor: "x" }, changedAt: "2026-10-14T00:00:00.000Z", note: "n", previousVersion: version > 1 ? version - 1 : null, ...over });
+const item = (tenantId: string, key: string): ReviewItem => ({ id: "i", tenantId, kind: "change", status: "open", createdAt: "2026-10-14T00:00:00.000Z", key, summary: "s" });
+const stores: [string, () => AnswerPolicyStore][] = [["mongo", () => createMongoAnswerPolicyStore(fakeDb().db)], ["in-memory", () => createInMemoryAnswerPolicyStore()]];
+
+test("ISS-001: delimiter-bearing tenant ids cannot collide with, or be denied by, another tenant's rows", async () => {
+  const f = fakeDb(); const store = createMongoAnswerPolicyStore(f.db); const svc = createAnswerPolicyService(store);
+  assert.equal(await store.appendRevision("t|a", rev("t|a", "1", 1), 0), true);
+  // checker reproduction: tenant "t" + policy "a|1" is now rejected as an invalid id (not a false version_conflict)
+  await assert.rejects(store.appendRevision("t", rev("t", "a|1", 1), 0), /invalid policy id/);
+  await assert.rejects(svc.save("t", "a|1", body(), A), (e) => (e as PolicyServiceError).code === "invalid_policy");
+  // and every VALID neighbour of the old ambiguous encoding writes independently
+  for (const [t, p] of [["t", "a-1"], ["t|a|1", "1"], ["t|a", "1b"], ["t", "1"]] as const) assert.equal(await store.appendRevision(t, rev(t, p, 1), 0), true, `${t}/${p}`);
+  assert.equal((await store.history("t|a", "1")).length, 1); assert.deepEqual(await store.history("t", "a"), []);
+  assert.equal((await svc.save("t|a", "pol", body(), A)).revision.version, 1);
+  assert.deepEqual((await svc.list("t")).map((p) => p.policyId), ["1", "a-1"]);
+  await assert.rejects(svc.history("t", "a|1"), (e) => (e as PolicyServiceError).code === "invalid_policy");
+  await assert.rejects(svc.list(" bad"), (e) => (e as PolicyServiceError).code === "invalid_policy");
+  assert.ok(f.rows(REVISIONS).every((r) => typeof r._id === "object" && (r._id as Row).tenantId === r.tenantId));
+});
+test("ISS-002: a crash between the revision write and the change-item write is repaired from history", async () => {
+  const f = fakeDb(); const real = createMongoAnswerPolicyStore(f.db); let crash = true;
+  const flaky: AnswerPolicyStore = { ...real, addItemIfAbsent: async (t, i) => { if (crash && i.kind === "change") { crash = false; throw new Error("simulated crash"); } return real.addItemIfAbsent(t, i); } };
+  const svc = createAnswerPolicyService(flaky);
+  await assert.rejects(svc.save("tenant-a", "p1", body(), A), /simulated crash/);
+  assert.equal((await real.history("tenant-a", "p1")).length, 1, "revision persisted");
+  assert.equal((await real.items("tenant-a")).length, 0, "item missing right after the crash");
+  const q = await createAnswerPolicyService(real).queue("tenant-a");
+  assert.deepEqual(q.map((i) => [i.kind, i.key, i.change?.changedFields]), [["change", "p1@1", ["created"]]]);
+  assert.equal((await createAnswerPolicyService(real).queue("tenant-a")).length, 1, "repair is idempotent");
+  await createAnswerPolicyService(real).save("tenant-a", "p1", body({ expectedVersion: 1, style: "detailed", note: "v2" }), A);
+  assert.deepEqual((await createAnswerPolicyService(real).queue("tenant-a")).map((i) => i.key).sort(), ["p1@1", "p1@2"]);
+  const done = (await createAnswerPolicyService(real).queue("tenant-a"))[0]!;
+  await createAnswerPolicyService(real).resolve("tenant-a", done.id, { decision: "approved", note: "ok" }, A);
+  assert.equal((await createAnswerPolicyService(real).queue("tenant-a", "approved")).length, 1, "repair does not reopen a resolved item");
+});
+for (const [name, make] of stores) {
+  test(`ISS-003 (${name}): closeItem cannot cross tenants; appendRevision refuses version gaps`, async () => {
+    const store = make();
+    const { item: a } = await store.addItemIfAbsent("tenant-a", item("tenant-a", "k"));
+    const foreign: ReviewItem = { ...a, tenantId: "tenant-b", status: "approved", resolution: { decision: "approved", note: "steal", by: { actor: "b" }, at: "t" } };
+    assert.equal(await store.closeItem("tenant-b", a.id, foreign), false, "M1: tenant B cannot close tenant A's item");
+    assert.equal((await store.getItem("tenant-a", a.id))?.status, "open");
+    assert.equal(await store.getItem("tenant-b", a.id), null);
+    assert.equal(await store.closeItem("tenant-a", a.id, { ...a, status: "dismissed" }), true);
+    assert.equal(await store.appendRevision("tenant-a", rev("tenant-a", "p", 1), 0), true);
+    assert.equal(await store.appendRevision("tenant-a", rev("tenant-a", "p", 3), 1), false, "M9: v1 then v3 refused (version != expected+1)");
+    assert.equal(await store.appendRevision("tenant-a", rev("tenant-a", "p", 3), 2), false, "M8: expected 2 refused while v2 does not exist");
+    assert.equal(await store.appendRevision("tenant-a", rev("tenant-a", "p", 2), 1), true);
+    assert.equal(await store.appendRevision("tenant-a", rev("tenant-a", "p", 2), 1), false, "duplicate version refused");
+    assert.deepEqual((await store.history("tenant-a", "p")).map((r) => r.version), [1, 2]);
+  });
+}
