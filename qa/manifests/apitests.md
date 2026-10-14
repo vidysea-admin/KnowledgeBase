@@ -18,3 +18,6 @@ Checked: the real /ask hydrator (apps/api/src/ask/source-context.ts) reads turns
 - Full apps/api suite (D2_FIXTURE_PYTHON set): ℹ tests 874 / pass 874 / fail 0.
 - tsc --noEmit -p tsconfig.json: exit 0. lint-loc --all: lint:structure OK (10 stages, 0 failed).
 - Real p1/p2 dirs untouched.
+
+## Correction
+The first commit (bb0e1682) held only this manifest: the test edit was written into the MAIN tree by mistake. Cause: [IO.File]::ReadAllText/WriteAllText with a relative path resolve against the .NET process cwd (main), not PowerShell's Set-Location (lane). Fixed by copying main's file into the lane (blob e4aa71d3), committing, and restoring main from HEAD. Re-verified in the lane (below).
