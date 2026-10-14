@@ -67,7 +67,23 @@ export function runtimeChronologicalTurns(turns: Turns[]): Turns[] {
     assertGroundedTurns(turns);
     return turns.map((turn, index) => ({ turn: structuredClone(turn), index })).sort((a, b) => a.turn.tStart - b.turn.tStart || a.turn.tEnd - b.turn.tEnd || a.index - b.index).map(({ turn }) => turn);
 }
-export function runtimeWindows(turns: Turns[]): RuntimeSpan[][] {
+/** Per-request character budget for strict grounded LLM calls (ISS-GROUNDBUDGET-001). Default 16000; override with
+ * LKB_GROUNDED_REQUEST_BUDGET (positive integer >= 4000, e.g. derived from a larger-context model). Judge (x4) and
+ * reconcile (x2) budgets scale from it. Strictness is unchanged: an over-budget payload still refuses. */
+export const DEFAULT_REQUEST_BUDGET = 16000;
+export function runtimeRequestBudget(env: Record<string, string | undefined> = process.env): number {
+    const raw = env.LKB_GROUNDED_REQUEST_BUDGET;
+    if (raw === undefined || raw === "")
+        return DEFAULT_REQUEST_BUDGET;
+    const n = Number(raw);
+    if (!Number.isInteger(n) || n < 4000)
+        throw new Error("LKB_GROUNDED_REQUEST_BUDGET must be an integer >= 4000");
+    return n;
+}
+/** Exact size of the extract request a window produces: spans plus the duplicated inventory plus wrapper. */
+const extractPayloadLength = (spans: RuntimeSpan[]) => JSON.stringify({ phase: "extract-summary", spans, inventory: runtimeInventory(spans) }).length;
+export function runtimeWindows(turns: Turns[], budget = runtimeRequestBudget()): RuntimeSpan[][] {
+    const spanBudget = Math.floor(budget * 3 / 4), fits = (spans: RuntimeSpan[]) => JSON.stringify(spans).length <= spanBudget && extractPayloadLength(spans) <= budget;
     turns = runtimeChronologicalTurns(turns);
     const spans: RuntimeSpan[] = [];
     for (const turn of turns) {
@@ -85,12 +101,12 @@ export function runtimeWindows(turns: Turns[]): RuntimeSpan[][] {
     const windows: RuntimeSpan[][] = [];
     let current: RuntimeSpan[] = [];
     for (const span of spans) {
-        if (JSON.stringify([span]).length > 12000)
+        if (!fits([span]))
             throw new Error("source metadata exceeds window budget");
-        if (JSON.stringify([...current, span]).length > 12000) {
+        if (!fits([...current, span])) {
             windows.push(current);
             current = current.slice(-2);
-            while (JSON.stringify([...current, span]).length > 12000)
+            while (!fits([...current, span]))
                 current.shift();
         }
         current.push(span);
@@ -160,7 +176,7 @@ export function runtimeQA(raw: unknown, turns: Turns[], questionSpans?: RuntimeS
     const answerEvidence = runtimeEvidence(r.answerEvidence, turns, answerSpans);
     return { id, question, questionEvidence, answer: runtimeExtractive(r.answer, answerEvidence), answerEvidence, status: "answered" };
 }
-export async function runtimeComplete(complete: RuntimeComplete, kind: "summarize" | "claims", system: string, payload: unknown, budget = 16000): Promise<unknown> {
+export async function runtimeComplete(complete: RuntimeComplete, kind: "summarize" | "claims", system: string, payload: unknown, budget = runtimeRequestBudget()): Promise<unknown> {
     const content = JSON.stringify(payload);
     if (content.length > budget)
         throw new Error("complete evidence context exceeds request budget");
@@ -182,10 +198,10 @@ export async function runtimeVerdicts(complete: RuntimeComplete, kind: "summariz
         }
     const indices = turns.flatMap((t, i) => citedIds.has(t._id) ? [i] : []);
     const context = turns.filter((_, i) => indices.some((n) => Math.abs(i - n) <= 1));
-    if (JSON.stringify(context).length > 48000)
+    if (JSON.stringify(context).length > runtimeRequestBudget() * 3)
         throw new Error("full semantic context exceeds48K budget");
     const raw = runtimeRecord(await runtimeComplete(complete, kind, (mode === "pending-qa" ? 'Review exactly every pending question candidate; completeness is per-question judgment, not new insight extraction. ' : mode === "claim-extraction" ? 'Review factual claim extraction completeness; informative but fact-free source may have noClaims=true. ' : 'Review informative summary extraction completeness. ') +
-        'Independently check all submitted source spans and proposed extracts using full source and adjacent context. Return {processed: exact span inventory, complete: true|false, noContent: true|false, noClaims: true|false, verdicts:[{id,supported:boolean,categoryCorrect:boolean,answerRelevant:boolean}]}. Verdict every id exactly once. Negated/proposed adoption is not a decision; suggestions are not assigned actions. A quoted answer must answer its quoted question. Screen OCR/visual observations are unverified source observations, never verified speaker facts. complete=false for omissions; noContent=true only if these source spans contain no informative extract. No extra IDs.', { phase: "judge", mode, spans, context, items, inventory: runtimeInventory(spans) }, 64000));
+        'Independently check all submitted source spans and proposed extracts using full source and adjacent context. Return {processed: exact span inventory, complete: true|false, noContent: true|false, noClaims: true|false, verdicts:[{id,supported:boolean,categoryCorrect:boolean,answerRelevant:boolean}]}. Verdict every id exactly once. Negated/proposed adoption is not a decision; suggestions are not assigned actions. A quoted answer must answer its quoted question. Screen OCR/visual observations are unverified source observations, never verified speaker facts. complete=false for omissions; noContent=true only if these source spans contain no informative extract. No extra IDs.', { phase: "judge", mode, spans, context, items, inventory: runtimeInventory(spans) }, runtimeRequestBudget() * 4));
     assertRuntimeCoverage(raw.processed, spans);
     if (raw.complete !== true || (items.length === 0 && (mode === "claim-extraction" ? raw.noClaims !== true : mode === "summary-extraction" && raw.noContent !== true)))
         throw new Error("informative extraction gap or incomplete semantic review");

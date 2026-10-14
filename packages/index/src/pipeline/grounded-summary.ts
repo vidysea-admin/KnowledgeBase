@@ -2,7 +2,7 @@
 import type { Turns } from "@lkb/core";
 import type { JudgeContext } from "./notes/judge.js";
 import { collectWindow, judgePendingCandidates, tryQA, type DroppedNote } from "./notes/drop-mode.js";
-import { runtimeChronologicalTurns, runtimeArray, runtimeRecord, runtimeComplete, runtimeWindows, runtimeInventory, assertRuntimeCoverage, runtimeItem, runtimeQA, runtimeJudge, validateRuntimePage, type RuntimeComplete, type RuntimeItem, type RuntimeQA } from "./grounded.js";
+import { runtimeChronologicalTurns, runtimeArray, runtimeRecord, runtimeComplete, runtimeWindows, runtimeRequestBudget, runtimeInventory, assertRuntimeCoverage, runtimeItem, runtimeQA, runtimeJudge, validateRuntimePage, type RuntimeComplete, type RuntimeItem, type RuntimeQA } from "./grounded.js";
 const EXTRACT = 'Read ALL supplied source spans. Return {processed: exact inventory, items:[], qa:[]}. Items: {kind:insight|decision|action,text,origin:speaker-statement|screen-ocr|visual-observation,verification:"unverified",evidence:[{turnId,sessionId,quote}]}. QA: {question,questionEvidence,answer:null|string,answerEvidence:[],status:answered|unanswered}. Every text/question/answer must equal its exact evidence quotes joined by newline. Evidence quotes must lie entirely inside a submitted span. Do not supply ids. Preserve source origin; screen content is unverified. Proposals/negated adoption are not decisions; suggestions are not assigned actions. Extract informative content throughout; no inferred owners/names/dates. Questions without relevant cited answers are unanswered/null/empty answerEvidence.';
 function mergeQuestion(map: Map<string, RuntimeQA>, q: RuntimeQA): void {
     const prior = map.get(q.id);
@@ -39,9 +39,9 @@ export async function produceRuntimeSummary(turns: Turns[], complete: RuntimeCom
         const pending = [...questions.values()].filter((q) => q.status === "unanswered");
         for (let offset = 0; offset < pending.length;) {
             let batch = pending.slice(offset, offset + 8);
-            while (batch.length > 1 && JSON.stringify({ phase: "reconcile-questions", spans, questions: batch, inventory: runtimeInventory(spans) }).length > 32000)
+            while (batch.length > 1 && JSON.stringify({ phase: "reconcile-questions", spans, questions: batch, inventory: runtimeInventory(spans) }).length > runtimeRequestBudget() * 2)
                 batch = batch.slice(0, -1);
-            const answerRaw = runtimeRecord(await runtimeComplete(complete, "summarize", 'Review every pending question against all CURRENT spans. Return {processed: exact inventory, answers:[{id,answer:null|string,answerEvidence:[]}]}, exactly once for every pending id and no other id. Answers require relevant literal quotes entirely inside current spans, joined by newline; unresolved means null and []. Never reinterpret question text.', { phase: "reconcile-questions", spans, questions: batch, inventory: runtimeInventory(spans) }, 32000));
+            const answerRaw = runtimeRecord(await runtimeComplete(complete, "summarize", 'Review every pending question against all CURRENT spans. Return {processed: exact inventory, answers:[{id,answer:null|string,answerEvidence:[]}]}, exactly once for every pending id and no other id. Answers require relevant literal quotes entirely inside current spans, joined by newline; unresolved means null and []. Never reinterpret question text.', { phase: "reconcile-questions", spans, questions: batch, inventory: runtimeInventory(spans) }, runtimeRequestBudget() * 2));
             assertRuntimeCoverage(answerRaw.processed, spans);
             const answers = runtimeArray(answerRaw.answers).map(runtimeRecord);
             if (answers.length !== batch.length || new Set(answers.map((a) => a.id)).size !== batch.length || answers.some((a) => !batch.some((q) => q.id === a.id)))
