@@ -1,5 +1,5 @@
 # Manifest: indextests
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 1
 Lane: lane/indextests (base c3b67350)
 

@@ -22,3 +22,11 @@
 ## Mutation (scripts/lib/mutate.mjs apply/restore per mutation, 180 s timeout, finally-restore, git hash-object == HEAD blob after each; final fidelity true; harness deleted)
 Killed: drop session_page.json check; drop session.json check; label always "validated"; disable skipping; in-progress checked before captureOnly (fail 3).
 Survived: parse-failure => in-progress (REAL gap, ISS-INDEXTESTS-001); non-object guard removed (partly equivalent: null is caught by TypeError, but "5"/string would be skipped, untested); dropping the validation.json-exists check (equivalent, ENOENT is caught).
+
+---
+# Cycle 1
+**Cycle checked: 1**
+**VERDICT: PASS** (commit 3bbbaeae; ISS-INDEXTESTS-001 closed; ISS-INDEXTESTS-002 stays open pending Umesh, not a FAIL)
+- Fixtures: 9 byte shapes x 3 dir shapes = 27, as claimed; each must land in missing (exactly 1), inProgress empty.
+- Mutants (mutate.mjs, per-mutation restore, hash == HEAD blob after each): catch=>in-progress, non-object guard removed, Array guard dropped, typeof dropped - all 4 KILLED (fail 1 each). My cycle-0 surviving mutant is now killed.
+- Full packages/index: tests 677 / pass 677 / fail 0. KB_REAL_DATA_DIR main-data run: 11/11, p1/p2 listed as in-progress. tsc exit 0. lint-loc OK.
