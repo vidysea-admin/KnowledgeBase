@@ -288,6 +288,14 @@ def test_registration_native_same_host_other_port_confinement(tmp_path, case):
             "allowedHosts": ["127.0.0.1", "localhost"] if case == "positive-alias" else ["127.0.0.1"],
             "operator": {"firstName": "Fixture", "lastName": "Operator", "email": "fixture@example.test"},
             "form": {"mode": "native-html", "formSelector": "#registration", "submitSelector": "button[type=submit]", "fields": {"firstName": "#first", "lastName": "#last", "email": "#email"}}}
+        # Overall hard deadline for THIS case (attempts + reap + cleanup together). Never hang: on expiry FAIL with attempt_log.
+        # Env-tunable: LKB_TEST_BRINGUP_TIMEOUT_S (per attempt), LKB_TEST_BRINGUP_ATTEMPTS, LKB_TEST_HARD_DEADLINE_S, LKB_TEST_CLEANUP_RESERVE_S.
+        env_num = lambda name, default: float(os.environ.get(name) or default)
+        attempt_timeout, max_attempts = env_num("LKB_TEST_BRINGUP_TIMEOUT_S", 100), max(1, int(env_num("LKB_TEST_BRINGUP_ATTEMPTS", 4)))
+        hard_deadline = time.monotonic() + env_num("LKB_TEST_HARD_DEADLINE_S", 480)
+        cleanup_reserve = env_num("LKB_TEST_CLEANUP_RESERVE_S", 120)  # attempts+reap stop this long before the hard deadline so cleanup still fits
+        remaining = lambda reserve=0: hard_deadline - reserve - time.monotonic()
+        def deadline_fail(stage): raise AssertionError((case, "hard deadline exceeded during " + stage, "attempts (attempt, returncode, stdout, stderr):", attempt_log))
         command = []
         def build_command(): return [sys.executable, str(program), "about:blank", "--profile", profile, "--title", "Fixture", "--stop-file", stop]
         command = build_command()
@@ -303,25 +311,30 @@ def test_registration_native_same_host_other_port_confinement(tmp_path, case):
             # minutes on a loaded machine, before any registration code runs. That is environment, not behaviour under test, so a
             # launch that never reached "driver-ready" is retried on a fresh profile (up to 4 attempts, 100 s each). A launch that
             # DID reach driver-ready is never retried: its outcome is asserted as-is.
-            for attempt in range(4):
+            for attempt in range(max_attempts):
+                if remaining(cleanup_reserve) <= 5: deadline_fail("bring-up attempts (before attempt %d)" % attempt)
                 try:
-                    result = run_captured(command + ["--browser-executable", "cft", "--registration-stdin"], "main", 100, json.dumps(instructions))
+                    result = run_captured(command + ["--browser-executable", "cft", "--registration-stdin"], "main", min(attempt_timeout, remaining(cleanup_reserve)), json.dumps(instructions))
                     stalled = result.returncode != 0 and '"driver-ready"' not in result.stdout
                 except subprocess.TimeoutExpired:
                     result, stalled = None, not '"driver-ready"' in (root / "main.out").read_text(encoding="utf-8", errors="replace")
+                    if remaining(cleanup_reserve) <= 5: attempt_log.append((attempt, "timeout", (root / "main.out").read_text(encoding="utf-8", errors="replace"), (root / "main.err").read_text(encoding="utf-8", errors="replace"))); deadline_fail("bring-up attempt %d" % attempt)
                 attempt_log.append((attempt, getattr(result, "returncode", "timeout"), getattr(result, "stdout", (root / "main.out").read_text(encoding="utf-8", errors="replace")), getattr(result, "stderr", "")))
-                if not stalled or attempt == 3: break
+                if not stalled or attempt == max_attempts - 1: break
                 # Parent is dead; its owned Job (kill-on-close) reaps the stalled browser. Reset only this fixture's own profile.
+                gone = False
                 for _ in range(30):
-                    gone = subprocess.run(command + ["--cleanup-only"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=120).returncode == 0
+                    if remaining(cleanup_reserve) <= 5: deadline_fail("reap of stalled attempt %d" % attempt)
+                    try: gone = subprocess.run(command + ["--cleanup-only"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=min(120, remaining(cleanup_reserve))).returncode == 0
+                    except subprocess.TimeoutExpired: gone = False
                     if gone: break
                     time.sleep(1)
-                assert gone, (case, "stalled launch not cleanly reapable")
+                assert gone, (case, "stalled launch not cleanly reapable", attempt_log)
                 # No rmtree: a half-deleted profile (Default/ without the ownership ledger) is refused as "Legacy occupied or unproved".
                 # The next attempt uses a brand-new profile directory instead; the old one is reaped above and pytest removes tmp_path.
                 profile, stop = attempt_paths(attempt + 1)
                 command = build_command()
-            assert result is not None, (case, "browser bring-up stalled in all 4 attempts", attempt_log)
+            assert result is not None, (case, "browser bring-up stalled in all %d attempts" % max_attempts, attempt_log)
             assert result.returncode == 0, (case, "attempts (attempt, returncode, stdout, stderr):", attempt_log)
             events = [json.loads(line) for line in result.stdout.splitlines() if line.startswith("{")]
             outcome = next(event for event in events if event.get("event") == "registration-result")
@@ -354,18 +367,19 @@ def test_registration_native_same_host_other_port_confinement(tmp_path, case):
                 # Owned-Job teardown after the parent exits is asynchronous and measured at 13-18 s on an idle box (Chrome flushes
                 # before dying), far longer under load. Poll the recorded browser's death cheaply (no Python start per probe)
                 # BEFORE the strict cleanup replay, so spawn cost on a busy CPU cannot burn the retry budget.
-                death_deadline = time.monotonic() + 150
+                # Bounded by the remaining hard budget, but never below a small floor so cleanup is always attempted.
+                death_deadline = time.monotonic() + max(10, min(150, remaining() / 2))
                 while time.monotonic() < death_deadline:
                     try:
                         if psutil.Process(record["browser"]["pid"]).create_time() != record["browser"]["created"]: break
                     except psutil.NoSuchProcess: break
                     time.sleep(.5)
                 cleanup_started, cleanup_attempts = time.monotonic(), 0
-                deadline = cleanup_started + 90
+                deadline = cleanup_started + max(20, min(90, remaining()))
                 while True:
                     cleanup_attempts += 1
                     try:
-                        cleanup = run_captured(command + ["--cleanup-only"], "cleanup%d" % cleanup_attempts, 120)
+                        cleanup = run_captured(command + ["--cleanup-only"], "cleanup%d" % cleanup_attempts, max(20, min(120, deadline - time.monotonic())))
                     except subprocess.TimeoutExpired:
                         if time.monotonic() >= deadline: raise
                         continue
