@@ -1,7 +1,7 @@
 # iss-t040gen-010-011-rejection-and-lowercase-abbrev
 
 **Handshake status:** ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Tier: 4 (open medium issues ISS-T040GEN-010, ISS-T040GEN-011; the unit touches the data-write quote gate, so full ceremony). Lane: lane/t040reject (base e4d6f14). Qualified ids: ISS-T040GEN-010 and ISS-T040GEN-011 (ledger `qa/issues.t040gen.jsonl`, not edited here; the checker verifies and closes).
 Scope: `packages/index/src/pipeline/notes/sentence-span.ts` + `grounded-notes.test.ts`. The `dropUnverified` option stays OFF by default and is not wired anywhere new.
 
@@ -34,3 +34,25 @@ Replay (verbatim checker cases): "Fees are 1000 rupees. Wrong." / "Ignore that."
 - Short-follow and cue sets are judgement parameters (N=5; the cue vocabulary is small and closed, matched only at the start of the next segment); a rejection phrased without a cue and longer than N words ("The correct number is 1200 rupees.") still ships the earlier statement. A genuine confirmation ("Yes, absolutely.") also drops: fail closed.
 - 010 stays open for a lower-case <= 4-letter abbreviation whose left side holds no marker; there a wrong break cannot hide a negation (the marker is the safety property), but it can split a clause without one.
 - apps/api suite not re-run (this unit changes only `sentence-span.ts`).
+
+## Fix cycle 1 (responds to verdict cycle 0, FAIL: ISS-T040GEN-012; -010 and -011 stay open until the checker closes them)
+Merged codex/machine-migration-2026-10-09 first (merge 9e0be9b8). Two conflicts, both mechanical: `sentence-span.ts` (main added `opts.judged` and split out `lexicalNegationProblem`; kept both, and `lexicalNegationProblem` now takes `opts.shortFollowWords` so the lane's N still applies), and `grounded-notes.test.ts` (main moved the whole cycle-1.. block to `grounded-notes-sentence-span.test.ts`; took main's file and re-applied the lane's 98-line test diff there with `git apply`, all 6 hunks clean).
+
+**ISS-T040GEN-012 fix.** In `isBoundary`, the ISS-T040GEN-010 no-break rule now also fires when MARKER occurs between the dot and the next strong mark (`tailToStrongMark`, a plain forward scan; it deliberately does not call `isBoundary`/`sentenceEnd`, which would recurse through `sentenceStart`). The left fragment then ends mid-sentence and the merged whole sentence carries the marker, so `omits-qualifier` sees it.
+
+**Evidence (D-015, counts by issue id, replaying the ledger row's own recorded cases parsed from `qa/issues.t040gen.jsonl` at test time, not a hand-copied corpus):**
+- ISS-T040GEN-010: 1/1 refused (the row records one verbatim case; its "same for univ./mgmt./pg." variants are in the earlier cycle-0 replay test, still passing)
+- ISS-T040GEN-011: 3/3 refused
+- ISS-T040GEN-012: 2/2 refused (the row's third, "... pvt. Colleges only if you apply early.", is elided in the ledger; it is replayed in full, with univ./mgmt./pg./asst. variants, in the authored list: 7/7 refused, whole merged sentence still ships, no-marker control still breaks).
+- `node --test --import tsx src/pipeline/notes/grounded-notes-sentence-span.test.ts`: 16/16 (2 new). All `packages/index` tests: 673 pass / 0 fail. Notes + judge tests 15 consecutive runs: 15/15. `tsc --noEmit -p packages/index` exit 0. `node scripts/lint-loc.mjs --all` exit 0. apps/api suite not run (it only reaches this code behind the off-by-default option). No LLM/Mongo/network/browser.
+- Mutation (per-mutation byte backup, restored in finally, hash checked): remove the new `tailToStrongMark` clause -> 14/16, KILLED; restored hash == pre-run hash.
+- Fixtures changed (each merges now, fail closed; same assertions): `fill fast` -> `fill quickly`; `Cost is 3.5 lakh.` -> `3.5 rupees.`; judge-rules `karo. Nahi.` -> `kijiye. Nahi.`. judge-rules replay constant 11 -> 4: the structural layer now refuses the abbreviation cases itself, so fewer ship under an always-same judge (per id: -011 3/3 still caught by the rules; -010 and -012 now 0 ship).
+- Recall, same naive splitter, same corpus (3427 turns), measured by script this cycle (the HEAD baseline and cycle-0 figures reproduce exactly):
+
+| variant | sentence quotes | clause quotes |
+|---|---|---|
+| base e4d6f14 (cycle 3) | 10901/15157 = 71.9% | 20413/33751 = 60.5% |
+| cycle 0 (6f0e88a) | 8448 = 55.7% | 17575 = 52.1% |
+| cycle 1 (this) | 7786 = 51.4% | 16562 = 49.1% |
+
+  The -012 fix costs a further 4.3 points of sentence recall and 3.0 clause; total vs base -20.5 / -11.4. Cost cause: any sentence ending in a lower-case word of <= 4 letters followed by a sentence that contains a marker ("... fill fast. We do not ...") is now one merged sentence; indistinguishable from "pvt. Colleges do not" without a dictionary. Owner decision, not mine: whether this recall is acceptable with the option ON (it stays OFF by default).

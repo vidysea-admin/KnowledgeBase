@@ -60,6 +60,11 @@ const OPEN_OR_WS = (c: string) => WS.test(c) || OPENERS.has(c);
  * AND the next word does not start in lower case. Anything else (capitalised, mixed case, digits with letters, single letter, dotted) NEVER breaks:
  * an unknown token fails closed, the sentence just gets longer and the negation floor sees more of it.
  */
+/** Text from `from` to the next strong mark followed by whitespace/end (a plain forward scan: it must NOT call isBoundary, which would recurse with sentenceStart). */
+function tailToStrongMark(t: string, from: number): string {
+  let e = from; while (e < t.length && !(STRONG.has(t[e]!) && (e + 1 >= t.length || WS.test(t[e + 1]!)))) e++;
+  return t.slice(from, e);
+}
 function isBoundary(t: string, i: number): boolean {
   if (!STRONG.has(t[i]!) || !(i + 1 >= t.length || WS.test(t[i + 1]!))) return false;
   if (t[i] !== ".") return true;
@@ -76,8 +81,9 @@ function isBoundary(t: string, i: number): boolean {
   let n = i + 1; while (n < t.length && OPEN_OR_WS(t[n]!)) n++;
   // ISS-T040GEN-010: a lower-case token of <= 4 letters before a capitalised word may be an unlisted abbreviation ("pvt. Colleges", "univ.", "mgmt.", "pg."), and no
   // dictionary is available in node_modules. Fail closed WHERE IT MATTERS: do not break when the sentence so far holds a negation/qualifier marker (a wrong break there
-  // would hide the marker from a quote that starts after it). With no marker on the left a wrong break cannot drop a negation, so it stays a break (recall).
-  if (!number && [...letters].length <= SHORT_TOKEN_LETTERS && n < t.length && /\p{Lu}/u.test(t[n]!) && MARKER.test(t.slice(sentenceStart(t, i), i))) return false;
+  // would hide the marker from a quote that starts after it). ISS-T040GEN-012: the same holds for a marker AFTER the dot (up to the next strong mark): the left fragment would ship
+  // and drop it, so that case merges too. With no marker on either side a wrong break cannot drop a negation, so it stays a break (recall).
+  if (!number && [...letters].length <= SHORT_TOKEN_LETTERS && n < t.length && /\p{Lu}/u.test(t[n]!) && (MARKER.test(t.slice(sentenceStart(t, i), i)) || MARKER.test(tailToStrongMark(t, n)))) return false;
   if (word === "no" && n < t.length && /\p{N}/u.test(t[n]!)) return false;
   if (n < t.length && LOWER.test(t[n]!)) return false;
   return true;

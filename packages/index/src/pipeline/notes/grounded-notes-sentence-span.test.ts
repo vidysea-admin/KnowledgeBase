@@ -23,10 +23,10 @@ test("ISS-T040GEN-002 replay: a quote that drops a governing negation is dropped
   }
 });
 test("sentence-span rule: whole sentences and clauses on punctuation still pass; cuts and omitted qualifiers do not", async () => {
-  const S = "Apply early, because seats fill fast. We do not recommend applying in March.";
+  const S = "Apply early, because seats fill quickly. We do not recommend applying in March.";
   const ok: [string, string][] = [
-    [S, "Apply early, because seats fill fast."], [S, "We do not recommend applying in March."], [S, "We do not recommend applying in March"],
-    [S, "because seats fill fast."], ["Honestly, the fee is 1,000 rupees today.", "the fee is 1,000 rupees today."],
+    [S, "Apply early, because seats fill quickly."], [S, "We do not recommend applying in March."], [S, "We do not recommend applying in March"],
+    [S, "because seats fill quickly."], ["Honestly, the fee is 1,000 rupees today.", "the fee is 1,000 rupees today."],
     ["Hello all. \"The fee is 1,000 rupees today.\" Thanks.", "The fee is 1,000 rupees today."],
     ["Fee kitna hai, wo bataya nahi gaya.", "wo bataya nahi gaya."], ["Yeh option achha hai। Fees 1000 rupees hai।", "Fees 1000 rupees hai।"],
   ];
@@ -97,7 +97,7 @@ test("abbreviation-aware sentence splitting: more abbreviations, fail-closed whe
   ];
   for (const [text, q] of bad) assert.notEqual(await spanOf(text, q), null, q);
   // a real boundary still splits: the next sentence is judged on its own
-  for (const [text, q] of [["We do not recommend waiting. Apply in March works.", "Apply in March works."], ["Dr. Rao said March works. We do not recommend April for anyone.", "Dr. Rao said March works."], ["Cost is 3.5 lakh. We do not recommend April for anyone.", "Cost is 3.5 lakh."], ["We do not want item 3. March works fine here.", "March works fine here."], ["No. 5 is excellent. Apply in March works.", "Apply in March works."], ["I said yes. Apply in March works.", "Apply in March works."]] as const)
+  for (const [text, q] of [["We do not recommend waiting. Apply in March works.", "Apply in March works."], ["Dr. Rao said March works. We do not recommend April for anyone.", "Dr. Rao said March works."], ["Cost is 3.5 rupees. We do not recommend April for anyone.", "Cost is 3.5 rupees."], ["We do not want item 3. March works fine here.", "March works fine here."], ["No. 5 is excellent. Apply in March works.", "Apply in March works."], ["I said yes. Apply in March works.", "Apply in March works."]] as const)
     assert.equal(await spanOf(text, q), null, q);
 });
 test("MARKER is a real unicode regex: each \p class blocks glued letters, digits and underscore, and braces do not block", async () => {
@@ -210,4 +210,41 @@ test("ISS-T040GEN-011 replay: a statement followed by a rejection, a retraction 
   // the threshold is a parameter: N=0 turns the short rule off, N=8 widens it
   const { sentenceSpanProblem } = await import("./sentence-span.js"), t = "Fees are 1000 rupees. The hostel costs extra for you.";
   assert.equal(sentenceSpanProblem(t, 0, S.length, { shortFollowWords: 0 }), null); assert.equal(sentenceSpanProblem(t, 0, S.length, { shortFollowWords: 8 }), "unconfirmed-by-short-reply");
+});
+
+// ---- cycle 1 (checker FAIL cycle 0): D-015 -- re-run each issue's OWN recorded reproductions verbatim from qa/issues.t040gen.jsonl ----
+test("ISS-T040GEN-010/-011/-012: every reproduction recorded in the ledger row is refused (counts by id)", async () => {
+  const { readFileSync } = await import("node:fs"), { sentenceSpanProblem } = await import("./sentence-span.js");
+  const rows = readFileSync(new URL("../../../../../qa/issues.t040gen.jsonl", import.meta.url), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+  const expected: Record<string, number> = { "ISS-T040GEN-010": 1, "ISS-T040GEN-011": 3, "ISS-T040GEN-012": 2 };
+  const report: string[] = [];
+  for (const [id, min] of Object.entries(expected)) {
+    const row = rows.find((r) => r.id === id); assert.ok(row, id);
+    let last = ""; const cases: (readonly [string, string])[] = []; // `"T" ships "Q"` / `"T" -> "Q"`, and `"T" ships it` (re-uses the previous Q)
+    for (const m of String(row.evidence).matchAll(/"([^"]+)"\s*(?:ships|->)\s*(?:"([^"]+)"|it\b)/g)) { last = m[2] ?? last; cases.push([m[1]!, last] as const); }
+    assert.ok(cases.length >= min, `${id}: parsed ${cases.length} recorded cases, expected >= ${min}`);
+    let refused = 0;
+    for (const [text, quote] of cases) { const i = text.indexOf(quote); assert.ok(i >= 0, quote); if (sentenceSpanProblem(text, i, i + quote.length) !== null) refused++; }
+    report.push(`${id}: ${refused}/${cases.length} refused`);
+    assert.equal(refused, cases.length, `${id}: ${report.at(-1)}`);
+  }
+  console.log(report.join("; "));
+});
+test("ISS-T040GEN-012: marker AFTER an unlisted lower-case abbreviation -- the left fragment and the whole merged sentence behave (checker's variants + controls)", async () => {
+  const { sentenceSpanProblem } = await import("./sentence-span.js");
+  const leftShips: [string, string][] = [
+    ["Admission is open for pvt. Colleges do not take March applications.", "Admission is open for pvt."],
+    ["Admission is open for pvt. Colleges only if you apply early.", "Admission is open for pvt."],
+    ["Seats are open in pvt. Colleges but not in govt ones.", "Seats are open in pvt."],
+    ["Admission is open for univ. Colleges do not take March applications.", "Admission is open for univ."],
+    ["Seats are open in mgmt. Quota but not in govt ones.", "Seats are open in mgmt."],
+    ["Admission is open for pg. Courses unless you apply early.", "Admission is open for pg."],
+    ["Admission is open for asst. Deans never in March.", "Admission is open for asst."],
+  ];
+  for (const [text, q] of leftShips) assert.notEqual(sentenceSpanProblem(text, 0, q.length), null, q);
+  // the whole merged sentence still ships (recall), and an abbreviation with no marker anywhere is still a plain break
+  assert.equal(sentenceSpanProblem(leftShips[0]![0], 0, leftShips[0]![0].length), null);
+  const plain = "Admission is open for pvt. Colleges in March are usually quite crowded every year.";
+  assert.equal(sentenceSpanProblem(plain, 0, "Admission is open for pvt.".length), null);
+  assert.equal(sentenceSpanProblem("Apply early. Seats fill quickly in the popular colleges.", 0, "Apply early.".length), null);
 });
