@@ -15,3 +15,6 @@ Join rules: load, add+edit rule, Save disabled when clean, Save persists across 
 Real Ask answer quality/citations from the corpus, real search ranking, live webinar operations/retention data, the real join-rules store, ETag/412 conflict dialog.
 
 Note: Vite may have refreshed its dependency cache under apps/web/node_modules/.vite (junction to the main checkout); no package files were changed.
+
+## CORRECTION (browsercheck fix cycle 1, 2026-10-14)
+The line "read-only without scope: PASS" above is WITHDRAWN. The page becomes read-only only after a write returns 403; that run never attempted a write, and join-rules-5-readonly.png is byte-identical to join-rules-3-after-reload.png (the rw key). Read-only mode was untested. See qa/evidence/browser-checks-2026-10-14-joinrules/ for the redo (Save -> PUT 403 -> read-only alert).

@@ -1,0 +1,9 @@
+PASS rw: Add rule + edit enables Save 
+PASS rw: Save succeeds with If-Match/ETag and persists after reload 
+PASS rw: no read-only notice 
+PASS ro: before any write, no read-only notice (page cannot know yet) | notice present before write=false
+PASS ro: edit a rule and click Save -> 403 -> read-only alert, inputs and Save disabled | PUT 403; alert=This key can view rules but cannot change them. Use a key with the join-rules scope to edi
+PASS phone 375px: no horizontal overflow, Save and Add rule reachable | scrollWidth=375 clientWidth=375
+PASS 503: unavailable state shown as an alert, no editor | Rule editing is not available on this server yet.
+PASS screenshots are distinct (ro-after-403 differs from rw-after-reload; the cycle-0 bug was byte-identical files) | {"rw_edited":"d9fafbcf1906","rw_reloaded":"fc66efa819c3","ro_after403":"8ba73a4eb9f7","phone":"9e30b56d8178","s503":"35acf270c7c9"}
+console errors: 2
