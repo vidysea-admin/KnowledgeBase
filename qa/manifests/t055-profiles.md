@@ -1,7 +1,7 @@
 # t055-profiles
 
-Status: ready-for-check
-**Handshake status:** ready-for-check
+Status: checked-PASS
+**Handshake status:** checked-PASS
 Fix cycle: 1
 
 Task: T-055; priority tier 3 (roadmap). Branch `lane/t055-profiles` from `lane/codexwave1` (cd843b26). Not an issue-fix unit; no ledger corpus substituted.

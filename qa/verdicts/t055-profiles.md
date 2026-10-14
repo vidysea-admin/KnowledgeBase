@@ -31,3 +31,23 @@ Per-mutation byte backup, try/finally restore, restored hash == original, tracke
 
 ## Required for cycle 1
 Normalise the tenant namespace in topic-claim matching with a test using `toc:visas` vs `topic:visas`; render quote/speaker/timestamp on claim rows; refuse claims with no evidence in highlights (and test it, killing M1-class mutants); fix per-row text for skipped sessions.
+
+---
+
+# Cycle 1
+
+Verdict: PASS
+Cycle checked: 1
+Commit checked: dc994c01
+ISSUES-WRITTEN: none
+
+D-015 reproductions (all four re-run in a fresh Playwright context, lane Vite on :5198 stopped by PID, mocked REAL shapes: claim topicRefs `toc:visas`, node `topic:visas`; 1280px and 375px):
+- ISS-T055PROFILES-001: `toc:visas` claim now shown on the visas profile (4/4 expectations). Negatives: `toc:visas-extra` NOT shown; `othertenant:empty-topic` claim would match slug `empty-topic` only if the API returned it, but /claims is tenant-scoped (`claimsColl(tenantId)`, tenant from the verified key) and topicRefs are written with the caller's own tenant, so no cross-tenant exposure. Compare is segment after the last colon vs node.ref.
+- ISS-T055PROFILES-002: claim rows now show quote, speaker ("Anita"), timestamp ("30s"), session and link `/sessions/s3#turn-t3`.
+- ISS-T055PROFILES-003: highlights hide the evidence-less claim ("1 claims are hidden: evidence unavailable"); grounded claim shown.
+- ISS-T055PROFILES-004: skipped sessions now say "Quote not loaded (limit 8 sessions)"; 0 occurrences of the wrong "turn not found" text.
+- scrollWidth == innerWidth at 375 and 1280 on topic, empty and highlights views.
+
+Mutation (per-mutation backup, try/finally, hash verified): api/claims.ts evidence guard removed: KILLED (1 fail); ProfileHighlights evidence filter removed: KILLED; slug compare broken: KILLED (3 fail). Survivor (low, redundant): `c.evidence.length > 0` in profileModel matched filter; the same guard exists in api/claims.ts isRow, which is killed. api/claims.ts blob unchanged (79301e60 == 933ea3f2).
+
+Gates: web vitest full: first run 826/830 (the 2 inherited SearchPage failures plus IngestPage and SessionDetailPage speaker-suggestion timeouts under load); those two files re-ran 3x clean (12/12 each) and are untouched by this lane. tsc exit 0. lint-loc: only pre-existing meeting-bot violation.
