@@ -181,7 +181,7 @@ pair(
     put(root, "NOTES.md", lines(r.mdMaxLines + 1, "note"));
     put(root, r.readmeFile, lines(r.readmeMaxLines + 1, "readme"));
   },
-  /root has 16 loose files[\s\S]*ARCHITECTURE\.md: 151 lines[\s\S]*NOTES\.md: 201 lines[\s\S]*README\.md: 81 lines/,
+  new RegExp(`root has ${r.maxLooseFiles + 1} loose files` + /[\s\S]*ARCHITECTURE\.md: 151 lines[\s\S]*NOTES\.md: 201 lines[\s\S]*README\.md: 81 lines/.source),
 );
 
 // C4 — duplicate exports + duplicate schema $id
