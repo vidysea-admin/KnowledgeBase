@@ -21,6 +21,15 @@ jobs:
         with:
           node-version: 24
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Install host dependencies for root-budget fixture tests
+        # lint.test.mjs imports gen-types.mjs and its JavaScript schema compiler.
+        # These fixture tests need no dependency lifecycle scripts or native builds.
+        run: timeout 300 pnpm install --frozen-lockfile --ignore-scripts
+
       - name: Check root budget from the clean checkout
         run: |
           node scripts/lint-root.mjs
