@@ -5,10 +5,10 @@ Lane: lane/indextests (base c3b67350)
 
 ## Changes
 - packages/index/src/pipeline/notes/judge.test.ts: expected route map gains `vision: ["ollama","gemini"]` (added by ollamafirst, pinned by packages/ai/src/vision/chain.test.ts:114). deepEqual kept, not weakened.
-- packages/index/src/tree/tree-real-data.test.ts: `isInProgress` (no session.json, no session_page.json, validation.json parses with status != "passed") -> skipped, reported in `inProgress`, logged by assertReadyCorpus. Passed-validation-with-missing-files, unparseable/null validation.json, and partial session files still land in `missing` (fail loudly). `KB_REAL_DATA_DIR` env overrides the data root. Two fixture tests (temp dirs) added; the old `{status:"failed"}` capture-exemption case was removed from the malformed list because that shape is now in-progress by definition (covered by the new test).
+- packages/index/src/tree/tree-real-data.test.ts (refined per coordinator): a dir with NEITHER session.json NOR session_page.json (and a parseable validation.json object) is IN-PROGRESS whatever its status: skipped, listed in `inProgress` as "<dir> (validation failed)" or "<dir> (validated, awaiting finalize)", logged. Exactly one session file, or an unparseable/empty one, still lands in `missing` (fails loudly). Valid capture-only dirs are still classified captureOnly first. `KB_REAL_DATA_DIR` env overrides the data root. Fixtures cover: neither+failed (skip), neither+passed (skip, awaiting finalize), only session.json (fail), only session_page.json (fail), empty/unparseable (fail), both present (load). Two assertions in the capture-exemption test relaxed (missing+inProgress == 1, never captureOnly/completed) since capture-shaped dirs with a non-capture extra are now awaiting finalize.
 
 ## Evidence
-- `node --test --import tsx src/tree/tree-real-data.test.ts src/pipeline/notes/judge.test.ts` (packages/index): pass 19 / fail 0
-- Full `node --test --import tsx "src/**/*.test.ts"` (packages/index): tests 675, pass 675, fail 0
+- judge.test.ts + tree-real-data.test.ts: `node --test --import tsx src/tree/tree-real-data.test.ts`: pass 10 / fail 0
+- Full packages/index `node --test --import tsx "src/**/*.test.ts"`: tests 676, pass 676, fail 0
 - tsc --noEmit -p tsconfig.json: exit 0; `node scripts/lint-loc.mjs --all`: exit 0
-- Read-only run vs MAIN data (KB_REAL_DATA_DIR=...\KnowledgeBase\data\toc-migrated): pass 8 / fail 1. p1 listed in-progress (validation status "failed"). p2 FAILS: its validation.json is status "passed" (73 turns) but it has no session.json/session_page.json yet, so per the required rule it is corruption-class. Likely finalize pending; re-run once p2 gets session files.
+- Read-only run with KB_REAL_DATA_DIR=C:/Users/product/Desktop/KnowledgeBase/data/toc-migrated: pass 10 / fail 0; logged "in-progress ingests skipped (2): 2026-10-13-zoom-webinar-p1 (validation failed), 2026-10-13-zoom-webinar-p2 (validated, awaiting finalize)"

@@ -53,17 +53,18 @@ function isCaptureOnly(dir: string, sessionId: string): boolean {
 }
 
 /**
- * A live ingest in progress: no session.json, no session_page.json, and a validation.json that parses with
- * status other than "passed". A passed validation with missing files is NOT in progress: it stays a failure
- * (real corruption signal). Unparseable validation.json is likewise not in progress.
+ * A live ingest in progress or awaiting finalize: NEITHER session.json NOR session_page.json exists, and
+ * validation.json parses to an object. Returns a label with the validation status, or null. Exactly one of the two
+ * files present, or either unparseable/empty, is NOT in progress: it falls through to the loud failure path.
  */
-function isInProgress(dir: string): boolean {
-  const has = (name: string): boolean => readdirSync(dir).includes(name);
-  if (has("session.json") || has("session_page.json") || !has("validation.json")) return false;
+function inProgressLabel(dir: string): string | null {
+  const names = readdirSync(dir);
+  if (names.includes("session.json") || names.includes("session_page.json") || !names.includes("validation.json")) return null;
   try {
     const validation = JSON.parse(readFileSync(join(dir, "validation.json"), "utf8"));
-    return validation !== null && typeof validation === "object" && validation.status !== "passed";
-  } catch { return false; }
+    if (validation === null || typeof validation !== "object") return null;
+    return validation.status === "passed" ? "validated, awaiting finalize" : `validation ${String(validation.status)}`;
+  } catch { return null; }
 }
 
 function loadRealData(dataDir = DATA_DIR): {
@@ -80,8 +81,9 @@ function loadRealData(dataDir = DATA_DIR): {
     if (!dirName.isDirectory()) continue;
     const dir = join(dataDir, dirName.name);
     try {
-      if (isInProgress(dir)) { inProgress.push(dirName.name); continue; }
       if (isCaptureOnly(dir, dirName.name)) { captureOnly.push(dirName.name); continue; }
+      const label = inProgressLabel(dir);
+      if (label) { inProgress.push(`${dirName.name} (${label})`); continue; }
       const session = JSON.parse(readFileSync(join(dir, "session.json"), "utf8")) as Sessions;
       const page = JSON.parse(readFileSync(join(dir, "session_page.json"), "utf8")) as SessionPages;
       assert.ok(session && typeof session._id === "string" && session._id.length > 0, "session identity required");
@@ -99,7 +101,7 @@ function loadRealData(dataDir = DATA_DIR): {
 }
 
 function assertReadyCorpus(data: ReturnType<typeof loadRealData>, minimum = 23): void {
-  if (data.inProgress.length) console.log(`in-progress live ingests skipped (${data.inProgress.length}): ${data.inProgress.join(", ")}`);
+  if (data.inProgress.length) console.log(`in-progress ingests skipped (${data.inProgress.length}): ${data.inProgress.join(", ")}`);
   assert.deepEqual(data.missing, [], `every migrated output must have session.json + session_page.json; missing: ${data.missing.join(", ")}`);
   assert.ok(data.completed.length >= minimum, `expected at least ${minimum} completed real sessions, found ${data.completed.length}`);
   assert.equal(data.sessions.length, data.completed.length);
@@ -255,37 +257,38 @@ test("malformed or partly processed capture metadata never receives the intake-o
   ];
   for (const files of cases) withCorpus((root, put) => {
     put(id, files); const data = loadRealData(root);
-    assert.equal(data.missing.length, 1); assert.deepEqual(data.captureOnly, []);
-    assert.throws(() => assertReadyCorpus(data, 1), /every migrated output/);
+    // no exemption: either a loud failure, or (neither session file + parseable validation) in-progress, never captureOnly/completed
+    assert.equal(data.missing.length + data.inProgress.length, 1); assert.deepEqual(data.captureOnly, []);
+    assert.deepEqual(data.completed, []); assert.throws(() => assertReadyCorpus(data, 1));
   });
   withCorpus((root, put) => {
     put(id, intake); mkdirSync(join(root, id, "unfinished-stage"));
     const data = loadRealData(root);
-    assert.equal(data.missing.length, 1); assert.deepEqual(data.captureOnly, []);
-    assert.throws(() => assertReadyCorpus(data, 1), /every migrated output/);
+    assert.equal(data.missing.length + data.inProgress.length, 1); assert.deepEqual(data.captureOnly, []);
+    assert.throws(() => assertReadyCorpus(data, 1));
   });
 });
 
-test("a live ingest without session files and a non-passed validation is IN-PROGRESS: skipped and reported", () => withCorpus((root, put) => {
+test("dirs with neither session file are IN-PROGRESS: skipped, reported with validation status", () => withCorpus((root, put) => {
   put("live-failed", { "source.json": "{}", "validation.json": JSON.stringify({ stage: "transcript", status: "failed" }) });
-  put("live-running", { "validation.json": JSON.stringify({ status: "running" }) });
-  const done = realFiles(REAL_COMPLETED_ID, ["source.json", "session.json", "session_page.json"]);
-  put("done", done);
+  put("live-passed", { "validation.json": JSON.stringify({ status: "passed", transcriptValidated: true }), "turns.json": "[]" });
+  put("done", realFiles(REAL_COMPLETED_ID, ["source.json", "session.json", "session_page.json"]));
   const data = loadRealData(root); assertReadyCorpus(data, 1);
-  assert.deepEqual(data.inProgress.sort(), ["live-failed", "live-running"]);
+  assert.deepEqual([...data.inProgress].sort(), ["live-failed (validation failed)", "live-passed (validated, awaiting finalize)"]);
   assert.deepEqual(data.missing, []); assert.deepEqual(data.captureOnly, []); assert.deepEqual(data.completed, ["done"]);
 }));
 
-test("a PASSED validation with missing session files is real corruption and still fails loudly", () => {
-  const passed = JSON.stringify({ status: "passed", transcriptValidated: true });
+test("exactly one session file, or an unparseable/empty one, still fails loudly whatever validation says", () => {
   const complete = realFiles(REAL_COMPLETED_ID, ["session.json", "session_page.json"]);
+  const passed = JSON.stringify({ status: "passed" }), failed = JSON.stringify({ status: "failed" });
   const cases: Record<string, string>[] = [
-    { "validation.json": passed },
     { "validation.json": passed, "session.json": complete["session.json"]! },
+    { "validation.json": failed, "session.json": complete["session.json"]! },
     { "validation.json": passed, "session_page.json": complete["session_page.json"]! },
-    { "validation.json": "{" },
-    { "validation.json": "null" },
-    { "validation.json": JSON.stringify({ status: "failed" }), "session.json": complete["session.json"]! },
+    { "validation.json": failed, "session_page.json": complete["session_page.json"]! },
+    { "validation.json": passed, "session.json": "", "session_page.json": complete["session_page.json"]! },
+    { "validation.json": passed, "session.json": complete["session.json"]!, "session_page.json": "{" },
+    { "validation.json": passed, "session.json": "{", "session_page.json": "{" },
   ];
   for (const files of cases) withCorpus((root, put) => {
     put("candidate", files); const data = loadRealData(root);
@@ -293,3 +296,9 @@ test("a PASSED validation with missing session files is real corruption and stil
     assert.throws(() => assertReadyCorpus(data, 1), /every migrated output/);
   });
 });
+
+test("both session files present and valid are loaded, not skipped", () => withCorpus((root, put) => {
+  put("both", { "validation.json": JSON.stringify({ status: "failed" }), ...realFiles(REAL_COMPLETED_ID, ["session.json", "session_page.json"]) });
+  const data = loadRealData(root); assertReadyCorpus(data, 1);
+  assert.deepEqual(data.inProgress, []); assert.deepEqual(data.completed, ["both"]);
+}));
