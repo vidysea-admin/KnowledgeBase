@@ -163,7 +163,7 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
 
     if (item.cancelled) { skipped.push({ ...base, reason: "cancelled" }); continue; }
     if (input.everyWebinar) {
-      const kind = classifyWebinarInvite(item.title);
+      const kind = input.classifyInvite ? input.classifyInvite({ title: item.title, meetingUrl: item.meetingUrl, sender: item.sender }) : classifyWebinarInvite(item.title);
       if (kind !== "webinar") {
         skipped.push({ ...base, reason: kind === "meeting" ? "not-webinar" : "needs-review" }); continue;
       }
@@ -227,6 +227,7 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
   // duration); everyone else in the cluster loses.
   eligible.sort((a, b) => new Date(a.startTime as string).getTime() - new Date(b.startTime as string).getTime());
 
+  const priority = (i: NormalizedItem): number => input.priorityOf?.({ source: i.source, sourceId: i.sourceId, title: i.title, sender: i.sender }) ?? 0;
   const winners: NormalizedItem[] = [];
   let cluster: NormalizedItem[] = [];
 
@@ -238,6 +239,8 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
       return;
     }
     const [winner, ...losers] = [...cluster].sort((a, b) => {
+      const prioDiff = priority(b) - priority(a); // autojoin: higher topic priority first; 0 for everyone without priorityOf
+      if (prioDiff !== 0) return prioDiff;
       const startDiff = new Date(a.startTime as string).getTime() - new Date(b.startTime as string).getTime();
       if (startDiff !== 0) return startDiff;
       return durationMs(b) - durationMs(a); // longest duration wins the tie
@@ -246,7 +249,7 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
     for (const loser of losers) {
       skipped.push({
         sessionKey: loser.sessionKey, source: loser.source, sourceId: loser.sourceId, title: loser.title,
-        reason: "overlap-lost", detail: `lost to ${winner!.sessionKey} (earlier start, or longer on a tie)`,
+        reason: "overlap-lost", detail: `lost to ${winner!.sessionKey} (${priority(winner!) > priority(loser) ? "higher topic priority" : "earlier start, or longer on a tie"})`,
       });
     }
     cluster = [];

@@ -24,6 +24,7 @@ beforeEach(() => {
     "/calendar/upcoming": () => json({ meetings: [] }),
     "/webinar-operations": () => json({ operations: [], omitted: 0 }),
     "/sessions": () => json({ sessions: [] }),
+    "/bot-events?limit=20": () => json({ events: [] }),
   };
   vi.stubGlobal("fetch", vi.fn(async (url: string) => {
     const path = String(url).replace(/^https?:\/\/[^/]+/, ""); calls.push(path);
@@ -61,7 +62,7 @@ describe("sections and request counts", () => {
     expect(within(section("Webinar operations")).getByText("Finished webinar")).toBeInTheDocument();
     expect(within(section("Past recordings")).getByRole("link", { name: /Open session and transcript: Past one/ })).toHaveAttribute("href", "/sessions/s1");
     expect(count("/calendar/upcoming")).toBe(1); expect(count("/webinar-operations")).toBe(1); expect(count("/sessions")).toBe(1);
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(4); // + /bot-events (autojoin Bot activity section)
   });
 
   test("no API key means no request at all", () => {

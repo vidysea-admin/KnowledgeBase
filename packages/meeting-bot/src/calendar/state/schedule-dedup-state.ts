@@ -146,6 +146,11 @@ export interface ScheduledJob {
   title: string;
   
   sessionId: string;
+  /** Autojoin (optional; the launcher ignores them): scheduled start, topic verdict and test-data tag, read back by the capture watcher. */
+  startTime?: string;
+  careerGuidance?: boolean;
+  testData?: boolean;
+  matchedKeywords?: string[];
 }
 
 function scheduledJobDir(stateDir: string): string {

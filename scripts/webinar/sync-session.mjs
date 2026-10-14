@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { isProtectedWorkDbName, bindDerivedArtifacts } from "../lib/transcript-provenance.mjs";
+import { resolveWorkDb } from "../watch/test-data-route.mjs";
 /**
  * scripts/webinar/sync-session.mjs (moved from scripts/sync-webinar-session.mjs 2026-09-24,
  * fix cycle 1 — lint-dirsize budget: scripts/ was 33/32, this was the only new file in the diff,
@@ -193,7 +194,10 @@ const upsert = (coll, doc) => {
 };
 const strip = ({ tenantId: _t, ...rest }) => rest;
 
-const workDb = process.env.MONGO_WORK_DB?.trim();
+// Test-data routing (2026-10-14): a source tagged testData:true goes to lkb_staging only (scripts/watch/test-data-route.mjs).
+const route = resolveWorkDb({ testData: sourceDoc.testData, workDb: process.env.MONGO_WORK_DB?.trim(), env: process.env });
+const workDb = route.workDb;
+if (route.testData) console.log(`  testData source: routed to ${workDb}${route.rerouted ? " (not the configured work database)" : ""}`);
 if (isProtectedWorkDbName(workDb, process.env)) throw new Error("MONGO_WORK_DB must name an isolated work database; production writes refused");
 await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", workDb);
 const gen = `gen-${Date.now()}`;
