@@ -1,7 +1,7 @@
 # T-054 durable atomic transcript corrections (persistence, routes, refresh execution)
 
-**Handshake status:** ready-for-check
-**Status:** ready-for-check
+**Handshake status:** checked-PASS
+**Status:** checked-PASS
 **Fix cycle:** 1
 **Task:** T-054 (scoped unit only; whole task stays in_progress)
 **Priority tier:** 3 - next unblocked roadmap feature, assigned in the current wave. Touches tenancy and data writes, so full ceremony.

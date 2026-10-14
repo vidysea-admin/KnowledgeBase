@@ -30,3 +30,16 @@ Produced by the repo generator: `gen-types --check` passes with the two new file
 
 ## Notes
 Actor is `apikey:<tenantId>` (no key or user id on VerifiedKey): the audit cannot attribute a person (manifest gap 5). T-054 stays in_progress.
+
+---
+
+# Cycle 1 (fix cycle 1, commit 4ebcd329, test-only)
+
+VERDICT: PASS (scoped)
+Cycle checked: 1
+ISSUES-WRITTEN: none
+
+- Production source unchanged since 7011ec79: the diff touches only persist.test.ts, refresh.test.ts, memdb.testsupport.ts and the manifest. The one removed line (refresh.test.ts boot call) was replaced by the same call plus a recording of executed targets; the new assertion on that list is added, none weakened. memdb.testsupport.ts now rejects a cross-tenant duplicate _id on upsert, as Mongo does (stricter).
+- The 5 cycle-0 survivors re-run verbatim, per-mutation backup, restore in finally, hash verified: headId-no-tenant KILLED (fail 2), revisionRowId-no-tenant KILLED (fail 2), tenant-from-query KILLED (fail 1), history $set KILLED (fail 1), refresh-ignore-superseded KILLED (fail 1). All files restored identical.
+- transcript-review tests: tests 32 / pass 32 / fail 0. Full apps/api suite: tests 959 / pass 959 / fail 0. tsc over transcript-review with a temporary paths tsconfig: exit 0 (config deleted).
+- ISS-T054-PERSIST-001 and -002 closed. Live gaps from cycle 0 (mount, real MongoDB, real refresh executor) remain open; T-054 stays in_progress.
