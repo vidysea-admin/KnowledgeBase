@@ -36,3 +36,28 @@ meeting-bot 2 EPERM symlink; lint-loc 408 lines (on main).
 - qa/evidence: 28 test/probe-shaped files, none matched by any current test glob; 76 qa files contain C:\Users paths (ISS-005).
 - Secrets: none found (regex scan of added/modified text files: only prose false positives).
 - >1 MB: none added by the snapshot (the 7 qa/evidence PNGs and 3 raw PDFs already exist on main).
+
+---
+# Cycle 1 (commit 4de57107, main merged at 4afb0e31)
+
+VERDICT: PASS
+Cycle checked: 1
+
+Same method (temporary lane `paths` tsconfig, deleted).
+
+| Check | Result |
+|---|---|
+| tsc api/web/core/ask/meeting-bot | all exit 0 |
+| apps/api | 933 pass / 0 fail |
+| apps/web vitest | 81 files, 816/816 pass (was 814/2 fail) |
+| apps/web vite build | exit 0 |
+| test:webinar globs | 195/0 |
+| supervisor tests | 10/10 on 5 standalone runs; 1 failure in one earlier standalone run (see flakes) |
+| lint-loc --all, lint-dirsize | OK (1012 files; 179 dirs) |
+| snapshot.mjs --check | OK |
+| contracts | PASS by vacuity |
+
+1. ISS-003 root cause CONFIRMED: SessionDetailPage.tsx (absent at main 4f449b27, present at snapshot) mounts GroundedContentPanel, which fetches /sessions/:id/grounded-content; SemanticResults is not the extra call. The cycle-1 diff to SearchPage.test.tsx only adds a grounded-content branch to the routing fetch; no expect()/count assertion changed. Not weakened.
+2. Stream-cap deadline 1000 -> 60000 ms: the assertion's purpose is the 'too large' (64 KiB cap) message, and the mock reader returns instantly, so the cap trips well within a second unless the machine is starved (Stopwatch plus 5 ms sleeps). A hang regression would still fail (message becomes 'timed out', or the 15 s spawnSync timeout in run() kills it), so the test is not blinded; 60 s only exceeds the 15 s harness timeout, making the deadline moot. Suggestion: 10000 ms (below the 15 s harness timeout, still load-tolerant).
+3. 34 data/ junk files gone; only reference is the .handoffs inventory json; no import. Supervisor test uses import.meta.url. SNAPSHOT check OK. The 28 qa/evidence absolute-path files are evidence only, outside all test globs (apps/*/src, packages/*/src, explicit lists): harmless.
+4. Flakes: send-now-host 'launch: 202' 5/5 pass. Supervisor 5/5 pass (10/10 each). One earlier standalone supervisor run failed 1 of 10 (test name not captured) while durations range 17-46 s, i.e. the host is under heavy load (Chrome worker); load-attributed: these tests spawn powershell.exe with a 15 s harness timeout. Not reproduced in 6 subsequent runs; weak evidence it is not real.
