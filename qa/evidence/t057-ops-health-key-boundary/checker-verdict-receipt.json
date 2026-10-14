@@ -1,0 +1,10 @@
+{
+  "verdict": "PASS",
+  "cycleChecked": 0,
+  "launchRecordedUtc": "2026-10-14T08:41:16Z",
+  "confirmedPersistUtc": "2026-10-14T09:16:40.2375205Z",
+  "launchToConfirmedSeconds": 2124.2375205,
+  "finalCandidatePinsMatch": 6,
+  "verdictSha256": "B3A1CD3FADCDF721C78D66D0E8DDD67279FE6DD19C38E3DFAA2C33C2B543AA14",
+  "startBeforeFirstTool": "UNKNOWN"
+}

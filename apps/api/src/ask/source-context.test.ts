@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import type { Db } from "mongodb";
@@ -48,9 +49,52 @@ test("trusted hydrator reads scoped exact sessions, preserves literal speech and
   assert.equal(input.summary, node.summary);
   assert.deepEqual(filters[0]!.filter, { sessionId: { $in: ["s"] }, tenantId: "toc" });
 });
+/**
+ * Same rule as packages/index tree-real-data (lane indextests, 45076785): a dated dir with NEITHER session.json NOR
+ * session_page.json, and a validation.json that parses to an object, is a live/unfinalized ingest: skipped and logged.
+ * Exactly one of the two files, or an unparseable validation.json, is NOT in progress and stays in the corpus (fails loudly).
+ */
+function inProgressLabel(dir: string): string | null {
+  const names = readdirSync(dir);
+  if (names.includes("session.json") || names.includes("session_page.json") || !names.includes("validation.json")) return null;
+  try {
+    const v = JSON.parse(readFileSync(join(dir, "validation.json"), "utf8"));
+    if (v === null || typeof v !== "object") return null;
+    return v.status === "passed" ? "validated, awaiting finalize" : "validation " + String(v.status);
+  } catch { return null; }
+}
+/** KB_REAL_DATA_DIR points at another data root (read-only), e.g. the main tree. */
+const CORPUS_DIR = process.env["KB_REAL_DATA_DIR"] || fileURLToPath(new URL("../../../../data/toc-migrated/", import.meta.url));
+function datedCorpusIds(corpus: string): { ids: string[]; inProgress: string[] } {
+  const ids: string[] = [], inProgress: string[] = [];
+  for (const e of readdirSync(corpus, { withFileTypes: true })) {
+    if (!e.isDirectory() || !/^\d{4}-\d\d-\d\d-/.test(e.name)) continue;
+    const label = inProgressLabel(join(corpus, e.name));
+    if (label) inProgress.push(e.name + " (" + label + ")"); else ids.push(e.name);
+  }
+  return { ids: ids.sort(), inProgress };
+}
+test("in-progress dated dirs (neither session file) are excluded from the corpus; one file or unparseable validation is not", () => {
+  const root = mkdtempSync(join(tmpdir(), "apitests-"));
+  try {
+    const put = (id: string, files: Record<string, string>) => { mkdirSync(join(root, id)); for (const [k, v] of Object.entries(files)) writeFileSync(join(root, id, k), v); };
+    put("2026-01-01-done", { "session.json": "{}", "session_page.json": "{}", "turns.json": "[]" });
+    put("2026-01-02-failed", { "validation.json": JSON.stringify({ status: "failed" }), "turns.json": "[]" });
+    put("2026-01-03-passed", { "validation.json": JSON.stringify({ status: "passed" }) });
+    put("2026-01-04-one", { "validation.json": JSON.stringify({ status: "failed" }), "session.json": "{}" });
+    put("2026-01-05-badval", { "validation.json": "{" });
+    put("2026-01-06-nullval", { "validation.json": "null" });
+    put("2026-01-07-noval", { "turns.json": "[]" });
+    put("undated", { "validation.json": JSON.stringify({ status: "failed" }) });
+    const r = datedCorpusIds(root);
+    assert.deepEqual(r.ids, ["2026-01-01-done", "2026-01-04-one", "2026-01-05-badval", "2026-01-06-nullval", "2026-01-07-noval"]);
+    assert.deepEqual(r.inProgress.sort(), ["2026-01-02-failed (validation failed)", "2026-01-03-passed (validated, awaiting finalize)"]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
 test("all 23 original + six additional dated sources can hydrate genuine scoped corpus text", async () => {
-  const corpus = fileURLToPath(new URL("../../../../data/toc-migrated/", import.meta.url));
-  const ids = readdirSync(corpus).filter((id) => /^\d{4}-\d\d-\d\d-/.test(id)).sort();
+  const corpus = CORPUS_DIR;
+  const { ids, inProgress } = datedCorpusIds(corpus);
+  if (inProgress.length) console.log("in-progress ingests skipped (" + inProgress.length + "): " + inProgress.join(", "));
   assert.equal(ids.length, 29);
   assert.equal(ids.filter((id) => id.startsWith("2026-09")).length, 6);
   let retained = 0;

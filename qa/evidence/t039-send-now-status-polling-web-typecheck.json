@@ -1,0 +1,20 @@
+{
+  "command": "node node_modules/typescript/lib/tsc.js --noEmit -p apps/web/tsconfig.json",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "exitCode": 0,
+  "wallTimeSeconds": 8.6013715,
+  "stdout": "",
+  "stderr": "",
+  "meaning": "Shared whole-web TypeScript check, no behavioral or live-browser acceptance. Candidate owners separately confirm their files were stable during the check.",
+  "configSHA256": {
+    "apps/web/tsconfig.json": "F67D852A59376DC6D5A386F669D984D7B3133860B693CA00DFA59A3CAF3596E0",
+    "tsconfig.base.json": "6BC2D632C06E482B900C73F73DD6C703B3791BD5B02B05AAF7701CD9BA417C47"
+  },
+  "sendNowSHA256": {
+    "apps/web/src/api/send-now.ts": "31D3BDBADE0B8135512512C1305F02118719F0BE20A491112E44E9BD5E98BA01",
+    "apps/web/src/pages/meeting-bot/SendNowForm.tsx": "D03AA61A38204FCAA2936F3F031029D5ADFD846FF2D9ADC3E3639AEE7E3910D9",
+    "apps/web/src/pages/meeting-bot/SendNowForm.test.tsx": "099E318D627D2D769F2AD076758374FE85E99A2508B602CE90E742AC32EA9727",
+    "apps/web/src/pages/meeting-bot/useSendNowStatus.ts": "C9C81C331B508E5AA427FCF3C758FF2CFCCEBD67B1AC3D1EF97D82A2ED5C479D",
+    "apps/web/src/pages/meeting-bot/useSendNowStatus.test.tsx": "F04DCCFEC1B1686BCAB0620682F0299F60FFF5551BBEECF2FE4AA3F351D65DB5"
+  }
+}

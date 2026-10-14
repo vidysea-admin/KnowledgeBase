@@ -1,0 +1,1186 @@
+{
+  "version": 1,
+  "batch": 4,
+  "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+  "sourcePacket": {
+    "path": "data/eval/extraction-adjudication-packet.json",
+    "sha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175"
+  },
+  "humanGold": false,
+  "sourceSessions": [
+    {
+      "caseId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "tenantId": "toc",
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "sourceBindingSha256": "ae0e5b680071dfc461cf9c766b79af4637641455a903042785c9f0ad56a3e8c7",
+      "sourceBinding": {
+        "caseId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "tenantId": "toc",
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/claims.json",
+            "sha256": "124d5944e4a633718e3e14599e759a33a672570422a1633b559c2868b61f886a",
+            "normalizedLfSha256": "c49be3d05e6829f267f0644961d2da47d55094a5d1ed61e208f2c58e321f0e9a",
+            "bytes": 2197
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+            "sha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+            "normalizedLfSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+            "bytes": 71001
+          }
+        }
+      },
+      "sourceTurns": 38,
+      "sourceClaims": 4,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+          "bytes": 88391
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "c49be3d05e6829f267f0644961d2da47d55094a5d1ed61e208f2c58e321f0e9a",
+          "bytes": 2140
+        }
+      }
+    },
+    {
+      "caseId": "2026-06-25-in-focus-2",
+      "tenantId": "toc",
+      "sessionId": "2026-06-25-in-focus-2",
+      "sourceBindingSha256": "f917bcfc96ba5f957fd7ef999674a7549806c2c11b5586a9b36498a4bd09f291",
+      "sourceBinding": {
+        "caseId": "2026-06-25-in-focus-2",
+        "tenantId": "toc",
+        "sessionId": "2026-06-25-in-focus-2",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-06-25-in-focus-2/claims.json",
+            "sha256": "ae68cc03ab33d3ca350e44f55fb78c7d987152ce0f4f6eb8f216aa7973021409",
+            "normalizedLfSha256": "017ea0894d3b908fa8bf449885d0ad3ff686c9f9193616643a2cfc06de20b24e",
+            "bytes": 1347
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-06-25-in-focus-2/turns.json",
+            "sha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+            "normalizedLfSha256": "13751a71cff2b4d3e3253b20bb0a4e5e7625d4cb847d1d50d4f47572a00ff65d",
+            "bytes": 59932
+          }
+        }
+      },
+      "sourceTurns": 69,
+      "sourceClaims": 3,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-06-25-in-focus-2/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "fcbd3a1364cf2f44969fcd223fef7433a8c4fb7043b1bd4e9a79449e398f8afb",
+          "bytes": 67511
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-06-25-in-focus-2/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "017ea0894d3b908fa8bf449885d0ad3ff686c9f9193616643a2cfc06de20b24e",
+          "bytes": 1303
+        }
+      }
+    },
+    {
+      "caseId": "2026-06-30-exploring-identity-success-counseling",
+      "tenantId": "toc",
+      "sessionId": "2026-06-30-exploring-identity-success-counseling",
+      "sourceBindingSha256": "a9ce6cd70c31ea7399b7ec99d79da4508007439a56103a1ba40fe1176ceef0d4",
+      "sourceBinding": {
+        "caseId": "2026-06-30-exploring-identity-success-counseling",
+        "tenantId": "toc",
+        "sessionId": "2026-06-30-exploring-identity-success-counseling",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/claims.json",
+            "sha256": "dcba321a6cd77eedb19bee1235156dac9053acb8ca795338ab83b831dd235684",
+            "normalizedLfSha256": "f446a1e98bf45d90cddc9080afaa8ccb62a71902941151366fa82a5e0fb421c5",
+            "bytes": 938
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/turns.json",
+            "sha256": "3610ddfd8a9fc8d68bbeb04dd73ae508fe042c9e127d0a039315ffa4dd2c9dd0",
+            "normalizedLfSha256": "d3169ba6536072aa7e40872839c503bdcca9304c6167a55c67a7658a48d01c78",
+            "bytes": 53561
+          }
+        }
+      },
+      "sourceTurns": 16,
+      "sourceClaims": 2,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "f128e50c567ed7b450e437e9ff5e4fa5ce96e141da9fe624608495a8ed38f93c",
+          "bytes": 100841
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "f446a1e98bf45d90cddc9080afaa8ccb62a71902941151366fa82a5e0fb421c5",
+          "bytes": 911
+        }
+      }
+    },
+    {
+      "caseId": "2026-07-03-inside-the-uc-session",
+      "tenantId": "toc",
+      "sessionId": "2026-07-03-inside-the-uc-session",
+      "sourceBindingSha256": "4b3636653f9d1c0d1bc486f7caefd4a67aa21cad4357a6ba529f6fa58c4e4e42",
+      "sourceBinding": {
+        "caseId": "2026-07-03-inside-the-uc-session",
+        "tenantId": "toc",
+        "sessionId": "2026-07-03-inside-the-uc-session",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/claims.json",
+            "sha256": "e0985b468082b68113910ee5cb47a2f46d1654698e5eeccab766f218a6770b52",
+            "normalizedLfSha256": "0dbf689c7d2992fd1a3a62d2d6f1ef9e6ae211c8370f4d3e03c2bc57ee62a7f7",
+            "bytes": 1644
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+            "sha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+            "normalizedLfSha256": "cea1ea840042fee4572f42f4406ba7a0e30b5a184c1f2dc9f101d961a0581858",
+            "bytes": 63682
+          }
+        }
+      },
+      "sourceTurns": 50,
+      "sourceClaims": 4,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+          "bytes": 76162
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "0dbf689c7d2992fd1a3a62d2d6f1ef9e6ae211c8370f4d3e03c2bc57ee62a7f7",
+          "bytes": 1591
+        }
+      }
+    }
+  ],
+  "entries": [
+    {
+      "ordinal": 31,
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c03",
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "1d4ad4100a28532e2ec5f20d1b23f93e234c11bd754e979794405507e3a58875",
+      "sourceBindingSha256": "ae0e5b680071dfc461cf9c766b79af4637641455a903042785c9f0ad56a3e8c7",
+      "persistedClaim": {
+        "_id": "2026-06-19-entrance-exams-pathways-india-part1-c03",
+        "tenantId": "toc",
+        "text": "NEET's tie-breaking mandate ranks candidates first by Biology marks, then Chemistry, then Physics.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t060",
+            "sessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+          "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t060",
+          "current": {
+            "available": false,
+            "reason": "turn-absent",
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+              "sha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+              "normalizedLfSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+              "bytes": 71001
+            },
+            "matches": []
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+              "bytes": 88391
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-19-entrance-exams-pathways-india-part1-t060",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+                  "speakerRef": "unknown",
+                  "tStart": 2095,
+                  "tEnd": 2127,
+                  "text": "Chirag Khutia: Now how does the ranking thing work for inter-se merit, as per the NEET mandate? That candidates obtaining higher marks in Biology, followed by Chemistry, followed by Physics. And then candidate with less proportion of number of attempted incorrect answers. That's why I mentioned that if you're going to do pure guess, it's better to leave that answer unless you are eliminating two or three options. And same sequence: then for overall incorrect, then Bio, Chemistry, and Physics. So that is something we also have to kind of keep in mind."
+                },
+                "textSha256": "542860dff71f83ae7830f6abd482fd3edef088816c7de57c061bbc60797e2af1"
+              }
+            ]
+          },
+          "sameIdContentChanged": false
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unavailable",
+        "literalRationale": "Current citation has no literal match.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 32,
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c04",
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "84bc3028621371e6389c7beebf63be20ce37cef100c8a3471851897de121c3ea",
+      "sourceBindingSha256": "ae0e5b680071dfc461cf9c766b79af4637641455a903042785c9f0ad56a3e8c7",
+      "persistedClaim": {
+        "_id": "2026-06-19-entrance-exams-pathways-india-part1-c04",
+        "tenantId": "toc",
+        "text": "A 30-mark difference in NEET score can cause an All India Rank swing of about 14,500 places, pushing a candidate from a government-seat range into needing a private or AYUSH option.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t059",
+            "sessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+          "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t059",
+          "current": {
+            "available": false,
+            "reason": "turn-absent",
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+              "sha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+              "normalizedLfSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+              "bytes": 71001
+            },
+            "matches": []
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+              "bytes": 88391
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-19-entrance-exams-pathways-india-part1-t059",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+                  "speakerRef": "unknown",
+                  "tStart": 2056,
+                  "tEnd": 2095,
+                  "text": "Chirag Khutia: So why this is important, why I mentioned about negative marking? Let's say I've just picked up three examples: student A with a 650 mark, assuming he has an AIR for 3,500, has a 99.7 percentile, and most likely he'll get a government seat. Versus a student B with an All India of 18,000, a 30-point difference, is state-dependent for a government seat. Versus a student C with a 580 score and 97.5 percentile will have to consider a private or an AYUSH. So 30-mark difference between all of these categories can lead to about 14,500 rank difference. So that is something again to be noted."
+                },
+                "textSha256": "b4bbea5a0b86d84c1f44ac1ce3a39a9ec01e5847575208f12e56ff618ccd76ba"
+              }
+            ]
+          },
+          "sameIdContentChanged": false
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unavailable",
+        "literalRationale": "Current citation has no literal match.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 33,
+      "claimId": "2026-06-25-in-focus-2-c01",
+      "sessionId": "2026-06-25-in-focus-2",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "6c2751cc9e219060ae941fff9f8d51eee0d1f4b866bfaa86cd7d30c2ca7890e3",
+      "sourceBindingSha256": "f917bcfc96ba5f957fd7ef999674a7549806c2c11b5586a9b36498a4bd09f291",
+      "persistedClaim": {
+        "_id": "2026-06-25-in-focus-2-c01",
+        "tenantId": "toc",
+        "text": "Futurowise's courses run 2-4 weeks and are taught by professors or industry experts, ending with a published project and certificate.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-06-25-in-focus-2-t007",
+            "sessionId": "2026-06-25-in-focus-2"
+          },
+          {
+            "turnId": "2026-06-25-in-focus-2-t008",
+            "sessionId": "2026-06-25-in-focus-2"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-06-25-in-focus-2",
+          "turnId": "2026-06-25-in-focus-2-t007",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-25-in-focus-2/turns.json",
+              "sha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+              "normalizedLfSha256": "13751a71cff2b4d3e3253b20bb0a4e5e7625d4cb847d1d50d4f47572a00ff65d",
+              "bytes": 59932
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-25-in-focus-2-t007",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-25-in-focus-2",
+                  "speakerRef": "Devesh",
+                  "tStart": 1062,
+                  "tEnd": 1066,
+                  "text": "Absolutely, I hear you, and I look forward to working on those."
+                },
+                "textSha256": "8fc6b7064fcf660694fb88f078976aa10ca8f07c7acda67cb126b1f5065b0601"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-25-in-focus-2/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "fcbd3a1364cf2f44969fcd223fef7433a8c4fb7043b1bd4e9a79449e398f8afb",
+              "bytes": 67511
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-25-in-focus-2-t007",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-25-in-focus-2",
+                  "speakerRef": "unknown",
+                  "tStart": 202,
+                  "tEnd": 241,
+                  "text": "Devesh Lahoti: What Futurowise is—it's a program which—Futurowise is, you know, I would like to say platform—the platform which prepares students for—high school students for the future skills through short, intensive online courses on skills which are important for the next decade. Every program that we run is led by industry experts and professors, and students leave with a real skill and a published project and a certificate—all of that within a 2- to 4-week program."
+                },
+                "textSha256": "a20cc10c1632b893367a4a2e8502b337747c7909a280f3c8fefc7fb9ce3bd1e5"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        },
+        {
+          "sessionId": "2026-06-25-in-focus-2",
+          "turnId": "2026-06-25-in-focus-2-t008",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-25-in-focus-2/turns.json",
+              "sha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+              "normalizedLfSha256": "13751a71cff2b4d3e3253b20bb0a4e5e7625d4cb847d1d50d4f47572a00ff65d",
+              "bytes": 59932
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-25-in-focus-2-t008",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-25-in-focus-2",
+                  "speakerRef": "Abha",
+                  "tStart": 1066,
+                  "tEnd": 1073,
+                  "text": "But, your projects have been fantastic, and the students have been very happy with the masterclass, as well. So, maybe in the same related subjects would be nice."
+                },
+                "textSha256": "416b8e532e28674dbad594ffd470445d33a14005760bd5e585897d47e73c67ae"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-25-in-focus-2/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "fcbd3a1364cf2f44969fcd223fef7433a8c4fb7043b1bd4e9a79449e398f8afb",
+              "bytes": 67511
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-25-in-focus-2-t008",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-25-in-focus-2",
+                  "speakerRef": "unknown",
+                  "tStart": 241,
+                  "tEnd": 282,
+                  "text": "Devesh Lahoti: So, to encapsulate, what we do is we run short online courses—and when I say short, these are 2- to 4-week-long courses—which are taught by professors from the university or industry experts. And the kind of students that we find ourselves working with are typically curious, academically inclined, and want to learn a future skill. And that's what we do. When a student finishes their program, when a student completes their program with us, they end up with a future skill."
+                },
+                "textSha256": "07b38ef5cc8a11b44f695931a7c3ddce4cd09051db4e3fda9d065c8681c965f7"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turns praise projects and a masterclass; they establish none of the claimed course duration, instructors, publication, or certification.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 34,
+      "claimId": "2026-06-25-in-focus-2-c02",
+      "sessionId": "2026-06-25-in-focus-2",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "b306e88cab37cc1f68145fe0dde8ce6b5f28166f9612786f8e4b612ad32665f4",
+      "sourceBindingSha256": "f917bcfc96ba5f957fd7ef999674a7549806c2c11b5586a9b36498a4bd09f291",
+      "persistedClaim": {
+        "_id": "2026-06-25-in-focus-2-c02",
+        "tenantId": "toc",
+        "text": "Futurowise's Foundations of Data Science course teaches Tableau and Python basics as part of its data-science curriculum.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-06-25-in-focus-2-t011",
+            "sessionId": "2026-06-25-in-focus-2"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-06-25-in-focus-2",
+          "turnId": "2026-06-25-in-focus-2-t011",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-25-in-focus-2/turns.json",
+              "sha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+              "normalizedLfSha256": "13751a71cff2b4d3e3253b20bb0a4e5e7625d4cb847d1d50d4f47572a00ff65d",
+              "bytes": 59932
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-25-in-focus-2-t011",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-25-in-focus-2",
+                  "speakerRef": "Himanshu",
+                  "tStart": 1122,
+                  "tEnd": 1139,
+                  "text": "Thank you so much, Amrita. Thanks, Bhakti. Thanks, Vijaya, for this opportunity. I think, as a whole, it's going to be a great learning for me as well at this moment. One second, ha."
+                },
+                "textSha256": "43ad9e2b354f9c498c61ccd41f801658401146cea6c0927be7dec5313ce41e8a"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-25-in-focus-2/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "fcbd3a1364cf2f44969fcd223fef7433a8c4fb7043b1bd4e9a79449e398f8afb",
+              "bytes": 67511
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-25-in-focus-2-t011",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-25-in-focus-2",
+                  "speakerRef": "unknown",
+                  "tStart": 365,
+                  "tEnd": 599,
+                  "text": "Devesh Lahoti: I'll show you some of the programs which are coming up over the next 3 to 4 months. And each and every one of these programs are designed with a vision of ensuring that this is a skill that will help them in the next decade. And I have like a small list here, but there are more programs that we are working on: 1. Foundations of Money and Investing: which is what teaches the students about how money works, how finances work, and how to build—how to invest your money. And eventually, every student ends with a virtual portfolio of their own. 2. Foundations of Data Science: and this is one of my favorites. The cohort is running right now, and the next cohort starts in August—end of August. And in Foundations of Data Science, students are learning Tableau, which is a data visualization tool. They are learning a little bit of Python, and they're learning how data science works, how to gather the data, how to analyze the data, how to visualize the data, and finally how to make a whole story out of that data. And students are working on their own projects. Interesting projects—I was just in conversation with some students—they are working on how literacy rates across different states changed over the last decade and does gender have a role to play in that. Very interesting topic. 3. Prompt Engineering: is starting 4th of July, and I have shared the flyer with some of you over WhatsApp. Prompt engineering is a 2-week program where you learn how AI works, you learn how to develop beautiful prompts which will give you the right kind of results. It'll tell you about the ethical aspects of AI, and eventually you will close with your own project in prompt engineering which will help you design your own study plan or something like that. 4. Foundations of Agentic AI: It's happening over the Independence Day weekend, 15th and 16th of August, where students will work with us to develop their own AI agents. It's exciting, and I think if you have your students, you can give them projects like \"Why don't you build this AI agent for me?\" And by the end of this program, they will bring that project to you, which might help you in your own work—a real AI agent. 5. Foundations of Entrepreneurship: is about creating your own business plan, which happens in October—October 2, 3, 4—where students will be with us over a weekend, and they will learn the basics, the foundations of entrepreneurship. They will learn the tools which entrepreneurs use, and eventually they will build their own business plan. 6. Brand Strategy and Digital Marketing: is a program where you learn about how brands work. And in a few weeks, I'll host a session for all of you, like a masterclass on digital marketing and brand strategy. Just look out for that invite. We'll talk about how you can build your own brand, and you can also start digital marketing by yourself."
+                },
+                "textSha256": "6d307113fc9a86ca50f8e613be355319736a5cd9a2de7175f8470f9963c76a1b"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turn contains introductory thanks and a pause, without course content or software names.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 35,
+      "claimId": "2026-06-25-in-focus-2-c03",
+      "sessionId": "2026-06-25-in-focus-2",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "c2fd21d7d87f1b65cb80e2d91ce58a1214c60119197bc062238ce7f042bd5fc3",
+      "sourceBindingSha256": "f917bcfc96ba5f957fd7ef999674a7549806c2c11b5586a9b36498a4bd09f291",
+      "persistedClaim": {
+        "_id": "2026-06-25-in-focus-2-c03",
+        "tenantId": "toc",
+        "text": "The Student Scoop's mentors undergo a mandatory 7-day teacher-training program before they are allowed to take any class.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-06-25-in-focus-2-t063",
+            "sessionId": "2026-06-25-in-focus-2"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-06-25-in-focus-2",
+          "turnId": "2026-06-25-in-focus-2-t063",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-25-in-focus-2/turns.json",
+              "sha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+              "normalizedLfSha256": "13751a71cff2b4d3e3253b20bb0a4e5e7625d4cb847d1d50d4f47572a00ff65d",
+              "bytes": 59932
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-25-in-focus-2-t063",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-25-in-focus-2",
+                  "speakerRef": "Himanshu",
+                  "tStart": 2932,
+                  "tEnd": 2933,
+                  "text": "Bye everyone."
+                },
+                "textSha256": "d50129c1901cfd1477b9fd3208129cb7561c75d606dfbc4fe1ac4fd95dbbad25"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-25-in-focus-2/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "fcbd3a1364cf2f44969fcd223fef7433a8c4fb7043b1bd4e9a79449e398f8afb",
+              "bytes": 67511
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-25-in-focus-2-t063",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-25-in-focus-2",
+                  "speakerRef": "unknown",
+                  "tStart": 2063,
+                  "tEnd": 2106,
+                  "text": "Himansshu Jainn: No. So currently, ma'am, honestly we've been supporting only with Sciences and Mathematics and Economics. So with Sciences, all three Sciences are taken care of: Physics, Chemistry, Bio. My team is currently completely in-house, in-house trained. In terms of credentials of the mentors, any faculty who has spent about a year and more with us, we primarily get their Category 1, 2, and 3 workshops in progression, which are IB-certified. So yes, training internally is provided. Most of our mentors have to undergo a very rigorous 7-day teachers training program, before which we do not let them take up any classes. So I personally take those 7-day training programs, and post which only we allocate any mentor to any student."
+                },
+                "textSha256": "abd08fef88802a2d1c0ad1aa85071e7ffc1d25b2d4a376d52162c612fb5a1ce9"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turn says goodbye and provides no mentor-training requirement.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 36,
+      "claimId": "2026-06-30-exploring-identity-success-counseling-c01",
+      "sessionId": "2026-06-30-exploring-identity-success-counseling",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "abf6fe599df8b6502e7d5562fd15270c615643e077c3cd68d53c4dccafc8bfc0",
+      "sourceBindingSha256": "a9ce6cd70c31ea7399b7ec99d79da4508007439a56103a1ba40fe1176ceef0d4",
+      "persistedClaim": {
+        "_id": "2026-06-30-exploring-identity-success-counseling-c01",
+        "tenantId": "toc",
+        "text": "The Career Construction Inventory's 4Cs are Control, Concern, Curiosity, and Confidence.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-06-30-exploring-identity-success-counseling-t085",
+            "sessionId": "2026-06-30-exploring-identity-success-counseling"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-06-30-exploring-identity-success-counseling",
+          "turnId": "2026-06-30-exploring-identity-success-counseling-t085",
+          "current": {
+            "available": false,
+            "reason": "turn-absent",
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/turns.json",
+              "sha256": "3610ddfd8a9fc8d68bbeb04dd73ae508fe042c9e127d0a039315ffa4dd2c9dd0",
+              "normalizedLfSha256": "d3169ba6536072aa7e40872839c503bdcca9304c6167a55c67a7658a48d01c78",
+              "bytes": 53561
+            },
+            "matches": []
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "f128e50c567ed7b450e437e9ff5e4fa5ce96e141da9fe624608495a8ed38f93c",
+              "bytes": 100841
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-30-exploring-identity-success-counseling-t085",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-30-exploring-identity-success-counseling",
+                  "speakerRef": "unknown",
+                  "tStart": 3762,
+                  "tEnd": 3797,
+                  "text": "Luke Devlin: So Mark Savickas, um if you haven't heard of this guy, you really need to, to dive into his work. It is really profound. Uh, he has taken us from a modern career psychology space uh where we mostly deal with sorting um in a uh mass-production line, uh and, and taken it to a very individual approach. And the 4Cs, uh as part of the Career Construction Inventory, are: Control, Concern, Curiosity, and Confidence."
+                },
+                "textSha256": "e1d909055853eb2dad645182f36de4b8633b14c397312c87ca6f71a6cf6e1819"
+              }
+            ]
+          },
+          "sameIdContentChanged": false
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unavailable",
+        "literalRationale": "Current citation has no literal match.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 37,
+      "claimId": "2026-06-30-exploring-identity-success-counseling-c02",
+      "sessionId": "2026-06-30-exploring-identity-success-counseling",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "6d55e67173116a1c05c68dfec96df1079b8210515b36a3f71f681e5c2f80dd86",
+      "sourceBindingSha256": "a9ce6cd70c31ea7399b7ec99d79da4508007439a56103a1ba40fe1176ceef0d4",
+      "persistedClaim": {
+        "_id": "2026-06-30-exploring-identity-success-counseling-c02",
+        "tenantId": "toc",
+        "text": "Andrew Hallam's success framework is described as a four-legged table including financial stability among its legs.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-06-30-exploring-identity-success-counseling-t073",
+            "sessionId": "2026-06-30-exploring-identity-success-counseling"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-06-30-exploring-identity-success-counseling",
+          "turnId": "2026-06-30-exploring-identity-success-counseling-t073",
+          "current": {
+            "available": false,
+            "reason": "turn-absent",
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/turns.json",
+              "sha256": "3610ddfd8a9fc8d68bbeb04dd73ae508fe042c9e127d0a039315ffa4dd2c9dd0",
+              "normalizedLfSha256": "d3169ba6536072aa7e40872839c503bdcca9304c6167a55c67a7658a48d01c78",
+              "bytes": 53561
+            },
+            "matches": []
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "f128e50c567ed7b450e437e9ff5e4fa5ce96e141da9fe624608495a8ed38f93c",
+              "bytes": 100841
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-30-exploring-identity-success-counseling-t073",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-30-exploring-identity-success-counseling",
+                  "speakerRef": "unknown",
+                  "tStart": 3181,
+                  "tEnd": 3238,
+                  "text": "Luke Devlin: And so this is, I think Balance is maybe his second book, uh but it was an attempt to write to a different demographic. I think Millionaire Teacher is really written for adults, where Balance is written more for, for young adults. Um, and the idea is that, you know, this person who specializes in uh in in money, knowledge, and education also doesn't want to be seen as somebody who is all money all the time. And so he talks in his book about this idea of success having four legs on a table, and that if you give more attention to one than the other, then your table will be rocky and imbalanced. And uh so his definition of success is, is a four-legged table uh with with wealth or or financial um stability and, and strength, uh but health, purpose, and relationships."
+                },
+                "textSha256": "2b63021210d5175b606725e86817fe8c9253d876549eefa7523f9d6b37da2def"
+              }
+            ]
+          },
+          "sameIdContentChanged": false
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unavailable",
+        "literalRationale": "Current citation has no literal match.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 38,
+      "claimId": "2026-07-03-inside-the-uc-session-c01",
+      "sessionId": "2026-07-03-inside-the-uc-session",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "684f064045708562cb74d40baea148b7a9e3daff7d107f7901775088a9b9e66a",
+      "sourceBindingSha256": "4b3636653f9d1c0d1bc486f7caefd4a67aa21cad4357a6ba529f6fa58c4e4e42",
+      "persistedClaim": {
+        "_id": "2026-07-03-inside-the-uc-session-c01",
+        "tenantId": "toc",
+        "text": "The UC system has 10 campuses total, but only 9 offer undergraduate programs.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-03-inside-the-uc-session-t011",
+            "sessionId": "2026-07-03-inside-the-uc-session"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-03-inside-the-uc-session",
+          "turnId": "2026-07-03-inside-the-uc-session-t011",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+              "sha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+              "normalizedLfSha256": "cea1ea840042fee4572f42f4406ba7a0e30b5a184c1f2dc9f101d961a0581858",
+              "bytes": 63682
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-03-inside-the-uc-session-t011",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-03-inside-the-uc-session",
+                  "speakerRef": "Amrita",
+                  "tStart": 169,
+                  "tEnd": 178,
+                  "text": "Bijoya, when you feel majority have responded, you could share the poll results."
+                },
+                "textSha256": "9af853d40355d83168cf402b34ff5ad50e54710ee9e5f5418e27665c6a047fe7"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+              "bytes": 76162
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-03-inside-the-uc-session-t011",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-03-inside-the-uc-session",
+                  "speakerRef": "unknown",
+                  "tStart": 208,
+                  "tEnd": 262,
+                  "text": "Aastha Chhikara: Yeah, so I see that a majority of us have the right answers, but for the ones that are, you know, that may have answered differently as well: So, \"How many University of California campuses are there?\" So this was again a trick question because there are in fact 10 campuses. However, only nine of them offer undergraduate programs; the UC San Francisco campus is only a master's, you know, campus. So of course we'll cover that in depth as well. \"How many students are studying at the UC campuses?\" So it's over 300,000, so over 3 lakh students at the various campuses. \"Which campus was originally known as the Farm?\" So this was actually UC Davis, so we have a majority of us that have answered this correctly as well. And \"Which is the oldest UC campus?\" is Berkeley. So, yeah."
+                },
+                "textSha256": "38f08da35d554f1efda9024097da8aad0fac6f9c5c1372a655bad57cfa25045c"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turn requests poll results without stating campus or undergraduate-program counts.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 39,
+      "claimId": "2026-07-03-inside-the-uc-session-c02",
+      "sessionId": "2026-07-03-inside-the-uc-session",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "ba7f6c2ef9efb23ae0460f3972934f55d08eb06d0ecfdea70d98682f426ec83d",
+      "sourceBindingSha256": "4b3636653f9d1c0d1bc486f7caefd4a67aa21cad4357a6ba529f6fa58c4e4e42",
+      "persistedClaim": {
+        "_id": "2026-07-03-inside-the-uc-session-c02",
+        "tenantId": "toc",
+        "text": "Over 300,000 students are enrolled across the UC system's various campuses.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-03-inside-the-uc-session-t011",
+            "sessionId": "2026-07-03-inside-the-uc-session"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-03-inside-the-uc-session",
+          "turnId": "2026-07-03-inside-the-uc-session-t011",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+              "sha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+              "normalizedLfSha256": "cea1ea840042fee4572f42f4406ba7a0e30b5a184c1f2dc9f101d961a0581858",
+              "bytes": 63682
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-03-inside-the-uc-session-t011",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-03-inside-the-uc-session",
+                  "speakerRef": "Amrita",
+                  "tStart": 169,
+                  "tEnd": 178,
+                  "text": "Bijoya, when you feel majority have responded, you could share the poll results."
+                },
+                "textSha256": "9af853d40355d83168cf402b34ff5ad50e54710ee9e5f5418e27665c6a047fe7"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+              "bytes": 76162
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-03-inside-the-uc-session-t011",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-03-inside-the-uc-session",
+                  "speakerRef": "unknown",
+                  "tStart": 208,
+                  "tEnd": 262,
+                  "text": "Aastha Chhikara: Yeah, so I see that a majority of us have the right answers, but for the ones that are, you know, that may have answered differently as well: So, \"How many University of California campuses are there?\" So this was again a trick question because there are in fact 10 campuses. However, only nine of them offer undergraduate programs; the UC San Francisco campus is only a master's, you know, campus. So of course we'll cover that in depth as well. \"How many students are studying at the UC campuses?\" So it's over 300,000, so over 3 lakh students at the various campuses. \"Which campus was originally known as the Farm?\" So this was actually UC Davis, so we have a majority of us that have answered this correctly as well. And \"Which is the oldest UC campus?\" is Berkeley. So, yeah."
+                },
+                "textSha256": "38f08da35d554f1efda9024097da8aad0fac6f9c5c1372a655bad57cfa25045c"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turn requests poll results without any enrollment figure.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 40,
+      "claimId": "2026-07-03-inside-the-uc-session-c03",
+      "sessionId": "2026-07-03-inside-the-uc-session",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "f0f01373ff459c58167d13b802026fda951393a0ddaf9b676eca21741f72f81b",
+      "sourceBindingSha256": "4b3636653f9d1c0d1bc486f7caefd4a67aa21cad4357a6ba529f6fa58c4e4e42",
+      "persistedClaim": {
+        "_id": "2026-07-03-inside-the-uc-session-c03",
+        "tenantId": "toc",
+        "text": "UC is a test-blind, test-free system: SAT/ACT scores are not reviewed at all in admissions decisions.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-03-inside-the-uc-session-t019",
+            "sessionId": "2026-07-03-inside-the-uc-session"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-03-inside-the-uc-session",
+          "turnId": "2026-07-03-inside-the-uc-session-t019",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+              "sha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+              "normalizedLfSha256": "cea1ea840042fee4572f42f4406ba7a0e30b5a184c1f2dc9f101d961a0581858",
+              "bytes": 63682
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-03-inside-the-uc-session-t019",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-03-inside-the-uc-session",
+                  "speakerRef": "Vaishnavi",
+                  "tStart": 336,
+                  "tEnd": 352,
+                  "text": "Yeah. Um, hi, everyone. Good evening. My name is Vaishnavi Kotiyal. I am based out of Delhi, and I'm an in-country representative for University of California, Merced. Um, so happy to be here and look forward to interacting with you all. Thank you."
+                },
+                "textSha256": "b66572529d34567acf2e14bf42643a06dc211a7b295ffea5cae87ece5977c53a"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+              "bytes": 76162
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-03-inside-the-uc-session-t019",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-03-inside-the-uc-session",
+                  "speakerRef": "unknown",
+                  "tStart": 2124,
+                  "tEnd": 2533,
+                  "text": "Vaishnavi Kotiyal: Thank you, Beauti. So from here I'll take on the test scores. So, Aastha, can you go for the next slide? So first is English language proficiency. So English proficiency is not required, so you don't have to send in your TOEFL, IELTS, or Duolingo scores. Students from your school, English language of instruction, which is this is this exam is basically waived off for all of you. You don't have to send in any of these scores, it is not going to be required. We see that there is SAT and ACT on here, that's only going to be used to meet the English proficiency, which you don't need. So there is no other section on the UC application that will allow you to submit any ACT or SAT score. The total score, right, it is not going to be reviewed. We are test-blind and test-free UC system. None of us are going to review your ACT or SAT scores, not for your admission purpose, not for your scholarship purpose. And none of us are going to look at the scores even if you try to send them in from the College Board. So this is not just for the Merced or any particular campus, but all of us, the UCs, are not reviewing any test scores at all. Next slide, Aastha. So this is basically your AP exam. So if you're trying to add on your AP exam, so international exam, this is the area where you can add them in. So this is this is for exam only, not for your AP, IB coursework. For the ones you're planning to take, for the ones you already have scores for. So this is something that you can add exams that you have taken or you already have score for. Next slide, Aastha. So this is also IB exams, wherein you just have to fill in that you are taking IB or not, and if you have the scores, you can just add on to it. Next slide. So this is your international exams. So people we in India have CBSE, GCSE, ICSE, O Level, so this is for them as well. So you just have to add on. Next slide, if you can just turn the next slide, Aastha. So if you can see that you can just choose India, which year, and you just have to add the exam type, and you just have to then continue, Save and continue. Yeah, so this is how it will be. So if you have received the score, you can just add on your score; if you have the predicted, not received, accordingly you can just add on to it. Next one. So, activities and awards. So your application is—yeah, so your application is just not your academics only. There is this activities and award section that is reviewed and considered as well. So first, this whole section allows you to add up up to 20 different activities across six different categories. So up to 20 activities does not mean that we require you to add all the 20 activities, okay? So it's not that you have to add 20 activities, it's just that you also we allow you to add up to 20. If you don't have 20, that's completely fine. You only have to add five activities if you have, as meaningful to you, and add those five activities and that's completely fine. Remember, it is not the quantity, it is the quality over the quantity of your activities that we look forward to. If there are unfamiliar acronyms, so don't expect us to understand them. Make sure you spell the entire acronym when you list down all the activities. When you're putting in this section, how should you list your activities or your awards? That's very important. So my recommendation and tip is that you put them in the order of your how meaningful it is to you and how much time you have committed to that activity instead of listing it in order of time, suppose, I say. It is not chronological. We do prefer you to list it in the order of importance, which is very, very important. So order of importance to you, how meaningful it is this activity to you. If you have committed to an activity or extracurricular program for the entire 4 years of your high school or career, you know you commit a lot of hours every week to that activity. So that takes is something which is very meaningful and probably very, you know, important to you. So the okay, so list in order of the importance and the order of the ones that's more meaningful to you, not chronological. That's the tip. Second, slide continued. So here it is very important that you focus on the on your roles and responsibilities and why you accomplished them, not just describing the activity, what the activity is. Don't forget if you're planning to do that even after you graduate, after you say suppose you complete your 12th grade, you can also check in check that off in the section here. So we won't ask you any certification or completion, we don't verify that with your school, we don't ask for any awards for you to send that in, but we that but do remember that we also have signed the verification of statement of integrity, that is application integrity. So everything that you list in this section should be something that you have completed and should be something that you are able to talk about, that you have accomplished and that is meaningful to you. So then the activities and awards... The third is basically the activities and awards of educational prep programs. That's how going to be listed in according to it. Slide three, Aastha. Yeah. So as for scholarship and support programs, we don't have any specific link to it. It's just that it's a merit-based thing. So Aastha, Beauti, and I have also discussed that we have a separate scholarship that will be automatically given to you once you fill in your application."
+                },
+                "textSha256": "5b72e552dcc31b7dc41680e91b325f72add0be6ff0c828e09c98654dcae484a3"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turn introduces a UC Merced representative without discussing admissions testing policy.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    }
+  ]
+}

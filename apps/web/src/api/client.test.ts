@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { apiFetch, AUTH_INVALIDATED_EVENT, AUTH_KEY_STORAGE_KEY, ApiError } from "./client.js";
+import { advanceAuthSession, apiFetch, AUTH_INVALIDATED_EVENT, AUTH_KEY_STORAGE_KEY, ApiError } from "./client.js";
 
 describe("apiFetch", () => {
   beforeEach(() => {
@@ -9,6 +9,24 @@ describe("apiFetch", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  test("an in-flight 401 from a previous login cannot invalidate a new login using the same key", async () => {
+    localStorage.setItem(AUTH_KEY_STORAGE_KEY, "same-key");
+    let resolve!: (value: Response) => void;
+    vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>((done) => { resolve = done; })));
+    const dispatch = vi.spyOn(window, "dispatchEvent");
+    const request = apiFetch("/sessions", "same-key").catch((error: unknown) => error);
+    advanceAuthSession();
+    resolve(new Response("{}", { status: 401 }));
+    expect(await request).toMatchObject({ status: 401 });
+    expect(localStorage.getItem(AUTH_KEY_STORAGE_KEY)).toBe("same-key");
+    expect(dispatch).not.toHaveBeenCalled();
+    // A new request in this session still handles a genuine current-key 401.
+    vi.stubGlobal("fetch", vi.fn(async () => new Response("{}", { status: 401 })));
+    await expect(apiFetch("/sessions", "same-key")).rejects.toMatchObject({ status: 401 });
+    expect(localStorage.getItem(AUTH_KEY_STORAGE_KEY)).toBeNull();
+    expect(dispatch).toHaveBeenCalledTimes(1);
   });
 
   test("clears cached API key and emits AUTH_INVALIDATED_EVENT for 401", async () => {

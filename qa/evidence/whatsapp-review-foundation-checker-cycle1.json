@@ -1,0 +1,116 @@
+{
+  "slug": "whatsapp-review-foundation-20261014",
+  "cycle": 1,
+  "verdict": "FAIL",
+  "run": {
+    "command": "node --test --test-isolation=none --test-concurrency=1 --test-timeout=30000 --import ./.cache/coordination/safe-test-runtime/register.mjs apps/api/src/whatsapp/review/detection.test.ts apps/api/src/whatsapp/review/store.test.ts apps/api/src/whatsapp/review/router.test.ts apps/api/src/whatsapp/review/validation.test.ts qa/evidence/whatsapp-review-foundation-checker.test.ts",
+    "start": {
+      "current_time": "2026-10-14 09:12:51 UTC"
+    },
+    "end": {
+      "current_time": "2026-10-14 09:12:53 UTC"
+    },
+    "chunk_id": "669dad",
+    "wall_time_seconds": 1.8641847999999999,
+    "exit_code": 1,
+    "original_token_count": 1436,
+    "output": "✔ ordinary source text yields one pending evidence-bearing candidate with stable identity (8.5063ms)\n✔ literal topic/decision cues and real attachment metadata remain separate review candidates (1.1116ms)\n✔ sensitive/personal/duplicate flags include source evidence and never auto-approve (0.51ms)\n✔ same-import and same-tenant duplicates flag but equal foreign-tenant knowledge does not (0.3411ms)\n✔ tenant, source/session, exact occurrence and attachment evidence mismatches refuse (2.0174ms)\n✔ same-name attachment metadata in distinct captions flags a possible duplicate without claiming byte equality (0.5885ms)\n✔ authenticated HTTP reviewer lists exact evidence and explicitly publishes one candidate with audit actor (107.0287ms)\n✔ HTTP route refuses no auth/scope, foreign existence and forged decision principal/tenant (26.6644ms)\n✔ HTTP rejection is durable/idempotent and opposite decision honestly conflicts (17.741ms)\n✔ HTTP failed transaction and unresolved evidence do not return success or internal errors (18.7204ms)\n✔ HTTP approval without configured materializer is unavailable and retains quarantine (7.5878ms)\n✔ actual Mongo adapter persists pending candidates only, then explicit per-candidate atomic publish (4.999ms)\n✔ failed materialisation rolls back decision and every publisher write; retry can then commit (2.3512ms)\n✔ concurrent opposite decisions cannot both win; rejection remains a durable tombstone (1.8284ms)\n✔ same natural ids across tenants cannot read, publish or mutate each other's candidates (1.6354ms)\n✔ excluded material, missing publisher and lost/stale source evidence fail closed (1.9652ms)\n✔ same-turn edits to exact text or attribution create fresh pending ids without inheriting review (1.7835ms)\n✔ direct store cannot persist forged content or strip mandatory sensitive/exclusion flags (1.3755ms)\n✔ idempotent decision retry surfaces lost exact evidence rather than returning a stale candidate (1.3312ms)\n✔ schema-backed validation accepts canonical fixture/proposals and rejects canonical invalid fixture (1.551ms)\n✔ collection shape/lifecycle errors cannot cross the candidate persistence boundary (0.797ms)\n✔ exact provenance edits acquire new identities even when duplicate hashes agree (0.5736ms)\n✔ failed materialisation removes approval and partial writes; retry preserves siblings (4.0298ms)\n✖ missing materializer and excluded source fail closed; rejection remains durable (2.1669ms)\n✔ tenant and stale source evidence cannot become publishable (0.9189ms)\n✔ unresolvable batch evidence cannot leave a partial proposal (0.8792ms)\n✔ idempotent decision responses refuse source evidence that has subsequently vanished (1.1829ms)\n✔ valid-hash invented content and stripped personal/sensitive exclusions cannot be inserted (0.9111ms)\n✖ canonical lifecycle rejects impossible timestamps and excluded approved candidates (1.0762ms)\n✖ invalid injected decision time cannot persist a row outside the canonical lifecycle (1.7164ms)\nℹ tests 30\nℹ suites 0\nℹ pass 27\nℹ fail 3\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1500.1674\n\n✖ failing tests:\n\ntest at qa\\evidence\\whatsapp-review-foundation-checker.test.ts:44:1\n✖ missing materializer and excluded source fail closed; rejection remains durable (2.1669ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  'ok' !== 'excluded'\n  \n      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/qa/evidence/whatsapp-review-foundation-checker.test.ts:51:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 'ok',\n    expected: 'excluded',\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at qa\\evidence\\whatsapp-review-foundation-checker.test.ts:113:1\n✖ canonical lifecycle rejects impossible timestamps and excluded approved candidates (1.0762ms)\n  AssertionError [ERR_ASSERTION]: Missing expected exception.\n      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/qa/evidence/whatsapp-review-foundation-checker.test.ts:116:12)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: undefined,\n    expected: /schema/,\n    operator: 'throws',\n    diff: 'simple'\n  }\n\ntest at qa\\evidence\\whatsapp-review-foundation-checker.test.ts:118:1\n✖ invalid injected decision time cannot persist a row outside the canonical lifecycle (1.7164ms)\n  AssertionError [ERR_ASSERTION]: Missing expected rejection.\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/qa/evidence/whatsapp-review-foundation-checker.test.ts:124:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: undefined,\n    expected: /time|schema/,\n    operator: 'rejects',\n    diff: 'simple'\n  }\n"
+  },
+  "pins": [
+    {
+      "path": "schema/whatsapp_candidates.schema.json",
+      "expected": "B49E9681890DA26E7DECC89D5FB17D00B94735581F9C79E209DAD48CF415308F",
+      "actual": "B49E9681890DA26E7DECC89D5FB17D00B94735581F9C79E209DAD48CF415308F",
+      "matches": true
+    },
+    {
+      "path": "schema/fixtures/whatsapp_candidates/valid.json",
+      "expected": "DDFFDD73DE29E477735F7EA450BAB0CB965DDE5E1AA0DF0138AFA379A23C7683",
+      "actual": "DDFFDD73DE29E477735F7EA450BAB0CB965DDE5E1AA0DF0138AFA379A23C7683",
+      "matches": true
+    },
+    {
+      "path": "schema/fixtures/whatsapp_candidates/invalid.json",
+      "expected": "DC51F56060864B87C009A8E000A0819D3EAB397B488F232AF0387BBBB430004B",
+      "actual": "DC51F56060864B87C009A8E000A0819D3EAB397B488F232AF0387BBBB430004B",
+      "matches": true
+    },
+    {
+      "path": "packages/core/src/generated/whatsapp_candidates.ts",
+      "expected": "32F31FD21F6CFD72E3D819528878EC4C9BE659BA16C53779DD1F2EE896E60F10",
+      "actual": "32F31FD21F6CFD72E3D819528878EC4C9BE659BA16C53779DD1F2EE896E60F10",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/detection.ts",
+      "expected": "533E770878E3AD50031991DA114FA0F31E6A6876379954ABE368FBE807156F16",
+      "actual": "533E770878E3AD50031991DA114FA0F31E6A6876379954ABE368FBE807156F16",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/detection.test.ts",
+      "expected": "07CBD02AEB24D70EC590BAF3542CBCB76D8BD29DC884CA56DCDCC59DCF18E04B",
+      "actual": "07CBD02AEB24D70EC590BAF3542CBCB76D8BD29DC884CA56DCDCC59DCF18E04B",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/store.ts",
+      "expected": "B09B8F79BA390EBCA68822BF5AB814FC4BC93A28BF9D0C9EEA7197A7CC49D33E",
+      "actual": "B09B8F79BA390EBCA68822BF5AB814FC4BC93A28BF9D0C9EEA7197A7CC49D33E",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/store.test.ts",
+      "expected": "9747200FEE7E78710F596FBFD579C1DE00C688860484CBA8DAA08F803CE7EDAE",
+      "actual": "9747200FEE7E78710F596FBFD579C1DE00C688860484CBA8DAA08F803CE7EDAE",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/router.ts",
+      "expected": "0F3DD50960B9BDBBA4712FCDBBEA72EA25839D2BA257AE914BD3C0CB3EBE573A",
+      "actual": "0F3DD50960B9BDBBA4712FCDBBEA72EA25839D2BA257AE914BD3C0CB3EBE573A",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/router.test.ts",
+      "expected": "E3E46D08C63C958E460444D3D5F10571D4F73B5F29B3A1A070BD8C901BA8D033",
+      "actual": "E3E46D08C63C958E460444D3D5F10571D4F73B5F29B3A1A070BD8C901BA8D033",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/validation.ts",
+      "expected": "E7020BCD04CD3E6D82C1515EF088DE3C0DA91D74D09B707252F6BD120D89FF3F",
+      "actual": "E7020BCD04CD3E6D82C1515EF088DE3C0DA91D74D09B707252F6BD120D89FF3F",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/validation.test.ts",
+      "expected": "EF682D8303B0FAC122DA79B5F6716A576DC39136D87BE5D9981ACB3C1163CAB1",
+      "actual": "EF682D8303B0FAC122DA79B5F6716A576DC39136D87BE5D9981ACB3C1163CAB1",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/test-fixtures.ts",
+      "expected": "396AE050309DC64581EEFD937F3305331D90D6D5E2441E06C43D4F72DE0C4449",
+      "actual": "396AE050309DC64581EEFD937F3305331D90D6D5E2441E06C43D4F72DE0C4449",
+      "matches": true
+    },
+    {
+      "path": "qa/evidence/whatsapp-review-foundation-20261014-typecheck.mjs",
+      "expected": "F9933E92C864F0DBA237F01F502D63A588B95B89FAFA03CBA1B2D0E0826F6488",
+      "actual": "F9933E92C864F0DBA237F01F502D63A588B95B89FAFA03CBA1B2D0E0826F6488",
+      "matches": true
+    }
+  ],
+  "finalPinCheck": {
+    "chunk_id": "2146bd",
+    "wall_time_seconds": 0.509006,
+    "exit_code": 0,
+    "original_token_count": 81,
+    "output": "{\r\n  \"pins\": 14,\r\n  \"mismatches\": 0,\r\n  \"probeHash\": \"CFC47D33E4044ADDA0FC76008F625476D51CCAA0ECF53C579D8F53A8E4C1010A\",\r\n  \"checkpoint\": \"2026-10-14T09:14:25.1367469+00:00\"\r\n}\r\n# Manifest — whatsapp-review-foundation-20261014\r\n\r\n**Handshake status:** ready-for-check\r\nStatus: ready-for-check\r\nFix cycle: 1\r\nTask: T-007\r\n"
+  },
+  "probePath": "qa/evidence/whatsapp-review-foundation-checker.test.ts",
+  "probeHash": "CFC47D33E4044ADDA0FC76008F625476D51CCAA0ECF53C579D8F53A8E4C1010A",
+  "notes": "21 maker tests passed on final bytes; 6/9 independent probes passed. Three failures represent two findings. No live Mongo, providers, mutations or browser use. Runtime slot 2 released after command.",
+  "persistStarted": "2026-10-14 09:15:42 UTC"
+}

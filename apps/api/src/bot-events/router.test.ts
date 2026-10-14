@@ -6,6 +6,15 @@ import { requireAuth } from "../auth.js";
 import { fakeKeyStore } from "../fixtures.js";
 import { createBotEventsRouter, projectBotEvent, unavailableBotEventsDeps, type BotEventsDeps } from "./router.js";
 
+test("rules degradation survives the API projection with the same bounded safe fields", () => {
+  const projected = projectBotEvent({ id: "rules", at: "2026-10-14T12:00:00Z", kind: "rules-degraded",
+    sessionKey: "outage-1", title: "Join rules unavailable", detail: "No snapshot https://example.com/?token=SECRET", secret: "PRIVATE" });
+  assert.equal(projected?.kind, "rules-degraded");
+  assert.equal(projected?.detail?.includes("SECRET"), false);
+  assert.equal(projected?.detail?.includes("[link removed]"), true);
+  assert.equal(Object.hasOwn(projected ?? {}, "secret"), false);
+});
+
 const keyStore = fakeKeyStore({ owner: { tenantId: "owner", scopes: ["jobs"] }, other: { tenantId: "other", scopes: ["jobs"] }, limited: { tenantId: "owner", scopes: ["sessions"] } });
 const good = { id: "e1", at: "2026-10-15T09:00:00.000Z", kind: "about-to-join", sessionKey: "webinar-1", title: "Career Counselling Masterclass", careerGuidance: true, matchedKeywords: ["career"] };
 

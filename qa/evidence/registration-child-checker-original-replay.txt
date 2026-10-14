@@ -1,0 +1,18 @@
+▶ registration child lifecycle requires clean unique result and verified cleanup on failure
+  ✔ clean (122.9832ms)
+  ✔ nonzero (235.5906ms)
+  ✔ signal (234.3786ms)
+  ✔ fatal (227.468ms)
+  ✔ duplicate (220.277ms)
+  ✔ malformed (225.6194ms)
+  ✔ missing (252.0444ms)
+  ✔ cleanup-fails (248.2832ms)
+✔ registration child lifecycle requires clean unique result and verified cleanup on failure (1771.4379ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2044.0589

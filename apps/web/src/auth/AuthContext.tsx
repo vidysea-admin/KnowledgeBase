@@ -13,10 +13,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { AUTH_INVALIDATED_EVENT, AUTH_KEY_STORAGE_KEY, type AuthInvalidationEventDetail } from "../api/client.js";
+import { advanceAuthSession, AUTH_INVALIDATED_EVENT, AUTH_KEY_STORAGE_KEY, type AuthInvalidationEventDetail } from "../api/client.js";
 
 export interface AuthContextValue {
   apiKey: string | null;
+  /** Changes on explicit login/logout, including when the credential string is reused. */
+  sessionVersion: number;
   setApiKey: (key: string) => void;
   clearApiKey: () => void;
 }
@@ -42,12 +44,15 @@ function removeStoredKey(): void {
 
 export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
   const [apiKey, setApiKeyState] = useState<string | null>(readStoredKey);
+  const [sessionVersion, setSessionVersion] = useState(0);
 
   // This tab's CURRENT key, updated synchronously with every state change (never in an effect),
   // so the 401 handler never compares against a stale render closure.
   const keyRef = useRef<string | null>(apiKey);
 
   const setApiKey = useCallback((key: string) => {
+    advanceAuthSession();
+    setSessionVersion((version) => version + 1);
     try {
       window.localStorage.setItem(AUTH_KEY_STORAGE_KEY, key);
     } catch {
@@ -59,6 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
 
   // Explicit sign-out: the user chose to clear, so storage is cleared unconditionally.
   const clearApiKey = useCallback(() => {
+    advanceAuthSession();
+    setSessionVersion((version) => version + 1);
     removeStoredKey();
     keyRef.current = null;
     setApiKeyState(null);
@@ -87,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
     };
   }, [handleAuthInvalidated]);
 
-  const value = useMemo(() => ({ apiKey, setApiKey, clearApiKey }), [apiKey, setApiKey, clearApiKey]);
+  const value = useMemo(() => ({ apiKey, sessionVersion, setApiKey, clearApiKey }), [apiKey, sessionVersion, setApiKey, clearApiKey]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

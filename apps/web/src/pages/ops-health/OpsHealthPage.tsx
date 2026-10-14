@@ -31,14 +31,26 @@ function body<T>(p: Panel<T>, render: (d: T) => React.ReactNode): React.ReactNod
 }
 
 export function OpsHealthPage(): React.ReactElement {
-  const { apiKey } = useAuth();
+  const { apiKey, sessionVersion } = useAuth();
+  return <>
+    <div className="page-header">
+      <h1>Operations health</h1>
+      <p>Failures, errors and retries for your own tenant. Each figure covers the newest 50 rows of its source, not a lifetime total.</p>
+    </div>
+    {apiKey ? <OpsHealthPanels key={`${sessionVersion}:${apiKey}`} apiKey={apiKey} />
+      : <div className="card empty-note">Sign in with an API key to view operations health.</div>}
+  </>;
+}
+
+// Auth rotation replaces the state owner before commit, rather than clearing another tenant's
+// snapshots in a later effect. Logout unmounts it, including when the same key is used again.
+function OpsHealthPanels({ apiKey }: { apiKey: string }): React.ReactElement {
   const [queue, setQueue] = useState<Panel<ReturnType<typeof queueHealth>>>(loading);
   const [provider, setProvider] = useState<Panel<ReturnType<typeof providerJobsHealth>>>(loading);
   const [watch, setWatch] = useState<Panel<WatchRunsResponse>>(loading);
   const [generation, setGeneration] = useState(0);
 
   useEffect(() => {
-    if (!apiKey) return;
     let cancelled = false;
     setQueue(loading); setProvider(loading); setWatch(loading);
     const run = <T, R>(load: () => Promise<T>, map: (v: T) => R, set: (p: Panel<R>) => void, what: string) =>
@@ -52,12 +64,6 @@ export function OpsHealthPage(): React.ReactElement {
 
   return (
     <>
-      <div className="page-header">
-        <h1>Operations health</h1>
-        <p>Failures, errors and retries for your own tenant. Each figure covers the newest 50 rows of its source, not a lifetime total.</p>
-      </div>
-      {!apiKey && <div className="card empty-note">Sign in with an API key to view operations health.</div>}
-      {apiKey && (<>
         <section className="card" aria-labelledby="ops-queue">
           <h2 id="ops-queue">Upload queue</h2>
           {body(queue, (q) => q.total === 0 ? <p className="empty-note">No upload jobs recorded yet.</p> : (
@@ -100,7 +106,6 @@ export function OpsHealthPage(): React.ReactElement {
           <p className="row-meta">Source: GET /watch-runs. Retries are not recorded per watcher run.</p>
         </section>
         <button type="button" onClick={refresh}>Refresh</button>
-      </>)}
     </>
   );
 }

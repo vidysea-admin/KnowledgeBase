@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "node",
+    "--import",
+    "./.cache/coordination/safe-test-runtime/register.mjs",
+    "qa/evidence/reuse-checked-corpus-tests-checker.mjs"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "startedAt": "2026-10-14T09:41:14.123625+00:00",
+  "finishedAt": "2026-10-14T09:41:14.703221+00:00",
+  "elapsedSeconds": 0.5779999999940628,
+  "timeoutSeconds": 120,
+  "exitCode": 0,
+  "output": "qa/evidence/reuse-checked-corpus-tests-checker.txt"
+}

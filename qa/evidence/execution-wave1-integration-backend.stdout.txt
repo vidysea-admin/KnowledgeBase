@@ -1,0 +1,48 @@
+✔ simulation runs real Ask composition for each authenticated tenant and ignores submitted answer/tenant (95.8853ms)
+✔ missing credentials and missing Ask scope prevent all retrieval (24.1715ms)
+SyntaxError: Unexpected token 'n', "null" is not valid JSON
+    at JSON.parse (<anonymous>)
+    at createStrictSyntaxError (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\types\json.js:137:10)
+    at parse (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\types\json.js:86:15)
+    at C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\read.js:162:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:227:14)
+    at invokeCallback (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:238:16)
+    at done (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:227:7)
+    at IncomingMessage.onEnd (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:287:7)
+    at IncomingMessage.emit (node:events:514:28)
+    at endReadableNT (node:internal/streams/readable:1764:12)
+✔ invalid drafts and query budget fail before retrieval (39.7668ms)
+✔ missing tenant tree and bounded source failures report honest errors (19.6454ms)
+{"requestId":"53ffaff4-77d0-4f9a-bd96-1bf844d51d1f","method":"POST","path":"/answer-policy/simulate","status":401,"durationMs":2.13,"time":"2026-10-14T09:07:34.403Z","level":"warn","msg":"request"}
+{"requestId":"a3558cc8-6386-4048-8904-824822fd7959","method":"POST","path":"/answer-policy/simulate","status":200,"durationMs":2.65,"tenantId":"tenant-a","time":"2026-10-14T09:07:34.409Z","level":"info","msg":"request"}
+✔ actual createServer mounts simulation behind shared auth and existing Ask dependencies (31.6256ms)
+✔ rules degradation survives the API projection with the same bounded safe fields (0.5947ms)
+✔ returns the tenant's projected events; the tenant comes only from the key and the reader is called with it (11.3356ms)
+✔ auth and scope are enforced before any read; bad queries are 400; no deps or a throwing reader is 503 (19.5884ms)
+✔ rows are re-projected: unknown fields dropped, URLs removed, bad kinds/dates discarded (0.4996ms)
+✔ schedule tick dry run suppresses degradation alerts and snapshot writes (5.7644ms)
+✔ schedule tick degradation reaches downstream sink and uses injected tick clock (53.7146ms)
+✔ schedule tick validated primary clears outage only after snapshot persists (42.5911ms)
+✔ schedule tick snapshot-save failure cannot clear active outage (36.8184ms)
+✔ dry-run: lists what would be scheduled, calls the scheduler zero times, writes no state (3.0158ms)
+✔ dry-run output never contains the raw join-link token (1.6755ms)
+✔ real (non-dry-run) run: schedules once via the injected scheduler and records dedup state (29.3296ms)
+✔ real (non-dry-run) run: persists url/until/title/sessionId to a per-job JSON file, keyed by jobKey (ISS-317) (30.5311ms)
+✔ ISS-317: no title/url/sessionId text ever reaches the scheduler — hostile title/url are contained to the job file, never the /tr-bound call (31.1063ms)
+✔ ISS-319: a session crossing midnight keeps its full end datetime, which is AFTER its own start (30.3633ms)
+✔ ISS-321: a jobKey collision with a DIFFERENT session refuses loudly, skips only that item, and never overwrites the existing job file or crashes the tick (22.837ms)
+✔ ISS-321: re-scheduling the SAME session is still allowed — not treated as a collision (30.0473ms)
+✔ a second tick after a real run doesn't re-schedule the same session (duplicate-session) (44.6435ms)
+✔ HTTP candidate mapping preserves original registration/message/thread evidence (1.3672ms)
+✔ createHttpCandidateLoader: no apiKey -> [] without attempting a fetch (0.2306ms)
+✔ createHttpCandidateLoader: filters to approved/auto_approved only (0.4868ms)
+✔ createHttpCandidateLoader: a non-2xx response degrades to [] rather than throwing (0.3984ms)
+✔ createHttpCandidateLoader: a network throw degrades to [] rather than crashing the tick (0.4554ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3707.8256

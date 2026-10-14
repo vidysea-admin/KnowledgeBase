@@ -1,0 +1,10 @@
+apps/api/src/gws/gws-calendar.ts(80,17): error TS2394: This overload signature is not compatible with its implementation signature.
+apps/api/src/gws/gws-calendar.ts(196,3): error TS2322: Type '{ (windowDays?: number | undefined, run?: ((args: string[], exec?: typeof execFile) => Promise<string>) | undefined, changedSince?: string | undefined, acquisition?: undefined, watchDiscovery?: { ...; } | undefined): Promise<...>; (windowDays: number, run: ((args: string[], exec?: typeof execFile) => Promise<...>) |...' is not assignable to type '(days?: number | undefined, run?: ((args: string[], exec?: typeof execFile) => Promise<string>) | undefined, changedSince?: string | undefined, acquisition?: { syncToken?: string | undefined; } | undefined) => Promise<...>'.
+  Types of parameters 'acquisition' and 'acquisition' are incompatible.
+    Type '{ syncToken?: string | undefined; } | undefined' is not assignable to type 'undefined'.
+      Type '{ syncToken?: string | undefined; }' is not assignable to type 'undefined'.
+apps/api/src/gws/youtube-calendar.test.ts(55,22): error TS2571: Object is of type 'unknown'.
+apps/api/src/gws/youtube-calendar.test.ts(56,18): error TS2571: Object is of type 'unknown'.
+apps/api/src/gws/youtube-calendar.test.ts(58,18): error TS18046: 'native' is of type 'unknown'.
+apps/api/src/gws/youtube-calendar.test.ts(58,61): error TS18046: 'native' is of type 'unknown'.
+apps/api/src/gws/youtube-calendar.test.ts(59,18): error TS18046: 'native' is of type 'unknown'.

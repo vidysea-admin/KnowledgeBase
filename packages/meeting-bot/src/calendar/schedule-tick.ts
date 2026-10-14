@@ -113,6 +113,7 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
     ? await deps.loadKeyTenant().catch(() => null) : deps.joinRulesKeyTenantId;
   const result = await enforceJoinRules(selected, {
     mode: deps.joinRulesEnforce, tenantId: deps.joinRulesTenantId, keyTenantId, stateDir: deps.stateDir, log: deps.log, io: deps.joinRulesIo,
+    now: () => Date.parse(now), readOnly: dryRun, onDegraded: aj?.rulesDegraded, onHealthy: aj?.rulesHealthy,
   });
 
   deps.log(`schedule-tick: ${result.toSchedule.length} to schedule, ${result.skipped.length} skipped ` +

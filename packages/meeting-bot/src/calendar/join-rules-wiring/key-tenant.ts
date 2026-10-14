@@ -1,22 +1,22 @@
 /**
  * packages/meeting-bot/src/calendar/join-rules-wiring/key-tenant.ts — unit `t037-tick-verifies-key-tenant` (ISS-T037WIRE-001, ISS-WIREPRE-002).
- * Learns the tenant of the API key the tick uses, from the `X-LKB-Tenant` response header of `GET /webinar-operations`
- * (apps/api brain.ts: set from req.auth.tenantId, scope `sessions`; no API change). Runs ONLY when join-rules enforcement is enabled
+ * Learns the tenant of the API key the tick uses, from the `X-LKB-Tenant` response header of `GET /meeting-candidates`
+ * (set from req.auth.tenantId, scope `gmail`, already required by the scheduler). Runs ONLY when join-rules enforcement is enabled
  * (the caller checks) and costs exactly ONE request per enforcing tick; nothing is cached (a rotated key changes the tenant).
  *
  * Returns the tenant id (validated by the join-rules store's own validator, via joinRulesFilePath) or `null` = "could not verify".
- * null is never read as verified: absent/empty/multi-valued/invalid header, no key, HTTP error (401/403 missing `sessions` scope/5xx),
+ * null is never read as verified: absent/empty/multi-valued/invalid header, no key, HTTP error (401/403 missing `gmail` scope/5xx),
  * network error, timeout, redirect. The same key and base URL as the candidate fetch are used; the key is sent nowhere else.
  * The raw header is never logged: only a fixed reason token is.
  */
 import { joinRulesFilePath } from "../join-rules/join-rules-store.js";
 
-export const KEY_TENANT_PATH = "/webinar-operations";
+export const KEY_TENANT_PATH = "/meeting-candidates";
 /** Operator-facing cause for the statuses whose meaning is known (ISS-TENANTSIG-001 / -002). Fixed text only; the response is never echoed. */
 const STATUS_HINT: Readonly<Record<number, string>> = {
   401: "the API rejected the key",
-  403: "the key lacks the `sessions` scope (ISS-TENANTSIG-001)",
-  503: "the API's operations state is unavailable: an API-side fault, not a tenant mismatch (ISS-TENANTSIG-002)",
+  403: "the key lacks the `gmail` scope",
+  503: "the API's candidate discovery is unavailable: an API-side fault, not a tenant mismatch",
 };
 const TIMEOUT_MS = 15_000;
 

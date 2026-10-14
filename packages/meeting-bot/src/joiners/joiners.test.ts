@@ -10,7 +10,7 @@ import { createBrowserJoiner, registerInBrowser, type RegistrationInput } from "
 import { resolve, dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { execFileSync, spawnSync } from "node:child_process";
 import { createSystemAudioJoiner } from "./system-audio-joiner.js";
 
@@ -64,6 +64,43 @@ test("registration refuses invalid hosts/operator/selectors before execution", a
   ]) await assert.rejects(registerInBrowser({...registration, ...patch}, cfg));
   assert.equal(calls, 0);
 });
+test("registration child lifecycle requires clean unique result and verified cleanup on failure", async (t) => {
+  const submitted = {event: "registration-result", status: "submitted", reason: "awaiting_confirmation"};
+  const cases = [
+    {name: "clean", events: [submitted], expected: {status: "submitted", reason: "awaiting_confirmation"}},
+    {name: "nonzero", events: [submitted], exit: 7, reason: "browser_failure"},
+    {name: "signal", events: [submitted], signal: true, reason: "browser_failure"},
+    {name: "fatal", events: [submitted, {event: "fatal", error: "private diagnostic"}], reason: "browser_failure"},
+    {name: "duplicate", events: [submitted, submitted], reason: "invalid_result"},
+    {name: "malformed", events: [submitted, {event: "registration-result", status: "invented"}], reason: "invalid_result"},
+    {name: "missing", events: [{event: "driver-ready"}], reason: "missing_result"},
+    {name: "cleanup-fails", events: [submitted], exit: 7, cleanupExit: 9, reason: "owned_cleanup_failed"},
+  ];
+  for (const fixture of cases) await t.test(fixture.name, async () => {
+    const profileDir = mkdtempSync(join(tmpdir(), "registration-lifecycle-"));
+    const script = join(profileDir, "fixture.mjs"), cleanup = join(profileDir, "cleanup.json");
+    try {
+      writeFileSync(script, `import {writeFileSync} from 'node:fs';
+if (process.argv.includes('--cleanup-only')) {
+  writeFileSync(${JSON.stringify(cleanup)}, JSON.stringify(process.argv.slice(2)));
+  process.exit(${fixture.cleanupExit ?? 0});
+}
+process.stdin.resume();
+process.stdin.on('end', () => {
+  const output = ${JSON.stringify(fixture.events.map(event => JSON.stringify(event)).join("\n") + "\n")};
+  process.stdout.write(output, () => ${fixture.signal ? "process.kill(process.pid, 'SIGTERM')" : `process.exit(${fixture.exit ?? 0})`});
+});`);
+      const result = await registerInBrowser(registration, {python: process.execPath, joinScript: script, profileDir, timeoutMs: 2000});
+      assert.deepEqual(result, fixture.expected ?? {status: "uncertain", reason: fixture.reason});
+      assert.equal(existsSync(cleanup), fixture.name !== "clean");
+      if (existsSync(cleanup)) {
+        assert.deepEqual(JSON.parse(readFileSync(cleanup, "utf8")), ["about:blank", "--profile", profileDir,
+          "--title", "LKB registration", "--stop-file", `${profileDir}/registration-stop`, "--cleanup-only"]);
+      }
+    } finally { rmSync(profileDir, {recursive: true, force: true}); }
+  });
+});
+
 test("registration actual child timeout performs exact owned-profile cleanup", async (t) => {
   const pkgDir = resolve(dirname(fileURLToPath(import.meta.url)), "../.."), repoRoot = resolve(pkgDir, "../..");
   const configured = process.env.D2_FIXTURE_PYTHON || resolve(repoRoot, process.platform === "win32" ? ".venv/Scripts/python.exe" : ".venv/bin/python");

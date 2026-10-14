@@ -1,0 +1,62 @@
+[
+  {
+    "name": "dom",
+    "cmd": "node --test --test-isolation=none --test-concurrency=1 --test-timeout=30000 --import ./.cache/coordination/safe-test-runtime/register-react.mjs qa/evidence/t054-transcript-review-planner-editor/checker-dom.test.tsx",
+    "started": {
+      "current_time": "2026-10-14 09:09:06 UTC"
+    },
+    "ended": {
+      "current_time": "2026-10-14 09:09:11 UTC"
+    },
+    "chunk_id": "fd9866",
+    "wall_time_seconds": 3.4963476,
+    "exit_code": 0,
+    "original_token_count": 186,
+    "output": "✔ real client sends revision precondition and editor consumes committed canonical revision (197.5309ms)\n✔ real client to editor refuses stale post-commit GET without losing commit truth (51.571ms)\n✔ unmount invalidates real in-flight receipt, with no callback or canonical reload (23.2791ms)\n✔ a synchronous unmount callback cannot start a canonical reload (37.0971ms)\n✔ real mapping wire names only the chosen block and requires reason (47.5465ms)\n✔ an invalid durable receipt retains draft and disables unsafe retry (37.5981ms)\n✔ a replaced key/session hides previous data and ignores its late receipt (43.2385ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 2846.6112\n"
+  },
+  {
+    "name": "sample",
+    "cmd": "node --test --test-isolation=none --test-concurrency=1 --test-timeout=30000 --import ./.cache/coordination/safe-test-runtime/register.mjs qa/evidence/t054-transcript-review-planner-editor/checker-sample.ts",
+    "started": {
+      "current_time": "2026-10-14 09:09:11 UTC"
+    },
+    "ended": {
+      "current_time": "2026-10-14 09:09:12 UTC"
+    },
+    "chunk_id": "ac947a",
+    "wall_time_seconds": 0.8080428,
+    "exit_code": 1,
+    "original_token_count": 323,
+    "output": "✖ retained TOC sample plans exact correction and detached audit without mutating inputs (3.6948ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 460.1689\n\n✖ failing tests:\n\ntest at qa\\evidence\\t054-transcript-review-planner-editor\\checker-sample.ts:5:1\n✖ retained TOC sample plans exact correction and detached audit without mutating inputs (3.6948ms)\n  ReviewPlanningError: Invalid transcript review request\n      at invalid (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/planner.ts:15:31)\n      at file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/planner.ts:52:20\n      at Array.forEach (<anonymous>)\n      at planTranscriptReview (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/planner.ts:48:20)\n      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/qa/evidence/t054-transcript-review-planner-editor/checker-sample.ts:11:18)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.start (node:internal/test_runner/test:1262:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {\n    code: 'invalid'\n  }\n"
+  },
+  {
+    "name": "sample-valid-prefix-and-full-refusal",
+    "cmd": "node --test --test-isolation=none --test-concurrency=1 --test-timeout=30000 --import ./.cache/coordination/safe-test-runtime/register.mjs qa/evidence/t054-transcript-review-planner-editor/checker-sample.ts",
+    "started": {
+      "current_time": "2026-10-14 09:10:49 UTC"
+    },
+    "ended": {
+      "current_time": "2026-10-14 09:10:50 UTC"
+    },
+    "chunk_id": "fd28f0",
+    "wall_time_seconds": 0.8007527,
+    "exit_code": 0,
+    "original_token_count": 126,
+    "output": "{\"sample\":\"2026-04-21-visa-blueprint-part2-italy-france-nz\",\"sourceTurns\":291,\"literalPrefixTurns\":100,\"changedTurns\":1,\"inputPreserved\":true,\"auditDetached\":true,\"refresh\":\"pending\"}\n✔ full retained corpus with invalid source timings is refused without silent normalization (4.8458ms)\n✔ retained TOC sample plans exact correction and detached audit without mutating inputs (3.9157ms)\nℹ tests 2\nℹ suites 0\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 462.756\n"
+  },
+  {
+    "name": "contracts",
+    "cmd": "python contracts/verify_contracts.py",
+    "started": {
+      "current_time": "2026-10-14 09:10:50 UTC"
+    },
+    "ended": {
+      "current_time": "2026-10-14 09:10:52 UTC"
+    },
+    "chunk_id": "2d97e6",
+    "wall_time_seconds": 0.3650944,
+    "exit_code": 0,
+    "original_token_count": 20,
+    "output": "verify_contracts: no frozen contracts yet (research phase) -- PASS by vacuity\r\n"
+  }
+]

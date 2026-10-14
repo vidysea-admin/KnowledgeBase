@@ -32,7 +32,7 @@
 | T-004c | done | `regenerate()`: handle session year-migration cleanup + cross-year topic-evidence refresh | checker PASS 4/4, verdict `qa/verdicts/regenerate-year-migration.md`, commit `8ae94f4` |
 | T-006 | done | Recording-gap tracking (never silently drop) | checker PASS 7/7, verdict `819262a` |
 | T-021 | done | Golden set (50â€“100 Qs) + recall@k report â€” regenerate under gate Option C | **Semantic leg measured 2026-09-21 (manifest golden-set-semantic-leg, checker PASS cycle 0, verdict `5fab76e`): recall@5 = 0.935 (86/92), control 0.217, 6 misses, INFORMATIVE; pin rate 10.9% vs 63%; near-verbatim 0/0; condition-4 sibling margins published (all 6 misses negative). Conditions 1â€“3 SATISFIED (checker-reproduced), condition 4 evidence delivered.** UNBLOCKED 2026-09-08: qa/gates/golden-set-redesign.md is ANSWERED - Option C, regenerate the golden set from raw transcripts (data/toc-migrated/<sessionId>/turns.json), by a different model+prompt than the summarizer, phrased as real student questions, with near-neighbour distractors. This task IS that unit. Binding acceptance conditions from the gate: cite the question-blind control (0.217) beside every score; PASS = recall@5 STRICTLY between 0.217 and 1.000 with a non-zero miss count - 1.000 is a FAILURE of the remedy and escalates to Option B; re-run the verbatim-overlap and single-unique-token-pin diagnostics (pin rate must fall well below 63%). The gate is answered but NOT closed - it closes when this unit satisfies those conditions. DONE 2026-10-13: gate condition 4 ratified by Umesh (D-156); U1.4/U1.5 baselines re-point to the redesigned golden set (semantic leg recall@5 0.935, qa/verdicts/golden-set-semantic-leg.md; gate qa/gates/golden-set-redesign.md). |
-| T-022 | open | Evaluator calibration on 30 hand-scored pairs | depends T-021. NOT gate-blocked - the gate file says so explicitly. Blocked only by its dependency: calibration needs a non-saturated golden set to calibrate against. |
+| T-022 | in_progress | Evaluator calibration on 30 hand-scored pairs |  T-021 dependency completed under D-156. Scoped human-review intake checked-PASS cycle 0 (qa/verdicts/t022-calibration-human-review.md); thirty human reviews and live calibration remain open. |
 
 ## Phase A â€” Capture
 
@@ -52,8 +52,8 @@
 
 | ID | Status | Task | Notes |
 |---|---|---|---|
-| T-007 | open | WhatsApp â†’ claims ingestion review | depends T-020 |
-| T-008 | open | Vector index (`chunks`, Atlas Vector Search) + unstructured search | depends T-007 |
+| T-007 | in_progress | WhatsApp â†’ claims ingestion review | depends T-020 |
+| T-008 | in_progress | Vector index (`chunks`, Atlas Vector Search) + unstructured search | depends T-007 |
 | T-009 | done | Developer API â€” `POST /ask` real, honest 501 stubs, rate limiting | checker PASS 8/8, verdict `cb04252`; post-verdict security fix `be86bf8` (shell:true removed) |
 | T-010 | done | Product shell (`apps/web`, real Vite+React SPA) â€” un-deferred 2026-09-04 (Umesh asked for a proper professional UI: sidebar nav, dashboard, Obsidian-style brain/graph view, calendar). Phases 0-3: `qa/verdicts/web-app-shell-brain-calendar.md`, checker PASS. Phase 4 (Settings/API-key CRUD â€” real list/create/revoke, tenant-isolated, raw key shown once): `qa/verdicts/web-settings-keys.md`, checker PASS. Ingest/Meeting-Bot pages remain a separate, later unit (not part of T-010's original scope). | depends T-009 |
 | T-011a | done | Phase-B per-user browser profile bot + live monitor â€” **privacy/consent logic only** | checker PASS 1/1, verdict `qa/verdicts/browser-profile-privacy.md`, commit `59dc2db`; real Playwright/UI wiring remains future work (see contract Non-goals). **Renamed from T-011 on 2026-09-07**: this row and `.goal/goal.json`'s T-011 were two different scopes sharing one id, so this row read as "the meeting bot is done" when it never claimed that. |
@@ -161,11 +161,11 @@ Original north star, task statuses and evidence are preserved. Grouping does not
 |---|---|---|---|
 | T-052 | in_progress | Automatic webinar registration and confirmation-email join-link correlation | G1; deps T-036, T-037; independent acceptance required |
 | T-053 | open | Connector expansion public/on-demand intake missing-recording workflow and watched-source verification | G1; deps T-006, T-023, T-025, T-027, T-045; independent acceptance required |
-| T-054 | open | Transcript review and speaker mapping UI | G3; deps T-003, U2.4, T-044; independent acceptance required |
-| T-055 | open | Page-evidenced documents topic/speaker pages collections and resource directories | G4; deps T-020, U2.2, U2.3, U2.4; independent acceptance required |
-| T-056 | open | Full cited-answer UX policies conflicts review queue and unstructured search acceptance | G5; deps U3.1, U3.2, T-007, T-008, T-022; independent acceptance required |
+| T-054 | in_progress | Transcript review and speaker mapping UI | G3; deps T-003, U2.4, T-044; independent acceptance required |
+| T-055 | in_progress | Page-evidenced documents topic/speaker pages collections and resource directories | G4; deps T-020, U2.2, U2.3, U2.4; independent acceptance required |
+| T-056 | in_progress | Full cited-answer UX policies conflicts review queue and unstructured search acceptance | G5; deps U3.1, U3.2, T-007, T-008, T-022; independent acceptance required |
 | T-057 | in_progress | Sessions explorer graph health jobs analytics notifications Sheets and setup UI | G6; deps T-010, U2.6, T-006; independent acceptance required; slices t057-analytics-page, t057-system-status-page merged (source scope) |
-| T-058 | open | FAQ reports and meeting preparation builders | G7; deps T-056; independent acceptance required |
+| T-058 | in_progress | FAQ reports and meeting preparation builders | G7; deps T-056; independent acceptance required |
 | T-059 | open | Evaluation loss to gap capture re-index and re-test flywheel | G8; deps T-021, T-022, T-043; independent acceptance required |
 | T-060 | open | Multi-tenant hosting roles audit API webhooks security and retention completion | G9; deps T-009, T-018, T-026, T-051; independent acceptance required |
 | T-061 | open | Wider application automation and bot-monitored operations | G10; deps T-060; independent acceptance required |
@@ -178,3 +178,17 @@ T-052 .3 migration and reviewed standing-test repairs: maker Python48/48, downst
 - T-052 approved ownership-test continuation (2026-10-05): `test_sb_join_ownership.py` created under explicit user approval/D-106. Watcher privacy affected union393/393 and all five isolated green/red/restored claims complete; exact-port7-case real Chrome fixture and final current Python identity pending. Status remains in_progress; no release/production claim. App controller readback is paused while repo goal JSON remains active; this discrepancy is not completion.
 
 - T-052 D112/D113 verification checkpoint (2026-10-05): explicit approved ownership test file332nonblank, existing iframe374 and base311; original safety assertions retained. Reviewed host-policy mapping and strictcleanup-before-death ordering verified. Current-identity full Python91/91passed102.55s (session84175), action-port isolated green/assertion-red/byte-restored-green complete (90490). Prior89passed2failed retained. Watcher affected Nodeunion393/393 and five isolated floors complete. T-052 remains in_progress: full contract/independent dual acceptance and live operational gates remain; no release/production/Ubuntu claim. App controller remains paused, repo goal remains active.
+
+## Parallel implementation checkpoint (2026-10-14)
+
+Scoped foundation work has started for T-007, T-008, T-022, T-054, T-055, T-056 and T-058. These parents are in_progress; none is closed by a smaller unit PASS. Current detail:
+
+- T-007: whatsapp-review-foundation-20261014 cycle 2 checked-PASS; standalone source-bound proposal, transaction and review-router foundation only. Mounting, actual review/publication and searchable approved evidence remain unaccepted.
+- T-008: t008-semantic-web-consumer cycle 0 checked-PASS; additive authenticated semantic client/results foundation only. Shared integration, interactive proof and full structured/vector acceptance remain unaccepted.
+- T-022: t022-calibration-human-review cycle 0 checked-PASS; neutral intake and MAE-consumption foundation only. T-021 dependency is completed under D-156. Thirty individual human reviews, live scoring and final calibration remain required; no labels approved here.
+- T-054: t054-transcript-review-planner-editor cycle 0 checked-PASS; pure revision-bound planning and standalone editor only. Persistence, mounting, downstream refresh and whole-task acceptance remain unaccepted.
+- T-055: t055-evidence-directory cycle 0 checked-PASS; additive read-only evidence/resource directory only. Document highlights, full profiles, curated collections and quality gates remain open.
+- T-056: parallel-answer-policy cycle 0 checked-PASS; transient tenant-bound policy simulation foundation only. Shared integration, saved policy history/application, conflicts, review queue and browser acceptance remain open.
+- T-058: t058-evidence-builder cycle 0 checked-PASS; literal source-evidenced output foundation only. Authenticated integration, synthesis, persistence/export/UI and user acceptance remain open.
+
+Current scoped source close-out: 19/20 new foundations have matching-cycle checked-PASS; Windows supervisor installer cycle 1 awaits its checker. See qa/QUEUE.md current close-out table. None closes its broader parent acceptance. Remaining code includes WhatsApp quarantine/UI, canonical transcript persistence/refresh, saved/YAML policies, reports/exports, OCR storage and platform/flywheel integration; remaining live/human gates include capture/provider bindings, gold reviews, real supervisor recovery, seven-day observation and Ubuntu proof.

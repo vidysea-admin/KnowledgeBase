@@ -7,7 +7,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, statSy
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 
-export const ALERT_KINDS = ["about-to-join", "capture-started", "capture-stopped-early", "capture-failed", "capture-done"] as const;
+export const ALERT_KINDS = ["about-to-join", "capture-started", "capture-stopped-early", "capture-failed", "capture-done", "rules-degraded"] as const;
 export type AlertKind = (typeof ALERT_KINDS)[number];
 
 export interface BotFeedEvent {

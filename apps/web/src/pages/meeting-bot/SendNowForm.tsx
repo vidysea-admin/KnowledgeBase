@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { sendBotNow } from "../../api/send-now.js";
 import { ApiError } from "../../api/client.js";
+import { useSendNowStatus } from "./useSendNowStatus.js";
 
 const MAX_AHEAD_MS = 24 * 60 * 60 * 1000;
 
@@ -45,24 +46,36 @@ export function SendNowForm({ apiKey }: { apiKey: string | null }): React.ReactE
   const [url, setUrl] = useState(""), [until, setUntil] = useState("");
   const [busy, setBusy] = useState(false), [denied, setDenied] = useState(false);
   const [outcome, setOutcome] = useState<Outcome>(null);
+  const [job, setJob] = useState<{ key: string | null; id: string } | null>(null);
   const inFlight = useRef(false);
+  const owner = useRef({ key: apiKey, generation: 0 });
+  if (owner.current.key !== apiKey) owner.current = { key: apiKey, generation: owner.current.generation + 1 };
+  useEffect(() => {
+    inFlight.current = false; setBusy(false); setDenied(false); setOutcome(null); setJob(null);
+    return () => { owner.current.generation++; };
+  }, [apiKey]);
+  const progress = useSendNowStatus(apiKey, job?.key === apiKey ? job.id : null);
   const hint = untilHint(until, Date.now());
   const ready = Boolean(apiKey) && url.trim() !== "" && until.trim() !== "";
   async function submit(ev: React.FormEvent): Promise<void> {
     ev.preventDefault();
     if (inFlight.current || denied || !ready) return;
-    inFlight.current = true; setBusy(true); setOutcome(null);
+    const generation = owner.current.generation;
+    inFlight.current = true; setBusy(true); setOutcome(null); setJob(null);
     try {
       const r = await sendBotNow(apiKey, url.trim(), until.trim());
+      if (generation !== owner.current.generation) return;
       const id = typeof r?.jobId === "string" ? r.jobId.slice(0, 80) : "";
       setOutcome(r?.status === "launching" && id
         ? { kind: "ok", text: `Launching (job id ${id}). The launcher has started; the bot has not joined yet.` }
         : { kind: "error", text: "The server answered without a job id. No bot was confirmed." });
+      if (r?.status === "launching" && id) setJob({ key: apiKey, id });
     } catch (e) {
+      if (generation !== owner.current.generation) return;
       const o = describe(e);
       if (o?.kind === "denied") setDenied(true);
       setOutcome(o);
-    } finally { inFlight.current = false; setBusy(false); }
+    } finally { if (generation === owner.current.generation) { inFlight.current = false; setBusy(false); } }
   }
   return <section className="card" aria-label="Send bot now">
     <h2>Send bot now</h2>
@@ -75,6 +88,8 @@ export function SendNowForm({ apiKey }: { apiKey: string | null }): React.ReactE
       <p role="note" id="send-now-hint">{hint ?? "HH:MM (your local time, today) or an ISO date and time with an offset; in the future, at most 24 hours ahead."}</p>
       <button type="submit" disabled={busy || denied || !ready}>{busy ? "Sending..." : "Send bot now"}</button>
     </form>
-    {outcome && <p role={outcome.kind === "ok" ? "status" : "alert"}>{outcome.text}</p>}
+    {outcome && <p role={outcome.kind === "ok" ? "status" : "alert"}>{outcome.kind === "ok" && progress
+      ? `Launch accepted (job id ${job?.id}). Meeting admission is unknown.` : outcome.text}</p>}
+    {progress && <p role="status">{progress}</p>}
   </section>;
 }

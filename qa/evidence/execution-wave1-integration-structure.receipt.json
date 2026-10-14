@@ -1,0 +1,5 @@
+{
+  "command": "node scripts/lint-loc.mjs --all",
+  "exitCode": 1,
+  "durationSeconds": 11.243062
+}

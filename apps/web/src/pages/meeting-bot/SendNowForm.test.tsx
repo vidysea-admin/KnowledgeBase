@@ -111,6 +111,36 @@ describe("SendNowForm", () => {
     render(<SendNowForm apiKey={null} />);
     expect(screen.getByRole("button", { name: "Send bot now" })).toBeDisabled();
   });
+
+  test("real job id triggers scoped status GET with truthful running label", async () => {
+    const jobId = "send-now-20261014100000-abcdef";
+    fetchMock.mockResolvedValueOnce(json(202, { jobId, status: "launching" }))
+      .mockResolvedValueOnce(json(200, { jobId, status: "running", joined: "unknown" }));
+    render(<SendNowForm apiKey={KEY} />); fill(); submit();
+    expect(await screen.findByText(/recorder process is alive/)).toHaveTextContent("Meeting admission is unknown");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[1]![0]).toContain(`/calendar/send-now/${jobId}`);
+    expect(fetchMock.mock.calls[1]![1].headers.authorization).toBe(`Bearer ${KEY}`);
+  });
+
+  test("replacing key ignores late POST result and never polls old job with new key", async () => {
+    let release!: (r: Response) => void;
+    fetchMock.mockReturnValueOnce(new Promise<Response>(r => { release = r; }));
+    const h = render(<SendNowForm apiKey={KEY} />); fill(); submit();
+    h.rerender(<SendNowForm apiKey="replacement" />);
+    release(json(202, { jobId: "send-now-20261014100000-abcdef", status: "launching" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send bot now" })).not.toBeDisabled());
+    expect(screen.queryByRole("status")).toBeNull(); expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  test("replacing key after launch clears old job without issuing a GET under replacement key", async () => {
+    const jobId = "send-now-20261014100000-abcdef";
+    fetchMock.mockResolvedValueOnce(json(202, { jobId, status: "launching" }))
+      .mockResolvedValueOnce(json(200, { jobId, status: "running", joined: "unknown" }));
+    const h = render(<SendNowForm apiKey={KEY} />); fill(); submit();
+    await screen.findByText(/recorder process is alive/); h.rerender(<SendNowForm apiKey="replacement" />);
+    expect(screen.queryByRole("status")).toBeNull(); expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe("untilHint (advisory only)", () => {

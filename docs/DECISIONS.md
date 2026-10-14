@@ -2237,3 +2237,11 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** Auto-discovery and auto-join are authorized for this deployment, with career counselling and guidance webinars first, other webinars staged as test data, and alerts sent by email and shown on the dashboard.
 **Approved-by:** Umesh
 **Links:** T-036; T-037; T-038
+
+## D-166 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Umesh approved the execution plan's T-037 `last-valid` join-rules policy by asking to implement that plan. Only a successfully validated, actually present complete primary rules/state document may refresh the tenant-bound integrity-checked snapshot. On primary failure, fallback is allowed only for the currently verified equal configured/API-key tenant and only while snapshot age is nonnegative and strictly below one hour. Missing, expired, future, corrupt, foreign or invalid snapshots refuse joins. Fallback never renews its validation time; cached deny and opt-out rules remain effective.
+**Why:** A bounded last-valid policy maintains previously validated controls during transient rules failures while preventing unrestricted continuation or cross-tenant attribution. This settles the execution plan's policy choice without weakening independent cancellation, registration, rejection, identity or tenant safeguards.
+**Result:** The explicit `last-valid` mode and one-hour exclusive expiry are authorized. Degradation immediately records durable dashboard state and attempts email to umeshsugara@vidysea.com through the authorized gws channel; delivery failure stays visible and cannot widen selection. Recovery clears degradation only after successful primary validation, evaluation and snapshot persistence. The source unit's PASS does not prove delivered alerts or live deployment: real scheduler forwarding, verified tenant/key signal, truthful UI, notification delivery and nonproduction live enforcement evidence must pass before enabling. Existing ISS-376 sender-policy and recurring/id-only opt-out gates remain separate. D-165 career priority/staging/auto-discovery authorization remains unchanged.
+**Approved-by:** Umesh
+**Links:** D-165; T-037; T-038; qa/contracts/t037-last-valid.md; qa/manifests/t037-last-valid.md; qa/verdicts/t037-last-valid.md; ISS-TENANTSIG-001; ISS-WIREPRE-001; ISS-376

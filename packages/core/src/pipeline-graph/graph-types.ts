@@ -1,6 +1,6 @@
 /**
- * packages/core/src/pipeline-graph/graph-types.ts — T-050 slice 6 (graph executor). UNWIRED, NOT exported from src/index.ts.
- * A minimal typed graph executor (no LangGraph package). The graph is WIRING ONLY: each node names a stage of the
+ * T-050 / D-161 graph executor seam. NOT exported from src/index.ts.
+ * Official LangGraph runs the wiring: each node names a stage of the
  * workflow definition and holds a handler; every ordering/retry/resume decision stays in the planner via the runner adapter.
  */
 import type { WorkflowDef } from "../domain/pipeline-workflow.js";

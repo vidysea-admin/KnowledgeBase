@@ -1137,3 +1137,52 @@ until then this note is the record.
   `git show 5fab76e:qa/QUEUE.md`.
 - Earlier sweeps: `git show d142628~1:qa/QUEUE.md` and prior history.
 > **ID correction 2026-09-27T07:29:29+05:30 (/checker):** the 2026-09-26 sweep's ISS-308 (ledger-schema) and ISS-309 (delegation-health) collided with maker-minted ISS-308/309 (22b6eb6). They are now **ISS-311** and **ISS-312**. ISS-310 is unchanged. The maker's ISS-308/309 (lane module instances, reingest orphan tree_index) keep their ids.
+
+## Current implementation wave checkpoint (2026-10-14)
+
+This checkpoint records the authorized parallel wave; earlier routing and historical evidence above are preserved. Existing TODO/high-issue rows require current ledger/source reconciliation before they are pulled again. No historical manifest or verdict was rewritten.
+
+- Tier 3: T-007, T-008, T-022, T-054, T-055, T-056 and T-058 are now in_progress on independently assigned foundations; full parent acceptance remains open.
+- Scoped checked-PASS cycle 0: t022-calibration-human-review, parallel-answer-policy and t058-evidence-builder. Candidate pins rechecked against their verdicts: 5/5, 9/9 and 2/2 match respectively.
+- U2.2 extraction-draft-review-batches cycle 0 is checked-PASS preparation only; individual human approval and threshold acceptance remain open. T-059/T-060 are not inferred started.
+- Current ready/in-progress units remain checker-owned: WhatsApp review, semantic web consumer, transcript review and evidence directory. See their matching manifests/packets for the current cycle rather than treating this timestamp as PASS.
+- T-051 remains in_progress/full release unverified; installation/restart, live full pipeline, seven-day observation and separate Ubuntu acceptance are not closed here.
+- Tracker audit before update: node scripts/tracker-audit.mjs --json --gate g1 -> exit 0, ok true, findings []. Post-update same command -> exit 0, ok true, findings [] (no tracker disagreement).
+
+## Current scoped source close-out and remaining acceptance (2026-10-14)
+
+Canonical manifest fields and same-slug verdict cycles currently establish 19/20 scoped checked-PASS units. This counts delivered foundations, not completed roadmap tasks or product percentage. Installer cycle 1 is still ready-for-check; its retained cycle-0 FAIL does not certify the revised candidate.
+
+| Unit | Current scoped state | Fix cycle |
+|---|---|---|
+| `t051-windows-supervisor-install` | awaiting matching cycle verdict | 1 |
+| `t055-evidence-directory` | checked-PASS | 0 |
+| `t039-send-now-status-polling` | checked-PASS | 0 |
+| `t041-probed-duration-alignment` | checked-PASS | 0 |
+| `u24-cloud-suggestion-routing` | checked-PASS | 0 |
+| `t052-registration-child-lifecycle` | checked-PASS | 1 |
+| `t038-durable-alert-retries` | checked-PASS | 1 |
+| `t037-least-privilege-tenant-signal` | checked-PASS | 0 |
+| `whatsapp-review-foundation-20261014` | checked-PASS | 2 |
+| `t050-langgraph-executor-replacement` | checked-PASS | 0 |
+| `t008-semantic-web-consumer` | checked-PASS | 0 |
+| `t040-grounded-content-consumer` | checked-PASS | 0 |
+| `t037-last-valid` | checked-PASS | 0 |
+| `t057-ops-health-key-boundary` | checked-PASS | 0 |
+| `t036-youtube-calendar-discovery` | checked-PASS | 0 |
+| `t054-transcript-review-planner-editor` | checked-PASS | 0 |
+| `parallel-answer-policy` | checked-PASS | 0 |
+| `t022-calibration-human-review` | checked-PASS | 0 |
+| `t058-evidence-builder` | checked-PASS | 0 |
+| `extraction-draft-review-batches` | checked-PASS | 0 |
+
+Candidate pins rechecked from current verdict/packet inventories for the 19 closed units; no product pin mismatch. T-041 and least-privilege tenant-signal Git blob hashes require the repository CRLF-to-LF clean normalization and match after that normalization. Integration cycle 0 and exact checked-corpus-test recovery are separately checked-PASS; neither is counted as one of these twenty new foundations.
+
+Remaining acceptance is explicitly split:
+
+- **Code/integration:** WhatsApp quarantine/intake and review UI, authenticated router/store mounting, real Mongo publication and approved-evidence search; canonical transcript persistence with audited concurrency, downstream refresh and SessionDetail editor mounting; saved/YAML policy versions/application, conflicts and answer-review queue; complete report/FAQ/brief integration, synthesis and persistence/export; searchable OCR storage/redaction decision; Ask official-graph migration and broader connector/platform/flywheel scope.
+- **Human quality:** T-022 thirty individually reviewed pairs and live final calibration; U2.2 individual extraction gold approvals/thresholds; speaker precision gates and human-confirmed suggested identities. AI drafts remain unapproved and default-off quality gates remain enforced.
+- **Live operations:** actual capture tenant/database/provider bindings, complete authenticated Gmail/Calendar acquisition, real registration and admitted capture, grounded extraction/index/cited Ask, received email/dashboard alerts, real supervisor installation/activation/restart/recovery, seven-day unattended observation, and separate Ubuntu acceptance. Existing synthetic hour-capture proof alone does not close these gates.
+- **Tracker state:** seven started parents remain in_progress, T-059/T-060 remain pending, and no parent is marked done here. `.goal/goal.json` project_path still stores the historical D:\KnowledgeBase value: repo-wide targeted reader search found no consumer proving it is a current runtime checkout selector, so it was preserved rather than guessing external semantics.
+
+Current source-table tracker verification: `node scripts/tracker-audit.mjs --json --gate g1` -> exit 0, `ok: true`, `findings: []`, after canonical source-state and acceptance-gate notes were updated.

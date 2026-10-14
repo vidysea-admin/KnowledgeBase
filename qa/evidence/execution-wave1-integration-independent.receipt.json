@@ -1,0 +1,9 @@
+{
+  "Command": "node --test --test-isolation=none --test-concurrency=1 --test-timeout=30000 --import ./.cache/coordination/safe-test-runtime/register.mjs qa/evidence/execution-wave1-integration-independent.mjs",
+  "StartedUtc": "2026-10-14T09:27:56.3603010Z",
+  "EndedUtc": "2026-10-14T09:27:58.4062982Z",
+  "DurationSeconds": 2.0459972,
+  "ExitCode": 0,
+  "TimedOut": false,
+  "ProbeSha256": "FFB3E9DFB94C732CA817E78919AD64235685646796A1E27916FEDC0496DDE129"
+}

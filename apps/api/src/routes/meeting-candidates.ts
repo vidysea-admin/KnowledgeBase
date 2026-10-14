@@ -53,6 +53,7 @@ export function createMeetingCandidatesRouter(deps: MeetingCandidatesDeps): Rout
     const work = deps.getWorkDatabase?.(req.auth!.tenantId);
     if (work && !isRefusedWorkDb(work)) res.setHeader("X-LKB-Work-DB", work);
     const candidates = await deps.listCandidates(req.auth!.tenantId);
+    res.setHeader("X-LKB-Tenant", req.auth!.tenantId);
     res.status(200).json({ candidates });
   });
 

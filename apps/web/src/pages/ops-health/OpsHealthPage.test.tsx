@@ -1,7 +1,8 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useLayoutEffect } from "react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { App } from "../../App.js";
-import { AuthProvider } from "../../auth/AuthContext.js";
+import { AuthProvider, useAuth } from "../../auth/AuthContext.js";
 import { OpsHealthPage } from "./OpsHealthPage.js";
 import { loadWatchRuns, providerJobsHealth, queueHealth } from "./opsHealthModel.js";
 
@@ -27,6 +28,106 @@ function route(over: Record<string, unknown> = {}) {
 beforeEach(() => { fetchMock.mockReset(); vi.stubGlobal("fetch", fetchMock); localStorage.setItem("lkbApiKey", "sample-key"); });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); localStorage.clear(); window.history.replaceState(null, "", "/"); });
 const mount = () => render(<AuthProvider><OpsHealthPage /></AuthProvider>);
+
+// Layout effects run after DOM commit, before passive effects can erase a leaked snapshot.
+function AuthControls({ commits }: { commits: Array<{ key: string | null; text: string }> }) {
+  const { apiKey, sessionVersion, setApiKey, clearApiKey } = useAuth();
+  useLayoutEffect(() => { commits.push({ key: apiKey, text: document.body.textContent ?? "" }); }, [apiKey, sessionVersion, commits]);
+  return <>
+    <button onClick={() => setApiKey("replacement-key")}>Rotate key</button>
+    <button onClick={clearApiKey}>Sign out</button>
+    <button onClick={() => setApiKey("sample-key")}>Restore key</button>
+    <button onClick={() => { clearApiKey(); setApiKey("sample-key"); }}>Restart session</button>
+    <span data-testid="current-key">{apiKey ? "signed in" : "signed out"}</span>
+  </>;
+}
+function mountWithControls(commits: Array<{ key: string | null; text: string }>) {
+  return render(<AuthProvider><OpsHealthPage /><AuthControls commits={commits} /></AuthProvider>);
+}
+
+test("key rotation discards every old-tenant panel before passive effects run", async () => {
+  const commits: Array<{ key: string | null; text: string }> = [];
+  route(); mountWithControls(commits);
+  await screen.findByText(/3 jobs: 1 pending/);
+  await screen.findByText(/2 jobs: 0 pending/);
+  await screen.findByText(/2 runs, 1 with failures/);
+  fetchMock.mockImplementation(() => new Promise(() => {}));
+  fireEvent.click(screen.getByRole("button", { name: "Rotate key" }));
+  const rotated = commits.find((c) => c.key === "replacement-key");
+  expect(rotated).toBeDefined();
+  expect(rotated!.text).not.toMatch(/3 jobs:|2 jobs:|2 runs,|2026-10-12T10:00:00.000Z/);
+  expect(screen.getAllByRole("status")).toHaveLength(3);
+  expect(fetchMock.mock.calls.slice(-3).every((c) => c[1].headers.authorization === "Bearer replacement-key")).toBe(true);
+});
+
+test("logout and same-key relogin discard old snapshots instead of restoring them", async () => {
+  const commits: Array<{ key: string | null; text: string }> = [];
+  route(); mountWithControls(commits); await screen.findByText(/3 jobs: 1 pending/);
+  fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
+  expect(commits.find((c) => c.key === null)!.text).not.toContain("3 jobs:");
+  expect(screen.queryByRole("region", { name: "Upload queue" })).toBeNull();
+  fetchMock.mockImplementation(() => new Promise(() => {}));
+  fireEvent.click(screen.getByRole("button", { name: "Restore key" }));
+  expect(commits.at(-1)!.key).toBe("sample-key");
+  expect(commits.at(-1)!.text).not.toContain("3 jobs:");
+  expect(screen.getAllByRole("status")).toHaveLength(3);
+});
+
+test.each(["Restore key", "Restart session"])("%s discards same-key snapshots even when the credential never changes in a commit", async (button) => {
+  const commits: Array<{ key: string | null; text: string }> = [];
+  route(); mountWithControls(commits);
+  await screen.findByText(/3 jobs: 1 pending/);
+  await screen.findByText(/2 jobs: 0 pending/);
+  await screen.findByText(/2 runs, 1 with failures/);
+  const before = commits.length;
+  fetchMock.mockImplementation(() => new Promise(() => {}));
+  fireEvent.click(screen.getByRole("button", { name: button }));
+  expect(commits.length).toBeGreaterThan(before);
+  expect(commits.at(-1)!.key).toBe("sample-key");
+  expect(commits.at(-1)!.text).not.toMatch(/3 jobs:|2 jobs:|2 runs,/);
+  expect(screen.getAllByRole("status")).toHaveLength(3);
+});
+
+test("late old-key success, error and 401 cannot overwrite panels or invalidate the replacement", async () => {
+  const pending: Array<{ path: string; resolve: (value: ReturnType<typeof ok>) => void }> = [];
+  const empty = { "/activity-health": { ...queue, jobs: [] }, "/jobs": { jobs: [], limit: 50, truncated: false },
+    "/watch-runs": { ...runs, runs: [], summary: { runs: 0, runsWithFailures: 0, totalDriveFailed: 0, totalErrors: 0, lastFailureAt: null } } };
+  fetchMock.mockImplementation((url: string, init: { headers: { authorization: string } }) => {
+    const path = new URL(url, "http://x").pathname;
+    if (init.headers.authorization === "Bearer sample-key") return new Promise((resolve) => pending.push({ path, resolve }));
+    return Promise.resolve(ok(empty[path as keyof typeof empty]));
+  });
+  mountWithControls([]); expect(pending).toHaveLength(3);
+  fireEvent.click(screen.getByRole("button", { name: "Rotate key" }));
+  await screen.findByText("No upload jobs recorded yet.");
+  await screen.findByText("No provider jobs recorded yet.");
+  await screen.findByText("No watcher runs recorded yet.");
+  await act(async () => {
+    pending.find((p) => p.path === "/activity-health")!.resolve(ok({ message: "old failure" }, 401));
+    pending.find((p) => p.path === "/jobs")!.resolve(ok({ message: "old failure" }, 503));
+    pending.find((p) => p.path === "/watch-runs")!.resolve(ok(runs));
+  });
+  await waitFor(() => expect(localStorage.getItem("lkbApiKey")).toBe("replacement-key"));
+  await waitFor(() => expect(screen.getByText("No watcher runs recorded yet.")).toBeInTheDocument());
+  expect(screen.getByTestId("current-key")).toHaveTextContent("signed in");
+  expect(screen.queryByRole("alert")).toBeNull();
+  expect(screen.queryByText(/2 runs, 1 with failures/)).toBeNull();
+});
+
+test("an old same-key 401 after logout and relogin cannot clear the restored operations session", async () => {
+  const pending: Array<(response: ReturnType<typeof ok>) => void> = [];
+  fetchMock.mockImplementation(() => new Promise((resolve) => { pending.push(resolve); }));
+  mountWithControls([]); expect(pending).toHaveLength(3);
+  fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
+  route();
+  fireEvent.click(screen.getByRole("button", { name: "Restore key" }));
+  await screen.findByText(/3 jobs: 1 pending/);
+  await act(async () => { for (const resolve of pending) resolve(ok({ message: "old session" }, 401)); });
+  expect(screen.getByTestId("current-key")).toHaveTextContent("signed in");
+  expect(localStorage.getItem("lkbApiKey")).toBe("sample-key");
+  expect(screen.getByText(/3 jobs: 1 pending/)).toBeInTheDocument();
+  expect(screen.queryByText("Sign in with an API key to view operations health.")).toBeNull();
+});
 
 test("renders failures, errors, retries and last failure from all three sources, GET only with the bearer key", async () => {
   route(); mount();

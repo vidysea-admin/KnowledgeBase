@@ -1,0 +1,5 @@
+{
+  "command": "node scripts/gen-types.mjs --check",
+  "exitCode": 0,
+  "durationSeconds": 0.6635583
+}

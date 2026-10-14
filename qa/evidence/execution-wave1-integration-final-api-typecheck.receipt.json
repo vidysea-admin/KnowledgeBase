@@ -1,0 +1,10 @@
+{
+  "Command": "node node_modules/typescript/bin/tsc --noEmit -p apps/api/tsconfig.json",
+  "StartedUtc": "2026-10-14T09:23:28.1377780Z",
+  "EndedUtc": "2026-10-14T09:23:35.1904766Z",
+  "DurationSeconds": 7.0526986,
+  "ExitCode": 0,
+  "TimedOut": false,
+  "Stdout": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\execution-wave1-integration-final-api-typecheck.stdout.txt",
+  "Stderr": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\execution-wave1-integration-final-api-typecheck.stderr.txt"
+}

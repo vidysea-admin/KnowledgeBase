@@ -18,6 +18,33 @@ function seededMeetingCandidates() {
   return deps;
 }
 
+test("ISS-TENANTSIG-001 / ISS-WIREPRE-001: gmail+calendar keys receive their authenticated tenant without sessions scope", { timeout: 10_000 }, async () => {
+  const server = await startTestServer(buildTestDeps({ meetingCandidates: seededMeetingCandidates(), keyStore: fakeKeyStore({
+    "one": { tenantId: "tenant-1", scopes: ["gmail", "calendar"] },
+    "two": { tenantId: "tenant-2", scopes: ["gmail", "calendar"] },
+    "no-gmail": { tenantId: "tenant-1", scopes: ["calendar"] },
+  }) }));
+  try {
+    for (const [key, tenant, count] of [["one", "tenant-1", 2], ["two", "tenant-2", 0]] as const) {
+      const res = await fetch(`${server.baseUrl}/meeting-candidates?tenantId=forged`, {
+        headers: { authorization: `Bearer ${key}`, "X-LKB-Tenant": "forged" }, signal: AbortSignal.timeout(3_000),
+      });
+      assert.equal(res.status, 200); assert.equal(res.headers.get("x-lkb-tenant"), tenant);
+      assert.equal((await res.json() as { candidates: unknown[] }).candidates.length, count);
+    }
+    for (const [key, status] of [["no-gmail", 403], ["unknown", 401]] as const) {
+      const res = await fetch(`${server.baseUrl}/meeting-candidates`, {
+        headers: { authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(3_000),
+      });
+      assert.equal(res.status, status); assert.equal(res.headers.get("x-lkb-tenant"), null); await res.text();
+    }
+    const sessions = await fetch(`${server.baseUrl}/webinar-operations`, {
+      headers: { authorization: "Bearer one" }, signal: AbortSignal.timeout(3_000),
+    });
+    assert.equal(sessions.status, 403); await sessions.text();
+  } finally { await server.close(); }
+});
+
 test("ISS-359 recorded reproduction 1: implicit tenant-1 fixture rows are invisible to tenant-2", async () => {
   const deps = seededMeetingCandidates();
   assert.equal((await deps.listCandidates("tenant-1")).length, 2, "owner positive control");

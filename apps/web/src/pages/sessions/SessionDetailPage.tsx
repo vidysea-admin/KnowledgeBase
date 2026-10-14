@@ -5,6 +5,7 @@ import { getSession, getSessionMedia, streamSessionMedia } from "../../api/sessi
 import { ApiError } from "../../api/client.js";
 import type { SessionDetail } from "../../api/types.js";
 import { SpeakerSuggestions } from "./SpeakerSuggestions.js";
+import { GroundedContentPanel } from "./grounded/GroundedContentPanel.js";
 
 const MAX_TURNS_SHOWN = 200;
 
@@ -135,6 +136,7 @@ export function SessionDetailPage(): React.ReactElement {
       </div>
 
       <SpeakerSuggestions apiKey={apiKey} sessionId={detail.session._id} />
+      <GroundedContentPanel apiKey={apiKey} sessionId={detail.session._id} />
 
       {detail.media && <div className="card">
         <div className="section-title">Recording</div>

@@ -7,7 +7,7 @@ import { processVideo, keyframeOcrHook } from './process-video.mjs';
 
 // T-041 wiring. FAKES ONLY: fake media commands, fake hook, fake transport. No network, no model, no real ffmpeg.
 const turns = [{ _id: 'turn-1', tenantId: 'test-tenant', sessionId: 'session-1', tStart: 0, tEnd: 2, text: 'A speaker claim.', speakerRef: 'Speaker 1' }];
-function fixture(t) {
+function fixture(t, duration = 2) {
   const root = mkdtempSync(join(tmpdir(), 'lkb-vslides-'));
   const dir = join(root, 'data', 'toc-migrated', 'session-1');
   mkdirSync(dir, { recursive: true });
@@ -15,7 +15,7 @@ function fixture(t) {
   writeFileSync(join(root, 'recording.webm'), 'media');
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const command = async (binary, args) => {
-    if (binary === 'ffprobe') return { stdout: JSON.stringify({ format: { duration: 2 }, streams: [{ codec_type: 'video' }] }) };
+    if (binary === 'ffprobe') return { stdout: JSON.stringify({ format: { duration }, streams: [{ codec_type: 'video' }] }) };
     const out = dirname(args.at(-1));
     writeFileSync(join(out, 'frame-000001.jpg'), 'pixels-A');
     writeFileSync(join(out, 'frame-000002.jpg'), 'pixels-B');
@@ -61,6 +61,7 @@ test('flag on: hook gets the video, turns mapped to align shape, a temp dir that
       ocrErrors: [{ frameId: 'f1', code: 'ocr-failed', attempts: 4 }] };
   } });
   assert.match(seen.video, /recording\.webm$/);
+  assert.equal(seen.endSec, 2);
   assert.deepEqual(seen.turns, [{ id: 'turn-1', tStart: 0, tEnd: 2, speakerRef: 'Speaker 1' }]);
   assert.ok(!existsSync(seen.outDir), 'temporary keyframe PNGs are not retained');
   assert.deepEqual(state.slideAlignment, { status: 'done', keyframeCount: 2, ocrErrorCount: 1 });
@@ -97,9 +98,45 @@ test('keyframeOcrHook: builds primary + fallback OCR on the gemini route from en
   ];
   const env = { GEMINI_API_KEY: 'K', WEBINAR_VISION_MODEL: 'm-primary', LKB_KEYFRAME_OCR: '1', LKB_KEYFRAME_OCR_FALLBACK_MODEL: 'm-fallback' };
   const hook = await keyframeOcrHook(env, transport, load);
-  assert.deepEqual(await hook({ video: 'v', outDir: 'o', turns: [] }), { status: 'done' });
+  assert.deepEqual(await hook({ video: 'v', outDir: 'o', turns: [], endSec: 2.3 }), { status: 'done' });
   assert.equal(got.env, env); assert.equal(got.ocr, 'ocr:m-primary'); assert.deepEqual(got.ocrRetry, { fallback: 'ocr:m-fallback' });
+  assert.deepEqual(got.pipeline, { endSec: 2.3 });
   const noFb = await keyframeOcrHook({ ...env, LKB_KEYFRAME_OCR_FALLBACK_MODEL: '' }, transport, load);
   await noFb({ video: 'v', outDir: 'o', turns: [] });
   assert.equal(got.ocrRetry.fallback, undefined);
+});
+
+test('fresh and reused video bound final OCR slide and turn overlap to the probed recording duration', async (t) => {
+  const { runKeyframeOcrPostProcess } = await import('../../packages/core/src/keyframes/post-process.ts');
+  const { extractSlideTurnAlignment } = await import('../../packages/core/src/keyframes/extract.ts');
+  const f = fixture(t, 2.3);
+  // The allowed 0.5s transcript tolerance must not lengthen actual screen evidence.
+  writeFileSync(join(f.dir, 'turns.json'), JSON.stringify([{ ...turns[0], tEnd: 2.6 }]));
+  const received = [];
+  const load = async () => [
+    { runKeyframeOcrPostProcess: (input) => {
+      received.push(input.pipeline.endSec);
+      return runKeyframeOcrPostProcess({ ...input, extract: (video, options) => extractSlideTurnAlignment(video, {
+        ...options, intervalSec: 2, exec: async (_command, args) => ({
+          code: 0, stdout: args.includes('rawvideo') ? Buffer.alloc(72 * 2) : Buffer.alloc(0),
+          stderr: '', timedOut: false, truncated: false,
+        }),
+      }) });
+    } },
+    { createGeminiVisionOcr: () => async () => ({ text: 'Synthetic visible slide' }) },
+  ];
+  const slideAlignment = await keyframeOcrHook({ LKB_KEYFRAME_OCR: '1' }, undefined, load);
+  for (const reused of [false, true]) {
+    const state = await processVideo({ ...f.input, slideAlignment });
+    assert.equal(Boolean(state.reused), reused);
+    assert.equal(state.slideAlignment.status, 'done');
+    const { alignment } = JSON.parse(readFileSync(join(f.dir, 'slide-alignment.json'), 'utf8'));
+    assert.deepEqual(alignment.errors, []);
+    assert.equal(alignment.slides.length, 1);
+    assert.equal(alignment.slides[0].to, 2.3);
+    assert.equal(alignment.turns[0].attachments[0].to, 2.3);
+    assert.equal(alignment.turns[0].attachments[0].overlapSec, 2.3);
+    assert.ok(!JSON.stringify(alignment).includes('Synthetic visible slide'));
+  }
+  assert.deepEqual(received, [2.3, 2.3]);
 });

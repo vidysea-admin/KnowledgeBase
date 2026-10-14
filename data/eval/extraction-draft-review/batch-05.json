@@ -1,0 +1,1569 @@
+{
+  "version": 1,
+  "batch": 5,
+  "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+  "sourcePacket": {
+    "path": "data/eval/extraction-adjudication-packet.json",
+    "sha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175"
+  },
+  "humanGold": false,
+  "sourceSessions": [
+    {
+      "caseId": "2026-07-03-inside-the-uc-session",
+      "tenantId": "toc",
+      "sessionId": "2026-07-03-inside-the-uc-session",
+      "sourceBindingSha256": "4b3636653f9d1c0d1bc486f7caefd4a67aa21cad4357a6ba529f6fa58c4e4e42",
+      "sourceBinding": {
+        "caseId": "2026-07-03-inside-the-uc-session",
+        "tenantId": "toc",
+        "sessionId": "2026-07-03-inside-the-uc-session",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/claims.json",
+            "sha256": "e0985b468082b68113910ee5cb47a2f46d1654698e5eeccab766f218a6770b52",
+            "normalizedLfSha256": "0dbf689c7d2992fd1a3a62d2d6f1ef9e6ae211c8370f4d3e03c2bc57ee62a7f7",
+            "bytes": 1644
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+            "sha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+            "normalizedLfSha256": "cea1ea840042fee4572f42f4406ba7a0e30b5a184c1f2dc9f101d961a0581858",
+            "bytes": 63682
+          }
+        }
+      },
+      "sourceTurns": 50,
+      "sourceClaims": 4,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+          "bytes": 76162
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "0dbf689c7d2992fd1a3a62d2d6f1ef9e6ae211c8370f4d3e03c2bc57ee62a7f7",
+          "bytes": 1591
+        }
+      }
+    },
+    {
+      "caseId": "2026-07-08-beyond-black-robes-law-careers",
+      "tenantId": "toc",
+      "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+      "sourceBindingSha256": "24e56f8e12b9d2aa9d492448f91033467d0bc4826699a53ff01f506930b49abf",
+      "sourceBinding": {
+        "caseId": "2026-07-08-beyond-black-robes-law-careers",
+        "tenantId": "toc",
+        "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/claims.json",
+            "sha256": "814c6392009f12f6c8551e47d582844b3250dd012065ddcd8ba4efee5ab55141",
+            "normalizedLfSha256": "b591a5b04ad8987d64278bb0b09239a696e42d780bdaca69d93d122c541d5c25",
+            "bytes": 1651
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/turns.json",
+            "sha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+            "normalizedLfSha256": "75d65d97c41f237fe7b75a440fa932ce2001c2e0f1a8acb3e8ea2365c78975b8",
+            "bytes": 110046
+          }
+        }
+      },
+      "sourceTurns": 134,
+      "sourceClaims": 3,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+          "bytes": 123704
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "b591a5b04ad8987d64278bb0b09239a696e42d780bdaca69d93d122c541d5c25",
+          "bytes": 1607
+        }
+      }
+    },
+    {
+      "caseId": "2026-07-15-creative-futures",
+      "tenantId": "toc",
+      "sessionId": "2026-07-15-creative-futures",
+      "sourceBindingSha256": "bf999944a72661be786d0c6d5ddca6fc86caaeb531b29191fc63560f37761218",
+      "sourceBinding": {
+        "caseId": "2026-07-15-creative-futures",
+        "tenantId": "toc",
+        "sessionId": "2026-07-15-creative-futures",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-07-15-creative-futures/claims.json",
+            "sha256": "a441c46403478c2dc48301c3837d1c815a17ce9d20ce761e59cdbf38d577362f",
+            "normalizedLfSha256": "2c886ed266acc9f64dcbf0737958d4ef1001d8466aba56124362c57a735b4c99",
+            "bytes": 1255
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+            "sha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+            "normalizedLfSha256": "e0802d0f7934e41f9982924fcf813e57d5a67a205ebff85c4d9a36785e6e1288",
+            "bytes": 160163
+          }
+        }
+      },
+      "sourceTurns": 269,
+      "sourceClaims": 3,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "53ff3b19e362cce7e8caa46e68495236da55ca289067028700649d68939554ea",
+          "bytes": 127884
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-15-creative-futures/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "2c886ed266acc9f64dcbf0737958d4ef1001d8466aba56124362c57a735b4c99",
+          "bytes": 1215
+        }
+      }
+    },
+    {
+      "caseId": "2026-07-22-uniaccess-cept-university",
+      "tenantId": "toc",
+      "sessionId": "2026-07-22-uniaccess-cept-university",
+      "sourceBindingSha256": "bdbc646fff76ad6468ecd263b89659c0a3b01c30c20f685fc28deaee767ab14a",
+      "sourceBinding": {
+        "caseId": "2026-07-22-uniaccess-cept-university",
+        "tenantId": "toc",
+        "sessionId": "2026-07-22-uniaccess-cept-university",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/claims.json",
+            "sha256": "62dd1a9ebb3c32d8ab01724ed9a1e1ba322cce12032db727d3d853bbcb9e67e3",
+            "normalizedLfSha256": "7fcde036a5b9053f02340eb2679bc4dc04f0656df9858bb43fe29ed7619309a7",
+            "bytes": 1361
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+            "sha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+            "normalizedLfSha256": "27a260ca24052977071f2b4ccf4fbb25a844d316ccc0cfd92d53243cf94bb773",
+            "bytes": 44699
+          }
+        }
+      },
+      "sourceTurns": 56,
+      "sourceClaims": 3,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "f41764fd45c53cabc8c4bd9ca04c16091da302e66ecd5eea253a9fd50f736d05",
+          "bytes": 48428
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "7fcde036a5b9053f02340eb2679bc4dc04f0656df9858bb43fe29ed7619309a7",
+          "bytes": 1317
+        }
+      }
+    }
+  ],
+  "entries": [
+    {
+      "ordinal": 41,
+      "claimId": "2026-07-03-inside-the-uc-session-c04",
+      "sessionId": "2026-07-03-inside-the-uc-session",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "53e64545462cb62840491f0d4b4ffea681f6428caba0325e4c2abea0403d586d",
+      "sourceBindingSha256": "4b3636653f9d1c0d1bc486f7caefd4a67aa21cad4357a6ba529f6fa58c4e4e42",
+      "persistedClaim": {
+        "_id": "2026-07-03-inside-the-uc-session-c04",
+        "tenantId": "toc",
+        "text": "UC Riverside's non-resident merit scholarship for international students can go up to $89,100 spread across 4 years.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-03-inside-the-uc-session-t016",
+            "sessionId": "2026-07-03-inside-the-uc-session"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-03-inside-the-uc-session",
+          "turnId": "2026-07-03-inside-the-uc-session-t016",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+              "sha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+              "normalizedLfSha256": "cea1ea840042fee4572f42f4406ba7a0e30b5a184c1f2dc9f101d961a0581858",
+              "bytes": 63682
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-03-inside-the-uc-session-t016",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-03-inside-the-uc-session",
+                  "speakerRef": "Amrita",
+                  "tStart": 262,
+                  "tEnd": 297,
+                  "text": "Awesome. So, all of you can pat your back for getting the answers right. Um, and I think what we'll do in the interest of time is skip the next poll, maybe we'll bring it up back later when we're, you know, but I just want to, you know, Aastha, Beauty, and Vaishnavi hand it to you to lead in, you know, to start the session with the overview of the UC system, and then we move into the application, and then particularly the PIQs and, you know, that's the order in which we are going to go over today's session. Thank you."
+                },
+                "textSha256": "1159fc6a68bf0cf19fb3e5969867f4ad88d3c8d06bd9606f1ee148ec47cd0259"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+              "bytes": 76162
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-03-inside-the-uc-session-t016",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-03-inside-the-uc-session",
+                  "speakerRef": "unknown",
+                  "tStart": 353,
+                  "tEnd": 893,
+                  "text": "Aastha Chhikara: Perfect. Thank you all so much. So taking us directly into, you know, the part of the presentation that has a lot of learning, you know, involved. So, University of California, like we have, you know, seen in the poll as well, there are 10, you know, campuses. And ideally the University of California, you know, campuses are very beautifully situated across the entire state of California. You can see my mouse moving with the state as well. So there are four UCs in Northern California, there are five UCs in Southern California. Now, the University of California system is a public university system. You have—may have heard of public universities, private universities in the U.S., state universities as well. So the UC system and the focus areas and, you know, what the UCs really stand out for, or why students actually want to come and study at a University of California campus: The gist of that you can see on the right-hand side of your screen. So one of course is academic and research excellence. So when we're talking about even undergraduate education, you have opportunities to do research, you have opportunities to work with faculty, and of course you're essentially studying and learning with faculty that is required to do research while they're teaching students as well. So that's an ongoing process that they're a part of, and you as a student, you know, also have the option, you know, to join them as well. The second thing is our campuses, in terms of the location, they're very nicely spread out, you know, throughout the entire state. While they're spread out, they're also located very close to, you know, hubs that are important for students right from the bachelor's level to start exploring, you know, options in terms of internships and opportunities for themselves as well, right? So the campuses are very diverse, even the programs and the majors that they may study are very, very diverse across the campuses. We have, you know, a link that we'll be sharing, you know, and different links that we'll be sharing with you through the course of this, but at this time please know that you can apply, you know, to so many different majors at any of the campuses all through just this one University of California, you know, application that one student does. So out of these, four UCs you will see up in the north: UC Davis, UC Berkeley, Santa Cruz, and Merced. Now these four UCs are in and around the Silicon Valley area, very ideally situated as well. And then moving further south to Southern California, you have Santa Barbara, you have Los Angeles, Riverside, Irvine, and San Diego. Now these five UCs are actually close to the entertainment industry, which is near Los Angeles; the agricultural industry near Riverside; and also the biotech industry, which is Oceanside area. It's actually in between Irvine, Riverside, and San Diego area. So ideally even in terms of, you know, prospects that students, you know, see for their future as well, there's a lot that you can learn in and around this area. Also, as a University of California student, you get to be part of the fabulous alumni network that you can, you know, use and also, you know, support in the future as well. All of the campuses are, you know, they're not stand-alone buildings; they've been around for over 100 years. Some campuses, you know, even more, and some campuses are, you know, newer campuses as well. But they all offer, you know, very, very vibrant student life. There's a lot of resources in terms of like a shared library that is actually shared between all of the UCs together, even in terms of, you know, extracurriculars or learning opportunities outside of classrooms as well. These, you know, organizations and clubs, you know, that we have to offer on campus, actually are offered at a majority of these campuses. If we feel we don't even find, you know, one organization that I want to be part of, you're very welcome to actually create one with five other students and, you know, an advisor, faculty advisor, you know, as well. All of these campuses are globally recognized. All of the campuses also fall amongst the top 100 institutions in the U.S. according to the U.S. News Report as well. So, yeah, globally recognized institutions, and some of the campuses do also offer scholarships. So this is one big myth that I want to, you know, sort of bust right now and really clarify that the UC system does offer scholarships for international students, out-of-state students as well, and we will talk about that during, you know, our presentation also. So in the interest of time, I want to quickly, you know, now start with institutional introductions, and then we will, you know, take you all through the University of California application. The University of California application, you can see in the center of this slide, these essentially are the only sections on your application. So it is pretty, you know, easy when you look at it like this. When you're filling it out, we recommend that you do it sequentially, just so that you don't miss out on any one of the subsections that does open up in your application. But essentially it's an \"About you\" section in which we learn about you, where you're studying, where the student is from—which city, which country, which place they're from—their family, how many siblings they have, you know, how their parents have been supporting them; different campuses and majors is, you know, what you get to pick and choose—we'll take you through that as well; the academic history; activities and awards; and scholarships—now these are the three and the personal insight, are the three major sections that you will essentially be, you know, focusing on today. So before we start the application, one quick, you know, round of introduction to our campuses. First I'm going to focus on Riverside, that's the institution and the campus that I represent. You can see it in my background as well. So University of California, Riverside is in the Southern California region. We're about an hour east of Los Angeles, about an hour and a half north of Riverside—north of San Diego, in the city called Riverside. Now, one of my favorite parts of having been an international student studying in Southern California is just the access to opportunities where you're studying as an undergrad student. So at Riverside, you actually are in the center where you can essentially reach the beaches, the ski mountains, Disneyland, Palm Springs, Temecula—all of these places within, you know, between 45 minutes to an hour and a half's drive. Even further south down to Mexico in 2 hours. So ideally, in terms of, you know, things that you want to explore with friends, you want to, you know, meet new people... California itself, you know, it's a very, very diverse, you know, state, welcoming students and people from all nationalities. But, yeah, you won't find anything that you would miss essentially in the Southern California region. You'd find a lot of Indian students and Indian families, and, you know, families from around the world, you know, as well. So UC Riverside, I just want to highlight maybe a couple of programs, you know, like our Psychology, our Entomology program, our Physics, Astrophysics concentration area. We are one of the UCs that does offer Business Analytics and Business Administration as well. And even in terms of the support that students do require, so we have a set international, you know, office that will help students, you know, figure out how to navigate coming to a new country. I do want to highlight something: So of course UC campuses do also have Nobel laureates that are teaching students as well. So UC Riverside actually has two Nobel laureates, one in Physics and one in Chemistry, Dr. Barish and Dr. Strock, and they are teaching students biosciences as well. That's our mascot on the very left, Scotty the Bear. And with regards to scholarship, we do cover more than one year's tuition, living expenses, personal expenses with the Academic Merit Scholarship that students can, you know, get as well. So this scholarship is based off of the GPA that students essentially have, and this scholarship goes up to $89,100, and that is spread across your 4 years. So I will now pass on to UC Merced, taking you guys up north."
+                },
+                "textSha256": "4da089f68573b982ffd1d89c280eea6d6930ac49f442659ffb031791f7d9def1"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turn introduces the session agenda without Riverside scholarship eligibility, amount, or duration.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 42,
+      "claimId": "2026-07-08-beyond-black-robes-law-careers-c01",
+      "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "857067072e9c70c29f2af8ec59c521e276e31abe56c17e657cd2654b1efcbe63",
+      "sourceBindingSha256": "24e56f8e12b9d2aa9d492448f91033467d0bc4826699a53ff01f506930b49abf",
+      "persistedClaim": {
+        "_id": "2026-07-08-beyond-black-robes-law-careers-c01",
+        "tenantId": "toc",
+        "text": "A student who completes an undergraduate law degree abroad and wants to practice in India must complete a mandatory 2-year Bar Council of India bridge course.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-08-beyond-black-robes-law-careers-t095",
+            "sessionId": "2026-07-08-beyond-black-robes-law-careers"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+          "turnId": "2026-07-08-beyond-black-robes-law-careers-t095",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/turns.json",
+              "sha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+              "normalizedLfSha256": "75d65d97c41f237fe7b75a440fa932ce2001c2e0f1a8acb3e8ea2365c78975b8",
+              "bytes": 110046
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-08-beyond-black-robes-law-careers-t095",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+                  "speakerRef": "Anchal",
+                  "tStart": 3547,
+                  "tEnd": 3552,
+                  "text": "Yes, who will judge. Yes, absolutely. I think we've had a fabulous conversation, and I want to wrap it up in the benefit of time, because you two learned men have given me a full download, and I think all of us a full download, onto Law as a career avenue and how it's not linear anymore, and how it's an ecosystem of opportunities. And whether it's choosing the right institution, or discovering an emerging field uh like ADR, or policy, or compliance, the success today comes from making that informed decision, rather than just simply following tradition. Uh, I really feel that you guys have really done a fabulous job by decoding Law for us today, and and careers in Law, and thank you um to everybody who's been part of this session today, and stayed till the end. I'm not ending this here, I'm opening the rather the floor for conversation, but before I do that, I want to invite Bhakti, because she wants to say a couple of words."
+                },
+                "textSha256": "b9bdc447e343473fa00dac285ecf971bb0672773d44bfc5a7698fb6d01fd9163"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+              "bytes": 123704
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-08-beyond-black-robes-law-careers-t095",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+                  "speakerRef": "unknown",
+                  "tStart": 3133,
+                  "tEnd": 3164,
+                  "text": "Harsh Vardhan Tiwari: Sir, you have actually answered, sir. There's nothing more to be added. It's just like that, see, understand this framework: if you want to work in India, one thing which you will need is that you will need to do a bridge course which is conducted by Bar Council of India. So it is itself a 2-year program. So you go abroad, do a 3-year program, come back to India, do another 2-year program, it's eventually 5-year program! And you're eventually doing the same work."
+                },
+                "textSha256": "184d3d65cb1ba8ea034547eaaf02a1cc7cc93902f5d3194d872afb3ef50f7ab5"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turn summarizes law-career opportunities and wraps the discussion; it states no foreign-degree bridge-course requirement.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 43,
+      "claimId": "2026-07-08-beyond-black-robes-law-careers-c02",
+      "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "7e7ca03ef9e9b841082c847399a9688eb85efa7a173677ffd0bae7560c483c43",
+      "sourceBindingSha256": "24e56f8e12b9d2aa9d492448f91033467d0bc4826699a53ff01f506930b49abf",
+      "persistedClaim": {
+        "_id": "2026-07-08-beyond-black-robes-law-careers-c02",
+        "tenantId": "toc",
+        "text": "Shardul Amarchand Mangaldas adopted Harvey AI in late September 2025, and other law firms have adopted similar AI tools since.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-08-beyond-black-robes-law-careers-t115",
+            "sessionId": "2026-07-08-beyond-black-robes-law-careers"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+          "turnId": "2026-07-08-beyond-black-robes-law-careers-t115",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/turns.json",
+              "sha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+              "normalizedLfSha256": "75d65d97c41f237fe7b75a440fa932ce2001c2e0f1a8acb3e8ea2365c78975b8",
+              "bytes": 110046
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-08-beyond-black-robes-law-careers-t115",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+                  "speakerRef": "Harshwardhan Tiwari",
+                  "tStart": 3852,
+                  "tEnd": 3869,
+                  "text": "Uh, so, Ma'am, uh, the usual answer is yes. Uh, any organization for that matter, and I will I will be very candid with you. I was working before this, uh, at a university, another university in North India. Even that had a legal team. In fact, the one where I am working right now, has a legal team. Anybody who is investing or is providing some kind of a, uh, legal legal recourse in this country, has a panel of lawyers. And, so that goes equally for consulting firms. And most of the times, in, in USA, if you look into, these consulting firms have their legal division as well. So, you sometimes read into Goldman Sachs is advising somebody. Or, if you look into the current IPO market in the country and you'll read those news, you'll figure it out these international consulting firms and their legal division is eventually helping them, to settle this IPO in- entire aspect of IPO. So, my answer is yes."
+                },
+                "textSha256": "fad4f0293a4ce74beb5176a0cbc77b09781730a2777d2dd31499808653789eb7"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+              "bytes": 123704
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-08-beyond-black-robes-law-careers-t115",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+                  "speakerRef": "unknown",
+                  "tStart": 3643,
+                  "tEnd": 3700,
+                  "text": "Harsh Vardhan Tiwari: So junior lawyers are mostly about doing research, making case summaries, doing some kind of a case law analysis, or preparing a brief, or reviewing a document. Now consider this a human being doing it for like all 16, 18 hours and putting that entire thing on just artificial intelligence. For that matter, I will tell you that major law firms in India have already employed the artificial intelligence. Shardul Amarchand Mangaldas employed Harvey AI in late September 2025, followed by other law firms which also went on with Lucidity / Lucio AI for that matter, or Claude for Legal by Anthropic, they moved on to that. The reason was that, because all this role which were basically so-called a clerical role did not involve that kind of a reasoning or dealing with the client or understanding what they need. Yes, they can be replaced."
+                },
+                "textSha256": "86685998d3f1eee11db38145e16620ca4beacb2fa6c0fbf287fd7127b22f12d5"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turn describes legal teams and consulting firms, without Harvey AI, the named law firm, or an adoption date.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 44,
+      "claimId": "2026-07-08-beyond-black-robes-law-careers-c03",
+      "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "5464fba92635d8db37350e84f8ba9d43ad123dc52e7201500c42c095defe8d4a",
+      "sourceBindingSha256": "24e56f8e12b9d2aa9d492448f91033467d0bc4826699a53ff01f506930b49abf",
+      "persistedClaim": {
+        "_id": "2026-07-08-beyond-black-robes-law-careers-c03",
+        "tenantId": "toc",
+        "text": "Claude for Legal (from Anthropic) is used by law firms alongside tools like Harvey and traditional research platforms (Manupatra, LexisNexis) for tasks such as case summaries.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-08-beyond-black-robes-law-careers-t115",
+            "sessionId": "2026-07-08-beyond-black-robes-law-careers"
+          },
+          {
+            "turnId": "2026-07-08-beyond-black-robes-law-careers-t119",
+            "sessionId": "2026-07-08-beyond-black-robes-law-careers"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+          "turnId": "2026-07-08-beyond-black-robes-law-careers-t115",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/turns.json",
+              "sha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+              "normalizedLfSha256": "75d65d97c41f237fe7b75a440fa932ce2001c2e0f1a8acb3e8ea2365c78975b8",
+              "bytes": 110046
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-08-beyond-black-robes-law-careers-t115",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+                  "speakerRef": "Harshwardhan Tiwari",
+                  "tStart": 3852,
+                  "tEnd": 3869,
+                  "text": "Uh, so, Ma'am, uh, the usual answer is yes. Uh, any organization for that matter, and I will I will be very candid with you. I was working before this, uh, at a university, another university in North India. Even that had a legal team. In fact, the one where I am working right now, has a legal team. Anybody who is investing or is providing some kind of a, uh, legal legal recourse in this country, has a panel of lawyers. And, so that goes equally for consulting firms. And most of the times, in, in USA, if you look into, these consulting firms have their legal division as well. So, you sometimes read into Goldman Sachs is advising somebody. Or, if you look into the current IPO market in the country and you'll read those news, you'll figure it out these international consulting firms and their legal division is eventually helping them, to settle this IPO in- entire aspect of IPO. So, my answer is yes."
+                },
+                "textSha256": "fad4f0293a4ce74beb5176a0cbc77b09781730a2777d2dd31499808653789eb7"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+              "bytes": 123704
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-08-beyond-black-robes-law-careers-t115",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+                  "speakerRef": "unknown",
+                  "tStart": 3643,
+                  "tEnd": 3700,
+                  "text": "Harsh Vardhan Tiwari: So junior lawyers are mostly about doing research, making case summaries, doing some kind of a case law analysis, or preparing a brief, or reviewing a document. Now consider this a human being doing it for like all 16, 18 hours and putting that entire thing on just artificial intelligence. For that matter, I will tell you that major law firms in India have already employed the artificial intelligence. Shardul Amarchand Mangaldas employed Harvey AI in late September 2025, followed by other law firms which also went on with Lucidity / Lucio AI for that matter, or Claude for Legal by Anthropic, they moved on to that. The reason was that, because all this role which were basically so-called a clerical role did not involve that kind of a reasoning or dealing with the client or understanding what they need. Yes, they can be replaced."
+                },
+                "textSha256": "86685998d3f1eee11db38145e16620ca4beacb2fa6c0fbf287fd7127b22f12d5"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        },
+        {
+          "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+          "turnId": "2026-07-08-beyond-black-robes-law-careers-t119",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/turns.json",
+              "sha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+              "normalizedLfSha256": "75d65d97c41f237fe7b75a440fa932ce2001c2e0f1a8acb3e8ea2365c78975b8",
+              "bytes": 110046
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-08-beyond-black-robes-law-careers-t119",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+                  "speakerRef": "Bhakti",
+                  "tStart": 4130,
+                  "tEnd": 4147,
+                  "text": "That answers my question."
+                },
+                "textSha256": "d52006d72e450ea46cc38d3358b02ed9514bd04b839e3e001d373e950ba65e2a"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+              "bytes": 123704
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-08-beyond-black-robes-law-careers-t119",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+                  "speakerRef": "unknown",
+                  "tStart": 3750,
+                  "tEnd": 3799,
+                  "text": "Deepu Krishna: That's where I'm coming to. So even in law schools now students are getting taught that how to use AI to your benefit, because you have to use it. Believe me, I and Harsh when we were in law school there was no AI, but we had softwares like Manupatra, LexisNexis, where we could just put in a keyword about the problem which we are researching and there will be a list of cases relating to it. But now it has become easy. So the same Manupatra and LexisNexis and Claude and Harvey, etc., we just need to go, but still we have to read. It won't create the entire thing. It will not have that kind of a human element that humans will always have. That's why it's called as artificial intelligence. So AI plus human intelligence is important, and this is one of those profession where you will always see a lawyer."
+                },
+                "textSha256": "5e29522c93272ae1bc80d4e4ff8417317b538718b684ae4a43ad8ab0b260b8e8"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turns discuss institutional legal teams and acknowledge an answer; none mention AI tools, research platforms, or case summaries.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 45,
+      "claimId": "2026-07-15-creative-futures-c01",
+      "sessionId": "2026-07-15-creative-futures",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "e89de70798474edf8b965c320f2932d359975aa638ad07a8a7bdf2c6d275588e",
+      "sourceBindingSha256": "bf999944a72661be786d0c6d5ddca6fc86caaeb531b29191fc63560f37761218",
+      "persistedClaim": {
+        "_id": "2026-07-15-creative-futures-c01",
+        "tenantId": "toc",
+        "text": "According to SCAD's presentation, roughly 85% of career success comes from soft skills and 15% from technical skills.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-15-creative-futures-t015",
+            "sessionId": "2026-07-15-creative-futures"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-15-creative-futures",
+          "turnId": "2026-07-15-creative-futures-t015",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+              "sha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+              "normalizedLfSha256": "e0802d0f7934e41f9982924fcf813e57d5a67a205ebff85c4d9a36785e6e1288",
+              "bytes": 160163
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-15-creative-futures-t015",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-15-creative-futures",
+                  "speakerRef": "Emily Lee",
+                  "tStart": 687,
+                  "tEnd": 713,
+                  "text": "Within 29 STEM program, SCAD offers the 11 different schools. We are the most comprehensive art design university in the US. We're the largest, uh we have a lot of great ranking. QS ranking this year, we're number 15. Uh Arts and Objects, we're number 1. Many of our major is top 1 rank by Red Dot Design Award, DesignIntelligence, International Design Awards, and so on and so forth."
+                },
+                "textSha256": "0336c2359f1f62bc85e189b744287b4e16373d17cbc72f6ecbda0ba6cbedeafd"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "53ff3b19e362cce7e8caa46e68495236da55ca289067028700649d68939554ea",
+              "bytes": 127884
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-15-creative-futures-t015",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-15-creative-futures",
+                  "speakerRef": "unknown",
+                  "tStart": 490,
+                  "tEnd": 528,
+                  "text": "The second one to highlight is almost 85% of the career success do come from soft skills and 15 come from the technical skills. And this is the research that coming from Carnegie Foundation, Stanford University Research Center, and Harvard University. And this is actually what SCAD offers, right? So individuals are looking in the creative field; communication and analytical skills are helping them to succeed. And these soft skills are sometimes quite underestimated."
+                },
+                "textSha256": "af50e2cb07ecbe749dff7728867b8a0591c918bceef299e0b162a92d47a01ffc"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": {
+        "source": {
+          "path": "data/eval/extraction-reconciliation-reviewed.json",
+          "sha256": "8aa7ce9c90ae2b83107fdf815e90491194ac4fea830ae79a4b957d52dc5ea0e5",
+          "normalizedLfSha256": "f8f62587cc140e64941af8a7f651712be5a317758816804b012cd3ab12ece35d",
+          "bytes": 14288
+        },
+        "record": {
+          "claimId": "2026-07-15-creative-futures-c01",
+          "sessionId": "2026-07-15-creative-futures",
+          "tenantId": "toc",
+          "claimText": "According to SCAD's presentation, roughly 85% of career success comes from soft skills and 15% from technical skills.",
+          "claimTextSha256": "d7018acbd0a145cb88894309f9690b74001ab6f49cdbd06643ecef2e349658aa",
+          "currentTurnsSha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+          "originalClaimsSha256": "a441c46403478c2dc48301c3837d1c815a17ce9d20ce761e59cdbf38d577362f",
+          "originalEvidence": [
+            {
+              "turnId": "2026-07-15-creative-futures-t015",
+              "sessionId": "2026-07-15-creative-futures"
+            }
+          ],
+          "proposedEvidence": [
+            {
+              "sessionId": "2026-07-15-creative-futures",
+              "turnId": "2026-07-15-creative-futures-t009",
+              "turnTextSha256": "dbcd89e0b43a17ea3b5f0a962c03543782dcf3db1faeb8f1146be56d0d96c70b",
+              "tStart": 491,
+              "tEnd": 524,
+              "speakerRef": "Emily Lee",
+              "reviewRole": "assertion support"
+            }
+          ],
+          "reviewStatus": "INDEPENDENTLY_REVIEWED_REPLACEMENT_PROPOSAL",
+          "rationale": "Directly inspected the complete current cited turn(s). Assertion is supported as presented in the transcript; external factual truth and speaker identity remain separate gates."
+        },
+        "currentCitationContexts": [
+          {
+            "sessionId": "2026-07-15-creative-futures",
+            "turnId": "2026-07-15-creative-futures-t009",
+            "current": {
+              "available": true,
+              "reason": null,
+              "artifact": {
+                "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+                "sha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+                "normalizedLfSha256": "e0802d0f7934e41f9982924fcf813e57d5a67a205ebff85c4d9a36785e6e1288",
+                "bytes": 160163
+              },
+              "matches": [
+                {
+                  "record": {
+                    "_id": "2026-07-15-creative-futures-t009",
+                    "tenantId": "toc",
+                    "sessionId": "2026-07-15-creative-futures",
+                    "speakerRef": "Emily Lee",
+                    "tStart": 491,
+                    "tEnd": 524,
+                    "text": "Second one to highlight, is almost 85% of the career success do come from soft skills, and 15 come from the technical skills. And thi- this is a research that coming from, um, Carnegie Foundation, Stanford University Research Center, and Harvard University. And this is actually what SCAD offers, right? So, individuals are looking in the creative field, um, communication and an- analytical skills are helping them to success, and these soft skills are sometimes,"
+                  },
+                  "textSha256": "dbcd89e0b43a17ea3b5f0a962c03543782dcf3db1faeb8f1146be56d0d96c70b"
+                }
+              ]
+            },
+            "originalMigration": {
+              "available": true,
+              "reason": null,
+              "artifact": {
+                "available": true,
+                "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+                "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+                "sha256": "53ff3b19e362cce7e8caa46e68495236da55ca289067028700649d68939554ea",
+                "bytes": 127884
+              },
+              "matches": [
+                {
+                  "record": {
+                    "_id": "2026-07-15-creative-futures-t009",
+                    "tenantId": "toc",
+                    "sessionId": "2026-07-15-creative-futures",
+                    "speakerRef": "unknown",
+                    "tStart": 303,
+                    "tEnd": 328,
+                    "text": "Emilie Li: Thank you so much. I'm Emilie Li from SCAD. I'm the Associate Director of International Admission, especially overlooking the South Asia market. Me and my team will be traveling heavily to India, to South Asia this fall, and we have been. So, many of you guys may have already been very familiar with SCAD. And I'm so glad to be here again to talk about creative careers, the future of creative careers."
+                  },
+                  "textSha256": "15783410d3f564ff738ff31b91789f461db5adf2a55dfbc20852213cdea2ee3f"
+                }
+              ]
+            },
+            "sameIdContentChanged": true
+          }
+        ]
+      },
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Literal citation discusses SCAD schools and rankings, without career-success skill percentages.",
+        "replacementCitationSupport": "supported",
+        "replacementRationale": "Replacement explicitly attributes almost 85% of career success to soft skills and 15 to technical skills within SCAD's presentation.",
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 46,
+      "claimId": "2026-07-15-creative-futures-c02",
+      "sessionId": "2026-07-15-creative-futures",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "67d76a6ae35e9bef93d7832ede7c236cf2aa2bf64153f276a39635c1c5b68ec8",
+      "sourceBindingSha256": "bf999944a72661be786d0c6d5ddca6fc86caaeb531b29191fc63560f37761218",
+      "persistedClaim": {
+        "_id": "2026-07-15-creative-futures-c02",
+        "tenantId": "toc",
+        "text": "63% of SCAD's degree programs are STEM-designated, which qualifies international graduates for 3 years of OPT.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-15-creative-futures-t019",
+            "sessionId": "2026-07-15-creative-futures"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-15-creative-futures",
+          "turnId": "2026-07-15-creative-futures-t019",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+              "sha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+              "normalizedLfSha256": "e0802d0f7934e41f9982924fcf813e57d5a67a205ebff85c4d9a36785e6e1288",
+              "bytes": 160163
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-15-creative-futures-t019",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-15-creative-futures",
+                  "speakerRef": "Emily Lee",
+                  "tStart": 805,
+                  "tEnd": 831,
+                  "text": "build our classrooms. And Google also, along with Meta, hosts these AI Summit, um, just a great example of what resources our student is using in term of AI, in term of different technology that they're having. And again, we're not shying away from it because the future is going to be led by AI. Instead, we're teaching our student, teaching all of the creatives how they are mastering AI and what they should be creating, and with the AI Summit, we bring the latest news"
+                },
+                "textSha256": "50d278db088a7a5858ffd0903cff2e021104a5df787cfcc206c64ef148aaddcc"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "53ff3b19e362cce7e8caa46e68495236da55ca289067028700649d68939554ea",
+              "bytes": 127884
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-15-creative-futures-t019",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-15-creative-futures",
+                  "speakerRef": "unknown",
+                  "tStart": 649,
+                  "tEnd": 688,
+                  "text": "So at SCAD, we offer 29 STEM programs, which accounts about 63% of the SCAD total degree programs. Things like UI/UX, visual effects, industrial design, game development, architecture—quite a lot of different majors at SCAD are belong to STEM. And of course, STEM in the academic field stands for science, technology, engineering, mathematics. In a more practical field means student get to study after SCAD education, they got to receive a 3-year of OPT post-graduation to help them to work in the US and get internships, get job offers, things like that."
+                },
+                "textSha256": "3c8d5a68b8de2a361b865e4f5c18efbc369aa2caefdfa80bfa79a61f8b0075bd"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turn discusses AI summits and teaching technology, without STEM designation percentages or OPT eligibility.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 47,
+      "claimId": "2026-07-15-creative-futures-c03",
+      "sessionId": "2026-07-15-creative-futures",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "d36c535ad5917a4cc3e9f1fc426da92966cdf965f68235095bf15c2ca2bd70e9",
+      "sourceBindingSha256": "bf999944a72661be786d0c6d5ddca6fc86caaeb531b29191fc63560f37761218",
+      "persistedClaim": {
+        "_id": "2026-07-15-creative-futures-c03",
+        "tenantId": "toc",
+        "text": "SCADpro is SCAD's in-house collaborative innovation studio that pairs students with real companies on live projects.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-15-creative-futures-t026",
+            "sessionId": "2026-07-15-creative-futures"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-15-creative-futures",
+          "turnId": "2026-07-15-creative-futures-t026",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+              "sha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+              "normalizedLfSha256": "e0802d0f7934e41f9982924fcf813e57d5a67a205ebff85c4d9a36785e6e1288",
+              "bytes": 160163
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-15-creative-futures-t026",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-15-creative-futures",
+                  "speakerRef": "spk:1",
+                  "tStart": 1048,
+                  "tEnd": 1078,
+                  "text": "Senior leadership that Google have been phenomenally impressed by those outcomes and the craft that has gone into it and and the teamwork and the collaboration. I can open the Google Maps application, and I can point to a number of things that I know that we talked about in our SCADpro collaboration with them. Working with SCAD students has been really great. They're all so highly motivated, so excited to take on new challenges and provide these very inspirational solutions to our real business challenges. CBS Sports wanted AR graphics for the game."
+                },
+                "textSha256": "570512a95ec8d80acf02f0df83efbc8f4ec812c0fa47879c7a91a5252244e9dd"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "53ff3b19e362cce7e8caa46e68495236da55ca289067028700649d68939554ea",
+              "bytes": 127884
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-15-creative-futures-t026",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-15-creative-futures",
+                  "speakerRef": "unknown",
+                  "tStart": 866,
+                  "tEnd": 899,
+                  "text": "Now, I keep mentioning SCADpro. SCADpro is our collaborative innovation studio. It pairs our student with Fortune 500 companies in a classroom and help them build real industry projects. Now, we have done almost 900-plus projects. 75 of them, product or service, are being launched to the market. And this is just a great way for our student to get real industry experience. And those experiences are accounting towards actual work experience when they're looking for jobs."
+                },
+                "textSha256": "b0dba5c548174b964001f26d5e3c22fa9195357ea1b770e22aa2cb25528b9fb9"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": {
+        "source": {
+          "path": "data/eval/extraction-reconciliation-reviewed.json",
+          "sha256": "8aa7ce9c90ae2b83107fdf815e90491194ac4fea830ae79a4b957d52dc5ea0e5",
+          "normalizedLfSha256": "f8f62587cc140e64941af8a7f651712be5a317758816804b012cd3ab12ece35d",
+          "bytes": 14288
+        },
+        "record": {
+          "claimId": "2026-07-15-creative-futures-c03",
+          "sessionId": "2026-07-15-creative-futures",
+          "tenantId": "toc",
+          "claimText": "SCADpro is SCAD's in-house collaborative innovation studio that pairs students with real companies on live projects.",
+          "claimTextSha256": "f3e3d255fa532f6ffd82cc93f5b34e36f3de0a2a028d6e63df3a4d63f6c7d4b9",
+          "currentTurnsSha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+          "originalClaimsSha256": "a441c46403478c2dc48301c3837d1c815a17ce9d20ce761e59cdbf38d577362f",
+          "originalEvidence": [
+            {
+              "turnId": "2026-07-15-creative-futures-t026",
+              "sessionId": "2026-07-15-creative-futures"
+            }
+          ],
+          "proposedEvidence": [
+            {
+              "sessionId": "2026-07-15-creative-futures",
+              "turnId": "2026-07-15-creative-futures-t021",
+              "turnTextSha256": "92e12dda455f8ce3b3118fa9e35610d7b4b2d8bf7cee94e63871a881a0377a3e",
+              "tStart": 858,
+              "tEnd": 892,
+              "speakerRef": "Emily Lee",
+              "reviewRole": "assertion support"
+            }
+          ],
+          "reviewStatus": "INDEPENDENTLY_REVIEWED_REPLACEMENT_PROPOSAL",
+          "rationale": "Directly inspected the complete current cited turn(s). Assertion is supported as presented in the transcript; external factual truth and speaker identity remain separate gates."
+        },
+        "currentCitationContexts": [
+          {
+            "sessionId": "2026-07-15-creative-futures",
+            "turnId": "2026-07-15-creative-futures-t021",
+            "current": {
+              "available": true,
+              "reason": null,
+              "artifact": {
+                "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+                "sha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+                "normalizedLfSha256": "e0802d0f7934e41f9982924fcf813e57d5a67a205ebff85c4d9a36785e6e1288",
+                "bytes": 160163
+              },
+              "matches": [
+                {
+                  "record": {
+                    "_id": "2026-07-15-creative-futures-t021",
+                    "tenantId": "toc",
+                    "sessionId": "2026-07-15-creative-futures",
+                    "speakerRef": "Emily Lee",
+                    "tStart": 858,
+                    "tEnd": 892,
+                    "text": "uh, very interesting for a lot of the young generations as well. Now I keep mentioning Scadpro. Scadpro is our collaborative innovation studio, it pair a student with Fortune 500 companies in a classroom and help them build a real industry projects. Now, we have done almost 900+ projects, um, 75 of the product or service are being launched to market. And this is just a great way for our student to get real industry experience and those experience are accounting towards actual work experience,"
+                  },
+                  "textSha256": "92e12dda455f8ce3b3118fa9e35610d7b4b2d8bf7cee94e63871a881a0377a3e"
+                }
+              ]
+            },
+            "originalMigration": {
+              "available": true,
+              "reason": null,
+              "artifact": {
+                "available": true,
+                "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+                "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+                "sha256": "53ff3b19e362cce7e8caa46e68495236da55ca289067028700649d68939554ea",
+                "bytes": 127884
+              },
+              "matches": [
+                {
+                  "record": {
+                    "_id": "2026-07-15-creative-futures-t021",
+                    "tenantId": "toc",
+                    "sessionId": "2026-07-15-creative-futures",
+                    "speakerRef": "unknown",
+                    "tStart": 713,
+                    "tEnd": 732,
+                    "text": "Now, with our academic experience, we are developed based on the needs of the industry. And of course, based on the three pillars is everything that we do at SCAD: creativity, business, innovation, and with the need of the industry."
+                  },
+                  "textSha256": "8aaf0339faad71dbf3b308034cad91cc8697db65a6ff5cc1f2e51a532574add0"
+                }
+              ]
+            },
+            "sameIdContentChanged": true
+          }
+        ]
+      },
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "partially_supported",
+        "literalRationale": "Literal citation supports SCADpro student collaboration with Google and real business challenges, but does not define its institutional innovation-studio role.",
+        "replacementCitationSupport": "supported",
+        "replacementRationale": "Replacement defines SCADpro as SCAD's collaborative innovation studio pairing students with Fortune 500 companies on real industry projects.",
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 48,
+      "claimId": "2026-07-22-uniaccess-cept-university-c01",
+      "sessionId": "2026-07-22-uniaccess-cept-university",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "4dae3402aaa167430f186b4761c356a5d60c6c73cea65ec052a188c618285ac8",
+      "sourceBindingSha256": "bdbc646fff76ad6468ecd263b89659c0a3b01c30c20f685fc28deaee767ab14a",
+      "persistedClaim": {
+        "_id": "2026-07-22-uniaccess-cept-university-c01",
+        "tenantId": "toc",
+        "text": "CEPT University was established in 1962 by architect B.V. Doshi.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-22-uniaccess-cept-university-t004",
+            "sessionId": "2026-07-22-uniaccess-cept-university"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-22-uniaccess-cept-university",
+          "turnId": "2026-07-22-uniaccess-cept-university-t004",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+              "sha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+              "normalizedLfSha256": "27a260ca24052977071f2b4ccf4fbb25a844d316ccc0cfd92d53243cf94bb773",
+              "bytes": 44699
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-22-uniaccess-cept-university-t004",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-22-uniaccess-cept-university",
+                  "speakerRef": "Nilesh",
+                  "tStart": 145,
+                  "tEnd": 682,
+                  "text": "Yes. Okay. So, yes. This is the CEPT campus. We are a very small campus out there in Ahmedabad. Like it's so we established in 1962 by B. V. Doshi, who is an architect. We started with the School of Architecture and then subsequently every decade we have added School of Planning, School of Technology, and we also run MBA program. We are following the cross-disciplinary learning since now a four decades. So, our pedagogy is studio-driven and cross-disciplinary. This is CEPT in numbers. We are GSIRF 6. We are the only private university there since 2020. We have a small cohort of 2,100 students. Most of our 70% of our faculties are practitioner. So, they practice apart from teaching at the CEPT. We also have a five-star status in GSIRF Gujarat rating and we are also Center of Excellence. We offer generous means-based and merit-based scholarships. More than 25% of the students every year gets means-based scholarship at CEPT. We also have a lot of travel programs that are talked about in later. So, like we have a lot many IPRs and travel courses that we run. So, what we are known as I told you for studio-based pedagogy. Now, what is the studio-based pedagogy? That forms 70% of the core academic of the CEPT. So, 70% of your credit is a single studio. And a typical studio is a group of 10 to 12 students working in a on a given real-life problem. And the studios are span across L1, L2, L3, L4. Say, L1 is a foundation studio. L2 is a vertical studio where a second and third-year students can be together and they are horizontally also. So, vertical and horizontal, horizontal to the discipline. So, student in architecture can take a studio in civil engineering if they allow. Right? If If many of the studios are offered as a cross-disciplinary where in a faculty offers multiple cohorts. Then L3 is the level four and five, year four and five students, and L4 is a Master students. Some of the Master students can also take an L3 studio and fifth-year students can also take a L4 studio. So, that's how it is vertically and horizontally aligned. Our all programs are five-year. Our all UG programs are five-year, be it a design program or civil engineering program or an urban design and architecture program. Why? Because we run a common foundation program for all of these students. There, like, we prepare students from elementary education to exploratory education. They will have to learn as to how I'll make the choices. They will have to learn as to how I'll work in studios. They will have to learn the designs around it. Right? So, that's where we prepare them in the first year of their education. And this is a single cohort. It has a separate dean and separate institutional framework that we are running since last three decades now. Our syllabus is only 30% fixed, rest of rest of the syllabus is completely choice-based. A student can decide studios. Every year they make choices as to I want to do this studio. If not available, then this is the second studio that I want to do. And the faculty will offer the multiple different kind of the studios. Those are the faculties who are either working at CEPT, CEPT faculty, and some studios are with the industry, some are the with the cross-disciplinary two faculties from the two different department of a studio. So, there are around 100 studios every semester that a student choose from. Then, the second very important choice with the students is the summer and winter school. We offer around 100 specialized summer and winter schools during the summer and winter break and those are travel-based national, travel-based international, and on-campus programs. So, so students have a multiple choice. They can either do it as a credit course or an additional credit course the way they like. And these are the courses where the faculties from outside CEPT, a practitioner from outside CEPT can offer a summer/winter school. So, if you want to offer, you can also offer a school, if gets selected, that's a part of the cohort. And then, students outside the CEPT can also apply for the summer/winter schools. One of the very exciting aspect of CEPT is the exhibitions. Our winter exhibition is the largest, which is typically so best time to visit CEPT is December when the winter exhibition happens. Like, all the work of a studio are on the display. So, you will see entire campus with those final work of the studios displayed there. Summer exhibitions are also there, which happens in the May second week. We have two, two juries during the semester, mid-sem and end-sem. And juries are a board of reviewers. They are among from the industry, alum, practitioner, they all form as a board of reviews and they that keep changing. So, they will not review only the student's work, but the studio work. So, automatically, the faculty review also happens at the same time. Like, every year, the 10 studios are selected as a excellence, bean excellence awards, and there is a separate curated exhibition and catalog released for those excellence exhibitions. We have around 40 active international collaboration. Most of our collaborations are two-way. They are for the student exchange program, collaborative studios are there like they go for summer/winter schools, they are collaborative. They come here, we go there. And then, there are joint research between faculty, students, or a group of faculty and students. We run about 17 PG programs. They are also cross-disciplinary program. So, a civil engineering can apply to all our planning program. Somebody who has graduated in design, they can do architecture program in conservation and regeneration. So, lot of people don't know, but we also run MBA in real estate, MBA in urban management. The way IRMA runs our rural management program, we are the only institute in India who runs an urban management program. In bachelors, we have around 126 in B.Arch, 40 in bachelor of urban design. When it comes to architecture, we accept NATA score. For urban design, we accept NATA or JEE Paper 2 score. Lot of people confused about how the merits are calculated. So, B.Arch and B.U.D. merit has a 50-50 weightage of NATA and board score. So, if a student has scored 90% in board, 120 in NATA because NATA is out of 200, so student merit score will be 75. So, this is the score which is a good score to get into the CEPT. The student can stay positive if his score, merit score of 75, and this is how calculated by 50%. So, this is the only entrance exam which also takes board into account. And we run bachelors in design program. We have communications design, product design, and multidisciplinary design. So, student can decide to remain in multidisciplinary rather than selecting his major. There, the admissions are only through UCEED. We also run a civil engineering program since 1982, so it's one of the oldest civil engineering program at in India. And we have only a small cohort of 40 students there. And there also, we follow the similar studio-based pedagogy. And yes, we are open for counselors. You can schedule a visit at CEPT, a group or an individual visit. We also arrange a lot of workshops in your cities or at the CEPT campus. And if you want to organize a specific workshop, like we have done this with one of our community members in past, we can do that. We have a program ambassadors, so if you are, counseling students and who want more information about CEPT, they can get in touch with the program ambassadors. Link to their names are already there on the website. We organize a lot of public events and webinars. There are open houses, which I usually share on the group. And yes, we maintain this relationship. So, yes, this this is what all about CEPT. Now, if you have any question."
+                },
+                "textSha256": "3fd70be34155e0fbfc0c0dabb63201c765f9776efdc04b98470a663e0efb04b2"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "f41764fd45c53cabc8c4bd9ca04c16091da302e66ecd5eea253a9fd50f736d05",
+              "bytes": 48428
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-22-uniaccess-cept-university-t004",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-22-uniaccess-cept-university",
+                  "speakerRef": "unknown",
+                  "tStart": 145,
+                  "tEnd": 189,
+                  "text": "Nilesh Gotecha: Okay. All right. Slideshow view, okay. So yes, this is the CEPT campus. We are a very small campus out there in Ahmedabad. So we established in 1962 by B.V. Doshi, who is an architect. We started with the School of Architecture, and then subsequently every decade we have added School of Planning, School of Technology, and we also run MBA programs. We are following the cross-disciplinary learning since now four decades. So our pedagogy is studio-driven and cross-disciplinary."
+                },
+                "textSha256": "785b780e367ecc24a05f5b08a6e85ea9e9a269dec6d87e6166f25cf0729ed9a5"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": {
+        "source": {
+          "path": "data/eval/extraction-reconciliation-reviewed.json",
+          "sha256": "8aa7ce9c90ae2b83107fdf815e90491194ac4fea830ae79a4b957d52dc5ea0e5",
+          "normalizedLfSha256": "f8f62587cc140e64941af8a7f651712be5a317758816804b012cd3ab12ece35d",
+          "bytes": 14288
+        },
+        "record": {
+          "claimId": "2026-07-22-uniaccess-cept-university-c01",
+          "sessionId": "2026-07-22-uniaccess-cept-university",
+          "tenantId": "toc",
+          "claimText": "CEPT University was established in 1962 by architect B.V. Doshi.",
+          "claimTextSha256": "414c35876cded96e8cda6935b1fd571beb0e0db32a88ead6ddf6e6d638caf729",
+          "currentTurnsSha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+          "originalClaimsSha256": "62dd1a9ebb3c32d8ab01724ed9a1e1ba322cce12032db727d3d853bbcb9e67e3",
+          "originalEvidence": [
+            {
+              "turnId": "2026-07-22-uniaccess-cept-university-t004",
+              "sessionId": "2026-07-22-uniaccess-cept-university"
+            }
+          ],
+          "proposedEvidence": [
+            {
+              "sessionId": "2026-07-22-uniaccess-cept-university",
+              "turnId": "2026-07-22-uniaccess-cept-university-t004",
+              "turnTextSha256": "3fd70be34155e0fbfc0c0dabb63201c765f9776efdc04b98470a663e0efb04b2",
+              "tStart": 145,
+              "tEnd": 682,
+              "speakerRef": "Nilesh",
+              "reviewRole": "assertion support"
+            }
+          ],
+          "reviewStatus": "INDEPENDENTLY_REVIEWED_REPLACEMENT_PROPOSAL",
+          "rationale": "Directly inspected the complete current cited turn(s). Assertion is supported as presented in the transcript; external factual truth and speaker identity remain separate gates."
+        },
+        "currentCitationContexts": [
+          {
+            "sessionId": "2026-07-22-uniaccess-cept-university",
+            "turnId": "2026-07-22-uniaccess-cept-university-t004",
+            "current": {
+              "available": true,
+              "reason": null,
+              "artifact": {
+                "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+                "sha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+                "normalizedLfSha256": "27a260ca24052977071f2b4ccf4fbb25a844d316ccc0cfd92d53243cf94bb773",
+                "bytes": 44699
+              },
+              "matches": [
+                {
+                  "record": {
+                    "_id": "2026-07-22-uniaccess-cept-university-t004",
+                    "tenantId": "toc",
+                    "sessionId": "2026-07-22-uniaccess-cept-university",
+                    "speakerRef": "Nilesh",
+                    "tStart": 145,
+                    "tEnd": 682,
+                    "text": "Yes. Okay. So, yes. This is the CEPT campus. We are a very small campus out there in Ahmedabad. Like it's so we established in 1962 by B. V. Doshi, who is an architect. We started with the School of Architecture and then subsequently every decade we have added School of Planning, School of Technology, and we also run MBA program. We are following the cross-disciplinary learning since now a four decades. So, our pedagogy is studio-driven and cross-disciplinary. This is CEPT in numbers. We are GSIRF 6. We are the only private university there since 2020. We have a small cohort of 2,100 students. Most of our 70% of our faculties are practitioner. So, they practice apart from teaching at the CEPT. We also have a five-star status in GSIRF Gujarat rating and we are also Center of Excellence. We offer generous means-based and merit-based scholarships. More than 25% of the students every year gets means-based scholarship at CEPT. We also have a lot of travel programs that are talked about in later. So, like we have a lot many IPRs and travel courses that we run. So, what we are known as I told you for studio-based pedagogy. Now, what is the studio-based pedagogy? That forms 70% of the core academic of the CEPT. So, 70% of your credit is a single studio. And a typical studio is a group of 10 to 12 students working in a on a given real-life problem. And the studios are span across L1, L2, L3, L4. Say, L1 is a foundation studio. L2 is a vertical studio where a second and third-year students can be together and they are horizontally also. So, vertical and horizontal, horizontal to the discipline. So, student in architecture can take a studio in civil engineering if they allow. Right? If If many of the studios are offered as a cross-disciplinary where in a faculty offers multiple cohorts. Then L3 is the level four and five, year four and five students, and L4 is a Master students. Some of the Master students can also take an L3 studio and fifth-year students can also take a L4 studio. So, that's how it is vertically and horizontally aligned. Our all programs are five-year. Our all UG programs are five-year, be it a design program or civil engineering program or an urban design and architecture program. Why? Because we run a common foundation program for all of these students. There, like, we prepare students from elementary education to exploratory education. They will have to learn as to how I'll make the choices. They will have to learn as to how I'll work in studios. They will have to learn the designs around it. Right? So, that's where we prepare them in the first year of their education. And this is a single cohort. It has a separate dean and separate institutional framework that we are running since last three decades now. Our syllabus is only 30% fixed, rest of rest of the syllabus is completely choice-based. A student can decide studios. Every year they make choices as to I want to do this studio. If not available, then this is the second studio that I want to do. And the faculty will offer the multiple different kind of the studios. Those are the faculties who are either working at CEPT, CEPT faculty, and some studios are with the industry, some are the with the cross-disciplinary two faculties from the two different department of a studio. So, there are around 100 studios every semester that a student choose from. Then, the second very important choice with the students is the summer and winter school. We offer around 100 specialized summer and winter schools during the summer and winter break and those are travel-based national, travel-based international, and on-campus programs. So, so students have a multiple choice. They can either do it as a credit course or an additional credit course the way they like. And these are the courses where the faculties from outside CEPT, a practitioner from outside CEPT can offer a summer/winter school. So, if you want to offer, you can also offer a school, if gets selected, that's a part of the cohort. And then, students outside the CEPT can also apply for the summer/winter schools. One of the very exciting aspect of CEPT is the exhibitions. Our winter exhibition is the largest, which is typically so best time to visit CEPT is December when the winter exhibition happens. Like, all the work of a studio are on the display. So, you will see entire campus with those final work of the studios displayed there. Summer exhibitions are also there, which happens in the May second week. We have two, two juries during the semester, mid-sem and end-sem. And juries are a board of reviewers. They are among from the industry, alum, practitioner, they all form as a board of reviews and they that keep changing. So, they will not review only the student's work, but the studio work. So, automatically, the faculty review also happens at the same time. Like, every year, the 10 studios are selected as a excellence, bean excellence awards, and there is a separate curated exhibition and catalog released for those excellence exhibitions. We have around 40 active international collaboration. Most of our collaborations are two-way. They are for the student exchange program, collaborative studios are there like they go for summer/winter schools, they are collaborative. They come here, we go there. And then, there are joint research between faculty, students, or a group of faculty and students. We run about 17 PG programs. They are also cross-disciplinary program. So, a civil engineering can apply to all our planning program. Somebody who has graduated in design, they can do architecture program in conservation and regeneration. So, lot of people don't know, but we also run MBA in real estate, MBA in urban management. The way IRMA runs our rural management program, we are the only institute in India who runs an urban management program. In bachelors, we have around 126 in B.Arch, 40 in bachelor of urban design. When it comes to architecture, we accept NATA score. For urban design, we accept NATA or JEE Paper 2 score. Lot of people confused about how the merits are calculated. So, B.Arch and B.U.D. merit has a 50-50 weightage of NATA and board score. So, if a student has scored 90% in board, 120 in NATA because NATA is out of 200, so student merit score will be 75. So, this is the score which is a good score to get into the CEPT. The student can stay positive if his score, merit score of 75, and this is how calculated by 50%. So, this is the only entrance exam which also takes board into account. And we run bachelors in design program. We have communications design, product design, and multidisciplinary design. So, student can decide to remain in multidisciplinary rather than selecting his major. There, the admissions are only through UCEED. We also run a civil engineering program since 1982, so it's one of the oldest civil engineering program at in India. And we have only a small cohort of 40 students there. And there also, we follow the similar studio-based pedagogy. And yes, we are open for counselors. You can schedule a visit at CEPT, a group or an individual visit. We also arrange a lot of workshops in your cities or at the CEPT campus. And if you want to organize a specific workshop, like we have done this with one of our community members in past, we can do that. We have a program ambassadors, so if you are, counseling students and who want more information about CEPT, they can get in touch with the program ambassadors. Link to their names are already there on the website. We organize a lot of public events and webinars. There are open houses, which I usually share on the group. And yes, we maintain this relationship. So, yes, this this is what all about CEPT. Now, if you have any question."
+                  },
+                  "textSha256": "3fd70be34155e0fbfc0c0dabb63201c765f9776efdc04b98470a663e0efb04b2"
+                }
+              ]
+            },
+            "originalMigration": {
+              "available": true,
+              "reason": null,
+              "artifact": {
+                "available": true,
+                "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+                "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+                "sha256": "f41764fd45c53cabc8c4bd9ca04c16091da302e66ecd5eea253a9fd50f736d05",
+                "bytes": 48428
+              },
+              "matches": [
+                {
+                  "record": {
+                    "_id": "2026-07-22-uniaccess-cept-university-t004",
+                    "tenantId": "toc",
+                    "sessionId": "2026-07-22-uniaccess-cept-university",
+                    "speakerRef": "unknown",
+                    "tStart": 145,
+                    "tEnd": 189,
+                    "text": "Nilesh Gotecha: Okay. All right. Slideshow view, okay. So yes, this is the CEPT campus. We are a very small campus out there in Ahmedabad. So we established in 1962 by B.V. Doshi, who is an architect. We started with the School of Architecture, and then subsequently every decade we have added School of Planning, School of Technology, and we also run MBA programs. We are following the cross-disciplinary learning since now four decades. So our pedagogy is studio-driven and cross-disciplinary."
+                  },
+                  "textSha256": "785b780e367ecc24a05f5b08a6e85ea9e9a269dec6d87e6166f25cf0729ed9a5"
+                }
+              ]
+            },
+            "sameIdContentChanged": true
+          }
+        ]
+      },
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "supported",
+        "literalRationale": "Current cited turn explicitly states CEPT was established in 1962 by B. V. Doshi, an architect.",
+        "replacementCitationSupport": "supported",
+        "replacementRationale": "Replacement cites the same current turn, which explicitly states establishment in 1962 by architect B. V. Doshi.",
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 49,
+      "claimId": "2026-07-22-uniaccess-cept-university-c02",
+      "sessionId": "2026-07-22-uniaccess-cept-university",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "4a33441f8e7b99b49923091c2bf918cb46472aec9dab0db0f7ee36f0dcf2ab9d",
+      "sourceBindingSha256": "bdbc646fff76ad6468ecd263b89659c0a3b01c30c20f685fc28deaee767ab14a",
+      "persistedClaim": {
+        "_id": "2026-07-22-uniaccess-cept-university-c02",
+        "tenantId": "toc",
+        "text": "70% of a CEPT student's academic credit comes from studio-based coursework.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-22-uniaccess-cept-university-t005",
+            "sessionId": "2026-07-22-uniaccess-cept-university"
+          },
+          {
+            "turnId": "2026-07-22-uniaccess-cept-university-t006",
+            "sessionId": "2026-07-22-uniaccess-cept-university"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-22-uniaccess-cept-university",
+          "turnId": "2026-07-22-uniaccess-cept-university-t005",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+              "sha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+              "normalizedLfSha256": "27a260ca24052977071f2b4ccf4fbb25a844d316ccc0cfd92d53243cf94bb773",
+              "bytes": 44699
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-22-uniaccess-cept-university-t005",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-22-uniaccess-cept-university",
+                  "speakerRef": "Pooja",
+                  "tStart": 682,
+                  "tEnd": 717,
+                  "text": "That was super, super quick and efficient, Nilesh. Thank you so much. And I think it's, it's a great idea to open the floor, because a lot of folks probably have questions. So, yeah. Guys, just feel free to unmute yourself and ask your question and Nilesh will answer. Go ahead, if you have. Anybody have any questions for Nilesh? Or was he super clear?"
+                },
+                "textSha256": "090912fcf6fa8cca23d36331e3e140f7279501ee51c8279a67e8f103d95964de"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "f41764fd45c53cabc8c4bd9ca04c16091da302e66ecd5eea253a9fd50f736d05",
+              "bytes": 48428
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-22-uniaccess-cept-university-t005",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-22-uniaccess-cept-university",
+                  "speakerRef": "unknown",
+                  "tStart": 189,
+                  "tEnd": 236,
+                  "text": "Nilesh Gotecha: This is CEPT in numbers: We are NIRF 6th. We are the only private university there since 2020. We have a small cohort of 2,100 students. Most of our—70% of our faculties are practitioners, so they practice apart from teaching at the CEPT. We also have a 5-star status in GSIRF Gujarat rating, and we are also a Center of Excellence. We offer generous means-based and merit-based scholarships. More than 25% of the students every year gets means-based scholarship at CEPT. We also have a lot of travel programs that I'll talk about later. So like, we have a lot many IPRs and travel courses that we run."
+                },
+                "textSha256": "2afb88424414f2bef1b1e0811538382d1e15bb54a732b795618df68faadb84cd"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        },
+        {
+          "sessionId": "2026-07-22-uniaccess-cept-university",
+          "turnId": "2026-07-22-uniaccess-cept-university-t006",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+              "sha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+              "normalizedLfSha256": "27a260ca24052977071f2b4ccf4fbb25a844d316ccc0cfd92d53243cf94bb773",
+              "bytes": 44699
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-22-uniaccess-cept-university-t006",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-22-uniaccess-cept-university",
+                  "speakerRef": "spk:2",
+                  "tStart": 717,
+                  "tEnd": 724,
+                  "text": "Yeah, I think it was quite self-explanatory. I mean, the visuals were also understandable, so thank you, Nilesh, for that."
+                },
+                "textSha256": "fe6d3d5fc7f16ecc3d9a186e63212cb8c4cc9475551616a97ce74641f375729a"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "f41764fd45c53cabc8c4bd9ca04c16091da302e66ecd5eea253a9fd50f736d05",
+              "bytes": 48428
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-22-uniaccess-cept-university-t006",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-22-uniaccess-cept-university",
+                  "speakerRef": "unknown",
+                  "tStart": 236,
+                  "tEnd": 307,
+                  "text": "Nilesh Gotecha: So what we are known, as I told you, for studio-based pedagogy. Now what is a studio-based pedagogy that forms 70% of the core academic of the CEPT? So 70% of your credit is a single studio, and a typical studio is a group of 10 to 12 students working in a—on a given real-life problem. And the studios are span across L1, L2, L3, L4. L1 is a Foundation studio. L2 is a vertical studio where a second and third-year students can be together, and they are horizontally also. So vertical and horizontal through the discipline. So a student in architecture can take a studio in civil engineering if they allow, right? If many of the studios are offered as a cross-disciplinary, where in a faculty offers multiple cohorts. Then L3 is the level four and five—year four and five students—and L4 is a master's students. Some of the master's students can also take an L3 studio, and fifth-year students can also take a L4 studio. So that's how it is vertically and horizontally aligned."
+                },
+                "textSha256": "9b72b7d947c0e278b4c0010c265fea09f8fdfdf6d62723cae320c2eba763da74"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current cited turns invite questions and thank Nilesh; neither states the studio-credit percentage.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 50,
+      "claimId": "2026-07-22-uniaccess-cept-university-c03",
+      "sessionId": "2026-07-22-uniaccess-cept-university",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "c1e3222f6c3a4bc1ba70643d7f2eb499e448643fbddc6a6acb30e2af7de98809",
+      "sourceBindingSha256": "bdbc646fff76ad6468ecd263b89659c0a3b01c30c20f685fc28deaee767ab14a",
+      "persistedClaim": {
+        "_id": "2026-07-22-uniaccess-cept-university-c03",
+        "tenantId": "toc",
+        "text": "CEPT's B.Des program does not require applicants to submit a portfolio for admission.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-22-uniaccess-cept-university-t033",
+            "sessionId": "2026-07-22-uniaccess-cept-university"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-22-uniaccess-cept-university",
+          "turnId": "2026-07-22-uniaccess-cept-university-t033",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+              "sha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+              "normalizedLfSha256": "27a260ca24052977071f2b4ccf4fbb25a844d316ccc0cfd92d53243cf94bb773",
+              "bytes": 44699
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-22-uniaccess-cept-university-t033",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-22-uniaccess-cept-university",
+                  "speakerRef": "Nilesh",
+                  "tStart": 1370,
+                  "tEnd": 1378,
+                  "text": "We don't declare, but a student will know their merit rank from their dashboard. So, every applicant will know their merit number."
+                },
+                "textSha256": "461124b6b8a0cb1d852cc9817426960baf97f9524aa1ccdc6b898c917dd90c7c"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "f41764fd45c53cabc8c4bd9ca04c16091da302e66ecd5eea253a9fd50f736d05",
+              "bytes": 48428
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-22-uniaccess-cept-university-t033",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-22-uniaccess-cept-university",
+                  "speakerRef": "unknown",
+                  "tStart": 1079,
+                  "tEnd": 1129,
+                  "text": "Nilesh Gotecha: So we don't require any portfolio. So NATA and UCEED both have a component one and component two. Component one is typically their aptitude and design thinking skill, and part two analyze the design thinking, right? So there is no portfolio a student has to submit for the CEPT admissions. And there after, their portfolio will automatically get developed. So as I show you that studio, the student work from last 10 years is on display there, every semester-wise. So yes, CEPT admission doesn't require portfolio for design programs. NID requires portfolio, I believe, and other institutes, but not CEPT. CEPT is only UCEED."
+                },
+                "textSha256": "3da001f07ecc162ca303701a7bada6b74e99c21b261b9fcd22c2d53b4da72114"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation explains dashboard merit ranks; it does not discuss B.Des portfolios or admission requirements.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase
+
+stderr | qa/evidence/execution-wave1-integration-web-build.test.mjs > actual production Vite build emits the App entry and integration consumer assets
+(!) Some chunks are larger than 500 kB after minification.
+
+ ✓ qa/evidence/execution-wave1-integration-web-build.test.mjs (1 test) 5027ms
+   ✓ actual production Vite build emits the App entry and integration consumer assets 5025ms
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  09:21:18
+   Duration  5.98s (transform 36ms, setup 0ms, collect 399ms, tests 5.03s, environment 0ms, prepare 195ms)
+
+Captured from exec_command chunk 4c98c4; diagnostic advice after the chunk-size warning omitted here. Original tool output preserved in conversation. Exit 0, measured tool command wall 7.8926174 seconds.

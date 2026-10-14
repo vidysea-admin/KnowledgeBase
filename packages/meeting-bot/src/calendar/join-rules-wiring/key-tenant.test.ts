@@ -1,5 +1,5 @@
 /**
- * unit `t037-tick-verifies-key-tenant` — the tick verifies the API key's tenant (X-LKB-Tenant of GET /webinar-operations) before applying join rules.
+ * unit `t037-tick-verifies-key-tenant` — the tick verifies the API key's tenant (X-LKB-Tenant of GET /meeting-candidates) before applying join rules.
  * ISS-T037WIRE-001 recorded reproduction in PRODUCTION SHAPE (buildRealScheduleTickDeps + fake fetch); header handling table; one request per enforcing tick; default parity.
  */
 import { test } from "node:test";
@@ -24,23 +24,25 @@ const G2 = row("g2", { meetingUrl: "https://meet.google.com/abc-defg-hij", start
 
 type Reply = { status?: number; headers?: Array<[string, string]>; throws?: unknown };
 interface Req { url: string; auth: string | null; redirect?: string; hasSignal: boolean }
-/** Fake API: candidates + calendar bodies, and a configurable /webinar-operations reply. */
+/** Same candidates endpoint for acquisition and verification; independently configurable replies simulate a failure between requests. */
 function fakeApi(rows: unknown[], ops: Reply | (() => Reply)) {
   const reqs: Req[] = [];
+  let verifying = true, verifications = 0;
   const f = async (url: string | URL | Request, init?: RequestInit) => {
     const u = String(url), h = new Headers(init?.headers);
     reqs.push({ url: u, auth: h.get("authorization"), redirect: init?.redirect, hasSignal: init?.signal instanceof AbortSignal });
-    if (u.startsWith(`${BASE}/meeting-candidates`)) return new Response(JSON.stringify({ candidates: rows }), { status: 200 });
     if (u.startsWith(`${BASE}/calendar/upcoming`)) return new Response(JSON.stringify({ meetings: [] }), { status: 200 });
-    if (u.startsWith(`${BASE}/webinar-operations`)) {
+    if (u === `${BASE}/meeting-candidates`) {
+      if (!verifying) return new Response(JSON.stringify({ candidates: rows }), { status: 200 });
+      verifications++;
       const r = typeof ops === "function" ? ops() : ops;
       if (r.throws) throw r.throws;
       const hd = new Headers(); for (const [k, v] of r.headers ?? []) hd.append(k, v);
-      return new Response("{}", { status: r.status ?? 200, headers: hd });
+      return new Response(JSON.stringify({ candidates: rows }), { status: r.status ?? 200, headers: hd });
     }
     throw new Error(`unexpected request ${u}`);
   };
-  return { reqs, f: f as typeof fetch, opsCount: () => reqs.filter((r) => r.url.includes("/webinar-operations")).length };
+  return { reqs, f: f as typeof fetch, opsCount: () => verifications, setVerifying: (value: boolean) => { verifying = value; } };
 }
 async function withEnv<T>(env: Record<string, string | undefined>, f: typeof fetch, fn: () => Promise<T>): Promise<T> {
   const keys = ["LKB_API_URL", "LKB_API_KEY", "LKB_TENANT_ID", "LKB_JOIN_RULES_ENFORCE"], saved = keys.map((k) => process.env[k]), realFetch = globalThis.fetch;
@@ -65,7 +67,14 @@ async function tick(root: string, env: Record<string, string | undefined>, api: 
     const log = (m: string) => { logs.push(m); };
     const d = { ...buildRealScheduleTickDeps(), stateDir: root, now: () => NOW, log,
       scheduler: { scheduleOnce: async (j: { jobKey: string }) => { scheduled.push(j.jobKey); } }, ...extra } as ScheduleTickDeps;
-    if (d.loadKeyTenant && !("loadKeyTenant" in extra)) d.loadKeyTenant = createKeyTenantLoader(BASE, KEY, log);
+    api.setVerifying(false);
+    if (d.loadKeyTenant && !("loadKeyTenant" in extra)) {
+      const verify = createKeyTenantLoader(BASE, KEY, log);
+      d.loadKeyTenant = async () => {
+        api.setVerifying(true);
+        try { return await verify(); } finally { api.setVerifying(false); }
+      };
+    }
     const result = await runScheduleTickOnce(d, dryRun);
     return { result, logs, scheduled, ids: result.toSchedule.map((i) => i.sourceId) };
   });
@@ -80,7 +89,7 @@ test("header table: only a single valid tenant id verifies; everything else is `
     ["two values", { headers: [["X-LKB-Tenant", A], ["X-LKB-Tenant", B]] }, null], ["same value twice", { headers: [["X-LKB-Tenant", A], ["X-LKB-Tenant", A]] }, null],
     ["comma list", H("ten-a,ten-b"), null], ["invalid chars", H("ten a/../x"), null], ["path-like", H("..\\evil"), null], ["10,000 chars", H("a".repeat(10_000)), null],
     ["uppercase variant (store validator is lowercase-only)", H("TEN-A"), null], ["device name", H("con"), null],
-    ["401", { status: 401, headers: [["X-LKB-Tenant", A]] }, null], ["403 (no sessions scope)", { status: 403 }, null], ["403 even with header", { status: 403, headers: [["X-LKB-Tenant", A]] }, null],
+    ["401", { status: 401, headers: [["X-LKB-Tenant", A]] }, null], ["403 (no gmail scope)", { status: 403 }, null], ["403 even with header", { status: 403, headers: [["X-LKB-Tenant", A]] }, null],
     ["500", { status: 500, headers: [["X-LKB-Tenant", A]] }, null], ["network error", { throws: new TypeError("fetch failed") }, null],
     ["timeout", { throws: new DOMException("timed out", "TimeoutError") }, null], ["redirect refused", { throws: new TypeError("unexpected redirect") }, null],
   ];

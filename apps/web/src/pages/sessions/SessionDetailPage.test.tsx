@@ -19,6 +19,20 @@ function renderAt(id: string) {
 }
 
 describe("SessionDetailPage", () => {
+  test("session detail consumes the mounted grounded endpoint without rewriting its summary", async () => {
+    vi.spyOn(sessionsApi, "getSession").mockResolvedValue({ session: { _id: "grounded-session", title: "Evidence session", date: "2026-10-14",
+      status: { transcribe: "done", index: "done" } }, page: { summary: "Existing summary." }, turns: [], claims: [] });
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(async (url) => new Response(JSON.stringify(
+      String(url).includes("grounded-content") ? { sessionId: "grounded-session", notes: [{ id: "note", kind: "insight",
+        text: "Preserved grounded content.", origin: "speaker-statement", verification: "unverified", evidence: [] }], qa: [], claims: [] }
+        : { suggestions: [] }), { headers: { "content-type": "application/json" } }));
+    try {
+      renderAt("grounded-session");
+      await screen.findByText("Preserved grounded content.");
+      expect(screen.getByText("Existing summary.")).toBeInTheDocument();
+      expect(fetchMock.mock.calls.some(call => String(call[0]).includes("/sessions/grounded-session/grounded-content"))).toBe(true);
+    } finally { fetchMock.mockRestore(); }
+  });
   test("stream citation seeks restart for forward-unbuffered and backward-evicted targets", async () => {
     const sources: Source[] = [];
     class Buffer extends EventTarget {
