@@ -30,25 +30,36 @@ async function withAbortTimeout<T>(start: (signal: AbortSignal) => Promise<T>, m
   const onOuter = () => ctl.abort();
   if (outer?.aborted) ctl.abort(); else outer?.addEventListener("abort", onOuter, { once: true });
   let t: ReturnType<typeof setTimeout> | undefined;
-  const timeout = new Promise<never>((_, rej) => { t = setTimeout(() => { ctl.abort(); rej(new Error(`${label} timed out after ${ms}ms`)); }, ms); });
+  const timeout = new Promise<never>((_, rej) => {
+    t = setTimeout(() => { rej(new Error(`${label} timed out after ${ms}ms`)); ctl.abort(); }, ms);
+    const gone = () => rej(new Error(`${label} aborted`));
+    if (ctl.signal.aborted) gone(); else ctl.signal.addEventListener("abort", gone, { once: true });
+  });
   try { return await Promise.race([start(ctl.signal), timeout]); }
   finally { if (t) clearTimeout(t); outer?.removeEventListener("abort", onOuter); }
 }
 
-/** First valid JSON object in a model reply (tolerates fences, reasoning prose, <think> blocks). `accept` (e.g. the strict
- *  schema validator) may reject a candidate; the next candidate is tried. The thrown message is fixed: it never echoes the reply. */
+/** Replies longer than this are truncated before scanning (bounds the work; no real reply is this large). */
+export const MAX_EXTRACT_CHARS = 256 * 1024;
+const MAX_EXTRACT_CANDIDATES = 64;
+/** First valid JSON object in a model reply (tolerates fences, reasoning prose, <think> blocks). ONE linear pass tracks brace
+ *  depth and string/escape state (string state only inside an object, so stray quotes in prose cannot desync it); balanced
+ *  spans are then tried in start order and each is run through `accept` (e.g. the strict schema validator). The thrown message
+ *  is fixed: it never echoes the reply. */
 export function extractJsonObject(text: string, accept?: (v: unknown) => unknown): unknown {
-  for (let start = text.indexOf("{"); start !== -1; start = text.indexOf("{", start + 1)) {
-    let depth = 0, inStr = false, esc = false;
-    for (let i = start; i < text.length; i++) {
-      const c = text[i]!;
-      if (inStr) { if (esc) esc = false; else if (c === "\\") esc = true; else if (c === '"') inStr = false; continue; }
-      if (c === '"') inStr = true; else if (c === "{") depth++;
-      else if (c === "}" && --depth === 0) {
-        try { const v = JSON.parse(text.slice(start, i + 1)); return accept ? accept(v) : v; } catch { /* next candidate */ }
-        break;
-      }
-    }
+  const src = text.length > MAX_EXTRACT_CHARS ? text.slice(0, MAX_EXTRACT_CHARS) : text;
+  const stack: number[] = []; const spans: [number, number][] = [];
+  let inStr = false, esc = false;
+  for (let i = 0; i < src.length; i++) {
+    const c = src.charCodeAt(i);
+    if (inStr) { if (esc) esc = false; else if (c === 92) esc = true; else if (c === 34) inStr = false; continue; }
+    if (c === 34) { if (stack.length) inStr = true; }
+    else if (c === 123) stack.push(i);
+    else if (c === 125 && stack.length) spans.push([stack.pop()!, i + 1]);
+  }
+  spans.sort((x, y) => x[0] - y[0]);
+  for (const [from, to] of spans.slice(0, MAX_EXTRACT_CANDIDATES)) {
+    try { const v = JSON.parse(src.slice(from, to)); return accept ? accept(v) : v; } catch { /* next candidate */ }
   }
   throw new Error("vision reply contained no valid JSON object");
 }

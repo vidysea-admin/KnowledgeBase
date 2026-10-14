@@ -1,6 +1,7 @@
 import {test} from "node:test";
 import assert from "node:assert/strict";
-import {createCliTransport, cliEnvironment, resolveCliCommand} from "./ai-transport.js";
+import {createCliTransport, cliEnvironment, resolveCliCommand, realTransport} from "./ai-transport.js";
+import {createServer} from "node:http";
 const call=(source:string, stdin="")=>({kind:"cli" as const,command:process.execPath,args:["-e",source],stdin});
 test("Native transport roundtrips literal Unicode stdin without shell",async()=>{
  const t=createCliTransport({timeoutMs:5000});
@@ -105,4 +106,19 @@ test("Cleanup reporter that throws cannot alter the outcome",async()=>{
   const r=await createCliTransport({cleanup:{...p.cleanup,onFailure:()=>{throw new Error("boom")}}})(call("console.log(JSON.stringify({result:'ok'}))"));
   assert.deepEqual(r.body,{result:"ok"});
  }finally{sweep(p)}
+});
+
+test("http transport passes the AbortSignal to fetch: abort cancels a never-answered request and the server sees the close",async()=>{
+ let closed=false;
+ const srv=createServer((req)=>{req.on("close",()=>{closed=true});});
+ await new Promise<void>((r)=>srv.listen(0,"127.0.0.1",()=>r()));
+ try{
+  const port=(srv.address() as {port:number}).port;
+  const ctl=new AbortController();setTimeout(()=>ctl.abort(),100);
+  const started=Date.now();
+  await assert.rejects(realTransport({kind:"http",method:"POST",url:`http://127.0.0.1:${port}/x`,body:{a:1},signal:ctl.signal}),(e:unknown)=>(e as Error).name==="AbortError");
+  assert.ok(Date.now()-started<3000);
+  for(let i=0;i<50&&!closed;i++)await new Promise((r)=>setTimeout(r,20));
+  assert.equal(closed,true);
+ }finally{srv.closeAllConnections();srv.close()}
 });

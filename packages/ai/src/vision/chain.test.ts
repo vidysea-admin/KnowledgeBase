@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { fakeTransport } from "../testUtils.js";
-import { buildVisionBackends, createGeminiVisionBackend, createOllamaVisionBackend, extractJsonObject, newVisionTally, runVisionChain, VisionAllProvidersFailedError, type VisionImageRequest } from "./chain.js";
+import { buildVisionBackends, createGeminiVisionBackend, createOllamaVisionBackend, extractJsonObject, DEFAULT_VISION_BACKEND_TIMEOUT_MS, MAX_EXTRACT_CHARS, newVisionTally, runVisionChain, VisionAllProvidersFailedError, type VisionImageRequest } from "./chain.js";
 import { detectGeminiFreeTier, GeminiFreeTierQuotaError } from "../gemini-quota.js";
 import { createGeminiSttAdapter } from "../stt/gemini.js";
 import { parseRoutingYaml } from "../routing-config.js";
@@ -192,4 +192,40 @@ test("validateJson: reasoning prose around valid JSON is served by the first oll
   const t = split({ ollama: () => ({ status: 200, body: { message: { content: "The user wants JSON.\n```json\n" + OK_JSON + "\n```" } } }), gemini: geminiOk });
   const r = await runVisionChain(buildVisionBackends(ENV, t), REQ, { validateJson: strict });
   assert.equal(r.provider, "ollama"); assert.equal(r.attempts, 1);
+});
+
+// ---- visionfix cycle 1: ISS-VISIONFIX-002 (linear extractor) and ISS-VISIONFIX-003 (surviving mutants) ----
+test("ISS-VISIONFIX-002: extractor is linear: 32k '{', 16k '{\"', 200 KB unbalanced all finish < 100 ms and throw the fixed message", () => {
+  for (const input of ["{".repeat(32_000), '{"'.repeat(16_000), "{".repeat(200_000), '{"a":'.repeat(30_000)]) {
+    const t0 = performance.now();
+    assert.throws(() => extractJsonObject(input, strict), /no valid JSON object/);
+    assert.ok(performance.now() - t0 < 100, `took ${performance.now() - t0} ms`);
+  }
+});
+
+test("extractor: input beyond the cap is not scanned (object after the cap is ignored)", () => {
+  const ok = JSON.stringify({ readable: true, ocrText: "x" });
+  assert.deepEqual(extractJsonObject(" ".repeat(100) + ok, strict), { readable: true, ocrText: "x" });
+  assert.throws(() => extractJsonObject(" ".repeat(MAX_EXTRACT_CHARS) + ok, strict), /no valid JSON object/);
+});
+
+test("extractor: a '}' and '{' inside a string do not end/open an object (string-aware); stray quote in prose does not desync", () => {
+  const o = { readable: true, ocrText: "tail } and {{ head" };
+  assert.deepEqual(extractJsonObject("He said \"hi and then " + JSON.stringify(o), strict), o);
+  assert.deepEqual(extractJsonObject(JSON.stringify({ readable: true, ocrText: "a } b" }), strict), { readable: true, ocrText: "a } b" });
+});
+
+test("backend default timeout is 45 s (not 120 s)", () => { assert.equal(DEFAULT_VISION_BACKEND_TIMEOUT_MS, 45_000); });
+
+test("outer signal (ctx.signal) abort cancels the in-flight request and rejects", async () => {
+  let sig: AbortSignal | undefined;
+  const t = async (r: TransportRequest) => { sig = r.signal; return new Promise<TransportResponse>(() => {}); };
+  const outer = new AbortController();
+  const b = createOllamaVisionBackend({ transport: t, model: "m", baseUrl: "https://ollama.com", timeoutMs: 5000 });
+  const p = b.call(REQ, { signal: outer.signal }).then(() => "resolved", (e: Error) => e.message);
+  await new Promise((r) => setTimeout(r, 10)); outer.abort();
+  assert.equal(await Promise.race([p, new Promise((r) => setTimeout(() => r("hung"), 500))]).then((x) => (x === "hung" ? "hung" : "settled")), "settled");
+  assert.equal(sig!.aborted, true);
+  const pre = new AbortController(); pre.abort();
+  await b.call(REQ, { signal: pre.signal }).catch(() => {}); assert.equal(sig!.aborted, true, "pre-aborted outer signal aborts at once");
 });
