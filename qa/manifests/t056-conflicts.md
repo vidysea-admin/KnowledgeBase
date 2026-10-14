@@ -1,7 +1,7 @@
 # T-056 persistent answer policies, conflict detector, review queue
 
-**Handshake status:** ready-for-check
-**Status:** ready-for-check
+**Handshake status:** checked-PASS
+**Status:** checked-PASS
 **Fix cycle:** 1
 **Task:** T-056 (scoped slice; task remains open)
 **Priority tier:** 3 (roadmap); full ceremony because it is a tenancy and data-write area.

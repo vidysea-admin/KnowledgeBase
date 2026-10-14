@@ -1,6 +1,6 @@
 # Verdict: t056-conflicts
 
-**Verdict:** FAIL
+**Verdict:** FAIL (cycle 0, superseded by the cycle 1 section below)
 **Cycle checked:** 0
 **Checker:** independent, lane/t056-conflicts at c85e8fcd (commits 4f0a4ae0, c85e8fc)
 **Ceremony:** full (tenancy and data-write area)
@@ -27,3 +27,18 @@ Killed 12: M2-M7, M10-M15. SURVIVED 3: M1 closeItem without tenantId, M8 drop pr
 
 ## Required for cycle 1
 Fix 001; add store-level tests for 003 (cross-tenant closeItem, version gap); decide 002.
+
+---
+
+# Cycle 1 (commit 6fa28951)
+
+**Verdict:** PASS
+**Cycle checked:** 1
+
+- D-015 reproductions: the t|a / 1 vs t / a|1 collision now yields invalid-id rejection (no false version_conflict); all valid neighbours (t/a-1, t|a|1/1, t|a/1b, t/1) write independently. Crash between revision and change item: queue() repairs it from history, idempotent on repeat, and a resolved item is not reopened.
+- Mutants against the new code: M1, M8, M9 all KILLED (previously survived). Extra: _id back to delimited string, store policy-id validation removed, class folding removed, checkIds tenant check removed: all KILLED. M18/M19 (repair removal) NOT APPLIED by the harness (pattern mismatch), not claimed. No restore or HEAD-fidelity mismatch.
+- Object _id: built in one fixed key order everywhere (same literal for insert and lookup), the fake compares by ordered JSON so order-sensitivity is exercised; a partial-key lookup cannot match an exact embedded-document _id. Untested on real MongoDB.
+- repairChangeItems: 10 concurrent queue() calls plus concurrent saves gave 4 items, 4 unique keys, 0 items for another tenant; it only reads one tenant's history and inserts with that tenantId.
+- Class folding: "visa" vs "visas-policy" distinct (correct); "visa"/"visas", "loans"/"loan", separators merge as intended; only trivial odd merges (status/statu, analysis/analysi). Broad vs narrow remains a documented limitation.
+- Tests: answer-policy 32/32; full apps/api x2: 960/960 both runs; tsc (temporary paths tsconfig, deleted) exit 0; lint-loc: only the known meeting-bot violation.
+- New findings, filed not fixed (non-security): ISS-T056CONFLICTS-006 (medium: a recurring conflict stays out of the open queue after its item was superseded) and -007 (low: GET queue writes under read scope). ISS-005 (usage.test.ts timing flake, unrelated) remains open. ISS-001..004 closed.
