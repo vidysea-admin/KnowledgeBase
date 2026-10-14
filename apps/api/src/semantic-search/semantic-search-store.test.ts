@@ -8,12 +8,17 @@ import assert from "node:assert/strict";
 import { createMongoSemanticSearchDeps, semanticSearchEnabled } from "./semantic-search-store.js";
 
 const CHUNKS = [
-  { _id: "c1", tenantId: "toc", sourceRef: "s1", vector: [1, 0] },
-  { _id: "c2", tenantId: "toc", sourceRef: "s1", vector: [0.9, 0.1] },
-  { _id: "c3", tenantId: "toc", sourceRef: "s2", vector: [0, 1] },
+  { _id: "c1", tenantId: "toc", sourceRef: "s1", turnRefs: ["t1"], vector: [1, 0] },
+  { _id: "c2", tenantId: "toc", sourceRef: "s1", turnRefs: ["t1"], vector: [0.9, 0.1] },
+  { _id: "c3", tenantId: "toc", sourceRef: "s2", turnRefs: ["t2"], vector: [0, 1] },
   { _id: "c4", tenantId: "toc", sourceRef: "s3", vector: [1, 0, 0] }, // dimension mismatch: skipped
   { _id: "c5", tenantId: "toc", sourceRef: "s4" }, // no vector
-  { _id: "x1", tenantId: "other", sourceRef: "s9", vector: [1, 0] }, // other tenant, perfect match
+  { _id: "x1", tenantId: "other", sourceRef: "s9", turnRefs: ["t9"], vector: [1, 0] }, // other tenant, perfect match
+];
+const TURNS = [
+  { _id: "t1", tenantId: "toc", sessionId: "s1", tStart: 3, tEnd: 9, text: "Visa rules matter. Apply early." },
+  { _id: "t2", tenantId: "toc", sessionId: "s2", tStart: 1, tEnd: 2, text: "Portfolios win." },
+  { _id: "t9", tenantId: "other", sessionId: "s9", tStart: 0, tEnd: 1, text: "Secret other tenant text." },
 ];
 const SESSIONS = [
   { _id: "s1", tenantId: "toc", title: "One" },
@@ -24,6 +29,8 @@ interface Call { coll: string; op: string; filter: Record<string, unknown> }
 
 function matches(f: Record<string, unknown>, d: Record<string, unknown>): boolean {
   if (f.tenantId !== undefined && d.tenantId !== f.tenantId) return false;
+  const inn = (f._id as { $in?: string[] } | undefined)?.$in;
+  if (inn) return inn.includes(d._id as string);
   if (f._id !== undefined && d._id !== f._id) return false;
   const v = f.vector as { $exists?: boolean } | undefined;
   if (v?.$exists !== undefined && ("vector" in d) !== v.$exists) return false;
@@ -31,7 +38,7 @@ function matches(f: Record<string, unknown>, d: Record<string, unknown>): boolea
 }
 function fakeDb() {
   const calls: Call[] = [];
-  const rows = (n: string) => (n === "chunks" ? CHUNKS : SESSIONS) as unknown as Record<string, unknown>[];
+  const rows = (n: string) => (n === "chunks" ? CHUNKS : n === "turns" ? TURNS : SESSIONS) as unknown as Record<string, unknown>[];
   const db = {
     collection: (name: string) => ({
       find: (filter: Record<string, unknown>) => {
@@ -86,4 +93,30 @@ test("flag is OFF unless exactly LKB_SEMANTIC_SEARCH=1", () => {
   assert.equal(semanticSearchEnabled({}), false);
   for (const v of ["0", "true", "", "yes"]) assert.equal(semanticSearchEnabled({ LKB_SEMANTIC_SEARCH: v }), false);
   assert.equal(semanticSearchEnabled({ LKB_SEMANTIC_SEARCH: "1" }), true);
+});
+
+test("hits carry turn/time/quote evidence (additive); turns are loaded tenant-pinned", async () => {
+  const { db, calls } = fakeDb();
+  const hits = await createMongoSemanticSearchDeps({ embed, db }).search("toc", "visa", 10);
+  assert.deepEqual(hits.map((h) => h.sessionId), ["s1", "s2"]);
+  assert.deepEqual(hits[0]?.turnIds, ["t1"]);
+  assert.equal(hits[0]?.tStart, 3);
+  assert.equal(hits[0]?.tEnd, 9);
+  assert.equal(hits[0]?.quote?.text, "Visa rules matter.");
+  const tc = calls.filter((c) => c.coll === "turns");
+  assert.ok(tc.length >= 1);
+  for (const c of tc) assert.equal(c.filter.tenantId, "toc");
+  const other = await createMongoSemanticSearchDeps({ embed, db }).search("other", "q", 10);
+  assert.equal(other[0]?.quote?.text, "Secret other tenant text.");
+  assert.ok(hits.every((h) => !JSON.stringify(h).includes("Secret")));
+});
+
+test("a hit whose chunk references a missing turn makes the search throw, not ship uncited", async () => {
+  const { db } = fakeDb();
+  TURNS.splice(0, 1);
+  try {
+    await assert.rejects(() => createMongoSemanticSearchDeps({ embed, db }).search("toc", "q", 10), /missing turn t1/);
+  } finally {
+    TURNS.unshift({ _id: "t1", tenantId: "toc", sessionId: "s1", tStart: 3, tEnd: 9, text: "Visa rules matter. Apply early." });
+  }
 });

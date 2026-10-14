@@ -13,6 +13,7 @@ export { buildKnowledgeGraph, type BuildKnowledgeGraphInput, type KnowledgeGraph
 export type { KnowledgeGraph, KnowledgeGraphNode, KnowledgeGraphEdge, KnowledgeGraphEvidence, KnowledgeGraphNodeKind, KnowledgeGraphSource, KnowledgeGraphStats } from "./graph/types.js";
 
 export { cosineSimilarity, rankByCosine, rankSessionsByCosine, type ScorableChunk, type ScoredChunk } from "./vector/cosine.js";
+export { rankChunksWithEvidence, attachEvidence, verifyQuoteSpan, selectQuote, type ChunkEvidenceResult, type EvidenceChunk, type EvidenceTurn, type EvidenceOptions, type QuoteSpan } from "./vector/chunk-evidence.js";
 export { createVectorRetriever, type VectorRetrieverOptions } from "./vector/retriever.js";
 
 export { computeRecallAtK, type GoldenQuestion, type RetrieveFn, type RecallResult, type RecallMiss } from "./eval/recall.js";

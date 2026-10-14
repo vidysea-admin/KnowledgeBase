@@ -14,6 +14,14 @@ export interface SemanticHit {
   sessionId: string;
   score: number;
   session: Sessions | null;
+  /**
+   * T-008 chunk evidence for the hit's best chunk (additive; session-level fields above are
+   * unchanged): the turns it spans, their time window, and a verbatim, provenance-checked quote.
+   */
+  turnIds?: string[];
+  tStart?: number;
+  tEnd?: number;
+  quote?: { turnId: string; charStart: number; charEnd: number; text: string };
 }
 
 export interface SemanticSearchDeps {
