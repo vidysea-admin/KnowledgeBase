@@ -1,7 +1,7 @@
 # T-051 disabled Windows supervisor installation interface
 
-Status: ready-for-check
-**Handshake status:** ready-for-check
+Status: checked-PASS
+**Handshake status:** checked-PASS
 Fix cycle: 1
 
 Authority: root execution GO for new supervisor installer and focused mocked tests; user requested fastest parallel closure. Priority tier 3, T-051. No existing setup/runner/watch source changes; no actual task registration, capture, service start, credentials or proof-marker writes.
@@ -21,3 +21,5 @@ Cycle 1 evidence: exact approved test command above exit0, 10/10, 13.41s. Exact 
 Frozen cycle 1 SHA256: installer 2FD5C7F6CCFD91D263C290D3DB89BF38FF83B037DF1D6935BE06E56B6E978EE3; tests 4BFFC4E521C294645407244B076A0D3E747D40C7268015B86A9E7BDFF0BB5261. Source remains beneath supervisor/ to respect directory structural limit.
 
 Whole release remains NOT VERIFIED; actual Windows real-webinar processing/index/Ask, supervisor restart, connected alerts and independent Ubuntu acceptance remain separate.
+
+Close-out: independent checker cycle 1 VERDICT PASS (qa/verdicts/t051-windows-supervisor-install.md, Cycle checked: 1). ISS-380 verified/closed. Scoped acceptance only; activation, live install and recovery remain HOLD.

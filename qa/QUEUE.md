@@ -1155,7 +1155,7 @@ Canonical manifest fields and same-slug verdict cycles currently establish 19/20
 
 | Unit | Current scoped state | Fix cycle |
 |---|---|---|
-| `t051-windows-supervisor-install` | awaiting matching cycle verdict | 1 |
+| `t051-windows-supervisor-install` | checked-PASS | 1 |
 | `t055-evidence-directory` | checked-PASS | 0 |
 | `t039-send-now-status-polling` | checked-PASS | 0 |
 | `t041-probed-duration-alignment` | checked-PASS | 0 |
