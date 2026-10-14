@@ -1,0 +1,42 @@
+{
+  "$comment": "Career-guidance topic classifier keywords. Matching is case-insensitive, whole-word (an optional plural s is allowed); spaces match spaces or hyphens. Score = sum over matched keywords of the weight of each field it appears in. An event is career-guidance when score >= minScore. Edit this file, not code. List a word once: a plural s is matched automatically, and multi-word phrases that only repeat single keywords add nothing. Ambiguous words are left out on purpose: bare SOP (a standard operating procedure in most workplaces) and campus (campus security). SOP is matched only through the phrase statement of purpose, or by an admission/university/college/abroad word in the same title.",
+  "minScore": 3,
+  "weights": {
+    "title": 3,
+    "description": 1,
+    "sender": 2
+  },
+  "keywords": [
+    "career",
+    "counselling",
+    "counseling",
+    "guidance",
+    "admission",
+    "study abroad",
+    "study overseas",
+    "studying abroad",
+    "university",
+    "universities",
+    "college",
+    "course selection",
+    "choosing a course",
+    "choosing your course",
+    "stream selection",
+    "subject selection",
+    "aptitude",
+    "psychometric",
+    "profile building",
+    "profile-building",
+    "portfolio building",
+    "scholarship",
+    "financial aid",
+    "statement of purpose",
+    "internship",
+    "higher education",
+    "undergraduate",
+    "student visa",
+    "counsellor",
+    "counselor",
+    "postgraduate"
+  ]
+}

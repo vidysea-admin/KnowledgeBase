@@ -132,6 +132,10 @@ export interface SelectAutoRecordItemsInput {
   alreadyScheduled: ReadonlySet<string> | readonly string[];
   /** Approved release policy; legacy callers retain trusted-sender behaviour when absent. */
   everyWebinar?: boolean;
+  /** Autojoin: replaces the title-only webinar classifier (only consulted with everyWebinar). Absent = the built-in one. */
+  classifyInvite?: (invite: { title: string; meetingUrl?: string; sender?: string }) => "webinar" | "meeting" | "uncertain";
+  /** Autojoin: higher wins an overlap before the earliest-start rule. Absent = 0 for everyone (todays behaviour). */
+  priorityOf?: (item: { source: "calendar" | "gmail"; sourceId: string; title: string; sender?: string }) => number;
 }
 
 export interface SelectAutoRecordItemsResult {

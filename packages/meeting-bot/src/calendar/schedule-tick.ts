@@ -16,6 +16,7 @@ import { enforceJoinRules, parseJoinRulesEnforce, type JoinRulesEnforceIo } from
 import { loadScheduledKeysForTick, recordScheduled, writeScheduledJob, type WebinarCalendarAcquisition } from "./state/schedule-state.js";
 import { createHttpCandidateLoader, createHttpCalendarLoader } from "./schedule-loaders.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
+import { announceScheduled, buildAutojoinTickDeps, createTopicLookup, dropOwnMarkerEvents, writeCaptureTags, type AutojoinTickDeps } from "../autojoin/tick-wiring.js";
 export {
   createHttpCandidateLoader, createHttpCalendarLoader, loadNoCalendarEvents, loadWebinarSourcesWithHealth, type WebinarFeedHealth,
 } from "./schedule-loaders.js";
@@ -46,6 +47,8 @@ export interface ScheduleTickDeps {
   /** Production: verifies the key's tenant (one `GET /webinar-operations`, header `X-LKB-Tenant`); called ONLY when enforcement is enabled. */
   loadKeyTenant?: () => Promise<string | null>;
   joinRulesIo?: JoinRulesEnforceIo;
+  /** Autojoin (decision 2026-10-14): topic priority, extended webinar detection, test-data tags and alerts. Absent = today's behaviour exactly. */
+  autojoin?: AutojoinTickDeps;
 }
 
 export function buildRealScheduleTickDeps(): ScheduleTickDeps {
@@ -53,9 +56,12 @@ export function buildRealScheduleTickDeps(): ScheduleTickDeps {
   if (existsSync(envFile)) process.loadEnvFile(envFile);
   const apiUrl = (process.env.LKB_API_URL ?? "http://localhost:3300").replace(/\/$/, "");
   const log = (msg: string) => console.log(`[bot] ${msg}`);
+  const autojoin = buildAutojoinTickDeps(REPO_ROOT, DEFAULT_STATE_DIR, process.env, log);
+  const discoveryOff = autojoin !== undefined && !autojoin.cfg.discovery; // config says discovery is off: the tick sees no events and schedules nothing
   return {
-    loadCalendarEvents: createHttpCalendarLoader(apiUrl, process.env.LKB_API_KEY),
-    loadCandidates: createHttpCandidateLoader(apiUrl, process.env.LKB_API_KEY, log, true),
+    autojoin,
+    loadCalendarEvents: discoveryOff ? async () => [] : createHttpCalendarLoader(apiUrl, process.env.LKB_API_KEY),
+    loadCandidates: discoveryOff ? async () => [] : createHttpCandidateLoader(apiUrl, process.env.LKB_API_KEY, log, true),
     everyWebinar: true,
     joinRulesEnforce: process.env.LKB_JOIN_RULES_ENFORCE,
     joinRulesTenantId: process.env.LKB_TENANT_ID,
@@ -83,7 +89,9 @@ function describeToSchedule(item: AutoRecordItem): string {
  * can assert on it without re-parsing log lines.
  */
 export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolean) {
-  const [calendarEvents, candidates] = await Promise.all([deps.loadCalendarEvents(), deps.loadCandidates()]);
+  const [loadedEvents, candidates] = await Promise.all([deps.loadCalendarEvents(), deps.loadCandidates()]);
+  const aj = deps.autojoin, calendarEvents = aj ? dropOwnMarkerEvents(loadedEvents) : loadedEvents;
+  const lookup = aj ? createTopicLookup(aj, calendarEvents, candidates) : undefined;
   const now = deps.now();
   const trustedSenders = loadTrustedSenderConfig();
   // Fail closed (ISS-ALERTID-006): no valid tenant, or an untagged / other-tenant state file, stops the tick before anything is scheduled.
@@ -97,7 +105,7 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
 
   const selected = selectAutoRecordItems({
     calendarEvents, candidates, now, leadMinutes: DEFAULT_LEAD_MINUTES, trustedSenders, alreadyScheduled,
-    everyWebinar: deps.everyWebinar,
+    everyWebinar: deps.everyWebinar, ...lookup?.hooks,
   });
   // Veto-only join rules (T-037); `off` (the default) returns `selected` itself without opening the store.
   // Key tenant (ISS-T037WIRE-001): fetched per tick, only when enforcing; a throwing loader means "unverified" (null).
@@ -136,8 +144,10 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
       deps.log(`  refused to schedule ${item.sessionKey}: sessionKey does not derive a safe job key — skipped`);
       continue;
     }
+    const tags = lookup?.tagsFor(item) ?? {};
     try {
       writeScheduledJob(deps.stateDir, jobKey, {
+        ...(aj ? { startTime: item.startTime, ...tags } : {}),
         url: item.meetingUrl,
         // ISS-319 fix: the FULL ISO end datetime, not a bare local HH:mm — so a session that
         // crosses midnight doesn't resolve to a stop time ~24h in the past (record-commands.ts's
@@ -155,6 +165,7 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
         `${err instanceof Error ? err.message : String(err)}`);
       continue;
     }
+    if (aj) writeCaptureTags(aj.tagsDir, item.sessionKey, tags, deps.log);
     await deps.scheduler.scheduleOnce({
       jobKey,
       launcherPath: RECORD_LAUNCHER,
@@ -168,7 +179,9 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
       deps.log(`  WARNING: scheduled ${item.sessionKey} but could not record it in schedule-state.json: ${err instanceof Error ? err.message : String(err)}`);
     }
     deps.log(`  scheduled: ${item.sessionKey} via one-off Windows task (job ${jobKey})`);
+    await announceScheduled(aj, item, tags, deps.log);
   }
+  if (aj?.watchCaptures) await aj.watchCaptures().catch((e: unknown) => deps.log(`  autojoin: capture watch failed: ${e instanceof Error ? e.message : String(e)}`));
 
   return result;
 }
@@ -179,5 +192,8 @@ export function parseScheduleTickArgs(rest: string[]): { dryRun: boolean } {
 
 export async function runScheduleTick(rest: string[]): Promise<void> {
   const { dryRun } = parseScheduleTickArgs(rest);
-  await runScheduleTickOnce(buildRealScheduleTickDeps(), dryRun);
+  const deps = buildRealScheduleTickDeps();
+  const autojoinOff = deps.autojoin !== undefined && !deps.autojoin.cfg.webinarAutoJoin;
+  if (autojoinOff && !dryRun) deps.log("schedule-tick: autojoin config has webinarAutoJoin off - running as --dry-run (nothing scheduled)");
+  await runScheduleTickOnce(deps, dryRun || autojoinOff);
 }

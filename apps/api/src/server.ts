@@ -37,6 +37,7 @@ import { createCors } from "./cors.js";
 import { createJobsRouter, type JobsReadDeps } from "./jobs/router.js";
 import { unavailableJobsReadDeps } from "./jobs/fixture-store.js";
 import { createActivityHealthRouter, unavailableActivityHealthDeps } from "./activity-health/router.js";
+import { createBotEventsRouter, unavailableBotEventsDeps, type BotEventsDeps } from "./bot-events/router.js";
 import type { ActivityHealthDeps } from "./activity-health/types.js";
 import { withFileQueueActivity, type FileQueueActivityDeps } from "./activity-health/file-queue-activity.js";
 import { createNotificationsRouter } from "./activity-health/notifications.js";
@@ -76,6 +77,8 @@ export interface ServerDeps {
   sourceIntake?: SourceIntakeDeps;
   jobs?: JobsReadDeps;
   activityHealth?: ActivityHealthDeps;
+  /** Autojoin bot activity feed (GET /bot-events, scope jobs). Optional: absent -> 503 (fail closed). Wired by scripts/webinar/join-rules-api-host.ts. */
+  botEvents?: BotEventsDeps;
   /** D-139/D-158: tenant-scoped dead jobs of the packages/core file queue (FileJobQueue.listDead), shown in /activity-health (source job-queue) and /notifications. Optional: absent -> unchanged. Production wiring pending (runner unwired). */
   fileQueue?: FileQueueActivityDeps;
   /** T-057 D2 watcher run history (GET /watch-runs, scope jobs). Optional: absent -> 503 (fail closed). */
@@ -123,6 +126,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createJobsRouter(deps.jobs ?? unavailableJobsReadDeps));
   const activityHealth = deps.fileQueue ? withFileQueueActivity(deps.activityHealth ?? unavailableActivityHealthDeps, deps.fileQueue) : deps.activityHealth ?? unavailableActivityHealthDeps;
   app.use(createActivityHealthRouter(activityHealth));
+  app.use(createBotEventsRouter(deps.botEvents ?? unavailableBotEventsDeps));
   app.use(createWatchRunsRouter(deps.watchRuns ?? unavailableWatchRunsDeps));
   // T-057 D5: read-only aggregation of the three sources above; no store of its own.
   app.use(createNotificationsRouter({ activityHealth, fileQueue: deps.fileQueue,

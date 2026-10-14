@@ -10,6 +10,7 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, statSync, lstatSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { readCaptureTags } from "../autojoin/capture-tags.js";
 
 import { gapsForSourceDoc, type GapWindow } from "./reconnect-gaps.js";
 import { createTelegramNotifier, readTurnCount, type TelegramNotifier } from "./notify/telegram-alerts.js";
@@ -197,6 +198,7 @@ export async function finalizeRecordingWith(
     audioPath: toPosix(path.relative(root, audio)),
     audioLevel: { maxDb, meanDb, silent },
     gaps: gapsForSourceDoc(gaps), // T-029: forced-disconnect windows recovered mid-run, if any
+    ...readCaptureTags(recordDir, sessionId), // autojoin: testData / careerGuidance / matchedKeywords from the schedule tick, if any
     consent: {
       given: true,
       recordedBy: "Umesh Sugara (registered attendee) via LKB bot",
