@@ -6,7 +6,7 @@
 **Fix cycle:** 1
 **Dual check:** no
 **Issues addressed:** ISS-BROWSERCHECK-001 (medium, closed); ISS-BROWSERCHECK-002 stays open (low, T-056)
-**Status:** ready-for-check
+**Status:** checked-PASS
 
 ## What cycle 0 got wrong (verdict qa/verdicts/browser-checks-2026-10-12.md, FAIL)
 "Join rules - key without join-rules scope: editor read-only: PASS" was vacuous (no write attempted; screenshot byte-identical to rw). Withdrawn in qa/evidence/browser-checks-2026-10-12/summary.md. ISS-BROWSERCHECK-001 evidence text corrected in the ledger.
