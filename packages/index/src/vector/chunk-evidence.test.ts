@@ -7,8 +7,8 @@ import {
   attachEvidence, rankChunksWithEvidence, selectQuote, verifyQuoteSpan,
   type EvidenceChunk, type EvidenceTurn,
 } from "./chunk-evidence.js";
-import { buildVectorSearchPipeline, collectTurnIds, mapAtlasResults, type AtlasDoc } from "./atlas-adapter.js";
 
+const T = { tenantId: "t1" };
 const turn = (id: string, session: string, tStart: number, tEnd: number, text: string): EvidenceTurn =>
   ({ _id: id, sessionId: session, tStart, tEnd, text, tenantId: "t1" });
 const TURNS = new Map([
@@ -25,7 +25,7 @@ const CHUNKS = [
 ];
 
 test("returns chunk-level results, NOT session-deduped, with turn/time/quote evidence", () => {
-  const r = rankChunksWithEvidence([1, 0], CHUNKS, TURNS, 3, { queryText: "student visa" });
+  const r = rankChunksWithEvidence([1, 0], CHUNKS, TURNS, 3, { tenantId: "t1", queryText: "student visa" });
   assert.deepEqual(r.map((x) => x.chunkId), ["c1", "c2", "c3"]);
   assert.equal(r.filter((x) => x.sessionId === "S1").length, 2, "same session appears twice");
   assert.deepEqual(r[0]!.turnIds, ["u1", "u2"]);
@@ -56,14 +56,14 @@ test("provenance: a quote that is not verbatim text of its turn is refused", () 
 
 test("refuses loudly on malformed or missing evidence", () => {
   const bad = (c: Partial<EvidenceChunk>, m: Map<string, EvidenceTurn> = TURNS) =>
-    () => attachEvidence({ ...CHUNKS[0]!, ...c } as EvidenceChunk, 0.5, m);
+    () => attachEvidence({ ...CHUNKS[0]!, ...c } as EvidenceChunk, 0.5, m, T);
   assert.throws(bad({ turnRefs: [] }), /turnRefs/);
   assert.throws(bad({ turnRefs: undefined as never }), /turnRefs/);
   assert.throws(bad({ turnRefs: ["u1", "u1"] }), /turnRefs/);
   assert.throws(bad({ turnRefs: ["nope"] }), /missing turn nope/);
   assert.throws(bad({ sourceRef: "S2" }), /belongs to session S1/);
   assert.throws(bad({ sourceRef: "" }), /no sourceRef/);
-  assert.throws(() => attachEvidence(CHUNKS[0]!, NaN, TURNS), /non-finite score/);
+  assert.throws(() => attachEvidence(CHUNKS[0]!, NaN, TURNS, T), /non-finite score/);
   const mk = (t: EvidenceTurn) => new Map([["u1", t], ["u2", TURNS.get("u2")!]]);
   assert.throws(bad({}, mk(turn("u1", "S1", 10, 5, "x y z."))), /invalid time/);
   assert.throws(bad({}, mk(turn("u1", "S1", NaN, 5, "x y z."))), /invalid time/);
@@ -72,53 +72,58 @@ test("refuses loudly on malformed or missing evidence", () => {
 
 test("rank refuses dimension mismatch by default, skips only on opt-in; k validated", () => {
   const mixed = [...CHUNKS, chunk("c4", "S2", ["u3"], [1, 0, 0])];
-  assert.throws(() => rankChunksWithEvidence([1, 0], mixed, TURNS, 2), /dims/);
-  assert.equal(rankChunksWithEvidence([1, 0], mixed, TURNS, 9, { skipMismatched: true }).length, 3);
-  assert.throws(() => rankChunksWithEvidence([1, 0], CHUNKS, TURNS, -1), /k must be/);
-  assert.deepEqual(rankChunksWithEvidence([1, 0], CHUNKS, TURNS, 0), []);
+  assert.throws(() => rankChunksWithEvidence([1, 0], mixed, TURNS, 2, T), /dims/);
+  assert.equal(rankChunksWithEvidence([1, 0], mixed, TURNS, 9, { tenantId: "t1", skipMismatched: true }).length, 3);
+  assert.throws(() => rankChunksWithEvidence([1, 0], CHUNKS, TURNS, -1, T), /k must be/);
+  assert.deepEqual(rankChunksWithEvidence([1, 0], CHUNKS, TURNS, 0, T), []);
 });
 
 test("a bad row inside the top k refuses instead of being silently skipped", () => {
   const broken = [chunk("c0", "S1", ["ghost"], [1, 0]), ...CHUNKS];
-  assert.throws(() => rankChunksWithEvidence([1, 0], broken, TURNS, 1), /missing turn ghost/);
+  assert.throws(() => rankChunksWithEvidence([1, 0], broken, TURNS, 1, T), /missing turn ghost/);
 });
 
 test("ties break on chunkId (deterministic) and tenant mismatch is refused", () => {
   const tie = [chunk("b", "S1", ["u1"], [1, 0]), chunk("a", "S1", ["u2"], [1, 0])];
-  assert.deepEqual(rankChunksWithEvidence([1, 0], tie, TURNS, 2).map((x) => x.chunkId), ["a", "b"]);
+  assert.deepEqual(rankChunksWithEvidence([1, 0], tie, TURNS, 2, T).map((x) => x.chunkId), ["a", "b"]);
   assert.throws(() => rankChunksWithEvidence([1, 0], tie, TURNS, 1, { tenantId: "other" }), /tenant mismatch/);
 });
 
-test("atlas: pipeline pins tenant filter and projects the score", () => {
-  const p = buildVectorSearchPipeline({ indexName: "chunks_vec", queryVector: [1, 2], tenantId: "t1", limit: 5 });
-  const vs = (p[0] as { $vectorSearch: Record<string, unknown> }).$vectorSearch;
-  assert.deepEqual(vs.filter, { tenantId: "t1" });
-  assert.equal(vs.limit, 5);
-  assert.equal(vs.numCandidates, 100);
-  assert.equal(vs.path, "vector");
-  assert.deepEqual((p[1] as { $project: Record<string, unknown> }).$project.score, { $meta: "vectorSearchScore" });
+test("tenancy (ISS-001/002): tenantId is REQUIRED; chunk and turn tenant checks each independently refuse", () => {
+  const noTenant = [undefined, {}, { tenantId: "" }, { tenantId: { $ne: null } }] as never[];
+  for (const o of noTenant) {
+    assert.throws(() => rankChunksWithEvidence([1, 0], CHUNKS, TURNS, 1, o), /tenantId is required/);
+    assert.throws(() => attachEvidence(CHUNKS[0]!, 0.5, TURNS, o), /tenantId is required/);
+    // refused even when there is nothing to scope (empty corpus, k=0): the entry point itself is gated
+    assert.throws(() => rankChunksWithEvidence([1, 0], [], TURNS, 1, o), /tenantId is required/);
+    assert.throws(() => rankChunksWithEvidence([1, 0], CHUNKS, TURNS, 0, o), /tenantId is required/);
+  }
+  // foreign chunk, matching turns
+  const foreignChunk = [{ ...CHUNKS[0]!, tenantId: "OTHER" }];
+  assert.throws(() => rankChunksWithEvidence([1, 0], foreignChunk, TURNS, 1, T), /chunk c1 tenant mismatch/);
+  const noTenantChunk = [{ ...CHUNKS[0]!, tenantId: undefined }];
+  assert.throws(() => rankChunksWithEvidence([1, 0], noTenantChunk, TURNS, 1, T), /chunk c1 tenant mismatch/);
+  // matching chunk, foreign turn
+  const foreignTurns = new Map(TURNS);
+  foreignTurns.set("u2", { ...TURNS.get("u2")!, tenantId: "OTHER" });
+  assert.throws(() => attachEvidence(CHUNKS[0]!, 0.5, foreignTurns, T), /turn u2 tenant mismatch/);
+  const untenantedTurns = new Map(TURNS);
+  untenantedTurns.set("u1", { ...TURNS.get("u1")!, tenantId: undefined });
+  assert.throws(() => attachEvidence(CHUNKS[0]!, 0.5, untenantedTurns, T), /turn u1 tenant mismatch/);
 });
 
-test("atlas: pipeline refuses unscoped, empty, non-finite and out-of-range params", () => {
-  const base = { indexName: "i", queryVector: [1], tenantId: "t1", limit: 5 };
-  assert.throws(() => buildVectorSearchPipeline({ ...base, tenantId: "" }), /tenantId/);
-  assert.throws(() => buildVectorSearchPipeline({ ...base, tenantId: { $ne: null } as never }), /tenantId/);
-  assert.throws(() => buildVectorSearchPipeline({ ...base, queryVector: [] }), /queryVector/);
-  assert.throws(() => buildVectorSearchPipeline({ ...base, queryVector: [1, NaN] }), /queryVector/);
-  assert.throws(() => buildVectorSearchPipeline({ ...base, limit: 0 }), /limit/);
-  assert.throws(() => buildVectorSearchPipeline({ ...base, limit: 1001 }), /limit/);
-  assert.throws(() => buildVectorSearchPipeline({ ...base, numCandidates: 2 }), /numCandidates/);
-  assert.throws(() => buildVectorSearchPipeline({ ...base, indexName: "" }), /indexName/);
+test("provenance (ISS-003): a faulty selector is caught through attachEvidence, incl. whitespace and foreign-turn quotes", () => {
+  const sel = (q: { turnId: string; charStart: number; charEnd: number; text: string }) => ({ ...T, selectQuote: () => q });
+  assert.throws(() => attachEvidence(CHUNKS[0]!, 0.5, TURNS, sel({ turnId: "u1", charStart: 0, charEnd: 7, text: "Welcomf" })), /not verbatim/);
+  assert.throws(() => attachEvidence(CHUNKS[0]!, 0.5, TURNS, sel({ turnId: "u1", charStart: 7, charEnd: 8, text: " " })), /not verbatim/);
+  assert.throws(() => attachEvidence(CHUNKS[0]!, 0.5, TURNS, sel({ turnId: "u3", charStart: 0, charEnd: 8, text: "Creative" })), /not in chunk/);
+  assert.throws(() => attachEvidence(CHUNKS[0]!, 0.5, TURNS, sel({ turnId: "zz", charStart: 0, charEnd: 1, text: "a" })), /unloaded turn/);
+  const ok = attachEvidence(CHUNKS[0]!, 0.5, TURNS, sel({ turnId: "u1", charStart: 0, charEnd: 7, text: "Welcome" }));
+  assert.equal(ok.quote.text, "Welcome");
 });
 
-test("atlas: mapper yields evidence results in Atlas order and refuses bad docs/tenants", () => {
-  const docs: AtlasDoc[] = [{ ...CHUNKS[2]!, score: 0.9 }, { ...CHUNKS[0]!, score: 0.8 }];
-  assert.deepEqual(collectTurnIds(docs).sort(), ["u1", "u2", "u3"]);
-  const r = mapAtlasResults(docs, TURNS, { tenantId: "t1", queryText: "portfolio" });
-  assert.deepEqual(r.map((x) => x.chunkId), ["c3", "c1"]);
-  assert.equal(r[0]!.quote.text, "Creative careers need a portfolio.");
-  assert.equal(r[0]!.score, 0.9);
-  assert.throws(() => mapAtlasResults(docs, TURNS, { tenantId: "t2" }), /tenant mismatch/);
-  assert.throws(() => mapAtlasResults([{ ...docs[0]!, score: undefined as never }], TURNS, { tenantId: "t1" }), /non-finite/);
-  assert.throws(() => collectTurnIds([{ ...docs[0]!, turnRefs: [] }]), /turnRefs/);
+test("degenerate vectors (ISS-006): empty query vector and non-finite chunk components refuse regardless of rank", () => {
+  assert.throws(() => rankChunksWithEvidence([], [chunk("e", "S1", ["u1"], [])], TURNS, 1, T), /non-empty/);
+  const nan = [...CHUNKS, chunk("z", "S2", ["u3"], [NaN, 1])];
+  assert.throws(() => rankChunksWithEvidence([1, 0], nan, TURNS, 1, T), /non-finite vector/);
 });

@@ -53,8 +53,10 @@ export interface ChunkEvidenceResult {
 export interface EvidenceOptions {
   /** Query text, used only to choose which sentence of the chunk to quote. */
   queryText?: string;
-  /** When set, chunk AND turns must carry exactly this tenantId. */
-  tenantId?: string;
+  /** REQUIRED. Chunk AND turns must carry exactly this tenantId; there is no unscoped mode. */
+  tenantId: string;
+  /** Test seam: replaces the default quote selector; its output is still verified. */
+  selectQuote?: (turns: EvidenceTurn[], queryText?: string) => QuoteSpan;
 }
 
 const MAX_QUOTE_CHARS = 300;
@@ -112,8 +114,9 @@ export function attachEvidence(
   chunk: EvidenceChunk,
   score: number,
   turnsById: ReadonlyMap<string, EvidenceTurn>,
-  options: EvidenceOptions = {},
+  options: EvidenceOptions,
 ): ChunkEvidenceResult {
+  if (typeof options?.tenantId !== "string" || !options.tenantId) refuse("tenantId is required (no unscoped evidence)");
   if (!chunk || typeof chunk._id !== "string" || !chunk._id) refuse("chunk has no _id");
   if (typeof chunk.sourceRef !== "string" || !chunk.sourceRef) refuse(`chunk ${chunk._id} has no sourceRef`);
   if (!Array.isArray(chunk.turnRefs) || chunk.turnRefs.length === 0 ||
@@ -121,21 +124,24 @@ export function attachEvidence(
     refuse(`chunk ${chunk._id} has missing or malformed turnRefs`);
   }
   if (typeof score !== "number" || !Number.isFinite(score)) refuse(`chunk ${chunk._id} has a non-finite score`);
-  if (options.tenantId !== undefined && chunk.tenantId !== options.tenantId) refuse(`chunk ${chunk._id} tenant mismatch`);
+  if (chunk.tenantId !== options.tenantId) refuse(`chunk ${chunk._id} tenant mismatch`);
   const turns: EvidenceTurn[] = [];
   for (const id of chunk.turnRefs) {
     const t = turnsById.get(id);
     if (!t) refuse(`chunk ${chunk._id} references missing turn ${id}`);
     if (t.sessionId !== chunk.sourceRef) refuse(`turn ${id} belongs to session ${t.sessionId}, chunk ${chunk._id} to ${chunk.sourceRef}`);
-    if (options.tenantId !== undefined && t.tenantId !== options.tenantId) refuse(`turn ${id} tenant mismatch`);
+    if (t.tenantId !== options.tenantId) refuse(`turn ${id} tenant mismatch`);
     if (!Number.isFinite(t.tStart) || !Number.isFinite(t.tEnd) || t.tStart < 0 || t.tEnd < t.tStart) {
       refuse(`turn ${id} has invalid time ${t.tStart}..${t.tEnd}`);
     }
     if (typeof t.text !== "string" || t.text.trim() === "") refuse(`turn ${id} has empty text`);
     turns.push(t);
   }
-  const quote = selectQuote(turns, options.queryText);
-  verifyQuoteSpan(quote, turns.find((t) => t._id === quote.turnId)!);
+  const quote = options.selectQuote ? options.selectQuote(turns, options.queryText) : selectQuote(turns, options.queryText);
+  // Verified against the LOADED turn (looked up independently from the map), not against the
+  // object the selector sliced from: an injected/faulty selector is caught here.
+  verifyQuoteSpan(quote, turnsById.get(quote.turnId) ?? refuse(`quote references unloaded turn ${quote.turnId}`));
+  if (!chunk.turnRefs.includes(quote.turnId)) refuse(`quote turn ${quote.turnId} is not in chunk ${chunk._id}`);
   return {
     chunkId: chunk._id,
     sessionId: chunk.sourceRef,
@@ -158,12 +164,15 @@ export function rankChunksWithEvidence(
   chunks: EvidenceChunk[],
   turnsById: ReadonlyMap<string, EvidenceTurn>,
   k: number,
-  options: EvidenceOptions & { skipMismatched?: boolean } = {},
+  options: EvidenceOptions & { skipMismatched?: boolean },
 ): ChunkEvidenceResult[] {
+  if (typeof options?.tenantId !== "string" || !options.tenantId) refuse("tenantId is required (no unscoped evidence)");
+  if (!Array.isArray(queryVector) || queryVector.length === 0) refuse("query vector must be non-empty");
   if (!Number.isInteger(k) || k < 0) refuse(`k must be a non-negative integer, got ${k}`);
   if (k === 0) return [];
   const scored: Array<{ chunk: EvidenceChunk; score: number }> = [];
   for (const c of chunks) {
+    if (c.vector && c.vector.some((x) => !Number.isFinite(x))) refuse(`chunk ${c._id} has a non-finite vector component`);
     if (!c.vector || c.vector.length !== queryVector.length) {
       if (options.skipMismatched) continue;
       refuse(`chunk ${c._id} has ${c.vector?.length ?? "no"} dims, query has ${queryVector.length}`);
