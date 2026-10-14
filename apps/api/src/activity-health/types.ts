@@ -1,13 +1,22 @@
 export const activityStatuses = ["pending", "processing", "done", "failed"] as const;
-export const activityErrorClasses = ["cancelled", "timeout-or-failure", "deadline-or-attempts-exhausted", "configuration", "invalid-job", "operation-failed", "unknown"] as const;
+export const activityErrorClasses = ["cancelled", "timeout-or-failure", "deadline-or-attempts-exhausted", "configuration", "invalid-job", "operation-failed", "unknown",
+  // job-queue (packages/core file queue, D-139/D-158) allow-list; any other recorded code maps to "unknown"
+  "lease-expired", "run-missing", "bad-payload", "plan-invalid", "bad-node-result", "run-failed"] as const;
+export const activitySources = ["upload-queue", "job-queue"] as const;
+const jobQueueClasses: ReadonlySet<string> = new Set(["lease-expired", "run-missing", "bad-payload", "plan-invalid", "bad-node-result", "run-failed"]);
+/** Fixed allow-list for file-queue error codes; stage codes are arbitrary text, so anything else is the fixed unknown class. */
+export const jobQueueErrorClass = (code: unknown): typeof activityErrorClasses[number] => typeof code === "string" && jobQueueClasses.has(code) ? code as typeof activityErrorClasses[number] : "unknown";
 export interface ActivityJob {
+  /** Absent = upload-queue (rows are byte-identical to before D-158); "job-queue" = D-139 dead job in the packages/core file queue. */
+  source?: "job-queue";
   id: string;
   status: typeof activityStatuses[number];
   createdAt: string;
   updatedAt: string | null;
-  deadlineAt: string;
+  /** null only for source "job-queue" rows (the file queue records no deadline). */
+  deadlineAt: string | null;
   attempts: number;
-  maxAttempts: 1 | 2;
+  maxAttempts: number;
   automaticRetryCount: number;
   errorClass: typeof activityErrorClasses[number] | null;
 }
@@ -29,6 +38,17 @@ export function queueTimestamp(value: unknown): string {
       offsetHour !== undefined && (Number(offsetHour) > 23 || Number(offsetMinute) > 59)) throw new Error("Invalid queue timestamp");
   return new Date(epoch).toISOString();
 }
+const jobQueueId = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
+function projectJobQueueRow(job: Record<string, unknown>, seen: Set<string>): ActivityJob {
+  if (job.source !== "job-queue" || typeof job.id !== "string" || !jobQueueId.test(job.id) || seen.has("job-queue:" + job.id) || job.status !== "failed" ||
+      !Number.isInteger(job.maxAttempts) || Number(job.maxAttempts) < 1 || Number(job.maxAttempts) > 100 ||
+      !Number.isInteger(job.attempts) || Number(job.attempts) < 0 || Number(job.attempts) > Number(job.maxAttempts) ||
+      job.automaticRetryCount !== Math.max(0, Number(job.attempts) - 1) || job.deadlineAt !== null || job.updatedAt === null ||
+      !activityErrorClasses.includes(job.errorClass as ActivityJob["errorClass"] & string)) throw new Error("Invalid activity job");
+  seen.add("job-queue:" + job.id);
+  return { source: "job-queue", id: job.id, status: "failed", createdAt: queueTimestamp(job.createdAt), updatedAt: queueTimestamp(job.updatedAt), deadlineAt: null,
+    attempts: Number(job.attempts), maxAttempts: Number(job.maxAttempts), automaticRetryCount: Number(job.automaticRetryCount), errorClass: job.errorClass as ActivityJob["errorClass"] };
+}
 /** Reproject injected reader results at HTTP serialization; never serialize arbitrary dependencies. */
 export function projectActivitySnapshot(value: unknown, limit: number): ActivitySnapshot {
   assertActivityLimit(limit);
@@ -40,6 +60,7 @@ export function projectActivitySnapshot(value: unknown, limit: number): Activity
   const jobs = row.jobs.map((value: unknown): ActivityJob => {
     if (!value || typeof value !== "object") throw new Error("Invalid activity job");
     const job = value as Record<string, unknown>;
+    if (job.source !== undefined) return projectJobQueueRow(job, seen);
     if (typeof job.id !== "string" || !/^[a-f0-9]{64}$/.test(job.id) || seen.has(job.id) ||
         !activityStatuses.includes(job.status as ActivityJob["status"]) || ![1, 2].includes(Number(job.maxAttempts)) ||
         typeof job.maxAttempts !== "number" || !Number.isInteger(job.attempts) || Number(job.attempts) < 0 || Number(job.attempts) > Number(job.maxAttempts) ||

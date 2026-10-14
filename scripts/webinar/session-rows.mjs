@@ -26,6 +26,7 @@ import { isDeepStrictEqual } from "node:util";
 import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { join, relative, isAbsolute } from "node:path";
 import { screenEvidenceTurns } from "./process-video.mjs";
+import { assertTurnTimings } from "../lib/turn-timing.mjs";
 
 /** Resolve validated speech/screen generation and safe metadata for unattended recordings. */
 export function loadWebinarSession(dir, sessionId, readBytes = readFileSync) {
@@ -85,6 +86,7 @@ export function loadWebinarSession(dir, sessionId, readBytes = readFileSync) {
       consumed.add(turn._id);
     }
   }
+  if (Array.isArray(rawTurns)) assertTurnTimings(rawTurns, sessionId); // names the session and turn; the generic check below stays
   if (!Array.isArray(rawTurns) || !rawTurns.length || new Set(rawTurns.map((t) => t._id)).size !== rawTurns.length ||
     rawTurns.some((t) => t.sessionId !== sessionId ||
     t.tenantId !== source.tenantId || typeof t._id !== "string" || !t._id.trim() || !t.speakerRef || !Number.isFinite(t.tStart) ||

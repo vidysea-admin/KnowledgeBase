@@ -21,6 +21,7 @@ import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import "dotenv/config";
+import { requireWorkDatabase } from "./lib/transcript-provenance.mjs";
 import { register } from "tsx/esm/api";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -95,8 +96,7 @@ async function main() {
   const { speakers } = await import("../packages/db/src/collections/speakers.js");
   const { writeSpeakerDocs } = await import("../packages/index/src/pipeline/speaker-docs.js");
 
-  const url = process.env.MONGODB_URL || "mongodb://localhost:27017";
-  const dbName = process.env.MONGODB_DB || "lkb";
+  const { url, dbName } = requireWorkDatabase(process.env); // no `lkb` default: isolated work DB required
   await connect(url, dbName);
   try {
     // The write itself lives in typechecked source (ISS-102/ISS-103). This entrypoint only wires

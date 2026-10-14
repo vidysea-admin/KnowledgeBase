@@ -120,25 +120,35 @@ const lockWaitMs = () => { const n = Number(process.env.LEDGER_LOCK_WAIT_MS); re
 /**
  * Exclusive lock via `wx`. Hard overall deadline `waitMs` (option, else env LEDGER_LOCK_WAIT_MS, else 8000).
  * EEXIST = held by someone else: retry until the deadline. EACCES/EPERM/EBUSY with the lock file present is the
- * same thing seen mid-delete on Windows, so it retries too; with NO lock file it means "cannot create it" and, like
- * ENOENT/EROFS/anything else, fails immediately with the code. A stale lock is REPORTED, never stolen; its age is
+ * same thing seen mid-delete on Windows, so it retries too; with NO lock file it may be the delete finishing (retried at once, at most 5 consecutive times, ISS-ALLOC-005) but a
+ * lock that stays absent means "cannot create it" and fails with the code, as do ENOENT/EROFS/anything else. A stale lock is REPORTED, never stolen; its age is
  * taken from the `at` timestamp inside it when that parses, else from the file's mtime.
  */
-export function acquireLock(root, { waitMs = lockWaitMs(), staleMs = 30000 } = {}) {
+export function acquireLock(root, { waitMs = lockWaitMs(), staleMs = 30000, io = {} } = {}) {
+  const open = io.open ?? openSync, stat = io.stat ?? statSync; // io: test seam only
   const path = join(qaDir(root), LOCK_NAME), start = Date.now();
+  let absent = 0; // consecutive transient create errors with no lock file seen (ISS-ALLOC-005)
   for (;;) {
     let code = null, openErr = null;
     try {
-      const fd = openSync(path, "wx");
+      const fd = open(path, "wx");
       try { writeSync(fd, JSON.stringify({ pid: process.pid, at: new Date().toISOString() })); }
       finally { closeSync(fd); }
       return path;
     } catch (err) { openErr = err; code = err?.code ?? "UNKNOWN"; if (code !== "EEXIST" && !["EACCES", "EPERM", "EBUSY"].includes(code)) throw lockFail(path, err, code); }
     let mtime, held = "";
-    try { mtime = statSync(path).mtimeMs; } catch (err) {
-      if (code === "EEXIST" && Date.now() - start < waitMs) continue; // released between open and stat: retry, bounded
+    try { mtime = stat(path).mtimeMs; absent = 0; } catch (err) {
+      const timedOut = Date.now() - start >= waitMs;
+      if (code === "EEXIST" && !timedOut) continue; // released between open and stat: retry, bounded
       if (code === "EEXIST") throw new LedgerError(`ledger lock ${path} still contended after ${waitMs}ms; retry later`);
-      throw lockFail(path, openErr, code);
+      // EPERM/EACCES/EBUSY on create: a vanished lock is the holder's delete finishing (Windows), so retry; a lock
+      // that cannot even be stat'ed is delete-pending contention too. Only a lock that stays absent is a real error.
+      if (err?.code === "ENOENT") {
+        if (++absent > 5) throw lockFail(path, openErr, code);
+      } else absent = 0;
+      if (timedOut) throw new LedgerError(`ledger lock ${path} still contended after ${waitMs}ms (${code}); retry later`);
+      sleep(err?.code === "ENOENT" ? 2 : 10 + Math.floor(Math.random() * 25));
+      continue;
     }
     try { held = readFileSync(path, "utf8"); } catch { /* unreadable: report without content */ }
     let at = NaN; try { at = Date.parse(JSON.parse(held).at); } catch { /* fall back to mtime */ }

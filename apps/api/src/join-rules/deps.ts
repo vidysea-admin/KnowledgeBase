@@ -21,7 +21,7 @@ export interface OptOutMeetingHint { meetingUrl?: string; sessionKey?: string }
 export interface StoredJoinRulesValue { ruleSet: JoinRuleSetValue; state: JoinRuleStateValue }
 
 /** Mirrors `JoinRulesStoreError.code` in packages/meeting-bot (structural: apps/* may not import it). The router's status table is total over this. */
-export type JoinRulesStoreCode = "bad-tenant" | "corrupt" | "too-large" | "invalid" | "tenant-mismatch" | "not-a-file" | "write-failed" | "locked" | "lock-failed";
+export type JoinRulesStoreCode = "bad-tenant" | "corrupt" | "too-large" | "invalid" | "tenant-mismatch" | "not-a-file" | "write-failed" | "locked" | "lock-failed" | "precondition-failed";
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -33,8 +33,16 @@ type MaybePromise<T> = T | Promise<T>;
 export interface JoinRulesDeps {
   /** Missing file -> empty value; any defect throws (fail closed). */
   load(tenantId: string): MaybePromise<StoredJoinRulesValue>;
-  /** Overwrites with exactly what it is handed: callers MUST load first and preserve state. */
+  /** LEGACY unconditional full replace. The join-rules PUT no longer calls it (ISS-UNOPTLOCK-002); kept for seeding and other callers. */
   save(tenantId: string, value: StoredJoinRulesValue): MaybePromise<void>;
+  /** Like `load`, plus the validator of the stored rule set (`JOIN_RULES_ABSENT` = "absent" when nothing is stored). Unlocked read. */
+  loadWithValidator(tenantId: string): MaybePromise<StoredJoinRulesValue & { validator: string }>;
+  /**
+   * ATOMIC compare-and-set (the store's `saveJoinRulesIf`): inside the store's per-tenant lock, compares the stored validator with
+   * `expected` ("absent" = nothing stored) and writes `ruleSet`, keeping the approval/opt-out state AS LOADED UNDER THE LOCK.
+   * Mismatch throws a `JoinRulesStoreError` with `code === "precondition-failed"` and `currentValidator`; nothing is written.
+   */
+  saveIf(tenantId: string, expected: string, ruleSet: JoinRuleSetValue): MaybePromise<StoredJoinRulesValue & { validator: string }>;
   /** The engine's own `validateJoinRuleSet`; throws on invalid input, returns a normalised copy. */
   validateRuleSet(input: unknown): JoinRuleSetValue;
   recordApproval(tenantId: string, approval: { kind: "sender" | "domain"; value: string }): MaybePromise<JoinRuleStateValue>;

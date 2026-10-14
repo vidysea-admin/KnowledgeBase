@@ -24,5 +24,23 @@ export interface Turns {
    * real wall-clock ISO datetime the turn occurred, when the source has one (e.g. a WhatsApp message's real ts); tStart/tEnd stay relative-offset seconds
    */
   occurredAt?: string;
+  /**
+   * optional: present only on speakerRef 'screen' turns derived from a captured frame
+   */
+  screenEvidence?: {
+    frameId: string;
+    /**
+     * confined relative frame path under the session's screen-frames directory
+     */
+    file: string;
+    /**
+     * sha256 hex of the frame bytes
+     */
+    hash: string;
+    /**
+     * frame time in seconds; equals the turn's tStart
+     */
+    tStart: number;
+  };
   [k: string]: unknown;
 }

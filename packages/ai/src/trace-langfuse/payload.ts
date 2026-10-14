@@ -10,7 +10,8 @@
  *   A5 trace body keys  id, name, timestamp, sessionId, metadata
  *   A6 generation keys  id, traceId, name, startTime, endTime, model, level, statusMessage,
  *                       usageDetails{input,output}, costDetails{total}, metadata
- *   A7 2xx (incl. 207 multi-status) means accepted; per-event errors inside a 207 are NOT parsed.
+ *   A7 2xx means the batch was received; a 207 body is parsed (ingestion-response.ts) and per-event
+ *      errors drop the affected records (see sink.ts settle()). A 207 is never success without it.
  *
  * WHAT MAY LEAVE: only fields the redacted TraceRecord carries, each re-validated here (defence in
  * depth): label-shaped strings (<= 64 chars of [A-Za-z0-9._:-], no key-looking prefix, no long

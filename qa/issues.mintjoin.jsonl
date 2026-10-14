@@ -1,0 +1,1 @@
+{"id":"ISS-MINTJOIN-001","date":"2026-10-12","severity":"low","status":"open","title":"scripts/demo/seed-demo-server.mjs (named in ISS-BROWSERCHECK-001) was not changed: it seeds demo keys separately and still has no join-rules key","fix_direction":"decide whether a demo editor key is wanted; out of scope here"}

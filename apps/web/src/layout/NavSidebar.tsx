@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   DashboardIcon, SessionsIcon, AskIcon, BrainIcon, CalendarIcon, SourcesIcon,
@@ -38,21 +39,40 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/jobs", label: "Provider jobs", icon: <DocsIcon /> },
   { to: "/claims", label: "Claims", icon: <DocsIcon /> },
   { to: "/status", label: "System status", icon: <SettingsIcon /> },
+  { to: "/setup", label: "Setup wizard", icon: <SettingsIcon /> },
+  { to: "/ops-health", label: "Operations health", icon: <SettingsIcon /> },
+  { to: "/notifications", label: "Notifications", icon: <SettingsIcon /> },
 ];
 
 export function NavSidebar(): React.ReactElement {
+  // Below 640px the sidebar becomes a top bar; the links sit behind this menu button.
+  // On desktop the button is display:none and the link list is always shown (see styles.css).
+  const [open, setOpen] = useState(false);
   return (
-    <nav className="nav-sidebar">
-      <div className="brand">Vidysea &middot; LKB</div>
-      {NAV_ITEMS.map((item) => (
-        <NavLink key={item.to} to={item.to} end={item.to === "/"} className={({ isActive }) => (isActive ? "active" : "")}>
-          {item.icon}
-          <span>{item.label}</span>
-        </NavLink>
-      ))}
-      <div className="nav-divider" />
-      <a href={`${API_BASE_URL}/compete`}><ExternalLinkIcon /><span>Compete</span></a>
-      <a href={`${API_BASE_URL}/docs-ui`}><DocsIcon /><span>API Docs</span></a>
+    <nav className="nav-sidebar" data-open={open ? "true" : "false"} aria-label="Main">
+      <div className="nav-topbar">
+        <div className="brand">Vidysea &middot; LKB</div>
+        <button
+          type="button"
+          className="nav-toggle"
+          aria-expanded={open}
+          aria-controls="nav-links"
+          onClick={() => setOpen((o) => !o)}
+        >
+          {open ? "Close menu" : "Menu"}
+        </button>
+      </div>
+      <div id="nav-links" className="nav-links" onClick={() => setOpen(false)}>
+        {NAV_ITEMS.map((item) => (
+          <NavLink key={item.to} to={item.to} end={item.to === "/"} className={({ isActive }) => (isActive ? "active" : "")}>
+            {item.icon}
+            <span>{item.label}</span>
+          </NavLink>
+        ))}
+        <div className="nav-divider" />
+        <a href={`${API_BASE_URL}/compete`}><ExternalLinkIcon /><span>Compete</span></a>
+        <a href={`${API_BASE_URL}/docs-ui`}><DocsIcon /><span>API Docs</span></a>
+      </div>
     </nav>
   );
 }

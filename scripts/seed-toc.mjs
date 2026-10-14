@@ -20,11 +20,14 @@ import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import "dotenv/config";
 import { register } from "tsx/esm/api";
-import { assertDerivedArtifactsCurrent, requireWorkDatabase } from "./lib/transcript-provenance.mjs";
+import { loadSessionArtifacts, requireWorkDatabase, requireLegacyUnboundDatabase } from "./lib/transcript-provenance.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA_DIR = join(ROOT, "data", "toc-migrated");
 const DRY_RUN = process.argv.includes("--dry-run");
+// --legacy-unbound (D-149, pending append): accept sessions with NO derivation-provenance.json and stamp every
+// doc provenance {status:"legacy-unbound"}. Without it, behavior is unchanged.
+const LEGACY_UNBOUND = process.argv.includes("--legacy-unbound");
 // --sessions <id1,id2,...> (u1-toc-sept-catchup): scope the run to exactly the named session
 // directories instead of every directory under data/toc-migrated/. seed-toc.mjs uses plain
 // insertOne (no upsert, by design — T-002), so re-running it over the WHOLE directory once
@@ -65,7 +68,7 @@ function loadSessionDocs() {
   const docs = { sources: [], sessions: [], turns: [], session_pages: [], claims: [] };
   for (const sessionId of sessionIds) {
     const dir = join(DATA_DIR, sessionId);
-    const snapshot = assertDerivedArtifactsCurrent(dir).documents;
+    const snapshot = loadSessionArtifacts(dir, { legacyUnbound: LEGACY_UNBOUND }).documents;
     docs.sources.push(snapshot.source);
     docs.sessions.push(snapshot.session);
     docs.turns.push(...snapshot.turns);
@@ -76,7 +79,7 @@ function loadSessionDocs() {
 }
 
 async function seedLive(docs) {
-  const {url, dbName} = requireWorkDatabase(process.env);
+  const {url, dbName} = (LEGACY_UNBOUND ? requireLegacyUnboundDatabase : requireWorkDatabase)(process.env);
   const { connect, close } = await import("../packages/db/src/client.js");
   const { sources } = await import("../packages/db/src/collections/sources.js");
   const { sessions } = await import("../packages/db/src/collections/sessions.js");

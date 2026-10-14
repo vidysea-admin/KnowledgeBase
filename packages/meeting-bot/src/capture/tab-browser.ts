@@ -10,7 +10,8 @@ import path from "node:path";
 import type { BrowserJoinerDeps } from "../joiners/browser-joiner.js";
 import { getProcessStartTime } from "./controller-state.js";
 import { browserProfileArgs } from "./browser/browser-profile.js";
-import type { BotEvent } from "./obs-windows.js";
+import type { BotEvent } from "./obs/obs-windows.js";
+import { assertInsideDir, assertSafeCaptureFileName, assertSafeCaptureId, type TabReceiverGuard } from "./tab-receiver-guard.js";
 import {validateCaptureControlGaps, validateCaptureStatusIdentity, type GapWindow} from "./reconnect-gaps.js";
 
 const MAX_CHUNK = 8 * 1024 * 1024;
@@ -53,13 +54,16 @@ export interface TabBrowserConfig {
   browserExecutable?: string;
   profileDirectory?: string;
   autoClick?: boolean;
+  /** T-034 hardening (id/filename validation + size caps). Undefined = unchanged behaviour. */
+  guard?: TabReceiverGuard;
   startupTimeoutMs?: number;
   onEvent?: (handle: string, event: BotEvent) => void;
   log?: (message: string) => void;
 }
 
 /** Narrow loopback receiver; exposed to exercise real HTTP authentication/durability in tests. */
-export async function createTabCaptureReceiver(output: string, onEvent: (event: BotEvent) => void) {
+export async function createTabCaptureReceiver(output: string, onEvent: (event: BotEvent) => void, guard?: TabReceiverGuard) {
+  const chunkCap = guard ? Math.min(MAX_CHUNK, guard.maxChunkBytes) : MAX_CHUNK;
   const token = randomBytes(32).toString("hex");
   const fd = openSync(output, "wx");
   let nextSequence = 0, previousHash = "", busy = false, stopping = false, closed = false;
@@ -92,13 +96,17 @@ export async function createTabCaptureReceiver(output: string, onEvent: (event: 
     if (chunkRequest && busy) { res.writeHead(409).end(); return; }
     if (chunkRequest) busy = true;
     try {
-      const data = await body(req, chunkRequest ? MAX_CHUNK : 8192);
+      const data = await body(req, chunkRequest ? chunkCap : 8192);
       if (chunkRequest) {
         const rawSeq = route.searchParams.get("seq") ?? "";
         if (!/^\d+$/.test(rawSeq) || !data.length) { res.writeHead(400).end(); return; }
         const seq = Number(rawSeq), hash = createHash("sha256").update(data).digest("hex");
         if (seq === nextSequence - 1 && hash === previousHash) { res.end("ok"); return; }
         if (seq !== nextSequence) { res.writeHead(409).end(); return; }
+        if (guard && bytes + data.length > guard.maxTotalBytes) {
+          res.writeHead(413).end();
+          onEvent({event: "capture-error", t: Date.now() / 1000, error: "Capture total size cap exceeded"}); return;
+        }
         let offset = 0;
         while (offset < data.length) offset += writeSync(fd, data, offset, data.length - offset);
         fsyncSync(fd); bytes += data.length; previousHash = hash; nextSequence++;
@@ -112,7 +120,7 @@ export async function createTabCaptureReceiver(output: string, onEvent: (event: 
       }
       res.end("ok");
     } catch (error) {
-      if (!res.destroyed) res.writeHead(400).end();
+      if (!res.destroyed) res.writeHead(guard && error instanceof Error && error.message === "request too large" ? 413 : 400).end();
       onEvent({event: "capture-error", t: Date.now() / 1000, error: error instanceof Error ? error.message : "Receiver failed"});
     } finally { if (chunkRequest) busy = false; }
   });
@@ -146,6 +154,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
   let active = false;
   const deps: BrowserJoinerDeps = {
     async launch(url) {
+      if (cfg.guard) { assertSafeCaptureId("tenant id", cfg.tenantId); assertSafeCaptureId("session id", cfg.sessionId); }
       if (active) throw new Error("A tab capture is already active; overlapping webinar requires review");
       active = true;
       const handle = `tab-${Date.now()}-${randomBytes(4).toString("hex")}`;
@@ -156,6 +165,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
       let receiver: Awaited<ReturnType<typeof createTabCaptureReceiver>> | undefined;
       const extension = path.join(cfg.recordDir, `.extension-${handle}`);
       const output = path.join(cfg.recordDir, `${handle}.webm`);
+      if (cfg.guard) { assertSafeCaptureFileName(path.basename(output)); assertInsideDir(cfg.recordDir, output); }
       const statusPath = `${output}.status.json`;
       const controllerStartedAt = getProcessStartTime(process.pid);
       let captureStartedAt: string | undefined;
@@ -177,8 +187,9 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
         const lockFd = openSync(lock, "wx"); writeSync(lockFd, String(process.pid)); closeSync(lockFd); locked = true;
         if (existsSync(recoveryLock)) throw new Error("Profile recovery claimed during capture startup");
         let ready = false, failure: string | undefined;
+        let admittedSeen = false; // ISS-CAPTUREFIX-001: status says "recording" only once the bot is admitted (the recorder starts in the lobby)
         receiver = await createTabCaptureReceiver(output, (event) => {
-          if (event.event === "capture-started") { ready = true; captureStartedAt = new Date().toISOString(); status("recording"); }
+          if (event.event === "capture-started") { ready = true; captureStartedAt = new Date().toISOString(); status(admittedSeen ? "recording" : "starting"); }
           if (event.event === "capture-error") { failure = String(event.error ?? "Capture failed"); status("failed", failure); }
           // A stop that is not failed:false is a failure by itself: the capture-error POST may have been lost.
           // The partial .webm stays on disk, status "failed" (never "stopped"); stop() throws so nothing finalizes it.
@@ -197,7 +208,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
             for (const listener of levels) listener(event.db);
           }
           cfg.onEvent?.(handle, event);
-        });
+        }, cfg.guard);
         mkdirSync(extension);
         const assets = cfg.extensionDir ?? path.resolve(path.dirname(cfg.joinScript), "tab-capture");
         for (const file of ["manifest.json", "background.js", "recorder.html", "recorder.js"]) copyFileSync(path.join(assets, file), path.join(extension, file));
@@ -220,7 +231,9 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
           if (pending.length > 65536) { failure = "Browser event line too large"; pending = ""; return; }
           const lines = pending.split("\n"); pending = lines.pop() ?? "";
           for (const line of lines) {
-            try { const event = JSON.parse(line) as BotEvent; if (event.event === "fatal") failure = String(event.error); cfg.onEvent?.(handle, event); }
+            try { const event = JSON.parse(line) as BotEvent; if (event.event === "fatal") failure = String(event.error);
+              if (event.event === "admitted") { admittedSeen = true; if (captureStartedAt && !failure && !runs.get(handle)?.stopped) status("recording"); }
+              cfg.onEvent?.(handle, event); }
             catch { /* non-JSON Selenium diagnostics are not protocol events */ }
           }
         });

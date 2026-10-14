@@ -72,7 +72,7 @@ for (const code of codes) {
         if (p.split("\\").join("/") === LOCK && reads === 4 && !cleared) { cleared = true; fs.files.delete(LOCK); }
         return read(p);
       };
-      const r: any = new FileJobQueue({ dir: DIR, now: () => 1, fs, lockWaitMs: 80, lockStaleMs: 60_000 }).enqueue(job);
+      const r: any = new FileJobQueue({ dir: DIR, now: () => 1, fs, lockWaitMs: forever ? 300 : 5000, lockStaleMs: 60_000 }).enqueue(job); // ISS-JOBQPID-003: the clearing case needs 4 backoffs of 5-20 ms each, which Windows rounds to ~15.6 ms ticks (>= ~62-80 ms): a budget of 80 raced it. Only the never-clears case depends on the budget.
       if (forever) { assert.equal(r.error.code, "conflict"); assert.deepEqual(jobFiles(fs), []); } else assert.deepEqual(r, { ok: true, value: "enqueued" });
     }
   });

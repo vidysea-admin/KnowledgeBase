@@ -10,7 +10,7 @@
  * Zoom share tokens are bearer secrets: they are never placed in an error message.
  */
 import type { Transcribe } from "@lkb/ai";
-import type { Source, SourceDoc, MediaDoc, ConsentContext, Turn } from "../source.js";
+import { tenantSourceId, type Source, type SourceDoc, type MediaDoc, type ConsentContext, type Turn } from "../source.js";
 import type { RecordingHasher, RecordingReader } from "./recording.js";
 import { isInsideDir } from "./youtube.js";
 import { parseOnairUrl } from "./onair.js";
@@ -152,9 +152,10 @@ function createHosted(rec: Recogniser, deps: HostedRecordingDeps): Source {
       if (!bytes || bytes.byteLength === 0) throw new HostedRecordingError(rec.name, "empty-output", "media file is empty");
       const hash = await deps.hasher(bytes);
       const retrievedAt = now();
+      const sourceId = tenantSourceId(tenantId, hash);
 
       const source = {
-        _id: hash,
+        _id: sourceId,
         tenantId,
         kind: "url",
         captureMode: consent.captureMode,
@@ -167,9 +168,9 @@ function createHosted(rec: Recogniser, deps: HostedRecordingDeps): Source {
       } as SourceDoc;
       const media = [
         {
-          _id: `${hash}-media`,
+          _id: `${sourceId}-media`,
           tenantId,
-          sourceRef: hash,
+          sourceRef: sourceId,
           kind: VIDEO_EXT.test(mediaPath) ? "video" : "audio",
           path: mediaPath,
           retention: { purgeAfterVerified: false },

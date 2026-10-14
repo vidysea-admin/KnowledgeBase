@@ -38,6 +38,8 @@
  * runtime via tsx's programmatic register() API — same mechanism seed-toc.mjs already uses.
  */
 import "dotenv/config";
+import { requireBackfillDatabase } from "./lib/transcript-provenance.mjs";
+import { loadSharedDb, assertConnected } from "./lib/shared-db.mjs";
 import {fileURLToPath} from "node:url";
 import { register } from "tsx/esm/api";
 
@@ -61,14 +63,19 @@ try {
     const {runRecoveryEmbeddingBackfill} = await import("./lib/toc/toc-embedding-backfill.mjs");
     await runRecoveryEmbeddingBackfill(args.slice(1), {root: fileURLToPath(new URL("../", import.meta.url))});
   } else {
-  const { getDb, connect, close, scopedCollection } = await import("../packages/db/src/index.ts");
+  // The @lkb/db instance apps/api sees (not a relative-path copy): see scripts/lib/shared-db.mjs for the "Mongo not connected" cause.
+  const dbModule = await loadSharedDb();
+  const { getDb, connect, close, scopedCollection } = dbModule;
   const { buildChunks } = await import("../packages/index/src/index.ts");
   const { writeSessionChunks } = await import("../apps/api/src/indexing/session.ts");
   const { embed: routeEmbed } = await import("../packages/ai/src/index.ts");
   const { buildRouting } = await import("../apps/api/src/composition/production.ts");
 
-  // Same env vars as migrate-mongo-config.cjs and seed-toc.mjs — one convention, not a third.
-  await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", process.env.MONGODB_DB || "lkb");
+  // Same env vars as config/migrate-mongo-config.cjs and seed-toc.mjs — one convention, not a third.
+  // No default database (the old fallback was lkb): refuses unless an isolated work DB, or lkb_staging under the --legacy-unbound double opt-in.
+  const target = requireBackfillDatabase(process.env, { legacyUnbound: has("--legacy-unbound") });
+  await connect(target.url, target.dbName);
+  assertConnected(dbModule);
   const db = getDb();
   const sessionsColl = scopedCollection(db, "sessions");
   const turnsColl = scopedCollection(db, "turns");
@@ -157,7 +164,7 @@ ${failures.length} session(s) failed promotion:`);
       continue;
     }
 
-    const res = await writeSessionChunks(TENANT, s._id, turns, embed, db);
+    const res = await writeSessionChunks(TENANT, s._id, turns, embed, db, true, s.provenance?.status === "legacy-unbound" ? { status: "legacy-unbound", reason: s.provenance.reason } : undefined);
     totalWritten += res.written;
     // `writeSessionChunks` never throws — it returns why it skipped. Reporting that explicitly is
     // the point: a backfill that printed only successes would hide a provider outage as "done".

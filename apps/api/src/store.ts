@@ -5,10 +5,8 @@
  * accessor while other collections use their tenant-scoped accessors.
  */
 import { randomUUID, randomBytes } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import {
-  getDb, assertValidTenantId, createEvalRun, recordScore as recordEvalRunScore,
+  getDb, assertValidTenantId, scopedCollection, jobs as jobsColl, createEvalRun, recordScore as recordEvalRunScore,
   sessions as sessionsColl, sources as sourcesColl, gaps as gapsColl,
   claims as claimsColl, turns as turnsColl, sessionPages as sessionPagesColl, graphEdges as graphEdgesColl,
   listAll as listAllMeetingCandidates, createIfNew as createMeetingCandidateIfNew,
@@ -19,7 +17,7 @@ import type { WriteJobFn } from "@lkb/ai";
 import { buildKnowledgeGraph, treeIndexRootFilter, type KnowledgeGraph } from "@lkb/index";
 import type { ApiKeyStore, VerifiedKey } from "./auth.js";
 import type { TreeStore } from "./routes/ask/ask.js";
-import type { EvalRunStore } from "./routes/compete.js";
+import type { EvalRunStore } from "./routes/compete/compete.js";
 import { createHash } from "node:crypto";
 import { createWatchedSource, listActive as listActiveWatchedSources, recordFetch as recordWatchedFetch } from "@lkb/db";
 import { createGuardedFetcher, resolveAll, httpRequest, runWatchedSources, type WatchedRunDeps } from "@lkb/ingest";
@@ -31,13 +29,19 @@ import { probeMongoHealth } from "./health-probe.js";
 import type { GraphReadDeps } from "./routes/graph.js";
 import type { ApiKeySummary, KeysDeps } from "./routes/keys.js";
 import type { MeetingCandidatesDeps } from "./routes/meeting-candidates.js";
-import { scanGmailForMeetingCandidates } from "./gws-gmail.js";
+import { scanGmailForMeetingCandidates } from "./gws/gws-gmail.js";
+import { isRefusedWorkDb } from "./db-name.js";
 import { sha256Hex } from "./hash.js";
 
 /** `schema/index.json`'s top-level keys ARE the canonical list of real Mongo collections (its
  * own comment excludes `features_event` deliberately — a JSONL-file schema, not a collection) —
  * reused here instead of a second hand-maintained list that could drift from it. */
-const SCHEMA_INDEX_PATH = fileURLToPath(new URL("../../../schema/index.json", import.meta.url));
+
+/** `tree_index` roots through the shared tenant scope (ISS-AUTHTENANT-002): the accessor validates the
+ * tenant and merges it into every filter, so a root can no longer be read for an unvalidated or missing tenant. */
+type TreeRoot = TreeIndexRootDocument & { _id: string };
+const treeIndexColl = (tenantId: string) => scopedCollection<TreeRoot>(getDb(), "tree_index")(tenantId);
+const apiKeysColl = (tenantId: string) => scopedCollection<ApiKeys>(getDb(), "api_keys")(tenantId);
 
 export function createMongoApiKeyStore(): ApiKeyStore {
   return {
@@ -59,7 +63,7 @@ export function createMongoTreeStore(): TreeStore {
       // actually produces. It now also matches on the real `tenantId` field (ISS-062) --
       // TreeIndexRootDocument satisfies TreeStore's TreeIndexNode return type (it's a superset).
       try { assertValidTenantId(tenantId, "treeStore.load"); } catch { return null; } // invalid tenant: no tree and NO query (ISS-AUTHTENANT-002); the route answers its 404
-      return getDb().collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
+      return treeIndexColl(tenantId).findOne(treeIndexRootFilter(tenantId));
     },
   };
 }
@@ -78,7 +82,7 @@ export function createMongoEvalRunStore(): EvalRunStore {
 export function createMongoJobWriter(): WriteJobFn {
   return async (entry) => {
     assertValidTenantId(entry?.tenantId, "jobWriter");
-    await getDb().collection<Jobs>("jobs").insertOne({ _id: randomUUID(), ...entry });
+    await jobsColl(entry.tenantId).insertOne({ _id: randomUUID(), ...entry });
   };
 }
 
@@ -141,7 +145,7 @@ export function createMongoGraphReadDeps(): GraphReadDeps {
   return {
     async loadGraph(tenantId): Promise<KnowledgeGraph | null> {
       assertValidTenantId(tenantId, "graph.load"); // before the hand-built tree_index query (the accessors below only throw after it was issued)
-      const treeRootP = getDb().collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
+      const treeRootP = treeIndexColl(tenantId).findOne(treeIndexRootFilter(tenantId));
       const [treeRoot, entityEdges, sessionDocs] = await Promise.all([treeRootP, graphEdgesColl(tenantId).find({}).toArray(), sessionsColl(tenantId).find({}).toArray()]);
       if (!treeRoot && entityEdges.length === 0) return null;
       return buildKnowledgeGraph({ treeRoot, entityEdges, sessions: sessionDocs });
@@ -149,7 +153,7 @@ export function createMongoGraphReadDeps(): GraphReadDeps {
   };
 }
 
-export { createGwsCalendarReadDeps } from "./gws-calendar.js";
+export { createGwsCalendarReadDeps } from "./gws/gws-calendar.js";
 
 /** Real `MeetingCandidatesDeps` (routes/meeting-candidates.ts) — wraps the already-real
  * `@lkb/db` `meeting-candidates`/`trusted-senders` accessors plus the `gws`-backed Gmail scan.
@@ -163,7 +167,7 @@ export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, s
     getWorkDatabase(tenantId) {
       if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) return undefined;
       const work = process.env.MONGO_WORK_DB?.trim(), actual = databaseName();
-      return work && !["lkb", "global_university_db"].includes(work) && actual === work ? actual : undefined;
+      return work && !isRefusedWorkDb(work) && actual === work ? actual : undefined;
     },
     async scanGmail(tenantId) {
       if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) throw new Error("Connected Gmail owner mismatch");
@@ -206,12 +210,10 @@ export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, s
  * relies on the caller to remember not to serialize it) so a masked list can never accidentally
  * leak the one thing that must never leave this function. */
 export function createMongoKeysDeps(): KeysDeps {
-  const coll = () => getDb().collection<ApiKeys>("api_keys");
-
   return {
     async listKeys(tenantId): Promise<ApiKeySummary[]> {
       assertValidTenantId(tenantId, "apiKeys.list");
-      const docs = await coll().find({ tenantId }).toArray();
+      const docs = await apiKeysColl(tenantId).find({}).toArray();
       return docs.map((d) => ({
         _id: d._id,
         label: d.label ?? "(unlabeled)",
@@ -224,9 +226,8 @@ export function createMongoKeysDeps(): KeysDeps {
       assertValidTenantId(tenantId, "apiKeys.create");
       const id = randomUUID();
       const rawKey = `lkb_${randomBytes(24).toString("hex")}`;
-      await coll().insertOne({
+      await apiKeysColl(tenantId).insertOne({
         _id: id,
-        tenantId,
         keyHash: sha256Hex(rawKey),
         label,
         scopes,
@@ -237,8 +238,8 @@ export function createMongoKeysDeps(): KeysDeps {
     },
     async revokeKey(tenantId, id) {
       assertValidTenantId(tenantId, "apiKeys.revoke");
-      const result = await coll().updateOne(
-        { _id: id, tenantId, revokedAt: null },
+      const result = await apiKeysColl(tenantId).updateOne(
+        { _id: id, revokedAt: null },
         { $set: { revokedAt: new Date().toISOString() } },
       );
       return result.matchedCount > 0;
@@ -247,30 +248,11 @@ export function createMongoKeysDeps(): KeysDeps {
 }
 
 /** Real `HealthDeps` (routes/health.ts). `db.command({ping: 1})` is the standard MongoDB
- * liveness probe — cheaper than a real query and works even against an empty database. Counts
- * are ACROSS ALL TENANTS deliberately (this is an ops signal, not a tenant-scoped read — the
- * route is unauthenticated for exactly that reason, so it must never leak tenant-scoped content,
- * only aggregate numbers). A ping failure returns `db: "error"` and empty counts rather than
- * throwing — the route's whole job is to report an unhealthy backend, not crash reporting it. */
+ * liveness probe. LIVENESS ONLY: no countDocuments here (ISS-T057SCREEN-001) — the route is
+ * unauthenticated, so it reports reachability and nothing about data. A ping failure returns
+ * `db: "error"` rather than throwing. */
 export function createMongoHealthDeps(): HealthDeps {
-  return {
-    checkHealth: () =>
-      probeMongoHealth(
-        () => getDb().command({ ping: 1 }),
-        async () => {
-          const db = getDb();
-          const index = JSON.parse(readFileSync(SCHEMA_INDEX_PATH, "utf8")) as Record<string, unknown>;
-          const names = Object.keys(index).filter((k) => !k.startsWith("$"));
-          const collections: Record<string, number> = {};
-          await Promise.all(
-            names.map(async (name) => {
-              collections[name] = await db.collection(name).countDocuments();
-            }),
-          );
-          return collections;
-        },
-      ),
-  };
+  return { checkHealth: () => probeMongoHealth(() => getDb().command({ ping: 1 })) };
 }
 
 /**

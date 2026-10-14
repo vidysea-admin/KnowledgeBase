@@ -12,7 +12,7 @@ import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
 import { readFileSync } from "node:fs";
 
-import { buildSpeakerWindows, extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
+import { buildSpeakerWindows, extractSpeakersRuleBased as extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
 
 function turn(id: string, speakerRef: string, text: string): Turns {
   return { _id: id, tenantId: "t1", sessionId: "s1", speakerRef, tStart: 0, tEnd: 0, text };

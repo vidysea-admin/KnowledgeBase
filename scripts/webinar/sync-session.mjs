@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { bindDerivedArtifacts } from "../lib/transcript-provenance.mjs";
+import { isProtectedWorkDbName, bindDerivedArtifacts } from "../lib/transcript-provenance.mjs";
 /**
  * scripts/webinar/sync-session.mjs (moved from scripts/sync-webinar-session.mjs 2026-09-24,
  * fix cycle 1 — lint-dirsize budget: scripts/ was 33/32, this was the only new file in the diff,
@@ -33,7 +33,11 @@ import { bindDerivedArtifacts } from "../lib/transcript-provenance.mjs";
  *   summary -> session_pages, claims, chunks + embeddings, incremental tree_index, entity
  *   promotion, status.index -> done. With --dry-run it prints the plan and connects to nothing.
  *
- * Usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run] [--emit-files] [--index]
+ * Usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run] [--emit-files] [--index] [--grounded-notes]
+ *
+ * --grounded-notes (T-040, D-162): with --index, also writes grounded notes and Q&A (every item cited to a verified
+ *   quote in a real turn, judge + rules, ungrounded items dropped). OFF by default; KB_GROUNDED_NOTES=1 does the same.
+ *   Existing verified claims are preserved on re-run; see apps/api/src/indexing/grounded-write.ts.
  */
 import { readFileSync, writeFileSync, existsSync, renameSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
@@ -48,8 +52,9 @@ const sessionId = process.argv[2];
 const DRY_RUN = process.argv.includes("--dry-run");
 const EMIT_FILES = process.argv.includes("--emit-files");
 const INDEX = process.argv.includes("--index");
+const GROUNDED_NOTES = process.argv.includes("--grounded-notes");
 if (!sessionId) {
-  console.error("usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run] [--emit-files] [--index]");
+  console.error("usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run] [--emit-files] [--index] [--grounded-notes]");
   process.exit(1);
 }
 const dir = join(ROOT, "data", "toc-migrated", sessionId);
@@ -189,7 +194,7 @@ const upsert = (coll, doc) => {
 const strip = ({ tenantId: _t, ...rest }) => rest;
 
 const workDb = process.env.MONGO_WORK_DB?.trim();
-if (!workDb || ["lkb", "global_university_db"].includes(workDb)) throw new Error("MONGO_WORK_DB must name an isolated work database; production writes refused");
+if (isProtectedWorkDbName(workDb, process.env)) throw new Error("MONGO_WORK_DB must name an isolated work database; production writes refused");
 await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", workDb);
 const gen = `gen-${Date.now()}`;
 try {
@@ -213,7 +218,7 @@ try {
     `graph_edges ${ew.upserted} upserted/${ew.removedStale} stale removed`);
   if (INDEX) {
     const { buildIndexer } = await import("../../apps/api/src/composition/production.ts");
-    const res = await buildIndexer(undefined, { strictWebinar: true })(tenantId, sessionId);
+    const res = await buildIndexer(undefined, { strictWebinar: true, ...(GROUNDED_NOTES ? { groundedNotes: true } : {}) })(tenantId, sessionId);
     if (!res.completion?.strict || !res.completion.complete || res.summary?.degraded || res.claims?.degraded || res.chunks.skipped || !res.completion.treeWritten) {
       throw new Error("required webinar indexing incomplete; no completion proof emitted");
     }
@@ -223,6 +228,7 @@ try {
       turnCount: res.completion.turnCount, semanticSupport: "passed" };
     const proofPath = join(dir, "index-proof.json"), temp = `${proofPath}.${randomUUID()}.tmp`;
     writeFileSync(temp, JSON.stringify(proof) + "\n", { flag: "wx" }); renameSync(temp, proofPath);
+    if (res.groundedNotes) console.log(`grounded notes: ${JSON.stringify({ dropped: { summary: res.summary?.dropped ?? 0, claims: res.claims?.dropped ?? 0 }, ...res.groundedNotes })}`);
     console.log(`indexed: chunks ${res.chunks.written}${res.chunks.skipped ? ` (skipped: ${res.chunks.skipped})` : ""}` +
       `${res.entities ? `, entities ${JSON.stringify(res.entities)}` : ""}`);
   }

@@ -3,12 +3,20 @@
  * in-memory join-rules store that records the tenant argument of EVERY dep call (the spy), so a test can
  * assert WHICH tenant's data was read or changed rather than only the HTTP status.
  */
+import { createHash } from "node:crypto";
 import type { JoinRulesDeps, OptOutRemovalValue, JoinRuleSetValue, JoinRuleStateValue, StoredJoinRulesValue } from "./deps.js";
 
 export class StoreError extends Error {
   constructor(public readonly code: string) { super(`join-rules store: ${code}`); this.name = "JoinRulesStoreError"; }
 }
 export const empty = (): StoredJoinRulesValue => ({ ruleSet: { version: 1, ownDomains: [], rules: [] }, state: { approvedSenders: [], approvedDomains: [], optedOutEventIds: [] } });
+
+/** Fake validator: sha256 hex of the rule set only (state excluded), "absent" for no stored file - the same shape as the real store's. */
+export const fakeValidator = (ruleSet: JoinRuleSetValue): string => createHash("sha256").update(JSON.stringify(ruleSet)).digest("hex");
+export class PreconditionError extends Error {
+  constructor(public readonly currentValidator: string) { super("join-rules store: precondition-failed"); this.name = "JoinRulesStoreError"; }
+  readonly code = "precondition-failed";
+}
 
 export function spyStore() {
   const bytes = new Map<string, string>(); // tenant -> stored JSON (compared byte for byte)
@@ -24,8 +32,25 @@ export function spyStore() {
     if (failNextSave) { failNextSave = false; throw new Error("injected save failure C:\secret"); }
     put(t, v);
   };
+  const loadWithValidator = async (t: string) => {
+    calls.push({ op: "loadWithValidator", tenantId: t });
+    const v: StoredJoinRulesValue = JSON.parse(bytes.get(t) ?? JSON.stringify(empty()));
+    return { ...v, validator: bytes.has(t) ? fakeValidator(v.ruleSet) : "absent" };
+  };
+  /** Compare-and-write with no await between the compare and the write (the real store does it under a lock). */
+  const saveIf = async (t: string, expected: string, ruleSet: JoinRuleSetValue) => {
+    calls.push({ op: "saveIf-attempt", tenantId: t });
+    const cur: StoredJoinRulesValue = JSON.parse(bytes.get(t) ?? JSON.stringify(empty()));
+    const stored = bytes.has(t) ? fakeValidator(cur.ruleSet) : "absent";
+    if (stored !== expected) throw new PreconditionError(stored);
+    if (failNextSave) { failNextSave = false; throw new Error("injected save failure C:\secret"); }
+    const next = { ruleSet, state: cur.state };
+    calls.push({ op: "saveIf", tenantId: t }); // logged only when it writes, so "op === save|saveIf" counts real writes
+    put(t, next);
+    return { ...next, validator: fakeValidator(ruleSet) };
+  };
   const deps: JoinRulesDeps = {
-    load, save,
+    load, save, loadWithValidator, saveIf,
     validateRuleSet(input: unknown): JoinRuleSetValue {
       const o = input as Record<string, unknown>;
       const extra = Object.keys(o).filter(k => !["version", "ownDomains", "rules"].includes(k));

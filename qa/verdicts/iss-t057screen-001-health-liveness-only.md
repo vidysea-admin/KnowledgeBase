@@ -1,0 +1,20 @@
+# Verdict: iss-t057screen-001-health-liveness-only
+
+VERDICT: PASS
+Cycle checked: 0
+Commit checked: 3edc568 (lane/healthlive, base e4d6f14)
+Scope: apps/api only, in-process HTTP with fakes; no live Mongo, no Docker run.
+
+## EXPLANATION
+
+- Contract (main HEAD, health-route.md as amended by D-129): C1/C3/C6/I1 are void for `collections`, body is `{db}` only: `HealthReport` has the single field `db`; the handler builds the body from a whitelist (`{db: report.db === "ok" ? "ok" : "error"}`), never `{...report}`; a fake returning extra keys is not serialised (test). C2: `createMongoHealthDeps()` is `probeMongoHealth(() => getDb().command({ping:1}))`; no countDocuments, find, aggregation, `.collection(`, or schema-index read remains (`readFileSync`/`SCHEMA_INDEX_PATH` import removed from store.ts). C3: the catch returns the fixed `{db:"error"}`, no error text. C4: 503 unless db ok. C5: `app.use(createHealthRouter(...))` still precedes `app.use(requireAuth(...))` in server.ts (mutation 2 confirms the tests notice). I3: `probeMongoHealth` never rejects. I4: no write path. Caching headers: none are specified by the contract and none are added.
+- Removed fields: `watchSilent`/`watchUnreadable` are gone from the body (tenant-fleet state); the R2 detector still runs when db is ok and still calls `notifyWatchSilent` (test asserts alerts fire with no counts, tenant or source in the body).
+- Heartbeat 503 ruling: NOTE, not medium. A failed per-tenant heartbeat read turns the probe 503 (`unreadable > 0`). That is pre-existing behaviour, unchanged here, and silent watchers do NOT 503 (only unreadable reads do). Exposure: the Dockerfile HEALTHCHECK needs `--retries=3` consecutive failures at 30s intervals before `unhealthy`; plain Docker only labels the container and does not restart it, and compose has no healthcheck. An orchestrator that restarts on unhealthy (Swarm, k8s via a different probe) could restart-loop only if heartbeat reads fail persistently, which in practice means Mongo itself is failing, and the ping would fail then too. A single tenant's persistently unreadable heartbeat row would 503 the whole service though, which is stricter than a pure liveness probe. Recommend, not required: split into a liveness status (ping only) and keep heartbeat read health on the authenticated surface. Filed as low (ledger-only, ISS-HEALTHLIVE-001 not written; recorded here).
+- Consumers of removed fields: whole-repo grep (scripts, apps/web, packages, docs, Dockerfile, compose, tests) found none reading `collections`, `watchSilent` or `watchUnreadable` from `/health`. Dockerfile HEALTHCHECK uses `r.ok` only; scripts/live-verify.mjs:193 expects 404 on a different base; apps/web uses `/system-status` and its own tests assert `/health` is never requested; the web `watchSilent` fields are a local null placeholder, not a read from `/health`. No silent-undefined consumer.
+- Stale text (not defects, low, not filed): server.ts comment near the health mount still says "returns only aggregate cross-tenant counts"; store.ts keeps an orphaned doc comment about `schema/index.json` where `SCHEMA_INDEX_PATH` used to be; system-status.test.ts names reproduction 1 as "still open". Worth a drive-by in the next unit touching those files.
+- No `countDocuments`/collection enumeration reachable from `/health`: confirmed by reading health.ts, health-probe.ts, createMongoHealthDeps, and by the source-pin test.
+- Measured: health, health-probe, system-status, health-alert-sink tests 36/36; apps/api tsc `--noEmit` no errors under src.
+- Mutations (3, per-mutation byte backup, hash == HEAD blob after each, trees clean, harness deleted): re-add `collections` to the body KILLED (12 red); health router mounted after requireAuth KILLED (13 red); `res.status(200)` on db error KILLED (6 red).
+- ISS-T057SCREEN-001: reproduction 1 (anonymous GET /health reads all-tenant counts) now refused 1/1 and re-verified against the body; reproduction 2 (web reads /health) closed by statusweb earlier. Both closed, so status set to verified.
+
+ISSUES-WRITTEN: none

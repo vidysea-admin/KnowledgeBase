@@ -1,12 +1,14 @@
 // scripts/watch/watch-reingest.mjs — run-watch-loc-split: the `--reingest` repair path moved VERBATIM from
 // run-watch.mjs (only `export` added).
-import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { decideReingestAction, assertIndexed, ingestOneDriveFile } from "./lib/ingest-chain.mjs";
-import { ROOT, TENANT, RECORDINGS_DIR, AUDIO_DIR, CALENDAR_FIRST_YEAR, MONTHS, MONGODB_DB } from "./watch-config.mjs";
+import { ROOT, TENANT, LOCK_PATH, RECORDINGS_DIR, AUDIO_DIR, CALENDAR_FIRST_YEAR, MONTHS, watchDbTarget } from "./watch-config.mjs";
 import { runGws, findCurrentMonthFolder } from "./watch-sources.mjs";
 import { markDriveState } from "./watch-store.mjs";
 import { replaceSessionRows, withFailureRecorded } from "./lib/reingest-swap.mjs";
+import { defaultSnapshotDir } from "./lib/reingest-snapshot.mjs";
+import { recoverAll, snapshotHooks, withReingestLock, withWatchLock } from "./lib/reingest-recover.mjs";
 
 /**
  * `--reingest <driveFileId>` — the u2-fix1 live repair for ISS-304/305/306. NOT the normal
@@ -26,9 +28,30 @@ import { replaceSessionRows, withFailureRecorded } from "./lib/reingest-swap.mjs
 export async function runReingest(gdrive, driveFileId, calendarEvents, now) {
   const { connect } = await import("../../packages/db/src/client.js");
   const { findWatchState } = await import("../../packages/db/src/collections/watch-state.js");
-  const db = await connect(process.env.MONGODB_URL, MONGODB_DB);
+  // ISS-REINGESTEJSON-006: exclude run-watch --ingest for the whole run (recovery included), BEFORE any db write.
+  return withWatchLock({ lockPath: LOCK_PATH }, () => runReingestUnderWatchLock(gdrive, driveFileId, calendarEvents, now, connect, findWatchState));
+}
+
+async function runReingestUnderWatchLock(gdrive, driveFileId, calendarEvents, now, connect, findWatchState) {
+  const target = watchDbTarget();
+  const db = await connect(target.url, target.dbName);
   console.log(`--reingest ${driveFileId}: connected to Mongo db "${db.databaseName}"`);
 
+  // ISS-REINGESTSAFE-001: a previous run killed between the first delete and the end of ingest left a
+  // snapshot behind. Restore it BEFORE anything is derived from the (deleted) database state. A failed
+  // restore throws here, naming the snapshot, and the run stops.
+  const { scopedCollection } = await import("../../packages/db/src/lib/tenantScope.js");
+  const { regenerate, treeIndexRootFilter } = await import("../../packages/index/src/index.ts");
+  const snapDir = defaultSnapshotDir(ROOT);
+  const scoped = (name) => scopedCollection(db, name);
+  const rootFilter = treeIndexRootFilter(TENANT);
+  await recoverAll({ scoped, tenant: TENANT, dir: snapDir, rootFilter, regenerate, log: (m) => console.log(`--reingest: ${m}`) });
+  // ISS-REINGESTSAFE-005: one run per tenant + Drive file.
+  return withReingestLock({ dir: snapDir, tenant: TENANT, driveFileId }, () =>
+    reingestLocked({ db, gdrive, driveFileId, calendarEvents, now, snapDir, scoped, regenerate, rootFilter }));
+}
+
+async function reingestLocked({ db, gdrive, driveFileId, calendarEvents, now, snapDir, scoped, regenerate, rootFilter }) {
   const monthFolder = await findCurrentMonthFolder(gdrive, now);
   if (!monthFolder) throw new Error(`--reingest: no Drive subfolder found for ${MONTHS[now.getUTCMonth()]}`);
   const files = await gdrive.listDriveFiles(monthFolder.id, { run: runGws });
@@ -118,23 +141,15 @@ export async function runReingest(gdrive, driveFileId, calendarEvents, now) {
     if (oldSessionId && oldSessionId !== correctSessionId) {
       // ISS-309/316: delete-then-rebuild with a pre-delete snapshot, restore on failure, and the old
       // session's node pruned from tree_index on success. All access via scopedCollection.
-      const { scopedCollection } = await import("../../packages/db/src/lib/tenantScope.js");
-      const { regenerate, treeIndexRootFilter } = await import("../../packages/index/src/index.ts");
       const oldDir = join(ROOT, "data", "toc-migrated", oldSessionId);
+      const hooks = snapshotHooks({ dir: snapDir });
       const r = await replaceSessionRows({
-        scoped: (name) => scopedCollection(db, name), tenant: TENANT, driveFileId, oldSessionId, correctSessionId, ingest,
-        rootFilter: treeIndexRootFilter(TENANT), regenerate, log: (m, c) => console.log(`--reingest: ${m}:`, c),
-        writeSnapshot: async (snap) => {
-          const dir = join(ROOT, "data", "reingest-snapshots");
-          mkdirSync(dir, { recursive: true });
-          const path = join(dir, `${driveFileId}-${Date.now()}.json`);
-          writeFileSync(path, JSON.stringify(snap)); // Dates become strings here; restore uses the in-memory copy
-          return path;
-        },
-        finish: async (snapshotPath) => {
+        scoped, tenant: TENANT, driveFileId, oldSessionId, correctSessionId, ingest,
+        rootFilter, regenerate, log: (m, c) => console.log(`--reingest: ${m}:`, c),
+        ...hooks,
+        finish: async () => {
           // best effort: a leftover local dir/snapshot never turns a completed reingest into a failure
           try { if (existsSync(oldDir)) { rmSync(oldDir, { recursive: true, force: true }); console.log(`--reingest: removed ${oldDir}`); } } catch (e) { console.error(`--reingest: could not remove ${oldDir}: ${e.message}`); }
-          try { rmSync(snapshotPath, { force: true }); } catch { /* keep it */ }
         },
       });
       sessionId = r.sessionId;

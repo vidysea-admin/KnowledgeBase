@@ -7,12 +7,12 @@
   "updated": "2026-10-09T12:46:22",
   "progress": {
     "total": 95,
-    "done": 52,
-    "in_progress": 24,
+    "done": 55,
+    "in_progress": 21,
     "blocked": 0,
     "pending": 19,
     "current": "U2.2",
-    "percent": 55
+    "percent": 58
   },
   "tasks": [
     {
@@ -269,14 +269,14 @@
     {
       "id": "T-021",
       "title": "Golden set 50-100 Qs + recall@k report (target recall@5 >= 0.85)",
-      "status": "in_progress",
+      "status": "done",
       "base_criticality": "LOW",
       "deps": [
         "T-002"
       ],
       "criticality": "low",
-      "completed": "2026-09-03T13:45:00",
-      "note": "UNBLOCKED 2026-09-08: qa/gates/golden-set-redesign.md is ANSWERED - Option C, regenerate the golden set from raw transcripts (data/toc-migrated/<sessionId>/turns.json), by a different model+prompt than the summarizer, phrased as real student questions, with near-neighbour distractors. This task IS that unit. Binding acceptance conditions from the gate: cite the question-blind control (0.217) beside every score; PASS = recall@5 STRICTLY between 0.217 and 1.000 with a non-zero miss count - 1.000 is a FAILURE of the remedy and escalates to Option B; re-run the verbatim-overlap and single-unique-token-pin diagnostics (pin rate must fall well below 63%). The gate is answered but NOT closed - it closes when this unit satisfies those conditions.",
+      "completed": "2026-10-13T00:00:00",
+      "note": "UNBLOCKED 2026-09-08: qa/gates/golden-set-redesign.md is ANSWERED - Option C, regenerate the golden set from raw transcripts (data/toc-migrated/<sessionId>/turns.json), by a different model+prompt than the summarizer, phrased as real student questions, with near-neighbour distractors. This task IS that unit. Binding acceptance conditions from the gate: cite the question-blind control (0.217) beside every score; PASS = recall@5 STRICTLY between 0.217 and 1.000 with a non-zero miss count - 1.000 is a FAILURE of the remedy and escalates to Option B; re-run the verbatim-overlap and single-unique-token-pin diagnostics (pin rate must fall well below 63%). The gate is answered but NOT closed - it closes when this unit satisfies those conditions. | DONE 2026-10-13: gate condition 4 ratified by Umesh (D-156); U1.4/U1.5 baselines re-point to the redesigned golden set (semantic leg recall@5 0.935, qa/verdicts/golden-set-semantic-leg.md; gate qa/gates/golden-set-redesign.md).",
       "delivery_group": "G8"
     },
     {
@@ -697,12 +697,13 @@
     {
       "id": "U3.1",
       "title": "Ask page in apps/web (POST /ask reachable from the UI at /ask)",
-      "status": "in_progress",
+      "status": "done",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "Shipped + checker PASS 8/8 (qa/verdicts/web-ask-page.md); live-browser proof 2026-09-21 (qa/evidence/u31-ask-proof-20260921/summary.md). Stays in_progress ONLY because the plan section 10 U3.1 exit wording requires a literal Playwright pass, which has not been run (docs/PROGRESS.md:97). Reconciled 2026-10-12, ISS-349.",
-      "delivery_group": "G5"
+      "note": "Shipped + checker PASS 8/8 (qa/verdicts/web-ask-page.md); live-browser proof 2026-09-21 (qa/evidence/u31-ask-proof-20260921/summary.md). Stays in_progress ONLY because the plan section 10 U3.1 exit wording requires a literal Playwright pass, which has not been run (docs/PROGRESS.md:97). Reconciled 2026-10-12, ISS-349. | DONE 2026-10-13: Umesh accepted the real-Chrome CDP proof (qa/verdicts/web-ask-page.md PASS 8/8; qa/evidence/u31-ask-proof-20260921/) in place of a literal Playwright run (D-157).",
+      "delivery_group": "G5",
+      "completed": "2026-10-13T00:00:00"
     },
     {
       "id": "U3.2",
@@ -942,12 +943,13 @@
     {
       "id": "T-049",
       "title": "Langfuse self-hosted tracing on every Gemini call (transcribe, extract, ask): latency, tokens, cost, retries, failures",
-      "status": "in_progress",
+      "status": "done",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
-      "note": "Vidysea standard rule 5 (brain `patterns/agentic-architecture-standard.md`): self-hosted only, TELEMETRY_ENABLED=false, no enterprise key; approved by Umesh 2026-09-24",
-      "delivery_group": "G9"
+      "note": "Vidysea standard rule 5 (brain `patterns/agentic-architecture-standard.md`): self-hosted only, TELEMETRY_ENABLED=false, no enterprise key; approved by Umesh 2026-09-24 | DONE 2026-10-13: live evidence on Langfuse Cloud Hobby (qa/evidence/t049-langfuse-live-2026-10-13/summary.md; criteria 1,2,4,5 PASS, 6 VERIFIED); hosted free tier allowed with metadata-only traces, self-host if the free tier would be exceeded (D-155).",
+      "delivery_group": "G9",
+      "completed": "2026-10-13T00:00:00"
     },
     {
       "id": "T-050",

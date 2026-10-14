@@ -6,6 +6,13 @@
 //
 // GUARANTEE (see qa/manifests/iss-309-316-reingest-delete-safety.md): delete-then-rebuild with a
 // durable pre-delete snapshot, compensating restore and honest failure. NOT a transaction.
+//
+// iss-reingestsafe-001-004-typed-snapshot-replay: the snapshot is a type-exact EJSON file (reingest-snapshot.mjs),
+// written atomically and verified BEFORE the first delete, marked committed once ingest finishes, and removed on
+// success or after a verified restore. A process kill is healed at the next start by reingest-recover.mjs
+// (restoreOldRows below is shared by the in-process rollback and that recovery).
+
+import { contentHash, docKey } from "./reingest-snapshot.mjs";
 
 export const SESSION_COLLECTIONS = ["sources", "sessions", "turns", "session_pages", "claims", "chunks"];
 
@@ -59,10 +66,27 @@ async function snapshotRows(scoped, tenant, filters) {
   return snap;
 }
 
-/** Compensating restore. Removes whatever the failed attempt left behind (only rows linked to THIS
- * Drive file's source and absent before we started), then re-inserts the snapshot. Never throws:
+/** The ONLY session ids this run can create: the corrected id and the deterministic fork id ingest-chain's
+ * resolveSessionIdForIngest would give it (`<correct>-<first 6 of the Drive file id, lower-cased>`). Computed and
+ * recorded in the manifest BEFORE the first write. */
+export function plannedSessionIds({ correctSessionId, driveFileId, preexistingSessionIds = [] }) {
+  const pre = new Set(preexistingSessionIds);
+  return [correctSessionId, `${correctSessionId}-${driveFileId.slice(0, 6).toLowerCase()}`].filter((id) => !pre.has(id));
+}
+
+/** Session ids restore/recovery may delete: EXACTLY the manifest's planned ids, minus any id that existed before the
+ * run. No discovery by sourceId, so a session another writer created (or any sibling) is never touched
+ * (ISS-REINGESTEJSON-004, -006). A manifest without `plannedNewSessionIds` (legacy) deletes nothing by id. */
+export function ownedNewSessionIds({ preexistingSessionIds, plannedNewSessionIds }) {
+  if (!Array.isArray(plannedNewSessionIds)) return [];
+  const pre = new Set(preexistingSessionIds ?? []);
+  return [...new Set(plannedNewSessionIds.filter((id) => !pre.has(id)))];
+}
+
+/** Compensating restore. Removes the rows of sessions THIS run planned (ownedNewSessionIds; never a delete by
+ * sourceId, never a discovered session), then re-inserts the snapshot. Never throws:
  * returns { ok, errors } so the caller can report an incomplete restore instead of masking it. */
-async function restore({ scoped, tenant, driveFileId, oldSessionId, snapshot, preexistingSessionIds }) {
+export async function restoreOldRows({ scoped, tenant, driveFileId, oldSessionId, snapshot, preexistingSessionIds, plannedNewSessionIds, treeRoot = null, rootFilter = null }) {
   const errors = [];
   const step = async (label, fn) => {
     try {
@@ -71,11 +95,7 @@ async function restore({ scoped, tenant, driveFileId, oldSessionId, snapshot, pr
       errors.push(`${label}: ${reasonOf(err)}`);
     }
   };
-  let partialIds = [];
-  await step("find partial new sessions", async () => {
-    const linked = await scoped("sessions")(tenant).find({ sourceId: `gdrive-${driveFileId}` }).toArray();
-    partialIds = linked.map((s) => s._id).filter((id) => id !== oldSessionId && !preexistingSessionIds.includes(id));
-  });
+  const partialIds = ownedNewSessionIds({ preexistingSessionIds, plannedNewSessionIds }).filter((id) => id !== oldSessionId);
   for (const id of partialIds) {
     for (const [coll, filter] of Object.entries(oldRowFilters(driveFileId, id))) {
       if (coll === "sources") continue; // removed once below
@@ -90,6 +110,23 @@ async function restore({ scoped, tenant, driveFileId, oldSessionId, snapshot, pr
       const ids = snapshot[coll].map((d) => d._id);
       await scoped(coll)(tenant).deleteMany({ _id: { $in: ids } });
       await scoped(coll)(tenant).insertMany(snapshot[coll].map(({ tenantId: _t, ...rest }) => rest));
+    });
+  }
+  if (treeRoot && rootFilter) {
+    await step("restore tree_index node", async () => {
+      const tree = scoped("tree_index")(tenant);
+      const current = await tree.findOne(rootFilter);
+      if (!current) await tree.insertMany([(({ tenantId: _t, ...rest }) => rest)(treeRoot)]);
+      else if (docKey({ c: current.children ?? null }) !== docKey({ c: treeRoot.children ?? null })) await tree.updateOne(rootFilter, { $set: { children: treeRoot.children } });
+    });
+  }
+  // Verify what is now stored against the snapshot: row counts AND content (order/key-order independent).
+  const filters = oldRowFilters(driveFileId, oldSessionId);
+  for (const coll of SESSION_COLLECTIONS) {
+    await step(`verify ${coll}`, async () => {
+      const now = await scoped(coll)(tenant).find(filters[coll]).toArray();
+      if (now.length !== snapshot[coll].length) throw new Error(`${now.length} rows after restore, snapshot has ${snapshot[coll].length}`);
+      if (contentHash({ [coll]: now }) !== contentHash({ [coll]: snapshot[coll] })) throw new Error("content differs from snapshot");
     });
   }
   return { ok: errors.length === 0, errors };
@@ -118,19 +155,33 @@ export async function replaceSessionRows(deps) {
       throw new Error(`reingest aborted before any delete: snapshot of ${coll} has ${snapshot[coll].length} rows, count said ${before[coll]}`);
     }
   }
-  const snapshotRef = await deps.writeSnapshot(snapshot); // throws -> nothing deleted yet
-  const preexisting = await scoped("sessions")(tenant).find({ _id: correctSessionId }).toArray();
-  const preexistingSessionIds = preexisting.map((s) => s._id);
+  // Every session id that exists BEFORE the first write and is linked to this Drive file (the old one, sibling
+  // forks of the same file) or is the id we are about to create. Recorded in the manifest before any delete: restore
+  // and startup recovery may delete only sessions outside this set (ISS-REINGESTEJSON-004).
+  const linkedBefore = await scoped("sessions")(tenant).find({ sourceId: `gdrive-${driveFileId}` }).toArray();
+  const correctBefore = await scoped("sessions")(tenant).find({ _id: correctSessionId }).toArray();
+  const preexistingSessionIds = [...new Set([...linkedBefore, ...correctBefore].map((s) => s._id))];
+  const plannedNewSessionIds = plannedSessionIds({ correctSessionId, driveFileId, preexistingSessionIds });
+  const treeRoot = await scoped("tree_index")(tenant).findOne(rootFilter);
+  // Durable, verified snapshot BEFORE the first delete (throws -> nothing deleted yet).
+  const snapshotRef = await deps.writeSnapshot({ rows: snapshot, treeRoot, meta: { tenant, driveFileId, oldSessionId, correctSessionId, preexistingSessionIds, plannedNewSessionIds } });
 
   let sessionId;
   try {
     for (const coll of SESSION_COLLECTIONS) await scoped(coll)(tenant).deleteMany(filters[coll]);
     sessionId = await ingest();
+    // From here on new data is complete. The commit marker tells startup recovery never to restore over it;
+    // if the marker cannot be written we cannot make that promise, so the old data is restored instead.
+    await deps.commitSnapshot?.(snapshotRef);
   } catch (err) {
-    const r = await restore({ scoped, tenant, driveFileId, oldSessionId, snapshot, preexistingSessionIds });
-    const verdict = r.ok
-      ? `previous data for "${oldSessionId}" was RESTORED from the pre-delete snapshot`
-      : `RESTORE INCOMPLETE (${r.errors.join("; ")}) — recover from snapshot ${snapshotRef}`;
+    const r = await restoreOldRows({ scoped, tenant, driveFileId, oldSessionId, snapshot, preexistingSessionIds, plannedNewSessionIds, treeRoot, rootFilter });
+    let verdict;
+    if (r.ok) {
+      verdict = `previous data for "${oldSessionId}" was RESTORED from the pre-delete snapshot and verified`;
+      try { await deps.discardSnapshot?.(snapshotRef); } catch (e) { verdict += ` (could not remove snapshot ${snapshotRef}: ${reasonOf(e)})`; }
+    } else {
+      verdict = `RESTORE INCOMPLETE (${r.errors.join("; ")}) — recover from snapshot ${snapshotRef} (kept; startup recovery will retry)`;
+    }
     const e = new Error(`reingest FAILED after delete: ${reasonOf(err)}; ${verdict}`);
     e.cause = err;
     e.restored = r.ok;
@@ -144,11 +195,15 @@ export async function replaceSessionRows(deps) {
   try {
     await pruneTreeOfSession({ scoped, tenant, sessionId: oldSessionId, rootFilter, regenerate });
   } catch (err) {
-    const e = new Error(`reingest ingested "${sessionId}" but tree_index still lists "${oldSessionId}": ${reasonOf(err)} (new session is intact; old snapshot kept at ${snapshotRef})`);
+    const e = new Error(`reingest ingested "${sessionId}" but tree_index still lists "${oldSessionId}": ${reasonOf(err)} (new session is intact; snapshot kept at ${snapshotRef} marked committed — the next start retries the prune and then removes it)`);
     e.cause = err;
     e.phase = "tree-prune";
+    e.snapshotRef = snapshotRef;
     throw e;
   }
-  await deps.finish?.(snapshotRef); // remove old local dir + snapshot; best effort, see caller
+  // Fully successful: the snapshot has done its job. A failure to remove it is NOT a failed reingest: it stays
+  // marked committed and the next start finishes the cleanup safely.
+  try { await deps.discardSnapshot?.(snapshotRef); } catch (e) { log("could not remove snapshot", { snapshotRef, reason: reasonOf(e) }); }
+  await deps.finish?.(snapshotRef); // remove old local dir; best effort, see caller
   return { sessionId, before, after };
 }

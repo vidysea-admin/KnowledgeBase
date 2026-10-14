@@ -1923,3 +1923,317 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Changes-authorized:** qa/contracts/t037-join-rules-editor-page.md C1; qa/contracts/t037-join-rules-edit-api.md criterion 11
 **Approved-by:** Umesh
 **Links:** U2.4; U3.1; U3.2; T-046; T-037; T-043; T-039; T-052; T-040; T-051; ISS-T037UI-001; ISS-UNOPTLOCK-002; ISS-373; ISS-374; ISS-ALERTID-006; D-024; D-125; qa/manifests/webinar-portable-release.md
+
+## D-127 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 phase-3 gate model: API model instead of local qwen3:8b. The documented model (qwen3:8b via local Ollama) is not installed (Ollama runs with no models). Asked whether to download it, Umesh answered verbatim: "kyu download krna hai use api keys . api wale models se kaam nhi ho skta hai kyaa, ollama models? if not gemini models". Ruling: do not download any model; run the U2.4 phase-3 live precision gate on an API model, preferring the model production routes speaker resolution to per config/ai-routing.yaml, else another Gemini model.
+**Why:** Avoids a large local model download on a CPU-constrained shared machine; an API model that matches production routing is arguably the more meaningful measurement.
+**Result:** The gate's five bars, prompts, windows, 2-of-3 voting and scoring are UNCHANGED; only the model changes. Results are recorded as measured on the API model (model id stated in the evidence) and are not claimed as qwen3:8b results. A checker, not the runner, rules on ISS-104 / ISS-282. Nothing has been run by this entry.
+**Approved-by:** Umesh
+**Links:** U2.4; ISS-104; ISS-282; D-126
+
+## D-128 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Approver rulings 2026-10-12 (2): job-queue retention 30 d, usage_events collection, send-now cap and lean default. Umesh answered in-session with these selections. (1) Job-queue retention: "30 din" - terminal jobs in the T-050 file job queue are pruned after 30 days; this resolves ISS-JOBQPRUNE-001 (the pruneTerminalAfterMs option exists and is currently off by default). (2) usage_events: "Haan, banao" - create a new tenant-scoped `usage_events` collection (schema + migration) recording /ask and /search usage for T-057 D4 usage analytics; no query text is stored. (3) Defaults: "Dono rakho" - keep the send-now `until` cap at 24 h ahead, and keep lean video (720p, 5 fps) ON by default for OBS recordings.
+**Why:** These were open Approver questions: the queue retention period blocked enabling pruning, the usage analytics needed a sanctioned collection, and the two defaults needed confirmation.
+**Result:** Rulings recorded only. Nothing has been built, enabled or changed by this entry; the 30-day pruning default, the usage_events schema/migration and any schema edit must still be made through their own units, with the exact edit named when made. No query text may be stored in usage_events.
+**Approved-by:** Umesh
+**Links:** T-050; T-057; T-039; T-035; ISS-JOBQPRUNE-001; ISS-JOBQLOST-001; ISS-T057OPS-001; ISS-SENDNOWAPI-005; ISS-LEANWIRE; D-126
+
+## D-129 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Approver rulings 2026-10-12 (3). Umesh answered in-session. (1) /health: "Counts hatao, sirf liveness" - the public, unauthenticated GET /health stops returning all-tenant collection counts and keeps only liveness (API up, DB reachable); tenant-scoped counts remain on authenticated GET /system-status. This amends qa/contracts/health-route.md C2 ("Counts are aggregate only ... countDocuments() with no filter") and every criterion requiring `collections` in the /health body (C1, C3, C6, I1 wording); C5 (unauthenticated, mounted before requireAuth) stays. Closes the open part of ISS-T057SCREEN-001. (2) Tombstone (calendar cancelled-invite handling, lane/tombstone): "Amend + live check allow". (a) The D-060 acceptance floor is amended for the changed webinar-policy assertion: in webinar-policy.test.ts "known actual-wire and id-only cancellations ...", the old expectation (blocked, empty feeds, replay blocked beside a proven pair), which is the D-060 floor text "unknown tombstone empty effective feeds/gate" (repair plan line 210), is relaxed for a proven pair only; this satisfies merge condition 4 ("Approver-recorded amendment of the D-060 floor for the changed webinar-policy assertion"). (b) An agent may run ONE read-only live check against Umesh's Google Calendar to confirm the shape of a cancelled event resource, satisfying merge condition 5 ("Live confirmation of Google's cancelled-resource shape (id-only vs start/conferenceData)").
+**Why:** /health exposed coarse business-volume counts to any caller; liveness is all an ops probe needs. The tombstone unit's proven-pair relaxation is semantically right but changed a floor assertion that only an Approver entry may amend; the live check removes the remaining doubt about Google's cancelled-resource shape.
+**Result:** Rulings recorded only. No code built or changed here: the /health route/store/fixture/test edits, the tombstone merge and the live check each still need their own unit. Only the /health amendment is folded into qa/contracts/health-route.md. Merge conditions 4 (and 5 once the single read-only check is run and its result recorded) remain for the tombstone unit's checker to verify; ISS-TOMBSTONE-008 (medium) and the sender-binding question stay open. No other D-060 assertion is amended.
+**Supersedes:** D-060 -- amends only the one webinar-policy cancelled-tombstone assertion for proven pairs; every other D-060 acceptance floor item stands and D-060 stays otherwise in force.
+**Approved-by:** Umesh
+**Links:** T-057; T-036; ISS-T057SCREEN-001; ISS-T036CAL-011; ISS-TOMBSTONE-008; D-060; D-128
+
+## D-130 | 2026-10-12 | type: fix | status: ACTIVE
+
+**What:** Corrective clarification of D-129's `**Supersedes:** D-060` field, which was over-broad. D-060 remains in force IN FULL except the single assertion D-129 amended: in webinar-policy.test.ts "known actual-wire and id-only cancellations ...", the old expectation (blocked, empty feeds, replay blocked beside a proven pair), i.e. the D-060 floor text "unknown tombstone empty effective feeds/gate" (repair plan line 210), relaxed for a proven pair only. Every other D-060 assertion and acceptance-floor item stands unchanged.
+**Why:** The computed-status resolver (.claude/hooks/lab-session-start.ps1) treats any D-ids before ' -- ' in a Supersedes field as a full supersession and offers no partial/amends relation, so D-129 made D-060 compute as SUPERSEDED (by D-129) although D-129's own reasoning text says it "amends only the one webinar-policy cancelled-tombstone assertion for proven pairs; ... D-060 stays otherwise in force." Umesh's 2026-10-12 ruling "Amend + live check allow" authorised only that one amendment, not retirement of D-060.
+**Result:** Record only; no code or enforcement path changed. No partial-supersession syntax exists in append_decision.ps1 or the resolver, and a later entry cannot un-supersede, so the computed index may still print D-060 as SUPERSEDED (by D-129); readers must apply this entry: D-060 is ACTIVE except the one amended assertion. Adding an amends relation to the resolver would be an enforcement-path change needing its own Approved-by entry.
+**Approved-by:** Umesh (ruling 2026-10-12 "Amend + live check allow", which authorised only the single D-060 webinar-policy tombstone assertion amendment and one read-only live Google Calendar check)
+**Links:** D-060; D-129; T-051; T-036; ISS-TOMBSTONE-008
+
+## D-131 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 speaker model: Ollama Cloud via Umesh's paid Ollama API key instead of local qwen3:8b. Umesh ruled in-session 2026-10-12, verbatim: "ollama paid api key and we can use more advance model too . via api key. thik hai . tere paas hai naa ye key C:\Users\product\Desktop\KnowledgeBase\.env". Speaker naming (U2.4) may use an Ollama Cloud model (POST https://ollama.com/api/chat, bearer key read from .env) and a more capable model than qwen3:8b is acceptable. Transcript windows may be sent to ollama.com for this gate measurement.
+**Why:** qwen3:8b is not installed locally and is not offered on Ollama Cloud; D-127 ruled out downloading models and allowed an API model. Umesh has a paid Ollama key, so a more capable cloud model is available at known cost.
+**Result:** The gate's five bars, prompts, windows, 2-of-3 voting and scoring are UNCHANGED. Production config/ai-routing.yaml speakers routing is switched ONLY after a model passes the gate, in a separate unit. Results are recorded as measured on the named cloud model. A checker, not the runner, rules on ISS-104 / ISS-282. D-127 stays as history (no Supersedes field).
+**Approved-by:** Umesh
+**Links:** U2.4; ISS-104; ISS-282; D-127
+
+## D-132 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 direction: speaker naming moves from rule-only evidence to model-judged attribution. Umesh ruled in chat 2026-10-12, verbatim: "use model intelligence. like agar vo khud nhi btaynge tho ... vo voice tho phchaan legaa and overall session record hoga tho khi naa khi se mil hi jayega. make it intelligent instead of rule based". The model reads the whole session per diarized voice label (diarization already clusters voices) and may name a label from any contextual evidence: being called on, address-adjacent, handover, thanks, role continuity, or self-introduction. Each accepted name must carry a verbatim transcript quote that is verified to exist in the transcript (grounding), and that quote is stored as provenance.
+**Why:** The phase-3 Ollama Cloud gate (D-131) failed bar 5 because acceptance requires self-naming evidence (speakers-llm.ts evidence gate, namingTurns; handover and thanks routes are OFF), and only 2 of 144 gold named blocks are self-naming. A rule-only evidence gate cannot reach the gold set.
+**Result:** Gate bars 1 (100% accepted-identity precision) and 2 (0 wrong links) stay unchanged as the safety floor; the floor is not contradicted. Next: a maker unit implements this, it is scored offline on the recorded D-131 proposals first, then re-gated on deepseek-v4-pro within the existing Ollama Cloud budget. D-131 stays as history (no Supersedes field).
+**Approved-by:** Umesh
+**Links:** U2.4; D-131
+
+## D-133 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** ISS-REGCDP-004: Umesh approves updating the D-110/D-111 protected positive-alias control from 2 POSTs to 1 POST (approved-alias 307 no longer re-sends the body to a second POST). The owner-approved positive behaviour "alias 307 re-sends body, 2 POSTs" is retired; the same-host-only 307/308 rule of T-052 is ratified.
+**Why:** regsafe 87df0d1f had already made the 2-POST path unreachable (redirect:'error'), and the checker (lane regcdp, cycle 1 verdict) judged the 1-POST expectation stricter, not a leak.
+**Result:** The protected positive-alias fixture asserts ONE POST and uncertain. No Supersedes field is used: D-110/D-111 remain in force in full except this single positive-alias 2-POST assertion, and the session-start resolver offers no partial relation (see D-130). ISS-REGCDP-004 is closed as resolved by this decision.
+**Approved-by:** Umesh
+**Links:** ISS-REGCDP-004; T-052; D-110; D-111
+
+## D-134 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** ISS-ALERTID-001: skipped-session records for `lkb alert-who` resolution are persisted as one tenant-tagged record per skipped item: {sessionKey, startTime, source, tenantId}, with NO join URL. Records accumulate keyed by sessionKey, and rows whose start time is older than 30 days are dropped (the same window as job-queue retention, D-128). Alert-id computation is unchanged; ISS-ALERTID-002 remains a separate open item. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** alert-who needs to resolve an alert id back to a skipped session without storing join URLs, and the record store must stay tenant-scoped and bounded.
+**Result:** One record per skipped item, keyed by sessionKey, pruned at 30 days by start time. No change to alert-id computation.
+**Approved-by:** Umesh
+**Links:** ISS-ALERTID-001; ISS-ALERTID-007; D-128
+
+## D-135 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-045 re-ingest policy: re-ingesting media that is already ingested (same content-hash source _id) is idempotent. It returns the existing session id with an "already ingested" indication, and creates and deletes nothing. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** A content-hash source _id identifies the media, so a repeat ingest must not duplicate or destroy existing data.
+**Result:** Re-ingest of the same content hash is a no-op that reports the existing session id as already ingested.
+**Approved-by:** Umesh
+**Links:** T-045
+
+## D-136 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Source identity is tenant-scoped for ALL ingest adapters (url, recording, document, whatsapp, as already done for youtube/onair/zoom): source `_id` = tenantSourceId(tenant, contentHash), with contentHash kept as its own field. Existing stored data gets a migrate-mongo migration that rewrites old bare-hash ids and every reference to them. The migration is built and tested locally only, and is run against any real database ONLY with Umesh's explicit approval at that time. Reads must accept both the old and new id forms until the migration has run. This also clarifies D-135: "content-hash source _id" means the tenant-scoped content-hash id, and the within-tenant idempotency policy is unchanged. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** A bare content hash lets two tenants collide on one source id; tenant scoping closes ISS-T045TENANTID-001 consistently across every adapter.
+**Result:** All adapters use the tenant-scoped id; a local-only migration plus dual-form reads cover existing data; no real-database run without explicit approval.
+**Approved-by:** Umesh
+**Links:** ISS-T045TENANTID-001; ISS-T045INTAKE-001; T-045; D-135
+
+## D-137 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-041 OCR failure handling (assumption A5 in qa/manifests/t041-ocr-stage-alignment.md): when OCR fails on a keyframe, retry it a bounded number of times with backoff, then try a configured fallback OCR function if one is injected. Only if every attempt fails, omit the frame from alignment and report it in ocrErrors with its attempt count. A failed frame is never silently treated as blank text. Decided by Umesh (Approver) in chat 2026-10-12: "there must be a fallback or retry mechanism".
+**Why:** Silently treating a failed OCR frame as blank text would hide data loss and corrupt alignment; retry and fallback recover transient failures and the rest are reported.
+**Result:** Bounded retry with backoff, then optional injected fallback, then omit and report in ocrErrors with attempt count.
+**Approved-by:** Umesh
+**Links:** T-041; A5 (qa/manifests/t041-ocr-stage-alignment.md)
+
+## D-138 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** A WhatsApp owner may be mapped to exactly ONE tenant. Owner configuration that maps the same owner to two or more tenants is rejected at load with a clear error. WhatsApp session and turn ids stay as they are: no id change and no migration. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** The only way the bare WhatsApp session id (hash of groupJid and ownerUserId) can collide across tenants is one owner under two tenants; forbidding that closes the collision without rewriting citation-bearing ids.
+**Result:** Owner-to-tenant is one-to-one at config load; session and turn ids and stored data are untouched.
+**Approved-by:** Umesh
+**Links:** ISS-TENANTSRCID-001; D-136
+
+## D-139 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** When a pipeline run fails terminally (retries exhausted), its queue job is marked FAILED, not done, so /system-status and notifications see it. A resubmit of the same runKey creates a new attempt. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** Marking an exhausted run done would hide the failure from status and notifications; failed must be visible, and a resubmit must be able to retry without reusing the dead attempt.
+**Result:** Terminal failure maps to a FAILED queue job; resubmitting the same runKey starts a new attempt.
+**Approved-by:** Umesh
+**Links:** T-050; ISS-T050ADAPTER; qa/manifests/t050-runner-adapter.md
+
+## D-140 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Umesh (Approver) approves amending the job-queue contract (qa/contracts/t050-job-queue.md) criterion 13 to: "13. `LeaseRef.tenantId` and `claim` `opts.tenantId` are REQUIRED. A missing, empty or malformed tenant returns `invalid-input` and writes nothing. A well-formed tenant that differs from the job's tenant makes heartbeat/complete/fail return `not-found`, deep-equal to the answer for a missing id, in every job state, writing nothing. A claim returns only the named tenant's jobs. (ISS-JOBQTENANT-001)". A tenant outside the queue charset (ASCII letters, digits, dot, underscore, hyphen) gets invalid-input. Decided in chat 2026-10-12.
+**Why:** The old wording made the tenant optional and let an omitted tenant match any tenant's job; the checker PASSed the fix that enforces it, so the contract must match.
+**Result:** Criterion 13 now requires the tenant on every owner-checked queue operation; no wildcard.
+**Approved-by:** Umesh
+**Links:** ISS-JOBQTENANT-001
+
+## D-141 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 direction after the cycle-2 live gate. Model-proposed speaker names that pass deterministic grounding (verbatim quote containing the name, multi-name abstain, floor not contradicted), plus a verifier "yes" with single evidence, are shown as SUGGESTED. Each carries its quote and is never final until a human confirms it in the UI. Confirmed names become final with provenance "human-confirmed". Auto-final naming (no human) stays limited to the deterministic floor plus the independent-pair rule. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** The live gate (lane u24gate2, 2e621ece) showed 0 wrong and 0 additions in pair mode, so model proposals are useful as suggestions but not safe to finalize without a human.
+**Result:** Suggested names carry their quote and need human confirmation; auto-final stays at floor plus independent-pair.
+**Links:** U2.4; D-132; ISS-U24SMART-005
+
+## D-142 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-050 /ask graph shape. The /ask graph uses 4 coarse nodes: retrieve (selectNodes, candidate arms, rrfMerge, tree resolve, source hydrate) -> evaluate (ask() evaluation + web/tavily fallback + score audit) -> refine -> answer. It must be output-identical to runAskV2, unexported and off by default. Nodes may be split later. Umesh (Approver) delegated the choice in chat 2026-10-12 ("whatever is the best one").
+**Why:** Coarse nodes keep the graph a thin wrapper that can be proven output-identical to runAskV2; finer splits can follow once that is shown.
+**Result:** 4-node graph, unexported, off by default, output-identical to runAskV2.
+**Links:** T-050
+
+## D-143 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Live and staging writes go to the Mongo server in .env MONGODB_URL, using a SEPARATE database named `lkb_staging`. The production database `lkb` is never written by agents. Every write path must set the database name explicitly and assert that it is not `lkb`. Migrations, including tenant-scoped-source-ids and speaker-suggestions, may run against lkb_staging only. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** A separate staging database lets live runs and migrations be exercised on the real server without any risk to production data.
+**Result:** All agent writes target lkb_staging with an explicit database name and a guard against `lkb`; migrations run on lkb_staging only.
+**Approved-by:** Umesh
+**Links:** D-117; T-043; D-136; D-141
+
+## D-144 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Negation safety in generated notes moves from rule-based detection to an LLM JUDGE. A second model checks each generated note or claim against its cited source sentence(s), and drops or flags any note whose meaning differs, including polarity and negation. Deterministic grounding stays: the citation must exist. The judge is injectable and fakeable, and its cost per session is recorded. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** Rule-based negation detection cannot cover the ways meaning flips; a second model comparing note to cited source catches polarity and negation errors while citation existence stays deterministic.
+**Result:** An injectable LLM judge gates generated notes against their cited sentences; per-session judge cost is recorded.
+**Approved-by:** Umesh
+**Links:** T-040; ISS-T040GEN-012
+
+## D-145 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Retention: raw media (video and audio recordings and their derived media files) is purged 90 days after capture. Transcripts, notes, claims and citations are kept forever. The purge executor honours the existing dry-run vetoes, and logs what it deletes. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** Raw media is large and costly to keep, while the text artifacts carry the durable knowledge and the citations that reference it.
+**Result:** Media is purged at 90 days after capture; text artifacts are retained indefinitely; the executor respects dry-run vetoes and logs deletions.
+**Approved-by:** Umesh
+**Links:** T-046; Q6
+
+## D-146 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Live runs are approved: (1) T-043 indexing plus cited /ask against lkb_staging, with Gemini embeddings; (2) live browser checks for U3.1, U3.2, T-046 and the T-037 editor, using real local Chrome, up to 15 concurrent browsers on this machine; (3) the T-049 Langfuse live check; (4) a 60-minute live capture for T-034 and T-035, once Umesh provides a meeting link. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** These items cannot be proven by local fakes alone; approving them against the staging database bounds the risk to production.
+**Result:** Agents may run the listed live checks, writing only to lkb_staging (D-143); the T-034/T-035 capture waits for a meeting link from Umesh.
+**Approved-by:** Umesh
+**Links:** D-024; T-043; T-049; T-034; T-035; U3.1; U3.2; T-046; T-037
+
+## D-147 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Umesh approved raising the lint-dirsize budget for schema/ from 30 to 40 (2026-10-12). Schema files are one per collection and all tooling (gen-types, validate.py, kb:// resolver, CI) reads schema/ flat; relocation was rejected.
+**Why:** Splitting or relocating schema/ would break every tool that reads it flat, so the directory-size budget is raised instead.
+**Result:** lint-dirsize budget for schema/ is 40.
+**Approved-by:** Umesh
+**Links:** U2.4; D-141; lane u24suggest
+
+## D-148 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-043 staging data: Umesh chose to rebuild real derivation provenance by running the repo's own knowledge pipeline over raw/TOC/TOC-Materials (the 23 sessions), then seed and index lkb_staging (per D-143). Integrity checks (validation.json / derivation-provenance.json guards) stay in force; no forged or bypassed provenance. Model spend cap USD 10.
+**Why:** Provenance must be real, so staging data is derived by the repo's own pipeline rather than forged or the guards bypassed.
+**Result:** Staging is rebuilt from the 23 sessions with guards on and a USD 10 model spend cap.
+**Approved-by:** Umesh
+**Links:** T-043; D-143; D-146
+
+## D-149 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-043 staging data: TOC audio is not on this machine (raw/TOC/TOC-Materials/Audio absent), so provenance cannot be regenerated by the pipeline (D-148 infeasible). Umesh chose: seed the 23 existing data/toc-migrated transcript sessions into lkb_staging labelled provenance status 'legacy-unbound' via an explicit --legacy-unbound flag plus LKB_ALLOW_STAGING=lkb_staging opt-in; never `lkb`; no manual bindDerivedArtifacts (no forged provenance); integrity checks stay on for all other data.
+**Why:** Without the audio the pipeline cannot produce real provenance, so the existing sessions are seeded with an honest legacy-unbound label rather than forged provenance.
+**Result:** 23 sessions seeded into lkb_staging as legacy-unbound behind an explicit flag and env opt-in; production lkb untouched.
+**Supersedes:** D-148 -- D-148 required regenerating provenance by running the pipeline over the TOC audio, which is absent on this machine, so that method is infeasible; this entry replaces it in full with the legacy-unbound seeding.
+**Approved-by:** Umesh
+**Links:** T-043; D-143; D-146; D-148
+
+## D-150 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Umesh ruled (2026-10-13) that scripts/mint-key.mjs and the scripts/watch watcher (ingest/reingest) MAY write the production database lkb, but only with the explicit --i-know-this-is-production flag plus an exact MONGODB_DB=lkb; with no DB they refuse; otherwise limited to work/staging DBs.
+**Why:** These scripts legitimately need production access, but production writes must be a deliberate, explicit act rather than a default.
+**Result:** mint-key and the watch ingest/reingest scripts write lkb only with --i-know-this-is-production and MONGODB_DB=lkb; no DB set means refuse; otherwise work/staging DBs only.
+**Approved-by:** Umesh
+**Links:** ISS-LEGACYSEED-002; ISS-LEGACYSEED-003; D-143
+
+## D-151 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-040: Umesh ruled (2026-10-13) that when the note judge (D-144) is enabled, the rule-based lexical negation checks ALSO run (defense in depth): a note is dropped if either the judge or the rules reject it. Resolves ISS-T040JUDGE-002.
+**Why:** Running both layers means a note must pass the judge and the rules, so a judge miss is still caught by the lexical checks.
+**Result:** With the judge enabled, a note ships only if both the judge and the rule-based negation checks accept it.
+**Approved-by:** Umesh
+**Links:** T-040; D-144; ISS-T040JUDGE-002
+
+## D-152 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** ISS-ALERTID-002: Umesh ruled (2026-10-13) to keep alert ids as they are (unsalted hash); the offline-guessing risk is accepted. ISS-ALERTID-002 is closed as accepted-risk (ledger status wontfix).
+**Why:** The risk of offline guessing of alert ids was weighed and accepted by the Approver, so no change to the id scheme is made.
+**Result:** Alert ids stay an unsalted hash; ISS-ALERTID-002 closed as accepted-risk.
+**Approved-by:** Umesh
+**Links:** ISS-ALERTID-002
+
+## D-153 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** /ask with invalid source rows: Umesh chose (2026-10-13) to exclude invalid turns per-turn (e.g. tEnd<tStart legacy rows), record them in a warning, and answer from the remaining sessions; an excluded turn is never cited; if all rows are invalid the request is refused; foreign-tenant/foreign-session rows still refuse the whole request. New invalid timing is refused at write time.
+**Why:** A few bad legacy turns should not take down /ask (503) for every session, but cross-tenant rows remain a hard refusal and bad data must not be cited or newly written.
+**Result:** /ask answers from valid turns with a warning listing excluded ones; all-invalid or foreign rows refuse; new invalid timing is rejected at write.
+**Approved-by:** Umesh
+**Links:** T-043; lane badturns
+
+## D-154 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Tombstone constants confirmed: cancelled-meeting tombstones retained 14 days, match window +/-24 h (Umesh, 2026-10-13). Resolves the owner question in ISS-TOMBSTONE-001/-007 and ISS-T036CAL-011.
+**Why:** The retention and match-window constants were an open owner question on the tombstone issues; the Approver has now fixed them.
+**Result:** Tombstone retention is 14 days and the match window is +/-24 h.
+**Approved-by:** Umesh
+**Links:** D-060; D-129; D-130
+
+## D-155 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Langfuse: hosted Langfuse Cloud (cloud.langfuse.com) Hobby free tier is allowed; traces carry metadata only (model, tokens, cost, tenant tag), no transcript text. If usage would exceed the free tier, switch to self-hosted rather than paying. This amends ONLY the self-hosted-only assertion for T-049: the 'Langfuse self-hosted' wording in the TASKS.md T-049 row and the self-hosted clause of criterion 3 (TENANT ID ruling) in qa/contracts/t049-langfuse-trace-sink.md. No DECISIONS entry required self-hosting, so nothing is superseded and no other part of T-049 changes.
+**Why:** T-049 live evidence ran against a hosted free tier; the Approver allows it provided traces stay metadata-only and the project never pays for overage.
+**Result:** T-049 may use Langfuse Cloud Hobby with metadata-only traces; exceeding the free tier means self-hosting, not paying.
+**Approved-by:** Umesh
+**Links:** T-049; qa/contracts/t049-langfuse-trace-sink.md criterion 3
+
+## D-156 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-021: Umesh ratifies gate condition 4 -- U1.4/U1.5 baselines re-point to the redesigned golden set (semantic leg recall@5 0.935, qa/verdicts/golden-set-semantic-leg.md).
+**Why:** Gate condition 4 required an Approver decision to move the U1.4/U1.5 baselines onto the redesigned golden set.
+**Result:** U1.4/U1.5 baselines now measure against the redesigned golden set; T-021 gate condition 4 is ratified.
+**Approved-by:** Umesh
+**Links:** T-021; qa/gates/golden-set-redesign.md
+
+## D-157 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** U3.1: Umesh accepts the real-Chrome CDP browser proof (qa/verdicts/web-ask-page.md PASS 8/8, qa/evidence/u31-ask-proof-20260921/) in place of a literal Playwright run.
+**Why:** A real Chrome run over CDP exercised the actual page 8 of 8, which the Approver accepts as equivalent proof.
+**Result:** U3.1 browser proof is satisfied by the CDP real-Chrome evidence.
+**Approved-by:** Umesh
+**Links:** U3.1
+
+## D-158 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** /system-status contract (qa/contracts/t057-d2-activity-health.md C1/C4) amended: the DTO may include a `source` field (upload-queue | job-queue) and job-queue failures map to a fixed error-class allow-list; D-139 dead jobs appear tenant-scoped.
+**Why:** D-139 makes terminally failed runs dead jobs in the file job queue, which /system-status must be able to show without leaking raw error text or other tenants' jobs.
+**Result:** Contract C1 and C4 are amended accordingly; the source field and the fixed error-class allow-list are permitted.
+**Approved-by:** Umesh
+**Links:** D-139; ISS-FAILEDJOB-001; T-057
+
+## D-159 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Tombstone constants corrected: retention is 30 days (code MATCHED_HORIZON_MS, unchanged) and match window +/-24 h. D-154 stated 14 days because the owner question quoted the wrong current value; Umesh confirmed 30 days (2026-10-13).
+**Why:** D-154 recorded 14 days from a mis-quoted current value; the owner chose to keep the shipped 30-day horizon, so the record must match.
+**Result:** Tombstone retention is 30 days and the match window is +/-24 h; no code change.
+**Supersedes:** D-154 -- D-154's only assertion was the retention and window constants, and its 14-day figure was wrong; this entry replaces it in full with 30 days and +/-24 h.
+**Approved-by:** Umesh
+**Links:** D-060; D-129; ISS-TOMBSTONE-001; ISS-TOMBSTONE-007; ISS-T036CAL-011
+
+## D-160 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-042: build active-speaker tile capture in the meeting bot; tile-derived names (including tile+intro 'agree') are shown as SUGGESTED only and confirmed by a human, exactly like D-141 model suggestions; tile names never become auto-final. Capture is behind a flag, default off.
+**Why:** Tile names can be wrong or spoofed, so they get the same human-confirmation gate as model suggestions rather than being auto-final.
+**Result:** Tile capture is built behind a default-off flag; tile-derived names are SUGGESTED only until a human confirms.
+**Approved-by:** Umesh
+**Links:** T-042; D-141; ISS-T042FUSION-001
+
+## D-161 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-050: Umesh chose (2026-10-13) to use the real LangGraph library (official @langchain/langgraph, JS 1.x, exact pinned version) for the pipeline graph, replacing the minimal typed executor; behaviour, tests and the LKB_PIPELINE_GRAPH flag stay the same. The /ask graph (D-142) follows in a later unit.
+**Why:** The Approver prefers the official library over a hand-rolled executor, with identical behaviour, tests and flag so the swap is a pure replacement.
+**Result:** The pipeline graph moves to @langchain/langgraph (JS 1.x, exact pinned); the /ask graph follows in a later unit.
+**Approved-by:** Umesh
+**Links:** T-050; D-142
+
+## D-162 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Lift the D-119 driver-file hold so T-044 (drift-clamp/QA wiring), T-048 (single-call chooser wiring) and T-040 (grounded notes and Q&A wiring) can be built. The hold covered scripts/transcribe-long-session.mjs, sync-session.mjs, scripts/ingest-chain.mjs, scripts/lib/transcript-provenance*, scripts/upload/* and gemini-file-upload.ts. Each of the three wirings must sit behind a flag that is OFF by default.
+**Why:** D-119 reserved those files until real end-to-end evidence existed. qa/verdicts/u4.1-recording-upload-worker.md now records "Effective U4.1 unit VERDICT: PASS", which supplies that evidence. Umesh approved the lift explicitly on 2026-10-13.
+**Result:** The hold on the listed driver files is lifted for T-044, T-048 and T-040 work only, with default-off flags. The rest of D-119 is unchanged.
+**Supersedes:** D-119 -- only D-119's hold on the listed driver files is superseded, because the U4.1 PASS verdict now provides the end-to-end evidence the hold was waiting for; the remainder of D-119 stands.
+**Approved-by:** Umesh
+**Links:** T-044; T-048; T-040; U4.1; D-119; qa/verdicts/u4.1-recording-upload-worker.md
+
+## D-163 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** U2.2 golden labels: an agent may pre-fill the U2.2 adjudication fields in data/eval/extraction-adjudication-packet.json and data/eval/golden-set-human-review.json, clearly marked as AI drafts and never as humanGold. Each draft becomes gold only after Umesh reviews and approves it individually.
+**Why:** Pre-filling drafts reduces the human adjudication workload while keeping the human as the sole source of gold labels. Umesh gave this answer explicitly on 2026-10-13.
+**Result:** AI-drafted adjudication values are permitted but are not gold; no label counts as humanGold until Umesh approves that item.
+**Approved-by:** Umesh
+**Links:** U2.2; U2.3; U2.5; T-055
+
+## D-164 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** U0.10 real-LLM baseline: spend approved. Run it on Ollama Cloud models first (Umesh: "ollama glm 5.3 flash, deepseek 4.1 flash"), then Gemini at the end, using the keys already in .env.
+**Why:** The real-LLM baseline needs paid model calls; Umesh approved the spend and the run order explicitly on 2026-10-13.
+**Result:** U0.10 may run against Ollama Cloud models first and Gemini last, using existing .env keys.
+**Approved-by:** Umesh
+**Links:** U0.10; T-022; D-156
+
+## D-165 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Enable automatic meeting discovery and auto-join (T-036, T-037, T-038). The bot joins webinars automatically. Career counselling and career guidance content has the highest priority, including on scheduling conflicts. Other webinars, e.g. Google Cloud OnAir, are test data and go to staging. Alerts go by email to umeshsugara@vidysea.com via gws AND appear on the web dashboard. This authorizes enabling the T-038 scheduler consent gate, and setting the relevant default flags ON for this deployment.
+**Why:** Umesh answered directly on 2026-10-14. Q: "Should the bot join meetings on its own? Which ones?" A: "webinars and all . most high priority should be given to career counselling, career guidance and all these kind of data . humko ussi ka knowlege base bnnana hai . ye google wala tho for testing and all hai". Q: "When the scheduler finds a meeting, how should it tell you?" A: "email, and web dashbaord both".
+**Result:** Auto-discovery and auto-join are authorized for this deployment, with career counselling and guidance webinars first, other webinars staged as test data, and alerts sent by email and shown on the dashboard.
+**Approved-by:** Umesh
+**Links:** T-036; T-037; T-038

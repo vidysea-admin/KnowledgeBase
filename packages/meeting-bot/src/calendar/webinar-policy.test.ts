@@ -172,9 +172,12 @@ test("known actual-wire and id-only cancellations preserve metadata and block st
   const stale = reconcile(first.state, [{id: "cal-a", cancelled: true, providerUpdated: "2026-10-01T07:00:00.000Z"}]);
   assert.equal(choose(stale).toSchedule.length, 1); assert.equal(stale.calendarEvents[0]!.cancelled, false);
   const unknown = reconcile(first.state, [{id: "unknown", cancelled: true}]);
-  assert.equal(unknown.newStartsBlocked, true); assert.deepEqual(unknown.calendarEvents, []); assert.deepEqual(unknown.candidates, []);
+  // CHANGED (ISS-T036CAL-011; was: newStartsBlocked true, both feeds empty, replay still blocked). The tombstone is still recorded and listed
+  // (`unknown-tombstone`), but it can no longer stop the proven pair: the Calendar row and its linked Gmail copy are exactly as without it.
+  // The original hazard (a cancelled meeting's UNLINKED Gmail copy) stays guarded: see tombstone/unknown-tombstone-non-interference.test.ts.
+  assert.equal(unknown.newStartsBlocked, false); assert.deepEqual(unknown.calendarEvents, first.calendarEvents); assert.deepEqual(unknown.candidates, first.candidates);
   assert.ok(unknown.inventory.some(row => row.reason === "unknown-tombstone"));
-  assert.equal(reconcile(unknown.state, [], []).newStartsBlocked, true);
+  assert.equal(reconcile(unknown.state, [], []).newStartsBlocked, false);
 });
 test("accepted reschedule rewrites only proven Gmail lineage and retains sticky barriers", () => {
   const moved = calendarRow({startTime: "2026-10-02T12:00:00.000Z", endTime: "2026-10-02T13:00:00.000Z", meetingUrl: "https://zoom.us/w/333?tk=new", providerUpdated: "2026-10-01T08:30:00.000Z"});

@@ -11,6 +11,7 @@
     "topicRefs": { "type": "array", "items": { "type": "string" } },
     "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
     "status": { "type": "string", "enum": ["verified", "needs-review", "conflicting"] },
+    "origin": { "type": "string", "enum": ["speaker-statement", "screen-ocr", "visual-observation"], "description": "optional: source of the claim's evidence (strict webinar claims); legacy claims omit it" },
     "evidence": {
       "type": "array",
       "minItems": 1,
@@ -19,7 +20,8 @@
         "required": ["turnId", "sessionId"],
         "properties": {
           "turnId": { "type": "string" },
-          "sessionId": { "type": "string" }
+          "sessionId": { "type": "string" },
+          "quote": { "type": "string", "minLength": 1, "description": "optional literal contiguous substring of the cited turn's text (strict webinar claims)" }
         }
       }
     }

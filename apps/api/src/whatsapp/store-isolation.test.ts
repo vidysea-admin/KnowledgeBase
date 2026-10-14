@@ -8,7 +8,7 @@ function fixture(poison=false) {
   const effects={archive:0,fetch:0,write:0,index:0};
   const rows: Array<{name:string; value:any}> = [];
   const groups=[{groupJid:"same",ownerUserId:A,subject:"A",trackedPersonCount:1},{groupJid:"same",ownerUserId:B,subject:"B",trackedPersonCount:1},{groupJid:"foreign",ownerUserId:B,subject:"B",trackedPersonCount:1}];
-  const appDb=()=>({collection:(name:string)=>({replaceOne:async (_filter:unknown,value:unknown)=>{effects.write++;rows.push({name,value})},bulkWrite:async(value:unknown)=>{effects.write++;rows.push({name,value})}})}) as unknown as Db;
+  const appDb=()=>({collection:(name:string)=>({findOne:async()=>null,replaceOne:async (_filter:unknown,value:unknown)=>{effects.write++;rows.push({name,value})},bulkWrite:async(value:unknown)=>{effects.write++;rows.push({name,value})}})}) as unknown as Db;
   const options:WhatsAppStoreOptions={resolveOwner:createConfiguredWhatsAppOwnerResolver(JSON.stringify([{tenantId:"a",ownerUserId:A},{tenantId:"b",ownerUserId:B}])),appDb,
     listGroups:async owner=>{effects.archive++;return poison?groups.filter(g=>g.ownerUserId===B):groups.filter(g=>g.ownerUserId===owner)},
     fetchMessages:async (_group,owner)=>{effects.fetch++;return [{messageId:`message-${owner}`,personId:`person-${owner}`,displayName:"Fixture",text:"synthetic literal",ts:"2026-10-09T01:02:03.000Z"}]}};

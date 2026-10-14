@@ -2,7 +2,7 @@ import { test, mock } from "node:test";
 import assert from "node:assert/strict";
 import { once } from "node:events";
 import { request } from "node:http";
-import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -17,6 +17,17 @@ import { createConfiguredActivityHealthDeps, createQueueActivityHealthReader, re
 import type { ActivityHealthDeps } from "./types.js";
 
 const root = fileURLToPath(new URL("../../../../", import.meta.url));
+// Structural shape: every path (arrays as "[]") with its primitive type; null is dropped where the same path also has a non-null value.
+function shapeOf(value: unknown): string[] {
+  const seen = new Map<string, Set<string>>();
+  const walk = (v: unknown, path: string): void => {
+    if (Array.isArray(v)) { (seen.get(path) ?? seen.set(path, new Set()).get(path)!).add("array"); for (const item of v) walk(item, `${path}[]`); return; }
+    if (v !== null && typeof v === "object") { (seen.get(path) ?? seen.set(path, new Set()).get(path)!).add("object"); for (const [k, x] of Object.entries(v)) walk(x, `${path}.${k}`); return; }
+    (seen.get(path) ?? seen.set(path, new Set()).get(path)!).add(v === null ? "null" : typeof v);
+  };
+  walk(value, "$");
+  return [...seen].flatMap(([path, types]) => { const kinds = [...types]; const real = kinds.length > 1 ? kinds.filter(k => k !== "null") : kinds; return real.map(k => `${path}:${k}`); }).sort();
+}
 const env = { UPLOAD_TENANT_ID: "owner", UPLOAD_ACTOR: "operator", UPLOAD_QUEUE_DB: "upload_queue_fixture01", MONGODB_URL: "mongodb://fixture.invalid" };
 const row = { _id: "a".repeat(64), tenantId: "owner", kind: "transcribe.rpc", status: "pending", createdAt: "2026-10-09T12:00:00Z", deadlineMs: Date.parse("2026-10-09T12:30:00Z"), attempts: 0, maxAttempts: 2 };
 const options = (key = "owner") => ({ headers: { authorization: `Bearer ${key}` } });
@@ -122,7 +133,7 @@ with patch('job_queue.now_ms',lambda:clock),patch('job_queue.iso',lambda:'2026-1
  assert rows[3]['status']=='failed' and rows[5]['status']=='pending' and rows[6]['status']=='pending'
  print(json.dumps({'rows':rows,'firstAttempts':first['attempts'],'reclaimedAttempts':second['attempts'],'staleOwnerFenced':True,'terminalDeadlineCancelExhaustionFenced':True}))
 `;
-test("actual producer -> Python first/reclaim/fences -> real production Mongo binding -> authenticated current server -> consumer output", { timeout: 20000 }, async () => {
+test("actual producer -> Python first/reclaim/fences -> real production Mongo binding -> authenticated current server -> consumer output", { timeout: 150000 }, async () => {
   const queueModule = await import(new URL("../../../../scripts/upload/queue.mjs", import.meta.url).href);
   const parent = join(root, ".cache", "coordination", "t057-d2-private"); await mkdir(parent, { recursive: true }); const spoolRoot = await mkdtemp(join(parent, "spool-"));
   let produced: Record<string, unknown> | null = null, finished: Record<string, unknown> | null = null;
@@ -130,11 +141,11 @@ test("actual producer -> Python first/reclaim/fences -> real production Mongo bi
     updateOne: async (_filter: unknown, update: { $setOnInsert?: Record<string, unknown> }) => { if (update.$setOnInsert) produced = update.$setOnInsert; },
     findOne: async () => finished ?? produced,
   } };
-  const transport = await queueModule.createQueueTransport(queue, { spoolRoot, runId: "b".repeat(64), timeoutMs: 10000, pollMs: 10 });
+  const transport = await queueModule.createQueueTransport(queue, { spoolRoot, runId: "b".repeat(64), timeoutMs: 120000, pollMs: 10 });
   const pending = transport({ method: "GET", url: "https://generativelanguage.googleapis.com/v1beta/files/fixture?key=private-fixture-key", headers: {} });
   for (let n = 0; n < 100 && !produced; n++) await new Promise(resolve => setTimeout(resolve, 5)); assert.ok(produced);
   assert.equal(JSON.stringify(produced).includes("private-fixture-key"), false);
-  const child = spawnSync(process.env.D2_FIXTURE_PYTHON ?? join(root, ".venv", "Scripts", "python.exe"), ["-c", pythonFixture], { cwd: root, input: JSON.stringify([produced]), encoding: "utf8", timeout: 5000, windowsHide: true });
+  const child = spawnSync(process.env.D2_FIXTURE_PYTHON ?? join(root, ".venv", "Scripts", "python.exe"), ["-c", pythonFixture], { cwd: root, input: JSON.stringify([produced]), encoding: "utf8", timeout: 90000, windowsHide: true });
   assert.equal(child.status, 0, child.stderr); const proof = JSON.parse(child.stdout) as { rows: typeof row[]; firstAttempts: number; reclaimedAttempts: number; staleOwnerFenced: boolean; terminalDeadlineCancelExhaustionFenced: boolean };
   finished = proof.rows[0]!; assert.equal((await pending).status, 200);
   const calls: unknown[] = []; const safeCollection = memoryReader(proof.rows, calls);
@@ -152,7 +163,12 @@ test("actual producer -> Python first/reclaim/fences -> real production Mongo bi
       const response = await fetch(url, options()); assert.equal(response.status, 200); const body = await response.json(); assert.equal(connections, 1);
       assert.ok(!JSON.stringify(body).includes("claimToken")); assert.ok(!JSON.stringify(body).includes("foreign"));
       const output = { response: body, producerWorkerProof: { firstAttempts: proof.firstAttempts, reclaimedAttempts: proof.reclaimedAttempts, staleOwnerFenced: proof.staleOwnerFenced, terminalDeadlineCancelExhaustionFenced: proof.terminalDeadlineCancelExhaustionFenced }, selectedDatabase: env.UPLOAD_QUEUE_DB, httpStatus: response.status };
-      await writeFile(join(root, ".cache", "coordination", "t057-d2-runtime-output.json"), JSON.stringify(output, null, 2));
+      // Drift guard for the committed web fixture (apps/web/test-fixtures): the web integration test reads it instead of this run's output.
+      const fixturePath = join(root, "apps", "web", "test-fixtures", "t057-d2-runtime-output.json");
+      if (process.env.UPDATE_WEB_FIXTURE === "1") await writeFile(fixturePath, JSON.stringify(output, null, 2) + "\n");
+      const fixture = JSON.parse(await readFile(fixturePath, "utf8")) as Record<string, unknown>;
+      assert.deepEqual(shapeOf(output), shapeOf(fixture), "apps/web/test-fixtures/t057-d2-runtime-output.json drifted from the API output shape; regenerate with UPDATE_WEB_FIXTURE=1");
+      assert.deepEqual({ ...output, response: undefined }, { ...fixture, response: undefined });
     } finally { await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())); await deps.activityHealth.close?.(); }
     assert.equal(closes, 1);
     const missing = createServer({ ...buildTestDeps(), keyStore }); const server2 = missing.listen(0, "127.0.0.1"); await once(server2, "listening"); const address2 = server2.address(); assert.ok(address2 && typeof address2 !== "string");

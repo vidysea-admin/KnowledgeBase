@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://usage_events",
+  "title": "usage_events",
+  "description": "T-057 D4 usage analytics (ISS-T057OPS-001). ONE row per answered POST /ask or GET /search request, written fire-and-forget by apps/api/src/usage. Deliberately content-free: it records THAT a call happened, never WHAT was asked or answered. There is NO query text, answer text, hit list, API key id/hash/secret, IP address, user agent or request id - `additionalProperties: false` makes any such field a validation failure, not a quiet extra. Only 2xx (outcome ok) and 5xx (outcome error) responses are recorded; 4xx (bad request, missing scope, no tree yet) are caller mistakes, not usage. No retention/TTL is declared: no DECISIONS entry covers usage-event retention, so none is invented here (open question for the Approver).",
+  "type": "object",
+  "required": ["_id", "tenantId", "kind", "at", "day", "outcome", "latencyMs"],
+  "properties": {
+    "_id": { "type": "string", "minLength": 1, "description": "Random UUID; no information about the request." },
+    "tenantId": { "type": "string", "minLength": 1, "description": "From the verified API key only, never from the request." },
+    "kind": { "type": "string", "enum": ["ask", "search"] },
+    "at": { "type": "string", "format": "date-time", "description": "ISO-8601 instant the response finished." },
+    "day": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", "description": "UTC calendar day of `at` (YYYY-MM-DD) - the bucket GET /usage groups by." },
+    "outcome": { "type": "string", "enum": ["ok", "error"] },
+    "latencyMs": { "type": "integer", "minimum": 0, "description": "Wall-clock milliseconds from request arrival to response finish." }
+  },
+  "additionalProperties": false
+}

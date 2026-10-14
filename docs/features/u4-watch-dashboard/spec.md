@@ -12,7 +12,7 @@ requirements below are ordered alert-first, and the screen is specified as the p
 
 ## The gap the alert has to fill (checked, not assumed)
 
-`packages/meeting-bot/src/capture/telegram-alerts.ts:61-69` defines `TelegramNotifier` with
+`packages/meeting-bot/src/capture/notify/telegram-alerts.ts:61-69` defines `TelegramNotifier` with
 `notifyJoined` · `notifyDisconnected` · `notifyRecovered` · `notifySilence` · `notifyFinished`.
 Every one of those fires **during or after a recording that started**. There is no notification for:
 

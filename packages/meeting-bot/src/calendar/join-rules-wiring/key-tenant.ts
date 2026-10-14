@@ -9,7 +9,7 @@
  * network error, timeout, redirect. The same key and base URL as the candidate fetch are used; the key is sent nowhere else.
  * The raw header is never logged: only a fixed reason token is.
  */
-import { joinRulesFilePath } from "../join-rules-store.js";
+import { joinRulesFilePath } from "../join-rules/join-rules-store.js";
 
 export const KEY_TENANT_PATH = "/webinar-operations";
 /** Operator-facing cause for the statuses whose meaning is known (ISS-TENANTSIG-001 / -002). Fixed text only; the response is never echoed. */

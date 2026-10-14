@@ -22,6 +22,18 @@ export type TurnDoc = Turns;
 export type { Turn };
 
 /**
+ * ISS-T045INTAKE-001: tenant-scoped source identity. A content hash alone is global, so two tenants holding identical
+ * media would collide on a global-unique `sources._id` (existence oracle, cross-tenant denial, overwrite by upsert).
+ * The id is `<encodeURIComponent(tenantId)>:<hash>`: the encoded tenant never contains ':', so the pair is injective
+ * and the tenant can never be forged by choosing a hash. The bare hash stays in the `hash` field.
+ */
+export function tenantSourceId(tenantId: string, contentHash: string): string {
+  if (typeof tenantId !== "string" || tenantId.length === 0) throw new Error("tenantSourceId: tenantId required");
+  if (typeof contentHash !== "string" || contentHash.length === 0) throw new Error("tenantSourceId: contentHash required");
+  return `${encodeURIComponent(tenantId)}:${contentHash}`;
+}
+
+/**
  * Input to `Source.fetch()`. `captureMode` is required — no adapter guesses it. D-008
  * (provided-first, H8): a caller marks `captureMode: "provided"` only when an organizer-provided
  * recording/notes was actually used; anything else (including `"silent"`) must be supplied

@@ -154,6 +154,14 @@ test("ISS-T044W-001 alias variants through the library: all refused before any w
     const input = join(dir, name);
     writeFileSync(input, EXACT);
     const before = readFileSync(input);
+    // Probe the real filesystem: is the upper-cased spelling the same file? (Windows/macOS yes, Linux no.)
+    const probe = join(dir, "caseprobe.txt");
+    writeFileSync(probe, "x");
+    const caseInsensitive = existsSync(join(dir, "CASEPROBE.TXT"));
+    // Spellings that only alias the input on some platforms; elsewhere they name a distinct file.
+    const distinct = new Set<string>();
+    if (!caseInsensitive) distinct.add("upper case");
+    if (process.platform !== "win32") { distinct.add("trailing dot"); distinct.add("trailing space"); }
     const variants: Array<[string, string | null]> = [
       ["dot segment", `${dir}${sep}.${sep}${name}`],
       ["dotdot segment", join(dir, "sub", "..", name)],
@@ -183,7 +191,14 @@ test("ISS-T044W-001 alias variants through the library: all refused before any w
 
     for (const [label, out] of variants) {
       if (out === null) { tc.diagnostic(`SKIPPED ${label}: not creatable here`); continue; }
-      assert.throws(() => writeTranscriptQaReport({ inputPath: input, durationSec: 20, outPath: out, overwrite: true }), /over the input/, label);
+      if (distinct.has(label)) {
+        // Not an alias here: the write goes to the distinct file and must not touch the input.
+        const w = writeTranscriptQaReport({ inputPath: input, durationSec: 20, outPath: out, overwrite: true });
+        assert.equal(w.outPath, out, `${label}: distinct file written`);
+        assert.ok(existsSync(out), `${label}: distinct output exists`);
+      } else {
+        assert.throws(() => writeTranscriptQaReport({ inputPath: input, durationSec: 20, outPath: out, overwrite: true }), /over the input/, label);
+      }
       assert.ok(before.equals(readFileSync(input)), `${label}: input unchanged`);
     }
     if (viaJunction) {

@@ -6,6 +6,7 @@ import { UpcomingSection } from "./meeting-bot/UpcomingSection.js";
 import { PastSection } from "./meeting-bot/PastSection.js";
 import { OperationsSections } from "./meeting-bot/OperationsSections.js";
 import { DiscoveryStatus } from "./meeting-bot/DiscoveryStatus.js";
+import { SendNowForm } from "./meeting-bot/SendNowForm.js";
 
 /**
  * /meeting-bot: upcoming calendar meetings, live/in-progress operations, operations history and past recordings.
@@ -21,6 +22,7 @@ export function MeetingBotPage(): React.ReactElement {
   return <>
     <div className="page-header"><h1>Meeting bot</h1>
       <p>Upcoming meetings, capture in progress, webinar operations and past recordings.</p></div>
+    <SendNowForm apiKey={apiKey} />
     <UpcomingSection state={upcoming} />
     <DiscoveryStatus state={ops} />
     <OperationsSections state={ops} />

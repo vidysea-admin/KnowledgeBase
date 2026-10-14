@@ -173,7 +173,7 @@ test("a writer whose lock was taken over (stalled past the ceiling) refuses befo
   assert.ok(!w.names().some((n) => n.endsWith(".tmp")), "own temp removed");
 });
 
-test("orphan temp reaping: only this run's temp files, only after a takeover, never when the lock was simply free", () => {
+test("orphan temp reaping: only this run's temp files (after a takeover AND, since ISS-RUNLOCK-003, whenever the lock is acquired)", () => {
   const w = new LockWorld();
   crashedHolder(w);
   const stray = ["r2.run-state.json.u1.tmp", "r1.run-state.json.a.b.tmp", "r1.run-state.jsonx.tmp", "r1.run-state.json..tmp", "r1.run-state.json.u1.txt"];
@@ -183,10 +183,12 @@ test("orphan temp reaping: only this run's temp files, only after a takeover, ne
   const left = w.names().map((n) => n.split("/").pop());
   assert.ok(!left.some((n) => n === "r1.run-state.lock" || /^r1\.run-state\.json\.p100-\d+\.tmp$/.test(n!)), `reaped: ${left}`);
   for (const s of stray) assert.ok(left.includes(s), `kept ${s}`);
-  // a free lock (no takeover): a live writer's temp is never touched
+  // a free lock (no takeover): since ISS-RUNLOCK-003 the holder reaps here too. A temp file can only exist while the lock is held, so one found
+  // under OUR lock is a previous (dead or displaced) holder's; leaving it would let that holder's stalled rename land after our write.
   w.files.set(path.join("/r", "r1.run-state.json.live-1.tmp"), "x");
   assert.equal(code(b.store.save("r1", st(1), st(2))), "ok");
-  assert.ok(w.names().some((n) => n.endsWith("r1.run-state.json.live-1.tmp")));
+  assert.ok(!w.names().some((n) => n.endsWith("r1.run-state.json.live-1.tmp")), "orphan temp reaped under a freshly acquired lock");
+  for (const s of stray) assert.ok(w.names().map((n) => n.split("/").pop()).includes(s), `still kept ${s}`);
 });
 
 test("an abandoned takeover claim of a dead taker does not block recovery; a live taker's claim does", () => {

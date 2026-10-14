@@ -20,8 +20,8 @@
  */
 import type { Turns } from "@lkb/core";
 import { HANDOVER_MARKERS, containsNameVerbatim, hasNamingCueAt, isDiscourseOnly, looksLikeAName, nameOccurrences, readsAsAPlaceOrOrg } from "./speaker-name-rules.js";
-import { isReportedAt } from "./speaker-reported-rules.js";
-import { isCleanSelfIdentificationAt, turnHoldsOtherSelfIntroduction } from "./speaker-selfid-rules.js";
+import { isReportedAt } from "./speaker-rules/speaker-reported-rules.js";
+import { isCleanSelfIdentificationAt, turnHoldsOtherSelfIntroduction } from "./speaker-rules/speaker-selfid-rules.js";
 
 export type RelationRoute = "selfIdentification" | "handover" | "thanks";
 /** Which relation routes may bind a name. Frozen: a route is switched on by editing this line, in a reviewed change. */

@@ -6,6 +6,7 @@
  */
 import { Router, type Request, type Response } from "express";
 import { requireScope } from "../auth.js";
+import { createSendNowRouter, unavailableSendNowRouter, type SendNowDeps } from "../join-rules/send-now.js";
 
 export interface UpcomingMeeting {
   id: string;
@@ -36,6 +37,8 @@ export interface CalendarAcquisition {
 export interface CalendarReadDeps {
   listUpcoming(tenantId: string, changedSince?: string): Promise<UpcomingMeeting[]>;
   acquire?(tenantId: string, syncToken?: string): Promise<CalendarAcquisition>;
+  /** T-039 `POST /calendar/send-now`. Optional: absent -> that route answers 503 (fail closed). Real adapter: scripts/webinar/send-now-host.ts. */
+  sendNow?: SendNowDeps;
 }
 
 export function createCalendarRouter(deps: CalendarReadDeps): Router {
@@ -64,6 +67,8 @@ export function createCalendarRouter(deps: CalendarReadDeps): Router {
       res.status(503).json({ error: "discovery_unavailable", message: "Calendar discovery unavailable" });
     }
   });
+
+  router.use(deps.sendNow ? createSendNowRouter(deps.sendNow) : unavailableSendNowRouter());
 
   return router;
 }

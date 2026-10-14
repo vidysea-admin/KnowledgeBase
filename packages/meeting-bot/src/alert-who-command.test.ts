@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { alertIdFor } from "./calendar/alerts/attention-alerts.js";
-import { readWebinarOperationState, writeWebinarOperationState } from "./calendar/schedule-state.js";
+import { readWebinarOperationState, writeWebinarOperationState } from "./calendar/state/schedule-state.js";
 import { alertWhoHostOnly, loadCandidates, runAlertWho, type AlertWhoDeps } from "./alert-who-command.js";
 
 const NOW = new Date("2026-10-10T10:00:00.000Z");

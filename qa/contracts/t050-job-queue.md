@@ -16,7 +16,7 @@
 11. Job, worker, tenant ids (and error codes) are `[A-Za-z0-9][A-Za-z0-9._-]{0,63}`, no `..`, no trailing dot, no reserved device names; ids are never used to build a path (one fixed file name).
 12. Not exported from `packages/core/src/index.ts`; nothing under `src/domain` imports it.
 
-13. A `LeaseRef` may carry `tenantId`; when present and different from the job's tenant, heartbeat/complete/fail return `not-found`, deep-equal to the answer for a missing id, in every job state, writing nothing. Without it behaviour is as in invariants 3 and 6 (and reveals state; production callers must pass it).
+13. `LeaseRef.tenantId` and `claim` `opts.tenantId` are REQUIRED. A missing, empty or malformed tenant returns `invalid-input` and writes nothing. A well-formed tenant that differs from the job's tenant makes heartbeat/complete/fail return `not-found`, deep-equal to the answer for a missing id, in every job state, writing nothing. A claim returns only the named tenant's jobs. (ISS-JOBQTENANT-001; amended per D-140)
 
 ## Known limits (not criteria)
 Cross-process writers (ISS-JOBQUEUE-002); O(n) cost per operation; heartbeat/complete/fail by the unreplaced holder are honoured after expiry until another claim supersedes the lease; no backoff, pruning, power-loss proof.

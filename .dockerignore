@@ -1,13 +1,45 @@
+# Build-context exclusions for apps/api/Dockerfile and apps/web/Dockerfile (context = repo root).
+# They COPY packages/, apps/*, config/, workspace package.json files and the lockfile, so source
+# (apps/*/src, packages/*/src) and config/ai-routing.yaml must stay IN the context.
+
+# VCS and dependencies (installed inside the image)
+.git
 node_modules
 **/node_modules
 **/dist
-.git
+**/*.tsbuildinfo
+
+# secrets -- never in a build context (public remote; image layers are extractable)
 .env
 **/.env
+.env.*
 **/.env.*
+!.env.example
 !**/.env.example
-raw/TOC/TOC-Materials/Audio
-raw/TOC/TOC-Materials/Recordings
+config/client_secret.json
+**/client_secret*.json
+**/*.pem
+**/*.key
+data/bot-profile
+**/credentials*.json
+
+# data, recordings, QA and lane worktrees: not needed to build
+raw
+data
+qa
+KnowledgeBase-lanes
+**/recordings
+**/Recordings
+reference
 .playwright-mcp
-*.png
-qa/debug
+**/.playwright-mcp
+.playwright-cli
+.pnpm-store
+.venv
+.cache
+.handoffs
+.claude
+tmp
+*.log
+docs/HANDOFF.md
+**/__pycache__

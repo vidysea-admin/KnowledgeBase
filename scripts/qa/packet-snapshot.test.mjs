@@ -6,6 +6,7 @@ import { snapshot, freeze, verify, sha256, normalizeInventory, WORKSPACE, LIMITS
 
 const fixtureParent = path.join(WORKSPACE, '.cache/coordination');
 async function fixture(fn) {
+  await fs.mkdir(fixtureParent, { recursive: true });
   const root = await fs.mkdtemp(path.join(fixtureParent, 'packet-fixture-'));
   const put = async (rel, bytes) => { await fs.mkdir(path.dirname(path.join(root, rel)), { recursive: true }); await fs.writeFile(path.join(root, rel), bytes); };
   try {
@@ -61,8 +62,11 @@ test('real three-file snapshot → edit → entries freeze → readonly verify, 
   assert.equal(await fs.readFile(path.join(root, 'src/a.ts'), 'utf8'), 'export const a = 3;\n');
 }));
 test('CI sources format with exact base bindings verifies', async () => fixture(async ({ root, setup }) => { const { spec } = await setup('sources'); const result = await freeze(root, spec); assert.equal((await verify(root, result.path, result.sha256)).integrity, 'complete'); }));
-test('actual CI, B7 and D3 inventory adapters preserve pinned row/base identities; originals untouched', async () => {
-  for (const rel of ['meeting-bot-ci-types', 't057-b7-confidence-graph', 't057-d3-knowledge-gaps']) {
+test('actual CI, B7 and D3 inventory adapters preserve pinned row/base identities; originals untouched', async (t) => {
+  const rels = ['meeting-bot-ci-types', 't057-b7-confidence-graph', 't057-d3-knowledge-gaps'];
+  const present = await Promise.all(rels.map((rel) => fs.stat(path.join(WORKSPACE, `.cache/coordination/${rel}-cycle-0/inventory.json`)).then(() => true, () => false)));
+  if (!present.every(Boolean)) return t.skip('git-ignored real inventories under .cache/coordination are absent (fresh checkout/worktree)');
+  for (const rel of rels) {
     const file = path.join(WORKSPACE, `.cache/coordination/${rel}-cycle-0/inventory.json`); const before = await fs.readFile(file);
     const value = JSON.parse(before.toString('utf8').replace(/^\uFEFF/, '')); const adapted = normalizeInventory(value);
     assert.deepEqual(adapted.sourceRows.map(r => [r.path, r.sha256, r.baseSha256]), (value.sources ?? value.entries).map(r => [r.path, r.sha256, r.baseSha256]));

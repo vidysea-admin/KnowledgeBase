@@ -1,12 +1,12 @@
 // scripts/watch/watch-store.mjs — run-watch-loc-split: watch_state / heartbeat / report Mongo writers moved
 // VERBATIM from run-watch.mjs (only `export` added).
 import { buildHeartbeatDoc } from "./lib/heartbeat.mjs";
-import { TENANT, DRY_RUN, MONGODB_DB } from "./watch-config.mjs";
+import { TENANT, DRY_RUN, watchDbTarget } from "./watch-config.mjs";
 
 export async function loadSeenDriveIds() {
   const { connect } = await import("../../packages/db/src/client.js");
   const { listSeenIds } = await import("../../packages/db/src/collections/watch-state.js");
-  await connect(process.env.MONGODB_URL, MONGODB_DB);
+  { const t = watchDbTarget(); await connect(t.url, t.dbName); }
   return listSeenIds(TENANT, "drive");
 }
 
@@ -41,7 +41,7 @@ export async function markHeartbeatFor(sourceType, completedAt) {
   if (DRY_RUN) return;
   try {
     const { connect } = await import("../../packages/db/src/client.js");
-    await connect(process.env.MONGODB_URL, MONGODB_DB);
+    { const t = watchDbTarget(); await connect(t.url, t.dbName); }
     const { markHeartbeat } = await import("../../packages/db/src/collections/watch-heartbeat.js");
     await markHeartbeat(TENANT, buildHeartbeatDoc(TENANT, sourceType, completedAt));
   } catch (err) {

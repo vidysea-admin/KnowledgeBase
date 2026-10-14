@@ -17,6 +17,8 @@ import type { CompleteResult, Job } from "@lkb/ai";
 import { parseJsonLoose } from "@lkb/ai";
 import { produceRuntimeSummary } from "./grounded-summary.js";
 import type { RuntimeItem, RuntimeQA } from "./grounded.js";
+import type { DroppedNote } from "./notes/drop-mode.js";
+import { makeJudgeContext, type JudgeSidecar, type NoteJudge } from "./notes/judge.js";
 
 export type SummarizeCompleteFn = (job: Job) => Promise<CompleteResult>;
 
@@ -45,6 +47,10 @@ export interface SummarizeResult {
   page: SessionSummaryResult;
   /** `null` when the page is real (or genuinely empty); a reason when `page` is the fallback. */
   degraded: { reason: string } | null;
+  /** Drop-unverified mode only: proposals that failed verification and were NOT emitted. */
+  dropped?: DroppedNote[];
+  /** D-144: present when a `noteJudge` ran: dropped/unsure notes with reasons and the per-session judge cost. */
+  judgeSidecar?: JudgeSidecar;
 }
 
 const SUMMARIZE_SYSTEM_PROMPT = [
@@ -84,10 +90,12 @@ const FALLBACK_SLICE_LENGTH = 500;
  * `complete()` call or an unparseable response degrades to a clearly-labeled fallback (the raw
  * transcript's first slice) rather than blocking the ingest pipeline, and reports `degraded` so
  * the caller can decline to let that fallback overwrite a real prior summary (ISS-059). */
-export async function summarizeSession(turns: Turns[], complete: SummarizeCompleteFn, options: { strictWebinar?: boolean } = {}): Promise<SummarizeResult> {
+export async function summarizeSession(turns: Turns[], complete: SummarizeCompleteFn, options: { strictWebinar?: boolean; dropUnverified?: boolean; /** D-144: injectable negation judge (drop mode only) */ noteJudge?: NoteJudge; judgeMaxCostUsd?: number } = {}): Promise<SummarizeResult> {
   if (options.strictWebinar) {
-    try { return { page: await produceRuntimeSummary(turns, complete), degraded: null }; }
-    catch (error) { return { page: fallbackPage(buildTranscript(turns)), degraded: { reason: `strict grounded summary incomplete: ${error instanceof Error ? error.message : String(error)}` } }; }
+    const dropped: DroppedNote[] | undefined = options.dropUnverified ? [] : undefined;
+    const jc = dropped && options.noteJudge ? makeJudgeContext(options.noteJudge, { maxCostUsd: options.judgeMaxCostUsd }) : undefined;
+    try { const page = await produceRuntimeSummary(turns, complete, dropped, jc); return { page, degraded: null, ...(dropped ? { dropped } : {}), ...(jc ? { judgeSidecar: jc.sidecar } : {}) }; }
+    catch (error) { return { page: fallbackPage(buildTranscript(turns)), degraded: { reason: `strict grounded summary incomplete: ${error instanceof Error ? error.message : String(error)}` }, ...(jc ? { judgeSidecar: jc.sidecar } : {}) }; }
   }
   if (turns.length === 0) {
     return {

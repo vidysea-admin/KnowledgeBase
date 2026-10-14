@@ -11,10 +11,11 @@ import { bindDerivedArtifacts } from "../../lib/transcript-provenance.mjs";
  * Throws on any failure; the caller (run-watch.mjs) records `watch_state` status "failed" with
  * the thrown message — this module never swallows an error or marks anything itself.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { execFileSync } from "node:child_process";
 import { slugSessionId, buildAutoSessionSkeleton, deriveSessionDateAndTitle } from "./session-skeleton.mjs";
+import { SINGLE_CALL_FLAG, flagOn, planTranscriptionPath, selectTranscriber } from "../../lib/transcription-wiring.mjs";
 
 // ISS-304: was 55*60. transcribe-long-session.mjs's own DEFAULT_CHUNK_SECONDS is 2400 (40 min) —
 // its header names that as "headroom under the observed ~60min failure point" for a SINGLE
@@ -216,7 +217,17 @@ export async function ingestOneDriveFile(gdrive, gwsRun, file, monthName, deps) 
   writeFileSync(join(finalDataDir, "source.json"), JSON.stringify(stubSource, null, 2));
 
   const durationSeconds = audioDurationSeconds(audioPath);
-  const transcriber = durationSeconds !== null && durationSeconds > LONG_SESSION_THRESHOLD_SECONDS ? "transcribe-long-session.mjs" : "transcribe-toc-session.mjs";
+  // T-048 (D-162, OFF unless LKB_SINGLE_CALL_PATH=1): let chooseTranscriptionPath decide. A "single" plan goes
+  // to the long driver, which sees the same flag in its inherited env and runs one call with chunked fallback.
+  let plan = null;
+  if (flagOn(process.env, SINGLE_CALL_FLAG) && durationSeconds !== null) {
+    const { chooseTranscriptionPath, T048_THRESHOLDS } = await import("../../../packages/ai/src/stt/transcription-plan.ts");
+    plan = planTranscriptionPath({
+      enabled: true, durationSeconds, fileBytes: statSync(audioPath).size, modelId: process.env.GEMINI_STT_MODEL || "",
+      choose: chooseTranscriptionPath, thresholds: T048_THRESHOLDS,
+    });
+  }
+  const transcriber = selectTranscriber({ durationSeconds, longThresholdSeconds: LONG_SESSION_THRESHOLD_SECONDS, plan });
   execFileSync("node", [join(ROOT, "scripts", transcriber), sessionId], { timeout: 2 * 60 * 60 * 1000, stdio: "inherit" });
 
   const turns = JSON.parse(readFileSync(join(finalDataDir, "turns.json"), "utf8"));

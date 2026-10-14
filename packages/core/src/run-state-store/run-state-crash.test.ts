@@ -52,7 +52,12 @@ for (const mode of ["overwrite", "create"] as const) {
 
 test("a crash leaves at most a stray tmp/lock; the lock is reported (not silently stolen) and the tmp never mistaken for state", () => {
   const fs = prepared();
-  fs.crashAt = 7; // inside the temp-file write
+  // crash inside the temp-file write: located from a probe run, not hard-coded (the op count shifts when the lock/reap protocol changes)
+  const probe = prepared();
+  createRunStateStore("/r", probe).save("r1", st(1), st(2));
+  const tmpAt = probe.opLog.findIndex((o) => o.startsWith("create") && norm(o).endsWith(".tmp"));
+  fs.crashAt = probe.opLog.findIndex((o, i) => i > tmpAt && o.startsWith("write"));
+  assert.ok(tmpAt > 0 && fs.crashAt > tmpAt, "found the temp-file write");
   createRunStateStore("/r", fs).save("r1", st(1), st(2));
   const survivors = fs.names().map(norm);
   assert.ok(survivors.some((n) => n.endsWith(".tmp")), "partial temp file survives");

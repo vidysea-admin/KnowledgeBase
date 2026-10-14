@@ -8,7 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore } from "../fixtures.js";
-import { spyStore } from "./test-store.js";
+import { spyStore, fakeValidator, empty } from "./test-store.js";
 
 const P = "/calendar/join-rules";
 const KEYS = {
@@ -25,11 +25,12 @@ const WRITES: [string, string, unknown][] = [
 ];
 const ALL: [string, string, unknown][] = [["GET", P, undefined], ...WRITES];
 
-async function withServer(fn: (call: (m: string, p: string, key?: string, body?: unknown) => Promise<number>, s: ReturnType<typeof spyStore>) => Promise<void>) {
+async function withServer(fn: (call: (m: string, p: string, key?: string, body?: unknown, extra?: Record<string, string>) => Promise<number>, s: ReturnType<typeof spyStore>) => Promise<void>) {
   const s = spyStore();
   const server = await startTestServer(buildTestDeps({ keyStore: fakeKeyStore(KEYS), joinRules: s.deps }));
-  const call = async (m: string, p: string, key?: string, body?: unknown) => (await fetch(`${server.baseUrl}${p}`, {
-    method: m, headers: { ...(key ? { authorization: `Bearer ${key}` } : {}), ...(body !== undefined ? { "content-type": "application/json" } : {}) },
+  // PUT needs a precondition (428 otherwise); these tests are about SCOPE, so by default PUT creates (If-None-Match: *) - the 403/401 paths never reach it.
+  const call = async (m: string, p: string, key?: string, body?: unknown, extra: Record<string, string> = {}) => (await fetch(`${server.baseUrl}${p}`, {
+    method: m, headers: { ...(m === "PUT" && Object.keys(extra).length === 0 ? { "if-none-match": "*" } : {}), ...extra, ...(key ? { authorization: `Bearer ${key}` } : {}), ...(body !== undefined ? { "content-type": "application/json" } : {}) },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   })).status;
   try { await fn(call, s); } finally { await server.close(); }
@@ -59,7 +60,7 @@ test("a join-rules-only key can write but may NOT GET (least privilege: reading 
     assert.equal(await call("GET", P, "write-key"), 403);
     assert.equal(s.calls.length, 0);
     for (const [m, p, b] of WRITES) assert.equal(await call(m, p, "write-key", b), 200, `${m} ${p}`);
-    assert.ok(s.calls.some(c => c.op === "save" && c.tenantId === "tenant-a"));
+    assert.ok(s.calls.some(c => (c.op === "save" || c.op === "saveIf") && c.tenantId === "tenant-a"));
   });
 });
 
@@ -84,7 +85,10 @@ test("a failed save does not poison the tenant queue: later writes run, and a bu
     s.failNextSave();
     assert.equal(await call("POST", `${P}/opt-outs`, "both-key", { eventId: "lost" }), 500);
     assert.equal(await call("POST", `${P}/opt-outs`, "both-key", { eventId: "k1" }), 200);
-    assert.equal(await call("PUT", P, "both-key", RULES), 200);
+    const emptyTag = { "if-match": `"${fakeValidator(empty().ruleSet)}"` }; // the opt-out above created the file with an empty rule set
+    s.failNextSave();
+    assert.equal(await call("PUT", P, "both-key", RULES, emptyTag), 500); // a failed saveIf poisons nothing and writes nothing
+    assert.equal(await call("PUT", P, "both-key", RULES, emptyTag), 200);
     s.failNextSave();
     const burst = await Promise.all(["b1", "b2", "b3", "b4", "b5", "b6"].map(id => call("POST", `${P}/opt-outs`, "both-key", { eventId: id })));
     assert.equal(burst.filter(x => x === 500).length, 1);

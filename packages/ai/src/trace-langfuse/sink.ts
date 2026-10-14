@@ -12,13 +12,16 @@
  * endpoint cannot grow memory. `flush()` / `close()` resolve within `flushTimeoutMs` even when fetch
  * hangs; `close()` aborts in-flight requests and clears every timer. Credentials go ONLY in the
  * Authorization header; errors surface as static codes ("http_503", "timeout", "network"), never
- * as messages. See payload.ts for the ASSUMPTIONs about the Langfuse API.
+ * as messages. A 200/207 response body is parsed: events Langfuse rejected inside it are counted
+ * (`stats.eventErrors`/`rejected`) and their records dropped, not retried; an unreadable or
+ * incomplete 207 is "unconfirmed", never success. See payload.ts for the ASSUMPTIONs about the API.
  */
 import { randomUUID } from "node:crypto";
 import { isTelemetryEnabled, type TraceRecord, type TraceSink } from "../trace.js";
-import { INGESTION_PATH, toLangfuseBatch, validateBaseUrl } from "./payload.js";
+import { INGESTION_PATH, toLangfuseEvents, validateBaseUrl, type LangfuseEvent } from "./payload.js";
+import { assessIngestion, readBodyText } from "./ingestion-response.js";
 
-export type FetchFn = (url: string, init: Record<string, unknown>) => Promise<{ status: number; type?: string; body?: unknown }>;
+export type FetchFn = (url: string, init: Record<string, unknown>) => Promise<{ status: number; type?: string; body?: unknown; text?: () => Promise<string> }>;
 type Handle = unknown;
 
 export interface LangfuseSinkOptions {
@@ -40,7 +43,15 @@ export interface LangfuseSinkOptions {
 }
 
 export interface LangfuseSink extends TraceSink {
-  readonly stats: { sent: number; failures: number; dropped: number; pending: number; retries: number };
+  readonly stats: {
+    sent: number; failures: number; dropped: number; pending: number; retries: number;
+    /** events Langfuse rejected inside a 200/207 response (per event, not per record) */
+    eventErrors: number;
+    /** records dropped because at least one of their events was rejected */
+    rejected: number;
+    /** records dropped because a 207 did not confirm them (unreadable body or event missing from it) */
+    unconfirmed: number;
+  };
   flush(): Promise<void>;
   close(): Promise<void>;
 }
@@ -65,7 +76,7 @@ export function createLangfuseSink(opts: LangfuseSinkOptions): LangfuseSink {
   const setT = opts.setTimer ?? ((fn, ms) => setTimeout(fn, ms));
   const clearT = opts.clearTimer ?? ((h) => clearTimeout(h as ReturnType<typeof setTimeout>));
   const genId = opts.genId ?? randomUUID;
-  const stats = { sent: 0, failures: 0, dropped: 0, pending: 0, retries: 0 };
+  const stats = { sent: 0, failures: 0, dropped: 0, pending: 0, retries: 0, eventErrors: 0, rejected: 0, unconfirmed: 0 };
   const queue: TraceRecord[] = [];
   const timers = new Set<Handle>();
   const wakers = new Set<() => void>();
@@ -96,8 +107,9 @@ export function createLangfuseSink(opts: LangfuseSinkOptions): LangfuseSink {
     timer(done, ms);
   });
 
-  /** One POST. "ok" | "retry" | "final"; reports a static code on failure. */
-  const attempt = async (body: string): Promise<"ok" | "retry" | "final"> => {
+  /** One POST. "ok" (2xx; `status` and the bounded body text, null when unreadable) | "retry" | "final"; reports a static code on failure. */
+  type Attempt = { r: "ok" | "retry" | "final"; status?: number; text?: string | null };
+  const attempt = async (body: string): Promise<Attempt> => {
     const ac = new AbortController();
     aborts.add(ac);
     let h: Handle;
@@ -119,35 +131,54 @@ export function createLangfuseSink(opts: LangfuseSinkOptions): LangfuseSink {
         abortP,
       ]);
       const st = res?.status;
+      if (typeof st === "number" && st >= 200 && st < 300) {
+        return { r: "ok", status: st, text: await readBodyText(res, abortP) }; // bounded; per-event errors in a 200/207 live here
+      }
       try { (res?.body as { cancel?: () => unknown } | undefined)?.cancel?.(); } catch { /* ignore */ }
-      if (typeof st === "number" && st >= 200 && st < 300) return "ok";
       if (res?.type === "opaqueredirect" || st === 0 || (typeof st === "number" && st >= 300 && st < 400)) {
         report("redirect");
-        return "final";
+        return { r: "final" };
       }
       report(`http_${typeof st === "number" ? st : "unknown"}`);
-      return typeof st === "number" && st >= 500 ? "retry" : "final";
+      return { r: typeof st === "number" && st >= 500 ? "retry" : "final" };
     } catch {
       report(closed ? "closed" : timedOut ? "timeout" : "network");
-      return closed ? "final" : "retry";
+      return { r: closed ? "final" : "retry" };
     } finally {
       untimer(h!);
       aborts.delete(ac);
     }
   };
 
+  /** Apply the assessment of a 2xx response (policy and rationale: assessIngestion). */
+  const settle = (groups: { events: LangfuseEvent[] }[], recs: number, status: number, text: string | null | undefined): void => {
+    const a = assessIngestion(groups, recs, status, text);
+    stats.sent += a.sent;
+    stats.rejected += a.rejected;
+    stats.unconfirmed += a.unconfirmed;
+    stats.eventErrors += a.eventErrors;
+    stats.dropped += a.rejected + a.unconfirmed;
+    if (a.failed) stats.failures += 1;
+    for (const c of a.codes) report(c);
+  };
+
   const sendBatch = async (recs: TraceRecord[]): Promise<void> => {
     let body: string;
+    const groups: { events: LangfuseEvent[] }[] = [];
     try {
-      body = JSON.stringify(toLangfuseBatch(recs, genId));
+      for (const r of recs) {
+        try { groups.push({ events: toLangfuseEvents(r, genId) }); } catch { /* unmappable record: skipped, never forwarded raw */ }
+      }
+      body = JSON.stringify({ batch: groups.flatMap((g) => g.events) });
     } catch {
       stats.dropped += recs.length;
       return;
     }
     for (let n = 0; ; n++) {
-      const r = await attempt(body);
+      const a = await attempt(body);
+      const r = a.r;
       if (r === "ok") {
-        stats.sent += recs.length;
+        settle(groups, recs.length, a.status ?? 200, a.text);
         return;
       }
       if (r === "final" || n >= maxRetries || closed) break;

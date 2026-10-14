@@ -18,7 +18,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
-import { extractSpeakers as laneExtract, type SpeakersCompleteFn } from "./speakers-llm.js";
+import { extractSpeakersRuleBased as laneExtract, type SpeakersCompleteFn } from "./speakers-llm.js";
 import { looksLikeAName, isDiscourseOnly, citesNameAsAnIntroduction } from "./speaker-name-rules.js";
 import { citesNameAsSelfIdentification, citesNameAsHandover, citesNameAsThanks, RELATION_ROUTES } from "./speaker-relation-rules.js";
 

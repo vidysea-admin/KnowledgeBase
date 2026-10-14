@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../auth/AuthContext.js";
 import { DETAIL_SAMPLE, loadAnalytics, type AnalyticsData, type Part } from "./analyticsClient.js";
+import { UsageFigures } from "./UsagePanel.js";
 import {
   claimsPerSession, formatPercent, gapCounts, gapStatusList, graphEvidence, jobCounts, jobStatusList, sessionsOverTime, speakerResolution,
 } from "./analyticsModel.js";
@@ -39,7 +40,7 @@ export function AnalyticsPage(): React.ReactElement {
   }, [apiKey, generation]);
   const data = current?.data;
   return <>
-    <div className="page-header"><h1>Analytics</h1><p>Read-only figures computed from this tenant’s sessions, claims, graph, gaps and provider jobs.</p></div>
+    <div className="page-header"><h1>Analytics</h1><p>Read-only figures computed from this tenant’s sessions, claims, graph, gaps, provider jobs and /ask and /search usage.</p></div>
     {!apiKey ? <p className="card empty-note">Sign in with an API key to view analytics.</p> : <>
       <button type="button" disabled={!current} onClick={() => setGeneration(value => value + 1)}>Refresh</button>
       {!data && <p role="status">Loading analytics…</p>}
@@ -89,6 +90,7 @@ export function AnalyticsPage(): React.ReactElement {
             <Source>GET /jobs?limit=50, field status. A sample of recent jobs, not a lifetime total.</Source>
           </>;
         }}</Panel>
+        <Panel title="Usage: questions and searches" part={data.usage}>{value => <UsageFigures usage={value} />}</Panel>
       </>}
     </>}
   </>;

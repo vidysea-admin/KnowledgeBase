@@ -2,112 +2,51 @@
 import { randomUUID } from "node:crypto";
 import type { Db } from "mongodb";
 import { getDb, scopedCollection } from "@lkb/db";
-import type { SessionPages, Chunks, Claims, Sessions, TreeIndexRootDocument, Turns } from "@lkb/core";
-import { summarizeSession, extractClaims, buildChunks, buildTree, regenerate, treeIndexRootFilter, type SummarizeCompleteFn, runtimeChronologicalTurns, assertGroundedTurns, validateRuntimePage, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin } from "@lkb/index";
+import type { SessionPages, Claims, Sessions, TreeIndexRootDocument, Turns } from "@lkb/core";
+import { summarizeSession, extractClaims, buildChunks, buildTree, regenerate, treeIndexRootFilter, type SummarizeCompleteFn, type NoteJudge, runtimeChronologicalTurns, assertGroundedTurns, validateRuntimePage, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin } from "@lkb/index";
+import { suggestSpeakersForSession, type SpeakerSuggestOutcome } from "./speaker-suggest.js";
 import { recordVectorGap } from "./vector-gap.js";
+import { decisionsEnabled } from "@lkb/index";
+import { extractAndPersistDecisions } from "./decisions-persist.js";
 import { promoteAndPersistEntities, type PromotionResult } from "./promote-entities.js";
-import type { IndexEmbedFn, ChunkWriteResult, IndexSessionResult } from "./types.js";
+import type { IndexEmbedFn, IndexSessionResult } from "./types.js";
+import { toEvidenceTuple, toCitedItems, toQaEntries } from "./evidence-tuples.js";
+import { writeSessionChunks } from "./chunk-write.js";
+import { replacePageInsertFirst, replaceClaimsPreserving, judgeTotals } from "./grounded-write.js";
 
 // Re-exported so existing importers keep one import site for the indexing surface.
+export { prepareChunkDocuments, writeSessionChunks } from "./chunk-write.js";
 export type { IndexEmbedFn, ChunkSkipReason, ChunkWriteResult, IndexSessionResult } from "./types.js";
 
 
-function toEvidenceTuple<T>(items: T[]): [T, ...T[]] {
-  if (items.length === 0) throw new Error("toEvidenceTuple: evidence must be non-empty");
-  return items as [T, ...T[]];
-}
 
 export interface IndexSessionDeps {
   complete: SummarizeCompleteFn;
 
   strictWebinar?: boolean;
+  /** T-040: with strictWebinar, a proposal that fails strict quote verification or the judge is dropped (and counted) instead of degrading the whole page. */
+  dropUnverified?: boolean;
+  /** T-040 / D-144 / D-151: injectable note judge (effective only with strictWebinar + dropUnverified). Fails closed per note. */
+  noteJudge?: NoteJudge;
+  /** Per-session judge cost cap in USD (optional). */
+  judgeMaxCostUsd?: number;
 
   embed?: IndexEmbedFn;
+
+  /** U2.5: extract + persist decisions. Default (undefined) follows LKB_EXTRACT_DECISIONS, which is off. */
+  extractDecisions?: boolean;
+
+  /** U2.4 / D-141: OFF unless true. Writes `speaker_suggestions` rows only (never `speakers`); see ./speaker-suggest.ts. */
+  suggestSpeakers?: boolean;
 
   db?: Pick<Db, "collection">;
 }
 
 
 async function loadTreeRoot(tenantId: string, db: Pick<Db, "collection">): Promise<TreeIndexRootDocument | null> {
-  return db.collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
+  return scopedCollection<TreeIndexRootDocument & { _id: string }>(db as never, "tree_index")(tenantId).findOne(treeIndexRootFilter(tenantId));
 }
 
-
-/** Shared validated vector/document preparation; callers choose their persistence policy. */
-export function prepareChunkDocuments(
-  tenantId: string, sessionId: string, plans: ReturnType<typeof buildChunks>,
-  embedded: Awaited<ReturnType<IndexEmbedFn>>,
-): Chunks[] {
-  // The correlation JSON Schema cannot express (the U1.2 verdict's finding): `vector` and
-  // `dims` are independently optional there, so `{vector: [3 items], dims: 99}` validates.
-  // Asserted at the only place that can see both — the write.
-  if (embedded.vectors.length !== plans.length) {
-    throw new Error(
-      `indexSession: embedder returned ${embedded.vectors.length} vector(s) for ${plans.length} chunk(s)`,
-    );
-  }
-  if (!Number.isInteger(embedded.dims) || embedded.dims <= 0 || embedded.vectors.some((v) => v.some((n) => !Number.isFinite(n)))) throw new Error("invalid embedding dimensions/values");
-  const chunkDocs: Chunks[] = plans.map((plan, i) => {
-    const vector = embedded.vectors[i] ?? [];
-    if (vector.length !== embedded.dims) {
-      throw new Error(
-        `indexSession: chunk ${plan.chunkIndex} has ${vector.length} dims, batch reports ${embedded.dims}`,
-      );
-    }
-    return {
-      _id: randomUUID(),
-      tenantId,
-      sourceRef: sessionId,
-      turnRefs: toEvidenceTuple(plan.turnRefs),
-      chunkIndex: plan.chunkIndex,
-      vector: toEvidenceTuple(vector),
-      dims: embedded.dims,
-      embeddingModel: embedded.model,
-    };
-  });
-  return chunkDocs;
-}
-
-export async function writeSessionChunks(
-  tenantId: string,
-  sessionId: string,
-  turns: Turns[],
-  embed: IndexEmbedFn,
-  db: Pick<Db, "collection">,
-  persist = true,
-): Promise<ChunkWriteResult> {
-  const chunksColl = scopedCollection<Chunks>(db as never, "chunks");
-  const plans = buildChunks(turns);
-  if (plans.length === 0) {
-    console.warn(`indexSession(${tenantId}/${sessionId}): no chunkable turns — chunks left unchanged`);
-    return { written: 0, skipped: "no-chunkable-turns" };
-  }
-  // ISS-112: the C8 assertions below MUST sit inside this try. They previously followed it, so a
-  // contradictory batch threw past the catch and skipped `tree_index` and the status flip as well
-  // — exactly the "no vectors this run becomes no summary, no claims, no tree" trade the comment
-  // below says it refuses. A guarantee stated in a comment and contradicted by the line numbering
-  // is worse than no comment, because it stops the next reader checking.
-  try {
-    const embedded = await embed({ kind: "embedding", texts: plans.map((p) => p.text), purpose: "document" });
-
-    const chunkDocs = prepareChunkDocuments(tenantId, sessionId, plans, embedded);
-    // Clean replace, never accumulate — a re-index must not double the corpus. Reached only
-    // after every assertion above has passed, so the delete never runs without its replacement.
-    if (!persist) return { written: chunkDocs.length, skipped: null };
-    await chunksColl(tenantId).deleteMany({ sourceRef: sessionId } as never);
-    await chunksColl(tenantId).insertMany(chunkDocs);
-    return { written: chunkDocs.length, skipped: null };
-  } catch (err) {
-    // Never rethrow: the rest of indexing already succeeded, and failing the whole call would
-    // turn "no vectors this run" into "no summary, no claims, no tree" too. This now also
-    // covers the C8 assertions (ISS-112), which used to throw past it.
-    console.warn(
-      `indexSession(${tenantId}/${sessionId}): embedding failed — chunks left unchanged: ` +
-        `${err instanceof Error ? err.message : String(err)}`,
-    );
-    return { written: 0, skipped: "embedding-failed" };
-  }
-}
 
 
 export async function indexSession(
@@ -131,11 +70,14 @@ export async function indexSession(
     catch (error) { await sessionsColl(tenantId).updateOne({ _id: sessionId }, { $set: { "status.index": "failed" } }); throw new Error(`strict webinar index incomplete: ${error instanceof Error ? error.message : String(error)}`); }
   }
   const [summarizeResult, claimsResult] = await Promise.all([
-    summarizeSession(turns, deps.complete, { strictWebinar: strict }),
-    extractClaims(turns, deps.complete, { strictWebinar: strict }),
+    summarizeSession(turns, deps.complete, { strictWebinar: strict, dropUnverified: deps.dropUnverified, ...(deps.noteJudge ? { noteJudge: deps.noteJudge, judgeMaxCostUsd: deps.judgeMaxCostUsd } : {}) }),
+    extractClaims(turns, deps.complete, { strictWebinar: strict, dropUnverified: deps.dropUnverified, ...(deps.noteJudge ? { noteJudge: deps.noteJudge, judgeMaxCostUsd: deps.judgeMaxCostUsd } : {}) }),
   ]);
   const { page: summary, degraded: summaryDegraded } = summarizeResult;
   const { claims: extractedClaims, degraded: claimsDegraded } = claimsResult;
+  // T-040: grounded-notes mode (strict + dropUnverified) uses the insert-first / preserve-reviewed write path below.
+  const grounded = strict && deps.dropUnverified === true;
+  let claimWrite: { preserved: number; replaced: number; inserted: number } | undefined;
   let preparedTree: ReturnType<typeof regenerate> | undefined;
   let candidatePage: SessionPages | undefined;
   let preparedEmbed: Awaited<ReturnType<IndexEmbedFn>> | undefined;
@@ -159,6 +101,7 @@ export async function indexSession(
           claim.evidence = evidence;
         }
         const preparedPage: SessionPages = { _id: randomUUID(), tenantId, sessionId, ...summary,
+          citedItems: toCitedItems(summary.citedItems!), qa: toQaEntries(summary.qa!),
           evidence: toEvidenceTuple([...summary.citedItems!.flatMap((i) => i.evidence), ...summary.qa!.flatMap((q) => [...q.questionEvidence, ...q.answerEvidence])].map((e) => ({ ...e }))) };
         candidatePage = preparedPage;
         const [sessions, pages, root] = await Promise.all([sessionsColl(tenantId).find({}).toArray(), sessionPagesColl(tenantId).find({}).toArray(), loadTreeRoot(tenantId, db)]);
@@ -193,7 +136,7 @@ export async function indexSession(
   if (summaryDegraded && existingPage) {
     console.warn(`indexSession(${tenantId}/${sessionId}): summary degraded — existing session_pages left unchanged: ${summaryDegraded.reason}`);
   } else {
-    await sessionPagesColl(tenantId).deleteMany({ sessionId });
+    if (!grounded) await sessionPagesColl(tenantId).deleteMany({ sessionId });
     if (turns.length > 0) {
       const page: SessionPages = candidatePage ?? {
         _id: randomUUID(),
@@ -205,7 +148,8 @@ export async function indexSession(
         actionItems: summary.actionItems,
         evidence: toEvidenceTuple(turns.map((t) => ({ turnId: t._id, sessionId }))),
       };
-      await sessionPagesColl(tenantId).insertOne(page);
+      if (grounded) await replacePageInsertFirst(sessionPagesColl(tenantId) as never, sessionId, page);
+      else await sessionPagesColl(tenantId).insertOne(page);
     }
   }
 
@@ -216,7 +160,7 @@ export async function indexSession(
   // (ISS-056). On degradation the prior claims are left exactly as they were.
   if (claimsDegraded) {
     console.warn(`indexSession(${tenantId}/${sessionId}): claims left unchanged — ${claimsDegraded.reason}`);
-  } else {
+  } else if (!grounded) {
     await claimsColl(tenantId).deleteMany({ "evidence.sessionId": sessionId } as never);
   }
   if (!claimsDegraded && extractedClaims.length > 0) {
@@ -231,7 +175,15 @@ export async function indexSession(
       evidence: toEvidenceTuple(c.evidence ?? c.evidenceTurnIds.map((turnId) => ({ turnId, sessionId }))),
       ...(strict ? { origin: c.origin, verification: c.verification } : {}),
     }));
-    await claimsColl(tenantId).insertMany(claimDocs);
+    if (grounded) claimWrite = await replaceClaimsPreserving(claimsColl(tenantId) as never, sessionId, claimDocs);
+    else await claimsColl(tenantId).insertMany(claimDocs);
+  }
+
+  // U2.5 (flag-gated, OFF by default): flag-off reaches no decisions code, no collection, no job.
+  let decisionsOut: { count: number; degraded: string | null } | undefined;
+  if (deps.extractDecisions ?? decisionsEnabled()) {
+    try { decisionsOut = await extractAndPersistDecisions(tenantId, sessionId, turns, deps.complete, db); }
+    catch (error) { decisionsOut = { count: 0, degraded: `decisions persist failed: ${error instanceof Error ? error.message : String(error)}` }; }
   }
 
   // ISS-116's SECOND defect: this return used to be discarded, so a session that got no vectors
@@ -262,7 +214,7 @@ export async function indexSession(
     // Setting it here, once, at the write boundary, is what actually closes ISS-062: every root
     // this function ever persists from this point on carries the field, migrated or not.
     const rootDoc: TreeIndexRootDocument = { ...newRoot, tenantId };
-    await db.collection<TreeIndexRootDocument>("tree_index")
+    await scopedCollection<TreeIndexRootDocument & { _id: string }>(db as never, "tree_index")(tenantId)
       .replaceOne(treeIndexRootFilter(tenantId), rootDoc, { upsert: true });
 
     // U2.1: the tree already holds topic and org nodes, so promoting them to entity rows needs no
@@ -275,8 +227,15 @@ export async function indexSession(
 
   await sessionsColl(tenantId).updateOne({ _id: sessionId }, { $set: { "status.index": "done" } });
 
-  return { sessionId, chunks, entities, summary: { degraded: summaryDegraded?.reason ?? null },
-    claims: { degraded: claimsDegraded?.reason ?? null },
+  // U2.4 / D-141: suggestions only, behind the opt-in flag; absent flag = no call, no result key (byte-identical output).
+  const speakerSuggestions: SpeakerSuggestOutcome | undefined = deps.suggestSpeakers === true
+    ? await suggestSpeakersForSession(tenantId, sessionId, turns, deps.complete as never, db as Db)
+    : undefined;
+
+  return { sessionId, chunks, entities, ...(speakerSuggestions ? { speakerSuggestions } : {}), summary: { degraded: summaryDegraded?.reason ?? null, ...(summarizeResult.dropped ? { dropped: summarizeResult.dropped.length } : {}) },
+    claims: { degraded: claimsDegraded?.reason ?? null, ...(claimsResult.dropped ? { dropped: claimsResult.dropped.length } : {}) },
+    ...(decisionsOut ? { decisions: decisionsOut } : {}),
+    ...(grounded ? { groundedNotes: { claims: claimWrite ?? null, judge: judgeTotals(summarizeResult.judgeSidecar, claimsResult.judgeSidecar) ?? null } } : {}),
     completion: { version: 2, strict, complete: !summaryDegraded && !claimsDegraded && !chunks.skipped && Boolean(newRoot), generation: randomUUID(), turnCount: turns.length, treeWritten: Boolean(newRoot) } };
 }
 

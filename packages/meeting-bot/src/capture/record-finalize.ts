@@ -12,7 +12,9 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 import { gapsForSourceDoc, type GapWindow } from "./reconnect-gaps.js";
-import { createTelegramNotifier, readTurnCount, type TelegramNotifier } from "./telegram-alerts.js";
+import { createTelegramNotifier, readTurnCount, type TelegramNotifier } from "./notify/telegram-alerts.js";
+// Deep import: packages/core/src/index.ts does not re-export lean-video yet (ISS-LEANWIRE-001).
+import { isWithinLeanTarget, LEAN_TARGET_MB_PER_HOUR } from "@lkb/core/src/domain/lean-video.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, "..", "..", "..", "..");
@@ -26,6 +28,13 @@ const toPosix = (p: string) => p.split(path.sep).join("/");
  * Exported for tests (T-033): AT the boundary (-50) is not silent, below it (-50.1) is. */
 export function isSilentCapture(maxDb: number): boolean {
   return maxDb < SILENCE_MAX_DB;
+}
+
+/** T-035: measured MB/hour of a finished recording (MB = 1,000,000 bytes, as lean-video's estimator).
+ * undefined when size or duration is unusable — the check is advisory and never fails a finalize. */
+export function measuredMbPerHour(sizeBytes: number, durationSec: number): number | undefined {
+  if (!Number.isFinite(sizeBytes) || sizeBytes <= 0 || !Number.isFinite(durationSec) || durationSec <= 0) return undefined;
+  return sizeBytes / 1_000_000 / (durationSec / 3600);
 }
 
 function defaultExtractAudio(video: string, audioOut: string): void {
@@ -86,6 +95,7 @@ export interface FinalizeRecordingOverrides {
   measureVolume?: (audioPath: string) => { maxDb: number; meanDb: number };
   runTranscription?: (sessionId: string) => void;
   repoRoot?: string; // a test's temp dir, so nothing is ever written into the real repo tree
+  videoSizeBytes?: (video: string) => number; // T-035: defaults to statSync(video).size
 }
 
 /** Recording file → m4a → silence gate → source.json → (optional) transcript → T-030 Telegram
@@ -149,6 +159,17 @@ export async function finalizeRecordingWith(
       error: String(error) }, null, 2) + "\n");
     throw error;
   }
+
+  // T-035: flag a finished recording that is not under the lean target. Advisory: never throws.
+  try {
+    const sizeBytes = (overrides.videoSizeBytes ?? ((v: string) => statSync(v).size))(video);
+    const mbPerHour = measuredMbPerHour(sizeBytes, measuredDuration);
+    if (mbPerHour !== undefined && !isWithinLeanTarget(mbPerHour)) {
+      console.log(`[bot] recording size ${mbPerHour.toFixed(1)} MB/h is NOT under the ${LEAN_TARGET_MB_PER_HOUR} MB/h lean target`);
+      telegram.notifyOverTarget?.({ title, sessionId, mbPerHour, targetMbPerHour: LEAN_TARGET_MB_PER_HOUR,
+        sizeMb: sizeBytes / 1_000_000, durationSec: measuredDuration });
+    }
+  } catch (error) { console.log(`[bot] lean-target size check skipped: ${String(error)}`); }
 
   const audio = path.join(recordDir, `${sessionId}.m4a`);
   try { extractAudio(video, audio); } catch (error) { fail("audio", error); throw error; }

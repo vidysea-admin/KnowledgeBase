@@ -9,6 +9,8 @@
  *   - <raw/webinars>/scheduled/*.json          {...job,tenantId}; each file with a missing / different tag is REFUSED (not read).
  * Files written by older versions carry no tag: they are refused with an operator message, never read, migrated or deleted.
  * The tenant is chosen as every lkb command does (`captureTenant`), NEVER from the id.
+
+ * <raw/webinars>/skipped-sessions.json      {version,tenantId,entries}: one {sessionKey,startTime?,recordedAt,source,tenantId} per skipped session, no title/URL; 30-day retention (D-134, pending append).
  * SKIPPED sessions: webinar-identity keys (overlap-lost, untrusted-sender) resolve through operations.json rows; `cal:<id>` and
  * `gmail:<id>` keys (no-join-link, unsafe-join-link, needs-registration) resolve through operations.json `source.reconciliation`
  * (the provider ids the poller has seen). All tenant-tagged.
@@ -22,7 +24,8 @@ import { fileURLToPath } from "node:url";
 import { resolveAlertId, type AlertCandidate } from "./calendar/alerts/alert-resolve.js";
 import { canonicalStart, renderStart, neutralizeText } from "./calendar/alerts/attention-alerts.js";
 import { detectPlatform } from "./platform.js";
-import { assertTenantTag, StateTenantRefusal } from "./calendar/state-tenant-tag.js";
+import { readSkippedRecords } from "./calendar/state/skipped-state.js";
+import { assertTenantTag, StateTenantRefusal } from "./calendar/state/state-tenant-tag.js";
 
 const USAGE = "usage: lkb alert-who <alert-id> [--tenant T] [--tz ZONE]";
 export const LIMITS = { fileBytes: 5 * 1024 * 1024, jobBytes: 64 * 1024, jobFiles: 5000, rows: 20000 } as const;
@@ -99,6 +102,17 @@ export function loadCandidates(src: AlertWhoSources, deps: Pick<AlertWhoDeps, "r
         if (isPlain(e) && typeof e.sessionKey === "string") T.add({ sessionKey: e.sessionKey, title: str(e.title), source: "schedule-state" });
       }
     } catch (e) { problems.push(refusal(e, "schedule-state.json is unreadable or corrupt (skipped)")); }
+  }
+
+  const skippedFile = path.join(src.stateDir, "skipped-sessions.json");
+  if (existsSync(skippedFile)) {
+    if (!insideRoot(src.dataRoot, skippedFile)) problems.push("skipped-sessions.json resolves outside the data root (link not followed; skipped)");
+    else try {
+      readJsonCapped(skippedFile, LIMITS.fileBytes); // size / regular-file guard before the tagged read
+      for (const r of Object.values(readSkippedRecords(src.stateDir, src.tenantId)).slice(0, LIMITS.rows)) {
+        T.add({ sessionKey: r.sessionKey, start: r.startTime, source: "skipped-sessions" });
+      }
+    } catch (e) { problems.push(refusal(e, "skipped-sessions.json is unreadable or corrupt (skipped)")); }
   }
 
   const jobDir = path.join(src.stateDir, "scheduled");
@@ -203,7 +217,7 @@ export function runAlertWho(rest: string[], deps: AlertWhoDeps): number {
 /** Real wiring for cli.ts. Dynamic imports keep this module's tests free of the OBS/browser dependency graph. */
 export async function defaultAlertWhoDeps(): Promise<AlertWhoDeps> {
   const [{ captureTenant }, { readWebinarOperationState }] = await Promise.all([
-    import("./capture/record-commands.js"), import("./calendar/schedule-state.js"),
+    import("./capture/record-commands.js"), import("./calendar/state/schedule-state.js"),
   ]);
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
   return {

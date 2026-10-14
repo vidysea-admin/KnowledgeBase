@@ -1,0 +1,562 @@
+[
+  {
+    "t": "2026-10-13T09:13:05.895Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:05.896Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sources",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:05.896Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/gaps",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:05.896Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/keys",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:06.079Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:06.079Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sources",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:06.085Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/gaps",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:06.085Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/keys",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:09.361Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:09.361Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sources",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:09.361Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/gaps",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:09.361Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/keys",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:09.361Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:09.362Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sources",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:09.362Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/gaps",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:09.363Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/keys",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:12.043Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:12.043Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:16.254Z",
+    "status": 503,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/calendar/upcoming",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:16.254Z",
+    "status": 503,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/calendar/join-rules",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:16.254Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:16.254Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/meeting-candidates",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:16.256Z",
+    "status": 503,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/calendar/upcoming",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:16.257Z",
+    "status": 503,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/calendar/join-rules",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:16.257Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:16.257Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/meeting-candidates",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:20.072Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:20.072Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sources",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:20.072Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/keys",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:20.072Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/gaps",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:20.072Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sources",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:20.072Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:20.072Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/gaps",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:20.073Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/keys",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:20.244Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=counselling&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:20.768Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions/2026-08-24-uniaccess-leeds-arts-university",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:20.868Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions/2026-08-24-uniaccess-leeds-arts-university",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:21.073Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions/2026-08-24-uniaccess-leeds-arts-university/speaker-suggestions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:21.140Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions/2026-08-24-uniaccess-leeds-arts-university/speaker-suggestions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:29.330Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=counselling&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:30.885Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:30.886Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:32.085Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=AI%20in%20counselling&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:35.519Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=A%26B%20%231%2050%25%20%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%20%E4%B8%96%E7%95%8C&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:42.221Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=zzqxjvwk&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:44.309Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=%3Cimg%20src%3Dx%20onerror%3Dalert(1)%3E%3Cscript%3Ealert(2)%3C%2Fscript%3E&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:50.917Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:55.483Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:55.490Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sources",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:55.490Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/keys",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:55.490Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/gaps",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:55.490Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:55.490Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sources",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:55.490Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/keys",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:55.490Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/gaps",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:55.911Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=%EF%BF%BD%25A&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:13:59.967Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=counselling&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:14:01.514Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=students&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:14:04.214Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=counselling&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:14:06.211Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:14:06.211Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sources",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:14:06.211Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/gaps",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:14:06.211Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/keys",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:14:06.267Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sessions",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:14:06.268Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/sources",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:14:06.269Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/gaps",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:14:06.270Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/keys",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:14:09.742Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=counselling&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:14:13.591Z",
+    "status": 200,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=counselling&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  },
+  {
+    "t": "2026-10-13T09:14:17.335Z",
+    "status": 401,
+    "method": "GET",
+    "url": "http://127.0.0.1:3411/search?q=counselling&k=20",
+    "authHeader": "Bearer <redacted>",
+    "allowOrigin": "http://127.0.0.1:5411"
+  }
+]
