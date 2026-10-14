@@ -2,7 +2,7 @@
 
 **Handshake status:** ready-for-check
 **Status:** ready-for-check
-**Fix cycle:** 0
+**Fix cycle:** 1
 **Task:** T-054 (scoped unit only; whole task stays in_progress)
 **Priority tier:** 3 - next unblocked roadmap feature, assigned in the current wave. Touches tenancy and data writes, so full ceremony.
 **Lane:** lane/t054-persist (branched from lane/codexwave1)
@@ -41,3 +41,8 @@ apps/api/src/transcript-review/{store,service,router}.ts; tests persist.test.ts,
 
 ## Final run
 `node --test --import tsx src/transcript-review/*.test.ts`: ℹ tests 27 / ℹ pass 27 / ℹ fail 0 (6 planner, 12 persist, 5 refresh, 4 service). Full apps/api suite re-run on the final tree: ℹ tests 954 / ℹ pass 954 / ℹ fail 0.
+
+## Fix cycle 1 (ISS-T054-PERSIST-001 / -002; test-only, no production source changed)
+- Added tests: both tenants committing on the same session id; headId/revisionRowId differ per tenant (and have no delimiter ambiguity); same revision recorded for two tenants keeps both rows; `?tenantId=` query never switches tenant on GET/history/POST; history rows are insert-once; a superseded refresh stops executing the old revision's remaining targets. memdb now enforces unique `_id` on upsert like Mongo.
+- Mutants (per-mutation byte backup, restore in finally, sha verified; HEAD-fidelity `git hash-object` == `git rev-parse HEAD:<file>` for store.ts, router.ts, service.ts, all equal): headId without tenant KILLED, revisionRowId without tenant KILLED, tenant from query string KILLED, history `$set` instead of `$setOnInsert` KILLED, superseded return ignored KILLED, plus the earlier 7 (replaceHead without CAS, dup key as win, no heal, no body/header match, no 412 pre-check, overlay ignored, refresh unfenced) all still KILLED: 12/12.
+- `src/transcript-review/*.test.ts`: ℹ tests 32 / ℹ pass 32 / ℹ fail 0. Full apps/api suite (TSX_TSCONFIG_PATH absolute to a temporary paths tsconfig, deleted): ℹ tests 959 / ℹ pass 959 / ℹ fail 0. tsc with that temporary paths tsconfig: 0 errors (the earlier whatsapp errors were the lane's missing `@lkb/core` path resolution, not code).

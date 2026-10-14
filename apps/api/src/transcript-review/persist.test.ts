@@ -236,3 +236,70 @@ test("sample sanity: helper turn() carries extra fields that survive, uncorrecte
     assert.deepEqual(orig, turn("tenant-A", SESSION, 0, "Alpha original 0"));
   } finally { await h.close(); }
 });
+
+import { headId, revisionRowId, createMongoReviewStore } from "./store.js";
+
+test("ISS-T054-PERSIST-001: both tenants commit on the SAME session id: two heads, two history rows, neither disturbs the other", async () => {
+  const h = await boot();
+  try {
+    const a0 = (await h.get("key-a")).body.revision;
+    const b0 = (await h.get("key-b")).body.revision;
+    assert.equal((await h.post("key-a", a0, fix(A0, "A one"))).status, 200);
+    assert.equal((await h.post("key-b", b0, fix(B0, "B one"))).status, 200);
+    assert.equal(h.m.rows("transcript_reviews").length, 2);
+    assert.equal(h.m.rows("transcript_review_revisions").length, 2);
+    assert.equal((await h.get("key-a")).body.turns[0]!.text, "A one");
+    assert.equal((await h.get("key-b")).body.turns[0]!.text, "B one");
+  } finally { await h.close(); }
+});
+
+test("ISS-T054-PERSIST-001: head and history ids differ per tenant for the same session/revision", () => {
+  assert.notEqual(headId("tenant-A", "s"), headId("tenant-B", "s"));
+  assert.notEqual(revisionRowId("tenant-A", "s", "r"), revisionRowId("tenant-B", "s", "r"));
+  assert.notEqual(headId("a", "b:c"), headId("a:b", "c"), "no delimiter ambiguity");
+  assert.notEqual(revisionRowId("tenant-A", "s", "r"), revisionRowId("tenant-A", "s", "r2"));
+});
+
+test("ISS-T054-PERSIST-001: recording the same revision id for two tenants keeps both rows (store level)", async () => {
+  const h = await boot();
+  try {
+    const store = createMongoReviewStore(h.m.db);
+    const row = (t: string) => ({ _id: revisionRowId(t, SESSION, "same-rev"), tenantId: t, sessionId: SESSION, revision: "same-rev", parentRevision: "p", actorRef: "x", reviewedAt: "2026-10-14T09:00:00.000Z", reason: "r", changes: [], refreshTargets: [] });
+    await store.recordRevision("tenant-A", row("tenant-A"));
+    await store.recordRevision("tenant-B", row("tenant-B"));
+    assert.equal((await store.listRevisions("tenant-A", SESSION)).length, 1);
+    assert.equal((await store.listRevisions("tenant-B", SESSION)).length, 1);
+  } finally { await h.close(); }
+});
+
+test("ISS-T054-PERSIST-001: tenant comes from the key only - a ?tenantId= query never switches tenant", async () => {
+  const h = await boot();
+  try {
+    const a = (await h.get("key-a", "only-a")).body;
+    const q = "?tenantId=tenant-A";
+    const g = await h.call("GET", `/sessions/only-a/transcript-review${q}`, "key-b");
+    assert.equal(g.status, 404);
+    assert.equal((await g.text()).includes("Only A secret"), false);
+    assert.equal((await h.call("GET", `/sessions/only-a/transcript-review/history${q}`, "key-b")).status, 404);
+    const p = await h.call("POST", `/sessions/only-a/transcript-review${q}`, "key-b", { expectedRevision: a.revision, ...fix("tenant-A-only-a-t0", "hijack") }, { "if-match": `"${a.revision}"` });
+    assert.equal(p.status, 404);
+    // and B's own session through A's query name still reads B's data
+    const own = (await (await h.call("GET", `/sessions/${SESSION}/transcript-review${q}`, "key-b")).json()) as { turns: { text: string }[] };
+    assert.equal(own.turns[0]!.text, "Bravo original 0");
+    assert.deepEqual(h.m.writes, []);
+  } finally { await h.close(); }
+});
+
+test("ISS-T054-PERSIST-002: history rows are insert-once: a second record of the same id does not overwrite the first", async () => {
+  const h = await boot();
+  try {
+    const store = createMongoReviewStore(h.m.db);
+    const id = revisionRowId("tenant-A", SESSION, "r1");
+    const row = (reason: string) => ({ _id: id, tenantId: "tenant-A", sessionId: SESSION, revision: "r1", parentRevision: "p", actorRef: "x", reviewedAt: "2026-10-14T09:00:00.000Z", reason, changes: [], refreshTargets: [] });
+    await store.recordRevision("tenant-A", row("original reason"));
+    await store.recordRevision("tenant-A", row("tampered reason"));
+    const rows = await store.listRevisions("tenant-A", SESSION);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]!.reason, "original reason");
+  } finally { await h.close(); }
+});

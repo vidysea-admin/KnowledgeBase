@@ -34,6 +34,8 @@ export function memoryDb() {
       const hit = rowsOf(name).find((x) => matches(x, filter));
       if (hit) { Object.assign(hit, structuredClone(set)); return { matchedCount: 1, modifiedCount: 1, upsertedCount: 0 }; }
       if (!options.upsert) return { matchedCount: 0, modifiedCount: 0, upsertedCount: 0 };
+      // Like Mongo, _id is unique per collection across tenants: an upsert whose tenant-scoped filter misses but whose _id exists elsewhere fails.
+      if (rowsOf(name).some((r) => r._id === filter._id)) throw Object.assign(new Error("E11000 duplicate key"), { code: 11000 });
       rowsOf(name).push({ ...filter, ...structuredClone(set), ...structuredClone(onInsert) });
       return { matchedCount: 0, modifiedCount: 0, upsertedCount: 1 };
     },

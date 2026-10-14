@@ -68,7 +68,8 @@ test("a newer correction supersedes an in-flight refresh: the old run cannot ove
   let release!: () => void;
   const gate = new Promise<void>((r) => { release = r; });
   let first = true;
-  const h = await boot({ refresh: async (j) => { if (first && j.target === "session-page") { first = false; await gate; } } });
+  const ran: string[] = [];
+  const h = await boot({ refresh: async (j) => { ran.push(`${j.revision}:${j.target}`); if (first && j.target === "session-page") { first = false; await gate; } } });
   try {
     const r0 = (await h.get("key-a")).body.revision;
     const r1 = ((await (await h.post("key-a", r0, fix("v1"))).json()) as { revision: string }).revision;
@@ -77,6 +78,8 @@ test("a newer correction supersedes an in-flight refresh: the old run cannot ove
     const r2 = ((await (await h.post("key-a", r1, fix("v2"))).json()) as { revision: string }).revision;
     release();
     await (await running).text();
+    // ISS-T054-PERSIST-002: the superseded run stops at once - it must not keep executing the OLD revision's remaining targets.
+    assert.deepEqual(ran, [`${r1}:claims`, `${r1}:session-page`], "no chunks/tree/graph for the superseded revision");
     const head = h.m.rows("transcript_reviews")[0] as { revision: string; refresh: { status: string; revision: string; completed: string[] } };
     assert.equal(head.revision, r2);
     assert.equal(head.refresh.revision, r2);
