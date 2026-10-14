@@ -1,14 +1,14 @@
 # T-008 chunk-level semantic results with turn/time/quote evidence
 
-**Handshake status:** ready-for-check
-Status: ready-for-check
+**Handshake status:** checked-PASS
+Status: checked-PASS
 Fix cycle: 1
 Tier: 3 — remaining roadmap T-008 (cycle 1; closes the "chunk-level (not session-deduped) results" gap in qa/manifests/t008search.md "Not done" and the "no quote/time/turn evidence" gap in qa/manifests/t008-semantic-web-consumer.md).
 Maker: lane/t008-chunk-evidence (branched from lane/codexwave1 cd843b26)
 Contract: qa/contracts/vector-retrieval.md (C1 refusal, C3 determinism, C9 purity). Not edited.
 
 ## Fix cycle 1 (responds to qa/verdicts/t008-chunk-evidence.md, FAIL cycle 0)
-Scope now: packages/index/src/vector/chunk-evidence.{ts,test.ts}, packages/index/src/index.ts (export), apps/api/src/semantic-search/{route.ts,semantic-search-store.ts,semantic-search-store.test.ts}. server.ts untouched. `atlas-adapter.ts` DELETED (ISS-005: D-021 rules out `$vectorSearch`; no contract/TASKS row asks for it).
+Scope now: packages/index/src/vector/chunk-evidence.{ts,test.ts}, packages/index/src/index.ts (export), apps/api/src/semantic-search/{route.ts,semantic-search-store.ts,semantic-search-store.test.ts}. server.ts untouched. `atlas-adapter.ts` DELETED (ISS-T008-CHUNK-EVIDENCE-005: D-021 rules out `$vectorSearch`; no contract/TASKS row asks for it).
 
 Changes: `tenantId` is REQUIRED on `rankChunksWithEvidence` and `attachEvidence` (throws "tenantId is required" even for empty corpus or k=0); chunk and turn tenant checks are unconditional; empty query vector and non-finite chunk vector components refuse regardless of rank; quote is verified against the turn looked up independently from the loaded map and must belong to the chunk (`selectQuote` option is a test seam, its output still verified). Wiring: `rankChunksWithEvidence` exported from `@lkb/index`; `createMongoSemanticSearchDeps` loads turns for the best chunks' `turnRefs` via `scopedCollection<Turns>(tenantId)` (`$in` filter, tenant pinned) and adds ADDITIVE optional fields to `SemanticHit`: `turnIds`, `tStart`, `tEnd`, `quote {turnId,charStart,charEnd,text}`. Session-level fields and one-hit-per-session behaviour are unchanged (the semantic route contract is session-level; chunk-level multi-hit per session is NOT exposed by the API). Unverifiable evidence makes `search` throw -> route 503. Behind the existing LKB_SEMANTIC_SEARCH flag (route absent when off). ask-arms.ts does not exist in this lane (grep found no file); no `/ask` wiring done, listed as open.
 

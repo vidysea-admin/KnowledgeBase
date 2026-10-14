@@ -25,3 +25,24 @@ Yes for malformed evidence (verified by probes), with the tenant-optional and de
 
 ## Fix cycle 1 needs
 Tests killing the three tenant survivors; tenantId required (or loudly documented) on the evidence entry points; provenance test through attachEvidence; wire or explicitly defer (-004); drop or park the Atlas adapter. Not run: eval-recall vector (needs real Mongo and Gemini).
+
+---
+
+# Cycle 1 (appended)
+
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: 9da77dd3
+ISSUES-WRITTEN: none (all six cycle-0 issues closed in qa/issues.t008-chunk-evidence.jsonl)
+
+## Evidence
+- packages/index vector tests 26/26; full packages/index 692/692; tsc exit 0 for packages/index and apps/api (temporary paths tsconfig, absolute TSX_TSCONFIG_PATH, deleted). apps/api semantic-search tests 11/11. Full apps/api 935 tests, 933 pass, 2 fail, both unrelated to this unit and untouched by it: activity-health/router.test.ts (fails 3/3 in isolation, Python-fixture dependent) and usage/usage.test.ts hanging-write timeout (flaky under CPU load, passed 2 of 3 in isolation).
+- lint-loc: only the 2 known inherited failures (loc, snapshot). The maker's manifest cited ISS-005 bare, which failed the tracker G4 gate; I qualified it to ISS-T008-CHUNK-EVIDENCE-005 in the manifest, and the tracker stage now passes.
+- D-015 reproductions: -001 (3 tenancy mutants) chunk check, turn check killed; mapper guard N/A, adapter deleted (verified absent: no atlas-adapter.ts, no references). -002 omitted tenantId now throws (both entry points; both guard occurrences mutated and killed). -003 verifyQuoteSpan skip and non-empty/trim both killed. -004 wired (below). -005 adapter gone. -006 empty query vector and non-finite component both killed. 
+- Mutations (per-mutation backup, try/finally restore, 180 s timeout, HEAD-blob check each time): 15 mutants, 15 killed, no restore failures, tree clean.
+- Cross-tenant leak attempt via createMongoSemanticSearchDeps: a toc chunk referencing an other-tenant turn returned nothing: with a tenant-honouring db it throws "missing turn"; with a deliberately tenant-ignoring db on turns the ranker still throws "turn tenant mismatch" (defence in depth). Turn load goes through scopedCollection<Turns>(tenantId) with $in; unscoping it reddens a store test.
+- SemanticHit gains only optional fields (turnIds, tStart, tEnd, quote); session-level fields and one-hit-per-session behaviour unchanged; route stays behind LKB_SEMANTIC_SEARCH. Contract C1/C3/C9 hold (depcruise stage passes).
+
+## Notes and follow-ups (not blocking)
+- /ask not wired (no ask-arms.ts in this lane); web does not render the new fields; API exposes best chunk per session only.
+- Behaviour to be aware of: any non-finite vector component or tenant-less chunk/turn row among the best chunks makes search throw (503) rather than skip; correct per refuse-loudly, but a single bad row in the corpus will take the endpoint down. Not run against real Mongo.
