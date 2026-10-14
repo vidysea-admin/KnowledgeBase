@@ -2253,3 +2253,11 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** D-166 stands as written and is now explicitly approved. Join-rule design leans toward attempting a join over skipping, but never beyond D-166's bounds: one-hour exclusive expiry, tenant-bound verified snapshots, cached deny and opt-out rules still effective, and ISS-376 gates unchanged. ISS-CODEXWAVE1-001 is closed by this entry.
 **Approved-by:** Umesh
 **Links:** D-166; T-037; ISS-CODEXWAVE1-001 (Supersedes: none, this entry confirms D-166)
+
+## D-168 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Extend the D-150 deliberate production opt-in to the T-054 transcript-review store and the T-056 answer-policy store. They may write to `lkb` only when MONGODB_DB=lkb AND LKB_I_KNOW_THIS_IS_PRODUCTION=1. docker-compose's api service sets that opt-in. Without the opt-in, these stores keep refusing `lkb`, with a 503.
+**Why:** Umesh was asked on 2026-10-14: "Transcript corrections (T-054) and answer policies (T-056) return 503 on the production database (lkb), so they won't work live. The other stores write to lkb. Should these be allowed to write to production too?" He selected "Yes, with the opt-in (Recommended)": same pattern as D-150, writing to lkb only when the API has MONGODB_DB=lkb and LKB_I_KNOW_THIS_IS_PRODUCTION=1 set, with that env added to docker-compose's api service.
+**Result:** T-054 and T-056 stores can work live on lkb under the explicit opt-in; the default remains a 503 refusal.
+**Approved-by:** Umesh
+**Links:** D-150; D-143; T-054; T-056; ISS-WAVE2MOUNT-002
