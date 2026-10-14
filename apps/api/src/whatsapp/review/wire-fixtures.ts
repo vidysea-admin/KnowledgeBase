@@ -26,6 +26,11 @@ export function wireMongoFixture(seed: Record<string, Row[]> = {}) {
   let rows: Record<string, Row[]> = structuredClone(seed);
   let tail = Promise.resolve();
   const coll = (name: string) => (rows[name] ??= []);
+  // Mongo _id is unique per collection across ALL tenants; the double must enforce it or tenant collisions stay invisible.
+  const insertRow = (name: string, row: Row) => {
+    if (coll(name).some(existing => existing._id === row._id)) throw new Error(`E11000 duplicate key error collection: ${name} dup key: ${JSON.stringify(row._id)}`);
+    coll(name).push(structuredClone(row));
+  };
   const db = {
     client: { startSession: () => ({
       async withTransaction<T>(body: () => Promise<T>): Promise<T> {
@@ -42,7 +47,7 @@ export function wireMongoFixture(seed: Record<string, Row[]> = {}) {
       async replaceOne(filter: Filter, replacement: Row, options: { upsert?: boolean } = {}) {
         const index = coll(name).findIndex(r => matches(r, filter));
         if (index >= 0) { coll(name)[index] = structuredClone(replacement); return { modifiedCount: 1, upsertedCount: 0 }; }
-        if (options.upsert) { coll(name).push(structuredClone(replacement)); return { modifiedCount: 0, upsertedCount: 1 }; }
+        if (options.upsert) { insertRow(name, replacement); return { modifiedCount: 0, upsertedCount: 1 }; }
         return { modifiedCount: 0, upsertedCount: 0 };
       },
       async bulkWrite(ops: { replaceOne: { filter: Filter; replacement: Row; upsert?: boolean } }[]) {
@@ -54,7 +59,7 @@ export function wireMongoFixture(seed: Record<string, Row[]> = {}) {
         if (row) { Object.assign(row, structuredClone(update.$set ?? {})); return { modifiedCount: update.$set ? 1 : 0, upsertedCount: 0 }; }
         if (options.upsert) {
           const plain = Object.fromEntries(Object.entries(filter).filter(([, v]) => v === null || typeof v !== "object"));
-          coll(name).push(structuredClone({ ...plain, ...update.$setOnInsert, ...update.$set })); return { modifiedCount: 0, upsertedCount: 1 };
+          insertRow(name, { ...plain, ...update.$setOnInsert, ...update.$set }); return { modifiedCount: 0, upsertedCount: 1 };
         }
         return { modifiedCount: 0, upsertedCount: 0 };
       },

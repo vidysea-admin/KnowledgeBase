@@ -2,7 +2,7 @@
 
 **Handshake status:** checked-PASS (cycle 1, scoped to write-side; ISS-006 read-side quarantine still blocks mounting)
 Status: checked-PASS
-Fix cycle: 1
+Fix cycle: 2
 Task: T-007 (parent stays open; this is a scoped wiring unit)
 Lane: lane/wa-review-wire, branched from lane/codexwave1 (Codex foundation, pending merge)
 Priority tier: 3 — dependency-ready roadmap feature, assigned by orchestrator.
@@ -62,3 +62,17 @@ Counts by issue id (all tests in `wire-fix1.test.ts` unless stated; ledger repro
 
 Cycle-1 evidence: WhatsApp tests (`node --test --import tsx src/whatsapp/review/*.test.ts src/whatsapp/*.test.ts`, TSX_TSCONFIG_PATH set to the absolute temporary paths tsconfig, deleted afterwards): tests 51, pass 50, fail 0, skipped 1 (gated real Mongo). Scoped tsc with that tsconfig: exit 0. Full apps/api and lint-loc: see line below.
 Full apps/api (TSX_TSCONFIG_PATH absolute temp tsconfig): tests 948, pass 947, fail 0, skipped 1. lint-loc: no violation in any new/changed file; `lint-loc --all` fails only on the two pre-existing stages (meeting-bot py test 408 lines, stale SNAPSHOT.md).
+
+## Fix cycle 2 (responds to cycle-1 scoped PASS, issues ISS-WA-REVIEW-WIRE-008..012)
+
+Counts by issue id (`wire-fix1.test.ts`; fixture now enforces Mongo `_id` uniqueness across tenants):
+- ISS-008 (tenancy) FIXED 1/1. Review-log ids (marker and deleted-turn history) are `whatsAppLogId(tenantId, ...)`, a length-prefixed tenant-structured id, so a leftover tenant-A marker cannot E11000 tenant B (two-tenant test on the unique-_id fixture; boundary-ambiguity assertions included).
+- ISS-009 (data loss) FIXED 4/4. `SnapshotShrinkError` is thrown before any write when the snapshot is empty over stored turns, or would delete more than `maxDeleteFraction` (default 0.5, configurable, "over" not "at"). It is logged durably (`snapshot-refused` row), alerted (`console.error` "ALERT whatsapp-review"; no email channel exists in this lane), and leaves the pending marker. Bypass only through `wiring.forceIngestGroup` (operator-only, not on any route). Tests: empty snapshot, empty with threshold 1, 3-of-4 mass shrink, exactly-50% allowed, configurable 0.9, single legitimate deletion.
+- ISS-010 (low) FIXED 1/1. Deleted-message text and evidence quotes are redacted from decided candidate rows; contentHash, decision and status remain; test greps candidates, log, claims and turns for the deleted text. The unsalted-hash note is not addressed (log stores a plain SHA-256; salting needs a secret store, listed).
+- ISS-011 (low) FIXED 1/1. Missing snapshot throws with turns/claims/candidates byte-identical; affected-candidate lookup asserted tenant-scoped.
+- ISS-012 (low) FIXED. `schema/claims.schema.json` gains optional `source` enum `["whatsapp"]`; `node scripts/gen-types.mjs` regenerated only `packages/core/src/generated/claims.ts` (and `gen-types --check`: 30 files match). The two files sit outside apps/api/src/whatsapp, in the schema-owning paths the brief allowed.
+- Mutation probes `qa/evidence/wa-review-wire-mutate-cycle2.mjs` (throwaway copy dir): 11/11 KILLED (first run 10/11: the empty-snapshot refusal was masked by the fraction rule, fixed with a threshold-1 test).
+- Still open: ISS-004, ISS-006 (blocks mount), ISS-007, hash salting, no alert channel beyond console and the log row.
+
+Cycle-2 evidence: WhatsApp tests 57 total, 56 pass, 0 fail, 1 skipped (gated real Mongo); scoped tsc with temporary absolute paths tsconfig (deleted afterwards): exit 0. Full apps/api and lint-loc: see line below.
+Full apps/api (absolute TSX_TSCONFIG_PATH): tests 954, pass 953, fail 0, skipped 1. lint-loc: only the pre-existing meeting-bot py test (408 lines) fails; no new/changed file over budget.
