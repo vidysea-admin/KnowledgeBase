@@ -1,5 +1,5 @@
 # Manifest — visionfix
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Fix cycle:** 1
 **Contract:** none (fixes ISS-OLLAMAFIRST-001 and ISS-OLLAMAFIRST-002, both medium; unit `ollamafirst` follow-up)
 **Lane:** visionfix (branch lane/visionfix, from 1417a8f6)
