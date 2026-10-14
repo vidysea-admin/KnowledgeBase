@@ -7,7 +7,7 @@
 import { Router } from "express";
 import { requireScope } from "../auth.js";
 
-export const BOT_EVENT_KINDS = ["about-to-join", "capture-started", "capture-stopped-early", "capture-failed", "capture-done"] as const;
+export const BOT_EVENT_KINDS = ["about-to-join", "capture-started", "capture-stopped-early", "capture-failed", "capture-done", "rules-degraded"] as const;
 export interface BotEventRow {
   id: string; at: string; kind: (typeof BOT_EVENT_KINDS)[number]; sessionKey: string; title: string;
   startTime?: string; endTime?: string; careerGuidance?: boolean; testData?: boolean; matchedKeywords?: string[]; detail?: string; outputPath?: string;

@@ -1,0 +1,11 @@
+{
+  "command": "node --test --test-isolation=none --test-concurrency=1 --test-timeout=30000 --import ./.cache/coordination/safe-test-runtime/register.mjs qa/evidence/t041-probed-duration-checker.test.mjs",
+  "startUtc": "2026-10-14T09:22:02.9764513Z",
+  "endUtc": "2026-10-14T09:22:03.8156866Z",
+  "durationSeconds": 0.8392353,
+  "exitCode": 0,
+  "verdictPersistStartUtc": "2026-10-14T09:23:21Z",
+  "verdictPersistConfirmedUtc": "2026-10-14T09:23:38.4317183Z",
+  "measuredAnchorUtc": "2026-10-14T08:51:15Z",
+  "measuredAnchorToVerdictSeconds": 1943.4317183
+}

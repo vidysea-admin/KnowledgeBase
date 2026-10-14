@@ -38,6 +38,7 @@ test("anchors in HTML descriptions are read; google.com/url wrapper is not unwra
 
 test("hostile / non-matching links are refused", () => {
   const bad = [
+    `https://evilyoutube.com/live/${ID}`, `https://evilyoutu.be/${ID}`, `https://notyoutu.be/${ID}`,
     `http://youtu.be/${ID}`, `https://youtu.be.evil.com/${ID}`, `https://evil.com/youtube.com/live/${ID}`,
     `https://user@youtu.be/${ID}`, `https://youtu.be:8443/${ID}`, `https://www.youtube.com.evil.io/live/${ID}`,
     `https://www.youtube.com/watch?v=${ID}&v=ZZZZZZZZZZZ`, "https://www.youtube.com/watch?v=short",

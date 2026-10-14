@@ -1,0 +1,16 @@
+{
+  "command": "node node_modules/vitest/vitest.mjs run --config ../../qa/evidence/execution-wave1-integration-web-build.vitest.config.mjs --maxWorkers=1 --minWorkers=1",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase/apps/web",
+  "exitCode": 0,
+  "commandDurationSeconds": 7.8926174,
+  "testCount": 1,
+  "passCount": 1,
+  "buildStartedUtc": "2026-10-14T09:21:19.567Z",
+  "buildEndedUtc": "2026-10-14T09:21:24.587Z",
+  "testTimeoutMs": 120000,
+  "probeSha256": "808E9A2554C896C1C5B2EAD4A3842877D740137BEEC3116F3598DB5BBE891D37",
+  "configSha256": "4609D3F5B1CF96E14C884F6EAC0E40F4689899F389B5C4C725111682B57A63F6",
+  "output": "qa/evidence/execution-wave1-integration-web-build.stdout.txt",
+  "artifact": "qa/evidence/execution-wave1-integration-web-build-artifact.json",
+  "warning": "Bundle chunk larger than 500 kB; build succeeded."
+}

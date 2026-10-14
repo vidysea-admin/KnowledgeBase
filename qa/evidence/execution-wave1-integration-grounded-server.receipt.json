@@ -1,0 +1,5 @@
+{
+  "command": "node --test --test-isolation=none --test-concurrency=1 --test-timeout=30000 --import ./.cache/coordination/safe-test-runtime/register.mjs apps/api/src/server.test.ts",
+  "exitCode": 0,
+  "durationSeconds": 4.094296
+}

@@ -1,0 +1,10 @@
+✔ old same-key session 401 cannot clear restored page/auth/storage (204.6893ms)
+✔ batched logout/same-key login discards snapshots before passive effects (70.9463ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2126.5426

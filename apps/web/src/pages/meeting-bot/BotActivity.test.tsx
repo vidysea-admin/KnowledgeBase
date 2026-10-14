@@ -8,6 +8,12 @@ const state = (data: unknown, over: Partial<Loaded<{ events?: unknown }>> = {}):
   ({ data: data as { events?: unknown }, error: null, loading: false, noKey: false, reload: () => undefined, ...over });
 
 describe("BotActivity", () => {
+  test("join rules degradation is displayed as an operational alert", () => {
+    render(<BotActivity state={state({ events: [{ id: "rules", at: "2026-10-14T12:00:00Z", kind: "rules-degraded",
+      title: "Join rules unavailable", detail: "No validated snapshot is in use." }] })} />);
+    expect(screen.getByRole("alert").textContent).toContain("Join rules degraded: Join rules unavailable");
+    expect(screen.getByRole("alert").textContent).toContain("No validated snapshot is in use.");
+  });
   test("renders career, test-data and failure events with keywords, detail and output path as plain text", () => {
     render(<BotActivity state={state({ events: [
       { id: "1", at: "2026-10-15T09:00:00Z", kind: "about-to-join", title: "Career Counselling Masterclass", careerGuidance: true, matchedKeywords: ["career", "counselling"] },

@@ -21,6 +21,7 @@
  */
 import { execFile } from "node:child_process";
 import { resolveEventMeetingLink } from "../join-rules/calendar-link-extract.js";
+import { resolveYoutubeLive } from "../join-rules/youtube-live-extract.js";
 import type { UpcomingMeeting, CalendarAcquisition, CalendarReadDeps } from "../routes/calendar.js";
 
 interface GwsEventListResponse {
@@ -76,9 +77,10 @@ export function runGws(args: string[], exec = execFile): Promise<string> {
 }
 
 type CalendarRun = typeof runGws;
-export function listUpcomingGwsMeetings(windowDays?: number, run?: CalendarRun, changedSince?: string): Promise<UpcomingMeeting[]>;
-export function listUpcomingGwsMeetings(windowDays: number, run: CalendarRun | undefined, changedSince: undefined, acquisition: {syncToken?: string}): Promise<CalendarAcquisition>;
-export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, changedSince?: string, acquisition?: {syncToken?: string}): Promise<UpcomingMeeting[] | CalendarAcquisition> {
+export function listUpcomingGwsMeetings(windowDays?: number, run?: CalendarRun, changedSince?: string, acquisition?: undefined, watchDiscovery?: {enabled?: boolean}): Promise<UpcomingMeeting[]>;
+export function listUpcomingGwsMeetings(windowDays: number, run: CalendarRun | undefined, changedSince: undefined, acquisition: {syncToken?: string}, watchDiscovery?: {enabled?: boolean}): Promise<CalendarAcquisition>;
+export function listUpcomingGwsMeetings(windowDays?: number, run?: CalendarRun, changedSince?: string, acquisition?: {syncToken?: string}, watchDiscovery?: {enabled?: boolean}): Promise<UpcomingMeeting[] | CalendarAcquisition>;
+export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, changedSince?: string, acquisition?: {syncToken?: string}, watchDiscovery: {enabled?: boolean} = {enabled: process.env.LKB_YOUTUBE_LIVE_DISCOVERY === "true"}): Promise<UpcomingMeeting[] | CalendarAcquisition> {
   if (!Number.isFinite(windowDays) || windowDays <= 0 || windowDays > 366) throw new Error("Invalid calendar discovery window");
   if (changedSince !== undefined && (typeof changedSince !== "string" || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(changedSince) ||
       !Number.isFinite(Date.parse(changedSince)) || new Date(changedSince).toISOString() !== changedSince)) throw new Error("Invalid calendar change checkpoint");
@@ -158,6 +160,7 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, cha
           (e.organizer !== undefined && (!e.organizer || typeof e.organizer !== "object" || Array.isArray(e.organizer) || (e.organizer.email !== undefined && !text(e.organizer.email, 320))))) throw new Error("Invalid calendar event");
       const link = resolveEventMeetingLink({conferenceUrl: meetingUrlOf(e), location: e.location, description: e.description});
       const meetingUrl = link.url;
+      const watch = resolveYoutubeLive({location: e.location, description: e.description}, watchDiscovery);
       if (meetingUrl !== undefined && !text(meetingUrl, 8192)) throw new Error("Invalid calendar link");
       return {
       id: e.id,
@@ -167,6 +170,8 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, cha
       meetingUrl,
       ...(meetingUrl !== undefined && link.source ? {meetingUrlSource: link.source} : {}),
       ...(link.issue ? {meetingLinkIssue: link.issue} : {}),
+      ...(watch.watch ? {youtubeWatch: watch.watch} : {}),
+      ...(watch.issue ? {youtubeWatchIssue: watch.issue} : {}),
       organizer: e.organizer?.email,
       cancelled: e.status === "cancelled",
       recurringEventId: e.recurringEventId,

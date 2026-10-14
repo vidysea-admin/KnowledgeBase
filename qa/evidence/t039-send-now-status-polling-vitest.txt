@@ -1,0 +1,21 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+stderr | src/pages/meeting-bot/SendNowForm.test.tsx > SendNowForm > 403 keeps the rest of the meeting-bot page working
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/pages/meeting-bot/SendNowForm.test.tsx (23 tests) 636ms
+ ✓ src/pages/meeting-bot/useSendNowStatus.test.tsx (11 tests) 73ms
+stderr | src/pages/MeetingBotPage.test.tsx > MeetingBotPage operational status > shows real queued/failed/processing/ready/action-required states and retries
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/pages/MeetingBotPage.test.tsx (7 tests) 331ms
+
+ Test Files  3 passed (3)
+      Tests  41 passed (41)
+   Start at  09:33:33
+   Duration  7.71s (transform 440ms, setup 804ms, collect 1.37s, tests 1.04s, environment 3.21s, prepare 621ms)
+
+

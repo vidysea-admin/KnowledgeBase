@@ -1,0 +1,130 @@
+[
+  {
+    "Path": "apps/api/src/answer-policy/routes.test.ts",
+    "Sha256": "7B2E08244D659772CDB8C42A36FF376F5DAFA41B2023B0B54B732BC2DE33DEB6"
+  },
+  {
+    "Path": "apps/api/src/answer-policy/routes.ts",
+    "Sha256": "9B8066A3D10A0AF3CCAFC0DC9397229D338C71AFE62BA7288E057146B6BF4956"
+  },
+  {
+    "Path": "apps/api/src/bot-events/router.test.ts",
+    "Sha256": "2DF0462CBE2E6BC2A3361CB42C012CC2E6190402AE8499EDEB63C11FD201DAC1"
+  },
+  {
+    "Path": "apps/api/src/bot-events/router.ts",
+    "Sha256": "E95EE32CFF026AE69AEE92D363E18BFE9440A0026F4134187429EBF708318728"
+  },
+  {
+    "Path": "apps/api/src/gws/gws-calendar.ts",
+    "Sha256": "B5866AB4779F1CBE6E88AFA78C5FF6B027275E66932BAE678C052395DD507537"
+  },
+  {
+    "Path": "apps/api/src/gws/youtube-calendar.test.ts",
+    "Sha256": "51961D7B17B49A2FA34BA10DD22F82CCF9EE7749F9560C6E5FDAEF9CFD6C4D83"
+  },
+  {
+    "Path": "apps/api/src/server.ts",
+    "Sha256": "F15BA561553CF9CC61C519A2C9F247E662BDE12B842BEF53113E676F1020BC61"
+  },
+  {
+    "Path": "apps/api/tsconfig.json",
+    "Sha256": "E37D70F01DD85F180C1E3070DBED968ACD2D610BEB3EC9040A78259AA8CA1B03"
+  },
+  {
+    "Path": "apps/web/src/api/search/semanticClient.ts",
+    "Sha256": "BDCC85685F01CE7CCD2FD6642EECB458AE2365ABA712413CF0779CF26ED873BE"
+  },
+  {
+    "Path": "apps/web/src/App.tsx",
+    "Sha256": "EDB636DD2DC837ACE16103C2344949626F392BBEC0C6EFCA55D06F1D0D0B45E9"
+  },
+  {
+    "Path": "apps/web/src/layout/NavSidebar.tsx",
+    "Sha256": "0D904014C0BDCAC5BF5BB8323658EEB1A6689145BC81E9C42486B88F5F1E8132"
+  },
+  {
+    "Path": "apps/web/src/pages/answer-policy/AnswerPolicySimulator.tsx",
+    "Sha256": "B77B4355C6E7336F392D8418E1AB8E2C2FC62C91E12036F285497E72B245B24B"
+  },
+  {
+    "Path": "apps/web/src/pages/knowledge/KnowledgeDirectoryIntegration.test.tsx",
+    "Sha256": "49887B6309554DFB3D4267AE62C39FAF416F9F21981C7A8A11A6D9851327145A"
+  },
+  {
+    "Path": "apps/web/src/pages/knowledge/knowledgeDirectoryModel.ts",
+    "Sha256": "2D0E3B338FD64007175446CC9799EB51DF604E5B00E9FE0C804B0D085E568D68"
+  },
+  {
+    "Path": "apps/web/src/pages/knowledge/KnowledgeDirectoryPage.tsx",
+    "Sha256": "F921A761C043BC328407ABA85BBB78AA0F587EB44D7985D35227B8883FBA5E00"
+  },
+  {
+    "Path": "apps/web/src/pages/meeting-bot/BotActivity.test.tsx",
+    "Sha256": "0D192954D1D6161074FD1D8B0E927C8AB3E8DCDB7CACEF2310ED027AAE23207B"
+  },
+  {
+    "Path": "apps/web/src/pages/meeting-bot/BotActivity.tsx",
+    "Sha256": "3A950FEBA5BDA9296FDA415A7D4B93F0EB03CBC91C3AA57E07977CFCC47E7EC1"
+  },
+  {
+    "Path": "apps/web/src/pages/search/SearchPage.tsx",
+    "Sha256": "C452002EB5B8BE483754CDAC05458B43E6EBE6C462042FB0B1FE65184C1B5D32"
+  },
+  {
+    "Path": "apps/web/src/pages/search/semantic/SemanticResults.tsx",
+    "Sha256": "21DC97E5C1D2840FB8BB19C9DD10D445270A514CE6D63DBBB616509BCFCEB5CE"
+  },
+  {
+    "Path": "apps/web/tsconfig.json",
+    "Sha256": "F67D852A59376DC6D5A386F669D984D7B3133860B693CA00DFA59A3CAF3596E0"
+  },
+  {
+    "Path": "packages/core/src/generated/whatsapp_candidates.ts",
+    "Sha256": "32F31FD21F6CFD72E3D819528878EC4C9BE659BA16C53779DD1F2EE896E60F10"
+  },
+  {
+    "Path": "packages/core/src/index.ts",
+    "Sha256": "E486B5E936B8CB5E48E38C5C843F22960E2CA3FE529DD92F67ECD2447722C9FD"
+  },
+  {
+    "Path": "packages/meeting-bot/src/autojoin/alerts.ts",
+    "Sha256": "A9847BA5017E46C9A0785070E70A1715813958DE8AEE792D9D363EAA0DBF2A2A"
+  },
+  {
+    "Path": "packages/meeting-bot/src/autojoin/bot-events.ts",
+    "Sha256": "11165942976EC2643F3720E891BDC74AE491CB75A364B682404C4CAFBEE5CD60"
+  },
+  {
+    "Path": "packages/meeting-bot/src/autojoin/tick-wiring.ts",
+    "Sha256": "D8D00D63B4DFDCEB59183546F23921C20926615CA4B14266DC07F24A3D96D970"
+  },
+  {
+    "Path": "packages/meeting-bot/src/calendar/join-rules/join-rules-enforce.ts",
+    "Sha256": "DE752442003B219C088E082978AD1561CCAA679A8324D8E4CCF28545634E8FD7"
+  },
+  {
+    "Path": "packages/meeting-bot/src/calendar/join-rules/join-rules-last-valid.ts",
+    "Sha256": "980F31D77263DAC2F9397BCCB4161D54C6F0234D6453671E500EF099CC42463C"
+  },
+  {
+    "Path": "packages/meeting-bot/src/calendar/schedule-tick-rules-integration.test.ts",
+    "Sha256": "9C3B2EDA352673D31579435B60E860AAD0DD6B84E71D40340165940FD498FB43"
+  },
+  {
+    "Path": "packages/meeting-bot/src/calendar/schedule-tick.ts",
+    "Sha256": "145952AAF6D84865933E2B1E98520EE77AE1C9BEB7ED5AC7478DE708DFBE5C4B"
+  },
+  {
+    "Path": "packages/meeting-bot/tsconfig.json",
+    "Sha256": "E37D70F01DD85F180C1E3070DBED968ACD2D610BEB3EC9040A78259AA8CA1B03"
+  },
+  {
+    "Path": "schema/whatsapp_candidates.schema.json",
+    "Sha256": "B49E9681890DA26E7DECC89D5FB17D00B94735581F9C79E209DAD48CF415308F"
+  },
+  {
+    "Path": "tsconfig.base.json",
+    "Sha256": "6BC2D632C06E482B900C73F73DD6C703B3791BD5B02B05AAF7701CD9BA417C47"
+  }
+]

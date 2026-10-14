@@ -4,11 +4,12 @@ import { AuthProvider, useAuth } from "./AuthContext.js";
 import { apiFetch, AUTH_INVALIDATED_EVENT } from "../api/client.js";
 
 function Probe() {
-  const { apiKey, setApiKey } = useAuth();
+  const { apiKey, setApiKey, clearApiKey } = useAuth();
   return (
     <div>
       <span data-testid="key">{apiKey ?? "none"}</span>
       <button onClick={() => setApiKey("typed")}>set</button>
+      <button onClick={clearApiKey}>clear</button>
     </div>
   );
 }
@@ -33,6 +34,23 @@ describe("AuthProvider 401 handling (ISS-ISS260-001)", () => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
     localStorage.clear();
+  });
+
+  test("logout and same-key login fence the previous session's in-flight 401", async () => {
+    localStorage.setItem("lkbApiKey", "typed"); renderProbe();
+    let resolve!: (response: Response) => void;
+    vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>((done) => { resolve = done; })));
+    const oldRequest = apiFetch("/sessions", "typed").catch(() => {});
+    act(() => { screen.getByText("clear").click(); });
+    expect(screen.getByTestId("key")).toHaveTextContent("none");
+    act(() => { screen.getByText("set").click(); });
+    await act(async () => { resolve(new Response("{}", { status: 401 })); await oldRequest; });
+    expect(screen.getByTestId("key")).toHaveTextContent("typed");
+    expect(localStorage.getItem("lkbApiKey")).toBe("typed");
+    vi.stubGlobal("fetch", vi.fn(async () => new Response("{}", { status: 401 })));
+    await act(async () => { await apiFetch("/sessions", "typed").catch(() => {}); });
+    expect(screen.getByTestId("key")).toHaveTextContent("none");
+    expect(localStorage.getItem("lkbApiKey")).toBeNull();
   });
 
   test("recorded reproduction: tab 1 holds A, tab 2 stores B, late 401 for A leaves B in storage", async () => {

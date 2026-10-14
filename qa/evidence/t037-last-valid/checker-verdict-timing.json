@@ -1,0 +1,10 @@
+{
+  "launchUtc": "2026-10-14T09:11:13.0000000Z",
+  "launchPrecisionSeconds": 1,
+  "persistedUtc": "2026-10-14T09:17:27.7153442Z",
+  "confirmedUtc": "2026-10-14T09:17:48.7597688Z",
+  "launchToPersistSeconds": 374.7153442,
+  "launchToConfirmedSeconds": 395.7597688,
+  "phaseIntervalsOverlap": true,
+  "approvalRequested": false
+}

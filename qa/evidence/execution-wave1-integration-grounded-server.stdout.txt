@@ -1,0 +1,28 @@
+{"requestId":"907b9492-cbbc-4d04-99c2-9963a66b23bf","method":"GET","path":"/sessions/session-1/grounded-content","status":401,"durationMs":16.5,"time":"2026-10-14T09:31:44.202Z","level":"warn","msg":"request"}
+{"requestId":"80cca06b-1ae0-4eb3-af15-a84bdd27c94c","method":"GET","path":"/sessions/session-1/grounded-content","status":200,"durationMs":7.31,"tenantId":"tenant-a","time":"2026-10-14T09:31:44.228Z","level":"info","msg":"request"}
+✔ mounted grounded-content route consumes tenant-scoped BrainReadDeps and refuses unauthenticated reads (118.6042ms)
+{"requestId":"4b8778f9-d4a4-4087-8f99-12f9d84280e0","method":"POST","path":"/ask","status":200,"durationMs":28.4,"tenantId":"tenant-1","time":"2026-10-14T09:31:44.298Z","level":"info","msg":"request"}
+✔ POST /ask with a valid key + ask scope returns 200 with an AskResult shape (58.6446ms)
+{"requestId":"47652691-9b91-4179-8b61-347e8a3c9e6a","method":"POST","path":"/ask","status":401,"durationMs":1.27,"time":"2026-10-14T09:31:44.318Z","level":"warn","msg":"request"}
+✔ POST /ask with no Authorization header returns 401 (19.9697ms)
+{"requestId":"58f2ae25-729d-441f-807e-b66375aae420","method":"POST","path":"/ask","status":401,"durationMs":1.93,"time":"2026-10-14T09:31:44.334Z","level":"warn","msg":"request"}
+✔ POST /ask with an invalid/unknown key returns 401 (15.6988ms)
+{"requestId":"85f0f6ad-0a04-4723-bbd2-ae0ed915cf1b","method":"POST","path":"/ask","status":403,"durationMs":2.72,"tenantId":"tenant-1","time":"2026-10-14T09:31:44.350Z","level":"warn","msg":"request"}
+✔ POST /ask with a valid key that lacks the ask scope returns 403, not 401 (15.5583ms)
+{"requestId":"0777d637-bc34-4916-b4ef-3d05ca688039","method":"POST","path":"/webhooks/register","status":501,"durationMs":4.3,"tenantId":"tenant-1","time":"2026-10-14T09:31:44.388Z","level":"error","msg":"request"}
+✔ a valid key hitting a stub route gets 501 (authorized but not built), never 403 or 200 (38.8815ms)
+{"requestId":"ebc94d4d-e233-401b-a995-b5fdf34dedc9","method":"POST","path":"/webhooks/register","status":403,"durationMs":3.08,"tenantId":"tenant-1","time":"2026-10-14T09:31:44.405Z","level":"warn","msg":"request"}
+✔ a valid key lacking a stub route's scope still gets 403 there (scope check runs before the 501) (16.7595ms)
+{"requestId":"620ce083-7915-470f-81ee-2b7da98c0310","method":"GET","path":"/search","status":400,"durationMs":1.72,"tenantId":"tenant-rl","time":"2026-10-14T09:31:44.422Z","level":"warn","msg":"request"}
+{"requestId":"1483dedc-bdfb-4219-99c5-5ef39da7ab47","method":"GET","path":"/search","status":400,"durationMs":9.3,"tenantId":"tenant-rl","time":"2026-10-14T09:31:44.440Z","level":"warn","msg":"request"}
+{"requestId":"56cdfd57-bb41-4bfe-8546-21b413d00f48","method":"GET","path":"/search","status":429,"durationMs":2.32,"tenantId":"tenant-rl","time":"2026-10-14T09:31:44.449Z","level":"warn","msg":"request"}
+✔ rate limit trips after N requests with 429 and a Retry-After header (42.6396ms)
+✔ fixtures sanity: fakeTreeStore/fakeAskDeps build injectable deps without touching Mongo/network (0.6458ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3916.931

@@ -8,9 +8,9 @@
   "progress": {
     "total": 95,
     "done": 55,
-    "in_progress": 21,
+    "in_progress": 28,
     "blocked": 0,
-    "pending": 19,
+    "pending": 12,
     "current": "U2.2",
     "percent": 58
   },
@@ -90,25 +90,26 @@
     {
       "id": "T-007",
       "title": "WhatsApp -> claims ingestion review",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [
         "T-020"
       ],
-      "note": "needs Q4 consent decision first",
+      "note": "2026-10-14: whatsapp-review-foundation-20261014 cycle 2 checked-PASS; standalone source-bound proposal, transaction and review-router foundation only. Mounting, actual review/publication and searchable approved evidence remain unaccepted.",
       "criticality": "low",
       "delivery_group": "G1"
     },
     {
       "id": "T-008",
       "title": "Vector index + unstructured search",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "LOW",
       "deps": [
         "T-007"
       ],
       "criticality": "low",
-      "delivery_group": "G5"
+      "delivery_group": "G5",
+      "note": "2026-10-14: t008-semantic-web-consumer cycle 0 checked-PASS; additive authenticated semantic client/results foundation only. Shared integration, interactive proof and full structured/vector acceptance remain unaccepted."
     },
     {
       "id": "T-009",
@@ -282,14 +283,14 @@
     {
       "id": "T-022",
       "title": "Evaluator calibration on 30 hand-scored pairs",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "LOW",
       "deps": [
         "T-021"
       ],
       "criticality": "low",
       "completed": "2026-09-03T13:46:01",
-      "note": "depends T-021. NOT gate-blocked - the gate file says so explicitly. Blocked only by its dependency: calibration needs a non-saturated golden set to calibrate against.",
+      "note": "2026-10-14: t022-calibration-human-review cycle 0 checked-PASS; neutral intake and MAE-consumption foundation only. T-021 dependency is completed under D-156. Thirty individual human reviews, live scoring and final calibration remain required; no labels approved here.",
       "delivery_group": "G8"
     },
     {
@@ -1020,7 +1021,7 @@
     {
       "id": "T-054",
       "title": "Transcript review and speaker mapping UI",
-      "status": "pending",
+      "status": "in_progress",
       "deps": [
         "T-003",
         "U2.4",
@@ -1028,13 +1029,13 @@
       ],
       "delivery_group": "G3",
       "base_criticality": "MEDIUM",
-      "note": "Remaining catalogue scope; umbrella acceptance requires each assigned feature independently verified. Existing implementations reused; no completion or live claim.",
+      "note": "2026-10-14: t054-transcript-review-planner-editor cycle 0 checked-PASS; pure revision-bound planning and standalone editor only. Persistence, mounting, downstream refresh and whole-task acceptance remain unaccepted.",
       "criticality": "low"
     },
     {
       "id": "T-055",
       "title": "Page-evidenced documents topic/speaker pages collections and resource directories",
-      "status": "pending",
+      "status": "in_progress",
       "deps": [
         "T-020",
         "U2.2",
@@ -1043,13 +1044,13 @@
       ],
       "delivery_group": "G4",
       "base_criticality": "MEDIUM",
-      "note": "Remaining catalogue scope; umbrella acceptance requires each assigned feature independently verified. Existing implementations reused; no completion or live claim.",
+      "note": "2026-10-14: t055-evidence-directory cycle 0 checked-PASS; additive read-only evidence/resource directory only. Document highlights, full profiles, curated collections and quality gates remain open.",
       "criticality": "low"
     },
     {
       "id": "T-056",
       "title": "Full cited-answer UX policies conflicts review queue and unstructured search acceptance",
-      "status": "pending",
+      "status": "in_progress",
       "deps": [
         "U3.1",
         "U3.2",
@@ -1059,7 +1060,7 @@
       ],
       "delivery_group": "G5",
       "base_criticality": "MEDIUM",
-      "note": "Remaining catalogue scope; umbrella acceptance requires each assigned feature independently verified. Existing implementations reused; no completion or live claim.",
+      "note": "2026-10-14: parallel-answer-policy cycle 0 checked-PASS; transient tenant-bound policy simulation foundation only. Shared integration, saved policy history/application, conflicts, review queue and browser acceptance remain open.",
       "criticality": "low"
     },
     {
@@ -1079,13 +1080,13 @@
     {
       "id": "T-058",
       "title": "FAQ reports and meeting preparation builders",
-      "status": "pending",
+      "status": "in_progress",
       "deps": [
         "T-056"
       ],
       "delivery_group": "G7",
       "base_criticality": "MEDIUM",
-      "note": "Remaining catalogue scope; umbrella acceptance requires each assigned feature independently verified. Existing implementations reused; no completion or live claim.",
+      "note": "2026-10-14: t058-evidence-builder cycle 0 checked-PASS; literal source-evidenced output foundation only. Authenticated integration, synthesis, persistence/export/UI and user acceptance remain open.",
       "criticality": "low"
     },
     {
@@ -1218,7 +1219,7 @@
   },
   "analytics": {
     "velocity_per_day": 0.83,
-    "eta_days": 53.0
+    "eta_days": 53
   },
   "last_deterministic_tick": "2026-10-09T12:46:22",
   "delivery_groups": [

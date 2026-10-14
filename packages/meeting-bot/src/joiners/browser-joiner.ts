@@ -134,17 +134,29 @@ export async function registerInBrowser(input: RegistrationInput,
       if (output.length > 65_536) abort("output_limit");
     });
     child.stderr.resume(); // Never propagate browser diagnostics containing private URLs or values.
-    child.on("close", () => {
+    child.on("close", (code, signal) => {
       closed = true;
-      if (aborting) return;
-      for (const line of output.split(/\r?\n/).reverse()) {
+      if (aborting || finished) return;
+      if (code !== 0 || signal) { void abort("browser_failure"); return; }
+      let result: RegistrationResult | undefined; let count = 0; let invalid = false; let fatal = false;
+      for (const line of output.split(/\r?\n/)) {
         try {
           const ev = JSON.parse(line);
-          if (ev.event === "registration-result" && ["submitted", "uncertain", "action_required"].includes(ev.status)
-            && typeof ev.reason === "string" && /^[a-z_]{1,64}$/.test(ev.reason)) return finish({status: ev.status, reason: ev.reason});
-        } catch { /* ordinary browser progress */ }
+          if (ev?.event === "fatal") fatal = true;
+          if (ev?.event !== "registration-result") continue;
+          count++;
+          if (["submitted", "uncertain", "action_required"].includes(ev.status)
+            && typeof ev.reason === "string" && /^[a-z_]{1,64}$/.test(ev.reason)) result = {status: ev.status, reason: ev.reason};
+          else invalid = true;
+        } catch {
+          // Text progress is compatible; a truncated result cannot revive an earlier success.
+          if (/"event"\s*:\s*"registration-result"/.test(line)) invalid = true;
+        }
       }
-      finish({ status: "uncertain", reason: "missing_result" });
+      if (fatal) { void abort("browser_failure"); return; }
+      if (invalid || count > 1) { void abort("invalid_result"); return; }
+      if (!result) { void abort("missing_result"); return; }
+      finish(result);
     });
     child.stdin.end(payload);
   }));

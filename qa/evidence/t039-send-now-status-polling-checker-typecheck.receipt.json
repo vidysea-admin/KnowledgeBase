@@ -1,0 +1,60 @@
+{
+  "completedUTC": "2026-10-14T09:40:32.4993375Z",
+  "outerTimeoutSeconds": 120,
+  "afterSHA256": [
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\api\\send-now.ts",
+      "Hash": "31D3BDBADE0B8135512512C1305F02118719F0BE20A491112E44E9BD5E98BA01"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\meeting-bot\\SendNowForm.tsx",
+      "Hash": "D03AA61A38204FCAA2936F3F031029D5ADFD846FF2D9ADC3E3639AEE7E3910D9"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\meeting-bot\\SendNowForm.test.tsx",
+      "Hash": "099E318D627D2D769F2AD076758374FE85E99A2508B602CE90E742AC32EA9727"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\meeting-bot\\useSendNowStatus.ts",
+      "Hash": "C9C81C331B508E5AA427FCF3C758FF2CFCCEBD67B1AC3D1EF97D82A2ED5C479D"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\meeting-bot\\useSendNowStatus.test.tsx",
+      "Hash": "F04DCCFEC1B1686BCAB0620682F0299F60FFF5551BBEECF2FE4AA3F351D65DB5"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\MeetingBotPage.test.tsx",
+      "Hash": "A6912D2C95BE119FF5005FAAC99C7D1DE5F025A704E7861D8D742B693312DE63"
+    }
+  ],
+  "command": "node node_modules/typescript/lib/tsc.js --noEmit -p apps/web/tsconfig.json",
+  "beforeSHA256": [
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\api\\send-now.ts",
+      "Hash": "31D3BDBADE0B8135512512C1305F02118719F0BE20A491112E44E9BD5E98BA01"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\meeting-bot\\SendNowForm.tsx",
+      "Hash": "D03AA61A38204FCAA2936F3F031029D5ADFD846FF2D9ADC3E3639AEE7E3910D9"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\meeting-bot\\SendNowForm.test.tsx",
+      "Hash": "099E318D627D2D769F2AD076758374FE85E99A2508B602CE90E742AC32EA9727"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\meeting-bot\\useSendNowStatus.ts",
+      "Hash": "C9C81C331B508E5AA427FCF3C758FF2CFCCEBD67B1AC3D1EF97D82A2ED5C479D"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\meeting-bot\\useSendNowStatus.test.tsx",
+      "Hash": "F04DCCFEC1B1686BCAB0620682F0299F60FFF5551BBEECF2FE4AA3F351D65DB5"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\MeetingBotPage.test.tsx",
+      "Hash": "A6912D2C95BE119FF5005FAAC99C7D1DE5F025A704E7861D8D742B693312DE63"
+    }
+  ],
+  "startedUTC": "2026-10-14T09:40:22.9078838Z",
+  "exitCode": 0,
+  "seconds": 9.5914537
+}

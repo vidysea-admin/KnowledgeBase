@@ -1,0 +1,1418 @@
+{
+  "version": 1,
+  "batch": 2,
+  "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+  "sourcePacket": {
+    "path": "data/eval/extraction-adjudication-packet.json",
+    "sha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175"
+  },
+  "humanGold": false,
+  "sourceSessions": [
+    {
+      "caseId": "2026-05-08-funding-dreams-loans-forex",
+      "tenantId": "toc",
+      "sessionId": "2026-05-08-funding-dreams-loans-forex",
+      "sourceBindingSha256": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+      "sourceBinding": {
+        "caseId": "2026-05-08-funding-dreams-loans-forex",
+        "tenantId": "toc",
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/claims.json",
+            "sha256": "d8fbcae25bc5aee0f0753be88a335cdd38ccfdfafadff530c8cf7f73cf339061",
+            "normalizedLfSha256": "994caa059c44902441c79d44b11b1d48bb0e739b40dbfc269f817f143836808e",
+            "bytes": 2382
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+            "sha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+            "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+            "bytes": 76746
+          }
+        }
+      },
+      "sourceTurns": 83,
+      "sourceClaims": 5,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+          "bytes": 92616
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "994caa059c44902441c79d44b11b1d48bb0e739b40dbfc269f817f143836808e",
+          "bytes": 2312
+        }
+      }
+    },
+    {
+      "caseId": "2026-05-20-telling-your-brand-story-better",
+      "tenantId": "toc",
+      "sessionId": "2026-05-20-telling-your-brand-story-better",
+      "sourceBindingSha256": "fdd472ab17f4547f636c7fe79000dcdc0c0c4fd9e6ca908e3edb2fe727291468",
+      "sourceBinding": {
+        "caseId": "2026-05-20-telling-your-brand-story-better",
+        "tenantId": "toc",
+        "sessionId": "2026-05-20-telling-your-brand-story-better",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/claims.json",
+            "sha256": "ebeb702925e8f63b3a645b2924c2957d876dcef45d41c19d9fc91bbd336da343",
+            "normalizedLfSha256": "159e46f0c93ff279270b0b3f52ff2a28f04362cc1e5f87b0320adc2ff50ee486",
+            "bytes": 933
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/turns.json",
+            "sha256": "2ae41f67947436cb5ee92c993bbd8cf4ae82670c2e95b6210eac4fca73f4f78a",
+            "normalizedLfSha256": "5c982fe673d5bdda527d6576cba6113327ab5e8284bc06be1837513ef0266b9e",
+            "bytes": 49101
+          }
+        }
+      },
+      "sourceTurns": 31,
+      "sourceClaims": 2,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "58612ed394808cf3c2a3367da17b183531bdccf27d5971fc85eadd31dcd481f2",
+          "bytes": 127280
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "159e46f0c93ff279270b0b3f52ff2a28f04362cc1e5f87b0320adc2ff50ee486",
+          "bytes": 906
+        }
+      }
+    },
+    {
+      "caseId": "2026-05-22-uniaccess-xavier-university",
+      "tenantId": "toc",
+      "sessionId": "2026-05-22-uniaccess-xavier-university",
+      "sourceBindingSha256": "91751c854720b10f5cf56b810852ac40e52eb4520214f48659cd67059216ce1e",
+      "sourceBinding": {
+        "caseId": "2026-05-22-uniaccess-xavier-university",
+        "tenantId": "toc",
+        "sessionId": "2026-05-22-uniaccess-xavier-university",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/claims.json",
+            "sha256": "c7afdd00600f6f3af24e1be5e8995494c13dcb2e8cd939ef0a9060235e0582fd",
+            "normalizedLfSha256": "db9a2a66e45c801bb98e70efe6cddab9f24e4ecd20f574b764d443954073dabd",
+            "bytes": 1376
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/turns.json",
+            "sha256": "9540ce875b248339533cec077615dbb111a2f5562c1b795f5627c1b32b9d17ab",
+            "normalizedLfSha256": "8809e80ce6af8c0f72ead587c3b40245726258659217015aa13474858dd7ccbb",
+            "bytes": 41140
+          }
+        }
+      },
+      "sourceTurns": 64,
+      "sourceClaims": 3,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "77d983a227996034e40dc522a5608a73f00760a7953351e2ab9398747fa39968",
+          "bytes": 42195
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "db9a2a66e45c801bb98e70efe6cddab9f24e4ecd20f574b764d443954073dabd",
+          "bytes": 1336
+        }
+      }
+    },
+    {
+      "caseId": "2026-05-23-uniaccess-atlas-skilltech",
+      "tenantId": "toc",
+      "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+      "sourceBindingSha256": "1fbf8b430dd7c589e960441ad83ab1678820ca0bb1601db879ab84c14baf8250",
+      "sourceBinding": {
+        "caseId": "2026-05-23-uniaccess-atlas-skilltech",
+        "tenantId": "toc",
+        "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/claims.json",
+            "sha256": "3d22c5bb9bdfb67e24c343b95a1d59250c740890198e1fa9ba79c4f2c3dcbee7",
+            "normalizedLfSha256": "1ca43e5f1bfcf975fff2a5cc877285118338a8ece8d8b7ef9d1e2af523618261",
+            "bytes": 1434
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+            "sha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+            "normalizedLfSha256": "edd79a5447c222145df9738c30009c5ece51825958e2ea78266e35b252043043",
+            "bytes": 10389
+          }
+        }
+      },
+      "sourceTurns": 8,
+      "sourceClaims": 3,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "01ac7389a1fbc6c276e46349306dc3a86f40ae5c4c658e87177ecff7bd30d545",
+          "bytes": 14544
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "1ca43e5f1bfcf975fff2a5cc877285118338a8ece8d8b7ef9d1e2af523618261",
+          "bytes": 1390
+        }
+      }
+    },
+    {
+      "caseId": "2026-05-28-in-focus-1",
+      "tenantId": "toc",
+      "sessionId": "2026-05-28-in-focus-1",
+      "sourceBindingSha256": "3f651d130d02b2ca4452f3a2aec8cfdccacbab8e711c21aadc8a5869c1cb9556",
+      "sourceBinding": {
+        "caseId": "2026-05-28-in-focus-1",
+        "tenantId": "toc",
+        "sessionId": "2026-05-28-in-focus-1",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-05-28-in-focus-1/claims.json",
+            "sha256": "3c7fe2f9cb069b90fd157465388e2523e689366eeebf38d07e5bf556a680a3c2",
+            "normalizedLfSha256": "92dd436ea5dbb190d351d4ee541e1da02594e1c9a8c5f6e5316e5811336ee0fd",
+            "bytes": 1148
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-05-28-in-focus-1/turns.json",
+            "sha256": "3f7229899fd1a4a6d190e3c9d402b12dcae2ceb9dc66cbf697d18e698d9e6581",
+            "normalizedLfSha256": "155e69c048c3c12f2dafddf32db6db0d1ed88f5dd38769276c668e03ae74fc7c",
+            "bytes": 52264
+          }
+        }
+      },
+      "sourceTurns": 59,
+      "sourceClaims": 3,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-28-in-focus-1/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "0ac457de7615bc242980485dca851754c20b6f0181bbe354f743489ed085062a",
+          "bytes": 65053
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-28-in-focus-1/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "92dd436ea5dbb190d351d4ee541e1da02594e1c9a8c5f6e5316e5811336ee0fd",
+          "bytes": 1108
+        }
+      }
+    }
+  ],
+  "entries": [
+    {
+      "ordinal": 11,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c05",
+      "sessionId": "2026-05-08-funding-dreams-loans-forex",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "085e98bb4d793899f03188177db01a8beffbf26d048fdb964b238ca0267fd151",
+      "sourceBindingSha256": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+      "persistedClaim": {
+        "_id": "2026-05-08-funding-dreams-loans-forex-c05",
+        "tenantId": "toc",
+        "text": "Families and counselors are often confused by the LRS, TCS, and FEMA rules governing overseas remittances for education.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t018",
+            "sessionId": "2026-05-08-funding-dreams-loans-forex"
+          },
+          {
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t030",
+            "sessionId": "2026-05-08-funding-dreams-loans-forex"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-08-funding-dreams-loans-forex",
+          "turnId": "2026-05-08-funding-dreams-loans-forex-t018",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+              "sha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+              "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+              "bytes": 76746
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-08-funding-dreams-loans-forex-t018",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-08-funding-dreams-loans-forex",
+                  "speakerRef": "Shweta",
+                  "tStart": 1726,
+                  "tEnd": 1741,
+                  "text": "Yep. I'm trying to share my screen again. If this doesn't work, uh, then, dear members, I suggest that we will discuss and we will undertake a discussion. I hope my screen is visible."
+                },
+                "textSha256": "4d8e4e09bdbf6dc6884d0bae5e20b77945f46ee2ce041918f35a20e73735f144"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+              "bytes": 92616
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-08-funding-dreams-loans-forex-t018",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-08-funding-dreams-loans-forex",
+                  "speakerRef": "unknown",
+                  "tStart": 729,
+                  "tEnd": 756,
+                  "text": "Dev Mehta: First is the cost. So where can they get the best rate, as Nikhil has mentioned earlier. Second is not only the speed at which the money is transferred to their children, but even the speed at which they kind of get the guidance, and what kind of guidance in terms of the clarity: the LRS rules, FEMA, TCS. These are all intimidating abbreviations. So a lot of this anxiety is caused by, you know, all these abbreviations."
+                },
+                "textSha256": "4fdedb7771aa9a61dbee3fd24eaff7d5e8b55fc771d5c2fde0086a8a3959af2f"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        },
+        {
+          "sessionId": "2026-05-08-funding-dreams-loans-forex",
+          "turnId": "2026-05-08-funding-dreams-loans-forex-t030",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+              "sha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+              "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+              "bytes": 76746
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-08-funding-dreams-loans-forex-t030",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-08-funding-dreams-loans-forex",
+                  "speakerRef": "Shweta",
+                  "tStart": 1805,
+                  "tEnd": 1810,
+                  "text": "Yes, I'm also wanting to, but I do not know."
+                },
+                "textSha256": "9a5fcdf1fee07d60c004b54291bc33946fe03453808b1d66e2e27a6b8a609b63"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+              "bytes": 92616
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-08-funding-dreams-loans-forex-t030",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-08-funding-dreams-loans-forex",
+                  "speakerRef": "unknown",
+                  "tStart": 1226,
+                  "tEnd": 1268,
+                  "text": "Dev Mehta: So these are the ways that, you know, through webinars like this, we help the parents understand what the nitty-gritties of TCS are, LRS. You know, TCS is a big component now. There is a lot of confusion around TCS because the government has a 2% slab for education, 20% slab for travel, 20% slab if the child is not a student overseas. So we kind of help parents break this down and give them a better clarity so that they know that they are in the right hands and they are not overpaying TCS for the wrong purpose code."
+                },
+                "textSha256": "dbcef9ced723a21d9c83b69b4132ccdd957f4db8ae9ccd8236cc9429ebe547eb"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citations discuss screen-sharing problems and an unspecified uncertainty; neither identifies confusion about LRS, TCS, FEMA, or education remittances.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 12,
+      "claimId": "2026-05-20-telling-your-brand-story-better-c01",
+      "sessionId": "2026-05-20-telling-your-brand-story-better",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "ec358f17eb0811d32646e13b6fcc5fb432b7750f3adb8eac085985678a93045e",
+      "sourceBindingSha256": "fdd472ab17f4547f636c7fe79000dcdc0c0c4fd9e6ca908e3edb2fe727291468",
+      "persistedClaim": {
+        "_id": "2026-05-20-telling-your-brand-story-better-c01",
+        "tenantId": "toc",
+        "text": "Mitul Shah's framework starts with 'E' for Examine -- examining the world around the brand before crafting a story.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-20-telling-your-brand-story-better-t049",
+            "sessionId": "2026-05-20-telling-your-brand-story-better"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-20-telling-your-brand-story-better",
+          "turnId": "2026-05-20-telling-your-brand-story-better-t049",
+          "current": {
+            "available": false,
+            "reason": "turn-absent",
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/turns.json",
+              "sha256": "2ae41f67947436cb5ee92c993bbd8cf4ae82670c2e95b6210eac4fca73f4f78a",
+              "normalizedLfSha256": "5c982fe673d5bdda527d6576cba6113327ab5e8284bc06be1837513ef0266b9e",
+              "bytes": 49101
+            },
+            "matches": []
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "58612ed394808cf3c2a3367da17b183531bdccf27d5971fc85eadd31dcd481f2",
+              "bytes": 127280
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-20-telling-your-brand-story-better-t049",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-20-telling-your-brand-story-better",
+                  "speakerRef": "unknown",
+                  "tStart": 2531,
+                  "tEnd": 2585,
+                  "text": "Mitul Shah: So I'll explain what what what EDUCATE is, and we've deciphered this and giving you simple examples of it. \"Ki bhai, E is for examine.\" Okay, now what do you examine? Examine the world around your brand. What is changing in culture, society, parents, students, what is happening in that category, right? Changing There's a huge change in culture, right? What are the the the Gen Z, the Gen Gen Alpha, how are they behaving? Are they absorbing education the same way we are absorbing? Definitely not, right? How is the society observing? Is it, \"Oh, arre IIT Kharagpur se aaya, to to bahut smart hoga.\" You know, that's all that narrative is also changing, right? Parents, how are parents? Parents are much more involved, sometimes too much, right? They become helicopter parents. So these are the things that you can examine around your world of your brand what is happening."
+                },
+                "textSha256": "b5f34530ed642448c139bee315fdbf8646666396b77311bc105b207b6b5330c3"
+              }
+            ]
+          },
+          "sameIdContentChanged": false
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unavailable",
+        "literalRationale": "The current literal citation has no matched source record.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 13,
+      "claimId": "2026-05-20-telling-your-brand-story-better-c02",
+      "sessionId": "2026-05-20-telling-your-brand-story-better",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "3639af46e14812122d5b7fbab37e5d3f3ada62e49fcd909fb14fe8ac88d577a9",
+      "sourceBindingSha256": "fdd472ab17f4547f636c7fe79000dcdc0c0c4fd9e6ca908e3edb2fe727291468",
+      "persistedClaim": {
+        "_id": "2026-05-20-telling-your-brand-story-better-c02",
+        "tenantId": "toc",
+        "text": "The framework identifies emotional doors (e.g. Joy) that a piece of communication can open to connect with an audience.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-20-telling-your-brand-story-better-t030",
+            "sessionId": "2026-05-20-telling-your-brand-story-better"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-20-telling-your-brand-story-better",
+          "turnId": "2026-05-20-telling-your-brand-story-better-t030",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/turns.json",
+              "sha256": "2ae41f67947436cb5ee92c993bbd8cf4ae82670c2e95b6210eac4fca73f4f78a",
+              "normalizedLfSha256": "5c982fe673d5bdda527d6576cba6113327ab5e8284bc06be1837513ef0266b9e",
+              "bytes": 49101
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-20-telling-your-brand-story-better-t030",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-20-telling-your-brand-story-better",
+                  "speakerRef": "spk:0",
+                  "tStart": 3056,
+                  "tEnd": 3058,
+                  "text": "Yes."
+                },
+                "textSha256": "5f9a2b795615ba6a3d5455fd5624d773fbca5bcd16249c421fd37411dc9837da"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "58612ed394808cf3c2a3367da17b183531bdccf27d5971fc85eadd31dcd481f2",
+              "bytes": 127280
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-20-telling-your-brand-story-better-t030",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-20-telling-your-brand-story-better",
+                  "speakerRef": "unknown",
+                  "tStart": 1308,
+                  "tEnd": 1419,
+                  "text": "Mitul Shah: These are the basic seven things that we can talk about. I call them emotional doors. Like emotional doors, how do you tap into a communication platform? So, you know, joy is one of them. So, right, \"This made me smile.\" Right, the Nike one, I saw they were smiling, right? You know, if you look at the the Africa one, you felt shit, fear, anxiety, and hope. Said, \"Oh, actually there was something built,\" right? Surprise, it could be, \"Hey, I didn't expect that. What the hell? How did that happen?\" Right? Fear, anxiety, I'm saying this matters to me because fear comes out of something that matters to you or agar wo chala gaya, nahi aaya, that's that's that's mattering to me, right? Pride. Now, education is full of pride, right? If if I say, \"I am from IIM Ahmedabad,\" you have a huge chip on your shoulder, right? If when I tell people I teach at MICA, people go, \"Oh, you teach at MICA? You must be smart.\" Said, \"Not really, but okay, theek hai. I mean, fine,\" right? Belonging, students love belonging, okay? They they they everyone's trying to find that tribe, right? Nostalgia: \"I'm in a familiar place,\" okay? Now, some younger kids might not have the nostalgia, but they still want to feel to parents \"Ki bhai, I remember going on my RX 100 for chai, sutta. I want my kid to follow the same thing,\" whatever, right? So that's nostalgia that connects to to a certain extent. And finally, hope is the greatest thing that we give, right? We hope them to get a great future, be it financially, be it happiness, whatever you want to feel, right? So these are the seven doors I call them. I mean, there could be other ones that you want to kind of build and establish, but these are the ones that we generally think that could work as seven doors into into building communication and storytelling."
+                },
+                "textSha256": "fe9b68b95b38b12706dff6e3efc3e3d5191f6fdca373616dd4396eed25c499eb"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "The current citation consists only of 'Yes' without an identifiable proposition about emotional doors or communication.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 14,
+      "claimId": "2026-05-22-uniaccess-xavier-university-c01",
+      "sessionId": "2026-05-22-uniaccess-xavier-university",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "0adfcfa49e1f25f32831e367a7ce40cb41b9bb4dcea2ede39ad5d6b1f11cc98c",
+      "sourceBindingSha256": "91751c854720b10f5cf56b810852ac40e52eb4520214f48659cd67059216ce1e",
+      "persistedClaim": {
+        "_id": "2026-05-22-uniaccess-xavier-university-c01",
+        "tenantId": "toc",
+        "text": "Xavier University has an 11:1 student-to-faculty ratio and an average class size of about 23 students.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-22-uniaccess-xavier-university-t020",
+            "sessionId": "2026-05-22-uniaccess-xavier-university"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-22-uniaccess-xavier-university",
+          "turnId": "2026-05-22-uniaccess-xavier-university-t020",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/turns.json",
+              "sha256": "9540ce875b248339533cec077615dbb111a2f5562c1b795f5627c1b32b9d17ab",
+              "normalizedLfSha256": "8809e80ce6af8c0f72ead587c3b40245726258659217015aa13474858dd7ccbb",
+              "bytes": 41140
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-22-uniaccess-xavier-university-t020",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-22-uniaccess-xavier-university",
+                  "speakerRef": "Sandeep",
+                  "tStart": 307,
+                  "tEnd": 339,
+                  "text": "direction, and purpose. A A lot of learning really happens outside the classroom as well. Through leadership opportunities, student organization organizations, service experiences, internships, and, most importantly, the conversations that shape students personally and professionally. Honestly, if I were just to think about, as a counselor, we speak a lot about families and counselors."
+                },
+                "textSha256": "5d2bda00b4fb7171575acdfdae506b670a65aee8b6e6c0a246a5b39f37c60ec4"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "77d983a227996034e40dc522a5608a73f00760a7953351e2ab9398747fa39968",
+              "bytes": 42195
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-22-uniaccess-xavier-university-t020",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-22-uniaccess-xavier-university",
+                  "speakerRef": "unknown",
+                  "tStart": 527,
+                  "tEnd": 581,
+                  "text": "Sandeep Bhalla: And I feel that's an important conversation to have, honestly. At Xavier, the model of teaching is intentionally different. With an 11:1 student-to-faculty ratio and an average class size of 23 students, the university is built around interaction and accessibility, not anonymity. Students are able to engage directly with professors, ask questions, visit office hours, and build mentorship relationships that continue well beyond a single semester. And I feel that becomes important because access really changes the outcomes. Research consistently shows that students who develop a meaningful relationship with faculty are likely to stay engaged academically. They seek internships, leadership opportunities, and most importantly, feel a stronger sense of belonging on campus."
+                },
+                "textSha256": "23adaf880403ae6086535e7e264dd5743702df1b237b878be6102160f7744525"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": {
+        "source": {
+          "path": "data/eval/extraction-reconciliation-reviewed.json",
+          "sha256": "8aa7ce9c90ae2b83107fdf815e90491194ac4fea830ae79a4b957d52dc5ea0e5",
+          "normalizedLfSha256": "f8f62587cc140e64941af8a7f651712be5a317758816804b012cd3ab12ece35d",
+          "bytes": 14288
+        },
+        "record": {
+          "claimId": "2026-05-22-uniaccess-xavier-university-c01",
+          "sessionId": "2026-05-22-uniaccess-xavier-university",
+          "tenantId": "toc",
+          "claimText": "Xavier University has an 11:1 student-to-faculty ratio and an average class size of about 23 students.",
+          "claimTextSha256": "72754f05f81cd82db3abf58d67cc15fee1989494111769e0b23823be380c7b64",
+          "currentTurnsSha256": "9540ce875b248339533cec077615dbb111a2f5562c1b795f5627c1b32b9d17ab",
+          "originalClaimsSha256": "c7afdd00600f6f3af24e1be5e8995494c13dcb2e8cd939ef0a9060235e0582fd",
+          "originalEvidence": [
+            {
+              "turnId": "2026-05-22-uniaccess-xavier-university-t020",
+              "sessionId": "2026-05-22-uniaccess-xavier-university"
+            }
+          ],
+          "proposedEvidence": [
+            {
+              "sessionId": "2026-05-22-uniaccess-xavier-university",
+              "turnId": "2026-05-22-uniaccess-xavier-university-t030",
+              "turnTextSha256": "8a0a63098bba1720a1245ca8e0f94e8bdef9f2940fbce2f6232aefdfe47dfb3e",
+              "tStart": 516,
+              "tEnd": 546,
+              "speakerRef": "Sandeep",
+              "reviewRole": "assertion support"
+            }
+          ],
+          "reviewStatus": "INDEPENDENTLY_REVIEWED_REPLACEMENT_PROPOSAL",
+          "rationale": "Directly inspected the complete current cited turn(s). Assertion is supported as presented in the transcript; external factual truth and speaker identity remain separate gates."
+        },
+        "currentCitationContexts": [
+          {
+            "sessionId": "2026-05-22-uniaccess-xavier-university",
+            "turnId": "2026-05-22-uniaccess-xavier-university-t030",
+            "current": {
+              "available": true,
+              "reason": null,
+              "artifact": {
+                "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/turns.json",
+                "sha256": "9540ce875b248339533cec077615dbb111a2f5562c1b795f5627c1b32b9d17ab",
+                "normalizedLfSha256": "8809e80ce6af8c0f72ead587c3b40245726258659217015aa13474858dd7ccbb",
+                "bytes": 41140
+              },
+              "matches": [
+                {
+                  "record": {
+                    "_id": "2026-05-22-uniaccess-xavier-university-t030",
+                    "tenantId": "toc",
+                    "sessionId": "2026-05-22-uniaccess-xavier-university",
+                    "speakerRef": "Sandeep",
+                    "tStart": 516,
+                    "tEnd": 546,
+                    "text": "that the campus that she is on and the degree that she is completing might not even be recognized for a licensure program in architecture, because the units that she had studied, there were not enough studio units, and that will not grant her the degree in M.Arch eventually when she applies for it. And, I feel that's an important conversation to have, honestly. At Xavier, the model of teaching is intentionally different, with an 11:1 student-to-faculty ratio and an average class size of 23 students,"
+                  },
+                  "textSha256": "8a0a63098bba1720a1245ca8e0f94e8bdef9f2940fbce2f6232aefdfe47dfb3e"
+                }
+              ]
+            },
+            "originalMigration": {
+              "available": true,
+              "reason": null,
+              "artifact": {
+                "available": true,
+                "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/turns.json",
+                "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+                "sha256": "77d983a227996034e40dc522a5608a73f00760a7953351e2ab9398747fa39968",
+                "bytes": 42195
+              },
+              "matches": [
+                {
+                  "record": {
+                    "_id": "2026-05-22-uniaccess-xavier-university-t030",
+                    "tenantId": "toc",
+                    "sessionId": "2026-05-22-uniaccess-xavier-university",
+                    "speakerRef": "unknown",
+                    "tStart": 792,
+                    "tEnd": 822,
+                    "text": "Sandeep Bhalla: Perfect. So that's what I was trying to understand, because ideally that's that's what makes Xavier slightly different. If we come to the next slide now, one another practical advantage for students is that Xavier offers the balance of close-knit environment while still being well connected to city. Downtown opportunities and the airport ensure that student life is both accessible and they are more convenient."
+                  },
+                  "textSha256": "dfa90fad2c85938d975330a6adf4fa0c0bee0ab5146ef6f740d2850e8c654826"
+                }
+              ]
+            },
+            "sameIdContentChanged": true
+          }
+        ]
+      },
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation describes learning outside classrooms without student-to-faculty or class-size figures.",
+        "replacementCitationSupport": "supported",
+        "replacementRationale": "Replacement t030 explicitly attributes an 11:1 student-to-faculty ratio and average class size of 23 students to Xavier.",
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 15,
+      "claimId": "2026-05-22-uniaccess-xavier-university-c02",
+      "sessionId": "2026-05-22-uniaccess-xavier-university",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "5fa4a514f24cb8f7d876c125a2137c64ac43ba6d330642e84d8eeafae47a57ab",
+      "sourceBindingSha256": "91751c854720b10f5cf56b810852ac40e52eb4520214f48659cd67059216ce1e",
+      "persistedClaim": {
+        "_id": "2026-05-22-uniaccess-xavier-university-c02",
+        "tenantId": "toc",
+        "text": "Xavier was awarded a $2.8 million grant from the NIH, one of only six institutions selected in that inaugural cohort.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-22-uniaccess-xavier-university-t038",
+            "sessionId": "2026-05-22-uniaccess-xavier-university"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-22-uniaccess-xavier-university",
+          "turnId": "2026-05-22-uniaccess-xavier-university-t038",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/turns.json",
+              "sha256": "9540ce875b248339533cec077615dbb111a2f5562c1b795f5627c1b32b9d17ab",
+              "normalizedLfSha256": "8809e80ce6af8c0f72ead587c3b40245726258659217015aa13474858dd7ccbb",
+              "bytes": 41140
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-22-uniaccess-xavier-university-t038",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-22-uniaccess-xavier-university",
+                  "speakerRef": "Sandeep",
+                  "tStart": 738,
+                  "tEnd": 760,
+                  "text": "students may choose a university for academics or rankings, at least at the initial aspect, but the experience they remember is more often than not shaped by relationships they build there. That human element is a huge part of what what makes Xavier different than the rest of the people that you may have ever and ever engaged with. But just to get an understanding from you, do you feel this is something that would make Xavier different, according to you? Do you think so? Do you think it might not really make that big of a difference? What do you think about that? Any ideas, any questions, maybe? What do you think?"
+                },
+                "textSha256": "5d193f8336294a1191133fe854efdce8e80b49619cf6cd6eedaf81b5c9eed3bf"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "77d983a227996034e40dc522a5608a73f00760a7953351e2ab9398747fa39968",
+              "bytes": 42195
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-22-uniaccess-xavier-university-t038",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-22-uniaccess-xavier-university",
+                  "speakerRef": "unknown",
+                  "tStart": 1097,
+                  "tEnd": 1150,
+                  "text": "Sandeep Bhalla: If we come to the next slide, on an academic front, and I know that's important, Xavier was really awarded $2.8 million from NIH, and notably it was one of the only six institutions selected in the inaugural cohort. For counselors, this matters because it signals that undergraduate institutions like Xavier, they are not just teaching-focused, but they are also contributing to serious research ecosystem, and students get exposure to that early on. At the same time, student experience isn't one-dimensional. Xavier has 19 Division I varsity teams competing in the BIG EAST Conference, which means a very active, high-energy campus environment. And even for students who are not athletes, this translate to strong school spirit, high engagement, and a sense of shared identity."
+                },
+                "textSha256": "bb6d759bf82df27077ad27e9c9a9dfee289ad56d32c0586f8ac6b9ad49a331f5"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation discusses relationships and Xavier's human element; it supplies no NIH grant amount or selected cohort size.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 16,
+      "claimId": "2026-05-22-uniaccess-xavier-university-c03",
+      "sessionId": "2026-05-22-uniaccess-xavier-university",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "268cd63419359055a5fa6572296d2cf377d1af4e76ed771ac6cefa90950b756b",
+      "sourceBindingSha256": "91751c854720b10f5cf56b810852ac40e52eb4520214f48659cd67059216ce1e",
+      "persistedClaim": {
+        "_id": "2026-05-22-uniaccess-xavier-university-c03",
+        "tenantId": "toc",
+        "text": "Xavier's international merit scholarships range from $23,000 to $36,000 annually, and effective annual tuition after aid can be as low as $11,500.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-22-uniaccess-xavier-university-t050",
+            "sessionId": "2026-05-22-uniaccess-xavier-university"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-22-uniaccess-xavier-university",
+          "turnId": "2026-05-22-uniaccess-xavier-university-t050",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/turns.json",
+              "sha256": "9540ce875b248339533cec077615dbb111a2f5562c1b795f5627c1b32b9d17ab",
+              "normalizedLfSha256": "8809e80ce6af8c0f72ead587c3b40245726258659217015aa13474858dd7ccbb",
+              "bytes": 41140
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-22-uniaccess-xavier-university-t050",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-22-uniaccess-xavier-university",
+                  "speakerRef": "Sandeep",
+                  "tStart": 1733,
+                  "tEnd": 1737,
+                  "text": "So, I'm guessing this was it. Thank you so much."
+                },
+                "textSha256": "aba8c1abd2905d5f252e85d4cce44287411dd0db44095b7bcd4f61729a2284b8"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "77d983a227996034e40dc522a5608a73f00760a7953351e2ab9398747fa39968",
+              "bytes": 42195
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-22-uniaccess-xavier-university-t050",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-22-uniaccess-xavier-university",
+                  "speakerRef": "unknown",
+                  "tStart": 1597,
+                  "tEnd": 1636,
+                  "text": "Sandeep Bhalla: Every student receives a scholarship opportunity, and nearly half of the students receive additional financial aid as well. Students can actually benefit from merit scholarships ranging from $23,000 to $36,000 annually, along with additional grants and financial aid options, making Xavier high-quality US education which is far more attainable as well. In fact, for many students, the annual tuition cost can sometimes even come down to as low as $11,500. This happened this year. I'm not supposed to even put that number, but then I had thought, why not?"
+                },
+                "textSha256": "cd80f6ddabce830b2692e14825f40f22ecfb84980d9c58ce88a84e8739b287d9"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation closes the presentation with thanks; it supplies no scholarship range or tuition after aid.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 17,
+      "claimId": "2026-05-23-uniaccess-atlas-skilltech-c01",
+      "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "5df514eef88c2a868a04b0424143fb44f93263ad98ff1be778de07a7d987d328",
+      "sourceBindingSha256": "1fbf8b430dd7c589e960441ad83ab1678820ca0bb1601db879ab84c14baf8250",
+      "persistedClaim": {
+        "_id": "2026-05-23-uniaccess-atlas-skilltech-c01",
+        "tenantId": "toc",
+        "text": "ISDI, ATLAS SkillTech's design school, operates in a long-standing collaboration with Parsons School of Design.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t005",
+            "sessionId": "2026-05-23-uniaccess-atlas-skilltech"
+          },
+          {
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t006",
+            "sessionId": "2026-05-23-uniaccess-atlas-skilltech"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+          "turnId": "2026-05-23-uniaccess-atlas-skilltech-t005",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+              "sha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+              "normalizedLfSha256": "edd79a5447c222145df9738c30009c5ece51825958e2ea78266e35b252043043",
+              "bytes": 10389
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-23-uniaccess-atlas-skilltech-t005",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+                  "speakerRef": "spk:0",
+                  "tStart": 617,
+                  "tEnd": 697,
+                  "text": "Sonal, do you have any questions?"
+                },
+                "textSha256": "a0c42a14a1bebf9c0069a37c9d1aa288ccda71c5df50ba1b0a944d75830bb724"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "01ac7389a1fbc6c276e46349306dc3a86f40ae5c4c658e87177ecff7bd30d545",
+              "bytes": 14544
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-23-uniaccess-atlas-skilltech-t005",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+                  "speakerRef": "unknown",
+                  "tStart": 120,
+                  "tEnd": 145,
+                  "text": "Farheen: For ISDI particularly, which is in collaboration with Parsons School, ISDI and ISME are a very long-standing, individual diploma-granting institutions since 2013 and 2015. They were diploma-granting earlier, and then when NEP came into effect, obviously then they were formed into a university, which is ATLAS SkillTech, and then the other majors were added."
+                },
+                "textSha256": "4aef625eccdfdf3ec83e5b0209dacd1f376d3327d5db9d00e185348ae1d52658"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        },
+        {
+          "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+          "turnId": "2026-05-23-uniaccess-atlas-skilltech-t006",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+              "sha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+              "normalizedLfSha256": "edd79a5447c222145df9738c30009c5ece51825958e2ea78266e35b252043043",
+              "bytes": 10389
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-23-uniaccess-atlas-skilltech-t006",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+                  "speakerRef": "spk:1",
+                  "tStart": 697,
+                  "tEnd": 703,
+                  "text": "Uh, but I think Sonal is not having any questions, she's dropped a text. Yeah, messages."
+                },
+                "textSha256": "7bade8d494d181e074b0bd33353ae3e27d71c7fccb724c35802fda960d29b9a0"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "01ac7389a1fbc6c276e46349306dc3a86f40ae5c4c658e87177ecff7bd30d545",
+              "bytes": 14544
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-23-uniaccess-atlas-skilltech-t006",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+                  "speakerRef": "unknown",
+                  "tStart": 145,
+                  "tEnd": 167,
+                  "text": "Farheen: So ISDI and Parsons are a long-standing collaboration, and the collaboration is to the extent that Parsons obviously influences the curriculum development, the faculty trainings for our faculty members as well. So our students get very first-hand advantage of although being in India, but learning in the Parsons style of curriculum."
+                },
+                "textSha256": "8a60921933c39e5143b8dda26e5906143f9b5691582c2088377a3c1b16276f84"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citations ask whether Sonal has questions and mention her messages; neither addresses ISDI or Parsons collaboration.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 18,
+      "claimId": "2026-05-23-uniaccess-atlas-skilltech-c02",
+      "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "b103c417dbad7b6e22f1a6a14b655ca4269e26adf65dcce826ad9feb8ae2ead8",
+      "sourceBindingSha256": "1fbf8b430dd7c589e960441ad83ab1678820ca0bb1601db879ab84c14baf8250",
+      "persistedClaim": {
+        "_id": "2026-05-23-uniaccess-atlas-skilltech-c02",
+        "tenantId": "toc",
+        "text": "ISME, ATLAS SkillTech's management school, is part of the Babson group of roughly 30 schools worldwide.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t007",
+            "sessionId": "2026-05-23-uniaccess-atlas-skilltech"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+          "turnId": "2026-05-23-uniaccess-atlas-skilltech-t007",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+              "sha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+              "normalizedLfSha256": "edd79a5447c222145df9738c30009c5ece51825958e2ea78266e35b252043043",
+              "bytes": 10389
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-23-uniaccess-atlas-skilltech-t007",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+                  "speakerRef": "spk:0",
+                  "tStart": 703,
+                  "tEnd": 713,
+                  "text": "Okay. Perfect. So, thank you so much. Thank you, Sonal, for sticking with us around. If you have any questions in the future, please feel free to reach out to me."
+                },
+                "textSha256": "4c1b0affff5928210aa2e2dc84514d031bac66f3007a7f1288ba3378484a91c4"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "01ac7389a1fbc6c276e46349306dc3a86f40ae5c4c658e87177ecff7bd30d545",
+              "bytes": 14544
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-23-uniaccess-atlas-skilltech-t007",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+                  "speakerRef": "unknown",
+                  "tStart": 167,
+                  "tEnd": 195,
+                  "text": "Farheen: For Management and Entrepreneurship school, we are a group of Babson group of schools, which are about 30 schools across the globe. There also there's definitely a lot of conversation and dialogue about what is beneficial for a student, and that's why our majority of our courses come with the influence of a learning pattern which is more US-centric rather than the rote learning which was seen earlier in India."
+                },
+                "textSha256": "884a0d9a4cdbb859db08674a7aeb9b6b7dfad8e0488b0277a0c92ea51a5d077f"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation thanks Sonal and invites future questions; it supplies no ISME affiliation or Babson group size.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 19,
+      "claimId": "2026-05-23-uniaccess-atlas-skilltech-c03",
+      "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "0c5255c3a08f2ac979ecafe6aa5e99a23eeabacc5b779b40052f177eaa1c8ab7",
+      "sourceBindingSha256": "1fbf8b430dd7c589e960441ad83ab1678820ca0bb1601db879ab84c14baf8250",
+      "persistedClaim": {
+        "_id": "2026-05-23-uniaccess-atlas-skilltech-c03",
+        "tenantId": "toc",
+        "text": "ATLAS SkillTech students have achieved recognition at NASA and Google competitions.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-23-uniaccess-atlas-skilltech-t008",
+            "sessionId": "2026-05-23-uniaccess-atlas-skilltech"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+          "turnId": "2026-05-23-uniaccess-atlas-skilltech-t008",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+              "sha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+              "normalizedLfSha256": "edd79a5447c222145df9738c30009c5ece51825958e2ea78266e35b252043043",
+              "bytes": 10389
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-23-uniaccess-atlas-skilltech-t008",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+                  "speakerRef": "spk:0",
+                  "tStart": 713,
+                  "tEnd": 743,
+                  "text": "Thank you. Bye-bye."
+                },
+                "textSha256": "924f0963dec369020fade5243e6c2d105555e3d7d673f8a938cfb1e27101f19d"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "01ac7389a1fbc6c276e46349306dc3a86f40ae5c4c658e87177ecff7bd30d545",
+              "bytes": 14544
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-23-uniaccess-atlas-skilltech-t008",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+                  "speakerRef": "unknown",
+                  "tStart": 195,
+                  "tEnd": 237,
+                  "text": "Farheen: Other than that, our uGDX school is very prominent. It's 3 years old at this time, however we have had some fantastic establishments and achievements through our experienced faculty members and our students, obviously. So students have achieved and won several accolades at NASA, at Google. We also have students who have participated in several other competitions and have won challenges in the Indian ecosystem as well. So our students are developing a car structure or a drone-structured car, basically, for the Indian Army also. I posted about that a couple of days back on our LinkedIn."
+                },
+                "textSha256": "2345e38afad485375d096de0a76651935fd9e9b4b065e5abc3cd730bf3f437e1"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation is a farewell without student competition achievements.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 20,
+      "claimId": "2026-05-28-in-focus-1-c01",
+      "sessionId": "2026-05-28-in-focus-1",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "c5b603b9adf8fbfc873a165fb611411bb2af68cc2b90a82ad8fb4711d3a1f06e",
+      "sourceBindingSha256": "3f651d130d02b2ca4452f3a2aec8cfdccacbab8e711c21aadc8a5869c1cb9556",
+      "persistedClaim": {
+        "_id": "2026-05-28-in-focus-1-c01",
+        "tenantId": "toc",
+        "text": "Innovique states it can provide a project-matching solution to a counselor within 48 hours.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-28-in-focus-1-t035",
+            "sessionId": "2026-05-28-in-focus-1"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-28-in-focus-1",
+          "turnId": "2026-05-28-in-focus-1-t035",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-28-in-focus-1/turns.json",
+              "sha256": "3f7229899fd1a4a6d190e3c9d402b12dcae2ceb9dc66cbf697d18e698d9e6581",
+              "normalizedLfSha256": "155e69c048c3c12f2dafddf32db6db0d1ed88f5dd38769276c668e03ae74fc7c",
+              "bytes": 52264
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-28-in-focus-1-t035",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-28-in-focus-1",
+                  "speakerRef": "Yavya",
+                  "tStart": 2284,
+                  "tEnd": 2291,
+                  "text": "Great. Could you maybe also talk a little bit about the mentorship you received and how you think that benefited you to come up with these ideas?"
+                },
+                "textSha256": "e2b510e75e5c6af062dc43f0882561e9d4c31f8cbf0e1c6e8c51ae06930de3c4"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-28-in-focus-1/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "0ac457de7615bc242980485dca851754c20b6f0181bbe354f743489ed085062a",
+              "bytes": 65053
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-28-in-focus-1-t035",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-28-in-focus-1",
+                  "speakerRef": "unknown",
+                  "tStart": 940,
+                  "tEnd": 965,
+                  "text": "Makrand Rajadhyaksha: So what do we promise? The first thing that we promise, and I say this with a lot of conviction, is that we require just 48 hours to provide a solution to any education counselor in any complex domain. We have our own network, and we believe that we would be able to mobilize that network very, very efficiently."
+                },
+                "textSha256": "e1ea1a9b4eb74aa359de879048720a010654414be823751c2177a4c25b2c1a17"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation asks about mentorship and idea development; it supplies no Innovique project-matching service or 48-hour commitment.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    }
+  ]
+}

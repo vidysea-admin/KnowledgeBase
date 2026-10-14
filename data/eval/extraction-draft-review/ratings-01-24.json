@@ -1,0 +1,194 @@
+[
+  {
+    "ordinal": 1,
+    "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c01",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation welcomes a guest; it supplies neither visa approval statistics nor a 2030 student target.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 2,
+    "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c02",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation describes the guest's University of Auckland education without tuition figures.",
+    "replacementSupport": "supported",
+    "replacementRationale": "Replacement t088 states the master's tuition range and university dependency; t089 supplies New Zealand country context."
+  },
+  {
+    "ordinal": 3,
+    "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c03",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation concerns engineering shortages and IT industry growth; it supplies no pathway program or tuition cap.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 4,
+    "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c04",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation concerns companies establishing New Zealand bases and employee demand, not Italian English-taught courses.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 5,
+    "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c05",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation describes embassy representation without graduate visa duration, openness, or guarantees.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 6,
+    "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c06",
+    "literalSupport": "unsupported",
+    "rationale": "Current citations concern New Zealand admission requirements and electronic visas; neither addresses Italian document attestation or designated officers.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 7,
+    "claimId": "2026-05-08-funding-dreams-loans-forex-c01",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation invites an interactive discussion without currency markup figures or provider comparisons.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 8,
+    "claimId": "2026-05-08-funding-dreams-loans-forex-c02",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation requests stopping screen sharing; it supplies no FEMA remittance restrictions.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 9,
+    "claimId": "2026-05-08-funding-dreams-loans-forex-c03",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation asks an unspecified question about actions after education and EMI payments; it identifies neither Section 80E nor interest tax benefits.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 10,
+    "claimId": "2026-05-08-funding-dreams-loans-forex-c04",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation discusses connecting counselors with Credila and closing the session; it gives no unsecured lending limit or tenure.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 11,
+    "claimId": "2026-05-08-funding-dreams-loans-forex-c05",
+    "literalSupport": "unsupported",
+    "rationale": "Current citations discuss screen-sharing problems and an unspecified uncertainty; neither identifies confusion about LRS, TCS, FEMA, or education remittances.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 12,
+    "claimId": "2026-05-20-telling-your-brand-story-better-c01",
+    "literalSupport": "unavailable",
+    "rationale": "The current literal citation has no matched source record.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 13,
+    "claimId": "2026-05-20-telling-your-brand-story-better-c02",
+    "literalSupport": "unsupported",
+    "rationale": "The current citation consists only of 'Yes' without an identifiable proposition about emotional doors or communication.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 14,
+    "claimId": "2026-05-22-uniaccess-xavier-university-c01",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation describes learning outside classrooms without student-to-faculty or class-size figures.",
+    "replacementSupport": "supported",
+    "replacementRationale": "Replacement t030 explicitly attributes an 11:1 student-to-faculty ratio and average class size of 23 students to Xavier."
+  },
+  {
+    "ordinal": 15,
+    "claimId": "2026-05-22-uniaccess-xavier-university-c02",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation discusses relationships and Xavier's human element; it supplies no NIH grant amount or selected cohort size.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 16,
+    "claimId": "2026-05-22-uniaccess-xavier-university-c03",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation closes the presentation with thanks; it supplies no scholarship range or tuition after aid.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 17,
+    "claimId": "2026-05-23-uniaccess-atlas-skilltech-c01",
+    "literalSupport": "unsupported",
+    "rationale": "Current citations ask whether Sonal has questions and mention her messages; neither addresses ISDI or Parsons collaboration.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 18,
+    "claimId": "2026-05-23-uniaccess-atlas-skilltech-c02",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation thanks Sonal and invites future questions; it supplies no ISME affiliation or Babson group size.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 19,
+    "claimId": "2026-05-23-uniaccess-atlas-skilltech-c03",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation is a farewell without student competition achievements.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 20,
+    "claimId": "2026-05-28-in-focus-1-c01",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation asks about mentorship and idea development; it supplies no Innovique project-matching service or 48-hour commitment.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 21,
+    "claimId": "2026-05-28-in-focus-1-c02",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation hands over to Pranav Patel without mentioning Innovique, copyright certificates, or government registration.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 22,
+    "claimId": "2026-05-28-in-focus-1-c03",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation says thanks without identifying Artiste 360 or a portfolio work count.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 23,
+    "claimId": "2026-05-29-decoding-ever-expanding-cast-c01",
+    "literalSupport": "unsupported",
+    "rationale": "Current citation explains families as central and external professionals as the surrounding ecosystem; it supplies no mapped count of approximately 24 roles.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 24,
+    "claimId": "2026-05-29-decoding-ever-expanding-cast-c02",
+    "literalSupport": "unavailable",
+    "rationale": "The current literal citation has no matched source record.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  }
+]

@@ -9,6 +9,9 @@ import type { Server } from "node:http";
 import type { ApiKeyStore } from "./auth.js";
 import { requireAuth } from "./auth.js";
 import { createAskRouter, type AskRouteDeps } from "./routes/ask/ask.js";
+import { createAnswerPolicyRouter } from "./answer-policy/routes.js";
+import { createGroundedContentDeps } from "./grounded-content/reader.js";
+import { createGroundedContentRouter } from "./grounded-content/router.js";
 import { createCompeteRouter, type EvalRunStore } from "./routes/compete/compete.js";
 import { createCompetePageRouter } from "./routes/compete/compete-page.js";
 import { createBrainRouter, type BrainReadDeps } from "./routes/brain.js";
@@ -120,9 +123,11 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createSystemStatusRouter(deps.systemStatus ?? unavailableSystemStatusDeps));
   app.use(createSetupStatusRouter()); // T-057 E4: booleans only, authenticated
   app.use(createAskRouter(deps.ask));
+  app.use(createAnswerPolicyRouter(deps.ask));
   app.use(createCompeteRouter({ ...deps.ask, evalRuns: deps.evalRuns }));
   app.use(createSpeakerSuggestionsRouter(deps.speakerSuggestions ?? unavailableSpeakerSuggestionDeps));
   app.use(createBrainRouter(deps.brain));
+  app.use(createGroundedContentRouter(createGroundedContentDeps(deps.brain)));
   app.use(createJobsRouter(deps.jobs ?? unavailableJobsReadDeps));
   const activityHealth = deps.fileQueue ? withFileQueueActivity(deps.activityHealth ?? unavailableActivityHealthDeps, deps.fileQueue) : deps.activityHealth ?? unavailableActivityHealthDeps;
   app.use(createActivityHealthRouter(activityHealth));

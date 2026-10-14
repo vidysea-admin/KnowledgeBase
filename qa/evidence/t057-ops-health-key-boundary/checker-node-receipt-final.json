@@ -1,0 +1,7 @@
+{
+  "command": "node --test --test-isolation=none --test-timeout=10000 --import ./.cache/coordination/safe-test-runtime/register-react.mjs qa/evidence/t057-ops-health-key-boundary/checker.node.test.tsx",
+  "startUtc": "2026-10-14T09:01:51.9520351Z",
+  "endUtc": "2026-10-14T09:01:54.2263262Z",
+  "elapsedSeconds": 2.2607913,
+  "exitCode": 0
+}

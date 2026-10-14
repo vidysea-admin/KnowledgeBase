@@ -7,7 +7,9 @@ import { SourcesPage } from "./pages/SourcesPage.js";
 import { SessionsListPage } from "./pages/sessions/SessionsListPage.js";
 import { SessionDetailPage } from "./pages/sessions/SessionDetailPage.js";
 import { AskPage } from "./pages/AskPage.js";
+import { AnswerPolicySimulator } from "./pages/answer-policy/AnswerPolicySimulator.js";
 import { SearchPage } from "./pages/search/SearchPage.js";
+import { KnowledgeDirectoryPage } from "./pages/knowledge/KnowledgeDirectoryPage.js";
 import { BrainPage } from "./pages/BrainPage.js";
 import { CalendarPage } from "./pages/CalendarPage.js";
 import { SettingsPage } from "./pages/SettingsPage.js";
@@ -39,7 +41,9 @@ export function App(): React.ReactElement {
               <Route path="/sessions" element={<SessionsListPage enableFilters={import.meta.env.VITE_SESSIONS_FILTERS === "1"} />} />
               <Route path="/sessions/:id" element={<SessionDetailPage />} />
               <Route path="/ask" element={<AskPage />} />
+              <Route path="/answer-policy" element={<AnswerPolicySimulator />} />
               <Route path="/search" element={<SearchPage />} />
+              <Route path="/knowledge" element={<KnowledgeDirectoryPage />} />
               <Route path="/brain" element={<BrainPage />} />
               <Route path="/explorer" element={<KnowledgeExplorerPage />} />
               <Route path="/graph-confidence" element={<ConfidenceGraphPage />} />

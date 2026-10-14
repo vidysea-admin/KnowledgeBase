@@ -29,6 +29,7 @@ export * from "./generated/watch_heartbeat.js";
 export * from "./generated/watch_reports.js";
 export * from "./generated/watch_state.js";
 export * from "./generated/watched_sources.js";
+export * from "./generated/whatsapp_candidates.js";
 
 export * from "./domain/keyframe-dedupe.js";
 export * from "./domain/keyframe-dedupe-validate.js";

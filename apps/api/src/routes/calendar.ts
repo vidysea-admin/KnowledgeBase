@@ -17,6 +17,9 @@ export interface UpcomingMeeting {
   endTime: string;
   /** Absent when the event has no joinable video-conference link. */
   meetingUrl?: string;
+  /** Watch evidence only: never a bot join URL or approval to capture. Discovery is opt-in. */
+  youtubeWatch?: {url: string; videoId: string; source: "location" | "description"};
+  youtubeWatchIssue?: "ambiguous";
   /** Set only when a description/location scan found no safe single join link (T-036): the scheduler/UI must not guess. */
   meetingLinkIssue?: "ambiguous" | "registration-only" | "host-start-link";
   /** Where meetingUrl came from (T-036): `conference` = Google's own conference data; `location`/`description` = free text

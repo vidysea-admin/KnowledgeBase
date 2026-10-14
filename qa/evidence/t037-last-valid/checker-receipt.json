@@ -1,0 +1,9 @@
+{
+  "command": "node --test --test-isolation=none --test-concurrency=1 --test-timeout=30000 --import ./.cache/coordination/safe-test-runtime/register.mjs qa/evidence/t037-last-valid/checker-probe.mts",
+  "startedUtc": "2026-10-14T09:14:51.0585862Z",
+  "endedUtc": "2026-10-14T09:14:52.2772619Z",
+  "durationSeconds": 1.2186757,
+  "exitCode": 0,
+  "outerTimeoutSeconds": 120,
+  "timedOut": false
+}

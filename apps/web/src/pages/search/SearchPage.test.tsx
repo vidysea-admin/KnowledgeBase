@@ -24,12 +24,15 @@ function show(key: string | null = "fixture-key") {
   return render(<AuthProvider><MemoryRouter initialEntries={["/search"]}><Controls /><Routes><Route path="/search" element={<SearchPage />} /></Routes></MemoryRouter></AuthProvider>);
 }
 function submit(query: string) { fireEvent.change(screen.getByRole("searchbox"), { target: { value: query } }); fireEvent.submit(screen.getByRole("form", { name: "Search transcripts" })); }
-/** Routes by URL: speaker-suggestions (U2.4, ebca1cea) gets an empty list and is recorded in `suggestions`; every other call goes to the ordered `inner` mock, so its order and count are unchanged. */
+/** Routes by URL: speaker-suggestions (U2.4, ebca1cea) gets an empty list and is recorded in `suggestions`; grounded-content gets an empty payload; every other call goes to the ordered `inner` mock, so its order and count are unchanged. */
 function routeSuggestions(inner: ReturnType<typeof vi.fn>) {
   const suggestions: string[] = [];
   const routed = vi.fn((input: unknown, init?: unknown) => {
     const path = new URL(String(input), "http://local.invalid").pathname;
     if (/\/sessions\/[^/]+\/speaker-suggestions$/.test(path)) { suggestions.push(path); return Promise.resolve(new Response(JSON.stringify({ suggestions: [] }), { headers: { "content-type": "application/json" } })); }
+    // Grounded panel is mounted in SessionDetailPage by the integrator (t040-grounded-content-consumer): answer with an empty valid payload.
+    const grounded = /^\/sessions\/([^/]+)\/grounded-content$/.exec(path);
+    if (grounded) return Promise.resolve(new Response(JSON.stringify({ sessionId: decodeURIComponent(grounded[1]!), notes: [], qa: [], claims: [] }), { headers: { "content-type": "application/json" } }));
     return inner(input, init);
   });
   return { routed, suggestions };

@@ -11,7 +11,8 @@ import type { SelectAutoRecordItemsInput } from "@lkb/core";
 import type { AutojoinConfig } from "./config.js";
 import { classifyTopic, type TopicConfig, type TopicVerdict } from "./topic-priority.js";
 import { classifyInviteExtended } from "./webinar-kind.js";
-import { flushFailureDigest, raiseAlert, type AlertInput } from "./alerts.js";
+import { flushFailureDigest, raiseAlert, raiseRulesDegraded, clearRulesDegraded, type AlertInput } from "./alerts.js";
+import type { JoinRulesDegradation } from "../calendar/join-rules/join-rules-enforce.js";
 import { loadAutojoinConfig } from "./config.js";
 import { loadTopicConfig } from "./topic-priority.js";
 import { createGwsRunner } from "./gws-channels.js";
@@ -25,6 +26,8 @@ export interface AutojoinTickDeps {
   /** Absent = the classifier is unavailable (config missing or malformed): nothing is prioritised or tagged, and a loud line says so. */
   topic?: TopicConfig;
   raise: (a: AlertInput) => Promise<unknown>;
+  rulesDegraded?: (event: JoinRulesDegradation) => Promise<unknown>;
+  rulesHealthy?: () => Promise<unknown> | unknown;
   /** Raises capture lifecycle alerts for jobs scheduled earlier (alerts only; see capture-watch.ts). */
   watchCaptures?: () => Promise<number>;
   /** Directory the recorder reads per-session tags from (record-finalize.ts): <recordDir>/capture-tags. */
@@ -85,6 +88,8 @@ export function buildAutojoinTickDeps(repoRoot: string, stateDir: string, env: N
   const raise = (a: AlertInput) => raiseAlert(alertDeps, a);
   return {
     cfg, topic, raise, tagsDir: path.join(stateDir, "capture-tags"),
+    rulesDegraded: (event) => raiseRulesDegraded(alertDeps, event),
+    rulesHealthy: () => clearRulesDegraded(alertDeps),
     watchCaptures: async () => { const n = await watchCaptures({ stateDir, tenantId, now: alertDeps.now, log, raise,
       outputFor: (sid) => (/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(sid) && existsSync(path.join(repoRoot, "data", "toc-migrated", sid, "source.json")) ? `data/toc-migrated/${sid}` : undefined) });
       await flushFailureDigest(alertDeps).catch(() => false); return n; },

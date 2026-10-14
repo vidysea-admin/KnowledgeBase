@@ -1,0 +1,5 @@
+{
+  "command": "node --test --test-isolation=none --test-concurrency=1 --test-timeout=10000 --import ./.cache/coordination/safe-test-runtime/register-react.mjs .cache/coordination/integration-bot-ui.test.tsx",
+  "exitCode": 0,
+  "durationSeconds": 1.8472418
+}

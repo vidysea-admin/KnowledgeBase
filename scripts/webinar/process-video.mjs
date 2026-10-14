@@ -141,12 +141,12 @@ export function screenEvidenceTurns(sessionId, tenantId, evidence) {
 }
 /** T-041: optional keyframe -> OCR -> slide/turn alignment stage (flag-gated by the caller; absent = nothing runs).
  * Writes slide-alignment.json (ids and ranges only, never slide text). A failing stage never fails the video stage. */
-async function runSlideAlignment(slideAlignment, { dir, media, sessionId, turns }) {
+async function runSlideAlignment(slideAlignment, { dir, media, sessionId, turns, duration }) {
   const outDir = mkdtempSync(join(tmpdir(), 'lkb-keyframes-'));
   try {
     const alignTurns = turns.map((t) => ({ id: t._id, tStart: t.tStart, tEnd: t.tEnd, ...(t.speakerRef ? { speakerRef: t.speakerRef } : {}) }));
     let outcome;
-    try { outcome = await slideAlignment({ video: media, outDir, turns: alignTurns }); }
+    try { outcome = await slideAlignment({ video: media, outDir, turns: alignTurns, endSec: duration }); }
     catch { outcome = { status: 'failed', code: 'stage-failed' }; }
     if (outcome.status === 'disabled') return { status: 'disabled' };
     atomic(join(dir, 'slide-alignment.json'), { version: 1, sessionId, ...outcome });
@@ -169,7 +169,7 @@ export async function keyframeOcrHook(env, transport, load = () => Promise.all([
     return value;
   } : make(env.WEBINAR_VISION_MODEL);
   const fallback = env.LKB_KEYFRAME_OCR_FALLBACK_MODEL ? make(env.LKB_KEYFRAME_OCR_FALLBACK_MODEL) : undefined;
-  return ({ video, outDir, turns }) => runKeyframeOcrPostProcess({ env, video, outDir, turns, ocr, ocrRetry: { fallback } });
+  return ({ video, outDir, turns, endSec }) => runKeyframeOcrPostProcess({ env, video, outDir, turns, ocr, ocrRetry: { fallback }, pipeline: { endSec } });
 }
 export async function processVideo({ root, sessionId, recording, tenantId, dryRun = false, vision,
   visionModel = 'injected', command = mediaCommand, slideAlignment }) {
@@ -208,7 +208,7 @@ export async function processVideo({ root, sessionId, recording, tenantId, dryRu
       load(join(dir, 'screen-evidence.json')).frames.every((f) => existsSync(join(dir, f.file)) &&
         digest(readFileSync(confined(root, join(dir, f.file)))) === f.hash)) {
       if (!slideAlignment) return { ...state, reused: true };
-      return { ...state, reused: true, slideAlignment: await runSlideAlignment(slideAlignment, { dir, media, sessionId, turns }) };
+      return { ...state, reused: true, slideAlignment: await runSlideAlignment(slideAlignment, { dir, media, sessionId, turns, duration }) };
     }
   }
   const lock = join(dir, '.video-stage.lock');
@@ -254,7 +254,7 @@ export async function processVideo({ root, sessionId, recording, tenantId, dryRu
       outputs: Object.fromEntries(OUTPUTS.map((f) => [f, digest(readFileSync(join(dir, f)))])) };
     atomic(statePath, state);
     if (!slideAlignment) return state;
-    return { ...state, slideAlignment: await runSlideAlignment(slideAlignment, { dir, media, sessionId, turns }) };
+    return { ...state, slideAlignment: await runSlideAlignment(slideAlignment, { dir, media, sessionId, turns, duration }) };
   } catch (error) {
     atomic(statePath, { status: 'failed', sessionId, inputHash, error: error.message });
     throw error;

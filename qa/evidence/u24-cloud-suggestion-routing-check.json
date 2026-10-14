@@ -1,0 +1,33 @@
+[
+  {
+    "command": [
+      "node",
+      "--test",
+      "--test-isolation=none",
+      "--test-concurrency=1",
+      "--test-timeout=30000",
+      "--import",
+      "./.cache/coordination/safe-test-runtime/register.mjs",
+      "apps/api/src/speaker-routing/routing.test.ts",
+      "qa/evidence/u24-cloud-suggestion-routing-independent.mjs"
+    ],
+    "started": "2026-10-14T09:34:49.265356+00:00",
+    "ended": "2026-10-14T09:34:51.656631+00:00",
+    "seconds": 2.389999999999418,
+    "exit": 0,
+    "stdout": "\u2714 construction is lazy and proposer/verifier have separate authenticated models (7.69ms)\n\u2714 missing credentials/models and same-model cloud aliases refuse without any call (1.832ms)\n\u2714 unrelated job kinds cannot enter either speaker route (0.6781ms)\n\u2714 provider errors do not expose credentials or source text (1.1621ms)\n\u2714 cloud fetch never follows redirects, uses bounded cancellation, and preserves request (24.383ms)\n\u2714 cloud transport rejects alternate origins/methods before fetch and hides failed bodies (0.6731ms)\n\u2714 caller cancellation reaches dedicated cloud transport (0.626ms)\n\u2714 existing verifier consumes the distinct route and returns unsure on provider failure (0.8259ms)\n\u2714 route snapshots tenant and recorder binding at construction (0.5155ms)\n\u2714 checker: real timeout signal expires, using accelerated injected clock only (6.5665ms)\n\u2714 checker: default transport never consumes failed response body, records sanitized attempt (0.6421ms)\n\u2714 checker: nested cloud/latest aliases cannot evade distinct-role refusal (0.3231ms)\n\u2139 tests 12\n\u2139 suites 0\n\u2139 pass 12\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 2237.8195\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "C:\\Program Files\\Python312\\python.exe",
+      "contracts/verify_contracts.py"
+    ],
+    "started": "2026-10-14T09:34:51.656631+00:00",
+    "ended": "2026-10-14T09:34:51.788548+00:00",
+    "seconds": 0.14100000000325963,
+    "exit": 0,
+    "stdout": "verify_contracts: no frozen contracts yet (research phase) -- PASS by vacuity\n",
+    "stderr": ""
+  }
+]

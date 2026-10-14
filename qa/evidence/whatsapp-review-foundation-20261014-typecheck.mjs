@@ -1,0 +1,12 @@
+import ts from "typescript";
+import { readdirSync } from "node:fs";
+const root = "apps/api/src/whatsapp/review";
+const roots = readdirSync(root).filter(name => name.endsWith(".ts")).map(name => `${root}/${name}`);
+const loaded = ts.readConfigFile("apps/api/tsconfig.json", ts.sys.readFile);
+if (loaded.error) throw new Error(ts.flattenDiagnosticMessageText(loaded.error.messageText, "\n"));
+const parsed = ts.parseJsonConfigFileContent(loaded.config, ts.sys, "apps/api");
+const program = ts.createProgram(roots, { ...parsed.options, noEmit: true });
+const diagnostics = [...parsed.errors, ...ts.getPreEmitDiagnostics(program)];
+if (diagnostics.length) console.error(ts.formatDiagnosticsWithColorAndContext(diagnostics, { getCurrentDirectory: ts.sys.getCurrentDirectory, getCanonicalFileName: name => name, getNewLine: () => "\n" }));
+console.log(JSON.stringify({ scope: "WhatsApp review source/tests with actual API options and transitive dependencies", roots: roots.length, sourceFiles: program.getSourceFiles().length, diagnostics: diagnostics.length }));
+process.exitCode = diagnostics.length ? 1 : 0;

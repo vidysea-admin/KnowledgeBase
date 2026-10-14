@@ -4,6 +4,7 @@ import { useAuth } from "../../auth/AuthContext.js";
 import { ApiError } from "../../api/client.js";
 import { normalizeQuery } from "./query.js";
 import { searchTranscripts, type TranscriptSearchHit } from "../../api/search/client.js";
+import { SemanticResults } from "./semantic/SemanticResults.js";
 
 type SearchState = { key: string; query: string } & (
   { status: "loading" } | { status: "failed"; message: string } | { status: "ready"; hits: TranscriptSearchHit[] }
@@ -102,6 +103,7 @@ export function SearchPage(): React.ReactElement {
             : <p>The source passage could not be resolved.</p>}
         </article>)}
       </section>}
+      <SemanticResults apiKey={apiKey} query={urlQuery} />
     </>}
   </>;
 }

@@ -11,6 +11,24 @@ import assert from "node:assert/strict";
 import { startTestServer } from "./testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeTreeStore, fakeAskDeps } from "./fixtures.js";
 
+test("mounted grounded-content route consumes tenant-scoped BrainReadDeps and refuses unauthenticated reads", async () => {
+  const calls: string[][] = [];
+  const deps = buildTestDeps({ keyStore: fakeKeyStore({ reader: { tenantId: "tenant-a", scopes: ["sessions"] } }) });
+  deps.brain.getSessionDetail = async (tenant, id) => {
+    calls.push([tenant, id]);
+    return { session: { _id: id, tenantId: tenant, sourceId: "src", title: "Session", date: "2026-10-14",
+      status: { transcribe: "done", index: "done" } }, claims: [], turns: [], page: null };
+  };
+  const server = await startTestServer(deps);
+  try {
+    assert.equal((await fetch(`${server.baseUrl}/sessions/session-1/grounded-content`)).status, 401);
+    assert.deepEqual(calls, []);
+    const response = await fetch(`${server.baseUrl}/sessions/session-1/grounded-content`, { headers: { authorization: "Bearer reader" } });
+    assert.equal(response.status, 200); assert.deepEqual(calls, [["tenant-a", "session-1"]]);
+    assert.deepEqual(await response.json(), { sessionId: "session-1", notes: [], qa: [], claims: [] });
+  } finally { await server.close(); }
+});
+
 test("POST /ask with a valid key + ask scope returns 200 with an AskResult shape", async () => {
   const server = await startTestServer(buildTestDeps());
   try {

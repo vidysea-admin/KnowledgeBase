@@ -35,7 +35,13 @@ export interface AuthInvalidationEventDetail {
   apiKey: string;
 }
 
-function invalidateAuth(apiKey: string): void {
+// A request belongs to the login session that sent it, even when a later login reuses the key.
+// This tab-local identity carries no credential and is never persisted or transmitted.
+let authSession: object = {};
+export function advanceAuthSession(): void { authSession = {}; }
+
+function invalidateAuth(apiKey: string, sentSession: object): void {
+  if (sentSession !== authSession) return;
   if (typeof window === "undefined" || !window.dispatchEvent) return;
 
   try {
@@ -85,6 +91,7 @@ export interface ApiFetchOptions {
 
 export async function apiFetch<T>(path: string, apiKey: string | null, options: ApiFetchOptions = {}): Promise<T> {
   if (!apiKey) throw new ApiError(401, "no API key set");
+  const sentSession = authSession;
 
   let res: Response;
   try {
@@ -104,7 +111,7 @@ export async function apiFetch<T>(path: string, apiKey: string | null, options: 
   }
 
   if (!res.ok) {
-    if (res.status === 401) invalidateAuth(apiKey);
+    if (res.status === 401) invalidateAuth(apiKey, sentSession);
     let message = `HTTP ${res.status}`;
     let code: string | undefined;
     try {

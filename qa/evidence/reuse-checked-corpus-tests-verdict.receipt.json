@@ -1,0 +1,14 @@
+{
+  "confirmedCompletion": "2026-10-14T09:43:45.715111+00:00",
+  "firstMeasuredCheckpoint": "2026-10-14T09:39:04.204831+00:00",
+  "checkpointToCompletionSeconds": 281.51028,
+  "exactLaunchTime": "unknown",
+  "finalPinsVerified": {
+    "apps/api/src/ask/source-context.test.ts": "1c0f348dff60516fa0e8bd3a381b42503aa7b6ff8533d218ed2f868dc80b795d",
+    "packages/index/src/tree/tree-real-data.test.ts": "820d6106cb3614f8e3faa68db6773524d10d39184e36eeda01c4d69708f40028",
+    "packages/index/src/pipeline/notes/judge.test.ts": "989d672b3dd96de6bdde272b2a9050b86923633484d7f70bbbf63409852d1643",
+    "qa/manifests/reuse-checked-corpus-tests.md": "88b033e2d3edcff9fd6623763ffdef10b3661e49b7d0130ce2f6b10ec77ec852",
+    "qa/packets/reuse-checked-corpus-tests.md": "22cffe736d1044c487897f4432df222e1f9cefe852ef9ab83422d60a2e8369c5"
+  },
+  "verdictSHA256": "c9e8c239fddf00991d6d62a32a3f998eae5eca8e42048641d7771eb217e70f73"
+}

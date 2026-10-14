@@ -1,0 +1,101 @@
+lint-loc: FAIL — 1 violation(s)
+  packages/meeting-bot/py/test_sb_join_ownership.py:408 (budget 400)
+lint:structure stage=loc exit=1
+lint-dirsize: OK (180 dir(s) within budget)
+lint:structure stage=dirsize exit=0
+lint-root: FAIL — 1 violation(s)
+  root has 16 loose files (budget 15): .dependency-cruiser.cjs .dockerignore .env .env.example .gitattributes .gitignore .gitmodules AGENTS.md ARCHITECTURE.md docker-compose.yml package.json pnpm-lock.yaml pnpm-workspace.yaml structure.config.json TASKS.md tsconfig.base.json
+lint:structure stage=root exit=1
+lint-dupes: OK (1662 unique export(s), 30 unique schema $id(s))
+lint:structure stage=dupes exit=0
+lint-migrations: OK (14521 file(s) scanned)
+lint:structure stage=migrations exit=0
+lint-codex-hooks: OK (6 pair(s) compared)
+lint:structure stage=codex-hooks exit=0
+FAIL: docs/SNAPSHOT.md is stale (123 line(s) differ from a fresh regeneration):
+  line 27: committed="  - `data/eval/`" fresh="  - `data/bot-profile/`"
+  line 28: committed="  - `data/toc-migrated/`" fresh="  - `data/eval/`"
+  line 29: committed="- `docs/`" fresh="  - `data/toc-migrated/`"
+  line 30: committed="  - `docs/adr/`" fresh="- `docs/`"
+  line 31: committed="  - `docs/archive/`" fresh="  - `docs/adr/`"
+  line 32: committed="  - `docs/features/`" fresh="  - `docs/archive/`"
+  line 33: committed="  - `docs/whatsapp/`" fresh="  - `docs/features/`"
+  line 34: committed="- `migrations/`" fresh="  - `docs/whatsapp/`"
+  line 35: committed="- `packages/` — Application logic, one exported symbol per concept" fresh="- `migrations/`"
+  line 36: committed="  - `packages/ai/`" fresh="- `packages/` — Application logic, one exported symbol per concept"
+  line 37: committed="  - `packages/ask/`" fresh="  - `packages/ai/`"
+  line 38: committed="  - `packages/core/`" fresh="  - `packages/ask/`"
+  line 39: committed="  - `packages/db/`" fresh="  - `packages/core/`"
+  line 40: committed="  - `packages/index/`" fresh="  - `packages/db/`"
+  line 41: committed="  - `packages/ingest/`" fresh="  - `packages/index/`"
+  line 42: committed="  - `packages/meeting-bot/`" fresh="  - `packages/ingest/`"
+  line 43: committed="- `qa/`" fresh="  - `packages/meeting-bot/`"
+  line 44: committed="  - `qa/audits/`" fresh="- `pytest-cache-files-581w7i9j/`"
+  line 45: committed="  - `qa/briefs/`" fresh="- `pytest-cache-files-ucil7u0y/`"
+  line 46: committed="  - `qa/checkpoints/`" fresh="- `qa/`"
+lint:structure stage=snapshot exit=1
+✖ scripts\lint.test.mjs (3.7592ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20.1313
+
+✖ failing tests:
+
+test at scripts\lint.test.mjs:1:1
+✖ scripts\lint.test.mjs (3.7592ms)
+  Error: spawn EPERM
+      at ChildProcess.spawn (node:internal/child_process:458:11)
+      at spawn (node:child_process:813:9)
+      at TestContext.<anonymous> (node:internal/test_runner/runner:529:19)
+      at FileTest.runInAsyncScope (node:async_hooks:227:14)
+      at FileTest.run (node:internal/test_runner/test:1402:25)
+      at FileTest.start (node:internal/test_runner/test:1262:17)
+      at runTestFile (node:internal/test_runner/runner:611:32)
+      at node:internal/test_runner/runner:1033:25
+      at node:internal/per_context/primordials:599:37
+      at new Promise (<anonymous>) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'spawn'
+  }
+lint:structure stage=lint-tests exit=1
+node:internal/child_process:1160
+    result.error = new ErrnoException(result.error, 'spawnSync ' + options.file);
+                   ^
+
+<ref *1> Error: spawnSync git EPERM
+    at Object.spawnSync (node:internal/child_process:1160:20)
+    at spawnSync (node:child_process:928:24)
+    at execFileSync (node:child_process:971:15)
+    at audit (file:///C:/Users/product/Desktop/KnowledgeBase/scripts/lib/tracker-audit.mjs:115:27)
+    at main (file:///C:/Users/product/Desktop/KnowledgeBase/scripts/tracker-audit.mjs:28:15)
+    at file:///C:/Users/product/Desktop/KnowledgeBase/scripts/tracker-audit.mjs:46:81
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'spawnSync git',
+  path: 'git',
+  spawnargs: [ 'log', '-1', '--format=%cI' ],
+  error: [Circular *1],
+  status: null,
+  signal: null,
+  output: null,
+  pid: 0,
+  stdout: undefined,
+  stderr: undefined
+}
+
+Node.js v24.21.0
+lint:structure stage=tracker exit=1
+
+✔ no dependency violations found (990 modules, 3990 dependencies cruised)
+
+lint:structure stage=dependencies exit=0
+lint:structure: FAIL (10 stages, 5 failed)

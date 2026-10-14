@@ -5,32 +5,34 @@
  * Setting (read once, in schedule-tick.ts buildRealScheduleTickDeps, from env LKB_JOIN_RULES_ENFORCE; parsed only here):
  *   `off` (DEFAULT; also absent, empty, any other string, any non-string)  -> returns the selection UNTOUCHED (same reference);
  *        the store is never opened, `applyJoinRules` is never called. Nothing is logged for absent/empty/`off`; a non-empty STRING that is
- *        not exactly one of the three accepted values logs ONE warning per process (ISS-T037WIRE-002) and stays off.
+ *        not exactly an accepted value logs ONE warning per process (ISS-T037WIRE-002) and stays off.
  *   `fail-closed` -> rules enforced; rules that cannot be evaluated => NONE of the tenant's meetings are scheduled (`rules-unevaluable`).
  *   `fail-open`   -> rules enforced when evaluable; otherwise the selection is left exactly as today's, with a loud warning.
- * Only the exact strings `fail-closed` / `fail-open` enable anything. Which one to use is the Approver's decision (W3).
+ *   `last-valid` -> verified tenant's full validated rules/state snapshot for <1 hour after primary failure; otherwise refuse.
+ * Enabling is a separate operational step. `last-valid` never treats an absent primary as empty rules.
  *
  * VETO ONLY: the result is always built from the INPUT selection by removing items (fail-closed / veto) or by putting back an
  * item the input already scheduled (fail-open); nothing the input did not schedule can be scheduled.
  * TENANCY (W4): a tick serves one tenant (its API key); rules are loaded for that tenant id only. A missing/invalid tenant id is
- * "cannot be evaluated", never a guess. Missing rules FILE = "no rules" (store returns an empty set): nothing removed.
+ * "cannot be evaluated", never a guess. Legacy modes retain missing rules FILE = "no rules"; last-valid does not.
  * TRANSIENT (`locked` / `lock-failed` / EBUSY-class read errors): the store's load takes NO lock (temp+rename writes), so it should not
  * occur on the read path; if it does it is retried within a small bounded budget, then treated as unevaluable (never as "no rules").
  */
 import type { AutoRecordItem, SelectAutoRecordItemsResult, SkippedItem } from "@lkb/core";
 import { applyJoinRules, type JoinRuleEvaluator } from "./join-rules-select.js";
 import { loadJoinRules, JoinRulesStoreError, type StoredJoinRules } from "./join-rules-store.js";
+import { joinRulesFilePath } from "./join-rules-store.js";
+import { JoinRulesSnapshotError, loadPrimaryJoinRules, loadLastValidJoinRules, saveLastValidJoinRules } from "./join-rules-last-valid.js";
 
-export type JoinRulesEnforceMode = "off" | "fail-closed" | "fail-open";
+export type JoinRulesEnforceMode = "off" | "fail-closed" | "fail-open" | "last-valid";
 export const JOIN_RULES_ENFORCE_ENV = "LKB_JOIN_RULES_ENFORCE";
 
 export function parseJoinRulesEnforce(raw: unknown): JoinRulesEnforceMode {
-  return raw === "fail-closed" || raw === "fail-open" ? raw : "off";
+  return raw === "fail-closed" || raw === "fail-open" || raw === "last-valid" ? raw : "off";
 }
 
 /**
- * ISS-T037WIRE-002: strict parsing stays (only the two exact strings enable), but a non-empty value that is not exactly
- * `off` / `fail-closed` / `fail-open` is made LOUD: one warning per process (per distinct value), echo bounded and sanitised.
+ * ISS-T037WIRE-002: exact parsing; unrecognised non-empty values are made LOUD once per process per distinct value.
  */
 let warnedValues = new Set<string>();
 /** Test seam: forget which unrecognised values were already reported in this process. */
@@ -42,7 +44,7 @@ function warnUnrecognised(raw: unknown, log: (msg: string) => void): void {
   if (warnedValues.has(shown)) return;
   warnedValues.add(shown);
   log(`schedule-tick: JOIN RULES WARNING: ${JOIN_RULES_ENFORCE_ENV} has an unrecognised value ${shown} — enforcement is OFF, ` +
-    "join-rule opt-outs and deny rules are NOT being applied. Accepted values: off, fail-closed, fail-open (exact, case-sensitive; empty = off)");
+    "join-rule opt-outs and deny rules are NOT being applied. Accepted values: off, fail-closed, fail-open, last-valid (exact, case-sensitive; empty = off)");
 }
 
 /** Test seams; production passes none. */
@@ -57,6 +59,17 @@ export interface JoinRulesEnforceConfig {
    * tenant could not be verified => `tenant-unverified` (same handling per policy); `undefined` = not supplied (test seam). Production
    * supplies it every enforcing tick from the `X-LKB-Tenant` header (join-rules-wiring/key-tenant.ts). */
   keyTenantId?: unknown;
+  /** Snapshot clock is read once per enforcement call. Production uses Date.now. */
+  now?: () => number;
+  /** Dry-run: no snapshot writes and no alert delivery. */
+  readOnly?: boolean;
+  onDegraded?: (event: JoinRulesDegradation) => Promise<unknown> | unknown;
+  /** Clear the active degradation outage after current primary validation and successful snapshot persistence. */
+  onHealthy?: () => Promise<unknown> | unknown;
+}
+/** Fixed/sanitized fields only; never includes rule contents, paths, sender identities or meeting URLs. */
+export interface JoinRulesDegradation {
+  tenantId?: string; reason: string; usingSnapshot: boolean; snapshotValidatedAt?: number; snapshotExpiresAt?: number;
 }
 
 const RETRY_WAITS_MS = [150, 300];
@@ -87,13 +100,15 @@ const isTransient = (e: unknown): boolean => {
   return typeof code === "string" && TRANSIENT_CODES.has(code);
 };
 
-async function readRules(c: JoinRulesEnforceConfig): Promise<{ stored: StoredJoinRules } | { error: string }> {
-  const load = c.io?.load ?? loadJoinRules;
+interface ReadRulesSuccess { stored: StoredJoinRules; healthy?: boolean; snapshot?: { validatedAt: number; expiresAt: number } }
+async function readRules(c: JoinRulesEnforceConfig): Promise<ReadRulesSuccess | { error: string; noFallback?: boolean }> {
+  const load = c.io?.load ?? (c.mode === "last-valid" ? loadPrimaryJoinRules : loadJoinRules);
   const wait = c.io?.wait ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
   for (let attempt = 0; ; attempt++) {
     try { return { stored: load(c.stateDir, c.tenantId as string) }; }
     catch (e) {
-      if (!isTransient(e) || attempt >= RETRY_WAITS_MS.length) return { error: describeFailure(e) };
+      if (!isTransient(e) || attempt >= RETRY_WAITS_MS.length) return { error: describeFailure(e),
+        noFallback: e instanceof JoinRulesStoreError && ["bad-tenant", "tenant-mismatch"].includes(e.code) };
       await wait(RETRY_WAITS_MS[attempt]!);
     }
   }
@@ -103,6 +118,57 @@ const skipAll = (items: readonly AutoRecordItem[]): SkippedItem[] => items.map((
   sessionKey: i.sessionKey, source: i.source, sourceId: i.sourceId, title: i.title, reason: "rules-unevaluable", detail: DETAIL_FAIL_CLOSED,
 }));
 
+async function degraded(c: JoinRulesEnforceConfig, event: JoinRulesDegradation): Promise<void> {
+  if (c.readOnly || !c.onDegraded) return;
+  try { await c.onDegraded(event); }
+  catch { c.log("schedule-tick: JOIN RULES WARNING: degradation alert delivery failed; rules policy remains enforced"); }
+}
+async function healthy(c: JoinRulesEnforceConfig): Promise<void> {
+  if (c.readOnly) return;
+  try { await c.onHealthy?.(); } catch { c.log("schedule-tick: JOIN RULES WARNING: recovery alert state not cleared; current rules remain enforced"); }
+}
+
+async function boundedRules(c: JoinRulesEnforceConfig): Promise<ReadRulesSuccess | { error: string }> {
+  const now = (c.now ?? Date.now)();
+  const reject = async (reason: string) => {
+    await degraded(c, { reason, usingSnapshot: false });
+    return { error: reason };
+  };
+  if (typeof c.tenantId !== "string" || !c.tenantId) return reject(REASON_TENANT_UNSET);
+  try { joinRulesFilePath(c.stateDir, c.tenantId); } catch { return reject(REASON_TENANT_UNSET); }
+  if (c.keyTenantId === undefined || c.keyTenantId === null) return reject(REASON_TENANT_UNVERIFIED);
+  if (c.keyTenantId !== c.tenantId) return reject(REASON_TENANT_MISMATCH);
+  const read = await readRules(c);
+  if ("stored" in read) {
+    let saved = false;
+    if (!c.readOnly) {
+      try {
+        saveLastValidJoinRules(c.stateDir, c.tenantId, read.stored, now);
+        saved = true;
+      }
+      catch (e) {
+        if (e instanceof JoinRulesSnapshotError && ["primary-changed", "primary-revalidation-failed"].includes(e.code)) {
+          await degraded(c, { tenantId: c.tenantId, reason: "primary-changed", usingSnapshot: false });
+          return { error: "primary changed or became unavailable during snapshot refresh; refusing the stale selection" };
+        }
+        await degraded(c, { tenantId: c.tenantId, reason: "snapshot-write-failed", usingSnapshot: false });
+        c.log("schedule-tick: JOIN RULES WARNING: last-valid snapshot not saved; current primary rules remain enforced"); }
+    }
+    return { ...read, healthy: saved };
+  }
+  if (!read.noFallback) {
+    try {
+      const snapshot = loadLastValidJoinRules(c.stateDir, c.tenantId, now);
+      await degraded(c, { tenantId: c.tenantId, reason: "primary-unavailable", usingSnapshot: true,
+        snapshotValidatedAt: snapshot.validatedAt, snapshotExpiresAt: snapshot.expiresAt });
+      c.log("schedule-tick: JOIN RULES WARNING: primary unavailable; applying validated tenant snapshot within its one-hour lifetime");
+      return { stored: snapshot.stored, snapshot: { validatedAt: snapshot.validatedAt, expiresAt: snapshot.expiresAt } };
+    } catch { /* No trusted unexpired snapshot: refuse, never renew. */ }
+  }
+  await degraded(c, { tenantId: c.tenantId, reason: read.noFallback ? "primary-identity-invalid" : "no-valid-snapshot", usingSnapshot: false });
+  return { error: read.error };
+}
+
 export async function enforceJoinRules(selection: SelectAutoRecordItemsResult, c: JoinRulesEnforceConfig): Promise<SelectAutoRecordItemsResult> {
   const mode = parseJoinRulesEnforce(c.mode);
   if (mode === "off") { warnUnrecognised(c.mode, c.log); return selection; }
@@ -111,7 +177,8 @@ export async function enforceJoinRules(selection: SelectAutoRecordItemsResult, c
   const items = Array.isArray(selection?.toSchedule) ? selection.toSchedule : [];
   const skipped = Array.isArray(selection?.skipped) ? selection.skipped : [];
 
-  const read = typeof c.tenantId !== "string" || c.tenantId === "" ? { error: REASON_TENANT_UNSET }
+  const read = mode === "last-valid" ? await boundedRules(c)
+    : typeof c.tenantId !== "string" || c.tenantId === "" ? { error: REASON_TENANT_UNSET }
     : c.keyTenantId === null ? { error: REASON_TENANT_UNVERIFIED }
     : c.keyTenantId !== undefined && c.keyTenantId !== c.tenantId ? { error: REASON_TENANT_MISMATCH }
     : await readRules(c);
@@ -122,12 +189,18 @@ export async function enforceJoinRules(selection: SelectAutoRecordItemsResult, c
   }
 
   const out = applyJoinRules(selection, read.stored.ruleSet, { state: read.stored.state }, c.io?.evaluate);
-  if (out === selection) return selection;
+  const recover = mode === "last-valid" && "healthy" in read && read.healthy === true;
+  if (out === selection) { if (recover) await healthy(c); return selection; }
   const removed = out.skipped.slice(skipped.length);
   const gone = items.filter((i) => !out.toSchedule.includes(i)); // removed[k] belongs to gone[k] (applyJoinRules appends in order)
   const unevaluable = gone.filter((_, k) => removed[k]?.reason === "rules-unevaluable");
-  if (unevaluable.length === 0) return out;
-  if (mode === "fail-closed") {
+  if (unevaluable.length === 0) { if (recover) await healthy(c); return out; }
+  if (mode === "last-valid") {
+    const snapshot = "snapshot" in read ? read.snapshot : undefined;
+    await degraded(c, { tenantId: c.tenantId, reason: "evaluation-failed", usingSnapshot: !!snapshot,
+      snapshotValidatedAt: snapshot?.validatedAt, snapshotExpiresAt: snapshot?.expiresAt });
+  }
+  if (mode !== "fail-open") {
     warn(`${unevaluable.length} meeting(s) could not be evaluated`, "NOT scheduled this tick");
     return out;
   }

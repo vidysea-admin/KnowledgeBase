@@ -201,3 +201,34 @@ test("the iteration cap stops a graph that never settles", async () => {
   const res = await runGraph({ runner: r.runner, graph: graphOf(f.handlers), lease: claim(r.runner), maxIterations: 2 });
   assert.equal(res.outcome, "error"); assert.equal(res.error!.code, "iteration-cap"); assert.equal(f.calls.length, 2);
 });
+
+test("cap boundaries preserve zero work and require a final planner step after the last stage", async () => {
+  for (const cap of [0, -1, Number.NaN, STAGES.length, STAGES.length + 1]) {
+    const r = rig(), f = fakes(); val(r.runner.submit(SUB));
+    const res = await runGraph({ runner: r.runner, graph: graphOf(f.handlers), lease: claim(r.runner), maxIterations: cap });
+    assert.equal(f.calls.length, cap >= STAGES.length ? STAGES.length : 0);
+    assert.equal(res.outcome, cap > STAGES.length ? "complete" : "error");
+    if (res.outcome === "error") assert.equal(res.error!.code, "iteration-cap");
+  }
+});
+
+test("long retry workflows use the caller cap rather than LangGraph's default recursion ceiling", async () => {
+  const def = { ...DEF, stages: DEF.stages.map(s => s.name === "media" ? { ...s, maxAttempts: 30 } : s) };
+  const r = rig(def); let attempts = 0;
+  const f = fakes({ media: c => ++attempts < 30 ? { kind: "fail", code: "io-error" } : { kind: "ok", outputFingerprint: fp(c.inputFingerprint) } });
+  val(r.runner.submit(SUB));
+  const built = buildGraph(def, f.handlers); assert.ok(built.ok);
+  const res = await runGraph({ runner: r.runner, graph: built.graph, lease: claim(r.runner), maxIterations: 40 });
+  assert.equal(res.outcome, "complete"); assert.equal(attempts, 30);
+  assert.equal(res.ran.length, 34); assert.equal(f.calls.at(-1)!.stage, "index");
+});
+
+test("workflow stage names remain independent of library reserved names", async () => {
+  const names = ["__start__", "__end__", "planner", "stage_0"];
+  const def = { ...DEF, stages: names.map((name, i) => ({ name, deps: i ? [names[i - 1]!] : [], optional: false, maxAttempts: 1, retryable: [] as string[] })) };
+  const r = rig(def), calls: string[] = [];
+  const handlers = Object.fromEntries(names.map(name => [name, () => { calls.push(name); return { kind: "ok" as const, outputFingerprint: fp(name) }; }]));
+  val(r.runner.submit(SUB)); const built = buildGraph(def, handlers); assert.ok(built.ok);
+  const res = await runGraph({ runner: r.runner, graph: built.graph, lease: claim(r.runner) });
+  assert.equal(res.outcome, "complete"); assert.deepEqual(calls, names);
+});

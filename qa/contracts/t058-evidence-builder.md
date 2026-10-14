@@ -1,0 +1,14 @@
+# Contract — t058-evidence-builder
+
+Checker-owned acceptance for the authorized T-058 literal evidence-output foundation. Basis: ARCHITECTURE H3 (turn, speaker, time, session provenance), tenancy rule (auth-derived tenant), the existing Claims/Turns types and root's bounded GO. This contract does not certify AI-generated FAQ answers, executive summaries, decisions, recommendations, production auth, persistence, exports, UI integration, T-056, whole T-058 or catalogue C10/C11/C12.
+
+1. The pure builder accepts an explicit tenant, authorized session scope and selected claims/turns. It makes no provider/network/database calls or writes, and leaves caller input unchanged.
+2. A missing/mismatched tenant on any supplied claim or turn refuses the entire request, including unselected rows. Refusal text does not echo source content. Caller authentication and authorization are required future integration gates.
+3. Only `verified` claims can select excerpts. Missing, needs-review and conflicting claims remain visibly withheld; claim interpretation is never emitted as established fact. Duplicate natural identities cannot be resolved by row order.
+4. Every evidence reference of a selected claim must resolve an actual turn in the explicit authorized session scope. Missing sources, wrong-session references or unusable evidence withhold that whole claim. An optional quote must be a nonempty exact contiguous substring; omitted quotes may use the literal full turn.
+5. Excerpts preserve actual source/turn identity, stable speaker reference, literal quote and finite nonnegative ordered source range. Display labels do not replace stable speaker identity. Document/URL character offsets are distinguished from audio seconds, following the existing source consumer convention.
+6. FAQ, report and meeting-preparation outputs are explicitly labelled evidence drafts. Structured excerpts, withheld reasons and available/partial/unavailable coverage are exposed. Missing or empty sections cannot appear fully ready.
+7. Editable Markdown escapes source HTML and Markdown syntax, maintains multiline quotations as quotations and derives links solely from real session/turn identities. Encoded IDs must roundtrip through the existing SessionDetailPage hash decoder and turn DOM-id convention.
+8. Focused successful and refusal cases pass independently. The actual TOC sample must be consumed without source mutation or unsupported factual invention; immediate structured/Markdown/anchor consumption is demonstrated. The required frozen-contract validator must run, with its empty-registry/vacuous scope disclosed. Verdict binds the submitted cycle and final source bytes.
+
+No filed issue-fix corpus applies to this new seam. No prior PASS on this seam exists at contract creation. Product and live acceptance remain separate gates; scoped success must not change the catalogue or whole-task status.
