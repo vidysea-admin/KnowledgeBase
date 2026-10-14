@@ -1,1 +1,0 @@
-if(process.argv.includes("--cleanup-only")){require("node:fs").writeFileSync("C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\registration-checker-fixtures-GaLngI\\missing.cleanup.json",JSON.stringify(process.argv.slice(2)));process.exitCode=0;}else{process.stdin.resume();process.stdin.on("end",()=>{console.log(JSON.stringify({event:"progress",status:"submitted"}));});}

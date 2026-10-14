@@ -41,6 +41,7 @@ a client of that API — with the long-range goal of beating top human counsello
   - `packages/ingest/`
   - `packages/meeting-bot/`
 - `qa/`
+  - `qa/artifacts/`
   - `qa/audits/`
   - `qa/briefs/`
   - `qa/checkpoints/`
@@ -110,6 +111,7 @@ a client of that API — with the long-range goal of beating top human counsello
 | watch_reports | _id, tenantId, runAt, mode, digestPath | no |
 | watch_state | _id, tenantId, sourceType, sourceId, status, seenAt | no |
 | watched_sources | _id, tenantId, url, reputationTier, checkIntervalHours, active | no |
+| whatsapp_candidates | _id, tenantId, sourceId, groupJid, sessionId, kind, text, contentHash, evidence, flags, status, createdAt | yes |
 
 ## Recent feature events (last 20)
 
