@@ -34,9 +34,9 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); localStorage.clear(); });
 test("topic profile shows claim, quote, timestamp and exact source link", async () => {
   route(); mount("/knowledge/profiles?tab=topics&id=topic%3Astudy-abroad");
   await screen.findByRole("article", { name: "Topic profile" });
-  expect(await screen.findByText("Apply to three universities before March.")).toBeInTheDocument();
-  expect(screen.getByText("Deadline is March · verified")).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "Open source turn" })).toHaveAttribute("href", "/sessions/s1#turn-t1");
+  expect((await screen.findAllByText("Apply to three universities before March.")).length).toBe(2);
+  expect(screen.getByText("Claim (verified): Deadline is March")).toBeInTheDocument();
+  expect(screen.getAllByRole("link", { name: "Open source turn" })[0]).toHaveAttribute("href", "/sessions/s1#turn-t1");
   expect(screen.getByText(/Inferred discussed/)).toHaveTextContent("confidence 0.60");
 });
 test("speaker profile never certifies identity or role", async () => {

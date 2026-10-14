@@ -22,9 +22,8 @@ export function ProfileDetail({ profile, tab, sessions, claimsNote }: { profile:
     {!profile.sessions.length && <p>No session could be linked unambiguously.</p>}
     <ul>{profile.sessions.slice(0, LIMIT).map(s => <li key={s._id}><Link to={sessionHref(s._id)}>{s.title || "Untitled session"}</Link> · {s.date.slice(0, 10) || "date unavailable"}</li>)}</ul>
     {!speaker && <><h3>Claims tagged with this topic</h3>
-      {claimsNote ? <p role="status">{claimsNote}</p> : !profile.claims.length ? <p>No claims are tagged with this topic id (see API gap: topic tags are tenant-namespaced).</p> :
-        <ul>{profile.claims.slice(0, LIMIT).map(c => <li key={c._id}><p>{c.text} · {c.status}{c.confidence !== undefined && ` · confidence ${c.confidence.toFixed(2)}`}</p>
-          {c.evidence.map((e, i) => <p key={i}><Link to={sessionHref(e.sessionId, e.turnId)}>{e.sessionTitle ?? e.sessionId}: turn {e.turnId}</Link></p>)}</li>)}</ul>}</>}
+      {claimsNote && <p role="status">{claimsNote}</p>}
+      {!profile.claims.length ? <p>No claims are tagged with this topic.</p> : <><p>{profile.claims.length} tagged claims.</p><ProfileEvidenceList refs={profile.claimEvidence} titles={titles} /></>}</>}
     <h3>Evidence ({profile.evidence.length})</h3>
     {profile.unresolvedEvidence > 0 && <p>{profile.unresolvedEvidence} evidence references were withheld because their session could not be determined.</p>}
     <ProfileEvidenceList refs={profile.evidence} titles={titles} />

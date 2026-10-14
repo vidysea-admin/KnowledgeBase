@@ -21,7 +21,7 @@ export async function loadQuotes(apiKey: string, refs: EvidenceRef[]) {
         quotes.set(`${id}\u0000${t._id}`, { text: t.text.slice(0, QUOTE_MAX_CHARS), clipped: t.text.length > QUOTE_MAX_CHARS, speaker: t.speakerLabel ?? null, tStart: t.tStart, tEnd: t.tEnd });
     } catch { failed.add(id); }
   }));
-  return { quotes, failed, skippedSessions: ids.length - chosen.length };
+  return { quotes, failed, skippedSessions: ids.length - chosen.length, skippedIds: new Set(ids.slice(QUOTE_SESSION_LIMIT)) };
 }
 
 /** All claims in bounded pages (API caps limit at 100, offset at 10000). */

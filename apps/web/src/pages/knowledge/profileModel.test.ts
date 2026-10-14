@@ -26,9 +26,10 @@ test("conflicting or unknown ownership withholds evidence; only the single known
   expect(p.evidence[0]).toMatchObject({ inferred: true, confidence: 0.6, origin: "graph_edges", tStart: 5 });
   expect(owningSession(graph, new Set(["s1"]), graph.edges[1]!, graph.edges[1]!.evidence![0])).toBeNull();
 });
-test("topic claims match by exact node id only; speakers get no claims", () => {
+test("topic claims match by slug after last colon (tenant-namespaced); speakers get no claims", () => {
   expect(buildProfile(sessions, graph, [claim(["topic:study-abroad"])], "topic:study-abroad", ["topic"])!.claims).toHaveLength(1);
-  expect(buildProfile(sessions, graph, [claim(["tenant:topic:study-abroad"])], "topic:study-abroad", ["topic"])!.claims).toHaveLength(0);
+  expect(buildProfile(sessions, graph, [claim(["toc:study-abroad"])], "topic:study-abroad", ["topic"])!.claims).toHaveLength(1);
+  expect(buildProfile(sessions, graph, [claim(["toc:study-abroad-x"])], "topic:study-abroad", ["topic"])!.claims).toHaveLength(0);
   expect(buildProfile(sessions, graph, [claim(["person:a"])], "person:a", ["person"])!.claims).toHaveLength(0);
 });
 test("wrong kind or missing node returns null; sessions link only when unambiguous", () => {

@@ -25,9 +25,12 @@ export function ProfileHighlights({ sessionId }: { sessionId: string }): React.R
   const cur = state && state.key === apiKey && state.id === sessionId ? state : null;
   if (!cur) return <p role="status">Loading highlights…</p>;
   if (cur.error || !cur.data) return <p role="alert">{cur.error}</p>;
-  const { notes, claims } = cur.data;
-  if (!notes.length && !claims.length) return <p>No highlights were published for this session.</p>;
+  const { notes } = cur.data;
+  const claims = cur.data.claims.filter(c => Array.isArray(c.evidence) && c.evidence.length > 0);
+  const hidden = cur.data.claims.length - claims.length;
+  if (!notes.length && !claims.length && !hidden) return <p>No highlights were published for this session.</p>;
   return <div style={{ overflowWrap: "anywhere" }}>
+    {hidden > 0 && <p role="status">{hidden} claims are hidden: evidence unavailable.</p>}
     {notes.map(n => <article key={n.id} className="card"><h3>{n.kind}</h3><p>{n.text}</p><p>Unverified generated note</p><Refs refs={n.evidence} /></article>)}
     {claims.map(c => <article key={c._id} className="card"><h3>Claim · {c.status}</h3><p>{c.text}</p><Refs refs={c.evidence} /></article>)}
   </div>;
