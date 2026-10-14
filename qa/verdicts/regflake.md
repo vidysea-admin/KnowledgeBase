@@ -14,3 +14,20 @@ Not done: full 7-case run and the 2 mutations (a FAIL already blocks; the base i
 
 ## ISSUES-WRITTEN
 ISS-REGFLAKE-001 (qa/issues.REGFLAKE.jsonl)
+
+## Cycle 1
+
+**VERDICT:** PASS
+**Cycle checked:** 1
+
+## EXPLANATION
+Commit 0d9d6ccd touches only test_sb_join_ownership.py and the manifest; production code unchanged, no ledger seeded or faked, no assertion weakened (the only assert changes add attempt_log to failure messages).
+- Retry forced: temp copy of the test with attempt-0 timeout cut to 2 s (stall before driver-ready, real Chrome). Result: 1 passed; tmp_path held profile-0 and profile-1, final main.out showed driver-ready then registration-result. Attempt 2 recovered on a fresh profile, no rmtree anywhere.
+- Real failure after driver-ready still fails: submitSelector mutated to a missing element, test FAILED on the first attempt, only profile-0 created (not retried).
+- Side note: an unreachable-host mutation fails before driver-ready, so it is retried 4 times and then fails with all 4 attempts' rc/stdout/stderr in the message (error surfacing confirmed).
+- Cleanup: stalled attempts are reaped by --cleanup-only; per-attempt profile dirs are deliberately kept under pytest tmp_path (bounded: pytest retains 3 basetemps; at most 4 profiles per case). No Chrome left (0 after every run).
+- Runs (second independent re-run): wrong-action 5/5 pass (12-19 s each); full file 52 passed / 0 failed in 626.8 s (box was loaded; earlier run 81.8 s). Retry mutation re-confirmed: 1 passed, profile-0 and profile-1 both present, driver-ready then registration-result; post-driver-ready mutation FAILED with profile-0 only.
+- Mutation copies were uniquely named, deleted; test file hash 3899bd95 == HEAD blob; worktree clean of harness files.
+
+## ISSUES-WRITTEN
+none (ISS-REGFLAKE-001 closed)

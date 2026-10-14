@@ -2,7 +2,7 @@
 
 **Contract:** none (test-harness hardening only; no production code changed).
 **Fix cycle:** 1
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Date:** 2026-10-13
 **Files:** `packages/meeting-bot/py/test_sb_join_ownership.py` (`test_registration_native_same_host_other_port_confinement`, 7 real-headed-Chrome cases)
 
