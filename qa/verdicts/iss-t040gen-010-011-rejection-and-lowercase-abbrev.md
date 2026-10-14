@@ -1,32 +1,23 @@
 # Verdict: iss-t040gen-010-011-rejection-and-lowercase-abbrev
 
-VERDICT: FAIL
-Cycle checked: 0
-Commit checked: 6f0e88a (lane/t040reject)
-Scope: `packages/index/src/pipeline/notes/sentence-span.ts` + `grounded-notes.test.ts`; the `dropUnverified` option stays off by default.
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: af035e7d (lane/t040reject, on merge 9e0be9b8)
+Scope: `sentence-span.ts` (`tailToStrongMark` + extended no-break rule), tests in `grounded-notes-sentence-span.test.ts`, one constant in `judge-rules.test.ts`. `dropUnverified` stays OFF by default.
 
 ## EXPLANATION
 
-ISS-T040GEN-011 is fixed. ISS-T040GEN-010's recorded reproduction is fixed, but the stated safety property of its rule is false: a meaning-reversed quote still ships when the marker sits AFTER the unlisted abbreviation. One medium defect, filed as ISS-T040GEN-012; -010 and -011 stay open until it is closed.
+ISS-T040GEN-010, -011 and -012 are fixed and verified. One new medium defect, ISS-T040GEN-013 (a dead assertion the unit introduced in judge-rules.test.ts), is filed; it does not reopen the three.
 
-1. Fixture changes (each diff hunk read). None weakens a safety test; all strengthen or keep the same assertion, and no assertion was deleted.
-   - "lakh. Fees" -> "rupees. Fees", "recommend it" -> "recommend waiting", "it's done" -> "it's finished", "I don't know" -> "I don't remember", "No. 5 is good" -> "excellent", "I said no" -> "I said yes": these are positive "a real break still lets the next sentence be judged alone" cases. The old words are now merged (<=4 letters, marker on the left), which fails closed. Same assertion, longer word.
-   - 007b "Yes, apply early." / "Sure." / "Yes, absolutely." used to ship; now assert `unconfirmed-by-short-reply`. Stricter, not weaker.
-   - 009 last case now uses a 5+ word question, because the short follow-up rule drops the old shape. Only the recall control changed; the question-is-not-evidence assertions are untouched.
-   - No meaning-reversal case now passes because of a fixture change.
+1. D-015 ledger replays, re-run by me (own probe on `sentenceSpanProblem(text, s, s+len)` with the ledger rows' verbatim cases, null = ships):
+   - ISS-T040GEN-010: 1/1 refused (`starts-mid-sentence`); plus the ledger's own elided variants univ./mgmt./pg.: 3/3 refused.
+   - ISS-T040GEN-011: 3/3 refused (`retracted-by-reply`).
+   - ISS-T040GEN-012: 3/3 refused (`ends-mid-sentence`). The maker's "2/2 + elided third" is faithful: the ledger elides the third as "... pvt. Colleges only if you apply early."; the cycle-0 verdict gives it as "Admission is open for pvt. Colleges only if you apply early." quote "Admission is open for pvt.", which I replayed.
+   - Control (no marker either side) still breaks, recall rule intact.
+2. Merge 9e0be9b8. `git diff 9e0be9b8^2 9e0be9b8` (main's side vs merge) shows only additions plus the signature changes of `sentenceSpanProblem`/`lexicalNegationProblem` and the SpanProblem union; main's `judged` option, the split-out `lexicalNegationProblem` and `resolveEvidence`'s judged path are intact, and `shortFollowWords` is threaded through `opts`. grounded-notes.test.ts is byte-identical to main's. In the moved test file, removed lines are only the lane's own fixture rewordings. Nothing from main is lost. 30/30 in the two grounded-notes files, judge-rules 9/9.
+3. judge-rules.test.ts. The value 4 is correct and legitimate: running it prints `TOTAL: 4 shipped before` (-010 0/4, -012 0/3 now refused structurally, -011 3/3 caught by the rules, -009 1/6); the 7 that left are the abbreviation cases. BUT the edit wrote a literal backslash-n inside a `//` comment, so `assert.equal(laxBefore, 4, ...)` is dead code and the pinned count is no longer asserted at all. That is a weakening, though only of the count pin: the per-case assertion in the loop still runs. Filed as ISS-T040GEN-013.
+4. Recall (for Umesh). Option ON: sentence recall 71.9% (base) -> 55.7% (cycle 0) -> 51.4% (cycle 1), clause 60.5% -> 49.1%, as reported by the maker; I did not re-measure. OFF is unchanged: `resolveEvidence`/`sentenceSpanProblem` are reachable only through the `dropUnverified` paths (drop-mode.ts, claims.ts `dropped ?`), and the full non-drop suites are green. The option is not wired live. Not a FAIL; the 71% figure no longer holds.
+5. Suites: packages/index 673/673 (0 fail); apps/api 871/871 (D2_FIXTURE_PYTHON set); `tsc --noEmit -p packages/index` exit 0; `lint-loc --all` exit 0.
+6. Mutations (own harness in the worktree, per-mutation byte backup, restore in `finally`, 240 s SIGKILL timeout, applied-hash checked, deleted after; 3 test files each): M1 drop the new tail clause KILLED (2); M2 tail returns "" KILLED (2); M3 SHORT_TOKEN_LETTERS 4->3 KILLED (2); M4 `||`->`&&` KILLED (3); M6 tail scan stops at first space KILLED (2); M5 tail slice drops its last char SURVIVED (a marker that is the final character of the tail is still matched by the shorter "no"/"not" prefix, so near-equivalent; low). Final `git hash-object sentence-span.ts` 49cee283 == `git rev-parse HEAD:` 49cee283.
 
-2. ISS-T040GEN-010 probes (my own, all word- and mark-aligned sub-quotes). Marker on the left (the recorded repro) is fixed: `pvt./univ./mgmt./pg./asst./qtr.` tails return `starts-mid-sentence`. Marker on the right is NOT:
-   - "Admission is open for pvt. Colleges do not take March applications." -> the quote "Admission is open for pvt." ships (null). The real sentence negates it. Meaning reversed.
-   - "Admission is open for pvt. Colleges only if you apply early." and "Seats are open in pvt. Colleges but not in govt ones." -> the left fragment ships the same way.
-   - "pvt. Colleges do not accept March applications." and "We pvt. Colleges accept March applications, not." ship only fragments that carry or omit nothing contradictory ("pvt.", or the full tail including its own "not"), so those variants are harmless.
-   Cause: the no-break test looks only at the text LEFT of the dot. The manifest claims "with no marker on the left a wrong break cannot hide a negation"; that is true for the right-hand quote but not for the left-hand one, whose omitted tail now sits in the next "sentence" and is never checked by `omits-qualifier`. This hole pre-dates the unit (HEAD behaves the same), but the unit's stated fix for -010 and its stated safety argument cover it. Direction: also keep the break merged when a marker occurs between the dot and the next real boundary (a lookahead using the same `MARKER`); measure the recall cost against the 11.4 points.
-
-3. ISS-T040GEN-011 probes: "Fees are 1000 rupees. Wrong." / "Ignore that." / "Not for freshers at this college though." / a 12-word "Wrong figure ..." / "Nope, I misquoted ..., sorry." -> all dropped (`retracted-by-reply`); a clause quote followed by ", no it is 1200" or ", ignore that" is dropped; "Hmm, wrong." (3 words) is dropped by the short-follow rule. The maker's replays pass. Still shipping, as the manifest admits (cue-vocabulary gap, not a regression): a >5-word rejection that does not open with a cue word ("Hold on, incorrect, it is 1200 for everyone here.", "Ignoring that figure, it is 1200 ...", "Hmm, no, 1200 ...", "The figure I gave you ... was mistaken entirely."). Note only; this class is open-ended by construction.
-
-4. Recall, for the owner. The option is off by default and not wired to the live runner, so nothing live changes. With it ON, cumulative whole-sentence quote recall on data/toc-migrated falls from 71.9% (HEAD) to about 55.7%, and clause quotes from 60.5% to 52.1% (-16.2 and -8.4 points; I did not re-measure, the manifest's numbers are the maker's and its HEAD baseline matched cycle 3). Roughly 4 in 9 whole-sentence quotes are now refused. The cost is stated honestly in the manifest; it is the price of failing closed, and the 71% figure quoted at merge no longer holds.
-
-5. Counts re-run by me: grounded-notes 28/28; all `packages/index/src/pipeline` tests 441/441; `tsc --noEmit -p packages/index` exit 0. No LLM, Mongo or network.
-
-6. Mutations (own harness inside the worktree, per-mutation byte backup, hash checked): A drop the retraction-cue check (`retractsPrevious` line) hash a72e7366 -> 27/28, KILLED. B make -010 unconditional-break (remove the marker-left early return) hash 06d81d80 -> 27/28, KILLED. Restored; `git hash-object sentence-span.ts` b1323c8a == `git rev-parse HEAD:` b1323c8a. Harness and probe deleted; worktree and main trees clean (apart from this verdict and the ledger row).
-
-ISSUES-WRITTEN: ISS-T040GEN-012
+ISSUES-WRITTEN: ISS-T040GEN-013
