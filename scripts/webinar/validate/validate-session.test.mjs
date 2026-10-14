@@ -143,7 +143,7 @@ test("unsafe sessionId is refused", async () => {
 // CLI argument parsing (webinarfix): a bare session id used to be dropped when --root was absent, so the tool always printed usage.
 const DEF = resolve("default-root");
 test("parseCliArgs: bare id, id with --root (either order), --dry-run, --accept-partial", () => {
-  assert.deepEqual(parseCliArgs(["s1"], DEF), { sessionId: "s1", root: DEF, rootMissing: false, acceptPartial: false, dryRun: false });
+  assert.deepEqual(parseCliArgs(["s1"], DEF), { sessionId: "s1", root: DEF, rootMissing: false, error: undefined, acceptPartial: false, dryRun: false });
   const after = parseCliArgs(["s1", "--root", "R"], DEF);
   assert.equal(after.sessionId, "s1"); assert.equal(after.root, resolve("R"));
   const before = parseCliArgs(["--root", "R", "s1"], DEF);
@@ -160,6 +160,12 @@ test("parseCliArgs: no id or a dangling --root is a usage error", () => {
   assert.equal(parseCliArgs(["s1", "--root"], DEF).rootMissing, true);
   assert.equal(parseCliArgs(["s1", "--root", "--dry-run"], DEF).rootMissing, true);
 });
+test("parseCliArgs: a second positional id or a repeated --root is an error, not silently ignored", () => {
+  assert.match(parseCliArgs(["s1", "s2"], DEF).error, /more than one session id.*s1, s2/);
+  assert.match(parseCliArgs(["s1", "--root", "A", "s2"], DEF).error, /more than one session id/);
+  assert.match(parseCliArgs(["s1", "--root", "A", "--root", "B"], DEF).error, /--root given more than once/);
+  assert.equal(parseCliArgs(["s1", "--root", "A"], DEF).error, undefined);
+});
 test("CLI: a bare session id reaches validation instead of printing usage (end to end)", () => {
   const script = fileURLToPath(new URL("./validate-session.mjs", import.meta.url));
   const empty = mkdtempSync(join(tmpdir(), "vs-cli-"));
@@ -170,5 +176,9 @@ test("CLI: a bare session id reaches validation instead of printing usage (end t
       assert.match(r.stderr, /validation could not run/, argv.join(" "));
     }
     assert.match(spawnSync(process.execPath, ["--import", "tsx", script], { encoding: "utf8", timeout: 60000 }).stderr, /usage:/);
+    for (const [argv, msg] of [[["a", "b"], /more than one session id/], [["a", "--root", empty, "--root", empty], /--root given more than once/]]) {
+      const r = spawnSync(process.execPath, ["--import", "tsx", script, ...argv], { encoding: "utf8", timeout: 60000 });
+      assert.notEqual(r.status, 0); assert.match(r.stderr, msg); assert.doesNotMatch(r.stderr, /validation could not run/);
+    }
   } finally { rmSync(empty, { recursive: true, force: true }); }
 });

@@ -3,7 +3,9 @@
 // no database, network or browser is touched (fetch is replaced; the other two paths are asserted at source level).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync, mkdtempSync} from 'node:fs';
+import {readFileSync, mkdtempSync, mkdirSync, writeFileSync, rmSync} from 'node:fs';
+import {createServer} from 'node:net';
+import {spawn} from 'node:child_process';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -92,4 +94,33 @@ test('join-rules-api-host.ts connects through requireDatabaseName() with no MONG
   assert.match(s, /import \{ requireDatabaseName \} from "\.\.\/\.\.\/apps\/api\/src\/db-name\.js";/);
   assert.match(s, /await connect\(process\.env\.MONGODB_URL \?\? "mongodb:\/\/localhost:27017", requireDatabaseName\(\)\);/);
   assert.doesNotMatch(s, /MONGODB_DB|["']lkb["']/);
+});
+
+// ISS-WEBINARFIX-001: behavioural, kills "guard wrapped in try/catch" and "raw MongoClient opened before the guard". The real script is
+// run against a protected work DB with a local TCP listener standing in for Mongo; ANY connection to it is a failed guard.
+test('sync-session.mjs with MONGO_WORK_DB=lkb exits non-zero with the protected-DB refusal and makes NO Mongo connection', async () => {
+  const sid = `zz-dbguard-${process.pid}-${Date.now()}`, dir = join(root, 'data', 'toc-migrated', sid);
+  const attempts = [];
+  const server = createServer(sock => { attempts.push(sock.remoteAddress); sock.destroy(); });
+  await new Promise(r => server.listen(0, '127.0.0.1', r));
+  try {
+    mkdirSync(dir, {recursive: true});
+    writeFileSync(join(dir, 'source.json'), JSON.stringify({_id: `${sid}-src`, tenantId: 't-guard', title: 'guard fixture', createdAt: '2026-10-14T00:00:00Z'}));
+    writeFileSync(join(dir, 'turns.json'), JSON.stringify([{_id: `${sid}-t001`, tenantId: 't-guard', sessionId: sid, speakerRef: 'spk:0', tStart: 0, tEnd: 5, text: 'hello'}]));
+    for (const work of ['lkb', 'LKB', 'global_university_db']) {
+      const env = {...process.env, MONGO_WORK_DB: work, MONGODB_URL: `mongodb://127.0.0.1:${server.address().port}/?serverSelectionTimeoutMS=1500&connectTimeoutMS=1500`};
+      delete env.LKB_ALLOW_STAGING;
+      const child = spawn(process.execPath, ['--import', 'tsx', join(root, 'scripts/webinar/sync-session.mjs'), sid], {env, cwd: root});
+      let err = '';
+      child.stderr.on('data', d => { err += d; });
+      child.stdout.resume();
+      const code = await new Promise(r => { const t = setTimeout(() => child.kill(), 60000); child.on('close', c => { clearTimeout(t); r(c); }); });
+      assert.notEqual(code, 0, `${work}: must exit non-zero`);
+      assert.match(err, /MONGO_WORK_DB must name an isolated work database; production writes refused/, `${work}: ${err.slice(0, 300)}`);
+      assert.deepEqual(attempts, [], `${work}: a Mongo connection was attempted`);
+    }
+  } finally {
+    server.close();
+    rmSync(dir, {recursive: true, force: true});
+  }
 });

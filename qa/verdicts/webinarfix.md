@@ -21,3 +21,18 @@ Claim 3 confirmed: generated .ts files are committed, so the failure is a loader
 
 ## Suite
 Webinar tests under tsx: 137 pass / 0 fail; .ts tests 44 pass / 0 fail. lint-loc --all OK (10 stages, 0 failed). lint-dirsize OK (164 dirs). No Mongo connection was made.
+
+---
+
+# Cycle 1
+
+**Cycle checked:** 1
+**Commit checked:** bf58a6e8 (main merged at ce85fad9)
+**VERDICT:** PASS
+ISSUES-WRITTEN: none
+
+- ISS-WEBINARFIX-001: the new behavioural test (real sync-session, TCP listener, MONGO_WORK_DB lkb/LKB/global_university_db) killed both survivors, try/catch-wrapped guard and raw MongoClient before the guard, plus guard removed. A control mutant doing a raw net.connect to the listener was caught via the "connection was attempted" assertion, so the listener does detect any connection. Each mutation was restored with HEAD-hash identity verified. Unmutated: pass 8 / fail 0. Fixture dir cleaned up.
+- ISS-WEBINARFIX-002: test:webinar globs *.test.ts; 183 tests / 183 pass / 0 fail, also with the quoted-glob form.
+- ISS-WEBINARFIX-003: two ids and a repeated --root print `error:` plus usage and exit 1; a lone unknown flag, a dangling --root and `../../x` still exit 1.
+- lint-loc OK (0 failed); lint-dirsize OK (164 dirs). No Mongo connection was made.
+- The three issues are closed in qa/issues.webinarfix.jsonl and the manifest is flipped to checked-PASS.
