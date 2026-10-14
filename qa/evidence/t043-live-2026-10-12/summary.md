@@ -199,3 +199,21 @@ Note: in-focus-3 (cited for Creative Futures) is not among the 9 embedded sessio
 - Server stopped; API key deleted (api_keys = 0); temp wrapper/driver scripts removed from apps/api; main tree `git status` clean; nothing pushed; no tracked source edited.
 - A stray untenanted `tree_index` doc from my first attempt was deleted; lkb_staging holds one `tree_index` root (tenant:toc, 19 sessions).
 - `lkb` was never connected to.
+
+## Follow-up 2026-10-13: embedding retry (lane t043live2) - STILL 751 of 1905
+
+Env: `LKB_ALLOW_STAGING=lkb_staging MONGO_WORK_DB=lkb_staging MONGODB_DB=lkb_staging`; DB name asserted `lkb_staging` (never `lkb`). No secrets recorded.
+
+- State before: lkb_staging `chunks` = 751, all with vectors, in 9 sessions (visa-blueprint-part2 237, funding-dreams 54, xavier 40, atlas 4, in-focus-1 28, in-focus-2 39, inside-the-uc 35, beyond-black-robes 86, creative-futures 228). 12 sessions (1154 chunks) have none. Dry run again plans 1905.
+- `node scripts/backfill.mjs chunks --legacy-unbound --session <id>` now connects with NO "Mongo not connected" error and no wrapper was needed. The only failure is the provider.
+- Result: 3 attempts (2026-09-24-in-focus, 27 chunks; atlas-skilltech; repeat) all failed, 0 written, chunks unchanged at 751. Exact error: `gemini embed error 429 RESOURCE_EXHAUSTED: Quota exceeded for metric generativelanguage.googleapis.com/embed_content_free_tier_requests, limit: 1000 (quotaId EmbedContentRequestsPerDayPerUserPerProjectPerModel-FreeTier, model gemini-embedding-1.0). Please retry in 22h4m` (retryDelay about 79.5ks). The daily window has NOT reset; it resets roughly 22h after these calls. Ollama fallback: 404 `nomic-embed-text` not found.
+- Side check: single/2-item raw `batchEmbedContents` calls with the same key succeeded (HTTP 200), so a few units of quota remain but not enough for a session batch; no further attempts made (stop-on-429 rule).
+- Ollama Cloud (OLLAMA_API_KEY): `GET https://ollama.com/api/tags` returns 200 with 18 models, none an embedding model (mistral-large-3, nemotron-3-*, glm-5.2/5.3, kimi-k2.6/k2.7-code/k3, minimax-m2.7/m3, mistral-large-4, gemma4:31b, deepseek-v4-*, gpt-oss:20b/120b, glm-5.3-flash). `/api/embed` with `nomic-embed-text` or `embeddinggemma` returned "not found" / "unauthorized". So no Ollama Cloud embedding model is available with this key. Routing config not changed.
+- Step 2 (vector-arm /ask rerun) NOT done: it needs all 1905 chunks embedded. Still to do: after reset, embed the 12 sessions (1154 chunks; fits under 1000/day only across two days, or use a billed key at about USD 0.06), then re-run 3-5 /ask questions excluding visa-blueprint t141 and ucas t114.
+- Cost today: USD 0. Servers: none started. No temp wrapper needed; scratchpad helper scripts only.
+
+## Follow-up 2 2026-10-13 (main tree, after dbguard2 merge): still 751 of 1905
+
+DB asserted `lkb_staging` (name only, never `lkb`). Guarded CLI `node scripts/backfill.mjs chunks --legacy-unbound --session 2026-07-22-uniaccess-cept-university` ran with no "Mongo not connected" (dbguard2 fix works) and no wrapper. A key probe returned 200 earlier, but the real batch got `429 RESOURCE_EXHAUSTED` (embed_content_free_tier_requests, daily limit 1000, "Please retry in 18h37m"). Retried 3 times with 20s/40s/80s backoff: 429 each time, 0 written, chunks unchanged at 751. Stopped per the rule; later sessions not attempted.
+Note: the remaining 1154 chunks exceed the 1000/day free quota even after reset, so finishing needs two days or a billed key (about USD 0.06).
+Step 2 (5 vector-arm /ask questions) NOT run; needs 1905 embedded. Cost today USD 0. No servers started; no temp files left. Nothing pushed.
