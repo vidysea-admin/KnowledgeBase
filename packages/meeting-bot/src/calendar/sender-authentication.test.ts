@@ -85,3 +85,33 @@ test("reconciliation accepts the verdict key on a gmail candidate and refuses a 
   assert.equal(reconcileWebinarSources({ ...input, candidates: [{ ...row, senderAuthenticated: true }] }).candidates.length, 1);
   assert.throws(() => reconcileWebinarSources({ ...input, candidates: [{ ...row, senderAuthenticated: "yes" as unknown as boolean }] }));
 });
+
+// ISS-376 (Approver ruling 1, hybrid): the row's own recorded reproductions, replayed verbatim in everyWebinar mode.
+const everyWebinarRun = (c: Record<string, unknown>) => selectAutoRecordItems({ everyWebinar: true,
+  candidates: [{ id: "c376", senderEmail: "attacker@evil.com", senderDomain: "evil.com", status: "pending", title: "Webinar: T",
+    meetingUrl: "https://zoom.us/j/123456789", startTime: "2030-01-01T10:00:00Z", endTime: "2030-01-01T11:00:00Z", ...c } as AutoRecordCandidateInput],
+  now: "2030-01-01T09:58:00Z", leadMinutes: 5, trustedSenders: cfg, calendarEvents: [], alreadyScheduled: [] });
+
+test("ISS-376 recorded reproductions (everyWebinar): 1 failed-auth refused, 2 unknown needs approval, 3 authenticated/approved scheduled, 4 rejected refused", () => {
+  let held = 0;
+  const failed = everyWebinarRun({ senderAuthenticated: false });
+  assert.equal(failed.toSchedule.length, 0); assert.equal(failed.skipped[0]?.reason, "untrusted-sender"); held++; // (1)
+  const unknown = everyWebinarRun({ senderAuthenticated: undefined });
+  assert.equal(unknown.toSchedule.length, 0); assert.equal(unknown.skipped[0]?.reason, "needs-review");
+  assert.match(unknown.skipped[0]?.detail ?? "", /needs approval/); held++; // (2) visible, never silent
+  assert.equal(everyWebinarRun({ senderAuthenticated: true }).toSchedule.length, 1); held++; // (3a)
+  for (const senderAuthenticated of [undefined, false]) assert.equal(everyWebinarRun({ status: "approved", senderAuthenticated }).toSchedule.length, 1);
+  held++; // (3b) a human approval is the promotion path
+  assert.equal(everyWebinarRun({ status: "rejected", senderAuthenticated: true }).toSchedule.length, 0); held++; // (4)
+  assert.equal(everyWebinarRun({ status: "auto_approved", senderAuthenticated: false }).toSchedule.length, 0);
+  assert.equal(everyWebinarRun({ status: "auto_approved", senderAuthenticated: true }).toSchedule.length, 1);
+  console.log(`ISS-376: ${held}/5 recorded reproductions behave as recorded`);
+  assert.equal(held, 5);
+});
+
+test("ISS-376: calendar-sourced items stay schedulable in everyWebinar mode", () => {
+  const r = selectAutoRecordItems({ everyWebinar: true, candidates: [], now: "2030-01-01T09:58:00Z", leadMinutes: 5, trustedSenders: cfg, alreadyScheduled: [],
+    calendarEvents: [{ id: "e376", title: "Webinar: T", startTime: "2030-01-01T10:00:00Z", endTime: "2030-01-01T11:00:00Z",
+      meetingUrl: "https://meet.google.com/abc-defg-hij", organizer: "anyone@evil.com" }] });
+  assert.equal(r.toSchedule.length, 1);
+});

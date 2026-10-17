@@ -225,6 +225,14 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput, options
       skipped.push({ ...base, reason: "unverified-link-source" });
       continue;
     }
+    // ISS-376 (Approver ruling 1, hybrid): record-every-webinar still skips the sender allowlist, but a Gmail candidate nobody has
+    // approved needs an authenticated sender. Explicit authentication failure is refused; an unknown (unreported) one waits for a human.
+    if (input.everyWebinar && item.candidate && !item.preTrusted && !item.senderVerified) {
+      skipped.push(item.candidate.senderAuthenticated === false
+        ? { ...base, reason: "untrusted-sender", detail: "sender authentication failed (ISS-376)" }
+        : { ...base, reason: "needs-review", detail: "needs approval: sender authentication unknown (ISS-376)" });
+      continue;
+    }
     const candidateTrust = !input.everyWebinar && item.candidate && item.senderVerified && !item.preTrusted
       ? options.trustedSendersForCandidate?.(item.candidate) : undefined;
     if (!input.everyWebinar && !item.preTrusted && !(item.senderVerified && isTrustedSender(item.sender, item.senderDomain, candidateTrust ?? trustedSenders))) {
