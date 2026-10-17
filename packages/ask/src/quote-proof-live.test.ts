@@ -77,3 +77,9 @@ test("one stale quote is dropped, the valid sibling stays cited", () => {
   assert.equal(out[0]!.summary, JSON.stringify([good]));
   assert.equal(h.excludedTurns!.length, 1);
 });
+test("consistently shifted byte offsets with correct char offsets and hashes are refused", () => {
+  const q = build(T, 0, 21); q.byteStart += 1; q.byteEnd += 1;
+  const h = hydration(q, { text: T });
+  assert.deepEqual(validateHydration(h, [orig]), []);
+  assert.match(h.excludedTurns![0]!.reason, /^quote-proof-stale: byte offsets differ/);
+});
