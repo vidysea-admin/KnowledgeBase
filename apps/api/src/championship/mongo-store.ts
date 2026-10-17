@@ -1,12 +1,17 @@
 import type { Db } from "mongodb";
 import type { EvalRuns } from "@lkb/core";
 import type { ChampionshipStore } from "../routes/championship/championship.js";
-import { createMongoEvidenceVerifier } from "../answer-policy/answer-evidence.js";
+import type { VerifyEvidence } from "../answer-policy/answer-records.js";
 import { assertChampionshipBank, ChampionshipError, type ChampionshipEvent } from "./model.js";
 import { championshipReport } from "./runtime.js";
 
+export interface MongoChampionshipStoreOptions {
+  /** Required: the composed saved-answer verifier (createComposedEvidenceVerifier). No bare default exists. */
+  verifyEvidence: VerifyEvidence;
+}
 /** Central migration installs schema validator and unique trial index. This adapter never mutates schema/indexes. */
-export function createMongoChampionshipStore(db: Db): ChampionshipStore {
+export function createMongoChampionshipStore(db: Db, options: MongoChampionshipStoreOptions): ChampionshipStore {
+  if (typeof options?.verifyEvidence !== "function") throw new TypeError("createMongoChampionshipStore requires the composed evidence verifier");
   const events = db.collection<ChampionshipEvent>("championship_events");
   async function writable() {
     const [options, indexes] = await Promise.all([events.options(), events.listIndexes().toArray()]).catch(() => {
@@ -31,7 +36,7 @@ export function createMongoChampionshipStore(db: Db): ChampionshipStore {
       judges: e.judges, rubric: e.rubric, reviewReference: e.reviewReference, bankDigest: e.bankDigest, createdAt: e.createdAt, evidenceStatus: e.evidenceStatus });
   }
   return {
-    verifyEvidence: createMongoEvidenceVerifier(db),
+    verifyEvidence: options.verifyEvidence,
     async create(tenantId, event) {
       valid(tenantId, event);
       if (event.revision !== 0 || event.frozenAt !== undefined || event.trials.length) throw new ChampionshipError("invalid_transition", "New events must be unfrozen revision-zero plans");

@@ -33,7 +33,7 @@ async function fixture() {
   const server = app.listen(0, "127.0.0.1"); await new Promise<void>(r => server.once("listening", r));
   const addr = server.address() as { port: number };
   const get = async () => (await (await fetch(`http://127.0.0.1:${addr.port}/championship/${event!._id}`, { headers: { authorization: "Bearer a" } })).json()) as { event: ChampionshipEvent; report: { missingSourceEvidenceRunIds: string[] } };
-  return { db, event: event!, get, reads, close: () => new Promise<void>(r => server.close(() => r())), store };
+  return { db, event: event!, get, reads, close: () => new Promise<void>(r => { server.closeAllConnections(); server.close(() => r()); }), store };
 }
 const sourcesOf = (e: ChampionshipEvent) => (e.trials[0]!.aiAnswer as { sources: { internal: unknown[] } }).sources.internal;
 
