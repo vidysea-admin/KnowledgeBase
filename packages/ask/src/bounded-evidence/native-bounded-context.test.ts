@@ -1,11 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { contextStrips, packContext, unpackContext, type ContextSource } from "./bounded-refine.js";
+import { contextStrips, packContext, unpackContext, type ContextSource } from "../bounded-refine.js";
 import type { TreeIndexNode } from "@lkb/core";
-import { askV2 } from "./ask-v2.js";
-import { fakeComplete, fakeTreeSearch, fakeWrite } from "./testUtils.js";
-import { BoundedAskError, type NativeSourceLocator } from "./source-context.js";
+import { askV2 } from "../ask-v2.js";
+import { fakeComplete, fakeTreeSearch, fakeWrite } from "../testUtils.js";
+import { BoundedAskError, type NativeSourceLocator } from "../source-context.js";
 const sha = (s: string) => createHash("sha256").update(s, "utf8").digest("hex");
 for (const kind of ["document-page", "message"] as const) {
   const text = kind === "document-page" ? "करियर की सलाह यहाँ है।" : "admission ka form yahan hai.";

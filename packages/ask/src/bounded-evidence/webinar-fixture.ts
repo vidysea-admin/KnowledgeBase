@@ -5,7 +5,7 @@
  */
 import { createHash } from "node:crypto";
 import type { TreeIndexNode } from "@lkb/core";
-import type { SourceQuote, SourceHydration } from "./source-context.js";
+import type { SourceQuote, SourceHydration } from "../source-context.js";
 
 export interface FixtureTurn { turnId: string; speakerRef: string; tStart: number; tEnd: number; text: string }
 

@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import type { TreeIndexNode } from "@lkb/core";
-import { BoundedAskError, validateHydration, type NativeSourceQuote, type NativeSourceLocator } from "./source-context.js";
+import { BoundedAskError, validateHydration, type NativeSourceQuote, type NativeSourceLocator } from "../source-context.js";
 const sha = (text: string) => createHash("sha256").update(text, "utf8").digest("hex");
 const revisionHash = sha("canonical current revision");
 function fixture(kind: "document-page" | "message") {

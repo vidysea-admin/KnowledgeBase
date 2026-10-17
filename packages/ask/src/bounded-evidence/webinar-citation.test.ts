@@ -14,10 +14,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { TreeIndexNode } from "@lkb/core";
 import type { CompleteResult, Job } from "@lkb/ai";
-import { askV2, type AskV2Deps } from "./ask-v2.js";
-import { BoundedAskError, type SourceQuote } from "./source-context.js";
-import { unpackContext } from "./bounded-refine.js";
-import { fakeTreeSearch, fakeWrite } from "./testUtils.js";
+import { askV2, type AskV2Deps } from "../ask-v2.js";
+import { BoundedAskError, type SourceQuote } from "../source-context.js";
+import { unpackContext } from "../bounded-refine.js";
+import { fakeTreeSearch, fakeWrite } from "../testUtils.js";
 import {
   A_SESSIONS, A_TENANT, B_MARKERS, B_SESSION, hydratorOver, quotesOf, treeFor,
 } from "./webinar-fixture.js";

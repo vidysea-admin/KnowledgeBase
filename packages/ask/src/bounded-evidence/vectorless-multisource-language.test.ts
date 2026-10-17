@@ -6,9 +6,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import type { TreeIndexNode } from "@lkb/core";
-import { askV2 } from "./ask-v2.js";
-import { BoundedAskError } from "./source-context.js";
-import { fakeComplete, fakeTreeSearch, fakeWrite } from "./testUtils.js";
+import { askV2 } from "../ask-v2.js";
+import { BoundedAskError } from "../source-context.js";
+import { fakeComplete, fakeTreeSearch, fakeWrite } from "../testUtils.js";
 
 for (const fixture of [
   { kind: "document", query: "करियर सलाह", title: "करियर सलाह", metadata: "दस्तावेज़ में करियर सलाह है।" },
