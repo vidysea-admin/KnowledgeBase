@@ -5,7 +5,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const POSITIONAL = /^spk:\d+$/;
-const dirs = readdirSync("data/toc-migrated", { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort();
+const dirs = [...(await import("./corpus-lock.mjs")).verifyCorpus().sessions].sort() /* ISS-290: pinned, hash-verified list */;
 const CLIP = 160;
 
 for (const s of dirs) {

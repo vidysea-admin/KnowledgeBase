@@ -76,18 +76,11 @@
       "positional": 3,
       "blocks": 3,
       "sessionLabelPairs": 2
-    },
-    {
-      "session": "2026-09-24-zoho-next-european-study-destinations",
-      "turns": 80,
-      "positional": 2,
-      "blocks": 2,
-      "sessionLabelPairs": 1
     }
   ],
   "totals": {
-    "positional": 496,
-    "blocks": 242,
-    "pairs": 30
+    "positional": 494,
+    "blocks": 240,
+    "pairs": 29
   }
 }
