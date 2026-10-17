@@ -48,6 +48,7 @@ import { createMongoWatchRunsDeps } from "../activity-health/watch-runs.js";
 import { createMongoClaimsListDeps } from "../claims/store.js";
 import { createConfiguredActivityHealthDeps } from "../activity-health/queue-reader.js";
 import { createLazyDatabase, defineLazyProperties } from "./lazy-database.js";
+import { resolveTileSuggest } from "./tile-suggest.js";
 
 const ROUTING_CONFIG_PATH = fileURLToPath(new URL("../../../../config/ai-routing.yaml", import.meta.url));
 
@@ -183,6 +184,7 @@ export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRou
       onIndexCommitted: options.onIndexCommitted,
       // U2.4 / D-141: speaker NAME SUGGESTIONS (never final), OFF unless KB_SPEAKER_SUGGEST=1 or the caller opts in. Uses the `speakers` route.
       suggestSpeakers: resolveSuggestSpeakers(options.suggestSpeakers),
+      tileSuggest: resolveTileSuggest(), // T-042: LKB_TILE_SUGGEST=1 only; fenced; context absent = no-op
       retrievalMode: "vectorless",
       complete,
       // D-173: active ingestion never requests embeddings, even with a stale config/flag.

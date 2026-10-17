@@ -2,6 +2,8 @@ import { Router } from "express";
 import type { EvalRuns } from "@lkb/core";
 import { requireScope } from "../../auth.js";
 import { ChampionshipError, createChampionshipEvent, type ChampionshipEvent } from "../../championship/model.js";
+import type { VerifyEvidence } from "../../answer-policy/answer-records.js";
+import { answerEvidence } from "../../answer-policy/answer-evidence.js";
 import { addChampionshipTrial, championshipReport, freezeChampionship } from "../../championship/runtime.js";
 
 /** Production adapter must retain documents, tenant-scope every operation and implement atomic revision CAS. */
@@ -10,6 +12,22 @@ export interface ChampionshipStore {
   get(tenantId: string, id: string): Promise<ChampionshipEvent | null>;
   replace(tenantId: string, id: string, expectedRevision: number, event: ChampionshipEvent): Promise<boolean>;
   getEvalRun(tenantId: string, id: string): Promise<EvalRuns | null>;
+  /** Tenant-scoped canonical-turn verifier (createMongoEvidenceVerifier). When absent, cited trials fail closed on read. */
+  verifyEvidence?: VerifyEvidence;
+}
+const STALE_REASON = "Stored candidate, policy or source evidence changed, was withdrawn, or cannot be verified.";
+/** Recompute stored quote proofs on read, as every other saved-answer path does; stale citations are stripped and flagged. */
+async function reverifyTrials(store: ChampionshipStore, tenantId: string, event: ChampionshipEvent): Promise<ChampionshipEvent> {
+  const trials = await Promise.all(event.trials.map(async trial => {
+    const sources = (trial.aiAnswer as { sources?: { internal?: unknown; web?: unknown } } | undefined)?.sources;
+    const cited = !!sources && [sources.internal, sources.web].some(v => Array.isArray(v) && v.length > 0);
+    if (!cited) return trial;
+    let ok = false;
+    try { ok = !!store.verifyEvidence && await store.verifyEvidence(tenantId, answerEvidence(trial.aiAnswer as never)); } catch { ok = false; }
+    if (ok) return trial;
+    return { ...trial, state: "stale" as const, aiAnswer: { ...(trial.aiAnswer as object), sources: { internal: [], web: [] }, reason: STALE_REASON } as typeof trial.aiAnswer };
+  }));
+  return { ...event, trials };
 }
 export function createChampionshipRouter(store: ChampionshipStore, clock = () => new Date().toISOString()): Router {
   const router = Router();
@@ -22,7 +40,8 @@ export function createChampionshipRouter(store: ChampionshipStore, clock = () =>
   router.get("/championship/:id", async (req, res, next) => {
     try { const event = await store.get(req.auth!.tenantId, String(req.params.id));
       if (!event || event.tenantId !== req.auth!.tenantId || event._id !== String(req.params.id)) { res.status(404).json({ error: "not_found" }); return; }
-      res.json({ event, report: championshipReport(event) });
+      const checked = await reverifyTrials(store, req.auth!.tenantId, event);
+      res.json({ event: checked, report: championshipReport(checked) });
     } catch (e) { if (e instanceof ChampionshipError) res.status(409).json({ error: e.code, message: e.message }); else next(e); }
   });
   for (const action of ["freeze", "trials"] as const) router.post(`/championship/:id/${action}`, async (req, res, next) => {
