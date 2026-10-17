@@ -2,8 +2,8 @@
 
 VERDICT: PASS
 Status: PASS
-Cycle checked: 0
-Reviewed SHA: c035902963769db3ddc8837ec087f5451fe64279
+Cycle checked: 1
+Reviewed SHA: 236f74dcb1bc533c93479dab9a4221199f61596f
 Base SHA: 9e55b6428c5f000e1bc25b24bd0a52ed11473b54
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w17-quotehash (lane/w17-quotehash)
 Checked at: 2026-10-17T17:19Z
@@ -52,3 +52,17 @@ There are no qa/issues*.jsonl rows for this unit. No rows to flip. Recommend fil
 - Live Mongo or apps/api runtime: no DB, no network. Item 5 was verified by code reading only.
 - The full package suite was not run (per the brief). bounded-ask.test.ts (the maker's 88/88 claim) was not re-run.
 - review_budget.py assess was not run. Maker usage was not supplied (null), so this is BOOTSTRAP_REVIEW with the ratio unverified. Checker active time was about 370 s (1792257180 to 1792257548, before the verdict was written). Checker tokens are unknown (null).
+
+## Cycle 1 re-check (F1), 2026-10-17
+
+VERDICT: PASS
+Cycle checked: 1
+Reviewed SHA: 236f74dcb1bc533c93479dab9a4221199f61596f
+
+- Identity: HEAD = 236f74dc..., which descends from c0359029 (through checker commit 134f532f). The c0359029..236f74dc diff touches only packages/ask/src/quote-proof-live.test.ts (+6, a new test for shifted byte offsets) and the manifest. source-context.ts is unchanged (blob 0cb7a5e0...).
+- `timeout 600 node --test --test-force-exit --import tsx src/quote-proof-live.test.ts`: exit 0, 9/9 (log: qa/evidence/w17-quotehash-checker/c1-t1-quote-proof-live.log).
+- D-020 mutation m3 (the whole byte-offset condition at source-context.ts:103-104 disabled), harness qa/evidence/w17-quotehash-checker/mutate-byteoffset-c1.sh. It uses a per-mutation backup, an idempotent `trap restore EXIT INT TERM ERR` and `timeout 600`. The mutant was applied (count 1). **KILLED** by the maker suite: 8 pass, 1 fail, and the failing test is "consistently shifted byte offsets with correct char offsets and hashes are refused". The file was restored and `cmp` passed. HEAD fidelity: `git -c core.autocrlf=true hash-object` = 0cb7a5e0c37b9439b8100745a87d77cd20ac8dab = `HEAD:` blob.
+- F1: CLOSED.
+- F2 (the championship serve path): still open. Per the coordinator it is tracked in a separate lane and does not block this unit.
+- Low notes (a)-(c) from cycle 0 are unchanged.
+- ISSUES-WRITTEN: none. There are no ledger rows to flip.
