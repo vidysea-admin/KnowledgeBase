@@ -107,6 +107,11 @@ export function baseArgs(root: string, mediaRoot: string, extra: string[] = [], 
   return ["--tenant", tenant, "--data-root", root, "--media-root", mediaRoot, "--min-age-days", "7", "--clip-padding-seconds", "15", ...ops, ...extra];
 }
 
+/** baseArgs at the purge floor (ruling 5: --min-age-days >= 90). */
+export function purgeBaseArgs(root: string, mediaRoot: string, extra: string[] = [], tenant = "toc"): string[] {
+  return baseArgs(root, mediaRoot, extra, tenant).map((a, i, arr) => (arr[i - 1] === "--min-age-days" ? "90" : a));
+}
+
 /** Pins every mtime so a later snapshot differs if anything is touched. */
 export function freezeTree(dir: string): void {
   for (const e of readdirSync(dir, { withFileTypes: true })) {

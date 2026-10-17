@@ -33,6 +33,11 @@ const VALUED = ["--tenant", "--data-root", "--media-root", "--min-age-days", "--
 const MAX_DAYS = 36500;
 const THRESHOLD_NOTE = "thresholds are an owner decision (ARCHITECTURE Q6) and this command has no default";
 
+/** Ruling 5 (2026-10-17, approver Umesh): purge-mode defaults and floors. The read-only report keeps no default. */
+export const PURGE_DEFAULT_MIN_AGE_DAYS = 90;
+export const PURGE_DEFAULT_CLIP_PADDING_SECONDS = 15;
+export type ArgMode = "report" | "purge";
+
 export type ParsedArgs = { ok: true; opts: ReportOptions } | { ok: false; message: string };
 
 const positive = (raw: string | undefined, max: number): number | null => {
@@ -41,7 +46,7 @@ const positive = (raw: string | undefined, max: number): number | null => {
   return Number.isFinite(n) && n > 0 && n <= max ? n : null;
 };
 
-export function parseArgs(argv: readonly string[]): ParsedArgs {
+export function parseArgs(argv: readonly string[], mode: ArgMode = "report"): ParsedArgs {
   const given = new Map<string, string>();
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i] ?? "";
@@ -57,8 +62,9 @@ export function parseArgs(argv: readonly string[]): ParsedArgs {
     if (given.has(name)) return { ok: false, message: `${name} given more than once` };
     given.set(name, value);
   }
-  const minAgeRaw = given.get("--min-age-days");
-  const clipRaw = given.get("--clip-padding-seconds");
+  const purge = mode === "purge";
+  const minAgeRaw = given.get("--min-age-days") ?? (purge ? String(PURGE_DEFAULT_MIN_AGE_DAYS) : undefined);
+  const clipRaw = given.get("--clip-padding-seconds") ?? (purge ? String(PURGE_DEFAULT_CLIP_PADDING_SECONDS) : undefined);
   if (minAgeRaw === undefined || clipRaw === undefined) {
     const missing = [minAgeRaw === undefined ? "--min-age-days" : "", clipRaw === undefined ? "--clip-padding-seconds" : ""].filter(Boolean);
     return { ok: false, message: `${missing.join(" and ")} required: ${THRESHOLD_NOTE}` };
@@ -67,6 +73,8 @@ export function parseArgs(argv: readonly string[]): ParsedArgs {
   const clipPaddingSeconds = positive(clipRaw, 3600);
   if (minAgeDays === null) return { ok: false, message: `--min-age-days must be a positive number up to ${MAX_DAYS}` };
   if (clipPaddingSeconds === null) return { ok: false, message: "--clip-padding-seconds must be a positive number up to 3600" };
+  if (purge && minAgeDays < PURGE_DEFAULT_MIN_AGE_DAYS) return { ok: false, message: `--min-age-days must be at least ${PURGE_DEFAULT_MIN_AGE_DAYS} for a purge (floor; ruling 5)` };
+  if (purge && clipPaddingSeconds < PURGE_DEFAULT_CLIP_PADDING_SECONDS) return { ok: false, message: `--clip-padding-seconds must be at least ${PURGE_DEFAULT_CLIP_PADDING_SECONDS} for a purge (minimum; ruling 5)` };
   const tenant = given.get("--tenant");
   const dataRoot = given.get("--data-root");
   if (!tenant || tenant.length > 200 || /\p{Cc}/u.test(tenant)) return { ok: false, message: "--tenant is required (1-200 characters, no control characters)" };

@@ -9,7 +9,7 @@ import type { EvidenceClipWindow } from "@lkb/core";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import test from "node:test";
-import { DAY, NOW, iso, tempRoot, writeSession, baseArgs } from "./retention-report.fixtures.js";
+import { DAY, NOW, iso, tempRoot, writeSession, purgeBaseArgs as baseArgs } from "./retention-report.fixtures.js";
 import { tenantSegment } from "./retention-report-state.js";
 import { runRetentionPurge, REAL_PURGE_IO, type PurgeIo } from "./retention-purge.js";
 import { runPurgeJob, type JobReport } from "./retention-purge-job.js";
@@ -18,6 +18,10 @@ import { clipArgs, clipFileName, extractEvidenceClips, resolveFfmpegCommand, typ
 import { buildLastRun, type LastRun } from "./retention-last-run.js";
 import { tenantRetentionSummaryPath } from "./production/private-summary.js";
 
+
+/** Test helper: pair --execute with --confirm-deletion unless the test passes --no-auto-confirm (to prove the refusal). */
+const withConfirm = (flags: string[]): string[] => flags.includes("--no-auto-confirm") ? flags.filter((f) => f !== "--no-auto-confirm")
+  : flags.includes("--execute") && !flags.includes("--confirm-deletion") ? [...flags, "--confirm-deletion"] : flags;
 const ASOF = ["--as-of", new Date(NOW).toISOString()];
 const WIN = { sessionId: "s", turnId: "t1", tStart: 85, tEnd: 125 };
 
@@ -162,7 +166,7 @@ function purge(e: Env, flags: string[], clipLog: string[][], clipOpts: Parameter
   const out: string[] = []; const unlinked: string[] = [];
   const cio = fakeClipIo(clipLog, clipOpts);
   const purgeIo: PurgeIo = { unlink: (p) => { order.push("unlink"); unlinked.push(p); REAL_PURGE_IO.unlink(p); } };
-  const code = runRetentionPurge([...baseArgs(e.root, e.media, ASOF), ...flags], {
+  const code = runRetentionPurge([...baseArgs(e.root, e.media, ASOF), ...withConfirm(flags)], {
     now: () => NOW, write: (l) => out.push(l), error: (l) => out.push(l), purgeIo,
     clips: { extract: (m, w, o) => { order.push("clips"); return extractEvidenceClips(m, w, o, "ffmpeg", cio); } },
   });
@@ -388,7 +392,7 @@ test("REAL purge end to end: execute keeps the media when the window is beyond i
     writeFileSync(target, readFileSync(realSource(srcDir, 10)));
     utimesSync(target, new Date(NOW - 120 * DAY), new Date(NOW - 120 * DAY));
     const clips = { extract: (m: string, w: readonly EvidenceClipWindow[], o: string) => extractEvidenceClips(m, w, o, FFMPEG) };
-    const run = (): string => { const out: string[] = []; runRetentionPurge([...baseArgs(e.root, e.media, ASOF), "--execute"], { now: () => NOW, write: (l) => out.push(l), error: (l) => out.push(l), clips }); return out.join("\n"); };
+    const run = (): string => { const out: string[] = []; runRetentionPurge([...baseArgs(e.root, e.media, ASOF), "--execute", "--confirm-deletion"], { now: () => NOW, write: (l) => out.push(l), error: (l) => out.push(l), clips }); return out.join("\n"); };
     const o1 = run(); // cited turn 100-110 s in a 10 s file
     assert.ok(existsSync(target), o1);
     assert.match(o1, /clip-extraction-failed: window-beyond-media/);

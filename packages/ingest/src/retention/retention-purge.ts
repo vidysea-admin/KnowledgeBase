@@ -14,7 +14,7 @@
  * additive: when `deps.clips` is set, execute mode first writes the D-008 evidence clips to <session>/evidence-clips/
  * and keeps the media if any clip is missing.
  *
- * DRY RUN BY DEFAULT. Deleting needs the explicit `--execute` flag. In execute mode the whole
+ * DRY RUN BY DEFAULT. Deleting needs the explicit `--execute --confirm-deletion` flag pair. In execute mode the whole
  * evaluation (gather, plan, guards) is RE-RUN from disk immediately before EACH item, so a
  * recording that became active, or got a new reference, after planning is vetoed at execution time.
  * One `unlink` per item is atomic; a failure on one item is reported and the others continue.
@@ -172,10 +172,20 @@ export function executePurge(opts: ReportOptions, execute: boolean, deps: PurgeD
         }
         clipsKept += cr.outcomes.length;
       }
-      purgeIo.unlink(c.absPath);
+      // Narrow the re-check/unlink window: clip extraction can take seconds, so evaluate again from disk
+      // immediately before the unlink and delete only if the same item is still eligible.
+      const last = evaluatePurge(opts, io, deps.now());
+      if (!last.ok) throw new Error(`final re-check failed: ${last.message}`);
+      const lc = last.candidates.find((x) => x.key === planned.key && x.relPath === planned.relPath);
+      if (lc === undefined) {
+        s.vetoed++;
+        deps.write(`VETOED ${where} reason=${cleanText(last.vetoes.get(planned.key) ?? "no longer eligible at final check", 160)}`);
+        continue;
+      }
+      purgeIo.unlink(lc.absPath);
       s.deleted++;
-      s.bytes += c.sizeBytes;
-      deps.write(`PURGED ${where} age_days=${c.ageDays.toFixed(1)} size_bytes=${c.sizeBytes}`);
+      s.bytes += lc.sizeBytes;
+      deps.write(`PURGED ${where} age_days=${lc.ageDays.toFixed(1)} size_bytes=${lc.sizeBytes}`);
     } catch (e) {
       s.failed++;
       const why = (e as NodeJS.ErrnoException).code ?? (e instanceof Error ? e.message : "error");
@@ -190,15 +200,31 @@ export function executePurge(opts: ReportOptions, execute: boolean, deps: PurgeD
 export const PURGE_USAGE = [
   ...USAGE.map((l) => l.replace(/retention-report/g, "retention-purge")),
   "  --execute: actually delete. Without it this is a dry run. Raw media captured more than 90 days ago only (D-145 pending append).",
+  "  --confirm-deletion: REQUIRED together with --execute; --execute alone refuses and deletes nothing. Refused without --execute.",
+  "  --min-age-days defaults to 90 and values below 90 are refused; --clip-padding-seconds defaults to 15 and values below 15 are refused (ruling 5).",
 ];
 
-export function runRetentionPurge(argv: readonly string[], deps: PurgeDeps): number {
+export const CONFIRM_FLAG = "--confirm-deletion";
+
+/** Shared by the purge CLI and the scheduled job: strips --execute/--confirm-deletion, enforces the double flag. */
+export function parsePurgeArgs(argv: readonly string[]): { ok: true; opts: ReportOptions; execute: boolean } | { ok: false; message: string } {
   const execCount = argv.filter((a) => a === "--execute").length;
-  const parsed = parseArgs(argv.filter((a) => a !== "--execute"));
-  if (!parsed.ok || execCount > 1) {
-    deps.error(`retention-purge: ${parsed.ok ? "--execute given more than once" : parsed.message}`);
+  const confirmCount = argv.filter((a) => a === CONFIRM_FLAG).length;
+  const parsed = parseArgs(argv.filter((a) => a !== "--execute" && a !== CONFIRM_FLAG), "purge");
+  if (!parsed.ok) return parsed;
+  if (execCount > 1) return { ok: false, message: "--execute given more than once" };
+  if (confirmCount > 1) return { ok: false, message: `${CONFIRM_FLAG} given more than once` };
+  if (execCount === 1 && confirmCount === 0) return { ok: false, message: `--execute requires ${CONFIRM_FLAG}; nothing was deleted` };
+  if (execCount === 0 && confirmCount === 1) return { ok: false, message: `${CONFIRM_FLAG} is only valid together with --execute` };
+  return { ok: true, opts: parsed.opts, execute: execCount === 1 };
+}
+
+export function runRetentionPurge(argv: readonly string[], deps: PurgeDeps): number {
+  const parsed = parsePurgeArgs(argv);
+  if (!parsed.ok) {
+    deps.error(`retention-purge: ${parsed.message}`);
     for (const l of PURGE_USAGE) deps.error(l);
     return 2;
   }
-  return executePurge(parsed.opts, execCount === 1, deps).code;
+  return executePurge(parsed.opts, parsed.execute, deps).code;
 }

@@ -6,7 +6,7 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSy
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { DAY, NOW, iso, tempRoot, writeSession, baseArgs } from "./retention-report.fixtures.js";
+import { DAY, NOW, iso, tempRoot, writeSession, purgeBaseArgs as baseArgs } from "./retention-report.fixtures.js";
 import { REAL_JOB_IO, MAX_REPORT_LINES, parseSummary, runPurgeJob, splitJobArgs, type JobReport } from "./retention-purge-job.js";
 import { tenantRetentionSummaryPath } from "./production/private-summary.js";
 import { runRetentionPurgeJobCli } from "./retention-purge-job-cli.js";
@@ -26,11 +26,15 @@ function fixture() {
   writeFileSync(srcFile, JSON.stringify(src));
   return { root, media, out, report: join(out, "sub", "last-run.json"), srcFile, done: () => { for (const d of [root, media, out]) rmSync(d, { recursive: true, force: true }); } };
 }
+
+/** Test helper: pair --execute with --confirm-deletion unless the test passes --no-auto-confirm (to prove the refusal). */
+const withConfirm = (flags: string[]): string[] => flags.includes("--no-auto-confirm") ? flags.filter((f) => f !== "--no-auto-confirm")
+  : flags.includes("--execute") && !flags.includes("--confirm-deletion") ? [...flags, "--confirm-deletion"] : flags;
 function job(f: ReturnType<typeof fixture>, flags: string[], extra: Partial<Parameters<typeof runPurgeJob>[1]> = {}) {
   const out: string[] = []; const err: string[] = [];
   const clips: NonNullable<Parameters<typeof runPurgeJob>[1]["clips"]> = extra.clips ?? { extract: (_media, windows) => ({ ok: true,
     outcomes: windows.map(window => ({ turnId: window.turnId, file: "injected-valid-clip", status: "exists" })) }) };
-  const code = runPurgeJob([...baseArgs(f.root, f.media, ASOF), "--report-file", f.report, ...flags], {
+  const code = runPurgeJob([...baseArgs(f.root, f.media, ASOF), "--report-file", f.report, ...withConfirm(flags)], {
     now: () => NOW, write: (l) => out.push(l), error: (l) => err.push(l), ...extra,
     clips,
   });
@@ -93,16 +97,6 @@ test("--report-file is required, single, and needs a value; usage errors write n
     assert.equal(bad.code, 2);
     assert.equal(mediaFiles(f).length, 1);
     assert.ok(!existsSync(f.report), "invalid tenant-bound arguments must not write an unscoped report");
-  } finally { f.done(); }
-});
-
-test("thresholds still have no default through the job", () => {
-  const f = fixture();
-  try {
-    const code = runPurgeJob(["--tenant", "toc", "--data-root", f.root, "--media-root", f.media, "--operations-state", "x.json", "--report-file", f.report],
-      { now: () => NOW, write: () => {}, error: () => {} });
-    assert.equal(code, 2);
-    assert.equal(mediaFiles(f).length, 1);
   } finally { f.done(); }
 });
 
@@ -170,5 +164,28 @@ test("real CLI binding refuses legacy/global override and mismatched configured 
     const raw = JSON.parse(readFileSync(tenantRetentionSummaryPath(f.root, "toc"), "utf8"));
     assert.equal(raw.tenantId, "toc"); assert.equal(raw.deleted, 0); assert.equal(raw.clipsRetained, null);
     assert.equal(mediaFiles(f).length, 1); assert.ok(!existsSync(join(f.out, "legacy.json")));
+  } finally { f.done(); }
+});
+
+test("job: --execute without --confirm-deletion refuses (exit 2), deletes nothing, writes no execute report", () => {
+  const f = fixture();
+  try {
+    const r = job(f, ["--execute", "--no-auto-confirm"]);
+    assert.equal(r.code, 2);
+    assert.match(r.err.join("\n"), /--execute requires --confirm-deletion/);
+    assert.equal(mediaFiles(f).length, 1);
+    assert.equal(existsSync(f.report), false);
+  } finally { f.done(); }
+});
+
+test("job: thresholds default to 90 / 15 and below-floor values are refused", () => {
+  const f = fixture();
+  try {
+    const noThresholds = baseArgs(f.root, f.media, ASOF).filter((a, i, arr) => !["--min-age-days", "--clip-padding-seconds"].includes(a) && !["--min-age-days", "--clip-padding-seconds"].includes(arr[i - 1] ?? ""));
+    const run = (extra: string[]) => { const err: string[] = []; const code = runPurgeJob([...noThresholds, ...extra, "--report-file", f.report], { now: () => NOW, write: () => {}, error: (l) => err.push(l) }); return { code, err: err.join("\n") }; };
+    assert.equal(run([]).code, 0);
+    assert.equal(run(["--min-age-days", "30"]).code, 2);
+    assert.equal(run(["--clip-padding-seconds", "5"]).code, 2);
+    assert.equal(mediaFiles(f).length, 1);
   } finally { f.done(); }
 });

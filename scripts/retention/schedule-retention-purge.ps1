@@ -2,7 +2,7 @@
 # T-046 / D-145: schedules the raw-media purge (media older than 90 days; transcripts kept forever).
 # Same mechanism as start-calendar-attendance.ps1: a pwsh launcher plus a Windows Scheduled Task (daily).
 # DRY RUN by default. Deleting needs BOTH -Execute and -ConfirmDeletion, at run time and at install time.
-# No thresholds default: -MinAgeDays and -ClipPaddingSeconds are an owner decision (ARCHITECTURE Q6).
+# Ruling 5 (2026-10-17, Umesh): -MinAgeDays defaults to 90 and is floored at 90; -ClipPaddingSeconds defaults to 15 and is floored at 15.
 [CmdletBinding()]
 param(
     [switch]$Run,
@@ -14,8 +14,8 @@ param(
     [string]$DataRoot,
     [string]$MediaRoot,
     [string]$OperationsState,
-    [string]$MinAgeDays,
-    [string]$ClipPaddingSeconds,
+    [string]$MinAgeDays = '90',
+    [string]$ClipPaddingSeconds = '15',
     [string]$ReportFile,
     [string]$DailyAt = '03:30',
     [string]$NodePath = 'C:\Program Files\WindowsApps\OpenAI.Codex_26.1002.7124.0_x64__2p2nqsd0c76g0\app\resources\cua_node\bin\node.exe'
@@ -34,7 +34,7 @@ function Assert-AbsolutePath([string]$Value) {
     }
 }
 function Assert-Token([string]$Name, [string]$Value, [string]$Pattern) {
-    if (-not $Value -or $Value -notmatch $Pattern) { throw "-$Name is required and has an invalid value (no default; thresholds are an owner decision, ARCHITECTURE Q6)." }
+    if (-not $Value -or $Value -notmatch $Pattern) { throw "-$Name has an invalid value." }
 }
 if ($Execute -and -not $ConfirmDeletion) { throw '-Execute needs -ConfirmDeletion. Without both this job is a dry run.' }
 if (($Run -or $InstallTask) -and $TaskPreview) { throw 'TaskPreview cannot run or install.' }
@@ -42,14 +42,19 @@ if ($DailyAt -notmatch '^([01]\d|2[0-3]):[0-5]\d$') { throw '-DailyAt must be HH
 foreach ($value in @($projectRoot, $NodePath, $OperationsState, $ReportFile)) { Assert-AbsolutePath $value }
 foreach ($value in @($DataRoot, $MediaRoot)) { if ($value) { Assert-AbsolutePath $value } }
 
+function Assert-Floor([string]$Name, [string]$Value, [double]$Floor) {
+    if ([double]::Parse($Value, [Globalization.CultureInfo]::InvariantCulture) -lt $Floor) { throw "-$Name must be at least $Floor (ruling 5 floor)." }
+}
 function Get-JobArguments {
     foreach ($p in @(@('Tenant', $Tenant, '^[A-Za-z0-9._-]{1,64}$'), @('MinAgeDays', $MinAgeDays, '^\d{1,5}(\.\d{1,3})?$'),
             @('ClipPaddingSeconds', $ClipPaddingSeconds, '^\d{1,4}(\.\d{1,3})?$'))) { Assert-Token $p[0] $p[1] $p[2] }
+    Assert-Floor 'MinAgeDays' $MinAgeDays 90
+    Assert-Floor 'ClipPaddingSeconds' $ClipPaddingSeconds 15
     foreach ($p in @(@('DataRoot', $DataRoot), @('MediaRoot', $MediaRoot))) { if (-not $p[1]) { throw "-$($p[0]) is required." } }
     $jobArgs = @('--import', 'tsx', $cliPath, '--tenant', $Tenant, '--data-root', $DataRoot, '--media-root', $MediaRoot,
         '--min-age-days', $MinAgeDays, '--clip-padding-seconds', $ClipPaddingSeconds,
         '--operations-state', $OperationsState, '--report-file', $ReportFile)
-    if ($Execute) { $jobArgs += '--execute' }
+    if ($Execute) { $jobArgs += @('--execute', '--confirm-deletion') }
     return $jobArgs
 }
 
