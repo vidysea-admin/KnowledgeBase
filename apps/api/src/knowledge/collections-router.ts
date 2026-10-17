@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import { Router, type Request, type Response } from "express";
 import { requireScope, isValidTenantId } from "../auth.js";
 import { producePageDocument } from "../../../../packages/ingest/src/sources/document-pages.js";
+import { buildPageIndex } from "../../../../packages/index/src/pipeline/page-evidence/page-segments.js";
+import { validateHighlight } from "../../../../packages/index/src/pipeline/page-evidence/highlight-validator.js";
 import { collectionId, type CollectionMember, type KnowledgeStore } from "./collections-store.js";
 import { createKnowledgeCatalogRouter } from "./catalog-router.js";
 import type { KnowledgeCatalog } from "./catalog-store.js";
@@ -98,6 +100,7 @@ export function createKnowledgeRouter(deps: KnowledgeDeps): Router {
   });
   router.get("/knowledge/documents/:id", requireScope("sessions"), async (req, res) => {
     try { const row = await deps.store.getDocument(tenant(req), req.params.id as string); if (!row) return send(res, 404, { error: "not_found" });
+      if (await deps.store.sourceWithdrawn(tenant(req), row.sourceId)) return send(res, 403, { error: "source_consent_withdrawn" });
       send(res, 200, { id: row._id, sourceId: row.sourceId, version: row.version, title: row.title, format: row.format, pageCount: row.pages.length,
         highlights: row.highlights.map(({ id, pageNumber, quote, text, verification }) => ({ id, pageNumber, quote, text, verification })) }); }
     catch { send(res, 503, { error: "knowledge_unavailable" }); }
@@ -106,15 +109,23 @@ export function createKnowledgeRouter(deps: KnowledgeDeps): Router {
     if (!/^[1-9][0-9]{0,2}$/.test(req.params.page as string)) return send(res, 400, { error: "invalid_page" });
     try { const row = await deps.store.getDocument(tenant(req), req.params.id as string); const page = row?.pages.find(p => p.pageNumber === Number(req.params.page));
       if (!row || !page) return send(res, 404, { error: "not_found" });
+      if (await deps.store.sourceWithdrawn(tenant(req), row.sourceId)) return send(res, 403, { error: "source_consent_withdrawn" });
       send(res, 200, { id: row._id, sourceId: row.sourceId, version: row.version, title: row.title, pageNumber: page.pageNumber, text: page.text }); }
     catch { send(res, 503, { error: "knowledge_unavailable" }); }
   });
   router.post("/knowledge/documents/:id/highlights", requireScope("ingest"), async (req, res) => {
     const b: unknown = req.body;
-    if (!obj(b) || !exact(b, ["sourceId", "version", "pageNumber", "quote"]) || !text(b.sourceId) || !text(b.version, 64) || !Number.isInteger(b.pageNumber) || Number(b.pageNumber) < 1 || typeof b.quote !== "string" || !b.quote.trim() || b.quote.length > 4000 || /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(b.quote)) return send(res, 400, { error: "invalid_highlight" });
+    if (!obj(b) || !exact(b, ["sourceId", "version", "pageNumber", "quote", "charStart", "charEnd"]) || (b.charStart === undefined) !== (b.charEnd === undefined) || (b.charStart !== undefined && (!Number.isInteger(b.charStart) || !Number.isInteger(b.charEnd))) || !text(b.sourceId) || !text(b.version, 64) || !Number.isInteger(b.pageNumber) || Number(b.pageNumber) < 1 || typeof b.quote !== "string" || !b.quote.trim() || b.quote.length > 4000 || /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(b.quote)) return send(res, 400, { error: "invalid_highlight" });
     try { const t = tenant(req); const row = await deps.store.getDocument(t, req.params.id as string);
-      const page = row?.pages.find(p => p.pageNumber === b.pageNumber);
-      if (!row || b.sourceId !== row.sourceId || b.version !== row.version || !page || !page.text.includes(b.quote)) return send(res, 422, { error: "evidence_unavailable" });
+      if (!row) return send(res, 404, { error: "not_found" });
+      if (await deps.store.sourceWithdrawn(t, row.sourceId)) return send(res, 403, { error: "source_consent_withdrawn" });
+      if (b.sourceId !== row.sourceId || b.version !== row.version) return send(res, 422, { error: "evidence_unavailable" });
+      // Page index from the tenant-owned row; offsets default to the first verbatim occurrence on the cited page, and validateHighlight decides.
+      const index = buildPageIndex({ tenantId: t, sourceId: row.sourceId, version: row.version, title: row.title, format: row.format, pages: row.pages });
+      const seg = index.segments.find(s => s.page === b.pageNumber); const at = seg ? seg.text.indexOf(b.quote) : -1;
+      const start = b.charStart !== undefined ? Number(b.charStart) : seg && at >= 0 ? seg.start + at : -1;
+      const verdict = validateHighlight(index, { quote: b.quote, page: b.pageNumber, start, end: b.charEnd !== undefined ? Number(b.charEnd) : start + b.quote.length });
+      if (!verdict.ok) return send(res, 422, { error: "evidence_unavailable", reason: verdict.reason });
       const id = createHash("sha256").update(JSON.stringify([row._id, row.version, b.pageNumber, b.quote])).digest("hex");
       const highlight = { id, pageNumber: Number(b.pageNumber), quote: b.quote, text: b.quote, verification: "unverified" as const };
       if (!await deps.store.saveHighlight(t, row._id, highlight)) return send(res, 409, { error: "evidence_changed" }); send(res, 200, { highlight });
