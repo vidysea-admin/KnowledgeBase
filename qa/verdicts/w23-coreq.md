@@ -1,29 +1,49 @@
 # Verdict: w23-coreq
 
-VERDICT: FAIL
-Cycle checked: 0
-Reviewed SHA: 4d8dbbedc9b70253e9ab9de570500a803c6ab324
-Base: 3c99337f
+VERDICT: PASS
+Cycle checked: 1
+Reviewed SHA: 95dc24c62b4f81d6811229862fb789f46a321419
+Base: 3c99337f (cycle 0 candidate 4d8dbbed)
 
-## Findings
-
-1. HIGH, acceptance violation (ISS-SCHEMAEDIT-001): `orphanGenerated` is exported but never called. `git show 4d8dbbed:scripts/gen-types.mjs | grep -n orphanGenerated` gives only line 76 (the definition), and `unlinkSync` is imported (line 11) but never used. `main()` (scripts/gen-types.mjs:85-113) is byte-identical to base. So `--check` does NOT fail on orphans and write mode does NOT delete them. The manifest and brief both claim otherwise.
-   Probe (copy of the script in a scratch dir inside the lane, since removed; real schema/; a hand-placed `generated/gone.ts` carrying the banner and no schema): write mode exit 0 and `gone.ts` still present; `--check` exit 0 printing `OK: 46 generated type file(s) + index.ts match schema/`. Required behaviour was exit 1 and deletion respectively.
-   Fix: in `main()`, after the drift loop, call `orphanGenerated(OUT_DIR, names)`. In CHECK mode print `ORPHAN: <rel path>`, count it into the failure and exit 1. In write mode `unlinkSync` each result. Because `orphanGenerated` only reads names from `readdirSync(outDir)` and joins them to `outDir`, traversal is not possible by construction, and it matches the banner string anywhere in the file (not strictly a leading banner; consider `startsWith` after the `/* eslint-disable */` line). Symlinks/junctions: `readdirSync` plus `unlinkSync` removes the link entry, not its target.
-2. HIGH, test gap: no test covers the main() orphan path (the only tests are the pure helper and `--check` on the real tree, which passes vacuously). A mutation of the loop is moot because the loop does not exist; the existing tests would not catch its absence, which is exactly what happened. Fix: add a spawn test that copies the script plus a minimal schema/generated tree to a temp dir and asserts `--check` exit 1 on an orphan and write mode removes it while leaving a banner-less hand file.
-3. Maker's mutation M1 only exercises the pure helper; it does not support the claim in the manifest title.
-
-## Verified
-- Deletion safety (write mode): not applicable as shipped, nothing is deleted. Banner filter in the helper: tested by test 1 (pass).
-- Real tree: `node scripts/gen-types.mjs --check` exit 0, `OK: 46 generated type file(s)`.
-- `node --test --test-force-exit scripts/gen-types.test.mjs`: pass 2, fail 0 (both vacuous for the wiring).
-- Own mutation of main-loop: not possible (nothing to mutate); absence demonstrated by the probe above instead. No candidate file touched; `git hash-object` of scripts/gen-types.mjs (c356642d...) and gen-types.test.mjs (eeb35fd4...) equal `4d8dbbed:` blobs.
-- ISS-JOBQUEUE-002 claim: `queue-lock.ts` exists at base 3c99337f; the cited PASS verdict qa/verdicts/iss-jobqueue-002-lost-update.md is PASS cycle 0 and states the lost-update half is met and the row stays `open-before-wiring` (pruning half ISS-JOBQLOST-001 verified; takeover ISS-JOBQLOST-003 and EPERM -004 follow-ups). Recorded repro replayed via `file-job-queue.lost-update.test.ts` run 15 times (timeout 600 each): 15/15 exit 0, pass 6 fail 0 each. The lost-update half is confirmed fixed at base. The row's own status is `open-before-wiring` by design (guards wiring, not a defect while unwired); it may be closed only if the owner accepts the lost-update + prune half as sufficient and notes ISS-JOBQLOST-003 (stall >30 s, verified status in ledger). I do not flip it here: no code in this unit changed it.
-- Lint: `node scripts/lint-loc.mjs --all` (alone, timeout 600) exit 1. 9 of 10 stages exit 0 (loc, dirsize, root, dupes, migrations, codex-hooks, snapshot, lint-tests, tracker). Stage `dependencies` exit 1362: 1362 errors, 1360 of them `no-unresolvable-workspace-import` (apps/api importing express, mongodb, @lkb/*) which is a lane node_modules environment gap, plus 2 other error lines not examined. Not attributable to this unit (no import changes); not accepted as a pass either: the dependencies stage is unverified.
+## Cycle 1 evidence (independently produced)
+- Diff 4d8dbbed..95dc24c6 read. `orphanGenerated` now lstat-filters (regular files only, `.ts`, banner-bearing, names from `readdirSync` of generated/) and is called in `main()`. CHECK prints DRIFT and exits 1 via the drift count; write mode `unlinkSync`s. A `GEN_TYPES_ROOT` env override was added for tests (the caller controls it; not a repo escape by itself).
+- Own orphan probe (real schema/ copy in a scratch root inside the lane, since removed). `--check` exit 1 listing the orphan, and the file was still present after `--check`. Write mode exit 0 `removed gone.ts`. The final `--check` exit 0.
+- Deletion safety probe:
+  - A hand-written `hand.ts` survived.
+  - A `.ts` file without the banner survived.
+  - A `.ts` junction pointing at a dir holding a banner-bearing file: the junction and the target file both survived.
+  - A banner-bearing file outside generated/ survived.
+  - Odd names `..ts` and `..x.ts` (banner-bearing, inside generated/) were treated as in-dir files and removed, and nothing outside was touched. Names from `readdirSync` cannot contain separators, so a `..` path component cannot arise.
+- A file symlink could not be created on this host (not permitted). It is covered only by the maker's skipped test and is UNVERIFIED here, though lstat `isFile()` is false for symlinks. Not probed: generated/ itself being a junction (repo-controlled config).
+- `node scripts/gen-types.mjs --check` on the lane tree: exit 0, `OK: 46 generated type file(s)`.
+- `node --test --test-force-exit scripts/gen-types.test.mjs`: pass 4, fail 0, skipped 1 (symlink, "symlink not permitted").
+- Mutations (per-mutation byte backup, trap, timeout 600, each restored). `git hash-object` of scripts/gen-types.mjs equals the `HEAD:` blob 4a21ef25..., and of the test file equals fa787e91..., both after restore.
+  - M1, delete the `unlinkSync(path)` call: killed (pass 3, fail 1, in the e2e orphan test).
+  - M3, drop `drift += 1` in the orphan loop (skips the check failure): killed (pass 3, fail 1, same e2e test).
+  - A syntax-breaking first attempt was a crash, not counted.
+- `node scripts/lint-loc.mjs --all`, alone, timeout 600: exit 1. 9 of 10 stages exit 0 (loc, dirsize, root, dupes, migrations, codex-hooks, snapshot, lint-tests, tracker). `dependencies` exit 1362, and all 1362 are `no-unresolvable-workspace-import` (lane node_modules gap). The count equals cycle 0, so this unit adds no violation. That stage cannot be verified in this lane and is recorded as a limit, not as a pass.
+- ISS-JOBQUEUE-002: the cycle 0 evidence stands (lock at base, lost-update 15/15). No code change in cycle 1.
 
 ## Ledger rows
-- ISS-SCHEMAEDIT-001: do NOT flip (the orphan check is not wired).
-- ISS-JOBQUEUE-002: no change in this unit; do not flip on this verdict.
+- ISS-SCHEMAEDIT-001: may be flipped to verified (checker verdict w23-coreq cycle 1, 95dc24c6).
+- ISS-JOBQUEUE-002: not changed by this unit. The row text is open-before-wiring and the owner decides closure.
 
 ISSUES-WRITTEN: none
-Not verified: dependencies lint stage in a fully installed tree; symlink/junction deletion behaviour (no deletion code exists).
+Not verified: dependencies lint stage in a fully installed tree; file-symlink deletion behaviour on this host.
+
+---
+
+## Superseded history (cycle 0, candidate 4d8dbbed, FAIL; not authoritative)
+
+Cycle-0 verdict was FAIL at cycle 0, reviewed SHA 4d8dbbedc9b70253e9ab9de570500a803c6ab324 (commit ca060985).
+
+### Findings (cycle 0)
+
+1. HIGH, acceptance violation (ISS-SCHEMAEDIT-001): `orphanGenerated` was exported but never called. `git show 4d8dbbed:scripts/gen-types.mjs | grep -n orphanGenerated` gave only line 76 (the definition), and `unlinkSync` was imported but never used. `main()` was byte-identical to base. So `--check` did NOT fail on orphans and write mode did NOT delete them. Probe: write mode exit 0 and `gone.ts` still present; `--check` exit 0 printing `OK: 46 generated type file(s) + index.ts match schema/`.
+2. HIGH, test gap: no test covered the main() orphan path.
+3. Maker's mutation M1 only exercised the pure helper.
+
+### Cycle 0 other checks
+- Real tree `--check` exit 0. Tests pass 2, fail 0.
+- ISS-JOBQUEUE-002: `queue-lock.ts` exists at base 3c99337f; the cited PASS verdict qa/verdicts/iss-jobqueue-002-lost-update.md is PASS cycle 0 (lost-update half met; pruning half ISS-JOBQLOST-001 verified; follow-ups ISS-JOBQLOST-003/004). `file-job-queue.lost-update.test.ts` run 15 times (timeout 600 each): 15/15 exit 0, pass 6 fail 0 each. The row stays `open-before-wiring` by design and was not flipped.
+- Lint: same result as cycle 1 (9 of 10 stages exit 0; dependencies exit 1362, lane node_modules gap).
