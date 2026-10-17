@@ -1,5 +1,5 @@
 import type { Graph, GraphEdge, GraphEvidence, SessionSummary, Source } from "../../api/types.js";
-import { safeHttpUrl } from "../../safe-url.js";
+import { safePublicResourceUrl } from "../../safe-url.js";
 
 const kinds = ["session", "topic", "org", "person", "country", "date", "month", "user", "other"];
 const origins = ["tree_index", "graph_edges"];
@@ -45,10 +45,8 @@ export function buildKnowledgeDirectory(sessions: SessionSummary[], sources: Sou
     collections.get(group)!.push(session);
   }
   const resources = [...sources].sort((a, b) => a.kind.localeCompare(b.kind) || a._id.localeCompare(b._id)).map(source => {
-    const safe = safeHttpUrl(source.url);
-    const parsed = safe ? new URL(safe) : null;
-    const href = parsed && !parsed.username && !parsed.password ? safe : null;
-    return { id: source._id, kind: source.kind, createdAt: source.createdAt, href, host: href ? parsed!.hostname : null };
+    const link = safePublicResourceUrl(source.url);
+    return { id: source._id, kind: source.kind, createdAt: source.createdAt, href: link?.href ?? null, host: link?.host ?? null };
   });
   return { selected, selectionMissing: Boolean(entityId && !selected), relationships, resources,
     entities: graph.nodes.filter(node => ["topic", "person", "org"].includes(node.kind)).sort((a, b) => a.kind.localeCompare(b.kind) || a.label.localeCompare(b.label) || a.id.localeCompare(b.id)),
