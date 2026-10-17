@@ -1,3 +1,7 @@
+> **Superseded by w17-wireapi PASS 79571b92 (item 1).** The FAIL below (checker 3912e5e3, reviewed ec78833c) is kept as history only; see qa/verdicts/w17-wireapi.md for the live verdict.
+
+---
+
 # Checker verdict: w17-champproof
 
 VERDICT: FAIL
