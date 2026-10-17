@@ -20,14 +20,29 @@
  * Items carry no tenant: the caller passes ONE tenant's rules/state, and the function holds no state.
  */
 import type { AutoRecordItem, SelectAutoRecordItemsResult, SkippedItem, SkipReason } from "@lkb/core";
-import { evaluateJoinRules, type JoinDecision, type JoinRuleEvent, type JoinRuleSet, type JoinRuleState } from "./join-rules.js";
+import { evaluateJoinRules, validateJoinRuleSet, validateJoinRuleState, type JoinDecision, type JoinRuleEvent, type JoinRuleSet, type JoinRuleState } from "./join-rules.js";
 import { meetingIdentity } from "../../send-now.js";
 
-export interface JoinRulesVetoContext { state?: JoinRuleState }
+export interface JoinRulesVetoContext {
+  state?: JoinRuleState;
+  /** ISS-T037VETO-003: receives the validation error message ONCE per applyJoinRules call (= once per tick) when the rule set or
+   * state is invalid. Optional; absent = no logging (today's behaviour). The skip detail itself stays fixed. */
+  log?: (msg: string) => void;
+}
 /** Test seam: production callers pass three arguments and get the real engine. */
 export type JoinRuleEvaluator = (event: JoinRuleEvent, rules: JoinRuleSet, state?: JoinRuleState) => JoinDecision;
 
 const UNEVALUABLE = "join-rules veto: rules could not be evaluated (failing closed)";
+
+/** Why the rule set/state is invalid (the JoinRuleSetValidationError message), cleaned for a log line. */
+export function describeInvalidRules(rules: unknown, state: unknown): string {
+  const clean = (m: string) => m.replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/[A-Za-z]:[\\/][^\s"']*/g, "<path>")
+    .replace(/(?:\/[\w.@-]+){2,}/g, "<path>").trim().slice(0, 300);
+  for (const [what, check] of [["rule set", () => validateJoinRuleSet(rules)], ["state", () => validateJoinRuleState(state)]] as const) {
+    try { check(); } catch (e) { return `${what}: ${clean(e instanceof Error ? e.message : String(e))}`; }
+  }
+  return "evaluator failure (rule set and state validate)";
+}
 
 function toEvent(item: AutoRecordItem, id: string): JoinRuleEvent {
   return { id, organizer: item.sender, meetingUrl: item.meetingUrl };
@@ -71,7 +86,7 @@ function siblingIds(selection: SelectAutoRecordItemsResult): Map<AutoRecordItem,
 
 /** Returns a skip entry when the rules refuse this item, else undefined (keep it scheduled). */
 function veto(item: AutoRecordItem, rules: JoinRuleSet, state: JoinRuleState | undefined,
-  evaluate: JoinRuleEvaluator, siblings: readonly string[]): SkippedItem | undefined {
+  evaluate: JoinRuleEvaluator, siblings: readonly string[], onInvalid?: () => void): SkippedItem | undefined {
   const base = { sessionKey: item.sessionKey, source: item.source, sourceId: item.sourceId, title: item.title };
   const out = (reason: SkipReason, detail: string): SkippedItem => ({ ...base, reason, detail });
   try {
@@ -86,7 +101,7 @@ function veto(item: AutoRecordItem, rules: JoinRuleSet, state: JoinRuleState | u
       if (d.reason === "meeting-opt-out") { via = own.includes(id) ? "" : " [same meeting, recorded under another source id]"; break; }
     }
     for (const d of decisions) {
-      if (d.reason === "invalid-rule-set") return out("rules-unevaluable", UNEVALUABLE);
+      if (d.reason === "invalid-rule-set") { onInvalid?.(); return out("rules-unevaluable", UNEVALUABLE); }
     }
     for (const d of decisions) {
       if (d.action !== "skip") continue; // join / needs-approval never remove
@@ -110,9 +125,13 @@ export function applyJoinRules(selection: SelectAutoRecordItemsResult, rules: Jo
     try { siblings = siblingIds(selection); } catch { /* own ids only: still sound, never adds */ }
     const kept: AutoRecordItem[] = [];
     const removed: SkippedItem[] = [];
+    let invalid = false;
     for (const item of selection.toSchedule) {
-      const s = veto(item, rules, context?.state, evaluate, siblings.get(item) ?? []);
+      const s = veto(item, rules, context?.state, evaluate, siblings.get(item) ?? [], () => { invalid = true; });
       if (s) removed.push(s); else kept.push(item);
+    }
+    if (invalid && context?.log) {
+      try { context.log(`join-rules: invalid rule set, failing closed for every item this tick (${removed.length} removed): ${describeInvalidRules(rules, context?.state)}`); } catch { /* logging never changes the veto */ }
     }
     if (removed.length === 0) return selection;
     return { toSchedule: kept, skipped: [...(Array.isArray(selection.skipped) ? selection.skipped : []), ...removed] };
