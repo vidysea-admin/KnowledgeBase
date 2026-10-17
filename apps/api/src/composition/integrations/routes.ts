@@ -34,13 +34,14 @@ import { createCaptureReadinessRouter } from '../../capture-readiness/router.js'
 import type { CaptureReadinessDeps } from '../../capture-readiness/types.js';
 import { createSessionDecisionsRouter } from '../../session-decisions/router.js';
 import type { SessionDecisionsDeps } from '../../session-decisions/reader.js';
+import { createRegistrationApprovalRouter, REGISTRATION_APPROVE_SCOPE, type RegistrationApprovalRouterDeps } from '../../registration-approvals/router.js';
 
 export type IntegratedWorkflows = EvaluationIntegrations & AnswerIntegrations & TranscriptIntegrations
   & Pick<KnowledgeIntegrations, 'knowledge' | 'connectorWorkflow' | 'whatsappReview'>
   & Pick<HostingIntegrations, 'hosting' | 'counsellorAccounts' | 'operationsSchedules' | 'retentionStatus'>
   & AutomationIntegrations & { botPrivacy?: BotPrivacyDeps; captureReadiness?: CaptureReadinessDeps; sessionDecisions?: SessionDecisionsDeps;
     answerReviewAuthority?: AnswerReviewAuthority; speakerRelations?: SpeakerRelationsRouterDeps; speakerRelationSource?: SpeakerRelationSourceRouterDeps;
-    nativeEvidence?: NativeEvidenceResolver; speakerAttributes?: SpeakerAttributesRouterDeps; extractionReview?: Parameters<typeof createExtractionReviewRouter>[0] };
+    nativeEvidence?: NativeEvidenceResolver; speakerAttributes?: SpeakerAttributesRouterDeps; registrationApprovals?: RegistrationApprovalRouterDeps; extractionReview?: Parameters<typeof createExtractionReviewRouter>[0] };
 const unavailable: RequestHandler = (_req, res) => { res.status(503).json({ error: 'workflow_unavailable', message: 'Workflow is unavailable; configure its required runtime.' }); };
 
 /** Called strictly after the shared authentication/rate-limit perimeter. */
@@ -77,6 +78,8 @@ export function mountIntegratedWorkflows(app: Express, deps: IntegratedWorkflows
   else app.use(createUnavailableOperationsIntegrationsRouter());
   if (deps.retentionStatus) app.use(createRetentionStatusRouter(deps.retentionStatus));
   else app.use('/retention/status', requireScope('sessions'), unavailable);
+  if (deps.registrationApprovals) app.use(createRegistrationApprovalRouter(deps.registrationApprovals));
+  else app.use('/registration-approvals', requireScope(REGISTRATION_APPROVE_SCOPE), unavailable);
   if (deps.transcriptReview) app.use(createTranscriptReviewRouter(deps.transcriptReview));
   else app.use('/sessions/:sessionId/transcript-review', requireScope('sessions'), unavailable);
 }
