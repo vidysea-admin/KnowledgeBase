@@ -1,5 +1,5 @@
 import { apiFetch, ApiError } from "../../../api/client.js";
-import { safeHttpUrl } from "../../../safe-url.js";
+import { safePublicResourceUrl } from "../../../safe-url.js";
 export interface CatalogTopic { id: string; name: string }
 interface CatalogSession { id: string; title: string }
 interface CatalogEvidence { sessionId: string; turnId: string; title: string; quote: string; speaker: string; tStart: number; origin: string; coordinate: "seconds" | "character-offset" }
@@ -10,7 +10,7 @@ const text = (v: unknown) => typeof v === "string" && v.length > 0;
 const topic = (v: unknown): v is CatalogTopic => obj(v) && text(v.id) && typeof v.name === "string";
 const session = (v: unknown): v is CatalogSession => obj(v) && text(v.id) && typeof v.title === "string";
 const bad = () => new ApiError(503, "Invalid knowledge catalog response.");
-const publicLink = (v: unknown) => { const safe = safeHttpUrl(v); if (!safe) return false; const u = new URL(safe); return !u.username && !u.password && !/[\x00-\x20\x7f-\x9f]/.test(safe); };
+const publicLink = (v: unknown) => safePublicResourceUrl(v) !== null;
 export async function listCatalogTopics(key: string): Promise<{ topics: CatalogTopic[]; truncated: boolean }> {
   const r = await apiFetch<{ topics: unknown[]; truncated: boolean }>("/knowledge/topics", key);
   if (!r || !Array.isArray(r.topics) || !r.topics.every(topic) || r.topics.length > 100 || typeof r.truncated !== "boolean") throw bad(); return r as { topics: CatalogTopic[]; truncated: boolean };
