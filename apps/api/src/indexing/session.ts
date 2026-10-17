@@ -5,6 +5,7 @@ import { getDb, scopedCollection } from "@lkb/db";
 import type { SessionPages, Claims, Sessions, TreeIndexRootDocument, Turns } from "@lkb/core";
 import { summarizeSession, extractClaims, buildChunks, buildTopicIndex, regenerate, treeIndexRootFilter, runtimeChronologicalTurns, assertGroundedTurns, validateRuntimePage, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin } from "@lkb/index";
 import { suggestSpeakersForSession, type SpeakerSuggestOutcome } from "./speaker-suggest.js";
+import { suggestTileSpeakersForSession, tileSpeakerSuggestEnabled, type TileSpeakerSuggestOutcome } from "./tile-speaker-suggest.js";
 import { recordVectorGap } from "./vector-gap.js";
 import { decisionsEnabled } from "@lkb/index";
 import { extractAndPersistDecisions } from "./persistence/decisions-persist.js";
@@ -308,7 +309,17 @@ async function indexSessionWithinPublication(
       preservedClaims: preservedClaimRefs, treeRevision, retrievalMode });
   } else await failIndexAttempt(db, tenantId, attempt);
 
-  return { sessionId, chunks, entities, ...(speakerSuggestions ? { speakerSuggestions } : {}), summary: { degraded: summaryDegraded?.reason ?? null, ...(summarizeResult.dropped ? { dropped: summarizeResult.dropped.length } : {}) },
+  // T-042 P9 / D-160 (flag-gated, OFF by default): runs ONLY after the attempt committed; a failed or degraded
+  // index never reaches it. Suggestion rows only -- no final-speaker write. Absent/disabled = no call, no result key.
+  let tileSpeakerSuggestions: TileSpeakerSuggestOutcome | undefined;
+  if (committed && deps.tileSuggest?.enabled === true && tileSpeakerSuggestEnabled()) {
+    try {
+      tileSpeakerSuggestions = await suggestTileSpeakersForSession(tenantId, sessionId, turns, deps.tileSuggest.context,
+        deps.tileSuggest.readCapture, db as Db, { enabled: true });
+    } catch { tileSpeakerSuggestions = { suggested: 0, inserted: null, reason: "failed" }; }
+  }
+
+  return { sessionId, chunks, entities, ...(speakerSuggestions ? { speakerSuggestions } : {}), ...(tileSpeakerSuggestions ? { tileSpeakerSuggestions } : {}), summary: { degraded: summaryDegraded?.reason ?? null, ...(summarizeResult.dropped ? { dropped: summarizeResult.dropped.length } : {}) },
     claims: { degraded: claimsDegraded?.reason ?? null, ...(claimsResult.dropped ? { dropped: claimsResult.dropped.length } : {}) },
     ...(decisionsOut ? { decisions: decisionsOut } : {}), ...(topicReport ? { topics: topicReport } : {}),
     ...(grounded ? { groundedNotes: { claims: claimWrite ?? null, judge: judgeTotals(summarizeResult.judgeSidecar, claimsResult.judgeSidecar) ?? null } } : {}),
