@@ -1,7 +1,7 @@
 # Manifest - wire006b-failclosed
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Lane: C:/Users/product/Desktop/KnowledgeBase-lanes/w17-wire006b (branch lane/w17-wire006b), base 306228cb. Candidate SHA: lane HEAD commit.
 Task: T-007 ISS-W17WIRE006-001 and -003 (medium, tenancy class).
 
@@ -11,7 +11,7 @@ Task: T-007 ISS-W17WIRE006-001 and -003 (medium, tenancy class).
 - apps/api/src/transcript-review/authorization.test.ts: new no-authorizeSession test (4 endpoints -> 503, 0 store accesses, 0 writes).
 - apps/api/src/grounded-content/reader.ts: createMongoGroundedContentDeps deleted (only importer was its own test; server.ts uses trustedBrainReads). Unused imports removed.
 - apps/api/src/grounded-content/reader.test.ts: raw-Mongo test replaced by absence test.
-- qa/issues.W17WIRE006.jsonl: two fixed-pending-check rows.
+- qa/issues.W17WIRE006.jsonl: NO change from this lane (cycle 1 restored it to 306228cb content; duplicate ids broke tracker-audit; integration branch regrades -001 and appends -003).
 
 ## Checks a checker must run (from apps/api, node on PATH, timeout 600)
 - node --test --import tsx src/transcript-review/{authorization,persist,service}.test.ts src/grounded-content/reader.test.ts src/visibility/read-side-quarantine{,-trusted}.test.ts src/grounded-postprocessing/transcripts.test.ts
