@@ -80,7 +80,8 @@ function nativeZoomJoin(html: string, hosts: string[], expectedId: string): stri
     try {url = new URL(raw);} catch {continue;}
     const path = /^\/(?:j|w)\/([1-9][0-9]{5,31})\/?$/.exec(url.pathname);
     const label = match[2]!.replace(/<[^>]+>/g, " ").replace(/&nbsp;|&#160;/gi, " ").replace(/\s+/g, " ").trim();
-    if (hosts.includes(url.hostname) && path) allIds.add(path[1]!);
+    // Provider IDs from ANY zoom.us host count, so a conflicting ID on an unlisted host fails closed.
+    if ((url.hostname === "zoom.us" || url.hostname.endsWith(".zoom.us")) && path) allIds.add(path[1]!);
     if (/^join webinar$/i.test(label) && attributes.has("type")) {
       if (attributes.get("type")!.toLowerCase() !== "button") return undefined;
       if (url.protocol !== "https:" || url.port || url.username || url.password || url.hash ||
@@ -90,9 +91,17 @@ function nativeZoomJoin(html: string, hosts: string[], expectedId: string): stri
   }
   return allIds.size === 1 && allIds.has(expectedId) && nativeButtons.length === 1 ? nativeButtons[0] : undefined;
 }
+/** Activation needs BOTH the module constant and an explicit caller opt-in. */
 export function inspectZoomRegistrationConfirmation(input: ZoomProofInput, options: ZoomProofOptions = {}) {
+  return inspectWithConstant(input, options, ZOOM_PROVIDER_CORRELATION_ENABLED);
+}
+/** TEST SEAM ONLY: lets tests exercise the active path while the shipped constant stays false. No production caller may use it. */
+export const inspectZoomRegistrationConfirmationWithConstantForTest = (input: ZoomProofInput, options: ZoomProofOptions, constantEnabled: boolean) =>
+  // The proof module does no I/O; its only external inputs are the two injected adapters, both required here.
+  options.authorize && options.readNativeEvent ? inspectWithConstant(input, options, constantEnabled) : {status: "inactive" as const, reason: "approval-required"};
+function inspectWithConstant(input: ZoomProofInput, options: ZoomProofOptions, constantEnabled: boolean) {
   const refuse = (reason: string) => ({status: "refused" as const, reason});
-  if ((options.enabled ?? ZOOM_PROVIDER_CORRELATION_ENABLED) !== true || !options.authorize || !options.readNativeEvent)
+  if (constantEnabled !== true || options.enabled !== true || !options.authorize || !options.readNativeEvent)
     return {status: "inactive" as const, reason: "approval-required"};
   if (!input || input.complete !== true || !id(input.tenantId) || !email(input.mailbox) || !stamp(input.checkedAt) ||
     ![input.attempts, input.messages, input.baselineMessageIds, input.consumedMessageIds].every(Array.isArray) ||

@@ -58,9 +58,9 @@ async function bounded<T>(pending: Promise<T>, ms: number): Promise<T> {
 }
 /** Real transport: TLS verifies hostname, DNS is pinned, cookies/credentials are absent, redirects are manual. */
 export function pinnedRegistrationGet(url: URL, pinned: {address: string; family: number}, remainingMs: number,
-  remainingBytes = 1024 * 1024): Promise<PinnedResponse> {
+  remainingBytes = 1024 * 1024, trust?: {ca?: string | Buffer}): Promise<PinnedResponse> {
   return new Promise((resolve, reject) => {
-    const req = request(url, {method: "GET", agent: false, rejectUnauthorized: true, servername: url.hostname,
+    const req = request(url, {method: "GET", agent: false, rejectUnauthorized: true, servername: url.hostname, ...(trust?.ca ? {ca: trust.ca} : {}),
       // Older HTTPS type declarations omit this supported net socket option.
       family: pinned.family, ...{autoSelectFamily: false},
       headers: {accept: "text/html,application/json", "accept-encoding": "identity", connection: "close"},
@@ -85,9 +85,17 @@ export function pinnedRegistrationGet(url: URL, pinned: {address: string; family
     req.on("close", () => clearTimeout(timer)); req.on("error", reject); req.end();
   });
 }
-export async function resolveRegistrationLink(input: LinkResolutionInput, options: ResolverOptions = {}): Promise<
-  {status: "inactive" | "refused"; reason: string} | {status: "candidate"; proof: ResolvedRegistrationLink}> {
-  if ((options.enabled ?? REGISTRATION_LINK_RESOLUTION_ENABLED) !== true || !options.authorize) return {status: "inactive", reason: "approval-required"};
+type ResolveResult = {status: "inactive" | "refused"; reason: string} | {status: "candidate"; proof: ResolvedRegistrationLink};
+/** Activation needs BOTH the module constant and an explicit caller opt-in. */
+export function resolveRegistrationLink(input: LinkResolutionInput, options: ResolverOptions = {}): Promise<ResolveResult> {
+  return resolveWithConstant(input, options, REGISTRATION_LINK_RESOLUTION_ENABLED);
+}
+/** TEST SEAM ONLY: lets tests exercise the active path while the shipped constant stays false. No production caller may use it. */
+export const resolveRegistrationLinkWithConstantForTest = (input: LinkResolutionInput, options: ResolverOptions, constantEnabled: boolean): Promise<ResolveResult> =>
+  // Never reaches real DNS/HTTPS: both transport doubles must be injected.
+  options.dns && options.get ? resolveWithConstant(input, options, constantEnabled) : Promise.resolve({status: "inactive", reason: "approval-required"});
+async function resolveWithConstant(input: LinkResolutionInput, options: ResolverOptions, constantEnabled: boolean): Promise<ResolveResult> {
+  if (constantEnabled !== true || options.enabled !== true || !options.authorize) return {status: "inactive", reason: "approval-required"};
   if (!input || typeof input.link !== "string" || input.link.length > 8192 || ![input.tenantId, input.sourceId, input.messageId].every(identifier) ||
     !hash(input.sourceHash) || !hash(input.policyHash)) return {status: "refused", reason: "input-invalid"};
   let authorization: ResolutionAuthorization | undefined;

@@ -19,9 +19,9 @@ import type { ReviewStore } from "./store.js";
 
 export interface TranscriptReviewDeps {
   store: ReviewStore; refresh?: RefreshExecutor; clock?: () => string;
-  /** Trusted server-side eligibility. Production MUST bind its source visibility perimeter;
-   * omission exists only for independently injected fixtures/capabilities. Never client-controlled. */
-  authorizeSession?: (tenantId: string, sessionId: string) => Promise<boolean>;
+  /** Trusted server-side eligibility. REQUIRED: the router fails closed (503) if a caller omits it at
+   * runtime. Fixtures that want no perimeter must pass an explicit allow-all. Never client-controlled. */
+  authorizeSession: (tenantId: string, sessionId: string) => Promise<boolean>;
 }
 
 const SESSION_ID = /^[A-Za-z0-9][A-Za-z0-9._:@-]{0,399}$/;
@@ -62,8 +62,10 @@ export function createTranscriptReviewRouter(deps: TranscriptReviewDeps): Router
   router.use(path, requireScope("sessions"), async (req, res, next) => {
     const sessionId = req.params.sessionId as string;
     if (!SESSION_ID.test(sessionId)) return badId(res);
+    // Fail closed: a composition that omits the perimeter (e.g. untyped/JS caller) never serves raw chat review.
+    if (typeof deps.authorizeSession !== "function") { fail(res, new Error("authorizeSession not configured")); return; }
     try {
-      if (deps.authorizeSession && !await deps.authorizeSession(tenantOf(req), sessionId)) {
+      if (!await deps.authorizeSession(tenantOf(req), sessionId)) {
         send(res, 404, { error: "not_found", message: "Transcript review not found" }); return;
       }
       next();

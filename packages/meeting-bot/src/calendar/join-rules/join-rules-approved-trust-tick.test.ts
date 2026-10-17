@@ -121,8 +121,10 @@ test("last-valid approved snapshot keeps original lifetime and refuses expired o
 test("off and everyWebinar retain their existing selection policy and do not project new approvals", async () => fixture(async (dir, deps) => {
   approve(dir); deps.joinRulesEnforce = "off";
   assert.equal((await runScheduleTickOnce(deps, true)).toSchedule.length, 0);
-  // ISS-376 policy stays explicitly unchanged; this is a compatibility assertion, not acceptance.
+  // ISS-376 hybrid: everyWebinar refuses a failed-auth sender and still schedules an authenticated one.
   deps.everyWebinar = true; deps.loadCandidates = async () => [{...candidate(), senderAuthenticated: false}];
+  assert.equal((await runScheduleTickOnce(deps, true)).toSchedule.length, 0);
+  deps.loadCandidates = async () => [{...candidate(), senderAuthenticated: true}];
   assert.equal((await runScheduleTickOnce(deps, true)).toSchedule.length, 1);
 }));
 

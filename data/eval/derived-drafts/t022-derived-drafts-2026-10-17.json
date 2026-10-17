@@ -1,0 +1,1029 @@
+{
+  "format": "calibration-derived-drafts-v1",
+  "label": "derived, not humanGold",
+  "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+  "humanGold": false,
+  "generatedAt": "2026-10-17T16:47:49.925Z",
+  "authority": "D-163 (AI drafts, never humanGold), D-164 (Ollama GLM/DeepSeek first, Gemini last)",
+  "models": [
+    "ollama/glm-5.3-flash",
+    "ollama/deepseek-v4.1-flash",
+    "gemini/gemini-2.5-flash"
+  ],
+  "calls": {
+    "used": 62,
+    "max": 90,
+    "capReached": false
+  },
+  "note": "Sidecar only: the hash-bound review packet and the authoritative store are untouched. Each item is confirmed or edited individually by Umesh.",
+  "source": "data/eval/calibration-human-review.json",
+  "rubric": "Score how well this title + summary answers the query, from 0 to 1. Be conservative: above 0.7 only when directly and completely answered. Judge these displayed inputs, not the full transcript.",
+  "items": [
+    {
+      "id": "review-001",
+      "inputSha256": "fefea1d8655d5369b1353d3c375235c3603d380ba8e9f6bd0d041e58977190ab",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0,
+        "agreement": "agree",
+        "spread": 0,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0, ollama/deepseek-v4.1-flash=0).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0,
+            "rationale": "The document describes Leeds Arts University's campuses, admissions, and scholarships and contains no information about AI's impact on creative jobs."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0,
+            "rationale": "The document provides information about Leeds Arts University and its programs, but does not address whether creative jobs are safe from AI replacement."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-002",
+      "inputSha256": "bc03793396e80ce74fd7d9f0397910a453137612ae6851e62fa18cbc7202da7d",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.125,
+        "agreement": "agree",
+        "spread": 0.15,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.2, ollama/deepseek-v4.1-flash=0.05).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.2,
+            "rationale": "The document is a duplicate UK admissions panel transcript focused on offer letters and demand growth, and its summary contains no content about stricter financial verification prior to visa applications."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.05,
+            "rationale": "The document is a duplicate re-upload of a UK panel transcript about offer letters and growth figures, with no content addressing university financial checks or visa application requirements."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-003",
+      "inputSha256": "5472a073319290519ff3d1bdd889a2e6ce0ab92b5918ee24dd9b48436c55ab5a",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.175,
+        "agreement": "agree",
+        "spread": 0.05,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.2, ollama/deepseek-v4.1-flash=0.15).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.2,
+            "rationale": "While the document discusses reference letters in the context of UCAS application changes, it does not address the query's specific question about whether a counselor's recommendation letter incorporating teacher input should sound like one voice or two distinct voices."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.15,
+            "rationale": "The document discusses UCAS letter of reference structure and counselor guidance but does not address whether a subject teacher's input should make the counselor's recommendation sound like two different people wrote it."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-004",
+      "inputSha256": "0324d8ad3ec7d122196694c281c1b472e0b473ad8dc88616b2f57d84162d3111",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.1,
+        "agreement": "agree",
+        "spread": 0,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.1, ollama/deepseek-v4.1-flash=0.1).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.1,
+            "rationale": "The document discusses creative career pathways, portfolio expectations, and soft skills, but contains no information about AI or whether creative jobs are safe from AI-driven replacement."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.1,
+            "rationale": "The document discusses creative career pathways and portfolio expectations but does not address whether creative jobs are safe from AI replacement."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-005",
+      "inputSha256": "2eae8dd350d043fc15ee6f0ca5daf050669b4e7e5e430acddc93fd9ff1189614",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.025,
+        "agreement": "agree",
+        "spread": 0.05,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.05, ollama/deepseek-v4.1-flash=0).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.05,
+            "rationale": "The document describes a session showcasing two student-focused education startups and contains no information about common mistakes organizations make when communicating their differentiation."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0,
+            "rationale": "The document describes an inaugural In Focus session and two featured programs, but does not address common mistakes organizations make when communicating what makes them special."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-006",
+      "inputSha256": "211b9a97cc10ee8622c3a98f70345078480fc9f232a00da5bcf14dcf8238b0a1",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.84,
+        "agreement": "agree",
+        "spread": 0.12,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.78, ollama/deepseek-v4.1-flash=0.9).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.78,
+            "rationale": "The document directly addresses the query by describing UKVI's tightened Basic Compliance Assessment and universities' adoption of the Enroly CAS Shield platform for pre-CAS financial and credibility checks, confirming stricter financial screening before visa applications, though the summary also covers broader topics like enrollment trends and counseling advice."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.9,
+            "rationale": "The document explicitly states that universities are adopting pre-CAS financial and credibility checks and that UKVI tightened its Basic Compliance Assessment, directly confirming stricter finance screening before visa application."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-007",
+      "inputSha256": "8e9bb7afeb38dbc7817a065851982362dbc488376a4fb7beefc72724f2a37acb",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.2,
+        "agreement": "agree",
+        "spread": 0,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.2, ollama/deepseek-v4.1-flash=0.2).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.2,
+            "rationale": "While the summary mentions international collaborations (Parsons, Babson), it never addresses the teaching style or pedagogical approach, so it does not directly answer the query."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.2,
+            "rationale": "The document mentions international collaborations (Parsons, Babson) but does not describe the teaching style or compare it to traditional regional models."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-008",
+      "inputSha256": "a15048a93cee6e8540067c4242440df91a7c1e69f133c6b7de349065c22e2e1d",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.1,
+        "agreement": "agree",
+        "spread": 0,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.1, ollama/deepseek-v4.1-flash=0.1).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.1,
+            "rationale": "The document covers entrance exam competition statistics and counseling logistics for JEE/NEET, but does not address the tradeoff between choosing a top-ranked college with a less preferred course versus a preferred course at a lower-ranked institution."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.1,
+            "rationale": "The document discusses Indian entrance exam competition and pathways but does not address the tradeoff between choosing a top-ranked college for a less popular course versus a desired course at a lower-ranked institution."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-009",
+      "inputSha256": "c6d9858701b40fcd106a6dd317a43e246b0b04ce803b5332149a468bd2ee9c5c",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.325,
+        "agreement": "agree",
+        "spread": 0.05,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.35, ollama/deepseek-v4.1-flash=0.3).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.35,
+            "rationale": "The document broadly touches on creative-career pathways and one unusual program (SCADpro), but it focuses on soft skills statistics, STEM/OPT designations, and portfolio expectations by region rather than actually listing less common career paths, so it does not directly answer the query."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.3,
+            "rationale": "The document discusses creative-career pathways broadly and related topics, but it does not list or describe specific less common career paths, so it only tangentially addresses the query."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-010",
+      "inputSha256": "b3a9b297a43b58738d18f2d33ec3b4090c5dc8b47d6e08cc2d67fe322d6428e3",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.575,
+        "agreement": "agree",
+        "spread": 0.15,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.65, ollama/deepseek-v4.1-flash=0.5).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.65,
+            "rationale": "The document directly addresses transforming generic institutional claims into emotionally resonant stories and provides a framework (E.D.U.C.A.T.E. plus emotional doors) for doing so, but its stated examples focus on school marketing clichés rather than specifically showing how to reframe a 'great team' selling point."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.5,
+            "rationale": "The document provides a general brand-storytelling framework and notes that generic claims lack emotional signal, but it does not directly explain how to reframe a specific standard selling point like 'great team' into a memorable story."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-011",
+      "inputSha256": "84efd4202c36309f383fe961dd63e829237bd2367a4bb105c3e1022aad26c5fb",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.6,
+        "agreement": "agree",
+        "spread": 0,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.6, ollama/deepseek-v4.1-flash=0.6).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.6,
+            "rationale": "The document directly addresses the collateral question for New Zealand—only nationalized-bank secured loans qualify and unsecured personal loans are explicitly rejected for proof-of-funds—but provides no loan or collateral guidance for Italy or France, so it only partially answers the country-agnostic query."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.6,
+            "rationale": "Document provides specific loan requirement for New Zealand (secured loans only, unsecured not accepted) but does not address loan requirements for the other visa processes mentioned."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-012",
+      "inputSha256": "d41bcc922651172679cd29630d494d33d5dc13c376a8e51b42b2f078eecaa7b9",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.125,
+        "agreement": "agree",
+        "spread": 0.05,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.15, ollama/deepseek-v4.1-flash=0.1).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.15,
+            "rationale": "The document describes education programs generally but provides no information on whether sessions are live or recorded, nor how study materials are created or sourced, which are the core of the query."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.1,
+            "rationale": "The document discusses online course structures and mentor training but does not specify whether sessions are live or recorded or whether instructors create their own study materials."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-013",
+      "inputSha256": "3a1c675921ca0ffc8b09885b38396ac1db8b6d0e752366ddd3d850c3f699e890",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.1,
+        "agreement": "agree",
+        "spread": 0,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.1, ollama/deepseek-v4.1-flash=0.1).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.1,
+            "rationale": "The document focuses on creative career pathways, admissions portfolios, and degree program details, offering no direct advice on promoting or sharing completed work with a wider audience."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.1,
+            "rationale": "The document discusses creative career pathways and portfolio expectations but does not address how to get completed work seen by a wider audience."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-014",
+      "inputSha256": "f2911d77a2c11b49e2530082e7c61b371dff2c2ddee9c0ee1df738c02523eed3",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.1,
+        "agreement": "disagree",
+        "spread": 0.4,
+        "flags": [
+          "models-disagree",
+          "look-closely"
+        ],
+        "validVotes": 3,
+        "rationale": "Median of 3 model scores (ollama/glm-5.3-flash=0.5, ollama/deepseek-v4.1-flash=0.1, gemini/gemini-2.5-flash=0.1).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.5,
+            "rationale": "The document is topically about the cast of people involved in the college application journey and mentions 'family cost reality' as a stakeholder tension, but it only defines professional roles and never explicitly states whether parents are part of the external support team."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.1,
+            "rationale": "The document focuses on professional roles in the college application ecosystem and only mentions family cost reality, without stating whether parents are considered part of an external support team."
+          },
+          {
+            "model": "gemini/gemini-2.5-flash",
+            "score": 0.1,
+            "rationale": "The document discusses professional roles and friction points in the college application process, mentioning 'family cost reality' but does not directly address whether parents are considered an 'external support team'."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-015",
+      "inputSha256": "9a8459ff479d8ae6cc62ce20415ba0c69594a0f84a011b349b8d1153f15552a3",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0,
+        "agreement": "agree",
+        "spread": 0,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0, ollama/deepseek-v4.1-flash=0).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0,
+            "rationale": "The document is a promotional overview of Xavier University's academics and scholarships and contains no information about recommendation letters or teacher/counselor input, so it does not answer the query."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0,
+            "rationale": "The document discusses Xavier University's academics and affordability, not whether a counselor recommendation letter with subject teacher input should sound like two different people wrote it."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-016",
+      "inputSha256": "6c020e1603a9c848cfbf75f0a0535824e163196592dee62c17ccf3a9a8d69975",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.3,
+        "agreement": "agree",
+        "spread": 0,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.3, ollama/deepseek-v4.1-flash=0.3).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.3,
+            "rationale": "The document mentions an entrepreneurship accelerator (StarterSky) that could tangentially relate to starting a project, but it does not address whether the program suits participants without a specific idea, and the visa-focused content is irrelevant."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.3,
+            "rationale": "The document describes an entrepreneurship accelerator but does not state whether it accepts or supports children without a specific project idea, so it only partially relates to the query."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-017",
+      "inputSha256": "8e3e8af039204bbe6d25e56abd65f3beb189868053fc5c634dd2b13b517e8bc5",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.1,
+        "agreement": "agree",
+        "spread": 0,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.1, ollama/deepseek-v4.1-flash=0.1).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.1,
+            "rationale": "The document covers UC system facts like campuses, test-blind policy, fees, and scholarships, but contains no information about personal essay requirements or application format."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.1,
+            "rationale": "The document covers UC system structure, test-free policy, fees, and scholarships but does not mention personal essay or application essay format requirements."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-018",
+      "inputSha256": "a58d423d0e75dceaf5673f57ad45a7aff7877361ee389bdef8a4b24b0426e9b5",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.275,
+        "agreement": "agree",
+        "spread": 0.15,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.35, ollama/deepseek-v4.1-flash=0.2).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.35,
+            "rationale": "The document tangentially touches on teaching models (1-on-1 mentoring, self-created flashcards, NotebookLM use) but does not directly answer whether sessions are live or recorded or address the creation vs. use of existing study materials as the primary focus."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.2,
+            "rationale": "The document describes personalized tutoring and a custom flashcard set but does not address whether sessions are live or recorded or directly compare creating versus using existing study materials."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-019",
+      "inputSha256": "4542c0d36fa57bb0ffaf3d327add0f960ccf2c8d2df92cb2f79e27edd38dcfba",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.45,
+        "agreement": "agree",
+        "spread": 0.1,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.4, ollama/deepseek-v4.1-flash=0.5).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.4,
+            "rationale": "The document is topically related since it discusses legal careers beyond the obvious path of litigation, but the summary does not name or explain any specific less-common career paths, focusing instead on where to study law and AI adoption in firms."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.5,
+            "rationale": "The document is broadly about non-litigation legal careers but does not actually list or describe any specific less common career paths, so it only partially addresses the query."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-020",
+      "inputSha256": "5cd7b0bf3ce5c717246859f1084d9129a0acfd3480c1ffff48a3e6a9e7200884",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.425,
+        "agreement": "agree",
+        "spread": 0.05,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.4, ollama/deepseek-v4.1-flash=0.45).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.4,
+            "rationale": "The document only tangentially touches the query's core question, briefly noting one mistake (generic claims like 'world-class infrastructure' carry no emotional signal), while its main focus is a brand-storytelling framework rather than a discussion of common communication mistakes."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.45,
+            "rationale": "The document mentions one mistake—generic institutional claims lacking emotional signal—but does not directly or comprehensively answer the query about the most common communication mistakes organizations make."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-021",
+      "inputSha256": "bb829fda3da7f34c1d007d856fdbec262175adbe7aa761b624b67587d76d4448",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.6,
+        "agreement": "disagree",
+        "spread": 0.25,
+        "flags": [
+          "models-disagree",
+          "look-closely"
+        ],
+        "validVotes": 3,
+        "rationale": "Median of 3 model scores (ollama/glm-5.3-flash=0.6, ollama/deepseek-v4.1-flash=0.85, gemini/gemini-2.5-flash=0.6).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.6,
+            "rationale": "The document directly states a 50% board-exam / 50% NATA split for the B.Arch program, which addresses the grade-vs-test weighting question, but only for one specific program rather than a general merit score calculation."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.85,
+            "rationale": "The summary explicitly states that CEPT's B.Arch admissions use a 50% board-exam/50% NATA-score split, and B.Des is purely UCEED-based, directly addressing the relative weighting of grades versus standardized tests."
+          },
+          {
+            "model": "gemini/gemini-2.5-flash",
+            "score": 0.6,
+            "rationale": "The document directly answers the relative importance of high school grades versus standardized test scores for one specific program (B.Arch) at CEPT University, showing a 50/50 split, but it does not provide a general answer."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-022",
+      "inputSha256": "6c81ef43fc82d5cd6d0755386553e69faa58ec1589dad5aef768f9dabd5f3f39",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.1,
+        "agreement": "agree",
+        "spread": 0,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.1, ollama/deepseek-v4.1-flash=0.1).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.1,
+            "rationale": "The document describes educational programs (Futurowise courses and The Student Scoop's readiness engine) and only tangentially mentions a 'published project,' offering no guidance on sharing or promoting completed work to a wider audience."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.1,
+            "rationale": "The document mentions courses ending in a published project but does not provide guidance on how to get work seen by a wider audience after completing a project."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-023",
+      "inputSha256": "30a3a782e238588eaf96a3336e3046b8142e390e896ef92849510224239e1b6c",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.4,
+        "agreement": "agree",
+        "spread": 0,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.4, ollama/deepseek-v4.1-flash=0.4).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.4,
+            "rationale": "The document touches on education financing and mentions unsecured loan limits for studying abroad, but it never addresses the visa process or whether collateral-free loans satisfy visa requirements, so it only partially relates to the query."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.4,
+            "rationale": "The document mentions unsecured education loan ceilings (relevant to personal loans without collateral) but does not address visa requirements or compare loans against property, so it only partially answers the query."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-024",
+      "inputSha256": "7bc96d6a698f2c19560307c86f22081d4a3fb398697ba9a72d248b18df34f1e4",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.025,
+        "agreement": "agree",
+        "spread": 0.05,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.05, ollama/deepseek-v4.1-flash=0).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.05,
+            "rationale": "The document is a promotional overview of Leeds Arts University's campuses, entry requirements, and scholarships, and does not address the general question of choosing between a top-ranked college with a less preferred course versus a preferred course at a lower-ranked institution."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0,
+            "rationale": "The document describes Leeds Arts University's campuses, courses, and entry requirements, but does not address the trade-off between college ranking and course preference."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-025",
+      "inputSha256": "73d9cb70eacb4f54d52c900b84396a19c8d47caf956ee0f235ae2148ba5a913c",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0,
+        "agreement": "agree",
+        "spread": 0,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0, ollama/deepseek-v4.1-flash=0).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0,
+            "rationale": "The document discusses structural changes to the UK UCAS application process and has no relevance to reframing selling points into memorable stories."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0,
+            "rationale": "The document is about UCAS application changes and letters of reference, not about reframing selling points into stories."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-026",
+      "inputSha256": "6307069f161f4932fe3af9bc192dec60d0570952c976e74e01768e8461263f77",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.425,
+        "agreement": "agree",
+        "spread": 0.05,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.4, ollama/deepseek-v4.1-flash=0.45).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.4,
+            "rationale": "The document describes programs like Futurowise's structured courses ending in a published project, which could plausibly suit a child without a pre-existing project idea, but it never explicitly addresses whether students can or cannot join without one, so it only partially and inferentially answers the query."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.45,
+            "rationale": "The document describes a project-based program (Futurowise) that could be relevant, but it does not directly address whether it works for a child without a specific project idea."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-027",
+      "inputSha256": "5b51a7109c7145d16173dd78285014605e56862ca0b2cebec0004927c5a8ccfa",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.875,
+        "agreement": "agree",
+        "spread": 0.05,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.85, ollama/deepseek-v4.1-flash=0.9).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.85,
+            "rationale": "The document directly addresses whether a long personal essay is required by explaining that the UCAS personal statement format changed from a single 4,000-character essay to three structured prompts of at least 350 characters each."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.9,
+            "rationale": "The document directly answers the query by stating the UCAS personal statement changed from a single 4,000-character essay to three structured prompts, confirming a different format."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-028",
+      "inputSha256": "de9b7f23c755d9d0f6b1470562198680f57b4e1afac028944a6fea5b150bcca5",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.025,
+        "agreement": "agree",
+        "spread": 0.05,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.05, ollama/deepseek-v4.1-flash=0).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.05,
+            "rationale": "The document covers structural changes to the UCAS application (personal statement prompts and reference letter sections) and never addresses who constitutes a college application support team or whether parents are included in it."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0,
+            "rationale": "The document discusses UCAS application changes and does not address whether parents are considered part of the external support team for college applications."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-029",
+      "inputSha256": "f3ccc815b80543b671ceae8e18090eeceabb75d8bb7075d03c9f1bd69baa5027",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0.3,
+        "agreement": "agree",
+        "spread": 0.2,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0.2, ollama/deepseek-v4.1-flash=0.4).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0.2,
+            "rationale": "The document describes edtech course offerings and a pedagogical training program, briefly touching on international curricula (IBDP/IGCSE/A-Level), but it does not address whether the teaching style follows an international model versus a traditional regional one."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0.4,
+            "rationale": "The document mentions international curricula (IBDP/IGCSE/A-Level) and structured pedagogical training, but does not explicitly compare or state whether the teaching style is international or traditional for the region."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    },
+    {
+      "id": "review-030",
+      "inputSha256": "0d1608552cc0795f09808f813cd81a0000882295e42705cd0027cda215d70de3",
+      "humanGold": false,
+      "aiDraft": {
+        "label": "derived, not humanGold",
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "score": 0,
+        "agreement": "agree",
+        "spread": 0,
+        "flags": [],
+        "validVotes": 2,
+        "rationale": "Median of 2 model scores (ollama/glm-5.3-flash=0, ollama/deepseek-v4.1-flash=0).",
+        "perModel": [
+          {
+            "model": "ollama/glm-5.3-flash",
+            "score": 0,
+            "rationale": "The document discusses dual enrollment and transferable college credit, with no mention of high school grades, standardized test scores, or merit score calculation for admission."
+          },
+          {
+            "model": "ollama/deepseek-v4.1-flash",
+            "score": 0,
+            "rationale": "The document discusses dual enrollment and college credit transfer, not the relative weighting of high school grades versus standardized test scores in merit score calculations."
+          }
+        ]
+      },
+      "humanReview": {
+        "score": null,
+        "rationale": null,
+        "approvedBy": null,
+        "approvedAt": null
+      }
+    }
+  ]
+}

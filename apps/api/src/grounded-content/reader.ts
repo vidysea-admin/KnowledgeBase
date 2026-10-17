@@ -1,6 +1,5 @@
 import type { Claims, CitedItem, QaEntry, SessionPages, Sessions, Turns } from "@lkb/core";
-import { assertValidTenantId, getDb, scopedCollection } from "@lkb/db";
-import type { Db } from "mongodb";
+import { assertValidTenantId } from "@lkb/db";
 
 export interface GroundedEvidence {
   turnId: string;
@@ -53,17 +52,4 @@ export function createGroundedContentDeps(read: GroundedReadDeps): GroundedConte
       })),
     };
   } };
-}
-
-export function createMongoGroundedContentDeps(db: Db = getDb()): GroundedContentDeps {
-  const sessions = scopedCollection<Sessions>(db, "sessions"), pages = scopedCollection<SessionPages>(db, "session_pages");
-  const claims = scopedCollection<Claims>(db, "claims"), turns = scopedCollection<Turns>(db, "turns");
-  return createGroundedContentDeps({ async getSessionDetail(tenantId, sessionId) {
-    const session = await sessions(tenantId).findOne({ _id: sessionId });
-    if (!session) return null;
-    const [page, sessionClaims, sessionTurns] = await Promise.all([
-      pages(tenantId).findOne({ sessionId }), claims(tenantId).find({ "evidence.sessionId": sessionId }).toArray(), turns(tenantId).find({ sessionId }).toArray(),
-    ]);
-    return { session, page, claims: sessionClaims, turns: sessionTurns };
-  } });
 }

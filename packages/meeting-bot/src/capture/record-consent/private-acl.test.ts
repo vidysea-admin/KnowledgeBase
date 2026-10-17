@@ -45,3 +45,26 @@ test("native ACL uses fixed script and literal argument path with bounded output
 test("explicit real Windows ACL probe uses existing broker-configured private directory without mutations",{
   skip:process.platform!=="win32"||!process.env.LKB_PRIVATE_ACL_PROBE_DIR
 },()=>{verifyPrivateDirectory(process.env.LKB_PRIVATE_ACL_PROBE_DIR!);});
+test("native ACL retries exactly once on ETIMEDOUT only and fails closed otherwise",{skip:process.platform!=="win32"},()=>{
+  const root=mkdtempSync(path.join(tmpdir(),"t011-acl-retry-")),target=path.join(root,"private retry");mkdirSync(target);
+  try {
+    const good={status:0,stdout:JSON.stringify({...proof,path:target})};
+    const timeout={status:null,error:{code:"ETIMEDOUT"},signal:"SIGTERM",stdout:"",stderr:""};
+    const script=(results:unknown[])=>{const calls:number[]=[];return {calls,run:((..._args:unknown[])=>{calls.push(1);return results[Math.min(calls.length-1,results.length-1)];}) as never};};
+    // timeout then success: accepted after exactly two launches
+    const a=script([timeout,good]);verifyPrivateDirectory(target,a.run);assert.equal(a.calls.length,2);
+    // timeout then timeout: refused as deadline, no third launch
+    const b=script([timeout,timeout,good]);
+    assert.throws(()=>verifyPrivateDirectory(target,b.run),(error:unknown)=>{
+      const failure=error as Error&{cause:{classification:string}};
+      assert.equal(failure.message,"Private Windows directory ACL unavailable");assert.equal(failure.cause.classification,"deadline");return true;
+    });
+    assert.equal(b.calls.length,2);
+    // non-timeout error: no retry
+    for(const failing of [{status:1,stdout:"",stderr:"PermissionDenied"},{status:null,error:{code:"EPERM"},stdout:"",stderr:""}]){
+      const c=script([failing,good]);assert.throws(()=>verifyPrivateDirectory(target,c.run),/ACL unavailable/);assert.equal(c.calls.length,1);
+    }
+    // success first time: one launch
+    const d=script([good]);verifyPrivateDirectory(target,d.run);assert.equal(d.calls.length,1);
+  }finally {rmSync(root,{recursive:true,force:true});}
+});

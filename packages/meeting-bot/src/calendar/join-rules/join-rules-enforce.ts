@@ -203,7 +203,7 @@ export async function enforceJoinRules(selection: SelectAutoRecordItemsResult, c
   }
   const selectedItems = Array.isArray(selection?.toSchedule) ? selection.toSchedule : [];
   const selectedSkipped = Array.isArray(selection?.skipped) ? selection.skipped : [];
-  const out = applyJoinRules(selection, read.stored.ruleSet, { state: read.stored.state }, c.io?.evaluate);
+  const out = applyJoinRules(selection, read.stored.ruleSet, { state: read.stored.state, log: (m) => c.log(`schedule-tick: JOIN RULES WARNING (${mode}): ${m}`) }, c.io?.evaluate);
   const recover = mode === "last-valid" && "healthy" in read && read.healthy === true;
   if (out === selection) { if (recover) await healthy(c); return selection; }
   const removed = out.skipped.slice(selectedSkipped.length);
@@ -215,6 +215,7 @@ export async function enforceJoinRules(selection: SelectAutoRecordItemsResult, c
     await degraded(c, { tenantId: c.tenantId, reason: "evaluation-failed", usingSnapshot: !!snapshot,
       snapshotValidatedAt: snapshot?.validatedAt, snapshotExpiresAt: snapshot?.expiresAt });
   }
+  else await degraded(c, { tenantId: c.tenantId, reason: "evaluation-failed", usingSnapshot: false }); // ISS-T037VETO-003: alert in every enforcing mode
   if (mode !== "fail-open") {
     warn(`${unevaluable.length} meeting(s) could not be evaluated`, "NOT scheduled this tick");
     return out;

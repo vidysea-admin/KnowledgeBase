@@ -91,3 +91,8 @@ Rough total: **8–10 working days**. Each unit goes through `/maker` → `/chec
 - Platform terms around recording: internal KB use only, never redistributed.
 - Zoho web-client changes can break the auto-click; P1 alerts make that visible the same day.
 - Laptop dependency (must be on, awake and logged in). Moving the bot to an always-on machine or VM is a later decision (not planned yet).
+
+## Send-now API host
+
+Send-now (`POST /calendar/send-now`, T-039) is live only through `scripts/webinar/join-rules-api-host.ts`. A plain `apps/api` start answers 503 `send_now_unavailable` ("send-now is served by the join-rules API host") by design. See `docs/docker-deployment.md`, "Send-now host".
+

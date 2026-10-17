@@ -7,7 +7,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, w
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { DAY, NOW, iso, snapshot, tempRoot, writeSession, emptyOps, baseArgs } from "./retention-report.fixtures.js";
+import { DAY, NOW, iso, snapshot, tempRoot, writeSession, emptyOps, purgeBaseArgs as baseArgs } from "./retention-report.fixtures.js";
 import { tenantSegment } from "./retention-report-state.js";
 import { REAL_PURGE_IO, runRetentionPurge, type PurgeIo } from "./retention-purge.js";
 
@@ -34,6 +34,10 @@ function session(e: Env, name: string, ageDays: number, extra: Record<string, un
   return dir;
 }
 
+
+/** Test helper: pair --execute with --confirm-deletion unless the test passes --no-auto-confirm (to prove the refusal). */
+const withConfirm = (flags: string[]): string[] => flags.includes("--no-auto-confirm") ? flags.filter((f) => f !== "--no-auto-confirm")
+  : flags.includes("--execute") && !flags.includes("--confirm-deletion") ? [...flags, "--confirm-deletion"] : flags;
 interface Ran { code: number; out: string; err: string; unlinked: string[] }
 function run(e: Env, flags: string[] = [], opts: { afterPlan?: () => void; purgeIo?: (log: string[]) => PurgeIo; extra?: string[]; omitClips?: boolean } = {}): Ran {
   const out: string[] = [];
@@ -42,7 +46,7 @@ function run(e: Env, flags: string[] = [], opts: { afterPlan?: () => void; purge
   const clips: NonNullable<Parameters<typeof runRetentionPurge>[1]["clips"]> = { extract: (_media, windows) => ({ ok: true,
     outcomes: windows.map(window => ({ turnId: window.turnId, file: "injected-valid-clip", status: "exists" })) }) };
   const purgeIo: PurgeIo = opts.purgeIo ? opts.purgeIo(unlinked) : { unlink: (p) => { unlinked.push(p); REAL_PURGE_IO.unlink(p); } };
-  const code = runRetentionPurge([...baseArgs(e.root, e.media, [...ASOF, ...(opts.extra ?? [])]), ...flags], {
+  const code = runRetentionPurge([...baseArgs(e.root, e.media, [...ASOF, ...(opts.extra ?? [])]), ...withConfirm(flags)], {
     now: () => NOW, write: (l) => out.push(l), error: (l) => err.push(l), purgeIo, ...(opts.afterPlan ? { afterPlan: opts.afterPlan } : {}),
     ...(opts.omitClips ? {} : { clips }),
   });
@@ -216,5 +220,77 @@ test("missing or malformed capture time is kept; unknown flags and a repeated --
     assert.equal(run(e, ["--execute", "--delete-all"]).code, 2);
     assert.ok(existsSync(emptyOps()));
     mkdirSync(join(e.media, "x"), { recursive: true });
+  } finally { e.done(); }
+});
+
+// ---- ruling 5 (2026-10-17): double flag, defaults, floors, final re-check ---------------------------------------
+test("--execute WITHOUT --confirm-deletion refuses with exit 2 and deletes nothing", () => {
+  const e = env();
+  try {
+    session(e, "a", 120);
+    const r = run(e, ["--execute", "--no-auto-confirm"]);
+    assert.equal(r.code, 2);
+    assert.match(r.err, /--execute requires --confirm-deletion/);
+    assert.equal(r.unlinked.length, 0);
+    assert.ok(existsSync(mediaFile(e, "a")), "media must survive");
+    assert.doesNotMatch(r.out, /EXECUTE mode|PURGED/);
+  } finally { e.done(); }
+});
+
+test("--confirm-deletion without --execute is a usage error; with both it deletes", () => {
+  const e = env();
+  try {
+    session(e, "a", 120);
+    const lone = run(e, ["--confirm-deletion"]);
+    assert.equal(lone.code, 2);
+    assert.ok(existsSync(mediaFile(e, "a")));
+    assert.equal(run(e, ["--execute", "--confirm-deletion", "--confirm-deletion"]).code, 2);
+    assert.ok(existsSync(mediaFile(e, "a")));
+    const both = run(e, ["--execute", "--confirm-deletion"]);
+    assert.equal(both.code, 0, both.err + both.out);
+    assert.ok(!existsSync(mediaFile(e, "a")));
+  } finally { e.done(); }
+});
+
+test("defaults are 90 days / 15 s when omitted; below the floors is refused", () => {
+  const e = env();
+  try {
+    session(e, "old", 120); session(e, "young", 60);
+    const strip = (args: string[]): string[] => args.filter((a, i) => !["--min-age-days", "--clip-padding-seconds"].includes(a) && !["--min-age-days", "--clip-padding-seconds"].includes(args[i - 1] ?? ""));
+    const go = (args: string[]) => { const out: string[] = []; const err: string[] = []; const code = runRetentionPurge(args, { now: () => NOW, write: (l) => out.push(l), error: (l) => err.push(l) }); return { code, out: out.join("\n"), err: err.join("\n") }; };
+    const base = strip(baseArgs(e.root, e.media, ASOF));
+    const d = go(base);
+    assert.equal(d.code, 0, d.err + d.out);
+    assert.match(d.out, /WOULD-PURGE path=m\/old\.webm/);
+    assert.doesNotMatch(d.out, /WOULD-PURGE path=m\/young/);
+    for (const bad of [["--min-age-days", "89"], ["--min-age-days", "7"], ["--clip-padding-seconds", "14"], ["--clip-padding-seconds", "1"]]) {
+      const r = go([...base, ...bad]);
+      assert.equal(r.code, 2, bad.join(" "));
+      assert.match(r.err, /must be at least/);
+    }
+    assert.equal(go([...base, "--min-age-days", "90", "--clip-padding-seconds", "15"]).code, 0);
+    assert.ok(existsSync(mediaFile(e, "old")), "dry runs delete nothing");
+  } finally { e.done(); }
+});
+
+test("a veto that appears AFTER clip extraction (just before unlink) still blocks the delete", () => {
+  const e = env();
+  try {
+    session(e, "late", 120);
+    const ops = join(mkdtempSync(join(tmpdir(), "t046purge-ops-")), "operations.json");
+    writeFileSync(ops, JSON.stringify({ version: 1, operations: {} }));
+    const out: string[] = []; const unlinked: string[] = [];
+    const code = runRetentionPurge([...baseArgs(e.root, e.media, [...ASOF, "--operations-state", ops]), "--execute", "--confirm-deletion"], {
+      now: () => NOW, write: (l) => out.push(l), error: (l) => out.push(l),
+      purgeIo: { unlink: (p) => { unlinked.push(p); REAL_PURGE_IO.unlink(p); } },
+      clips: { extract: (_m, windows) => {
+        writeFileSync(ops, JSON.stringify({ version: 1, operations: { late: { status: "processing" } } }));
+        return { ok: true, outcomes: windows.map((w) => ({ turnId: w.turnId, file: "c", status: "exists" as const })) };
+      } },
+    });
+    assert.equal(code, 0, out.join("\n"));
+    assert.equal(unlinked.length, 0);
+    assert.ok(existsSync(mediaFile(e, "late")));
+    assert.match(out.join("\n"), /VETOED path=m\/late\.webm reason=operation-in-progress/);
   } finally { e.done(); }
 });

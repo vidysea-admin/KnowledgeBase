@@ -5,6 +5,7 @@ import { getDb, scopedCollection } from "@lkb/db";
 import type { SessionPages, Claims, Sessions, TreeIndexRootDocument, Turns } from "@lkb/core";
 import { summarizeSession, extractClaims, buildChunks, buildTopicIndex, regenerate, treeIndexRootFilter, runtimeChronologicalTurns, assertGroundedTurns, validateRuntimePage, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin } from "@lkb/index";
 import { suggestSpeakersForSession, type SpeakerSuggestOutcome } from "./speaker-suggest.js";
+import { runTileSuggestHook } from "./session-tile-suggest-hook.js";
 import { recordVectorGap } from "./vector-gap.js";
 import { decisionsEnabled } from "@lkb/index";
 import { extractAndPersistDecisions } from "./persistence/decisions-persist.js";
@@ -299,16 +300,16 @@ async function indexSessionWithinPublication(
   }
 
   // U2.4 / D-141: suggestions only, behind the opt-in flag; absent flag = no call, no result key (byte-identical output).
-  const speakerSuggestions: SpeakerSuggestOutcome | undefined = deps.suggestSpeakers === true
-    ? await suggestSpeakersForSession(tenantId, sessionId, turns, deps.complete as never, db as Db)
-    : undefined;
+  const speakerSuggestions: SpeakerSuggestOutcome | undefined = deps.suggestSpeakers === true ? await suggestSpeakersForSession(tenantId, sessionId, turns, deps.complete as never, db as Db) : undefined;
 
   if (!summaryDegraded && !claimsDegraded && !chunks.skipped && !entities?.skipped && pageRef && chunkRefs.length && treeRevision !== undefined) {
     committed = await finishIndexAttempt(db, tenantId, attempt, { page: pageRef, chunks: [chunkRefs[0]!, ...chunkRefs.slice(1)], claims: generatedClaimRefs,
       preservedClaims: preservedClaimRefs, treeRevision, retrievalMode });
   } else await failIndexAttempt(db, tenantId, attempt);
 
-  return { sessionId, chunks, entities, ...(speakerSuggestions ? { speakerSuggestions } : {}), summary: { degraded: summaryDegraded?.reason ?? null, ...(summarizeResult.dropped ? { dropped: summarizeResult.dropped.length } : {}) },
+  const tileSpeakerSuggestions = await runTileSuggestHook(committed, deps.tileSuggest, tenantId, sessionId, turns, db as Db); // T-042 P9 / D-160 hook: gating + fail-soft in ./session-tile-suggest-hook.ts
+
+  return { sessionId, chunks, entities, ...(speakerSuggestions ? { speakerSuggestions } : {}), ...(tileSpeakerSuggestions ? { tileSpeakerSuggestions } : {}), summary: { degraded: summaryDegraded?.reason ?? null, ...(summarizeResult.dropped ? { dropped: summarizeResult.dropped.length } : {}) },
     claims: { degraded: claimsDegraded?.reason ?? null, ...(claimsResult.dropped ? { dropped: claimsResult.dropped.length } : {}) },
     ...(decisionsOut ? { decisions: decisionsOut } : {}), ...(topicReport ? { topics: topicReport } : {}),
     ...(grounded ? { groundedNotes: { claims: claimWrite ?? null, judge: judgeTotals(summarizeResult.judgeSidecar, claimsResult.judgeSidecar) ?? null } } : {}),

@@ -6,6 +6,7 @@
  * either file makes them mutually dependent, which `dependency-cruiser`'s `no-circular` rule
  * correctly rejected. A third module owned by neither is the honest resolution.
  */
+import type { TileCaptureContext, ReadTileCapture, TileSpeakerSuggestOutcome } from "./tile-speaker-suggest.js";
 import type { EmbedJob, EmbedResult } from "@lkb/ai";
 import type { Db } from "mongodb";
 import type { SummarizeCompleteFn, NoteJudge } from "@lkb/index";
@@ -48,6 +49,8 @@ export interface IndexSessionResult {
   groundedNotes?: { claims: { preserved: number; replaced: number; inserted: number } | null; judge: { judged: number; kept: number; dropped: number; unsure: number; rulesDropped: number; calls: number; costUsd: number } | null };
   /** U2.4: present only when speaker suggestion was opted into. */
   speakerSuggestions?: { suggested: number; inserted: number; degraded: string | null; error?: string };
+  /** T-042 P9: present only when the tile-suggest hook was enabled AND the index attempt committed. Never affects `completion`. */
+  tileSpeakerSuggestions?: TileSpeakerSuggestOutcome;
   /** U2.1 entity promotion. `null` when no tree root was produced, so there was nothing to promote
    * — distinct from a promotion that ran and failed, which reports `skipped`. */
   entities: { topics: number; orgs: number; claimsTagged: number; skipped: "promotion-failed" | null } | null;
@@ -75,6 +78,9 @@ export interface IndexSessionDeps {
 
   /** U2.4 / D-141: OFF unless true. Writes `speaker_suggestions` rows only (never `speakers`); see ./speaker-suggest.ts. */
   suggestSpeakers?: boolean;
+
+  /** T-042 P9: OFF unless `enabled === true` AND LKB_TILE_SUGGEST=1. Suggestion rows only (never `speakers`); runs only after a committed index. */
+  tileSuggest?: { enabled: boolean; context: TileCaptureContext; readCapture: ReadTileCapture };
 
   db?: Pick<Db, "collection">;
 }

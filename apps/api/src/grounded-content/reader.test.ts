@@ -1,9 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import express from "express";
-import type { Db } from "mongodb";
 import { requireAuth } from "../auth.js";
-import { createGroundedContentDeps, createMongoGroundedContentDeps, type GroundedContent, type GroundedReadDeps } from "./reader.js";
+import { createGroundedContentDeps, type GroundedContent, type GroundedReadDeps } from "./reader.js";
 import { createGroundedContentRouter } from "./router.js";
 
 function fixture(): NonNullable<Awaited<ReturnType<GroundedReadDeps["getSessionDetail"]>>> {
@@ -65,19 +64,10 @@ test("legacy page has empty grounded collections; unanswered cannot leak stale a
   delete detail.page!.qa; delete detail.page!.citedItems;
   assert.deepEqual((await deps.getGroundedContent("a", "session-1"))!.notes, []);
 });
-test("Mongo reads all include authenticated tenant, and unknown session avoids dependent reads", async () => {
-  const detail = fixture(), queries: Array<{ name: string; filter: Record<string, unknown> }> = [];
-  let found = true;
-  const db = { collection(name: string) { return {
-    async findOne(filter: Record<string, unknown>) { queries.push({ name, filter }); return name === "sessions" ? (found ? detail.session : null) : detail.page; },
-    find(filter: Record<string, unknown>) { queries.push({ name, filter }); return { toArray: async () => name === "claims" ? detail.claims : detail.turns }; },
-  }; } } as unknown as Db;
-  const deps = createMongoGroundedContentDeps(db);
-  assert.ok(await deps.getGroundedContent("a", "session-1"));
-  assert.equal(queries.length, 4); assert.ok(queries.every((q) => q.filter.tenantId === "a"));
-  found = false; queries.length = 0;
-  assert.equal(await deps.getGroundedContent("a", "session-1"), null); assert.equal(queries.length, 1);
-  await assert.rejects(() => deps.getGroundedContent("", "session-1"));
+test("raw unguarded Mongo reader is gone: ISS-W17WIRE006-003 (guarded path covered in visibility/read-side-quarantine-trusted.test.ts)", async () => {
+  const mod = await import("./reader.js") as Record<string, unknown>;
+  assert.equal(mod.createMongoGroundedContentDeps, undefined);
+  assert.deepEqual(Object.keys(mod).sort(), ["createGroundedContentDeps"]);
 });
 test("HTTP route requires auth and sessions scope, ignores client tenant, and returns real 404", async () => {
   const calls: string[] = [];

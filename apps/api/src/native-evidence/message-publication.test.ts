@@ -1,6 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Sources, TreeIndexRootDocument } from "@lkb/core";
+import type { ClientSession } from "mongodb";
+import { publishApprovedMessage } from "./message-publication.js";
 import { messagePublicationFixture } from "./message-publication-fixture.js";
 import { createWhatsAppNativeAuthority } from "./whatsapp-authority.js";
 import { buildNativeIntegrations } from "../composition/integrations/native.js";
@@ -119,3 +121,44 @@ test("consent withdrawn mid-transaction before the materializer starts: approval
   });
   await refused(f, /source\/session evidence unavailable|whatsapp_native_publication_unavailable/); assert.equal(withdrawn, true);
 });
+
+/** T-007 direct gate unit: calls the publication function itself, bypassing the repository/review layer and checkEvidence's own consent check. */
+async function directGate(consent: unknown) {
+  const f = await messagePublicationFixture(); const [listed] = await f.wiring.repository.list("tenant-a"); assert.ok(listed);
+  assert.equal((await f.wiring.repository.decide("tenant-a", listed._id, "approved", "reviewer")).result, "ok");
+  const stored = f.fx.rows("whatsapp_candidates").find(row => row._id === listed._id)! as unknown as Parameters<typeof publishApprovedMessage>[0]["candidate"];
+  const sourceId = f.result.sourceId;
+  const treeBefore = JSON.stringify(f.fx.rows("tree_index"));
+  await sourcePatch(f, consent === undefined ? { consent: undefined } : { consent });
+  // Upstream bypass: the first source read (checkEvidence) and every read from the third on (claimVisible etc.) see a consented source; only the gate's own second read sees the real state, so only the gate can refuse.
+  let sourceReads = 0;
+  const db = new Proxy(f.db, { get(target, key) {
+    if (key !== "collection") return Reflect.get(target, key, target);
+    return (name: string) => { const coll = target.collection(name); if (name !== "sources") return coll;
+      return new Proxy(coll, { get(c, method) {
+        if (method !== "findOne") return Reflect.get(c, method, c);
+        return async (...args: unknown[]) => { const row = await (c.findOne as (...a: unknown[]) => Promise<Record<string, unknown> | null>)(...args);
+          const n = ++sourceReads; return n !== 2 && row ? { ...row, consent: { given: true } } : row; };
+      } }); };
+  } }) as typeof f.db;
+  const session = { inTransaction: () => true } as unknown as ClientSession;
+  return { f, sourceId, treeBefore, call: () => publishApprovedMessage({ candidate: stored, db, session }), reads: () => sourceReads };
+}
+
+test("direct publishApprovedMessage control: consent.given === true does not throw", async () => {
+  const g = await directGate({ given: true, recordedBy: "whatsapp-owner:111111111111111111111111" });
+  await g.call(); assert.equal(JSON.stringify(g.f.fx.rows("tree_index")), g.treeBefore);
+});
+
+for (const [label, consent] of [
+  ["consent.given === false", { given: false, recordedBy: "whatsapp-owner:111111111111111111111111" }],
+  ["consent withdrawn", { given: false, recordedBy: "whatsapp-owner:111111111111111111111111", withdrawnAt: "2026-10-14T10:30:00Z" }],
+  ["consent record absent", undefined],
+] as const) {
+  test(`direct publishApprovedMessage refuses with ${label} even when upstream checks are bypassed`, async () => {
+    const g = await directGate(consent);
+    await assert.rejects(g.call(), /whatsapp_native_publication_unavailable/);
+    assert.ok(g.reads() >= 2, "gate must perform its own source read after the bypassed evidence check");
+    assert.equal(JSON.stringify(g.f.fx.rows("tree_index")), g.treeBefore);
+  });
+}

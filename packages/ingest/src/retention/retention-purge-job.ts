@@ -1,18 +1,17 @@
 /**
  * packages/ingest/src/retention/retention-purge-job.ts - T-046 / D-145. The SCHEDULABLE wrapper around the raw-media
  * purge executor: runs one purge pass, captures its log lines, and atomically writes a last-run report file that an
- * operator (or a later API/page unit) can read. DRY RUN unless `--execute` is passed; the wrapper adds no other way to
+ * operator (or a later API/page unit) can read. DRY RUN unless `--execute --confirm-deletion` are both passed; the wrapper adds no other way to
  * delete. Report lines come from the executor, which logs media path, age and size only (never transcript text).
  *
  * Extra option: `--report-file <path>` (required). Every other option is forwarded to `runRetentionPurge` unchanged,
- * so the executor's strict parser still rejects anything unknown and the thresholds still have no default (ARCHITECTURE Q6).
+ * so the executor's strict parser still rejects anything unknown and the thresholds default to 90 days / 15 s with those as floors (ruling 5).
  * Exit codes are the executor's (0 done, 2 usage, 3 unreadable state, 4 item failed) plus 5 = report file not writable.
  */
 import { mkdirSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { buildLastRun } from "./retention-last-run.js";
-import { runRetentionPurge, type PurgeDeps } from "./retention-purge.js";
-import { parseArgs } from "./retention-report-args.js";
+import { parsePurgeArgs, runRetentionPurge, type PurgeDeps } from "./retention-purge.js";
 import { tenantRetentionSummaryPath, validRetentionTenant, writeTenantRetentionSummary } from "./production/private-summary.js";
 
 export const REPORT_VERSION = 1;
@@ -83,10 +82,8 @@ export function runPurgeJob(argv: readonly string[], deps: JobDeps): number {
     deps.error("retention-purge-job: --report-file and the last-run summary path must differ (the summary would overwrite the full report)");
     return 2;
   }
-  const parsed = parseArgs(split.rest.filter(arg => arg !== "--execute"));
-  if (!parsed.ok || split.rest.filter(arg => arg === "--execute").length > 1) {
-    deps.error(`retention-purge-job: ${parsed.ok ? "--execute given more than once" : parsed.message}`); return 2;
-  }
+  const parsed = parsePurgeArgs(split.rest);
+  if (!parsed.ok) { deps.error(`retention-purge-job: ${parsed.message}`); return 2; }
   const opts = parsed.opts;
   if (!validRetentionTenant(opts.tenant) || !opts.dataRoot.trim()) { deps.error("retention-purge-job: invalid private-summary binding"); return 2; }
   const summaryPath = tenantRetentionSummaryPath(opts.dataRoot, opts.tenant);
@@ -107,7 +104,7 @@ export function runPurgeJob(argv: readonly string[], deps: JobDeps): number {
   const cap = deps.maxLines ?? MAX_REPORT_LINES;
   const report: JobReport = {
     version: REPORT_VERSION,
-    mode: split.rest.includes("--execute") ? "execute" : "dry-run",
+    mode: parsed.execute ? "execute" : "dry-run",
     startedAt, finishedAt: new Date(deps.now()).toISOString(), exitCode: code,
     summary: parseSummary(lines), truncated: lines.length > cap,
     lines: lines.length > cap ? [...lines.slice(0, cap - 1), lines[lines.length - 1] as string] : lines,

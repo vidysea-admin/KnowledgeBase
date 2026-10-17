@@ -66,3 +66,22 @@ test("verified tenant controls eligibility; recording review remains accessible 
     assert.deepEqual(h.authorized, [["tenant-A", SESSION], ["tenant-A", SESSION]]);
   } finally { await h.close(); }
 });
+test("ISS-W17WIRE006-001: a router composed WITHOUT authorizeSession fails closed (503) before any store access", async () => {
+  const m = memoryDb(); seed(m);
+  let accesses = 0; const base = createMongoReviewStore(m.db);
+  const store = new Proxy(base, { get(t, k) { const v = (t as never)[k]; return typeof v === "function" ? (...a: unknown[]) => { accesses++; return (v as (...x: unknown[]) => unknown).apply(t, a); } : v; } }) as ReviewStore;
+  const app = express(); app.use(express.json()); app.use(requireAuth(keys));
+  app.use(createTranscriptReviewRouter({ store } as unknown as Parameters<typeof createTranscriptReviewRouter>[0]));
+  const server = app.listen(0, "127.0.0.1"); await new Promise<void>((resolve) => server.once("listening", resolve));
+  const address = server.address(); assert.ok(address && typeof address === "object");
+  try {
+    for (const [method, suffix] of [["GET", ""], ["GET", "/history"], ["POST", ""], ["POST", "/refresh"]]) {
+      const response = await fetch(`http://127.0.0.1:${address.port}/sessions/${SESSION}/transcript-review${suffix}`, {
+        method, headers: { authorization: "Bearer key-a", "Content-Type": "application/json" }, ...(method === "POST" ? { body: "{}" } : {}) });
+      assert.equal(response.status, 503, `${method} ${suffix}`);
+      assert.deepEqual(await response.json(), { error: "transcript_review_unavailable", message: "Transcript review is unavailable" });
+      assert.equal(response.headers.get("cache-control"), "private, no-store");
+    }
+    assert.equal(accesses, 0); assert.deepEqual(m.writes, []);
+  } finally { await new Promise<void>((resolve) => server.close(() => resolve())); }
+});
