@@ -13,6 +13,7 @@ import { selectAutoRecordItems } from "./auto-join.js";
 import { loadTrustedSenderConfig } from "./auto-record-policy.js";
 import { parseStrictEmail } from "./join-rules/join-rules.js";
 import { reconcileWebinarSources } from "./calendar-client.js";
+import { createHttpCandidateLoader } from "./schedule-loaders.js";
 
 const cfg = loadTrustedSenderConfig({} as NodeJS.ProcessEnv); // the 4 default entries ISS-322 names
 const run = (c: Partial<AutoRecordCandidateInput>) => selectAutoRecordItems({
@@ -114,4 +115,24 @@ test("ISS-376: calendar-sourced items stay schedulable in everyWebinar mode", ()
     calendarEvents: [{ id: "e376", title: "Webinar: T", startTime: "2030-01-01T10:00:00Z", endTime: "2030-01-01T11:00:00Z",
       meetingUrl: "https://meet.google.com/abc-defg-hij", organizer: "anyone@evil.com" }] });
   assert.equal(r.toSchedule.length, 1);
+});
+
+// ISS-376 F1: the loader must keep "unknown" distinct from "failed"; coercing everything to false made the needs-approval branch unreachable in production.
+test("ISS-376: createHttpCandidateLoader maps senderAuthenticated absent/'true'/1/null -> undefined, true -> true, false -> false, and they select accordingly", async () => {
+  const row = (id: string, extra: Record<string, unknown>) => ({ _id: id, subject: "Webinar: T", senderEmail: "attacker@evil.com", senderDomain: "evil.com",
+    status: "pending", meetingUrl: "https://zoom.us/j/123456789", startTime: "2030-01-01T10:00:00Z", endTime: "2030-01-01T11:00:00Z", ...extra });
+  const rows = [row("absent", {}), row("str", { senderAuthenticated: "true" }), row("one", { senderAuthenticated: 1 }), row("nul", { senderAuthenticated: null }),
+    row("yes", { senderAuthenticated: true }), row("no", { senderAuthenticated: false })];
+  const original = globalThis.fetch;
+  try {
+    globalThis.fetch = (async () => new Response(JSON.stringify(rows), { status: 200 })) as typeof fetch;
+    const loaded = await createHttpCandidateLoader("http://local", "key", () => {}, true)();
+    const by = Object.fromEntries(loaded.map((c) => [c.id, c.senderAuthenticated]));
+    assert.deepEqual(by, { absent: undefined, str: undefined, one: undefined, nul: undefined, yes: true, no: false });
+    const r = selectAutoRecordItems({ everyWebinar: true, candidates: loaded, now: "2030-01-01T09:58:00Z", leadMinutes: 5, trustedSenders: cfg, calendarEvents: [], alreadyScheduled: [] });
+    assert.deepEqual(r.toSchedule.map((i) => i.sourceId), ["yes"]);
+    const reason = (id: string) => r.skipped.find((s) => s.sourceId === id)?.reason;
+    for (const id of ["absent", "str", "one", "nul"]) assert.equal(reason(id), "needs-review", id);
+    assert.equal(reason("no"), "untrusted-sender");
+  } finally { globalThis.fetch = original; }
 });
