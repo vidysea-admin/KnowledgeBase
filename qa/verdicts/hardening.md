@@ -1,10 +1,11 @@
 # Verdict: hardening (lane/w17-hardening)
 
-VERDICT: FAIL
-Cycle checked: 1
-Reviewed SHA: 648b06669fb80ecd970a7b5d1ba20bb87d19eae4
+VERDICT: PASS
+Cycle checked: 2
+Reviewed SHA: cfe0db3def7bce7f46c2a919f72b96d057775b2f
 Base SHA: 9e55b6428c5f000e1bc25b24bd0a52ed11473b54
 Checker: independent checker (Opus 5.5), fresh context, 2026-10-17
+History: cycle 1 at 648b06669fb80ecd970a7b5d1ba20bb87d19eae4 was FAIL (F-EOL). The cycle-1 record below is historical; the cycle-2 section at the end is authoritative.
 ISSUES-WRITTEN: none
 
 The lane FAILs on one narrow, mechanical defect in commit 9d05aaec: the whole files are converted from LF to CRLF. Its logic is correct. Fixes 1 and 2 PASS on their own.
@@ -100,3 +101,77 @@ All in qa/verdicts/hardening-evidence/ (untracked):
 - tsc-api and tsc-bot logs and .exit files
 - M1, M2, M2b, M3 and M3b logs
 - metrics-phase1.json and metrics-phase2-finalization.json, with their assess outputs (exit 0)
+
+---
+
+## Cycle 2: PASS
+
+Cycle checked: 2
+Reviewed SHA: cfe0db3def7bce7f46c2a919f72b96d057775b2f
+Parent chain: cfe0db3d is one commit on top of 7e5001b9, which is on top of 648b0666.
+
+### Identity
+- The lane HEAD is cfe0db3d and the tree is clean.
+- Manifest: Status ready-for-check, Fix cycle 2.
+
+### F-EOL is repaired
+- `git diff --numstat 9e55b642 cfe0db3d` gives:
+  - message-publication.test.ts 43/0
+  - private-acl.test.ts 23/0
+  - private-acl.ts 4/1
+  - start-record-detached.test.mjs 1/1
+  - qa/manifests/hardening.md 8/0
+  - qa/verdicts/hardening.md 102/0
+- None of these is whole-file churn.
+- private-acl.ts and private-acl.test.ts contain 0 CR bytes at cfe0db3d, and `git ls-files --eol` shows i/lf.
+- `git diff --ignore-cr-at-eol 648b0666 cfe0db3d -- packages/` is empty, so the change is line endings only and the logic is unchanged.
+
+### T-007 note is resolved
+- The proxy now returns a consented row for every source read except the second, which is the gate's own read. The comment has been corrected.
+- Mutation c2-M1 deleted line 47. It killed 4 tests: the direct given:false, withdrawn and absent tests, plus the existing absent test.
+- So the line-47 gate is now proven for all three consent states. If the gate's read stops being the second read, the tests fail rather than falsely pass.
+
+### Checks (each run under `timeout 600`, all exit 0)
+| Check | Result |
+|---|---|
+| message-publication.test.ts | 15/15 pass |
+| private-acl.test.ts | 3 pass, 1 skip (real probe needs an env var) |
+| apps/api tsc --noEmit | no output |
+| meeting-bot tsc --noEmit | no output |
+
+### Mutations (D-020)
+- Harness: mutate-c2.sh, with a byte backup per mutation, a trap on EXIT, INT, TERM and ERR, and `timeout 600`.
+- c2-M1 (delete the line-47 gate): killed 4 tests.
+- c2-M3 (accept on the second ETIMEDOUT): killed both the retry test and the bounded-time test.
+- After restore, `git -c core.autocrlf=true hash-object` equals the HEAD blob for both files:
+  - message-publication.ts: 36e39941
+  - private-acl.ts: 79704ecb
+
+### Reused, not re-run
+- start-record-detached.test.mjs (6/6) and mutations M2 and M2b are from cycle 1.
+- The launcher, the dispatch code and that test are byte-identical between 648b0666 and cfe0db3d.
+
+### Sub-verdicts
+| Fix | Verdict |
+|---|---|
+| T-007 | PASS |
+| ISS-ALERTTENANT-001 | PASS |
+| private-acl F-1 | PASS |
+
+### Remaining low notes (not filed, not blocking)
+- The private-acl.ts:18 diagnostic `deadlineMs:5000` understates elapsed time, which can reach about 10 s after a retry.
+- The apps/api/src/bot-privacy/private-acl.ts mirror has no retry.
+
+### Ledger
+- ISS-ALERTTENANT-001 may flip to verified.
+- T-007 stays in_progress, because this test-only change does not close the parent.
+- The t011 F-1 note is addressed. It is a verdict note, not a ledger row.
+- ISS-ALERTTENANT-002 and ISS-ALERTTENANT-003 stay open.
+
+### Not verified
+- The real Windows ACL probe.
+- Timing on a loaded host.
+- The efficiency ratio: maker usage is unknown, so this remains BOOTSTRAP_REVIEW with the ratio unverified.
+
+### Evidence
+qa/verdicts/hardening-evidence/c2-* (untracked)
