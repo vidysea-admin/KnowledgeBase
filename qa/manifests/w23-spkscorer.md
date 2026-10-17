@@ -1,8 +1,8 @@
 # w23-spkscorer
 
 Status: ready-for-check
-Fix cycle: 0
-Lane: lane/w23-spkscorer · Base: 3c99337f · Candidate: the lane HEAD commit "w23-spkscorer" · Tier: high (ISS-289, ISS-283), medium (ISS-290). Ledger rows NOT flipped.
+Fix cycle: 1
+Lane: lane/w23-spkscorer · Base: 3c99337f · Candidate: the lane HEAD commit "w23-spkscorer cycle 1" (cycle 0 was 9243679f, checker verdict 9b71e57a FAIL) · Tier: high (ISS-289, ISS-283), medium (ISS-290). Ledger rows NOT flipped.
 
 ## Finding at base
 `qa/evidence/u2-4-phase3-precision-regate-2026-09-22/` already carried partial fixes from u2-4-phase3-resume-c2 (relational citation counter inline in `05-score.mjs`, `corpus-lock.mjs` wired into 04/05/09/10) and the w17-u24regate `suggest-score-lib.mjs`. That lib is gold-based (independent of the acceptance rule) but scores block claims only, not evidence citations, and has no run-completeness notion, so it does not by itself close ISS-289 or ISS-283; it does not touch ISS-290. It is reused (`blocksOf`, `personMatch`) rather than copied.
@@ -23,3 +23,9 @@ Lane: lane/w23-spkscorer · Base: 3c99337f · Candidate: the lane HEAD commit "w
 - `node --test qa/evidence/u2-4-phase3-precision-regate-2026-09-22/scorer-independence.test.mjs qa/evidence/u2-4-phase3-precision-regate-2026-09-22/corpus-lock.test.mjs qa/evidence/u2-4-phase3-precision-regate-2026-09-22/suggest-score-lib.test.mjs` -> tests 17, pass 17, fail 0.
 - `node scripts/lint-loc.mjs --all` -> OK (10 stages, 0 failed).
 - Mutations (each fails 2 of 7 in scorer-independence.test.mjs, restored byte-identical): M1 citation-check always-valid; M2 bar4 `complete = true`; M3 01-block-stats back to live glob.
+
+## Fix cycle 1 (checker FAIL 9b71e57a)
+- ISS-290: `verifyCorpus` now THROWS on an unpinned positional session (the row's fix_direction: fail loudly) instead of printing a note. 02-dump-blocks, 03-dump-compact and 06-window-count read only the pinned, hash-verified list, as 01 does. Consequence: on the current data/toc-migrated (6 unpinned positional sessions) 01, 02, 03, 04, 05, 06, 09 and 10 now refuse until those sessions are golded and pinned or removed; that follow-up is the Approver's, not done here.
+- Tests: scorer-independence.test.mjs replaces the NOTE test with: unpinned session refused by verifyCorpus and 01/02/03; non-positional extra session is not unpinned; the REAL 11 pinned sessions copied to a temp cwd reproduce `TOTAL positional: 494 | blocks: 240 | session/label pairs: 29`. gold-labels.json and corpus.lock.json unchanged (empty diff).
+- Run: `node --test` on scorer-independence, corpus-lock and suggest-score-lib tests -> tests 19, pass 19, fail 0.
+- Mutation M4 (verifyCorpus notes instead of throwing) fails 1 test; restored, `git -c core.autocrlf=true hash-object` equals the pre-mutation blob.

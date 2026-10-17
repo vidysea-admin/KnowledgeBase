@@ -5,10 +5,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, mkdtempSync, mkdirSync, writeFileSync, rmSync, appendFileSync } from "node:fs";
+import { readFileSync, mkdtempSync, mkdirSync, writeFileSync, rmSync, appendFileSync, copyFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 import { invalidCitations } from "./citation-check.mjs";
 import { bar4 } from "./bar4-stability.mjs";
 
@@ -79,14 +80,39 @@ function fixture() {
   return cwd;
 }
 const stats = (cwd) => spawnSync(process.execPath, [join(HERE, "01-block-stats.mjs")], { cwd, encoding: "utf8" });
-test("ISS-290: 01-block-stats measures the pinned corpus only and names the unpinned session", () => {
+const verifyIn = (cwd) => spawnSync(process.execPath, ["--input-type=module", "-e",
+  `const { verifyCorpus } = await import(${JSON.stringify(pathToFileURL(join(HERE, "corpus-lock.mjs")).href)}); verifyCorpus(); console.log("LOCK-OK");`], { cwd, encoding: "utf8" });
+test("ISS-290: an unpinned positional session makes verifyCorpus AND 01/02/03 refuse (fail loudly), naming it", () => {
   const cwd = fixture();
   try {
+    const v = verifyIn(cwd);
+    assert.notEqual(v.status, 0);
+    assert.ok(v.stderr.includes("ISS-290: 1 unpinned positional session(s) in data/toc-migrated: [s2]"), v.stderr);
+    for (const f of ["01-block-stats.mjs", "02-dump-blocks.mjs", "03-dump-compact.mjs"]) {
+      const r = spawnSync(process.execPath, [join(HERE, f)], { cwd, encoding: "utf8" });
+      assert.notEqual(r.status, 0, f);
+      assert.ok(r.stderr.includes("ISS-290: 1 unpinned positional session"), f);
+    }
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+test("ISS-290: a non-positional extra session is not unpinned; 01-block-stats counts the pinned corpus only", () => {
+  const cwd = fixture();
+  try {
+    writeFileSync(join(cwd, "data/toc-migrated/s2/turns.json"), JSON.stringify([{ _id: "b1", speakerRef: "person:x" }]));
     const r = stats(cwd);
     assert.equal(r.status, 0, r.stderr);
-    assert.match(r.stdout, /affected sessions: 1\b/);
-    assert.match(r.stdout, /TOTAL positional: 2 \| blocks: 2 \| session\/label pairs: 2/);
-    assert.match(r.stderr, /ISS-290 NOTE: 1 positional session\(s\) .* s2/);
+    assert.ok(r.stdout.includes("TOTAL positional: 2 | blocks: 2 | session/label pairs: 2"), r.stdout);
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+test("ISS-290: on the REAL pinned sessions 01-block-stats reproduces 494 / 240 / 29", () => {
+  const cwd = mkdtempSync(join(tmpdir(), "stats-real-"));
+  try {
+    mkdirSync(join(cwd, OUT), { recursive: true });
+    for (const f of ["gold-labels.json", "corpus.lock.json"]) copyFileSync(join(OUT, f), join(cwd, OUT, f));
+    for (const g of gold) { mkdirSync(join(cwd, "data/toc-migrated", g.session), { recursive: true }); copyFileSync(join("data/toc-migrated", g.session, "turns.json"), join(cwd, "data/toc-migrated", g.session, "turns.json")); }
+    const r = stats(cwd);
+    assert.equal(r.status, 0, r.stderr);
+    assert.ok(r.stdout.includes("TOTAL positional: 494 | blocks: 240 | session/label pairs: 29"), r.stdout);
   } finally { rmSync(cwd, { recursive: true, force: true }); }
 });
 test("ISS-290: 01-block-stats refuses a drifted pinned session", () => {
