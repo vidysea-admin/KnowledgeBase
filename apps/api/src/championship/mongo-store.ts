@@ -1,6 +1,7 @@
 import type { Db } from "mongodb";
 import type { EvalRuns } from "@lkb/core";
 import type { ChampionshipStore } from "../routes/championship/championship.js";
+import { createMongoEvidenceVerifier } from "../answer-policy/answer-evidence.js";
 import { assertChampionshipBank, ChampionshipError, type ChampionshipEvent } from "./model.js";
 import { championshipReport } from "./runtime.js";
 
@@ -30,6 +31,7 @@ export function createMongoChampionshipStore(db: Db): ChampionshipStore {
       judges: e.judges, rubric: e.rubric, reviewReference: e.reviewReference, bankDigest: e.bankDigest, createdAt: e.createdAt, evidenceStatus: e.evidenceStatus });
   }
   return {
+    verifyEvidence: createMongoEvidenceVerifier(db),
     async create(tenantId, event) {
       valid(tenantId, event);
       if (event.revision !== 0 || event.frozenAt !== undefined || event.trials.length) throw new ChampionshipError("invalid_transition", "New events must be unfrozen revision-zero plans");
