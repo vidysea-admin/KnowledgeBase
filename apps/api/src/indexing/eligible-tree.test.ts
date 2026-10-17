@@ -135,3 +135,37 @@ test('matching cached summary cannot retain unsupported stale topic or org displ
     assert.equal((await eligibleTreeInput(f.db, tenant, f.sessions, f.pages, f.root)).existingRoot, undefined);
   }
 });
+
+test('routingSummary is never built from a withdrawn or unapproved source and stays within 768 UTF-8 bytes', async () => {
+  const { bindIndexTree } = await import('./generation.js');
+  const longNew = 'करियर 🧠 Current Student Visa guidance. '.repeat(80);
+  for (const withdrawal of ['consent-withdrawn', 'whatsapp-unapproved'] as const) {
+    const f = fixture();
+    const newPage = f.pages.find(page => page.sessionId === 'new')!;
+    newPage.summary = longNew;
+    f.rows.turns!.find(turn => turn.sessionId === 'new')!.text = longNew;
+    const oldSource = f.rows.sources!.find(source => source._id === 'source-old')!;
+    if (withdrawal === 'consent-withdrawn') oldSource.consent = { given: false };
+    else oldSource.kind = 'whatsapp-batch';
+    const eligible = await eligibleTreeInput(f.db, tenant, f.sessions, f.pages, f.root);
+    assert.deepEqual(eligible.pages.map(page => page.sessionId), ['new'], withdrawal);
+    const tree = buildTree(eligible.sessions, eligible.pages)[tenant]!;
+    // Pass EVERY page (including the withdrawn one) so only eligibility, not the input list, keeps it out.
+    const binding = { version: 1 as const, generation: '00000000-0000-4000-8000-000000000000', sessionId: 'new', sourceId: 'source-new', turnDigest: 'a'.repeat(64) };
+    const bound = bindIndexTree(tree, binding, f.pages as never, tenant);
+    const summaries: string[] = [];
+    const walk = (node: TreeIndexRootDocument | typeof bound) => { const text = node.evidence?.routingSummary; if (typeof text === 'string') summaries.push(text); node.children.forEach(walk); };
+    walk(bound);
+    assert.ok(summaries.length >= 2, withdrawal);
+    for (const text of summaries) {
+      assert.ok(!text.includes(marker), `${withdrawal}: withdrawn text leaked`);
+      assert.ok(Buffer.byteLength(text, 'utf8') <= 768, `${withdrawal}: ${Buffer.byteLength(text, 'utf8')} bytes`);
+      assert.ok(!text.includes('\uFFFD'));
+      assert.equal(Buffer.from(text, 'utf8').toString('utf8'), text);
+    }
+    assert.ok(!JSON.stringify(bound).includes(marker));
+    // Control: the unfiltered input WOULD leak, so the assertions above are not vacuous.
+    const unfiltered = bindIndexTree(buildTree(f.sessions, f.pages)[tenant]!, { ...binding, sessionId: 'old', sourceId: 'source-old' }, f.pages as never, tenant);
+    assert.ok(JSON.stringify(unfiltered).includes(marker), `${withdrawal}: control must leak`);
+  }
+});
