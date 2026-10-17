@@ -1,5 +1,28 @@
 # Verdict - w23-qahygiene
 
+VERDICT: PASS
+Cycle checked: 1
+Reviewed SHA: 0ecc02e4f341f24168db4fa26582c11478b1c66f
+Base SHA: 3c99337fb64188bc5ed94b2f058ecf92c8823864
+Ledger commit (cycle 0, unchanged): c17508853f4ef3a78bbae273ef5743b6a8e80f64
+ISSUES-WRITTEN: none
+Ledger rows may be flipped: already done in c1750885 (10 rows).
+
+## Cycle 1 re-check (0ecc02e4 on 65a106d3)
+
+Commands: git diff/show against base 3c99337f, byte greps. Results:
+- numstat over qa/manifests: 58 files, each 1/1 (46 files) or 2/2 (12 files) changed lines; no other manifest paths changed.
+- All changed lines are Status / Handshake status lines (non-status filter empty).
+- EF BF BD count per file, base vs candidate: no file differs (none introduced).
+- groundbudget.md vs base: single hunk, line 6 only (Status ready-for-check -> checked-PASS); line 24 still carries byte 0x97.
+- No CR bytes in any candidate manifest (LF preserved).
+- 65a106d3 is an ancestor of 0ecc02e4; cycle-0 verdict and ledger checks stand (same-slug PASS, cycle match, handshakeDisagreement null for all 58).
+Not re-run: Part 2 ledger work (unchanged, commit c1750885). No mutation (manifest-only unit).
+
+## Superseded history
+
+### Cycle 0 verdict (FAIL, superseded)
+
 VERDICT: FAIL
 Cycle checked: 0
 Reviewed SHA: 65a106d33a668fbd81ad2a690e63586f35305d76
