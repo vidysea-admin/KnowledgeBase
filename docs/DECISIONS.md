@@ -2336,3 +2336,25 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** Central integration may author the corresponding canonical schema, generated types, accessor and unapplied migration source, and apply only this one-count ordinary budget adjustment. No migration execution, host activation, native database writes, unrelated budget changes, frozen architecture or checker-owned acceptance edits are authorized. Earlier decisions and full parent acceptance gates remain intact.
 **Changes-authorized:** structure.config.json dirsize.overrides.schema only, plus its count explanation; separate canonical schema/generated/accessor/unapplied migration source follows the approved U2.4 implementation scope.
 **Links:** D-176; D-173; D-174; U2.4; qa/coordination/knowledge-brain-20261015/delivery-matrix.md; proposed schema/speaker_attributes.schema.json.
+
+## D-178 | 2026-10-17 | type: decision | status: ACTIVE
+**Title:** Approver rulings for the 40-task build wave (2026-10-17)
+**What:** Records the Approver's rulings for the 40-task build wave, plus the earlier D-153 malformed-turn fix.
+- D-153 malformed-turn handling (as approved): in apps/api source-context.ts, keep malformed turns only for sessions where sessionVisible is true, never cite them, and list them in excludedTurns with a per-turn warning.
+- Ruling 1, ISS-376 hybrid: in everyWebinar mode, a Gmail candidate whose sender authentication explicitly FAILED is not silently scheduled. Unknown-sender unauthenticated mail becomes "needs approval" and is auto-promoted when a human approves it. Authenticated, approved or calendar-sourced candidates stay schedulable.
+- Ruling 2, ISS-T037VETO-003: keep fail-closed plus the D-166 last-valid fallback (1h). Log the JoinRuleSetValidationError message once per tick and alert. The auto-join enforcement flag stays OFF until the t037-last-valid live conditions are met.
+- Ruling 3, ISS-TOMBSTONE-001: evidence-bounded expiry. Store a first-seen tick on the tombstone row and release the hold after the 30-day horizon (D-159). Also release it when the tombstone predates the Gmail row's message date. Rows lacking the field get a safe migration. Full ceremony applies.
+- Ruling 4, T-052 / D-079: activate the narrow, read-only Brevo/Zoom destination exception ONLY after an independent checker PASS on registration-link-resolver.ts and zoom-registration-proof.ts. No submissions.
+- Ruling 5, retention (T-046, ARCHITECTURE Q6): min-age-days=90, clip-padding-seconds=15. Agents run dry-runs only. Real deletion stays a human action.
+- Ruling 6, send-now: scripts/webinar/join-rules-api-host.ts is the single supported API host for send-now. A plain apps/api index.ts start intentionally answers 503 for send-now.
+**Why:** Open policy questions blocked the wave. The Approver ruled in chat on 2026-10-17. Verbatim: "Umesh approves rulings 1-5 as proposed (ISS-376 hybrid, tombstone 30-day expiry, T-052 activation after checker PASS, retention 90d/15s with dry-run only, join-rules-api-host as the send-now host). Record them and run all remaining work in parallel." Earlier the same day: "Umesh approves the D-153 fix in apps/api source-context.ts: keep malformed turns only for sessions where sessionVisible is true, never cite them, and list them in excludedTurns with a per-turn warning."
+**Result:** Rulings are recorded and authorize the paths below. Ruling 1 amends D-056 and contract C5; the contract text update follows via /graduate or a PIVOT checkpoint (makers never edit qa/contracts). Ruling 4 is a PIVOT of D-079 (amends it, does not retire it), limited to the narrow read-only Brevo/Zoom destination exception, gated on the checker PASS.
+**Amends:** D-056 and contract C5 (ruling 1; contract text update to follow via /graduate or PIVOT). D-079 (ruling 4, a PIVOT: D-079 "Authorize precise T-052 durable registration and proof-bound confirmation integration in existing source pipeline" stays in force; ruling 4 adds only a narrow, read-only Brevo/Zoom destination exception, activated after an independent checker PASS on registration-link-resolver.ts and zoom-registration-proof.ts, with no submissions). No decision is superseded.
+**Changes-authorized:**
+- packages/meeting-bot/src/calendar/** (rulings 1-3)
+- packages/meeting-bot/src/calendar/registration-* and zoom-registration-proof.ts (ruling 4)
+- packages/ingest/src/retention/** and the retention scheduler args (ruling 5)
+- ARCHITECTURE.md section 6 Q6 (ruling 5)
+- apps/api/src/ask/source-context.ts (D-153)
+**Approved-by:** Umesh
+**Links:** T-037, T-036, T-052, T-046, T-039, ISS-376, ISS-T037VETO-003, ISS-TOMBSTONE-001, ISS-SENDNOWAPI-004, D-153
