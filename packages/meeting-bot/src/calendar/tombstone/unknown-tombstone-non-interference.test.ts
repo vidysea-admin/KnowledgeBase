@@ -270,3 +270,21 @@ test("1, 2 and 500 unknown tombstones change nothing for trusted rows and stay l
     assert.ok(large < small * 9 + 50, `4x the rows must cost about 4x, not 16x (small ${small.toFixed(0)}ms, large ${large.toFixed(0)}ms)`);
   }
 });
+
+test("ISS-TOMBSTONE-001: validateReconciliationState rejects a future, garbage or non-canonical firstSeen on a stored unknown-tombstone row, and accepts a valid past one", () => {
+  const first = recon([cal(0), { id: "ghost", cancelled: true }], [mail(5)], true);
+  const withFirstSeen = (value: unknown) => {
+    const state = JSON.parse(JSON.stringify(first.state));
+    const row = (Object.values(state.occurrences) as { unresolved?: string; firstSeen?: unknown }[]).find(o => o.unresolved === "unknown-tombstone")!;
+    row.firstSeen = value; return state;
+  };
+  const tick = LATER;
+  assert.doesNotThrow(() => recon([cal(0)], [mail(5)], true, withFirstSeen(CHECKED), tick), "valid past canonical firstSeen is accepted");
+  assert.doesNotThrow(() => recon([cal(0)], [mail(5)], true, withFirstSeen(new Date(Date.parse(tick) + 30000).toISOString()), tick), "inside the 60s skew allowance is accepted");
+  const future = [new Date(Date.parse(tick) + 61000).toISOString(), "2099-01-01T00:00:00.000Z"];
+  const garbage = ["not-a-date", "", "2026-13-45T99:99:99.000Z", "2026-02-30T10:00:00.000Z", 12345, null, {}];
+  const nonCanonical = ["2026-10-11T10:00:00Z", "2026-10-11T15:30:00.000+05:30", "2026-10-11T10:00:00.0Z"];
+  for (const [label, values] of [["future", future], ["garbage", garbage], ["non-canonical", nonCanonical]] as const) for (const value of values) {
+    for (const available of SCOPES) assert.throws(() => recon([cal(0)], [mail(5)], available, withFirstSeen(value), tick), `${label} firstSeen ${JSON.stringify(value)} must be rejected (scope ${available})`);
+  }
+});
