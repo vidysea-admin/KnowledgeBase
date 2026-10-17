@@ -1,4 +1,4 @@
-import { apiFetch, ApiError } from "./client.js";
+import { apiFetch, ApiError } from "../client.js";
 
 /** One suggested speaker name (U2.4, D-141). A suggestion is NOT a final name until `status` is "confirmed". */
 export interface SpeakerSuggestion {

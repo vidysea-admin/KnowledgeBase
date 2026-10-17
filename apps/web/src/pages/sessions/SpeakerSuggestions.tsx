@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ApiError } from "../../api/client.js";
-import { decideSpeakerSuggestion, listSpeakerSuggestions, type SpeakerSuggestion } from "../../api/speakerSuggestions.js";
+import { decideSpeakerSuggestion, listSpeakerSuggestions, type SpeakerSuggestion } from "../../api/review/speakerSuggestions.js";
 
 type Row = SpeakerSuggestion & { decided?: "confirmed" | "rejected" };
 

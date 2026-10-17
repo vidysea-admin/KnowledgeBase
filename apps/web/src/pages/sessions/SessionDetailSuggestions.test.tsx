@@ -4,7 +4,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { AuthProvider } from "../../auth/AuthContext.js";
 import { SessionDetailPage } from "./SessionDetailPage.js";
 import * as sessionsApi from "../../api/sessions.js";
-import * as suggestionsApi from "../../api/speakerSuggestions.js";
+import * as suggestionsApi from "../../api/review/speakerSuggestions.js";
 
 afterEach(() => vi.restoreAllMocks());
 

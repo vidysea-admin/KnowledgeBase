@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import { TranscriptReview } from "./TranscriptReview.js";
-import * as api from "../../api/transcriptReview.js";
+import * as api from "../../api/review/transcriptReview.js";
 import { ApiError } from "../../api/client.js";
 afterEach(() => vi.restoreAllMocks());
 const snapshot = (sessionId = "s1"): api.TranscriptReviewSnapshot => ({ sessionId, revision: "r1", refresh: "complete", turns: [

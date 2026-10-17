@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ApiError } from "../../api/client.js";
-import { getTranscriptReview, saveTranscriptReview, type TranscriptReviewSnapshot } from "../../api/transcriptReview.js";
+import { getTranscriptReview, saveTranscriptReview, type TranscriptReviewSnapshot } from "../../api/review/transcriptReview.js";
 import { ReviewHistory } from "./ReviewHistory.js";
 
 /** Revision-bound transcript correction and explicit contiguous speaker mapping. */

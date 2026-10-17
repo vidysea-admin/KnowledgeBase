@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import { ReviewHistory } from "./ReviewHistory.js";
-import * as api from "../../api/transcriptReview.js";
+import * as api from "../../api/review/transcriptReview.js";
 afterEach(() => vi.restoreAllMocks());
 const row = { revision: "r1", parentRevision: "base-1", actorRef: "key:t", reviewedAt: "2026-10-14T10:00:00Z", reason: "Checked <b>recording</b>",
   changes: [{ turnId: "t1", before: { text: "Original", speakerRef: "spk:0" }, after: { text: "Corrected", speakerRef: "person:reviewed" } }] };

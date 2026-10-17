@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { SpeakerSuggestions } from "./SpeakerSuggestions.js";
-import * as api from "../../api/speakerSuggestions.js";
+import * as api from "../../api/review/speakerSuggestions.js";
 import { ApiError } from "../../api/client.js";
 
 const SUG: api.SpeakerSuggestion = {

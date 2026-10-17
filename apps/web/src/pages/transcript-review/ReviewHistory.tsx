@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { getTranscriptReviewHistory, refreshTranscriptReview, type TranscriptRefresh, type TranscriptReviewRevision } from "../../api/transcriptReview.js";
+import { getTranscriptReviewHistory, refreshTranscriptReview, type TranscriptRefresh, type TranscriptReviewRevision } from "../../api/review/transcriptReview.js";
 
 export function ReviewHistory({ apiKey, sessionId, revision, refresh, disabled, onRefreshed }: {
   apiKey: string | null; sessionId: string; revision: string; refresh: TranscriptRefresh; disabled: boolean; onRefreshed: () => void | Promise<void>;

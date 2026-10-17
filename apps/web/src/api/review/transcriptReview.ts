@@ -1,4 +1,4 @@
-import { apiFetch, ApiError } from "./client.js";
+import { apiFetch, ApiError } from "../client.js";
 export interface TranscriptReviewTurn { _id: string; text: string; speakerRef: string; speakerLabel?: string; tStart: number; tEnd: number }
 export type TranscriptRefresh = "pending" | "complete" | "failed";
 export interface TranscriptReviewSnapshot { sessionId: string; revision: string; turns: TranscriptReviewTurn[]; refresh: TranscriptRefresh; orphanedTurnIds?: string[] }

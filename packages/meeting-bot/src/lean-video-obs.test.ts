@@ -5,68 +5,16 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, linkSync, mkdtempSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, linkSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { applyLeanVideoToObs, leanRestorePath, restoreLeanVideoInObs } from "./lean-video-obs.js";
-import { runFinalize, runRecord } from "./capture/record-commands.js";
-import { createObsBrowserDeps, type ObsClientLike, type ObsBrowserConfig } from "./capture/obs/obs-windows.js";
-import type { TelegramNotifier } from "./capture/notify/telegram-alerts.js";
+import { createObsBrowserDeps, type ObsBrowserConfig } from "./capture/obs/obs-windows.js";
 
 const FIXTURE = join(dirname(fileURLToPath(import.meta.url)), "capture", "fake-join-fixture.mjs");
-type Call = { name: string; args?: any };
-
-const LEAN_VIDEO = { baseWidth: 1280, baseHeight: 720, outputWidth: 1280, outputHeight: 720, fpsNumerator: 5, fpsDenominator: 1 };
-const LEAN_PARAMS = [
-  { parameterCategory: "SimpleOutput", parameterName: "VBitrate", parameterValue: "500" },
-  { parameterCategory: "SimpleOutput", parameterName: "ABitrate", parameterValue: "64" },
-];
-
-const OPERATOR_VIDEO = { baseWidth: 1920, baseHeight: 1080, outputWidth: 1920, outputHeight: 1080, fpsNumerator: 30, fpsDenominator: 1 };
-
-/** A fake OBS that actually HOLDS state: Set* calls mutate it, Get* read it, so a restore is observable as end state. */
-function fakeObs(opts: { refuse?: string[]; startFails?: boolean; stopPath?: string; mode?: string | null; quality?: string | null; unreadable?: string[];
-  profile?: Record<string, string | null>; video?: Record<string, number>; onCall?: (name: string, args: any) => void } = {}) {
-  const calls: Call[] = [];
-  const state = {
-    video: { ...(opts.video ?? OPERATOR_VIDEO) } as Record<string, number>,
-    profile: { "Output/Mode": opts.mode === undefined ? "Simple" : opts.mode, "SimpleOutput/RecQuality": opts.quality === undefined ? "Stream" : opts.quality,
-      "SimpleOutput/VBitrate": "2500", "SimpleOutput/ABitrate": "160", ...(opts.profile ?? {}) } as Record<string, string | null>,
-    recording: false,
-  };
-  const refuse = new Set(opts.refuse ?? []);
-  const obs: ObsClientLike = {
-    connect: async () => undefined, disconnect: async () => {},
-    call: async (name: string, args?: any) => {
-      calls.push({ name, args });
-      opts.onCall?.(name, args);
-      if (refuse.has(name)) throw new Error(`${name} refused (simulated)`);
-      switch (name) {
-        case "GetInputList": return { inputs: [] };
-        case "GetSceneList": return { scenes: [] };
-        case "GetSceneItemId": return { sceneItemId: 1 };
-        case "GetVideoSettings": return { ...state.video };
-        case "SetVideoSettings": if (state.recording) throw new Error("output active (simulated)"); Object.assign(state.video, args); return {};
-        case "GetProfileParameter": {
-          const k = `${args.parameterCategory}/${args.parameterName}`;
-          if (opts.unreadable?.includes(k)) throw new Error(`${k} unreadable (simulated)`);
-          return { parameterValue: k in state.profile ? state.profile[k] : null, defaultParameterValue: null };
-        }
-        case "SetProfileParameter": state.profile[`${args.parameterCategory}/${args.parameterName}`] = args.parameterValue; return {};
-        case "GetRecordStatus": return { outputActive: state.recording };
-        case "GetSpecialInputs": return {};
-        case "StartRecord": if (opts.startFails) throw new Error("StartRecord rejected (simulated)"); state.recording = true; return {};
-        case "StopRecord": state.recording = false; return { outputPath: opts.stopPath };
-        default: return {};
-      }
-    },
-  };
-  return { obs, calls, state };
-}
-const names = (calls: Call[]) => calls.map((c) => c.name);
-const sets = (calls: Call[]) => calls.filter((c) => c.name === "SetVideoSettings" || c.name === "SetProfileParameter");
+import { fakeObs, names, sets, LEAN_VIDEO, LEAN_PARAMS, OPERATOR_VIDEO } from "./lean-video-obs-fake.js";
 
 const securityState = () => ({ version: 1, video: { ...OPERATOR_VIDEO }, params: [
   { parameterCategory: "SimpleOutput", parameterName: "VBitrate", previous: "02500" },
@@ -330,137 +278,6 @@ test("if the current video settings cannot be read or the state cannot be persis
     const rb = await applyLeanVideoToObs(b.obs, {}, () => {}, { stateFile: join(dir, "no-such-dir", "x.json") });
     assert.equal(rb.restorable, false); assert.equal(sets(b.calls).length, 0);
   } finally { rmSync(dir, { recursive: true, force: true }); }
-});
-
-// --- ISS-LEANWIRE-002: the bitrate keys only matter in Simple mode with RecQuality "Stream" -----------
-
-test("Advanced output mode: bitrate keys are SKIPPED with a warning, canvas/fps still apply, the mode is never changed", async () => {
-  const dir = tmp();
-  const { obs, calls, state } = fakeObs({ mode: "Advanced" });
-  const logs: string[] = [];
-  try {
-    const r = await applyLeanVideoToObs(obs, {}, (m) => logs.push(m), { stateFile: leanRestorePath(dir) });
-    assert.deepEqual(r.skipped, ["SimpleOutput/VBitrate", "SimpleOutput/ABitrate"]);
-    assert.deepEqual(names(sets(calls)), ["SetVideoSettings"]);
-    assert.equal(state.profile["Output/Mode"], "Advanced"); assert.equal(state.profile["SimpleOutput/VBitrate"], "2500");
-    assert.ok(logs.some((l) => /WARNING output mode is "Advanced"/.test(l) && /not changed/.test(l)), logs.join("|"));
-  } finally { rmSync(dir, { recursive: true, force: true }); }
-});
-
-test("Simple mode with RecQuality HQ: bitrate keys skipped with a warning naming the quality; RecQuality untouched", async () => {
-  const { obs, calls, state } = fakeObs({ quality: "HQ" });
-  const logs: string[] = [];
-  await applyLeanVideoToObs(obs, {}, (m) => logs.push(m));
-  assert.deepEqual(names(sets(calls)), ["SetVideoSettings"]);
-  assert.equal(state.profile["SimpleOutput/RecQuality"], "HQ");
-  assert.ok(logs.some((l) => /recording quality is "HQ"/.test(l)), logs.join("|"));
-});
-
-test("Simple mode + Stream quality, or both unset (OBS defaults): bitrates ARE sent; unreadable mode: sent with a warning", async () => {
-  for (const o of [{}, { mode: null, quality: null }] as const) {
-    const { obs, calls } = fakeObs(o);
-    await applyLeanVideoToObs(obs, {}, () => {});
-    assert.deepEqual(names(sets(calls)), ["SetVideoSettings", "SetProfileParameter", "SetProfileParameter"]);
-  }
-  const { obs, calls } = fakeObs({ unreadable: ["Output/Mode"] });
-  const logs: string[] = [];
-  await applyLeanVideoToObs(obs, {}, (m) => logs.push(m));
-  assert.equal(sets(calls).length, 3);
-  assert.ok(logs.some((l) => /could not read the OBS output mode/.test(l)));
-});
-
-// --- ISS-LEANWIRE-002: runRecord's OBS branch, driven end to end with a fake OBS ------------------------
-
-function silentTelegram(alerts: string[]): TelegramNotifier {
-  const noop = () => {};
-  return { enabled: false, onBotEvent: noop, notifyJoined: noop, notifySilence: noop, notifyFinished: noop, notifyOverTarget: noop,
-    notifyObsRestoreFailed: (m: string) => { alerts.push(m); } } as unknown as TelegramNotifier;
-}
-async function driveObsRecord(fake: ReturnType<typeof fakeObs>, alerts: string[]) {
-  const dir = mkdtempSync(join(tmpdir(), "lkb-lean-rr-")), recordDir = join(dir, "record");
-  mkdirSync(recordDir, { recursive: true });
-  const finalized: unknown[][] = [];
-  const prevPw = process.env.OBS_WS_PASSWORD; process.env.OBS_WS_PASSWORD = "unit-test";
-  try {
-    await runRecord(["https://meet.google.com/abc-defg-hij", "--until", new Date(Date.now() + 2500).toISOString(), "--backend", "obs",
-      "--session-id", "lean-rr", "--tenant", "fixture", "--title", "fixture",
-      "--capture-approved-by", "fixture-operator", "--capture-approval-ref", "OBS-local-fake-client-test",
-      "--organizer-consent", "given", "--recorded-by", "fixture-operator", "--confirmed-no-alternative"], {
-      recordDir, wait: () => new Promise((r) => setTimeout(r, 50)), finalize: async (...a) => { finalized.push(a); },
-      telegram: silentTelegram(alerts), platform: "win32", // OBS flow is platform-independent once the Windows-only gate is satisfied
-      obs: { obs: fake.obs, connectObs: async () => undefined, confirmBotWindow: async () => true, subscribeLevel: () => () => {},
-        config: { python: process.execPath, joinScript: FIXTURE, profileDir: join(dir, "profile"), log: () => {} } },
-    });
-    return { finalized, stateLeft: existsSync(leanRestorePath(recordDir)) };
-  } finally {
-    if (prevPw === undefined) delete process.env.OBS_WS_PASSWORD; else process.env.OBS_WS_PASSWORD = prevPw;
-    rmSync(dir, { recursive: true, force: true });
-  }
-}
-const T = { timeout: 90_000 };
-const recordedFile = (): { dir: string; out: string } => {
-  const dir = mkdtempSync(join(tmpdir(), "lkb-lean-out-")), out = join(dir, "o.mkv");
-  writeFileSync(out, "recording-bytes");
-  return { dir, out };
-};
-
-test("runRecord (OBS): apply -> record -> stop -> restore runs in exactly that order and leaves the operator's profile as found", T, async () => {
-  const { dir, out } = recordedFile();
-  const fake = fakeObs({ stopPath: out });
-  const alerts: string[] = [];
-  try {
-    const r = await driveObsRecord(fake, alerts);
-    const interesting = fake.calls.filter((c) => ["SetVideoSettings", "SetProfileParameter", "StartRecord", "StopRecord"].includes(c.name))
-      .map((c) => c.name === "SetProfileParameter" ? `${c.name}:${c.args.parameterName}=${c.args.parameterValue}` : c.name);
-    assert.deepEqual(interesting, [
-      "SetVideoSettings", "SetProfileParameter:VBitrate=500", "SetProfileParameter:ABitrate=64", // apply (lean)
-      "StartRecord", "StopRecord",                                                                // record, stop
-      "SetVideoSettings", "SetProfileParameter:VBitrate=2500", "SetProfileParameter:ABitrate=160", // restore (operator's values)
-    ]);
-    assert.deepEqual(fake.calls.filter((c) => c.name === "SetVideoSettings").map((c) => c.args), [LEAN_VIDEO, OPERATOR_VIDEO]);
-    assert.deepEqual(fake.state.video, OPERATOR_VIDEO);
-    assert.equal(fake.state.profile["SimpleOutput/VBitrate"], "2500");
-    assert.equal(r.stateLeft, false); assert.deepEqual(alerts, []); assert.equal(r.finalized.length, 1);
-  } finally { rmSync(dir, { recursive: true, force: true }); }
-});
-
-test("runRecord (OBS): a restore that fails raises the alert through the notifier (and the recording still finalizes)", T, async () => {
-  const { dir, out } = recordedFile();
-  // refuse only the RESTORE of the video settings (the lean set has width 1280, the operator's has 1920)
-  const fake = fakeObs({ stopPath: out, onCall: (n, a) => { if (n === "SetVideoSettings" && a.baseWidth === 1920) throw new Error("restore refused (simulated)"); } });
-  const alerts: string[] = [];
-  try {
-    const r = await driveObsRecord(fake, alerts);
-    assert.equal(alerts.length, 1); assert.match(alerts[0]!, /OBS profile NOT restored/); assert.match(alerts[0]!, /SetVideoSettings/);
-    assert.equal(r.stateLeft, true, "state kept for a retry");
-    assert.equal(r.finalized.length, 1);
-  } finally { rmSync(dir, { recursive: true, force: true }); }
-});
-
-test("crash then `lkb finalize --stop-obs`: the leftover state restores the operator's profile after StopRecord; a stuck restore alerts", T, async () => {
-  for (const stuck of [false, true]) {
-    const root = mkdtempSync(join(tmpdir(), "lkb-lean-crash-")), recordDir = join(root, "record"), profile = join(root, "profile");
-    mkdirSync(recordDir, { recursive: true });
-    const media = join(root, "existing.mkv"); writeFileSync(media, "retained");
-    const fake = fakeObs({ stopPath: media, onCall: (n, a) => { if (stuck && n === "SetProfileParameter" && a.parameterValue === "160") throw new Error("stuck (simulated)"); } });
-    const alerts: string[] = [];
-    try {
-      // The "crashed controller": it applied lean settings, started recording, and then died without stop().
-      await applyLeanVideoToObs(fake.obs, {}, () => {}, { stateFile: leanRestorePath(recordDir) });
-      await fake.obs.call("StartRecord");
-      assert.equal(fake.state.recording, true); assert.deepEqual(fake.state.video, LEAN_VIDEO);
-      const before = fake.calls.length;
-      await runFinalize(["--session-id", "crashed", "--tenant", "fixture", "--title", "crashed", "--stop-obs", "--video", media],
-        { obs: fake.obs, repoRoot: root, recordDir, profileDir: profile, normalize: (v: string) => v, finalize: async () => {}, telegram: silentTelegram(alerts) });
-      const after = names(fake.calls.slice(before));
-      assert.ok(after.indexOf("StopRecord") >= 0 && after.indexOf("StopRecord") < after.indexOf("SetVideoSettings"), after.join(","));
-      assert.deepEqual(fake.state.video, OPERATOR_VIDEO);
-      assert.equal(fake.state.profile["SimpleOutput/VBitrate"], "2500");
-      assert.equal(existsSync(leanRestorePath(recordDir)), stuck);
-      assert.equal(alerts.length, stuck ? 1 : 0);
-      if (stuck) assert.match(alerts[0]!, /SimpleOutput\/ABitrate/);
-    } finally { rmSync(root, { recursive: true, force: true }); }
-  }
 });
 
 test("record-commands.ts still passes leanVideo: {} to createObsBrowserDeps (the behaviour tests above fail without it; pin kept as a tripwire)", async () => {

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { getTranscriptReview, saveTranscriptReview, getTranscriptReviewHistory, refreshTranscriptReview } from "./transcriptReview.js";
-import * as client from "./client.js";
+import * as client from "../client.js";
 afterEach(() => vi.restoreAllMocks());
 const valid = () => ({ sessionId: "s1", revision: "r1", refresh: "complete", turns: [
   { _id: "t1", speakerRef: "spk:0", text: "Text", tStart: 0, tEnd: 10 },
