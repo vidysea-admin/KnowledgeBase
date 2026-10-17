@@ -1,5 +1,5 @@
 # t050beat - ISS-W050-002 heartbeat test
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 1
 Base SHA: 0a173706 (codex/machine-migration-2026-10-09)
 Candidate SHA: see lane/w16-t050beat HEAD

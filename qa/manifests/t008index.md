@@ -1,5 +1,5 @@
 # t008index
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Base: 9e55b642
 Candidate: see lane HEAD (code commit aa999d6d; this manifest is the following commit)

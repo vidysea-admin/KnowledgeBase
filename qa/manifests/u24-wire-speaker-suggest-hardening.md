@@ -1,6 +1,6 @@
 # u24-wire-speaker-suggest-hardening
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Lane: lane/w17-wu24. Base a0391420. Candidate SHA: see the lane's single commit (git log -1). Tier: ledger fix (ISS-WU24-001 medium, -002/-003 low); data-write class, so full ceremony. No contract, DECISIONS, composition or server.ts edit. session.ts untouched (327 lines before and after).
 

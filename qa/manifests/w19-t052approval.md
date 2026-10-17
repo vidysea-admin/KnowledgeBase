@@ -1,5 +1,5 @@
 # Manifest - w19-t052approval
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Fix cycle:** 0
 **Contract:** docs/DECISIONS.md D-180 (rulings 1 and 2, Approved-by Umesh); D-079 / wave-2 ruling 4 (activation only after independent checker PASS)
 **Base SHA:** 41ca141c (origin/master, merged into the lane)

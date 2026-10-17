@@ -1,7 +1,7 @@
 # T-035 shared finalizer integration (original duration, private EOF, OBS restore)
 
-**Handshake status:** ready-for-check
-**Status:** ready-for-check
+**Handshake status:** checked-PASS
+**Status:** checked-PASS
 **Fix cycle:** 1
 **Task:** T-035 (with T-034/T-011 shared finalizer). Scoped integration unit; parent T-035 is not claimed.
 **Contracts:** qa/contracts/goal-t035.md C4 (OBS restore after stop, launch failure and recovery), C5/C8 (derivative/private intervals before providers); qa/contracts/goal-t034.md C4-C7.

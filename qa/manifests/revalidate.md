@@ -4,7 +4,7 @@
 **Goal task:** none (live-run defect: p2 webinar `validation.json` stuck at failed after a successful re-transcription).
 **Date:** 2026-10-14
 **Fix cycle:** 0
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Branch:** lane/revalidate
 
 ## Defect

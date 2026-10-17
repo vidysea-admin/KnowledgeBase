@@ -1,6 +1,6 @@
 # Manifest — t048single (lane/w16-t048single)
 
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Fix cycle:** 1
 **Base SHA:** a9fac545 (checkpoint). **Candidate SHA:** see commit on lane/w16-t048single.
 **Parent:** qa/verdicts/goal-t048.md HOLD. Defaults stay OFF (D-162); no promotion; no provider calls.

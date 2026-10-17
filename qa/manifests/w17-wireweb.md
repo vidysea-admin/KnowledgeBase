@@ -1,6 +1,6 @@
 # w17-wireweb
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Base SHA: a0391420451b3a1f465d0862378cec3492f0133f
 Candidate SHA: see git log of branch lane/w17-wireweb (single commit)

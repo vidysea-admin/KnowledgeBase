@@ -1,5 +1,5 @@
 # Manifest - w19-sourcesweb
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Fix cycle:** 2
 **Contract:** qa/contracts/goal-t055.md C6 (no local source.path leakage; web consumer follow-up of w17-sourcepath)
 **Base SHA:** 121290ba

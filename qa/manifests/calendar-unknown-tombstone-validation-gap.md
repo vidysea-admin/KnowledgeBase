@@ -1,6 +1,6 @@
 # calendar-unknown-tombstone-validation-gap
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Lane: lane/w17-tombstone2 (base b44dc2c8, tip of lane/w17-tombstone with the PASS verdict for tombstone-expiry-ruling3)
 Candidate SHA: the commit carrying this manifest (see git log)

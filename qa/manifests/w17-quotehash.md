@@ -1,6 +1,6 @@
 # w17-quotehash
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 1
 Lane: w17-quotehash (lane/w17-quotehash)
 Base: 9e55b642

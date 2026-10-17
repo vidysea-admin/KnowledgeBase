@@ -1,7 +1,7 @@
 # speaker-profile-accepted-attributes
 
-Status: ready-for-check
-**Handshake status:** ready-for-check
+Status: checked-PASS
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Base SHA: a9fac545 (lane/w16-u24attr). Candidate SHA: the single commit on this branch (see packet). Pins below re-measured at this base; the earlier pins were stale. Source code was already integrated at base (acceptedAttributeReader is the optional third arg of createMongoSpeakerProfileDeps); this unit changes only this manifest.
 

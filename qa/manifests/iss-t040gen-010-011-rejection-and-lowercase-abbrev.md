@@ -1,6 +1,6 @@
 # iss-t040gen-010-011-rejection-and-lowercase-abbrev
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 1
 Tier: 4 (open medium issues ISS-T040GEN-010, ISS-T040GEN-011; the unit touches the data-write quote gate, so full ceremony). Lane: lane/t040reject (base e4d6f14). Qualified ids: ISS-T040GEN-010 and ISS-T040GEN-011 (ledger `qa/issues.t040gen.jsonl`, not edited here; the checker verifies and closes).
 Scope: `packages/index/src/pipeline/notes/sentence-span.ts` + `grounded-notes.test.ts`. The `dropUnverified` option stays OFF by default and is not wired anywhere new.

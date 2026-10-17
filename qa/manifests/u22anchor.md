@@ -1,5 +1,5 @@
 # Unit: u22anchor (lane w17-u22anchor)
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Base SHA: d42f3713 (deriveddrafts PASS verdict)
 Candidate SHA: see lane HEAD (single commit)

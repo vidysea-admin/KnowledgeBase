@@ -1,7 +1,7 @@
 # T-034/T-035 original private EOF across actual finalization
 
-**Handshake status:** ready-for-check
-**Status:** ready-for-check
+**Handshake status:** checked-PASS
+**Status:** checked-PASS
 **Fix cycle:** 1
 **Task:** T-011/T-034/T-035; ISS-CAPTUREMAKER-002.
 **Priority tier:** 2 — uncapped high privacy/source-identity boundary, root explicitly authorized source integration.

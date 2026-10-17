@@ -1,7 +1,7 @@
 # vectorless-tree-retrieval
 
-**Handshake status:** ready-for-check
-**Status:** ready-for-check
+**Handshake status:** checked-PASS
+**Status:** checked-PASS
 **Fix cycle:** 0
 **Priority tier:** 3 — approved vectorless roadmap, T-008/U3.2/T-056.
 **Authority:** approved Knowledge Brain plan; D-173; qa/contracts/vectorless-tree-retrieval.md.

@@ -1,6 +1,6 @@
 # T-055 collections hidden-member survival (ISS-T055COLLECTIONS-001)
 
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Fix cycle:** 1
 **Priority tier:** 3 (roadmap T-055); issue class data-write, severity high (full ceremony)
 **Root:** C:/Users/product/Desktop/KnowledgeBase-lanes/w16-t055coll (branch lane/w16-t055coll)

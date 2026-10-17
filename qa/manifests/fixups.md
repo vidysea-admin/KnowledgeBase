@@ -1,6 +1,6 @@
 # Manifest: fixups (test-only)
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 1
 Base SHA: 0a1737068e4aabee68ef2d6a12f510df045dfd3b
 Candidate SHA: 5fad5dd227cc9e021953c04843017c994dbf70e6

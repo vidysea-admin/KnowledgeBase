@@ -1,6 +1,6 @@
 # Manifest - wire006b-failclosed
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 1
 Lane: C:/Users/product/Desktop/KnowledgeBase-lanes/w17-wire006b (branch lane/w17-wire006b), base 306228cb. Candidate SHA: lane HEAD commit.
 Task: T-007 ISS-W17WIRE006-001 and -003 (medium, tenancy class).
