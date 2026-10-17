@@ -85,7 +85,8 @@ test("a handler that throws is recorded as an error; 4xx and unrelated routes re
     search: fakeSearchDeps({ search: async () => { throw new Error("boom with SECRET-QUERY-TEXT"); } }),
   }));
   try {
-    assert.equal((await fetch(`${server.baseUrl}/search?q=x`, { headers: auth("ask-a") })).status, 500);
+    // routes/search.ts now answers a failing search with a fixed 503 body; any 5xx is still recorded as an error.
+    assert.equal((await fetch(`${server.baseUrl}/search?q=x`, { headers: auth("ask-a") })).status, 503);
     await until(() => store.events.length === 1);
     assert.deepEqual({ kind: store.events[0]!.input.kind, outcome: store.events[0]!.input.outcome }, { kind: "search", outcome: "error" });
     const before = store.events.length;

@@ -11,6 +11,7 @@ import { Collection, MongoClient } from "mongodb";
 import { requireAuth } from "../auth.js";
 import { createServer, startServer } from "../server.js";
 import { buildProductionDeps } from "../composition/production.js";
+import { connect as connectAppDb, close as closeAppDb } from "@lkb/db";
 import { buildTestDeps, fakeKeyStore } from "../fixtures.js";
 import { createActivityHealthRouter } from "./router.js";
 import { createConfiguredActivityHealthDeps, createQueueActivityHealthReader, readQueueConfiguration, type QueueReadCollection } from "./queue-reader.js";
@@ -155,6 +156,10 @@ test("actual producer -> Python first/reclaim/fences -> real production Mongo bi
   const closeMock = mock.method(MongoClient.prototype, "close", async () => { closes++; });
   const previous = Object.fromEntries(Object.keys(env).map(key => [key, process.env[key]]));
   try {
+    // The lazy integrations gate their routes on the connected app database's name when the server registers them
+    // (composition/lazy-database.ts), so connect the app handle first, as server.ts does. connect is mocked (no socket);
+    // "lkb" without the production opt-in keeps those Mongo-backed integrations off. Only the queue reader is counted.
+    await connectAppDb(env.MONGODB_URL, "lkb"); connections = 0;
     Object.assign(process.env, env); const deps = buildProductionDeps(); assert.equal(connections, 0); assert.ok(deps.activityHealth);
     const server = startServer({ ...deps, keyStore, rateLimit: { max: 1000 } }, 0); await once(server, "listening"); const address = server.address(); assert.ok(address && typeof address !== "string");
     try {
@@ -170,7 +175,7 @@ test("actual producer -> Python first/reclaim/fences -> real production Mongo bi
       assert.deepEqual(shapeOf(output), shapeOf(fixture), "apps/web/test-fixtures/t057-d2-runtime-output.json drifted from the API output shape; regenerate with UPDATE_WEB_FIXTURE=1");
       assert.deepEqual({ ...output, response: undefined }, { ...fixture, response: undefined });
     } finally { await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())); await deps.activityHealth.close?.(); }
-    assert.equal(closes, 1);
+    assert.equal(closes, 1); await closeAppDb();
     const missing = createServer({ ...buildTestDeps(), keyStore }); const server2 = missing.listen(0, "127.0.0.1"); await once(server2, "listening"); const address2 = server2.address(); assert.ok(address2 && typeof address2 !== "string");
     try { assert.equal((await fetch(`http://127.0.0.1:${address2.port}/activity-health`, options())).status, 503); } finally { await new Promise<void>((resolve, reject) => server2.close(error => error ? reject(error) : resolve())); }
   } finally {

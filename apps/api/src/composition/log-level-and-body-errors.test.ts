@@ -53,7 +53,7 @@ const CASES: Array<[string, string, typeof BASELINE_400]> = [
   ["raw body (checker reproduction)", SECRET, BASELINE_400],
   ["truncated JSON with secret", `{"password":"${SECRET}", oops`, BASELINE_400],
   ["not-json with secret", `{not json ${SECRET}-tail`, BASELINE_400],
-  ["too large", "x".repeat(200000), BASELINE_413],
+  ["too large", "x".repeat(1_100_000), BASELINE_413], // over server.ts express.json limit (1mb)
 ];
 
 async function post(base: string, body: string) {

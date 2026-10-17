@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Db } from "mongodb";
-import { BlindDb, bindDb, type Row } from "../ask/tenant-test-kit.js";
+import { BlindDb, bindDb, recordingSource, type Row } from "../ask/tenant-test-kit.js";
 import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
 import { indexSession } from "../indexing/session.js";
 import { completeWith } from "../indexing/testutils.js";
@@ -22,13 +22,15 @@ const PAGE = (t: string) => ({ _id: `${t}-p1`, tenantId: t, sessionId: "s1", sum
 const A_ROOT: Row = { _id: "root-a", tenantId: A, node_id: `tenant:${B}`, level: "tenant", title: "A-OWNED-ROOT", summary: "", children: [] };
 
 test("tree_index upsert: B's indexSession cannot overwrite A's colliding root; B gets its OWN stamped root", async () => {
-  const db = new BlindDb({ sessions: [SESSION(B)], turns: [TURN(B)], session_pages: [PAGE(B)], tree_index: [structuredClone(A_ROOT)], chunks: [], claims: [] });
+  const db = new BlindDb({ sessions: [SESSION(B)], sources: [recordingSource(B)], turns: [TURN(B)], session_pages: [PAGE(B)], tree_index: [structuredClone(A_ROOT)], chunks: [], claims: [] });
   bindDb(db);
   const before = snapOf(db.all("tree_index"), A);
   await indexSession(B, "s1", { complete: completeWith() as never, db: db.asDb() });
-  const writes = db.queries.filter((q) => q.coll === "tree_index" && q.op === "replaceOne");
-  assert.equal(writes.length, 1, "the root replaceOne actually fired");
-  assert.equal(writes[0]!.filter.tenantId, B, "filter carries B");
+  // Generation publication writes the root with insertOne (a new generation row) where it once upserted with replaceOne.
+  const writes = db.queries.filter((q) => q.coll === "tree_index" && (q.op === "replaceOne" || q.op === "insertOne"));
+  assert.equal(writes.length, 1, "the root write actually fired");
+  if (writes[0]!.op === "replaceOne") assert.equal(writes[0]!.filter.tenantId, B, "filter carries B");
+  assert.ok(db.queries.filter((q) => q.coll === "tree_index" && q.op !== "insertOne").every((q) => q.filter.tenantId === B), "every root read/filter carries B");
   assert.equal(snapOf(db.all("tree_index"), A), before, "A's root byte-identical");
   const mine = db.all("tree_index").filter((r) => r.tenantId === B);
   assert.equal(mine.length, 1, "B's root was upserted under B");
@@ -67,6 +69,12 @@ test("WhatsApp sources/sessions replaceOne and turns bulkWrite: B cannot overwri
   const writes = db.queries.filter((q) => q.op === "replaceOne" || q.op === "bulkWrite");
   assert.ok(writes.some((q) => q.op === "replaceOne") && writes.some((q) => q.op === "bulkWrite"));
   for (const q of writes) { assert.equal(q.filter.tenantId, B, `${q.coll}.${q.op} filter`); assert.equal((q.doc as Row).tenantId, B, `${q.coll}.${q.op} document`); assert.equal(q.returned, 0, `${q.coll}.${q.op} matched nothing of A's`); }
+
+  // Sources are now inserted with an upsert updateOne + $setOnInsert (consent of an existing row is never rewritten).
+  const upserts = db.queries.filter((q) => q.op === "updateOne");
+  assert.ok(upserts.length > 0, "the sources upsert fired");
+  for (const q of upserts) { assert.equal(q.filter.tenantId, B, `${q.coll}.updateOne filter`); assert.equal(q.returned, 0, `${q.coll}.updateOne matched nothing of A's`);
+    assert.equal(((q.doc as { $setOnInsert?: Row }).$setOnInsert ?? {}).tenantId, B, `${q.coll}.updateOne inserted document`); }
 });
 
 test("WhatsApp legacy fallback read is tenant-scoped: A's legacy bare-hash source is not adopted by B", async () => {

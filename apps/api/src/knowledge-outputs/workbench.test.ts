@@ -307,7 +307,9 @@ test("removing a withheld item preserves other verified mappings and truthful co
   assert.doesNotMatch((await f.service.export("a", draft._id, 3)).markdown, /Unsupported text/u);
 });
 test("actual TOC unreviewed sample refuses; a clearly synthetic verified copy demonstrates downstream consumption without raw mutation", async () => {
-  const path = "data/toc-migrated/2026-08-27-in-focus-4/turns.json", claimsPath = "data/toc-migrated/2026-08-27-in-focus-4/claims.json";
+  // Resolved from this file (repo-root data/), not the cwd: `pnpm -r test` runs with apps/api as cwd.
+  const sample = new URL("../../../../data/toc-migrated/2026-08-27-in-focus-4/", import.meta.url);
+  const path = new URL("turns.json", sample), claimsPath = new URL("claims.json", sample);
   const before = readFileSync(path), claimsBefore = readFileSync(claimsPath);
   const turns = JSON.parse(before.toString()) as Turns[], claims = JSON.parse(claimsBefore.toString()) as Claims[];
   const f = fixture();

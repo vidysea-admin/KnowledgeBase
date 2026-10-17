@@ -31,10 +31,18 @@ test("indexing/session.ts imports treeIndexRootFilter and does not re-derive the
   assert.doesNotMatch(src, HAND_WRITTEN_FILTER, "must not hand-write the node_id shape again");
 });
 
-test("store.ts imports treeIndexRootFilter and both its tree_index call sites use it, not a hand-written copy", () => {
-  const src = read("store.ts");
-  assert.match(src, /import\s*\{[^}]*\btreeIndexRootFilter\b[^}]*\}\s*from\s*"@lkb\/index"/, "must import the shared filter");
-  assert.doesNotMatch(src, HAND_WRITTEN_FILTER, "must not hand-write the node_id shape again");
+test("store.ts tree/graph loaders delegate to trusted readers, whose tree_index root reads use treeIndexRootFilter, not a hand-written copy", () => {
+  // The build wave moved both loaders' tree_index reads out of store.ts into composition/integrations/trusted-readers.ts
+  // (createMongoTreeStore -> trustedTreeReads, createMongoGraphReadDeps -> trustedGraphReads). The pin follows them.
+  const store = read("store.ts");
+  assert.doesNotMatch(store, HAND_WRITTEN_FILTER, "store.ts must not hand-write the node_id shape again");
+  assert.match(store, /trustedTreeReads\(/, "createMongoTreeStore delegates to trustedTreeReads");
+  assert.match(store, /trustedGraphReads\(/, "createMongoGraphReadDeps delegates to trustedGraphReads");
+  const src = read("composition/integrations/trusted-readers.ts");
+  assert.match(src, /import\s*\{[^}]*\btreeIndexRootFilter\b[^}]*\}\s*from\s*['"]@lkb\/index['"]/, "must import the shared filter");
+  // This file also BUILDS a synthetic native-only root node ({ node_id: `tenant:${tenant}`, ... }); that is a node, not
+  // a query, so the pin applies to every line that issues a find/findOne.
+  for (const line of src.split("\n").filter(l => /\bfind(One)?\(/.test(l))) assert.doesNotMatch(line, HAND_WRITTEN_FILTER, "must not hand-write the node_id shape again");
   const usages = src.match(/treeIndexRootFilter\(/g) ?? [];
-  assert.equal(usages.length, 2, "both createMongoTreeStore.load and createMongoGraphReadDeps.loadGraph must call it — a count of 1 means one of the two regressed back to a hand-written filter");
+  assert.equal(usages.length, 2, "the tree loader's root read and currentTreeInput (shared by the tree and graph loaders) must both call it");
 });

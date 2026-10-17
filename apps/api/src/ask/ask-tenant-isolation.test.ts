@@ -19,7 +19,7 @@ import type { TreeIndexNode } from "@lkb/core";
 import { BoundedAskError } from "@lkb/ask";
 import { createAskArmsFor } from "./ask-arms.js";
 import { createSourceHydrator, createSourceRequestDepsFor } from "./source-context.js";
-import { BlindDb, realTreeStore, type Query, type Row } from "./tenant-test-kit.js";
+import { BlindDb, admitCorpus, realTreeStore, type Query, type Row } from "./tenant-test-kit.js";
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeAskDeps } from "../fixtures.js";
 
@@ -39,7 +39,7 @@ const A_TREE_SESSIONS = [sessionNode(A, "s-shared", "Visa October forms"), sessi
 const B_TREE_SESSIONS = [sessionNode(B, "s-shared", "Visa October forms bonus Zanzibar-B"), sessionNode(B, "b-only-session", "Visa October Zanzibar-B")];
 
 function corpus(): Record<string, Row[]> {
-  return {
+  return admitCorpus({
     tree_index: [root(A, A_TREE_SESSIONS), root(B, B_TREE_SESSIONS)],
     turns: [
       { _id: "a-turn-1", tenantId: A, sessionId: "s-shared", speakerRef: "spk:0", tStart: 10, tEnd: 20, text: "Visa forms open in October." },
@@ -55,7 +55,7 @@ function corpus(): Record<string, Row[]> {
       { _id: "b-chunk-1", tenantId: B, sourceRef: "s-shared", turnRefs: ["b-turn-1"], chunkIndex: 0, vector: [1, 0], dims: 2, embeddingModel: "offline" },
       { _id: "b-chunk-2", tenantId: B, sourceRef: "b-only-session", turnRefs: ["b-turn-2"], chunkIndex: 0, vector: [1, 0], dims: 2, embeddingModel: "offline" },
     ],
-  };
+  });
 }
 
 const embed = async () => ({ vectors: [[1, 0]], dims: 2, provider: "offline", model: "offline" });
@@ -89,8 +89,9 @@ test("tree load: tenant A gets A's root, never B's, with every query carrying A'
   assert.equal(tree.tenantId, A);
   assert.equal(tree.node_id, "tenant:tA");
   assert.deepEqual(leaks(tree), []);
-  assert.equal(db.queries.length, 1);
-  assert.deepEqual(db.queries[0]!.filter, { node_id: "tenant:tA", level: "tenant", tenantId: A });
+  // The trusted reader also reads A's sessions/pages/turns to admit the root: every query carries A, the root query is exact.
+  assert.deepEqual(unscoped(db.queries, A), []);
+  assert.ok(db.queries.some((q) => q.coll === "tree_index" && JSON.stringify(q.filter) === JSON.stringify({ node_id: "tenant:tA", level: "tenant", tenantId: A })));
   // Both roots exist; B's is reachable only by B's own filter.
   assert.equal(((await store.load(B)) as unknown as Row).tenantId, B);
 });
@@ -131,7 +132,7 @@ test("arms: the ranking is the A-only ranking even when B's rows would reorder i
   // also has cos 1.0; scoped, only A's data ranks. (Weak on ordering by design - the recorded
   // query filters below are the load-bearing check.)
   const data = corpus();
-  (data.chunks!.find((c) => c._id === "a-chunk-2")!).vector = [1, 0];
+  (data.chunks!.find((c) => (c.turnRefs as string[])[0] === "a-turn-2")!).vector = [1, 0];
   const db = new BlindDb(data);
   const res = await createAskArmsFor({ embed: embed as never, db: db.asDb() })(A)(QUERY, aTree());
   assert.equal(res.arms[0]![0]!.node_id, "tenant:tA/session:s-a2", "A's own chunk leads; B's tied/higher chunks did not enter the ranking");
@@ -172,7 +173,8 @@ test("hydrator: tenant A's quotes only, though B has the same sessionId with hig
   assert.equal(quotes[0]!.quote, "Visa forms open in October.");
   assert.deepEqual(leaks(out), []);
   assert.deepEqual(unscoped(db.queries, A), []);
-  assert.deepEqual(db.queries.map((q) => [q.coll, q.returned]), [["turns", 1], ["chunks", 1]], "turns and chunks each returned only A's single row");
+  // The review overlay / visibility gate add scoped findOne lookups; the corpus reads are the two finds.
+  assert.deepEqual(db.queries.filter((q) => q.op === "find").map((q) => [q.coll, q.returned]), [["turns", 1], ["chunks", 1]], "turns and chunks each returned only A's single row");
 });
 
 test("hydrator: asked for a session that exists only for B it refuses (no source rows) and leaks nothing", async () => {
@@ -254,7 +256,8 @@ test("HTTP /ask as tenant A: tree is A's, quotes are A's, nothing of B in body /
   assert.deepEqual(leaks(r.writes), [], "job rows");
   assert.deepEqual(leaks(r.logs), [], "console output");
   assert.ok(r.requestTenants.length > 0 && r.requestTenants.every((t) => t === A));
-  assert.ok(db.queries.some((q) => q.coll === "turns") && db.queries.some((q) => q.coll === "chunks") && db.queries.some((q) => q.coll === "tree_index"), "tree, turns and chunks were all read");
+  // Public request composition is vectorless (source-context.ts), so the route reads the tree and turns, not chunks.
+  assert.ok(db.queries.some((q) => q.coll === "turns") && db.queries.some((q) => q.coll === "tree_index"), "tree and turns were both read");
   assert.deepEqual(unscoped(db.queries, A), [], "every query the route issued carries tenantId=tA");
   assert.ok(r.writes.every((w) => (w as { tenantId?: string }).tenantId === undefined || (w as { tenantId?: string }).tenantId === A));
 });
@@ -295,7 +298,8 @@ test("HTTP /ask with an empty or undefined resolved tenant: no tenant data, no t
   }
 });
 
-test("HTTP /ask legacy arms path (extraCandidateArmsFor): arms are built per request from the key tenant only", async () => {
+// Public /ask no longer invokes the legacy arms (routes/ask/ask.test.ts); /answer-policy/simulate is the remaining legacy-arms route.
+test("HTTP /answer-policy/simulate legacy arms path (extraCandidateArmsFor): arms are built per request from the key tenant only", async () => {
   const db = new BlindDb(corpus());
   const base = buildTestDeps({ keyStore: fakeKeyStore({ k: { tenantId: A, scopes: ["ask"] } }) });
   const loads: string[] = [], bound: string[] = [];
@@ -305,8 +309,8 @@ test("HTTP /ask legacy arms path (extraCandidateArmsFor): arms are built per req
   base.ask.extraCandidateArmsFor = (tenantId) => { bound.push(tenantId); return arms(tenantId); };
   const server = await startTestServer(base);
   try {
-    const reply = await fetch(server.baseUrl + "/ask", { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer k" },
-      body: JSON.stringify({ query: QUERY, tenantId: B }) });
+    const reply = await fetch(server.baseUrl + "/answer-policy/simulate", { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer k" },
+      body: JSON.stringify({ query: QUERY, tenantId: B, draft: { policyId: "p", version: 1, mode: "internal-only" } }) });
     const text = await reply.text();
     assert.equal(reply.status, 200, text);
     assert.deepEqual(bound, [A]);

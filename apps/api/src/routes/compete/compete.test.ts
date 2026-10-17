@@ -18,6 +18,7 @@ import { unpackContext } from "../../../../../packages/ask/src/bounded-refine.js
 
 import { startTestServer } from "../../testUtils.js";
 import { buildTestDeps, fakeAskDeps, fakeKeyStore, fakeEvalRunStore } from "../../fixtures.js";
+import { withVisibleTranscripts } from "../../visibility/read-fixture.js";
 
 const COMPETE_KEY = { "compete-key": { tenantId: "tenant-1", scopes: ["ask", "compete"] } };
 
@@ -210,8 +211,8 @@ test("compete actual bounded factory preserves source grounding and concurrent t
   const nodes = Object.fromEntries(owners.map(tenant => [tenant, {node_id: `tenant:${tenant}/session:${tenant}-s`, title: "Visa", level: "session", summary: "UNREVIEWED_POISON ".repeat(1000), evidence: {sessionRef: `${tenant}-s`}, children: []} as TreeIndexNode]));
   const turns = owners.map(tenant => ({_id: `${tenant}-t1`, tenantId: tenant, sessionId: `${tenant}-s`, speakerRef: "spk:0", tStart: 0, tEnd: 5, text: `Visa form evidence for ${tenant}.`}));
   const chunks = owners.map(tenant => ({_id: `${tenant}-c1`, tenantId: tenant, sourceRef: `${tenant}-s`, turnRefs: [`${tenant}-t1`], chunkIndex: 0, vector: [1, 0], dims: 2, embeddingModel: "fixture"}));
-  const db = {collection: (collection: string) => ({find: (filter: any) => {filters.push({collection, ...filter}); return {toArray: async () =>
-    (collection === "turns" ? turns : chunks).filter(row => row.tenantId === filter.tenantId)};}})} as unknown as Db;
+  const db = withVisibleTranscripts({collection: (collection: string) => ({find: (filter: any) => {filters.push({collection, ...filter}); return {toArray: async () =>
+    (collection === "turns" ? turns : chunks).filter(row => row.tenantId === filter.tenantId)};}})} as unknown as Db, () => turns) as unknown as Db;
   const started: Record<string, Promise<void>> = {}, gates: Record<string, Promise<void>> = {}, release: Record<string, () => void> = {}, reached: Record<string, () => void> = {};
   for (const tenant of owners) {started[tenant] = new Promise(resolve => {reached[tenant] = resolve;}); gates[tenant] = new Promise(resolve => {release[tenant] = resolve;});}
   let attack = "";
@@ -239,7 +240,8 @@ test("compete actual bounded factory preserves source grounding and concurrent t
   const resultB = await pendingB; assert.equal(resultB.status, 200); assert.deepEqual(writes.map(row => row.tenantId), ["tenant-b"]);
   release["tenant-a"]!(); const resultA = await pendingA; assert.equal(resultA.status, 200);
   assert.deepEqual(factoryTenants, owners); assert.deepEqual(writes.map(row => row.tenantId), ["tenant-b", "tenant-a"]);
-  assert.deepEqual(embeddings.sort(), ["Visa form tenant-a", "Visa form tenant-b"]);
+  // Public request composition is always vectorless (source-context.ts RequestAskOptions): the embedder is never called.
+  assert.deepEqual(embeddings, []);
   for (const [tenant, result] of [["tenant-a", resultA], ["tenant-b", resultB]] as const) {
     assert.equal(result.body.aiAnswer.text, `The source says a visa form is needed for ${tenant}.`);
     const quote = result.body.aiAnswer.sources.internal[0].evidence.sourceQuotes[0];

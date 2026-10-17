@@ -16,6 +16,7 @@ import type { GraphContextSnapshot } from "./graph-context.js";
 import { createNativeSourceHydrator } from "./native-source-context.js";
 import type { NativeSourceLocator } from "@lkb/core";
 import type { SourceHydration } from "../../../../packages/ask/src/source-context.js";
+import { withVisibleTranscripts } from "../visibility/read-fixture.js";
 const sha = (s: string) => createHash("sha256").update(s).digest("hex");
 const source = (text = "Visa forms open in October.", fields: Partial<Turns> = {}): Turns =>
   ({ _id: "s-t1", tenantId: "toc", sessionId: "s", speakerRef: "spk:0", tStart: 12, tEnd: 20, text, ...fields });
@@ -37,7 +38,7 @@ function fakeDb(rows: { turns?: Turns[]; chunks?: unknown[] }, enforce = true) {
       });
     },
   }) }) } as unknown as Pick<Db, "collection">;
-  return { db, filters };
+  return { db: withVisibleTranscripts(db, () => (rows.turns ?? []) as unknown as Record<string, unknown>[]), filters };
 }
 function completion(json: unknown) { return { text: JSON.stringify(json), json, provider: "offline", model: "fixture",
   costUsd: 0, usage: { inputTokens: 1, outputTokens: 1 } }; }
@@ -160,7 +161,8 @@ test("same frozen rows survive DB object mutation during later embedding", async
   assert.ok(JSON.stringify(proof.nodes).includes("Visa forms open in October."));
   assert.ok(!JSON.stringify(proof.nodes).includes("POISON"));
 });
-test("vector span hash/offset poisoning refuses before embedding or quoted answer", async () => {
+// goal-t008 (content-bound chunks): a poisoned/stale vector chunk is DROPPED before embedding, never trusted; the answer degrades to lexical.
+test("vector span hash/offset poisoning is excluded before embedding or quoted answer", async () => {
   const turn = source("世界 😀 visa.");
   const span = { turnId: turn._id, charStart: 0, charEnd: 2, byteStart: 0, byteEnd: 6,
     turnTextSHA256: sha(turn.text), sliceSHA256: sha(turn.text.slice(0, 2)) };
@@ -170,7 +172,8 @@ test("vector span hash/offset poisoning refuses before embedding or quoted answe
     const spanId = sha(JSON.stringify(altered));
     const { db } = fakeDb({ turns: [turn], chunks: [{ _id: "c", tenantId: "toc", sourceRef: "s", turnRefs: [turn._id],
       chunkIndex: 0, vector: [1, 0], dims: 2, embeddingModel: "fixture", sourceSpans: [{ ...altered, spanId }], rawTextSha256: sha(turn.text.slice(0, 2)) }] });
-    await assert.rejects(createSourceHydrator("toc", { db, embed: async () => { calls++; throw new Error("not reached"); } })("visa", [node]), /span/);
+    const result = await createSourceHydrator("toc", { db, embed: async () => { calls++; throw new Error("not reached"); } })("visa", [node]);
+    assert.match(result.degraded ?? "", /content-bound reindexing/);
     assert.equal(calls, 0);
   }
 });
@@ -226,7 +229,7 @@ test("public request factory ignores explicit vector false across arms and sourc
   assert.equal(embeds, 0);
 });
 
-test("claimed nomic provenance validates positive spans and refuses altered policy/digest/input", async () => {
+test("claimed nomic provenance validates positive spans and excludes altered policy/digest/input", async () => {
   const turn = source();
   const span = { turnId: turn._id, charStart: 0, charEnd: turn.text.length, byteStart: 0, byteEnd: Buffer.byteLength(turn.text),
     turnTextSHA256: sha(turn.text), sliceSHA256: sha(turn.text) };
@@ -243,7 +246,10 @@ test("claimed nomic provenance validates positive spans and refuses altered poli
     { embeddingInputSha256: sha(turn.text) }, { rawTextSha256: "a".repeat(64) }]) {
     let called = false;
     const { db } = fakeDb({ turns: [turn], chunks: [{ ...chunk, ...attack }] });
-    await assert.rejects(createSourceHydrator("toc", { db, embed: async () => { called = true; return embed(); } })("visa", [node]), /vector/);
+    const run = createSourceHydrator("toc", { db, embed: async () => { called = true; return embed(); } })("visa", [node]);
+    // Altered policy/digest/input refuses; altered raw text no longer binds the chunk to its source, so it is excluded (goal-t008).
+    if ("rawTextSha256" in attack) assert.match((await run).degraded ?? "", /content-bound reindexing/);
+    else await assert.rejects(run, /vector/);
     assert.equal(called, false);
   }
 });

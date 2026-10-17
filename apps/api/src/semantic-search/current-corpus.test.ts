@@ -34,7 +34,7 @@ function fixture() {
   const doc: Turns = { _id: "document-turn", tenantId, sessionId: "document", speakerRef: "document", text: "Scholarship document guidance.", tStart: 1, tEnd: 2 };
   const chunk = (turn: Turns) => ({ _id: chunkContentId(tenantId, turn.sessionId, [turn._id], turn.text), tenantId,
     sourceRef: turn.sessionId, turnRefs: [turn._id], vector: [1, 0], dims: 2, embeddingModel: "fixture" });
-  const rows = { sources: [source, { _id: "doc", tenantId, kind: "document" }], sessions: [session, { ...session, _id: "document", sourceId: "doc", title: "Public document" }],
+  const rows = { sources: [source, { _id: "doc", tenantId, kind: "document" }], sessions: [session, { ...session, _id: "document", sourceId: "doc", title: "Public document", participants: ["Document author"] }],
     turns: [first, pending, doc], whatsapp_candidates: [candidate], claims: [claim], whatsapp_review_log: [], transcript_reviews: [],
     chunks: [chunk(first), { ...chunk(pending), embeddingModel: "wrong-model", vector: [NaN, 0] }, chunk(doc)],
     gaps: [{ _id: "private-gap", tenantId, kind: "vector-pending", status: "open", sourceRef: "private-session" }] } as unknown as Record<string, FixtureRow[]>;

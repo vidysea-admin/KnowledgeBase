@@ -16,7 +16,8 @@ test("actual buildIndexer grounded opt-in produces and persists cited summary/fa
   assert.ok(page.summary.includes(FACT)); assert.deepEqual(page.actionItems, [ACTION]);
   assert.equal(page.citedItems!.find((item) => item.kind === "insight")!.text, FACT);
   assert.equal(page.qa![0]!.answer, ANSWER); assert.equal(claims[0]!.text, FACT);
-  assert.ok(state.kinds.includes("note-judge")); assert.ok(state.kinds.includes("embedding"));
+  // D-173: buildIndexer is vectorless; active ingestion never requests embeddings (lexical chunks are still persisted).
+  assert.ok(state.kinds.includes("note-judge")); assert.ok(!state.kinds.includes("embedding"));
   assert.ok(state.jobs.length > 0 && state.jobs.every((job) => job.tenantId === "t"), "real router ledger remains tenant-bound");
   for (const name of ["session_pages", "claims", "chunks", "tree_index"]) {
     assert.ok(state.rows(name).length > 0, `${name} must actually be persisted`);

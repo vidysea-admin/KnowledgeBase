@@ -12,7 +12,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Db } from "mongodb";
-import { BlindDb, bindDb, type Row } from "../ask/tenant-test-kit.js";
+import { BlindDb, bindDb, mergeCorpus, sessionNodeFor, visibleSession, type Row } from "../ask/tenant-test-kit.js";
 import { createMongoApiKeyStore, createMongoGraphReadDeps, createMongoJobWriter, createMongoKeysDeps, createMongoTreeStore } from "../store.js";
 import { createMongoIngestDeps } from "../ingest-store.js";
 import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
@@ -30,15 +30,16 @@ const HOSTILE: ReadonlyArray<readonly [string, unknown]> = [
 const SENT_A = "SENT-A-ALPHA-7f3", SENT_B = "SENT-B-BRAVO-9c1";
 const snapshot = (db: BlindDb, colls: string[]) => JSON.stringify(colls.map((c) => db.all(c)));
 const keyRow = (t: string, id: string, label: string, hash = id): Row => ({ _id: id, tenantId: t, keyHash: sha256Hex(hash), label, scopes: ["ask"], createdAt: "2026-10-11", revokedAt: null });
-const sess = (t: string, title: string) => ({ node_id: `${t}/session:s1`, title, level: "session", summary: "", children: [], evidence: { sessionRef: "s1" } });
-const corpus = (): Record<string, Row[]> => ({
+// Each root's session is backed by a session the read gate admits (source, session, turn, page), so the stored root is served.
+const sess = (t: string, title: string) => sessionNodeFor(t, "s1", title, title);
+const corpus = (): Record<string, Row[]> => mergeCorpus({
   api_keys: [keyRow(A, "ka", SENT_A, "raw-a"), keyRow(B, "kb", SENT_B, "raw-b")],
   tree_index: [
     { _id: "ra", tenantId: A, node_id: `tenant:${A}`, title: SENT_A, level: "tenant", summary: "", children: [sess(A, SENT_A)] },
     { _id: "rb", tenantId: B, node_id: `tenant:${B}`, title: SENT_B, level: "tenant", summary: "", children: [sess(B, SENT_B)] },
   ],
   jobs: [], sources: [], sessions: [], turns: [], graph_edges: [],
-});
+}, visibleSession(A, "s1", SENT_A, SENT_A), visibleSession(B, "s1", SENT_B, SENT_B));
 const fresh = () => { const db = new BlindDb(corpus()); bindDb(db); return db; };
 const has = (v: unknown, s: string) => JSON.stringify(v).includes(s);
 
@@ -93,7 +94,10 @@ test("tree store positive control: tA gets only its own root, tB only its own", 
   const db = fresh(), store = createMongoTreeStore();
   const a = await store.load(A), b = await store.load(B);
   assert.ok(has(a, SENT_A) && !has(a, SENT_B)); assert.ok(has(b, SENT_B) && !has(b, SENT_A));
-  assert.deepEqual(db.queries.map((q) => q.filter), [{ node_id: "tenant:tA", level: "tenant", tenantId: A }, { node_id: "tenant:tB", level: "tenant", tenantId: B }]);
+  // The trusted reader also reads sessions/pages/turns to admit the root; every one of A's reads precedes B's and carries A.
+  const owner = db.queries.map((q) => q.filter.tenantId), firstB = owner.indexOf(B);
+  assert.ok(firstB > 0 && owner.slice(0, firstB).every((t) => t === A) && owner.slice(firstB).every((t) => t === B), JSON.stringify(owner));
+  for (const t of [A, B]) assert.ok(db.queries.some((q) => q.coll === "tree_index" && JSON.stringify(q.filter) === JSON.stringify({ node_id: `tenant:${t}`, level: "tenant", tenantId: t })));
 });
 
 // ---------------------------------------------------------------- graph loader: hand-built tree_index query + accessors
@@ -133,12 +137,12 @@ async function withFetchStub<T>(fn: (calls: string[]) => Promise<T>): Promise<T>
 }
 for (const [name, bad] of HOSTILE) {
   test(`ingestUrl: tenant ${name} throws the guard error before any fetch or write`, async () => {
-    const db = fresh();
+    const db = fresh(), before = snapshot(db, ["sources", "sessions", "turns"]);
     await withFetchStub(async (calls) => {
       await assert.rejects(() => createMongoIngestDeps().ingestUrl(bad as string, "https://example.com/p"), GUARD);
       assert.deepEqual(calls, [], "no outbound fetch");
     });
-    assert.deepEqual(db.queries, []); assert.deepEqual([db.all("sources"), db.all("sessions"), db.all("turns")], [[], [], []]);
+    assert.deepEqual(db.queries, []); assert.equal(snapshot(db, ["sources", "sessions", "turns"]), before, "no write");
   });
 }
 test("ingestUrl positive control: two tenants ingest the same URL; every stored row carries exactly its own tenant", async () => {
@@ -166,7 +170,7 @@ for (const [name, bad] of HOSTILE) {
   });
 }
 test("whatsapp ingestGroup positive control: every write filter and stored row carries exactly the calling tenant", async () => {
-  const db = fresh(), fx = { owner: 0, fetch: 0 };
+  const db = new BlindDb({ ...corpus(), sources: [], sessions: [], turns: [] }), fx = { owner: 0, fetch: 0 }; bindDb(db);
   await waDeps(db, fx).ingestGroup(A, "g1"); await waDeps(db, fx).ingestGroup(B, "g1");
   for (const q of db.queries) assert.ok(q.filter.tenantId === A || q.filter.tenantId === B, JSON.stringify(q.filter));
   assert.ok(db.queries.some((q) => q.op === "replaceOne" && q.filter.tenantId === A) && db.queries.some((q) => q.op === "bulkWrite" && q.filter.tenantId === B));
@@ -187,8 +191,13 @@ test("indexSession positive control: tree_index is read and upserted with exactl
   const { db, calls } = fakeDb();
   await indexSession("t", "s1", { complete: completeWith() as never, db });
   const root = calls.filter((c) => c.coll === "tree_index");
-  assert.deepEqual(root.map((c) => c.op), ["findOne", "replaceOne"]);
-  for (const c of root) assert.deepEqual(c.filter, { node_id: "tenant:t", level: "tenant", tenantId: "t" });
+  // Read and upsert first; the publication then re-reads the tenant's tree rows to verify them.
+  assert.deepEqual(root.slice(0, 2).map((c) => c.op), ["findOne", "replaceOne"]);
+  assert.deepEqual(root[0]!.filter, { node_id: "tenant:t", level: "tenant", tenantId: "t" });
+  // The upsert is now a compare-and-set on the root revision it read; the tenant root filter is otherwise unchanged.
+  const { indexRevision, ...upsertFilter } = root[1]!.filter!;
+  assert.deepEqual(upsertFilter, { node_id: "tenant:t", level: "tenant", tenantId: "t" }); assert.equal(typeof indexRevision, "number");
+  for (const c of root.slice(2)) { assert.equal(c.op, "find"); assert.equal(c.filter?.tenantId, "t"); }
   assert.equal(root[1]!.docs![0]!.tenantId, "t");
 });
 

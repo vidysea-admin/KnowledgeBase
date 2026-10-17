@@ -12,6 +12,8 @@ import { createAskArmsFor } from "./ask-arms.js";
 import type { TreeIndexNode } from "@lkb/core";
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeTreeStore, fakeAskDeps } from "../fixtures.js";
+import { withVisibleTranscripts } from "../visibility/read-fixture.js";
+import { chunkContentId } from "../indexing/chunk-integrity.js";
 
 const TREE: TreeIndexNode = {
   node_id: "tenant:t1", title: "t1", level: "tenant", summary: "", children: [
@@ -22,8 +24,26 @@ const TREE: TreeIndexNode = {
   ],
 };
 
+type Row = Record<string, unknown>;
+/**
+ * Completes the shorthand rows to what the production read gate accepts (whole turns, content-bound chunks): the
+ * visibility gate drops partial turns and goal-t008 drops chunks whose id does not bind them to their source text.
+ */
+function completeRows(rows: { chunks?: unknown[]; turns?: unknown[] }, tenantId = "t1") {
+  const turns: Row[] = ((rows.turns ?? []) as Row[]).map(t => ({ tenantId, speakerRef: "spk:0", tStart: 0, tEnd: 1, ...t }));
+  const chunks = ((rows.chunks ?? []) as Row[]).map(c => {
+    const tenant = (c.tenantId as string | undefined) ?? tenantId;
+    const source = turns.filter(t => t.tenantId === tenant && t.sessionId === c.sourceRef);
+    const turnRefs = source.map(t => t._id as string);
+    return { ...c, tenantId: tenant, turnRefs, embeddingModel: "fake",
+      _id: chunkContentId(tenant, c.sourceRef as string, turnRefs, source.map(t => (t.text as string).trim()).join(" ")) };
+  });
+  return { turns, chunks };
+}
+
 /** Records every tenantId the arms actually queried with. */
-function fakeDb(rows: { chunks?: unknown[]; turns?: unknown[] } = {}) {
+function fakeDb(shorthand: { chunks?: unknown[]; turns?: unknown[] } = {}) {
+  const rows = completeRows(shorthand);
   const queriedTenants: string[] = [];
   const db = {
     collection(name: string) {
@@ -31,13 +51,15 @@ function fakeDb(rows: { chunks?: unknown[]; turns?: unknown[] } = {}) {
         find: (filter?: Record<string, unknown>) => ({
           toArray: async () => {
             if (filter && typeof filter.tenantId === "string") queriedTenants.push(`${name}:${filter.tenantId}`);
-            return (name === "chunks" ? rows.chunks : rows.turns) ?? [];
+            // A real scoped Mongo query never returns another tenant's rows; the effective-turn reader refuses if one does.
+            const all = ((name === "chunks" ? rows.chunks : rows.turns) ?? []) as Record<string, unknown>[];
+            return typeof filter?.tenantId === "string" ? all.filter(row => row.tenantId === filter.tenantId) : all;
           },
         }),
       };
     },
   } as unknown as Pick<Db, "collection">;
-  return { db, queriedTenants };
+  return { db: withVisibleTranscripts(db, () => rows.turns), queriedTenants };
 }
 
 const embedOk = async () => ({ vectors: [[1, 0, 0]], dims: 3, provider: "fake", model: "fake" });
@@ -70,7 +92,7 @@ test("C6: every collection read carries the tenant the factory was called with",
 // resolving to tenant A's session". So: ONE db holding BOTH tenants' rows, and assertions on the
 // RETURNED NODES, plus an explicit non-vacuity check so this can never pass by querying nothing.
 test("C6: tenant B's arms return only tenant B's session — ONE corpus, both tenants in it", async () => {
-  const rows = {
+  const rows = completeRows({
     chunks: [
       { _id: "a:c1", tenantId: "tenant-a", sourceRef: "s1", vector: [1, 0, 0] },
       { _id: "b:c1", tenantId: "tenant-b", sourceRef: "s2", vector: [1, 0, 0] },
@@ -79,7 +101,7 @@ test("C6: tenant B's arms return only tenant B's session — ONE corpus, both te
       { _id: "a:t1", tenantId: "tenant-a", sessionId: "s1", text: "visas" },
       { _id: "b:t1", tenantId: "tenant-b", sessionId: "s2", text: "visas" },
     ],
-  };
+  });
   // A single db whose find() HONOURS the tenantId filter, so a leak is expressible: if the arms
   // ever query without a tenant (or with the wrong one), the other tenant's rows really do come
   // back and land in the returned nodes.
@@ -99,7 +121,7 @@ test("C6: tenant B's arms return only tenant B's session — ONE corpus, both te
     },
   } as unknown as Pick<Db, "collection">;
 
-  const factory = createAskArmsFor({ embed: embedOk as never, db });
+  const factory = createAskArmsFor({ embed: embedOk as never, db: withVisibleTranscripts(db, () => rows.turns) });
   const aRes = await factory("tenant-a")("visas?", TREE);
   const bRes = await factory("tenant-b")("visas?", TREE);
 
@@ -221,8 +243,12 @@ const TWO_TENANT_KEYS = fakeKeyStore({
   "key-b": { tenantId: "tenant-b", scopes: ["ask"] },
 });
 
-async function askAs(baseUrl: string, key: string, body: Record<string, unknown> = { query: "topic one" }) {
-  return fetch(`${baseUrl}/ask`, {
+// The build wave made PUBLIC /ask never invoke the legacy arms (routes/ask/ask.test.ts "public Ask never invokes the
+// legacy arms fallback"). The one remaining binding site is /answer-policy/simulate (answer-policy/routes.ts), which
+// binds `extraCandidateArmsFor(tenantId)` per request when no request factory is configured; ISS-169 now pins THAT site.
+const SIMULATE = { query: "topic one", draft: { policyId: "p", version: 1, mode: "internal-only" } };
+async function askAs(baseUrl: string, key: string, body: Record<string, unknown> = SIMULATE, path = "/answer-policy/simulate") {
+  return fetch(`${baseUrl}${path}`, {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
     body: JSON.stringify(body),
@@ -246,7 +272,11 @@ test("C6/ISS-169 — the arms are bound PER REQUEST from the verified key's tena
     // router-level id is the literal string "system".
     assert.deepEqual(rec.boundWith, [], "binding before any request is the boot-capture bug itself");
 
-    assert.equal((await askAs(server.baseUrl, "key-a", { query: "topic one", tenantId: "tenant-b" })).status, 200);
+    // Public /ask binds nothing at all.
+    assert.equal((await askAs(server.baseUrl, "key-a", { query: "topic one" }, "/ask")).status, 200);
+    assert.deepEqual(rec.boundWith, [], "public /ask never binds the legacy arms");
+
+    assert.equal((await askAs(server.baseUrl, "key-a", { ...SIMULATE, tenantId: "tenant-b" })).status, 200);
     assert.equal((await askAs(server.baseUrl, "key-b")).status, 200);
 
     // The ORDERED list is the assertion, not a membership check: a hoisted binding produces

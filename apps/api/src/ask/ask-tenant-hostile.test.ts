@@ -20,7 +20,7 @@ import { scopedCollection } from "@lkb/db";
 import { createAskArmsFor } from "./ask-arms.js";
 import { createSourceHydrator, createSourceRequestDepsFor } from "./source-context.js";
 import { createAskRouter, type TreeStore } from "../routes/ask/ask.js";
-import { BlindDb, realTreeStore, type Row } from "./tenant-test-kit.js";
+import { BlindDb, admitCorpus, realTreeStore, type Row } from "./tenant-test-kit.js";
 import { fakeAskDeps } from "../fixtures.js";
 import { assertValidTenantId } from "../../../../packages/db/src/lib/tenantScope.js";
 
@@ -34,7 +34,7 @@ const sess = (t: string, id: string, title: string): TreeIndexNode =>
 const root = (t: string, kids: TreeIndexNode[]): Row => ({ _id: `root-${t}`, tenantId: t, node_id: `tenant:${t}`, title: t, level: "tenant", summary: "", children: kids });
 const A_KIDS = [sess(A, "s-shared", `Visa October forms ${SENT_A}`)];
 const B_KIDS = [sess(B, "s-shared", `Visa October forms bonus ${SENT_B}`)];
-const corpus = (): Record<string, Row[]> => ({
+const corpus = (): Record<string, Row[]> => admitCorpus({
   tree_index: [root(A, A_KIDS), root(B, B_KIDS)],
   turns: [
     { _id: "a-turn-1", tenantId: A, sessionId: "s-shared", speakerRef: "spk:0", tStart: 10, tEnd: 20, text: `Visa forms open in October ${SENT_A}.` },
@@ -117,7 +117,9 @@ for (const [tenant, mine, other] of [[A, SENT_A, SENT_B], [B, SENT_B, SENT_A]] a
     const tree = await realTreeStore(db, []).load(tenant) as unknown as Row;
     assert.equal(tree.tenantId, tenant); assert.equal(tree.node_id, `tenant:${tenant}`);
     assert.deepEqual(found(tree, [mine, other]), [mine], "own sentinel, never the other tenant's");
-    assert.deepEqual(db.queries.map((q) => [q.coll, q.op, q.returned]), [["tree_index", "findOne", 1]]);
+    // The trusted reader then reads this tenant's sessions/pages/turns to admit the root: every read carries the tenant.
+    assert.ok(db.queries.every((q) => q.filter.tenantId === tenant), JSON.stringify(db.queries.map((q) => q.filter)));
+    assert.deepEqual([db.queries[0]!.coll, db.queries[0]!.op, db.queries[0]!.returned], ["tree_index", "findOne", 1]);
     assert.deepEqual(db.queries[0]!.filter, { node_id: `tenant:${tenant}`, level: "tenant", tenantId: tenant }, "filter carries exactly this tenant as plain strings");
   });
 }
@@ -126,7 +128,9 @@ for (const [name, value] of HOSTILE) {
     const db = new BlindDb(corpus());
     assert.equal(await realTreeStore(db, []).load(value as string), null);
     if (name !== "valid tenant with NO data") { assert.deepEqual(db.queries, [], "an invalid tenant never reaches the database"); return; }
-    assert.equal(db.queries.length, 1);
+    // Root query first; the admission reads that follow carry the same tenant and match nothing either.
+    assert.equal(db.queries[0]!.coll, "tree_index");
+    assert.ok(db.queries.every((q) => q.filter.tenantId === value && q.returned === 0), JSON.stringify(db.queries));
     const f = db.queries[0]!.filter;
     assert.equal(db.queries[0]!.returned, 0, `filter ${JSON.stringify(f)} must match no row`);
     assert.deepEqual(Object.keys(f), ["node_id", "level", "tenantId"], "no operator key spread in, none dropped");
@@ -145,8 +149,11 @@ for (const [name, value] of HOSTILE) {
     assert.deepEqual(found(r.text), [], "neither tenant's sentinel in the body");
     assert.ok(noStack(r.text), `no stack in body: ${r.text}`);
     assert.deepEqual(r.loads, [value], "tree.load got exactly the hostile value (or was not reached)");
-    if (value === NONE) assert.deepEqual(r.db.queries.map((q) => [q.coll, q.filter.tenantId]), [["tree_index", NONE]], "valid tenant, no data: one scoped tree query carrying exactly its id, then the no-data 404");
-    assert.deepEqual(r.db.queries.filter((q) => q.coll !== "tree_index"), [], "no turns/chunks query");
+    if (value === NONE) {
+      assert.deepEqual(r.db.queries[0] && [r.db.queries[0].coll, r.db.queries[0].filter.tenantId], ["tree_index", NONE], "valid tenant, no data: the scoped tree query first");
+      assert.ok(r.db.queries.every((q) => q.filter.tenantId === NONE), "every tree-admission read carries exactly its id, then the no-data 404");
+    }
+    assert.deepEqual(r.db.queries.filter((q) => q.coll === "turns" || q.coll === "chunks"), [], "no turns/chunks query");
     assert.ok(r.db.queries.every((q) => q.returned === 0), "no row of any tenant returned");
     assert.deepEqual(r.prompts, [], "no model call");
   });

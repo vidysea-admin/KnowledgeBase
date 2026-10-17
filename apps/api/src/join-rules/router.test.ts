@@ -228,8 +228,8 @@ test("invalid, unknown-field, non-object and oversized bodies are refused 4xx; s
     // malformed JSON
     const malformed = await fetch(`${srv.baseUrl}${URL_PATH}`, { method: "PUT", headers: { authorization: "Bearer a-key", "content-type": "application/json", ...ifMatch(RULES) }, body: "{not json" });
     assert.ok(malformed.status >= 400 && malformed.status < 500);
-    // oversized (> express.json 100kb default)
-    const huge = await call("PUT", URL_PATH, "a-key", { ...RULES, pad: "x".repeat(300_000) }, ifMatch(RULES));
+    // oversized (> the server's express.json limit, raised from the 100kb default to 1mb in server.ts)
+    const huge = await call("PUT", URL_PATH, "a-key", { ...RULES, pad: "x".repeat(1_100_000) }, ifMatch(RULES));
     assert.equal(huge.status, 413);
   });
   assert.deepEqual(s.files.get("tenant-a"), before);

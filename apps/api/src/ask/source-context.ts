@@ -109,6 +109,7 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
     const db = deps.db ?? getDb();
     // Query both collections by exact admitted session IDs and tenant-scoped wrappers.
     const rawRows = await scopedCollection<Turns>(db as never, "turns")(tenantId).find({ sessionId: { $in: sessionIds } }).toArray();
+    for (const row of rawRows) assertInScope(row, tenantId, new Set(sessionIds)); // typed scope refusal before any review-overlay read
     const visibility = createKnowledgeVisibility(db);
     const rows = await visibility.filterTurns(tenantId, await readEffectiveTurns(db, tenantId, rawRows));
     const graphScope = deps.graphScope ? await deps.graphScope() : undefined;

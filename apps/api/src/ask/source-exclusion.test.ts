@@ -10,6 +10,7 @@ import type { TreeIndexNode, Turns } from "@lkb/core";
 import { askV2, BoundedAskError, validateHydration } from "@lkb/ask";
 import { createSourceHydrator, createSourceRequestDepsFor } from "./source-context.js";
 import { unpackContext } from "../../../../packages/ask/src/bounded-refine.js";
+import { withVisibleTranscripts } from "../visibility/read-fixture.js";
 
 const VISA = "2026-04-21-visa-blueprint-part2-italy-france-nz", UCAS = "2026-08-10-ucas-what-changed-what-matters", OK = "2026-05-08-funding-dreams-loans-forex";
 const row = (sessionId: string, n: number, text: string, tStart: number, tEnd: number, extra: Partial<Turns> = {}): Turns =>
@@ -17,6 +18,9 @@ const row = (sessionId: string, n: number, text: string, tStart: number, tEnd: n
 const node = (sessionId: string, title: string): TreeIndexNode => ({ node_id: `tenant:toc/session:${sessionId}`, title, level: "session", summary: "", evidence: { sessionRef: sessionId }, children: [] });
 const tree = (...kids: TreeIndexNode[]): TreeIndexNode => ({ node_id: "tenant:toc", title: "toc", level: "tenant", summary: "", children: kids });
 function fakeDb(turns: Turns[]) {
+  return withVisibleTranscripts(fakeFind(turns), () => turns as unknown as Record<string, unknown>[]);
+}
+function fakeFind(turns: Turns[]) {
   return { collection: (name: string) => ({ find: (filter: Record<string, unknown>) => ({ toArray: async () => name !== "turns" ? [] : turns.filter((r) => {
     const ids = (filter.sessionId as { $in?: string[] }).$in; return r.tenantId === filter.tenantId && (!ids || ids.includes(r.sessionId)); }) }) }) } as unknown as Pick<Db, "collection">;
 }
@@ -98,7 +102,8 @@ test("ISS-BADTURNS-003: a negative tStart (with tEnd >= tStart) is excluded with
 test("ISS-BADTURNS-002: a foreign-tenant or foreign-session CHUNK that covers an excluded turn refuses the request (never dropped)", async () => {
   const chunk = (fields: Record<string, unknown>) => ({ _id: "c1", tenantId: "toc", sourceRef: OK, turnRefs: [`${VISA}-t141`], chunkIndex: 0, vector: [1, 0], dims: 2, embeddingModel: "fixture", ...fields });
   for (const bad of [chunk({ tenantId: "other" }), chunk({ sourceRef: "not-admitted" })]) {
-    const db = { collection: (name: string) => ({ find: () => ({ toArray: async () => name === "turns" ? [T141, GOOD_VISA, GOOD_OK] : [bad] }) }) } as unknown as Pick<Db, "collection">;
+    const db = withVisibleTranscripts({ collection: (name: string) => ({ find: () => ({ toArray: async () => name === "turns" ? [T141, GOOD_VISA, GOOD_OK] : [bad] }) }) } as unknown as Pick<Db, "collection">,
+      () => [T141, GOOD_VISA, GOOD_OK] as unknown as Record<string, unknown>[]);
     await assert.rejects(() => createSourceHydrator("toc", { db, embed: async () => ({ vectors: [[1, 0]], dims: 2, provider: "offline", model: "fixture" }) })("visa forms October", [visaN, okN]), BoundedAskError);
   }
 });

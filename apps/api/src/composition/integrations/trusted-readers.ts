@@ -1,7 +1,7 @@
 /** Production read perimeter: immutable originals stay stored; consumers see current eligible evidence. */
 import type { Db } from 'mongodb';
 import type { Claims, SessionPages, Sessions, Turns, TreeIndexRootDocument, GraphEdges } from '@lkb/core';
-import { scopedCollection } from '@lkb/db';
+import { assertValidTenantId, scopedCollection } from '@lkb/db';
 import { buildKnowledgeGraph, treeIndexRootFilter } from '@lkb/index';
 import type { BrainReadDeps } from '../../routes/brain.js';
 import type { CitationsDeps, CitationEvidence } from '../../routes/citations.js';
@@ -117,6 +117,8 @@ async function currentTreeInput(db: Pick<Db, 'collection'>, tenant: string) {
 
 export function trustedGraphReads(database: () => Db): GraphReadDeps {
   return { async loadGraph(tenant) {
+    // Refuse an invalid tenant with the typed guard error before any session or read, not as a masked 503.
+    assertValidTenantId(tenant, 'graph.load');
     try {
       return await withKnowledgeReadSnapshot(database(), async db => {
         const [eligible, edges] = await Promise.all([

@@ -7,7 +7,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { BlindDb, bindDb, type Row } from "../ask/tenant-test-kit.js";
+import { BlindDb, bindDb, visibleSession, type Row } from "../ask/tenant-test-kit.js";
 import { createMongoGraphReadDeps, createMongoJobWriter, createMongoKeysDeps, createMongoTreeStore } from "../store.js";
 import { createMongoIngestDeps } from "../ingest-store.js";
 import { indexSession } from "../indexing/session.js";
@@ -42,7 +42,8 @@ test("api_keys: tenant B cannot list, revoke or overwrite tenant A's key, even b
 test("tree load + graph: tenant B with no root of its own gets nothing, never A's root", async () => {
   const db = fresh();
   assert.equal(await createMongoTreeStore().load(B), null);
-  assert.ok(carries(db, B) && db.queries.every((q) => q.coll === "tree_index"));
+  // The trusted reader also reads B's sessions/pages to admit a root; B has none, so nothing (of A's) comes back.
+  assert.ok(carries(db, B) && db.queries.every((q) => q.returned === 0), JSON.stringify(db.queries));
   const db2 = fresh();
   assert.equal(await createMongoGraphReadDeps().loadGraph(B), null);
   assert.ok(carries(db2, B), JSON.stringify(db2.queries.map((q) => q.filter)));
@@ -73,7 +74,9 @@ test("ingestUrl: B's ingest adds only B-stamped rows and leaves A's sources/sess
 });
 
 test("indexSession tree_index read: B never loads A's root", async () => {
-  const db = fresh();
+  // B owns an indexable session s1 (the gate refuses before the root read otherwise); A's root sits in the same collection.
+  const own = visibleSession(B, "s1", "A real sentence.");
+  const db = fresh({ sessions: own.sessions!, sources: own.sources!, turns: own.turns! });
   await indexSession(B, "s1", { complete: completeWith() as never, db: db.asDb() }).catch(() => undefined);
   const reads = db.queries.filter((q) => q.coll === "tree_index" && q.op === "findOne");
   assert.ok(reads.length >= 1, "root was read");
