@@ -130,7 +130,7 @@ async function directGate(consent: unknown) {
   const sourceId = f.result.sourceId;
   const treeBefore = JSON.stringify(f.fx.rows("tree_index"));
   await sourcePatch(f, consent === undefined ? { consent: undefined } : { consent });
-  // Upstream bypass: checkEvidence's first source read is shown a consented source, so only the gate's own read can refuse.
+  // Upstream bypass: the first source read (checkEvidence) and every read from the third on (claimVisible etc.) see a consented source; only the gate's own second read sees the real state, so only the gate can refuse.
   let sourceReads = 0;
   const db = new Proxy(f.db, { get(target, key) {
     if (key !== "collection") return Reflect.get(target, key, target);
@@ -138,7 +138,7 @@ async function directGate(consent: unknown) {
       return new Proxy(coll, { get(c, method) {
         if (method !== "findOne") return Reflect.get(c, method, c);
         return async (...args: unknown[]) => { const row = await (c.findOne as (...a: unknown[]) => Promise<Record<string, unknown> | null>)(...args);
-          return ++sourceReads === 1 && row ? { ...row, consent: { given: true } } : row; };
+          const n = ++sourceReads; return n !== 2 && row ? { ...row, consent: { given: true } } : row; };
       } }); };
   } }) as typeof f.db;
   const session = { inTransaction: () => true } as unknown as ClientSession;
