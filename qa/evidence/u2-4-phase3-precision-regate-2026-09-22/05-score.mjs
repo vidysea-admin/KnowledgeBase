@@ -32,6 +32,8 @@ const gold = JSON.parse(readFileSync(join(OUT, "gold-labels.json"), "utf8"));
 // ISS-290: refuse to score a drifted corpus (hash-pinned in corpus.lock.json); unpinned sessions are named, not silent.
 const { verifyCorpus } = await import("./corpus-lock.mjs");
 const corpusLock = verifyCorpus();
+const { invalidCitations } = await import("./citation-check.mjs");
+const { bar4 } = await import("./bar4-stability.mjs");
 
 // per-turn gold override (mid-sentence diarizer join measured in the labelling notes:
 // in-focus-3 t071 continues Kshitij's answer into t072)
@@ -172,19 +174,10 @@ for (const r of perRun) {
 // different speaker? Reported side by side; the checker rules which one bar 2 means.
 const relationalInvalid = [];
 for (const r of perRun) {
-  const { turns, turnInfo } = sessionData.get(r.session);
-  const idx = new Map(turns.map((t, i) => [t._id, i]));
   const line = results.find((l) => l.session === r.session && l.outerRun === r.outerRun);
-  for (const c of r.checks) {
-    const blocks = (line.resolved.find((s) => s.speakerRef === c.speakerRef && s.displayName === c.displayName)?.blocks ?? [])
-      .filter((b) => { const t = turns[b.startTurnIndex]; const info = t && turnInfo.get(t._id); return info && info.label === c.speakerRef && personMatch(c.displayName, TURN_OVERRIDES[t._id] ?? info.person); });
-    for (const e of c.evidenceTurns) {
-      const k = idx.get(e);
-      const ok = k !== undefined && blocks.some((b) => (k >= b.startTurnIndex && k <= b.endTurnIndex) ||
-        ((k === b.startTurnIndex - 1 || k === b.endTurnIndex + 1) && turns[k].speakerRef !== c.speakerRef));
-      if (!ok) relationalInvalid.push({ session: r.session, outerRun: r.outerRun, speakerRef: c.speakerRef, displayName: c.displayName, turnId: e });
-    }
-  }
+  const checks = r.checks.map((c) => ({ ...c, blocks: line.resolved.find((s) => s.speakerRef === c.speakerRef && s.displayName === c.displayName)?.blocks ?? [] }));
+  // ISS-289: citation-check.mjs is the independent measure (gold persons + block geometry, no production predicate)
+  for (const v of invalidCitations({ turns: sessionData.get(r.session).turns, gold: gold.sessions.find((g) => g.session === r.session), checks, overrides: TURN_OVERRIDES })) relationalInvalid.push({ session: r.session, outerRun: r.outerRun, ...v });
 }
 
 // ---- bar 3 — floor preservation
@@ -227,11 +220,9 @@ const floorPresence = floorList.map((f) => {
 
 // ---- bar 4 — stability across outer runs (shipped-layer accepted sets)
 const sessions = [...new Set(perRun.map((r) => r.session))];
-const stability = sessions.map((s) => {
-  const runs = perRun.filter((r) => r.session === s).sort((a, b) => a.outerRun - b.outerRun);
-  const sets = runs.map((r) => JSON.stringify([...r.acceptedSet]));
-  return { session: s, outerRuns: runs.length, stable: runs.length >= 2 && new Set(sets).size === 1, acceptedSets: sets };
-});
+// ISS-283: bar 4 covers every PINNED session and is unmeasurable (allStable false) unless all expected runs executed fully
+const bar4s = bar4({ pinned: gold.sessions.map((g) => g.session), perRun });
+const stability = bar4s.perSession;
 
 // ---- bar 5 — correct additions beyond the floor
 const additions = new Map();
@@ -316,7 +307,7 @@ const summary = {
   bar1_acceptedIdentityPrecision: { accepted: totalAccepted, correct: totalCorrect, precision: totalAccepted === 0 ? null : +(totalCorrect / totalAccepted).toFixed(4), bar: 1.0, holds: totalAccepted > 0 && totalCorrect === totalAccepted },
   bar2_wrongLinks: { wrongIdentityCount: wrongLinkList.length, wrongEvidencePairs: wrongPairs, wrongEvidencePairsRelational: relationalInvalid.length, relationalInvalid, bar: 0, wrongLinkList },
   bar3_floorPreservation: { floorTurnsCovered: floorTurns, floorBlockCoveredTurns: floorCoveredTurns, floorSpeakerLabels: floorLabelCount, floorList, contradictedByAccepted: contradictions, presence: floorPresence },
-  bar4_stability: { perSession: stability, allStable: stability.every((s) => s.stable) },
+  bar4_stability: { perSession: stability, measurable: bar4s.measurable, allStable: bar4s.allStable, providerCallsExecuted: bar4s.callsExecuted, providerCallsExpected: bar4s.callsExpected },
   bar5_correctAdditions: { additions: distinctAdditions, count: distinctAdditions.length },
   iss255,
   perRun: perRun.map((r) => ({ session: r.session, outerRun: r.outerRun, windows: r.windows, providerCalls: r.providerCalls, ms: r.ms, degraded: r.degraded, accepted: r.checks.map((c) => ({ speakerRef: c.speakerRef, displayName: c.displayName, evidenceTurns: c.evidenceTurns, identityCorrect: c.identityCorrect, reasons: c.reasons })), unresolved: r.unresolved })),
@@ -326,6 +317,6 @@ console.log(JSON.stringify({
   accepted: totalAccepted, correct: totalCorrect, precision: summary.bar1_acceptedIdentityPrecision.precision,
   wrongIdentities: wrongLinkList.length, wrongPairs, wrongPairsRelational: relationalInvalid.length,
   floorTurns, floorCoveredTurns, floorLabels: floorLabelCount, contradicted: contradictions.length,
-  stableAll: summary.bar4_stability.allStable, additions: distinctAdditions.length,
+  stableAll: summary.bar4_stability.allStable, bar4Measurable: bar4s.measurable, additions: distinctAdditions.length,
   ISS255: iss255.verdict,
 }, null, 2));
