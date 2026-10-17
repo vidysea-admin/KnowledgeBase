@@ -185,7 +185,7 @@ export function createSendNowRouter(deps: SendNowDeps): Router {
 export function unavailableSendNowRouter(): Router {
   const router = Router();
   router.post("/calendar/send-now", requireScope(SEND_NOW_SCOPE), (_req: Request, res: Response) => {
-    res.status(503).json({ error: "send_now_unavailable", message: "send-now is not configured on this server; no bot was sent" });
+    res.status(503).json({ error: "send_now_unavailable", message: "send-now is served by the join-rules API host; no bot was sent" });
   });
   return router;
 }

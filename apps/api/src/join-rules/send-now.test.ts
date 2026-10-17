@@ -175,6 +175,18 @@ test("no launcher injected: scoped key gets a fail-closed 503, an unscoped key 4
   } finally { await s.close(); }
 });
 
+test("ruling 6 / ISS-SENDNOWAPI-004: a plain apps/api start (no sendNow dep) answers 503 pointing at the join-rules API host, without leaking internals", async () => {
+  const s = await serve(null);
+  try {
+    const r = await s.post("a-key", ok);
+    assert.equal(r.status, 503);
+    assert.equal(r.json.error, "send_now_unavailable");
+    assert.equal(r.json.message, "send-now is served by the join-rules API host; no bot was sent");
+    assert.deepEqual(Object.keys(r.json).sort(), ["error", "message"]);
+    assert.doesNotMatch(JSON.stringify(r.json), /scripts|\.ts|MONGODB|stack|ENOENT/i);
+  } finally { await s.close(); }
+});
+
 test("minting: send-now is never in a default key; it is issued only when asked for by name; typos and other names are refused", async () => {
   const { DEFAULT_SCOPES, WRITE_SCOPES, scopesFromArgv } = await import("../../../../scripts/lib/mint-scopes.mjs");
   assert.equal(SEND_NOW_SCOPE, "send-now");
