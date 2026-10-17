@@ -1,7 +1,7 @@
 # Manifest: t055-legacy-consent-backfill
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Unit: ISS-T055STORE-001 / D-181, staging-only backfill of consent-given `sources` rows for legacy documents
 Lane: w22-consentfill (lane/w22-consentfill, root C:\Users\product\Desktop\KnowledgeBase-lanes\w22-consentfill). Base 24c42b31 (lane/w21-integrate, PR #7 head). Code candidate 9c1fcb4f; decision commit b8868a14; this manifest is the commit after 9c1fcb4f.
 Authority: D-181 (Approved-by Umesh, verbatim quote inside the entry). Production stays unauthorized (D-117).
@@ -36,3 +36,9 @@ Authority: D-181 (Approved-by Umesh, verbatim quote inside the entry). Productio
 
 ## Remaining
 - Checker PASS required before any `--execute` run. Execution on staging is a no-op for tenant toc as measured.
+
+## Fix cycle 1 (checker ff551635 note)
+- Script now skips any document whose `sourceId` is referenced by a session in the same tenant (`skippedSharedWithSession`, ids in `skippedIds`); it never inserts for them, so no session is unhidden.
+- Test added (11 tests): `node --test --import tsx` pass 11 fail 0. `lint-loc --all` exit 0 (10 stages, 0 failed).
+- D-020 mutation (guard removed, backup + trap + autocrlf hash): killed, pass 10 fail 1; restored, blob dd05c7f3 before and after.
+- Staging dry-run was not repeated (0 documents). Execute not run.

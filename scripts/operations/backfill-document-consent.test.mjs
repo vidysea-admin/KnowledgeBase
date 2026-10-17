@@ -113,3 +113,11 @@ test("a backfilled row validates against schema/sources.schema.json", async () =
   const db = seed(); await run(db, { execute: true });
   for (const row of db.store.get("sources").filter(s => s.backfill)) assert.deepEqual(validateDoc(schema, row), { valid: true, errors: [] });
 });
+
+test("a document whose sourceId is referenced by a session is skipped, never unhiding that session", async () => {
+  const db = seed(); // d1 shared with a session; the session has no source row so it is hidden today
+  db.store.get("sessions").push({ _id: "s3", tenantId: "toc", sourceId: "d1" });
+  const dry = await run(db); assert.equal(dry.skippedSharedWithSession, 1); assert.deepEqual(dry.missingDocumentIds, ["d3"]);
+  const r = await run(db, { execute: true });
+  assert.deepEqual(r.insertedIds, ["d3"]); assert.equal(db.store.get("sources").some(s => s._id === "d1"), false);
+});

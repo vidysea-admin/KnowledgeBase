@@ -61,24 +61,26 @@ export async function backfillDocumentConsent({ db, scopedCollection, tenantId, 
   assertStagingDb(db.databaseName);
   const docs = scopedCollection(db, "document_documents")(tenantId), sessions = scopedCollection(db, "sessions")(tenantId);
   const sources = scopedCollection(db, "sources")(tenantId);
-  const at = now(), r = { tenantId, execute, documents: 0, documentsWithSource: 0, unusable: 0, raced: 0, inserted: 0,
+  const at = now(), r = { tenantId, execute, documents: 0, documentsWithSource: 0, unusable: 0, raced: 0, inserted: 0, skippedSharedWithSession: 0, skippedIds: [],
     sessions: 0, sessionsWithoutSource: 0, missingDocumentIds: [], insertedIds: [], unusableIds: [] };
   const hasRow = async sourceId => { const row = await sources.findOne({ _id: sourceId }); return Boolean(row && row.tenantId === tenantId); };
-  const plan = new Map();
+  const plan = new Map(), sessionSources = new Set();
+  for (const s of await sessions.find({}).toArray()) {
+    if (s.tenantId !== tenantId) continue;
+    r.sessions++;
+    if (typeof s.sourceId === "string" && s.sourceId) sessionSources.add(s.sourceId);
+    if (typeof s.sourceId !== "string" || !s.sourceId || !(await hasRow(s.sourceId))) r.sessionsWithoutSource++;
+  }
   for (const doc of await docs.find({}).toArray()) {
     if (doc.tenantId !== tenantId) continue;
     r.documents++;
     if (typeof doc.sourceId !== "string" || !doc.sourceId) { r.unusable++; r.unusableIds.push(String(doc._id)); continue; }
     if (await hasRow(doc.sourceId)) { r.documentsWithSource++; continue; }
+    if (sessionSources.has(doc.sourceId)) { r.skippedSharedWithSession++; r.skippedIds.push(String(doc._id)); continue; }
     const row = buildSourceRow(doc, at);
     if (!row) { r.unusable++; r.unusableIds.push(String(doc._id)); continue; }
     r.missingDocumentIds.push(String(doc._id));
     if (!plan.has(doc.sourceId)) plan.set(doc.sourceId, row);
-  }
-  for (const s of await sessions.find({}).toArray()) {
-    if (s.tenantId !== tenantId) continue;
-    r.sessions++;
-    if (typeof s.sourceId !== "string" || !s.sourceId || !(await hasRow(s.sourceId))) r.sessionsWithoutSource++;
   }
   if (!execute) return r;
   for (const [id, row] of plan) {
@@ -90,7 +92,7 @@ export async function backfillDocumentConsent({ db, scopedCollection, tenantId, 
 
 export function format(r) {
   const head = `${r.execute ? "EXECUTE" : "DRY-RUN"} tenant=${r.tenantId}`;
-  return [head, `  document_documents: total=${r.documents} withSourceRow=${r.documentsWithSource} missingSourceRow=${r.missingDocumentIds.length} unusable=${r.unusable}`,
+  return [head, `  document_documents: total=${r.documents} withSourceRow=${r.documentsWithSource} missingSourceRow=${r.missingDocumentIds.length} unusable=${r.unusable} skippedSharedWithSession=${r.skippedSharedWithSession}`,
     `  sessions: total=${r.sessions} withoutSourceRow=${r.sessionsWithoutSource} (report only, never written; already fail-closed)`,
     `  sources: ${r.execute ? `inserted=${r.inserted} raced=${r.raced}` : `wouldInsert=${new Set(r.missingDocumentIds).size}`}`,
     `  missingDocumentIds: ${r.missingDocumentIds.join(",") || "-"}`, `  unusableIds: ${r.unusableIds.join(",") || "-"}`].join("\n");
