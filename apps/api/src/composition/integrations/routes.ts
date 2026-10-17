@@ -9,6 +9,7 @@ import { createCalibrationReviewRouter } from '../../calibration-review/router.j
 import { createChampionshipRouter } from '../../routes/championship/championship.js';
 import { createEvaluationFlywheelRouter } from '../../evaluation-flywheel/router.js';
 import { createKnowledgeRouter } from '../../knowledge/collections-router.js';
+import { createPageHighlightsRouter } from '../../page-highlights/router.js';
 import { createConnectorWorkflowRouter } from '../../connector-workflow/router.js';
 import { createOutputRouter } from '../../knowledge-outputs/router.js';
 import { createAnswerHistoryRouter } from '../../answer-policy/answer-router.js';
@@ -36,7 +37,7 @@ import { createSessionDecisionsRouter } from '../../session-decisions/router.js'
 import type { SessionDecisionsDeps } from '../../session-decisions/reader.js';
 
 export type IntegratedWorkflows = EvaluationIntegrations & AnswerIntegrations & TranscriptIntegrations
-  & Pick<KnowledgeIntegrations, 'knowledge' | 'connectorWorkflow' | 'whatsappReview'>
+  & Pick<KnowledgeIntegrations, 'knowledge' | 'pageHighlights' | 'connectorWorkflow' | 'whatsappReview'>
   & Pick<HostingIntegrations, 'hosting' | 'counsellorAccounts' | 'operationsSchedules' | 'retentionStatus'>
   & AutomationIntegrations & { botPrivacy?: BotPrivacyDeps; captureReadiness?: CaptureReadinessDeps; sessionDecisions?: SessionDecisionsDeps;
     answerReviewAuthority?: AnswerReviewAuthority; speakerRelations?: SpeakerRelationsRouterDeps; speakerRelationSource?: SpeakerRelationSourceRouterDeps;
@@ -60,6 +61,8 @@ export function mountIntegratedWorkflows(app: Express, deps: IntegratedWorkflows
   else app.use('/championship', requireScope('compete'), unavailable);
   if (deps.knowledge) app.use(createKnowledgeRouter(deps.knowledge));
   else app.use('/knowledge', requireScope('sessions'), unavailable);
+  if (deps.pageHighlights) app.use(createPageHighlightsRouter(deps.pageHighlights));
+  else app.use('/sources/:id/highlights', requireScope('sessions'), unavailable);
   if (deps.connectorWorkflow) app.use(createConnectorWorkflowRouter(deps.connectorWorkflow));
   if (deps.whatsappReview) app.use(deps.whatsappReview);
   if (deps.speakerRelationSource) app.use(createSpeakerRelationSourceRouter(deps.speakerRelationSource));

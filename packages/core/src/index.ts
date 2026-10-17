@@ -24,6 +24,7 @@ export * from "./generated/media.js";
 export * from "./generated/meeting_candidates.js";
 export * from "./generated/operations_schedules.js";
 export * from "./generated/orgs.js";
+export * from "./generated/page_highlights.js";
 export * from "./generated/programs.js";
 export * from "./generated/session_pages.js";
 export * from "./generated/sessions.js";

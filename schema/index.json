@@ -610,5 +610,9 @@
         "nextRunAt": 1
       }
     }
+  ],
+  "page_highlights": [
+    { "keys": { "tenantId": 1, "_id": 1 }, "unique": true },
+    { "keys": { "tenantId": 1, "sourceId": 1, "documentHash": 1, "page": 1 } }
   ]
 }

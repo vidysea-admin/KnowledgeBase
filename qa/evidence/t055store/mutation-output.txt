@@ -1,0 +1,9 @@
+M1-skip-validateHighlight: test_exit=1 ℹ pass 4 ℹ fail 2; HEAD-fidelity OK (7d61aac9191170739fd7ef68cfd5a6c20c509698)
+M1-skip-validateHighlight: KILLED
+M2-skip-tenant-predicate-highlights: test_exit=1 ℹ pass 2 ℹ fail 4; HEAD-fidelity OK (686cb99eb861089ed6a5484b85289de5d68eb78a)
+M2-skip-tenant-predicate-highlights: KILLED
+M3-skip-tenant-predicate-sources: test_exit=1 ℹ pass 1 ℹ fail 5; HEAD-fidelity OK (686cb99eb861089ed6a5484b85289de5d68eb78a)
+M3-skip-tenant-predicate-sources: KILLED
+M4-skip-consent-check: test_exit=1 ℹ pass 5 ℹ fail 1; HEAD-fidelity OK (686cb99eb861089ed6a5484b85289de5d68eb78a)
+M4-skip-consent-check: KILLED
+final git status of touched files:
