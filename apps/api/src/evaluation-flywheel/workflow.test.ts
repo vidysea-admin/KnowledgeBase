@@ -186,10 +186,15 @@ test("source and index read deadlines keep the lease and never trigger index reb
     const ask = r.deps.ask; r.deps.ask = async () => { throw new Error("fixture refusal"); };
     await reject(w.retest("t", "loss", request), "unavailable"); r.deps.ask = ask;
     const original = r.deps.store[method], before = structuredClone(r.calls);
+    const pre = await w.inspect("t", "loss");
     r.deps.store[method] = () => new Promise<never>(() => {});
     await reject(w.retest("t", "loss", request), "unavailable");
     Object.assign(r.deps.store, { [method]: original });
     const head = await w.inspect("t", "loss"); assert.ok(head.flywheel.lock);
+    // A storage deadline must not run recovery writes: no failure record, no extra revision beyond lease acquisition.
+    assert.deepEqual(head.flywheel.failure, pre.flywheel.failure, "no recovery failure record");
+    assert.equal(head.flywheel.failureHistory?.length ?? 0, pre.flywheel.failureHistory?.length ?? 0, "failureHistory unchanged");
+    assert.equal(head.flywheel.revision, pre.flywheel.revision + 1, "only the lease acquisition wrote a revision");
     assert.deepEqual(r.calls, before); assert.equal(head.flywheel.stage, "indexed");
     await reject(w.retest("t", "loss", request), "conflict");
   }
@@ -214,9 +219,10 @@ test("terminal CAS deadline preserves committed completion or fences a late CAS 
     const r = rig(); r.deps.operationTimeoutMs = 10;
     const w = r.workflow(); await w.open("t", "loss");
     const replace = r.deps.store.replaceGap;
-    let late!: () => Promise<boolean>;
+    let late!: () => Promise<boolean>, casRevision = -1;
     r.deps.store.replaceGap = async (t, rev, row) => {
       if (row.flywheel.stage !== "retested") return replace(t, rev, row);
+      casRevision = rev;
       const snapshot = structuredClone(row);
       if (commitBeforeDeadline) await replace(t, rev, snapshot);
       else late = () => replace(t, rev, snapshot);
@@ -227,6 +233,10 @@ test("terminal CAS deadline preserves committed completion or fences a late CAS 
     const timedOut = await w.inspect("t", "loss");
     assert.equal(timedOut.flywheel.stage, commitBeforeDeadline ? "retested" : "indexed");
     assert.equal(Boolean(timedOut.flywheel.lock), !commitBeforeDeadline);
+    // No recovery write after the terminal CAS deadline: no failure record, no extra revision.
+    assert.equal(timedOut.flywheel.failure, undefined, "no recovery failure record");
+    assert.equal(timedOut.flywheel.failureHistory?.length ?? 0, 0, "failureHistory unchanged");
+    assert.equal(timedOut.flywheel.revision, commitBeforeDeadline ? casRevision + 1 : casRevision, "no extra revision written");
     if (!commitBeforeDeadline) r.advance(600001);
     const child = await r.workflow().retest("t", "loss", request);
     const recovered = await w.inspect("t", "loss");
