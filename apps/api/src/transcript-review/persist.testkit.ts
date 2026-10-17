@@ -38,7 +38,7 @@ export async function boot(opts: { refresh?: RefreshExecutor } = {}) {
   app.use(requireAuth(keys));
   let tick = 0;
   app.use(createTranscriptReviewRouter({
-    store: createMongoReviewStore(m.db), clock: () => new Date(Date.UTC(2026, 9, 14, 9, 0, tick++)).toISOString(),
+    store: createMongoReviewStore(m.db), authorizeSession: async () => true, clock: () => new Date(Date.UTC(2026, 9, 14, 9, 0, tick++)).toISOString(),
     ...(opts.refresh ? { refresh: opts.refresh } : {}),
   }));
   const server: Server = app.listen(0, "127.0.0.1");
