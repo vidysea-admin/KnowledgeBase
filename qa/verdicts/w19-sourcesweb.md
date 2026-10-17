@@ -1,8 +1,35 @@
 # Verdict - w19-sourcesweb
 
-VERDICT: FAIL
-Cycle checked: 1
-Reviewed SHA: 6fbc6b41d1751473130b76e5feb49dc6e17cf15a
+VERDICT: PASS
+Cycle checked: 2
+Reviewed SHA: 4f965e2ba3630a5c94185b3136c1a1b67abd1195
+Base SHA: 121290ba (cycle 1 candidate 6fbc6b41, verdict commit 22a490b8)
+Contract: qa/contracts/goal-t055.md C6
+
+## Cycle 2 findings
+- Cycle 1 finding 1 is fixed. `sourceLabel()` (SourcesPage.tsx:9-17) now calls `safeHttpUrl(s.url)` from `../safe-url.js`, then rejects URLs with credentials, and falls back to `kind (captureMode) date` otherwise.
+- Cycle 1 finding 2 is fixed. A `test.each` covers whitespace-padded, ftp, file, javascript and credentials URLs. Each case asserts the fallback label and that no host, credentials or path text appears.
+- Cycle 1 note 3 is fixed. The fixture now uses a single `as Source[]` cast on a non-fresh object (knowledgeDirectoryFixtures.ts:5).
+- Integrator note: `safePublicResourceUrl` is on master via PR #5 and is not on this base. After merge, an integrator should consider switching `sourceLabel()` to it. This is not a defect here.
+
+## Commands (from apps/web, `timeout 600`; evidence in qa/evidence/w19-sourcesweb-check/c2-*, untracked)
+- vitest, 3 files: exit 0, 3 files and 26 tests passed.
+- tsc `--noEmit -p tsconfig.json`: exit 0.
+- Mutation A, `safeHttpUrl(s.url)` replaced by `s.url ?? null` (the equivalent of removing the protocol check): 4 failed, 10 passed, KILLED. In cycle 1 the equivalent mutant survived.
+- Mutation B, credentials check replaced by `true`: 1 failed, 13 passed, KILLED.
+- Per-mutation byte backup and trap, `cmp` restore, then HEAD-fidelity: `git hash-object apps/web/src/pages/SourcesPage.tsx` = 34c41fcf7cfb9c2976e8666a6a3c6a70ec981fe5 = `HEAD:` blob (matches).
+
+## Limits
+- lint-loc `--all` not re-run. Checker token and time metrics unmeasured (null). No browser run.
+- Ledger rows may be flipped: YES, for the w19-sourcesweb web consumer of the C6 source.path leakage.
+
+ISSUES-WRITTEN: none
+
+# Superseded history
+
+Cycle 1 result (superseded): FAIL
+Cycle 1 checked: 1
+Cycle 1 reviewed SHA: 6fbc6b41d1751473130b76e5feb49dc6e17cf15a
 Base SHA: 121290ba
 Contract: qa/contracts/goal-t055.md C6 (safe absolute http(s) only; no local source.path leakage)
 
@@ -37,4 +64,3 @@ Contract: qa/contracts/goal-t055.md C6 (safe absolute http(s) only; no local sou
 
 Ledger rows may be flipped: NO. Reason: FAIL. Re-check after the fix in findings 1 and 2.
 
-ISSUES-WRITTEN: none
