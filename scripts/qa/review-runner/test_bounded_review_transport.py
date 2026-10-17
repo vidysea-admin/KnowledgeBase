@@ -35,7 +35,7 @@ class Fake:
 
 class BudgetTests(unittest.TestCase):
     def setUp(self):
-        self.root = Path(__file__).resolve().parents[2] / "qa/coordination/checker-hard-budget-20261015/transport-maker" / ("fixture-" + uuid.uuid4().hex)
+        self.root = Path(__file__).resolve().parents[3] / "qa/coordination/checker-hard-budget-20261015/transport-maker" / ("fixture-" + uuid.uuid4().hex)
         self.root.mkdir(parents=True)
         self.path = self.root / "request.json"
         self.raw = b.encode(dict(model="fake-pinned", instructions="Inspect sealed facts", input="facts"))

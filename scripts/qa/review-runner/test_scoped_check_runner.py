@@ -17,7 +17,7 @@ runner = importlib.util.module_from_spec(spec); spec.loader.exec_module(runner)
 
 class ScopedRunnerTests(unittest.TestCase):
     def setUp(self):
-        parent = Path(__file__).resolve().parents[2] / 'qa/coordination/checker-hard-budget-20261015/runner-maker'
+        parent = Path(__file__).resolve().parents[3] / 'qa/coordination/checker-hard-budget-20261015/runner-maker'
         # Python 3.12 tempfile uses mode 0700: Windows applies a restrictive ACL
         # incompatible with this sandbox's subprocess token. Inherit parent ACL.
         self.root = parent / ('fixture-' + uuid.uuid4().hex)

@@ -90,7 +90,7 @@ set -e
 grep -q MONGODB_DB docker-evidence/unset-db.log
 timeout 60 docker run --rm --name "$migration" --network "$network" \
   -e MONGODB_URL="$url" -e MONGODB_DB="$database" "$build_image" \
-  node scripts/qa/container-workflows/migrate-scratch.mjs | tee docker-evidence/scratch-migration.json
+  node scripts/qa/container-workflows/scratch-apply-migration.mjs | tee docker-evidence/scratch-migration.json
 timeout 60 docker run --name "$seed" --network "$network" --mount "type=bind,src=$helper,dst=/ci,readonly" \
   -e MONGODB_URL="$url" -e MONGODB_DB="$database" "$api_image" node /ci/seed.mjs | tee docker-evidence/seed.json
 timeout 20 docker volume create --label "lkb.ci-run=$suffix" "$state" >/dev/null
