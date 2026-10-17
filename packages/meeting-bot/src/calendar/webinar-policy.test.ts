@@ -23,7 +23,7 @@ test("accepted end boundary changes remain causal when the shortened end is alre
   assert.equal(activeWebinarStopReason(id,base.endTime,unknown),undefined);
 });
 
-test("watch retries only typed discovery failure after 60s and preserves fatal/preview gates", async () => {
+test("watch retries only typed discovery failure after the 5 minute POLL_MS and preserves fatal/preview gates", async () => {
   const {runPipelineWatch} = await import(new URL('../../../../scripts/webinar/run-pipeline.mjs', import.meta.url).href);
   let ticks = 0; const waits: number[] = [], logs: string[] = [];
   const stopped = new Error("fixture cancellation");
@@ -31,7 +31,7 @@ test("watch retries only typed discovery failure after 60s and preserves fatal/p
     tick: async () => {if (++ticks === 1) throw Object.assign(new Error("private provider details"), {code: "WEBINAR_DISCOVERY_UNAVAILABLE"}); return {status: "running"};},
     wait: async (ms: number) => {waits.push(ms); if (waits.length === 2) throw stopped;}, log: (text: string) => logs.push(text),
   }), error => error === stopped);
-  assert.equal(ticks, 2); assert.deepEqual(waits, [60000, 60000]); assert.ok(!logs.join(" ").includes("private"));
+  assert.equal(ticks, 2); assert.deepEqual(waits, [300000, 300000]); assert.ok(!logs.join(" ").includes("private"));
   for (const failure of [new Error("Webinar discovery unavailable"), new Error("owner mismatch"), new Error("lock invalid"), new Error("proof missing")]) {
     let waited = false;
     await assert.rejects(runPipelineWatch({run: true, watch: true}, {tick: async () => {throw failure;}, wait: async () => {waited = true;}}), error => error === failure);

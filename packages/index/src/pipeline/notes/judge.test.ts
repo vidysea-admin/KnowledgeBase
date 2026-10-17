@@ -219,14 +219,15 @@ test("negative control: with a lax judge (everything same) some recorded attacks
   console.log(`lax judge: ${shipped}/${ATTACKS.length} attacks ship (the judge is the gate for these)`);
 });
 
-test("config/ai-routing.yaml has a note-judge route (second model, claude-code first) and every pre-existing route is unchanged", () => {
+test("config/ai-routing.yaml has a note-judge route (verifier model first, not the generating model) and the other routes match the D-173 table", () => {
   const text = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..", "..", "config", "ai-routing.yaml"), "utf8");
   const chains = parseRoutingYaml(text);
-  assert.deepEqual(chains["note-judge"], ["claude-code", "gemini"]);
+  assert.deepEqual(chains["note-judge"], ["ollama-cloud-verifier", "ollama-cloud"]);
   assert.notEqual(chains["note-judge"]![0], chains.summarize![0], "the judge must not be the generating model first");
+  const cloud = ["ollama-cloud", "ollama-cloud-verifier"];
   assert.deepEqual(Object.fromEntries(Object.entries(chains).filter(([k]) => k !== "note-judge")), {
-    transcribe: ["gemini", "ollama", "claude-code"], namemap: ["gemini", "claude-code"], summarize: ["gemini", "claude-code", "ollama"], claims: ["gemini", "claude-code"], decisions: ["gemini", "claude-code"], topics: ["gemini", "claude-code"],
-    speakers: ["ollama"], "tree-summary": ["gemini", "claude-code"], evaluator: ["gemini", "claude-code"], answer: ["gemini", "claude-code", "ollama"], ask: ["gemini", "claude-code"], embedding: ["gemini", "ollama"],
+    transcribe: ["gemini"], namemap: cloud, summarize: cloud, claims: cloud, decisions: cloud, speakers: ["ollama"], "tree-summary": cloud, topics: cloud,
+    evaluator: ["ollama-cloud-verifier", "ollama-cloud"], "output-verifier": ["ollama-cloud-verifier"], "output-generation": ["ollama-cloud"], answer: cloud, ask: cloud,
     vision: ["ollama", "gemini"],
   });
 });

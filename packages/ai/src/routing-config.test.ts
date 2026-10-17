@@ -37,7 +37,10 @@ test("parses the real config/ai-routing.yaml with every jobKind an ordered array
   for (const kind of expectedKinds) {
     assert.ok(Array.isArray(chains[kind]) && chains[kind]!.length >= 1, `${kind} must be a non-empty array`);
   }
-  for (const kind of expectedKinds) {
-    assert.equal(chains[kind]![0], "gemini", `${kind} must start with gemini (D-005/D-008)`);
+  // Current provider policy: Ollama Cloud first for text work; Gemini stays first only for
+  // transcribe because Ollama has no audio model (supersedes the original Gemini-first D-005/D-008 expectation).
+  assert.equal(chains["transcribe"]![0], "gemini", "transcribe must start with gemini (no Ollama audio model)");
+  for (const kind of expectedKinds.filter(k => k !== "transcribe")) {
+    assert.match(chains[kind]![0]!, /^ollama-cloud/, `${kind} must start with an ollama-cloud route`);
   }
 });

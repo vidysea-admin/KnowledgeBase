@@ -17,7 +17,7 @@ export function packContext(strips: ContextStrip[]): PackedContext {
   const sources = new Map<string, PackedContext["sources"][number]>();
   const packed: PackedContext = { sources: [], strips: [] };
   for (const strip of strips) {
-    const identity = { sourceId: strip.sourceId, origin: strip.origin, ...(strip.source ? { source: strip.source } : {}) };
+    const identity = { sourceId: strip.sourceId, origin: strip.origin, ...(strip.source ? { source: structuredClone(strip.source) } : {}) };
     const prior = sources.get(strip.sourceId);
     if (prior && JSON.stringify(prior) !== JSON.stringify(identity)) throw new BoundedAskError("conflicting strip source identity");
     if (!prior) { sources.set(strip.sourceId, identity); packed.sources.push(identity); }

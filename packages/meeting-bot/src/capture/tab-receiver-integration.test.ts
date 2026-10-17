@@ -20,7 +20,7 @@ test("T-034: package.json test script runs the extension logic tests (CI runs `p
   assert.match(pkg.scripts.test, /py\/tab-capture\/\*\.test\.mjs/);
   assert.match(pkg.scripts.test, /src\/\*\*\/\*\.test\.ts/, "TS tests (this file) are still discovered");
   const found = readdirSync(EXT_DIR).filter((f) => f.endsWith(".test.mjs")).sort();
-  assert.deepEqual(found, ["background.test.mjs", "recorder-bitrate.test.mjs", "recorder.test.mjs"], "a new *.test.mjs is picked up by the glob; update this list on purpose");
+  assert.deepEqual(found, ["background.test.mjs", "native-audio-worklet.test.mjs", "native-recorder.test.mjs", "native-video.test.mjs", "recorder-bitrate.test.mjs", "recorder-origin.test.mjs", "recorder.test.mjs"], "a new *.test.mjs is picked up by the glob; update this list on purpose");
   const ci = readFileSync(new URL("../../../../.github/workflows/ci.yml", import.meta.url), "utf8");
   assert.match(ci, /run:\s*pnpm -r test/);
 });
