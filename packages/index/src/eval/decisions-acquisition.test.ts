@@ -28,8 +28,8 @@ test("actual extractor routes decisions; real readback survives into independent
   for (const stage of Object.values(result.report.stages)) { assert.equal(stage.available, true); assert.deepEqual(stage.issues, []); }
   assert.equal(result.report.stages.filtered.optionalChecks.attribution, 1);
   const downstream = aggregateExtractionReports([result.report]);
-  assert.equal(downstream.stages.raw.rows, 1);
-  assert.equal(downstream.stages.persisted.rows, 1);
+  assert.equal(downstream.stages.raw!.rows, 1);
+  assert.equal(downstream.stages.persisted!.rows, 1);
   assert.equal(result.report.semantic.measured, false);
   assert.equal(result.report.semantic.unsupportedRate.value, null);
   assert.equal(result.report.entities.person.measured, false);

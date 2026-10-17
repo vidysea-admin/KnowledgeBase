@@ -108,7 +108,7 @@ export async function acquireTopicRunEvidence(input: TopicRunEvidenceInput, comp
   const treeTopics: { nodeId: string; title: string; sessionId: string | null; sessionRefs: string[] }[] = [];
   const visit = (node: TreeIndexNode): void => {
     if (node.level === "topic") treeTopics.push({ nodeId: node.node_id, title: node.title,
-      sessionId: node.evidence?.sessionRef ?? null, sessionRefs: [...(node.evidence?.sessionRefs ?? [])] });
+      sessionId: node.evidence?.sessionRef ?? null, sessionRefs: Array.isArray(node.evidence?.sessionRefs) ? node.evidence.sessionRefs.filter((ref): ref is string => typeof ref === "string") : [] });
     node.children.forEach(visit);
   };
   if (produced.root) visit(produced.root);

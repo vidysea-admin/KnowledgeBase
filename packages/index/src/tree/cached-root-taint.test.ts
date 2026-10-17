@@ -3,7 +3,6 @@
  * double gains the snapshot-session capability the current production reader now requires (D-015). */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { Db } from 'mongodb';
 import type { Sessions, SessionPages, Turns, TreeIndexNode, TreeIndexRootDocument } from '@lkb/core';
 import { eligibleTreeInput } from '../../../../apps/api/src/indexing/eligible-tree.js';
 import { trustedTreeReads } from '../../../../apps/api/src/composition/integrations/trusted-readers.js';
@@ -52,7 +51,7 @@ function fixture(validOldCitation: boolean) {
   }; } }, collection(name: string) { return {
     async findOne(filter: Row) { return structuredClone(rows[name]?.find(row => matches(row, filter)) ?? null); },
     find(filter: Row) { return { async toArray() { return structuredClone(rows[name]?.filter(row => matches(row, filter)) ?? []); } }; },
-  }; } } as unknown as Db;
+  }; } } as unknown as ReturnType<Parameters<typeof trustedTreeReads>[0]>;
   return { sessions, pages, root, rows, db };
 }
 
