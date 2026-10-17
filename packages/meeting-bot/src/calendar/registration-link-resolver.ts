@@ -20,7 +20,7 @@ export interface PinnedResponse {status: number; locations: string[]; peerAddres
 export interface ResolverOptions {
   enabled?: boolean;
   /** Trusted host approval lookup; never use a request body or a synthetic fixture as live authority. */
-  authorize?: (input: LinkResolutionInput) => ResolutionAuthorization | undefined;
+  authorize?: (input: LinkResolutionInput) => ResolutionAuthorization | undefined | Promise<ResolutionAuthorization | undefined>;
   dns?: (host: string) => Promise<{address: string; family: number}[]>;
   get?: (url: URL, pinned: {address: string; family: number}, remainingMs: number, remainingBytes: number) => Promise<PinnedResponse>;
   now?: () => number;
@@ -99,7 +99,7 @@ async function resolveWithConstant(input: LinkResolutionInput, options: Resolver
   if (!input || typeof input.link !== "string" || input.link.length > 8192 || ![input.tenantId, input.sourceId, input.messageId].every(identifier) ||
     !hash(input.sourceHash) || !hash(input.policyHash)) return {status: "refused", reason: "input-invalid"};
   let authorization: ResolutionAuthorization | undefined;
-  try {authorization = options.authorize(input);} catch {return {status: "refused", reason: "approval-unavailable"};}
+  try {authorization = await options.authorize(input);} catch {return {status: "refused", reason: "approval-unavailable"};}
   if (!authorization || !identifier(authorization.decisionId) || ["tenantId", "sourceId", "messageId", "sourceHash", "policyHash"].some(
     key => authorization![key as keyof ResolutionAuthorization] !== input[key as keyof LinkResolutionInput]) ||
     authorization.linkHash !== privateEvidenceHash(input.link)) return {status: "refused", reason: "approval-binding"};

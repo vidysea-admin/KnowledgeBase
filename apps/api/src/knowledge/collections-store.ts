@@ -16,6 +16,8 @@ export interface KnowledgeStore {
   getCollection(tenantId: string, id: string): Promise<KnowledgeCollections | null>;
   writeCollection(tenantId: string, row: KnowledgeCollections, expectedRevision: number): Promise<boolean>;
   deleteCollection(tenantId: string, id: string, expectedRevision: number): Promise<boolean>;
+  /** True when the owning source row (if any) shows withdrawn consent or a revoked/deleted state. Absent rows are not treated as withdrawn. */
+  sourceWithdrawn(tenantId: string, sourceId: string): Promise<boolean>;
   memberExists(tenantId: string, member: CollectionMember): Promise<boolean>;
   listMembers(tenantId: string): Promise<Array<CollectionMember & { title: string; personId?: string }>>;
   speakerPersonId(tenantId: string, member: CollectionMember): Promise<string | null>;
@@ -70,6 +72,12 @@ export function createMongoKnowledgeStore(db: Db = getDb()): KnowledgeStore {
       return (await collections(t).updateOne({ _id, revision: expectedRevision }, { $set: fields })).matchedCount === 1;
     },
     async deleteCollection(t, id, expectedRevision) { canWrite(); return (await collections(t).deleteMany({ _id: id, revision: expectedRevision })).deletedCount === 1; },
+    async sourceWithdrawn(t, sourceId) {
+      const row = await scopedCollection<{ _id: string; tenantId: string; consent?: { given?: unknown }; status?: unknown; sourceMeta?: { nativeDocumentHead?: { status?: unknown } } }>(db, "sources")(t).findOne({ _id: sourceId });
+      if (!row || row.tenantId !== t) return false;
+      const gone = (v: unknown) => v === "revoked" || v === "deleted";
+      return row.consent?.given !== true || gone(row.status) || gone(row.sourceMeta?.nativeDocumentHead?.status);
+    },
     async memberExists(t, member) {
       const names = { session: "sessions", document: "document_documents", topic: "topics", speaker: "speakers" };
       const name = names[member.kind]; if (!name) return false;

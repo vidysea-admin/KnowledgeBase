@@ -610,5 +610,10 @@
         "nextRunAt": 1
       }
     }
+  ],
+  "registration_link_approvals": [
+    { "keys": { "tenantId": 1, "_id": 1 }, "unique": true },
+    { "keys": { "tenantId": 1, "linkHash": 1, "scopeHash": 1, "policyHash": 1 } },
+    { "keys": { "tenantId": 1, "bindingHash": 1, "policyHash": 1, "policyRevision": 1, "hostScopeHash": 1 } }
   ]
 }

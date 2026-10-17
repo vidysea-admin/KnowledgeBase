@@ -1,0 +1,9 @@
+M1-skip-validateHighlight: test_exit=1 ℹ pass 4 ℹ fail 2; HEAD-fidelity OK
+M1-skip-validateHighlight: KILLED
+M2-skip-tenant-predicate-docs: test_exit=1 ℹ pass 3 ℹ fail 3; HEAD-fidelity OK
+M2-skip-tenant-predicate-docs: KILLED
+M3-skip-tenant-own-check: test_exit=0 ℹ pass 6 ℹ fail 0; HEAD-fidelity OK
+M3-skip-tenant-own-check: SURVIVED
+M4-skip-consent-check-post: test_exit=1 ℹ pass 5 ℹ fail 1; HEAD-fidelity OK
+M4-skip-consent-check-post: KILLED
+git status of touched files:

@@ -8,11 +8,14 @@ import { createMongoSpeakerAttributeStore, readAcceptedSpeakerAttributes } from 
 import { createSpeakerAttributeService } from '../../speaker-attributes/service.js';
 import { createFileExtractionReviewStore } from '../../extraction-review/file-store.js';
 import { createReviewPolicyResolver, createReviewAdapters } from '../../review-authority/policy.js';
+import { createRegistrationApprovalStore } from '../../registration-approvals/store.js';
+import { createHumanApproverLookup } from '../../registration-approvals/router.js';
 
 /** Server-owned identity grants are explicit. Absence denies every human review action.
  * Construction is lazy; source snapshots and durable writes occur only in authenticated routes. */
 export function buildReviewIntegrations(db: Db, env: NodeJS.ProcessEnv) {
-  const authority = createReviewAdapters(createReviewPolicyResolver(env.LKB_REVIEW_AUTHORITY_JSON));
+  const resolver = createReviewPolicyResolver(env.LKB_REVIEW_AUTHORITY_JSON);
+  const authority = createReviewAdapters(resolver);
   const store = createMongoSpeakerRelationshipStore(db, readSpeakerKnowledgeAuthority);
   const extractionConfigured = env.LKB_EXTRACTION_REVIEW_DIR !== undefined || env.LKB_EXTRACTION_REVIEW_PACKET !== undefined;
   if (extractionConfigured && (!env.LKB_EXTRACTION_REVIEW_DIR || !env.LKB_EXTRACTION_REVIEW_PACKET)) throw new Error('extraction_review_configuration_unavailable');
@@ -20,6 +23,8 @@ export function buildReviewIntegrations(db: Db, env: NodeJS.ProcessEnv) {
     store: createFileExtractionReviewStore({ root: env.LKB_EXTRACTION_REVIEW_DIR!, packetPath: env.LKB_EXTRACTION_REVIEW_PACKET!, projectRoot: fileURLToPath(new URL('../../../../../', import.meta.url)) }) } : undefined;
   return {
     answerReviewAuthority: authority.answerReviewAuthority,
+    // D-180: human-only registration-link approvals; same server-owned identity grants as every human review.
+    registrationApprovals: { store: createRegistrationApprovalStore(db), humanFor: createHumanApproverLookup(resolver) },
     extractionReview,
     speakerProfiles: createMongoSpeakerProfileDeps(db, readAcceptedSpeakerRelationships, readAcceptedSpeakerAttributes),
     speakerAttributes: { service: createSpeakerAttributeService(createMongoSpeakerAttributeStore(db, readSpeakerAttributeAuthority)), contextFor: authority.relationshipContextFor },

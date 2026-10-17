@@ -118,6 +118,7 @@ a client of that API — with the long-range goal of beating top human counsello
 | operations_schedules | _id, tenantId, kind, revision, enabled, intervalHours, nextRunAt, lastAttemptAt, lastSuccessAt, lastResult, lastErrorCode, runId, leaseToken, leaseUntil, audit | no |
 | orgs | _id, tenantId, name | no |
 | programs | _id, tenantId, name | no |
+| registration_link_approvals | _id, tenantId, decisionId, linkHash, scopeHash, policyHash, approvedBy, approvedAt, expiresAt | no |
 | session_pages | _id, tenantId, sessionId, summary, evidence | yes |
 | sessions | _id, tenantId, sourceId, title, date, status | no |
 | sources | _id, tenantId, kind, hash, consent, createdAt, captureMode | no |
