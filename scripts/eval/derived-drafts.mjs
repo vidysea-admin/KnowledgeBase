@@ -13,6 +13,7 @@
  * Models (D-164 order): ollama glm-5.3-flash, ollama deepseek-v4.1-flash, then gemini (tie-break only, on disagreement).
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { resolve, dirname, relative, isAbsolute, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -72,14 +73,34 @@ export function t022Draft(item, votes) {
     humanReview: { score: null, rationale: null, approvedBy: null, approvedAt: null } };
 }
 
-export function u22Draft(entry, votes) {
+const sha256Text = (t) => createHash("sha256").update(String(t), "utf8").digest("hex");
+/**
+ * U2.2 re-anchoring. The cited turn ids are legacy positional ids; after the TOC re-migration the same id can point at different
+ * text (`sameIdContentChanged`). The hash-bound packet already carries the ARCHIVED original turn (`originalMigration`, git revision
+ * of data/toc-migrated) for every citation, so the text the claim was extracted from is judged, not whatever the id means today.
+ * Order: archived original (record text must match its recorded textSha256 and the cited id) -> current, only if the id's content
+ * did not change -> unresolved (no model sees it).
+ */
+export function resolveCitation(ctx) {
+  const o = ctx.originalMigration, om = o?.available && o.matches?.length === 1 ? o.matches[0] : null;
+  if (om?.record?.text && om.textSha256 === sha256Text(om.record.text) && om.record._id === ctx.turnId)
+    return { turnId: ctx.turnId, citationSource: "archived-original", record: om.record, textSha256: om.textSha256, artifactRevision: o.artifact?.revision ?? null };
+  const cm = ctx.current?.available && !ctx.sameIdContentChanged && ctx.current.matches?.length === 1 ? ctx.current.matches[0] : null;
+  if (cm?.record?.text && cm.textSha256 === sha256Text(cm.record.text) && cm.record._id === ctx.turnId)
+    return { turnId: ctx.turnId, citationSource: "current", record: cm.record, textSha256: cm.textSha256, artifactRevision: null };
+  return { turnId: ctx.turnId, citationSource: null, record: null, textSha256: null, reason: "no verifiable archived-original or unchanged-current text" };
+}
+export const resolveCitations = (entry) => entry.literalCitationContexts.map(resolveCitation);
+const citationSourceOf = (cs) => { const s = new Set(cs.filter((c) => c.citationSource).map((c) => c.citationSource)); return s.size === 0 ? null : s.size === 1 ? [...s][0] : "mixed"; };
+
+export function u22Draft(entry, votes, citations = resolveCitations(entry)) {
   const c = consensusLabel(votes);
   const best = votes.find((v) => v.label === c.label && v.rationale);
   return { claimId: entry.claimId, claimRecordSha256: entry.claimRecordSha256, sourceBindingSha256: entry.sourceBindingSha256, humanGold: false,
-    aiDraft: { label: DRAFT_LABEL, status: DRAFT_STATUS, literalCitationSupport: c.label, agreement: c.agreement, tally: c.tally, flags: c.flags, validVotes: c.validVotes,
+    aiDraft: { label: DRAFT_LABEL, status: DRAFT_STATUS, citationSource: citationSourceOf(citations), citations: citations.map((x) => ({ turnId: x.turnId, citationSource: x.citationSource, textSha256: x.textSha256, ...(x.artifactRevision ? { artifactRevision: x.artifactRevision } : {}) })), literalCitationSupport: c.label, agreement: c.agreement, tally: c.tally, flags: c.flags, validVotes: c.validVotes,
       literalRationale: c.label === null ? "No usable model majority; rate from the cited passages directly." : (best?.rationale ?? ""),
       replacementCitationSupport: null, replacementRationale: null, factualTruth: "unknown", omissions: "unknown", topicPrecision: "unknown", personPrecision: "unknown",
-      reviewBasis: "Multi-model rating of the current literal source passages only; no factual check. Replacement proposals are not rated here.", perModel: basis(votes) },
+      reviewBasis: "Multi-model rating of the cited turns re-anchored to their ARCHIVED ORIGINAL text (citationSource per citation; textSha256 = hash of the text judged); no factual check. Replacement proposals are not rated here.", perModel: basis(votes) },
     humanReview: { status: "unreviewed", approvedBy: null, approvedAt: null, decision: null, sourcePacketSha256: null }, bindingThresholds: null };
 }
 
@@ -141,10 +162,8 @@ const SUPPORT_PROMPT = [
 ].join(" ");
 
 export function u22Prompt(entry) {
-  const passages = entry.literalCitationContexts.map((c, i) => {
-    const m = c.current?.available ? c.current.matches?.[0]?.record : null;
-    return m ? `[${i + 1}] speaker ${m.speakerRef} @${m.tStart}s: ${m.text}` : `[${i + 1}] (cited turn ${c.turnId} is not available)`;
-  });
+  const passages = resolveCitations(entry).map((c, i) =>
+    c.record ? `[${i + 1}] speaker ${c.record.speakerRef} @${c.record.tStart}s: ${c.record.text}` : `[${i + 1}] (cited turn ${c.turnId} is not available)`);
   return `Claim: ${entry.persistedClaim.text}\n\nCited passages:\n${passages.join("\n") || "(none)"}`;
 }
 
@@ -175,13 +194,14 @@ export async function run(kind, { items, judges, maxCalls, now = () => new Date(
   const budget = { used: 0, max: maxCalls, capReached: false };
   const out = [];
   for (const item of items) {
-    if (kind === "u22" && !item.literalCitationContexts.some((c) => c.current?.available)) {
-      // Deterministic, no model call: nothing is displayed to rate.
-      out.push(u22Draft(item, [{ model: "rule/no-current-passage", label: "unavailable", rationale: "No cited turn is available in the current source." }, { model: "rule/no-current-passage-2", label: "unavailable", rationale: "Deterministic rule, not a model." }]));
+    const citations = kind === "u22" ? resolveCitations(item) : null;
+    if (kind === "u22" && !citations.some((c) => c.record)) {
+      // Deterministic, no model call: no cited turn resolves to verifiable text, so nothing is displayed to rate.
+      out.push(u22Draft(item, [{ model: "rule/no-current-passage", label: "unavailable", rationale: "No cited turn resolves to verifiable archived-original or unchanged-current text." }, { model: "rule/no-current-passage-2", label: "unavailable", rationale: "Deterministic rule, not a model." }], citations));
       continue;
     }
     const votes = await gatherVotes(item, judges, budget, kind === "t022" ? "score" : "label");
-    out.push(kind === "t022" ? t022Draft(item, votes) : u22Draft(item, votes));
+    out.push(kind === "t022" ? t022Draft(item, votes) : u22Draft(item, votes, citations));
   }
   return { format: kind === "t022" ? "calibration-derived-drafts-v1" : "extraction-derived-drafts-v1", label: DRAFT_LABEL, status: DRAFT_STATUS, humanGold: false,
     generatedAt: now(), authority: "D-163 (AI drafts, never humanGold), D-164 (Ollama GLM/DeepSeek first, Gemini last)",
@@ -198,7 +218,7 @@ async function main(argv) {
   const env = { ...parseEnvFile(val("--env-file") ? readFileSync(val("--env-file"), "utf8") : ""), ...Object.fromEntries(["OLLAMA_API_KEY", "GEMINI_API_KEY"].filter((k) => process.env[k]).map((k) => [k, process.env[k]])) };
   let items, extra;
   if (kind === "t022") { const p = JSON.parse(readFileSync(resolve(dataRoot, "data/eval/calibration-human-review.json"), "utf8")); items = p.items; extra = { source: "data/eval/calibration-human-review.json", rubric: p.rubric }; }
-  else { const { loadBundle } = await import("./extraction-review.mjs"); const b = loadBundle(dataRoot); items = b.entries; extra = { sourcePacketSha256: b.sourcePacketSha256, draftIndexSha256: b.draftIndexSha256 }; }
+  else { const { loadBundle } = await import("./extraction-review.mjs"); const b = loadBundle(dataRoot); items = b.entries; extra = { sourcePacketSha256: b.sourcePacketSha256, draftIndexSha256: b.draftIndexSha256, anchoring: "cited legacy turn ids re-anchored to the archived original turn text carried in the hash-bound packet (originalMigration); unresolvable citations get a deterministic unavailable rule vote, no model call" }; }
   const stats = { calls: 0 }, judges = await makeRealJudges(DEFAULT_MODELS, env, kind === "t022" ? "score" : "label", stats);
   if (judges.filter((j) => j.provider === "ollama").length < 2) throw new Error("refused: need both Ollama models (OLLAMA_API_KEY missing?); live run pending");
   const doc = await run(kind, { items, judges, maxCalls, extra });
