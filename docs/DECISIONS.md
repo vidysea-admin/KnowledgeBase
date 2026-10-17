@@ -2394,3 +2394,20 @@ fourth would have left real decisions idle behind an unrelated unit.
 - qa/issues*.jsonl status of ISS-282 only
 **Approved-by:** Umesh (delegated on 2026-10-17, verbatim "iska bhi permit le lee"; the rulings were made by the orchestrator under that delegation)
 **Links:** T-052, U2.4, ISS-282, D-079, D-178, D-179, D-176, D-177, D-057, D-126, qa/verdicts/u2-4-suggestion-regate-w17.md
+
+## D-181 | 2026-10-18 | type: decision | status: ACTIVE
+**Title:** Legacy document consent: backfill consent-given sources rows on STAGING (ISS-T055STORE-001)
+**What:** The Approver ruled that consent for all legacy imports was already obtained and directed a backfill of a consent-given `sources` row for each legacy document that has none. Verbatim: "Consent for all legacy imports was already obtained. Backfill a consent-given sources row for each legacy document, then merge PR #7 once CI is green."
+- Scope: create a `sources` row (`_id` equal to the document's `sourceId`, `consent.given: true`) for each `document_documents` row whose `sourceId` has no `sources` row in the same tenant. This is exactly the lookup `sourceWithdrawn` performs in apps/api/src/knowledge/collections-store.ts, so it closes ISS-T055STORE-001.
+- Sessions: a session with no `sources` row is already fail-closed in apps/api/src/visibility/knowledge.ts (context() returns null), so the same gap does not apply and sessions are NOT backfilled by this decision; the script only reports their count.
+- Environment: STAGING only (`lkb_staging`). Production stays unauthorized (D-117); the script refuses any other database and no production flag is implemented.
+- Marking: every backfilled row carries `consent.recordedBy: "owner-attestation:D-181"` and `backfill: { decision: "D-181", at }`, so the rows stay distinguishable and revocable. Existing `sources` rows (including withdrawn ones) are never modified.
+- Execution gate: dry-run by default; writes need `--execute --confirm-backfill D-181`, and only after an independent checker PASS of the script.
+**Why:** ISS-T055STORE-001 (checker 8568a72d): document highlights and page routes fail open when a legacy document has no `sources` row. The Approver chose backfill over fail-closed, because consent for the legacy imports is already on record.
+**Result:** Backfill script scripts/operations/backfill-document-consent.mjs (dry-run default, tenant-scoped, idempotent, staging-only) is authorized. Writes against staging need the checker PASS first; any production run needs a new Approver decision.
+**Approved-by:** Umesh
+**Changes-authorized:**
+- scripts/operations/backfill-document-consent.mjs and its test (new files)
+- `sources` rows on lkb_staging only, inserted by that script with the markers above
+- qa/manifests/ entry for the unit
+**Links:** T-055, ISS-T055STORE-001, D-117, D-020, D-015
