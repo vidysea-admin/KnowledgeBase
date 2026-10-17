@@ -31,6 +31,9 @@ const setup = (mutate?: (input: ReturnType<typeof reviewInput>) => void) => {
   const row = detectWhatsAppReviewCandidates("tenant-a", input, REVIEW_TIME)[0]!;
   return { input, f, row };
 };
+/** A competing authorization writer: bumps the source revision without touching consent. */
+const bumpRevision = (f: Fixture, sourceId: string) =>
+  f.db.collection<{ _id: string; tenantId: string; sourceMeta?: { authorizationRevision?: number } }>("sources").updateOne({ _id: sourceId, tenantId: "tenant-a" }, { $inc: { "sourceMeta.authorizationRevision": 1 } });
 const source = (f: Fixture) => f.rows("sources")[0] as Record<string, any>;
 
 test("ISS-WAVECTORLESS-002: withdrawal committed after the approval's source read aborts approval (CAS lost)", async () => {
@@ -109,10 +112,22 @@ test("ISS-WAVECTORLESS-002: any intervening authorization revision bump (even wi
   const { input, f, row } = setup();
   await createMongoWhatsAppReviewRepository(f.db).insert("tenant-a", [row]);
   const racing = hookSourcesUpdate(f, async () => {
-    await f.db.collection("sources").updateOne({ _id: input.source._id, tenantId: "tenant-a" }, { $inc: { "sourceMeta.authorizationRevision": 1 } } as never);
+    await bumpRevision(f, input.source._id);
   });
   const store = createMongoWhatsAppReviewRepository(racing, { materialize: c => f.publish(c.candidate, c.session) });
   await assert.rejects(store.decide("tenant-a", row._id, "approved", "reviewer"), /authorization fence/);
   assert.equal(f.rows("published").length, 0);
   assert.equal(source(f).sourceMeta.authorizationRevision, 1, "the competing writer's bump survives; approval rolled back");
+});
+
+test("ISS-WAVECTORLESS-002: a revision bump between the withdrawal's read and write forces a retry, never a stale apply", async () => {
+  const { input, f } = setup();
+  const racing = hookSourcesUpdate(f, async () => { await bumpRevision(f, input.source._id); });
+  await withdrawWhatsAppSourceConsent(racing, "tenant-a", input.source._id, "owner-withdrawal");
+  const writes = f.calls.filter(c => c.collection === "sources" && c.operation === "updateOne");
+  assert.equal(writes.length, 3, "competing bump, stale withdrawal attempt, retried withdrawal");
+  assert.deepEqual(writes[1]!.filter["sourceMeta.authorizationRevision"], { $in: [null, 0] }, "first attempt is conditional on the revision it read");
+  assert.equal(writes[2]!.filter["sourceMeta.authorizationRevision"], 1, "retry re-reads and conditions on the newer revision");
+  assert.equal(source(f).sourceMeta.authorizationRevision, 2, "bump then withdrawal each incremented once");
+  assert.deepEqual(source(f).consent, { given: false, recordedBy: "owner-withdrawal" });
 });

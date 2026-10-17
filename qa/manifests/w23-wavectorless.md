@@ -1,7 +1,7 @@
 # Manifest - w23-wavectorless
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w23-wavectorless (lane/w23-wavectorless)
 Base: 3c99337f (origin/master)
 Issues: ISS-WAVECTORLESS-001, -002, -003 (ledger rows not flipped; qa/issues.WAVECTORLESS.jsonl)
@@ -42,3 +42,9 @@ All restored; apps/api/src/whatsapp/store.ts hash equals HEAD blob.
 
 ## Checker should run
 The two race test files and store.test.ts / store-source-id.test.ts; schema/validate.py; gen-types --check; lint-loc --all; at least one mutation of the fence revision filter.
+
+## Fix cycle 1 (checker verdict ba318a36 on 382e0c14)
+- tsc: the cycle-0 "clean" claim was wrong; consent-cas.test.ts(112,50) TS2322. Fixed with a typed `collection<{_id: string; ...}>` helper (no `as never`). apps/api tsc exit 0, packages/core tsc exit 0.
+- M1 survivor: new test "revision bump between the withdrawal's read and write forces a retry" asserts 3 sources writes with revision filters {$in:[null,0]} then 1, final revision 2. Mutation removing the revision from the withdrawal filter: killed (pass 6, fail 1).
+- Production caller GAP (explicit): no API route, review action or store method writes WhatsApp source consent=false anywhere in apps/api or packages (greps find only readers: collections-store.sourceWithdrawn, visibility, head-store, speaker-profiles). `withdrawWhatsAppSourceConsent` therefore has no production caller; the owner-withdrawal entry point must be built and must call it, or the CAS protects nothing. Not wired here: needs an owner-facing route decision.
+- Results: whatsapp tests (review, whatsapp, whatsapp-review) see commit message counts; race files repeated 15x; lint-loc --all OK.
