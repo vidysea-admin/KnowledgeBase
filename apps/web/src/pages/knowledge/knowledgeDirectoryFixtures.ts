@@ -1,6 +1,6 @@
 import type { Graph, SessionSummary, Source } from "../../api/types.js";
 export const directorySessions: SessionSummary[] = [{ _id: "session/one", title: "Career session", date: "2026-10-13", status: { transcribe: "done", index: "done" } }];
-export const directorySources: Source[] = [{ _id: "resource-one", kind: "document", captureMode: "provided", createdAt: "2026-10-13", path: "C:/private/path.txt", url: "https://example.com/document" }];
+export const directorySources: Source[] = [{ _id: "resource-one", kind: "document", captureMode: "provided", createdAt: "2026-10-13", path: "C:/private/path.txt", url: "https://example.com/document" }] as unknown as Source[]; // legacy rows may still carry path; pages must not show it
 export const directoryGraph: Graph = {
   nodes: [
     { id: "topic:career", label: "Careers", kind: "topic", sources: ["graph_edges"] },

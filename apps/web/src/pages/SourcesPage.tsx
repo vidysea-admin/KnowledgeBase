@@ -4,6 +4,18 @@ import { listSources } from "../api/sources.js";
 import { ApiError } from "../api/client.js";
 import type { Source } from "../api/types.js";
 
+// Human-friendly label from API-provided fields only; never a local filesystem path.
+function sourceLabel(s: Source): string {
+  if (s.url) {
+    try {
+      const u = new URL(s.url);
+      if (u.protocol === "http:" || u.protocol === "https:") return `${u.host}${u.pathname === "/" ? "" : u.pathname}`;
+    } catch { /* fall through to kind/date label */ }
+  }
+  const day = /^\d{4}-\d{2}-\d{2}/.exec(s.createdAt)?.[0];
+  return `${s.kind} (${s.captureMode})${day ? ` ${day}` : ""}`;
+}
+
 export function SourcesPage(): React.ReactElement {
   const { apiKey } = useAuth();
   const [loaded, setLoaded] = useState<{ key: string | null; sources: Source[] | null; error: string | null }>({ key: apiKey, sources: null, error: null });
@@ -25,7 +37,7 @@ export function SourcesPage(): React.ReactElement {
   const search = query.trim().toLowerCase();
   const visible = (sources ?? []).filter((source) =>
     (!kind || source.kind === kind) && (!captureMode || source.captureMode === captureMode) &&
-    (!search || [source.kind, source.url, source.path].some((value) => value?.toLowerCase().includes(search))),
+    (!search || [source.kind, source.captureMode, source.url, source.hash, source.createdAt].some((value) => value?.toLowerCase().includes(search))),
   ).sort((a, b) => {
     const aTime = Date.parse(a.createdAt), bTime = Date.parse(b.createdAt);
     const dateOrder = (Number.isFinite(bTime) ? bTime : -Infinity) - (Number.isFinite(aTime) ? aTime : -Infinity);
@@ -47,7 +59,7 @@ export function SourcesPage(): React.ReactElement {
         <div className="card">
           <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "end" }}>
             <label style={{ display: "grid", gap: "0.3rem" }}>Search sources
-              <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Location or kind" />
+              <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="URL, kind, hash or date" />
             </label>
             <label style={{ display: "grid", gap: "0.3rem" }}>Kind
               <select value={kind} onChange={(event) => setKind(event.target.value)}>
@@ -68,7 +80,7 @@ export function SourcesPage(): React.ReactElement {
           {visible.map((s) => (
             <div key={s._id} className="row-card">
               <div className="row-title">{s.kind} &middot; {s.captureMode}</div>
-              <div className="row-meta">{s.url ?? s.path ?? "(no location recorded)"} &middot; {s.createdAt}</div>
+              <div className="row-meta">{sourceLabel(s)}{s.hash ? ` \u00b7 #${s.hash.slice(0, 8)}` : ""} &middot; {s.createdAt}</div>
             </div>
           ))}
         </div>
