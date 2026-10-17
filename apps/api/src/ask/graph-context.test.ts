@@ -118,3 +118,16 @@ test("Mongo graph reader opens read-only snapshot and loads only explicit speake
   assert.deepEqual(reads.map(r => r[1]), [{ personId: "person:a", tenantId: "A" }, { personId: "person:b", tenantId: "A" }]);
   assert.ok(reads.every(r => (r[2] as { session: unknown }).session === session)); assert.equal(calls.at(-1), "end");
 });
+
+// ISS-WA-REVIEW-WIRE-006 (T-007 criterion 9): the ask graph arm must not turn unreviewed WhatsApp claims into topic edges or allowed turns.
+test("topic graph snapshot withholds a published topic once its session source is an unreviewed WhatsApp batch", async () => {
+  const { f, db, canonical } = await publishedTopic(); const read = createMongoGraphSnapshotReader(db);
+  const control = await read("tenant-a", { topicRefs: [canonical] });
+  assert.ok(control.edges.length && control.turns.length && control.visibleSources.length, "control: the public published topic is served");
+  const source = f.rows("sources")[0]!; const original = source.kind;
+  source.kind = "whatsapp-batch";
+  const quarantined = await read("tenant-a", { topicRefs: [canonical] });
+  assert.deepEqual(quarantined.edges, []); assert.deepEqual(quarantined.turns, []); assert.deepEqual(quarantined.visibleSources, []);
+  source.kind = original;
+  assert.ok((await read("tenant-a", { topicRefs: [canonical] })).edges.length, "restoring the recording source restores the edges");
+});

@@ -1,0 +1,90 @@
+M1-search: ✖ lexical /search never returns pending WhatsApp turns, but still serves public turns (96.9532ms)
+M1-search: ✖ lexical /search never returns rejected WhatsApp turns, but still serves public turns (34.5231ms)
+M1-search: ✖ approved WhatsApp text is the only WhatsApp text any trusted reader serves; the sibling turn and group title never leave (49.0226ms)
+M1-search: ℹ pass 14
+M1-search: ℹ fail 3
+M1-search: ✖ failing tests:
+M1-search: ✖ lexical /search never returns pending WhatsApp turns, but still serves public turns (96.9532ms)
+M1-search: ✖ lexical /search never returns rejected WhatsApp turns, but still serves public turns (34.5231ms)
+M1-search: ✖ approved WhatsApp text is the only WhatsApp text any trusted reader serves; the sibling turn and group title never leave (49.0226ms)
+M2-corpus: ✖ semantic corpus excludes pending WhatsApp turns, sessions and chunks (9.4095ms)
+M2-corpus: ✖ semantic search ranks a pending WhatsApp chunk nowhere even when its vector is the nearest (6.1613ms)
+M2-corpus: ✖ semantic corpus excludes rejected WhatsApp turns, sessions and chunks (2.3347ms)
+M2-corpus: ✖ semantic search ranks a rejected WhatsApp chunk nowhere even when its vector is the nearest (1.9882ms)
+M2-corpus: ✖ approved WhatsApp text is the only WhatsApp text any trusted reader serves; the sibling turn and group title never leave (92.4001ms)
+M2-corpus: ℹ pass 12
+M2-corpus: ℹ fail 5
+M2-corpus: ✖ failing tests:
+M2-corpus: ✖ semantic corpus excludes pending WhatsApp turns, sessions and chunks (9.4095ms)
+M2-corpus: ✖ semantic search ranks a pending WhatsApp chunk nowhere even when its vector is the nearest (6.1613ms)
+M2-corpus: ✖ semantic corpus excludes rejected WhatsApp turns, sessions and chunks (2.3347ms)
+M2-corpus: ✖ semantic search ranks a rejected WhatsApp chunk nowhere even when its vector is the nearest (1.9882ms)
+M2-corpus: ✖ approved WhatsApp text is the only WhatsApp text any trusted reader serves; the sibling turn and group title never leave (92.4001ms)
+M3-arms: ✖ /ask lexical and vector arms never propose the pending WhatsApp session node (53.4799ms)
+M3-arms: ✖ /ask lexical and vector arms never propose the rejected WhatsApp session node (13.1923ms)
+M3-arms: ℹ pass 15
+M3-arms: ℹ fail 2
+M3-arms: ✖ failing tests:
+M3-arms: ✖ /ask lexical and vector arms never propose the pending WhatsApp session node (53.4799ms)
+M3-arms: ✖ /ask lexical and vector arms never propose the rejected WhatsApp session node (13.1923ms)
+M4-claims: ✖ claims list hides the old-wiring needs-review WhatsApp claim while pending (9.8563ms)
+M4-claims: ✖ claims list hides the old-wiring needs-review WhatsApp claim while rejected (21.4182ms)
+M4-claims: ℹ pass 15
+M4-claims: ℹ fail 2
+M4-claims: ✖ failing tests:
+M4-claims: ✖ claims list hides the old-wiring needs-review WhatsApp claim while pending (9.8563ms)
+M4-claims: ✖ claims list hides the old-wiring needs-review WhatsApp claim while rejected (21.4182ms)
+M5-outputs: ✖ knowledge outputs refuse a pending WhatsApp session and expose none of its claims or turns (97.7105ms)
+M5-outputs: ✖ knowledge outputs refuse a rejected WhatsApp session and expose none of its claims or turns (1.3309ms)
+M5-outputs: ℹ pass 15
+M5-outputs: ℹ fail 2
+M5-outputs: ✖ failing tests:
+M5-outputs: ✖ knowledge outputs refuse a pending WhatsApp session and expose none of its claims or turns (97.7105ms)
+M5-outputs: ✖ knowledge outputs refuse a rejected WhatsApp session and expose none of its claims or turns (1.3309ms)
+M6-eligible: ✖ eligible tree input drops the pending WhatsApp session and its page, and never retains a stale root (55.397ms)
+M6-eligible: ✖ eligible tree input drops the rejected WhatsApp session and its page, and never retains a stale root (1.257ms)
+M6-eligible: ✖ approved WhatsApp text is the only WhatsApp text any trusted reader serves; the sibling turn and group title never leave (13.853ms)
+M6-eligible: ℹ pass 14
+M6-eligible: ℹ fail 3
+M6-eligible: ✖ failing tests:
+M6-eligible: ✖ eligible tree input drops the pending WhatsApp session and its page, and never retains a stale root (55.397ms)
+M6-eligible: ✖ eligible tree input drops the rejected WhatsApp session and its page, and never retains a stale root (1.257ms)
+M6-eligible: ✖ approved WhatsApp text is the only WhatsApp text any trusted reader serves; the sibling turn and group title never leave (13.853ms)
+M7-catalog: ✖ topic catalog hides pending WhatsApp claims and sessions (34.7661ms)
+M7-catalog: ✖ topic catalog hides rejected WhatsApp claims and sessions (49.572ms)
+M7-catalog: ℹ pass 15
+M7-catalog: ℹ fail 2
+M7-catalog: ✖ failing tests:
+M7-catalog: ✖ topic catalog hides pending WhatsApp claims and sessions (34.7661ms)
+M7-catalog: ✖ topic catalog hides rejected WhatsApp claims and sessions (49.572ms)
+M8-trusted: ✖ brain list/detail reads hide the pending WhatsApp session, source, page, claims and turns (30.5749ms)
+M8-trusted: ✖ grounded content returns nothing for the pending WhatsApp session (6.1735ms)
+M8-trusted: ✖ citations never resolve the old-wiring WhatsApp claim while pending (34.2952ms)
+M8-trusted: ✖ brain list/detail reads hide the rejected WhatsApp session, source, page, claims and turns (15.0941ms)
+M8-trusted: ✖ grounded content returns nothing for the rejected WhatsApp session (3.5465ms)
+M8-trusted: ✖ citations never resolve the old-wiring WhatsApp claim while rejected (26.1994ms)
+M8-trusted: ✖ approved WhatsApp: only the reviewed claim text is reachable through brain detail and citation; sibling turn and group title are not (2.6742ms)
+M8-trusted: ℹ pass 2
+M8-trusted: ℹ fail 7
+M8-trusted: ✖ failing tests:
+M8-trusted: ✖ brain list/detail reads hide the pending WhatsApp session, source, page, claims and turns (30.5749ms)
+M8-trusted: ✖ grounded content returns nothing for the pending WhatsApp session (6.1735ms)
+M8-trusted: ✖ citations never resolve the old-wiring WhatsApp claim while pending (34.2952ms)
+M8-trusted: ✖ brain list/detail reads hide the rejected WhatsApp session, source, page, claims and turns (15.0941ms)
+M8-trusted: ✖ grounded content returns nothing for the rejected WhatsApp session (3.5465ms)
+M8-trusted: ✖ citations never resolve the old-wiring WhatsApp claim while rejected (26.1994ms)
+M8-trusted: ✖ approved WhatsApp: only the reviewed claim text is reachable through brain detail and citation; sibling turn and group title are not (2.6742ms)
+M9-graphctx: ✖ topic graph snapshot withholds a published topic once its session source is an unreviewed WhatsApp batch (69.215ms)
+M9-graphctx: ℹ pass 9
+M9-graphctx: ℹ fail 1
+M9-graphctx: ✖ failing tests:
+M9-graphctx: ✖ topic graph snapshot withholds a published topic once its session source is an unreviewed WhatsApp batch (69.215ms)
+M10-srcctx: ✖ source hydration refuses a stale tree node of a pending WhatsApp session without quoting it, and still hydrates the public session (102.6397ms)
+M10-srcctx: ✖ source hydration refuses a stale tree node of a rejected WhatsApp session without quoting it, and still hydrates the public session (2.2711ms)
+M10-srcctx: ✖ approved WhatsApp hydrates only reviewed text, never the unreviewed sibling or the group title (4.4183ms)
+M10-srcctx: ℹ pass 0
+M10-srcctx: ℹ fail 3
+M10-srcctx: ✖ failing tests:
+M10-srcctx: ✖ source hydration refuses a stale tree node of a pending WhatsApp session without quoting it, and still hydrates the public session (102.6397ms)
+M10-srcctx: ✖ source hydration refuses a stale tree node of a rejected WhatsApp session without quoting it, and still hydrates the public session (2.2711ms)
+M10-srcctx: ✖ approved WhatsApp hydrates only reviewed text, never the unreviewed sibling or the group title (4.4183ms)
