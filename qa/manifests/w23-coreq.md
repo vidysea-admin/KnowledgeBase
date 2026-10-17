@@ -1,7 +1,7 @@
 # Manifest: w23-coreq
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Base: 3c99337f
 Lane: lane/w23-coreq (C:\Users\product\Desktop\KnowledgeBase-lanes\w23-coreq)
 
@@ -20,3 +20,8 @@ The lost-update half is already fixed on base: lock in packages/core/src/job-que
 - Mutation M1 (drop banner filter in orphanGenerated): pass 1, fail 1 (killed); per-mutation backup, restored, cmp equal, `git -c core.autocrlf=true hash-object` c356642d... of restored working file
 - `node scripts/lint-loc.mjs --all`: 9 of 10 stages exit 0; stage `dependencies` exit unavailable (SIGTERM, execution-failed, under shared load); not re-verified
 - Not covered by a test: main() wiring of the orphan loop (mutation of it not run)
+
+## Fix cycle 1
+Cycle 0 FAIL: orphan call was never wired into main(). Now wired (check lists + exit 1; write unlinks banner-bearing regular files only, lstat, inside generated/). `GEN_TYPES_ROOT` env override added for tests. Tests: `node --test scripts/gen-types.test.mjs` pass 4, fail 0, skipped 1 (file symlink, not permitted on this host; covered by junction test instead).
+Mutations (per-mutation backup, restored, cmp equal, hash-object 4a21ef25 = working file): (a) skip orphan call in main: pass 3 fail 1; (b) drop banner check: pass 2 fail 2. Both killed.
+Real tree: `node scripts/gen-types.mjs --check` OK, rc=0.
