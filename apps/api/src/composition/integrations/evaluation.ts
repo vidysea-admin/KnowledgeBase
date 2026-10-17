@@ -6,6 +6,8 @@ import type { AskRouteDeps } from "../../routes/ask/ask.js";
 import type { SourceIntakeDeps } from "../../source-intake/store.js";
 import type { ChampionshipStore } from "../../routes/championship/championship.js";
 import { createMongoChampionshipStore } from "../../championship/mongo-store.js";
+import { createComposedEvidenceVerifier } from "./evidence-verifier.js";
+import type { NativeEvidenceResolver } from "../../native-evidence/resolver.js";
 import { createFileCalibrationReviewStore } from "../../calibration-review/file-store.js";
 import type { CalibrationReviewDeps } from "../../calibration-review/router.js";
 import { createMongoFlywheelStore } from "../../evaluation-flywheel/store.js";
@@ -19,7 +21,7 @@ export interface EvaluationIntegrations {
 }
 export interface EvaluationIntegrationInput {
   db: Db; env: NodeJS.ProcessEnv; root: string; index: BoundIndexer; ask: AskRouteDeps;
-  sourceIntake?: SourceIntakeDeps; routing: IntegrationRouting;
+  sourceIntake?: SourceIntakeDeps; routing: IntegrationRouting; nativeEvidence?: NativeEvidenceResolver;
 }
 const localAbsolute = (value: string | undefined): value is string => typeof value === "string"
   && value === value.trim() && isAbsolute(value) && !/^(?:\\\\|\/\/)/.test(value) && !/[\u0000-\u001f\u007f]/.test(value);
@@ -39,7 +41,8 @@ export function buildEvaluationIntegrations(input: EvaluationIntegrationInput): 
   const result: EvaluationIntegrations = {}, { env, db } = input;
   if (env.LKB_CHAMPIONSHIP === "1" && championshipDatabaseAllowed(db, env)) {
     // The store separately refuses writes until the canonical validator/unique trial migration exists.
-    result.championship = createMongoChampionshipStore(db);
+    // Same composed verifier as the answer workflow: consent/visibility gating plus the native resolver.
+    result.championship = createMongoChampionshipStore(db, { verifyEvidence: createComposedEvidenceVerifier(db, input.nativeEvidence) });
   }
   const storeRoot = env.CALIBRATION_REVIEW_STORE_DIR, corpusRoot = env.CALIBRATION_REVIEW_CORPUS_ROOT,
     packetPath = env.CALIBRATION_REVIEW_PACKET_PATH;

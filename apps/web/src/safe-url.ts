@@ -15,3 +15,15 @@ export function safeHttpUrl(value: unknown): string | null {
     return null; // not an absolute URL at all
   }
 }
+
+/**
+ * The one sanitizer for external resource links in the knowledge directory: safeHttpUrl plus
+ * a refusal of embedded credentials (user:pass@). Returns the URL and its hostname, or null.
+ */
+export function safePublicResourceUrl(value: unknown): { href: string; host: string } | null {
+  const safe = safeHttpUrl(value);
+  if (!safe) return null;
+  const parsed = new URL(safe);
+  if (parsed.username || parsed.password || /[\u0080-\u009f]/.test(safe)) return null;
+  return { href: safe, host: parsed.hostname };
+}

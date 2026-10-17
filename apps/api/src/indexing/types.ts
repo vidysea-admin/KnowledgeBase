@@ -6,7 +6,7 @@
  * either file makes them mutually dependent, which `dependency-cruiser`'s `no-circular` rule
  * correctly rejected. A third module owned by neither is the honest resolution.
  */
-import type { TileCaptureContext, ReadTileCapture, TileSpeakerSuggestOutcome } from "./tile-speaker-suggest.js";
+import type { TileCaptureContext, ReadTileCapture, TileSpeakerSuggestOutcome, TileSuggestionPublication } from "./tile-speaker-suggest.js";
 import type { EmbedJob, EmbedResult } from "@lkb/ai";
 import type { Db } from "mongodb";
 import type { SummarizeCompleteFn, NoteJudge } from "@lkb/index";
@@ -79,8 +79,11 @@ export interface IndexSessionDeps {
   /** U2.4 / D-141: OFF unless true. Writes `speaker_suggestions` rows only (never `speakers`); see ./speaker-suggest.ts. */
   suggestSpeakers?: boolean;
 
-  /** T-042 P9: OFF unless `enabled === true` AND LKB_TILE_SUGGEST=1. Suggestion rows only (never `speakers`); runs only after a committed index. */
-  tileSuggest?: { enabled: boolean; context: TileCaptureContext; readCapture: ReadTileCapture };
+  /** T-042 P9: OFF unless `enabled === true` AND LKB_TILE_SUGGEST=1. Suggestion rows only (never `speakers`); runs only after a committed index.
+   * `context`/`readCapture` come only from a trusted capture registry; absent = no-op. `publication` is the
+   * required current-generation write fence for the committed generation; absent = no-op. */
+  tileSuggest?: { enabled: boolean; context?: TileCaptureContext; readCapture?: ReadTileCapture;
+    publication?: (db: Db, tenantId: string, sessionId: string, generation: string) => TileSuggestionPublication };
 
   db?: Pick<Db, "collection">;
 }

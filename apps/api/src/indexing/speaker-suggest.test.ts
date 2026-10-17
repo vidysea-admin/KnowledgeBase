@@ -2,7 +2,7 @@
  * U2.4 / D-141 wiring: indexSession -> suggestSpeakersForSession -> extractSpeakersGrounded({suggest:true}) -> speaker_suggestions.
  * Fakes only (in-memory Db, scripted `complete`); no model call, no network.
  */
-import { test } from "node:test";
+import { test, mock } from "node:test";
 import assert from "node:assert/strict";
 import type { Turns } from "@lkb/core";
 import type { CompleteResult, Job } from "@lkb/ai";
@@ -10,7 +10,7 @@ import { memoryDb } from "../../../../packages/db/src/collections/speaker-sugges
 import { confirmSpeakerSuggestion, rejectSpeakerSuggestion } from "../../../../packages/db/src/collections/speaker-suggestions/index.js";
 import { createLogger } from "../composition/logger.js";
 import { resolveSuggestSpeakers } from "../composition/production.js";
-import { suggestSpeakersForSession, speakerSuggestEnabled } from "./speaker-suggest.js";
+import { suggestSpeakersForSession, speakerSuggestEnabled, SPEAKER_SUGGEST_TIMEOUT_MS } from "./speaker-suggest.js";
 import { indexSession } from "./session.js";
 import { fakeDb, completeWith } from "./testutils.js";
 import { createKnowledgeVisibility } from "../visibility/knowledge.js";
@@ -193,4 +193,56 @@ test("production default: suggestions OFF unless KB_SPEAKER_SUGGEST=1; an explic
   assert.equal(resolveSuggestSpeakers(undefined, { KB_SPEAKER_SUGGEST: "1" }), true);
   assert.equal(resolveSuggestSpeakers(false, { KB_SPEAKER_SUGGEST: "1" }), false);
   assert.equal(resolveSuggestSpeakers(true, {}), true);
+});
+
+test("ISS-WU24-001: a Db whose find() throws is logged once with the class only, and the result carries a sanitized error", async () => {
+  const { lines, log } = capture();
+  const secret = "SECRET-DB-MESSAGE";
+  const m = memoryDb();
+  const findThrows = { collection: () => ({ find: () => { throw new TypeError(secret); } }) } as never;
+  const r = await suggestSpeakersForSession(T, S, TURNS, scripted().complete, findThrows, { log });
+  assert.deepEqual([r.suggested, r.inserted, r.error], [0, 0, "TypeError"]);
+  assert.equal(lines.length, 1);
+  assert.equal(JSON.parse(lines[0]!).errorName, "TypeError");
+  assert.ok(!lines[0]!.includes(secret) && !JSON.stringify(r).includes(secret), "no message in log or result");
+  assert.equal(m.rows("speaker_suggestions").length, 0);
+});
+
+test("ISS-WU24-001: a degraded run is logged once with the reason, success path unchanged", async () => {
+  const { lines, log } = capture();
+  const r = await suggestSpeakersForSession(T, S, TURNS, async () => { throw new Error("ollama down"); }, memoryDb().db, { log });
+  if (r.degraded) {
+    assert.equal(lines.length, 1);
+    assert.equal(JSON.parse(lines[0]!).reason, r.degraded);
+  } else assert.equal(lines.length, 0);
+  const ok = capture();
+  const good = await suggestSpeakersForSession(T, S, TURNS, scripted().complete, memoryDb().db, { log: ok.log });
+  assert.deepEqual([good.suggested, good.error, ok.lines.length], [1, undefined, 0], "no log on the success path");
+});
+
+test("ISS-WU24-003: the default timeout constant is 300000 ms", () => {
+  assert.equal(SPEAKER_SUGGEST_TIMEOUT_MS, 300_000);
+});
+
+test("ISS-WU24-003: with the DEFAULT timeout (fake timers) a hung run is abandoned, and a late run writes nothing", async () => {
+  mock.timers.enable({ apis: ["setTimeout"] });
+  try {
+    const m = memoryDb();
+    const { lines, log } = capture();
+    let release!: () => void;
+    const gate = new Promise<void>((res) => { release = res; });
+    const inner = scripted("yes").complete;
+    const p = suggestSpeakersForSession(T, S, TURNS, async (job) => { await gate; return inner(job); }, m.db, { log });
+    mock.timers.tick(SPEAKER_SUGGEST_TIMEOUT_MS - 1);
+    let settled = false; void p.then(() => { settled = true; });
+    await new Promise<void>((res) => setImmediate(res));
+    assert.equal(settled, false, "not timed out one tick early");
+    mock.timers.tick(1);
+    const r = await p;
+    assert.equal(r.error, "timeout");
+    assert.equal(JSON.parse(lines[0]!).timeoutMs, 300_000);
+    release();
+    for (let i = 0; i < 20; i++) await new Promise<void>((res) => setImmediate(res));
+    assert.equal(m.rows("speaker_suggestions").length, 0, "abandoned run must not insert suggested-only rows");
+  } finally { mock.timers.reset(); }
 });

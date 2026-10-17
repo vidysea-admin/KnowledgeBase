@@ -182,7 +182,13 @@ async function main() {
   process.exitCode = afterBypasses.length === 0 ? 0 : 1;
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exitCode = 1;
-});
+function setProbeShape(shape) { PROBE_SHAPE = shape; }   // test hook (ISS-U24SMART-002): lets the suite break the probe and watch the control notice
+export { shipsAsPerson, probeCurrent, selfTest, setProbeShape };
+
+// Run the CLI only when executed directly, so audit-closed-class.test.mjs can import the probe without side effects.
+if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+  main().catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  });
+}
