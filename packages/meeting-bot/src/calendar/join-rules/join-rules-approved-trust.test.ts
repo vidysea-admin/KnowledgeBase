@@ -103,16 +103,17 @@ test("projection cannot supply trust to unauthenticated, rejected, cancelled, re
   assert.equal(projectApprovedSenderTrust(past), undefined);
 });
 
-test("legacy dedup and unchanged veto remain decisive; every-webinar ISSUE376 is explicitly unresolved", () => {
+test("legacy dedup and unchanged veto remain decisive; every-webinar refuses a failed-auth sender (ISS-376 hybrid)", () => {
   const x = input(); assert.equal(select(x, ["gmail:next-source"]).toSchedule.length, 0);
   const selected = select(x); x.context.document.stored.state.optedOutEventIds = ["next-source"];
   assert.equal(applyJoinRules(selected, x.context.document.stored.ruleSet, {state: x.context.document.stored.state}).toSchedule.length, 0);
   const skipped = select({...x, context: input().context, candidate: {...candidate(), senderAuthenticated: false}});
   assert.equal(skipped.toSchedule.length, 0);
   assert.equal(applyJoinRules(skipped, input().context.document.stored.ruleSet, {state: approved()}).toSchedule.length, 0);
-  // This retained legacy reproduction is evidence of the OPEN policy gate, not a positive authority test.
+  // ISS-376 (Approver ruling 1, hybrid): everyWebinar skips the allowlist but refuses a Gmail candidate whose authentication failed.
   const broad = selectAutoRecordItems({calendarEvents: [], candidates: [{...candidate(), senderEmail: "attacker@evil.com", senderDomain: "evil.com",
     senderAuthenticated: false}], now: new Date(now).toISOString(), leadMinutes: 5, trustedSenders: {emails: [], domains: []},
     alreadyScheduled: [], everyWebinar: true});
-  assert.equal(broad.toSchedule.length, 1);
+  assert.equal(broad.toSchedule.length, 0);
+  assert.equal(broad.skipped.some((k) => k.reason === "untrusted-sender"), true);
 });
