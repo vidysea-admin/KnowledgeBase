@@ -1,6 +1,8 @@
 import type { Graph, SessionSummary, Source } from "../../api/types.js";
 export const directorySessions: SessionSummary[] = [{ _id: "session/one", title: "Career session", date: "2026-10-13", status: { transcribe: "done", index: "done" } }];
-export const directorySources: Source[] = [{ _id: "resource-one", kind: "document", captureMode: "provided", createdAt: "2026-10-13", path: "C:/private/path.txt", url: "https://example.com/document" }] as unknown as Source[]; // legacy rows may still carry path; pages must not show it
+// Legacy row that still carries a local path; kept as a non-fresh object so it is assignable without a cast hack.
+const legacyPathRow = { _id: "resource-one", kind: "document", captureMode: "provided", createdAt: "2026-10-13", path: "C:/private/path.txt", url: "https://example.com/document" };
+export const directorySources: Source[] = [legacyPathRow] as Source[];
 export const directoryGraph: Graph = {
   nodes: [
     { id: "topic:career", label: "Careers", kind: "topic", sources: ["graph_edges"] },

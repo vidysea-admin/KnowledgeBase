@@ -68,6 +68,21 @@ describe("Sources explorer", () => {
     expect(document.body.innerHTML).not.toMatch(/[A-Za-z]:\\|\/raw\/|\/docs\//);
   });
 
+  test.each([
+    ["whitespace-padded", " https://example.test/pad "],
+    ["ftp", "ftp://example.test/file"],
+    ["file", "file:///C:/Users/x/secret.txt"],
+    ["javascript", "javascript:alert(1)"],
+    ["credentials", "https://user:pass@example.test/private"],
+  ])("falls back to the kind/captureMode/date label for %s urls", async (_name, url) => {
+    vi.spyOn(sourcesApi, "listSources").mockResolvedValue({ sources: [{ _id: "u", kind: "url", captureMode: "public", url, createdAt: "2026-09-01T00:00:00Z" }] as Source[] });
+    render(<SourcesPage />);
+    await screen.findByText("Showing 1 of 1 sources · Newest first");
+    const meta = document.querySelector(".row-meta")?.textContent ?? "";
+    expect(meta).toContain("url (public) 2026-09-01");
+    for (const bad of ["example.test", "user:pass", "secret", "javascript", "ftp:", "file:"]) expect(meta).not.toContain(bad);
+  });
+
   test("combines exact kind and capture filters, distinguishes no match, and clears all controls", async () => {
     vi.spyOn(sourcesApi, "listSources").mockResolvedValue({ sources: records });
     render(<SourcesPage />);
