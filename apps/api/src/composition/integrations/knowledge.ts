@@ -13,8 +13,6 @@ import type { IntegrationRouting } from "./types.js";
 import type { KnowledgeDeps } from "../../knowledge/collections-router.js";
 import type { ConnectorCapability, ConnectorWorkflowDeps } from "../../connector-workflow/types.js";
 import { createMongoKnowledgeStore } from "../../knowledge/collections-store.js";
-import { createMongoPageHighlightStore } from "../../page-highlights/store.js";
-import type { PageHighlightDeps } from "../../page-highlights/router.js";
 import { createMongoKnowledgeCatalog } from "../../knowledge/catalog-store.js";
 import { createDocxRenderer } from "../../knowledge/document-reader.js";
 import { buildConnectorWorkflowDeps } from "../../connector-workflow/wiring.js";
@@ -25,7 +23,6 @@ import { createMongoWhatsAppReviewSourceReader, createWhatsAppReviewSourceRouter
 
 export interface KnowledgeIntegrations {
   knowledge?: KnowledgeDeps;
-  pageHighlights?: PageHighlightDeps;
   connectorWorkflow?: ConnectorWorkflowDeps;
   whatsappReview?: Router;
   whatsapp?: WhatsAppRouteDeps;
@@ -75,7 +72,6 @@ export function buildKnowledgeIntegrations(input: {
   whatsappReview.use(reviewedWhatsApp.reviewRouter);
   return {
     knowledge,
-    pageHighlights: { store: createMongoPageHighlightStore(input.db) },
     ...(connectorWorkflow ? { connectorWorkflow } : {}),
     // Candidate-only ingestion has no direct indexer; approval remains a separate transaction.
     whatsapp: reviewedWhatsApp.whatsapp,

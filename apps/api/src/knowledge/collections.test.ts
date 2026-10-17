@@ -141,3 +141,32 @@ test("collections refuse raw WhatsApp members and cached names with a mixed unsa
   assert.equal(fx.rows.knowledge_collections![0]!.members.length, 3); // Reads/partial edits never rewrite curation/audit state.
   if (process.env.LKB_T055_EVIDENCE_DIR) await writeFile(join(process.env.LKB_T055_EVIDENCE_DIR, "collection-ledger-replay.json"), JSON.stringify({ issueId: "ISS-T055COLLECTIONS-001", proofClass: "actual-mounted-api-concrete-store-filter-enforcing-fake-db", original, cases: replay }, null, 2));
 }));
+test("T-055 C7: document highlights are validated against the page index; cross-tenant 404, consent withdrawn refused, re-ingest idempotent", async () => run(async (call, fx) => {
+  const request = { title: "Sample admissions document", format: "pdf", contentBase64: Buffer.from(samplePdf()).toString("base64") };
+  const doc = (await call("POST", "/knowledge/documents", request)).body; const path = `/knowledge/documents/${encodeURIComponent(doc.id)}/highlights`;
+  const base = { sourceId: doc.sourceId, version: doc.version };
+  const stored = () => fx.rows.document_documents![0]!.highlights.length;
+  // Forged page, absent quote, page 0, out-of-range page, wrong offsets, half-specified offsets: all refused, nothing stored.
+  const forged = await call("POST", path, { ...base, pageNumber: 2, quote: "Admission deadline" }); assert.deepEqual([forged.status, forged.body.reason], [422, "quote-absent-on-page"]);
+  const absent = await call("POST", path, { ...base, pageNumber: 1, quote: "Tuition is free" }); assert.deepEqual([absent.status, absent.body.reason], [422, "quote-absent-on-page"]);
+  const beyond = await call("POST", path, { ...base, pageNumber: 3, quote: "Admission" }); assert.deepEqual([beyond.status, beyond.body.reason], [422, "page-out-of-range"]);
+  const offsets = await call("POST", path, { ...base, pageNumber: 1, quote: "deadline", charStart: 0, charEnd: 8 }); assert.deepEqual([offsets.status, offsets.body.reason], [422, "offsets-mismatch"]);
+  assert.equal((await call("POST", path, { ...base, pageNumber: 0, quote: "Admission" })).status, 400);
+  assert.equal((await call("POST", path, { ...base, pageNumber: 1, quote: "Admission", charStart: 0 })).status, 400);
+  assert.equal(stored(), 0);
+  // Valid, with and without explicit (correct) document offsets, is stored once.
+  const ok = await call("POST", path, { ...base, pageNumber: 2, quote: "need evidence" }); assert.equal(ok.status, 200);
+  const start = "Admission deadline is October.".length + 1 + "Scholarships need evidence.".indexOf("need evidence");
+  assert.equal((await call("POST", path, { ...base, pageNumber: 2, quote: "need evidence", charStart: start, charEnd: start + 13 })).status, 200);
+  assert.equal(stored(), 1);
+  // Cross-tenant: the document is invisible to tenant b.
+  assert.equal((await call("POST", path, { ...base, pageNumber: 2, quote: "need evidence" }, "foreign")).status, 404);
+  assert.equal((await call("GET", path.replace("/highlights", ""), undefined, "foreign")).status, 404);
+  assert.ok(fx.calls.every(c => ["a", "b"].includes(c.filter.tenantId)));
+  // Consent withdrawn on the owning source: write and reads are refused.
+  fx.rows.sources!.push({ _id: doc.sourceId, tenantId: "a", kind: "document", consent: { given: false, recordedBy: "k" } });
+  const refused = await call("POST", path, { ...base, pageNumber: 1, quote: "Admission" }); assert.deepEqual([refused.status, refused.body.error], [403, "source_consent_withdrawn"]);
+  assert.equal((await call("GET", path.replace("/highlights", ""))).status, 403);
+  assert.equal((await call("GET", path.replace("/highlights", "/pages/1"))).status, 403);
+  assert.equal(stored(), 1);
+}));
