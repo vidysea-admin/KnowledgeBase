@@ -62,7 +62,8 @@ describe("sections and request counts", () => {
     expect(within(section("Webinar operations")).getByText("Finished webinar")).toBeInTheDocument();
     expect(within(section("Past recordings")).getByRole("link", { name: /Open session and transcript: Past one/ })).toHaveAttribute("href", "/sessions/s1");
     expect(count("/calendar/upcoming")).toBe(1); expect(count("/webinar-operations")).toBe(1); expect(count("/sessions")).toBe(1);
-    expect(calls).toHaveLength(4); // + /bot-events (autojoin Bot activity section)
+    // Every endpoint exactly once: the four section sources plus the later-added panels (bot activity, privacy, capture readiness, retention).
+    expect([...calls].sort()).toEqual(["/bot-events?limit=20", "/calendar/upcoming", "/meeting-bot/capture-readiness", "/meeting-bot/privacy", "/retention/status", "/sessions", "/webinar-operations"]);
   });
 
   test("no API key means no request at all", () => {

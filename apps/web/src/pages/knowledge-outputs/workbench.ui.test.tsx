@@ -1,13 +1,10 @@
-import { test } from "node:test";
+import { test, vi } from "vitest";
 import assert from "node:assert/strict";
 // @ts-expect-error jsdom is a test runtime dependency with no bundled declarations in this workspace.
 import { JSDOM } from "jsdom";
-// Direct node/jsdom harness avoids starting the Vitest worker pool in this shared-CPU lane.
-// @ts-expect-error coordination runtime is a local .mjs harness without TypeScript declarations.
-import { configureTestViteEnv } from "../../../../../.cache/coordination/safe-test-runtime/register.mjs";
 
 test("UI creates, cites, saves, reopens, revalidates and exports through authenticated API", async () => {
-  configureTestViteEnv({ PROD: true });
+  vi.stubEnv("PROD", true);
   const dom = new JSDOM("<!doctype html><html><body></body></html>", { url: "http://localhost/knowledge-outputs" });
   const keys = ["window", "document", "navigator", "HTMLElement", "HTMLInputElement", "HTMLTextAreaElement", "CustomEvent", "Event", "Node", "MutationObserver"] as const;
   const saved = new Map<string, PropertyDescriptor | undefined>();
@@ -66,8 +63,8 @@ test("UI creates, cites, saves, reopens, revalidates and exports through authent
     await waitFor(() => assert.ok(requests.some((r) => r.url === "/knowledge-outputs/o1" && r.method === "GET")));
     assert.ok(requests.some((r) => r.method === "PUT")); assert.ok(requests.some((r) => r.url.endsWith("/revalidate")));
   } finally {
-    cleanup(); globalThis.fetch = originalFetch; URL.createObjectURL = oldCreate; URL.revokeObjectURL = oldRevoke; dom.window.HTMLAnchorElement.prototype.click = oldClick;
+    vi.unstubAllEnvs(); cleanup(); globalThis.fetch = originalFetch; URL.createObjectURL = oldCreate; URL.revokeObjectURL = oldRevoke; dom.window.HTMLAnchorElement.prototype.click = oldClick;
     for (const [key, descriptor] of saved) { if (descriptor) Object.defineProperty(globalThis, key, descriptor); else Reflect.deleteProperty(globalThis, key); }
     dom.window.close();
   }
-});
+}, 30000);
