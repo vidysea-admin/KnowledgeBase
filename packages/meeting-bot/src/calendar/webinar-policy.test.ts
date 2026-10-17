@@ -43,13 +43,16 @@ test("watch retries only typed discovery failure after the 5 minute POLL_MS and 
   await assert.rejects(runPipelineWatch({watch: true}, {tick: async () => {assert.fail("unapproved watch cannot tick");}}), /requires --run/);
 });
 const candidate = { id: "invite", title: "Student visa webinar", senderEmail: "new@university.edu",
-  senderDomain: "university.edu", status: "pending" as const, meetingUrl: "https://zoom.us/w/123?tk=first", ...times };
+  senderDomain: "university.edu", senderAuthenticated: true, status: "pending" as const, meetingUrl: "https://zoom.us/w/123?tk=first", ...times };
 const selection = (candidates = [candidate], calendarEvents: any[] = []) => selectAutoRecordItems({
   calendarEvents, candidates, now: "2026-09-30T09:59:00Z", leadMinutes: 5,
   trustedSenders: { emails: [], domains: [] }, alreadyScheduled: [], everyWebinar: true,
 });
 
 test("automatic webinars do not require a trusted sender; ordinary meetings stay excluded", () => {
+  // ISS-376 (ruling 1): the allowlist is still skipped, but an unauthenticated sender no longer is.
+  assert.equal(selection([{ ...candidate, senderAuthenticated: false }]).toSchedule.length, 0);
+  assert.equal(selection([{ ...candidate, senderAuthenticated: undefined } as any]).skipped[0]?.reason, "needs-review");
   assert.equal(selection().toSchedule.length, 1);
   assert.equal(selection([{ ...candidate, title: "Team meeting" }]).skipped[0]?.reason, "not-webinar");
   assert.equal(selection([{ ...candidate, title: "Monthly update" }]).skipped[0]?.reason, "needs-review");

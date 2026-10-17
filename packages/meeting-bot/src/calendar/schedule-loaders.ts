@@ -39,7 +39,7 @@ function toCandidateInput(row: MeetingCandidateApiRow): AutoRecordCandidateInput
     title: row.subject,
     senderEmail: row.senderEmail,
     senderDomain: row.senderDomain,
-    senderAuthenticated: row.senderAuthenticated === true,
+    senderAuthenticated: typeof row.senderAuthenticated === "boolean" ? row.senderAuthenticated : undefined, // ISS-376: unknown stays unknown
     status: row.status,
     meetingUrl: row.meetingUrl,
     startTime: row.startTime,
