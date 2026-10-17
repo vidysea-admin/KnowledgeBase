@@ -4,8 +4,8 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { indexSession } from "./session.js";
-import { fakeDb, completeWith } from "./testutils.js";
+import { indexSession } from "../session.js";
+import { fakeDb, completeWith } from "../testutils.js";
 
 const seq = (calls: { coll: string; op: string }[]) => calls.map((c) => `${c.coll}.${c.op}`);
 const base = completeWith();

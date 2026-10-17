@@ -5,11 +5,11 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { indexSession } from "./session.js";
-import { fakeDb, embedOk, type Call } from "./testutils.js";
-import { resolveGroundedNotes, resolveJudgeMaxCostUsd } from "../composition/production.js";
-import { startTestServer } from "../testUtils.js";
-import { buildTestDeps, fakeKeyStore } from "../fixtures.js";
+import { indexSession } from "../session.js";
+import { fakeDb, embedOk, type Call } from "../testutils.js";
+import { resolveGroundedNotes, resolveJudgeMaxCostUsd } from "../../composition/production.js";
+import { startTestServer } from "../../testUtils.js";
+import { buildTestDeps, fakeKeyStore } from "../../fixtures.js";
 
 const T = (id: string, speakerRef: string, text: string, tStart: number) => ({ _id: id, tenantId: "t", sessionId: "s1", speakerRef, tStart, tEnd: tStart + 2, text });
 const Q = "When does the registration window open?";

@@ -4,11 +4,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { Sessions, SessionPages, Turns, TreeIndexNode, TreeIndexRootDocument } from '@lkb/core';
-import { eligibleTreeInput } from '../../../../apps/api/src/indexing/eligible-tree.js';
-import { trustedTreeReads } from '../../../../apps/api/src/composition/integrations/trusted-readers.js';
-import { buildTopicIndex } from './topic-indexing.js';
-import { buildTree } from './build.js';
-import { treeSearch } from './search.js';
+import { eligibleTreeInput } from '../eligible-tree.js';
+import { trustedTreeReads } from '../../composition/integrations/trusted-readers.js';
+import { buildTopicIndex, buildTree, treeSearch } from '@lkb/index';
 
 const tenant = 'tenant-a';
 const marker = 'CachedSecret';

@@ -6,8 +6,8 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { indexSession } from "./session.js";
-import { fakeDb, embedOk } from "./testutils.js";
+import { indexSession } from "../session.js";
+import { fakeDb, embedOk } from "../testutils.js";
 
 const T = (id: string, speakerRef: string, text: string, tStart: number) => ({ _id: id, tenantId: "t", sessionId: "s1", speakerRef, tStart, tEnd: tStart + 2, text });
 const Q = "When does the registration window open?";
