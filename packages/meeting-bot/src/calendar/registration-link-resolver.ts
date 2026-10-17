@@ -91,7 +91,9 @@ export function resolveRegistrationLink(input: LinkResolutionInput, options: Res
   return resolveWithConstant(input, options, REGISTRATION_LINK_RESOLUTION_ENABLED);
 }
 /** TEST SEAM ONLY: lets tests exercise the active path while the shipped constant stays false. No production caller may use it. */
-export const resolveRegistrationLinkWithConstantForTest = resolveWithConstant;
+export const resolveRegistrationLinkWithConstantForTest = (input: LinkResolutionInput, options: ResolverOptions, constantEnabled: boolean): Promise<ResolveResult> =>
+  // Never reaches real DNS/HTTPS: both transport doubles must be injected.
+  options.dns && options.get ? resolveWithConstant(input, options, constantEnabled) : Promise.resolve({status: "inactive", reason: "approval-required"});
 async function resolveWithConstant(input: LinkResolutionInput, options: ResolverOptions, constantEnabled: boolean): Promise<ResolveResult> {
   if (constantEnabled !== true || options.enabled !== true || !options.authorize) return {status: "inactive", reason: "approval-required"};
   if (!input || typeof input.link !== "string" || input.link.length > 8192 || ![input.tenantId, input.sourceId, input.messageId].every(identifier) ||

@@ -1,6 +1,10 @@
 import { test } from "node:test";
 import { createServer } from "node:https";
-import { TEST_TLS_CERT, TEST_TLS_KEY } from "./registration-tls-test-fixture.js";
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+const fixtureDir = fileURLToPath(new URL("../../__fixtures__/registration-tls/", import.meta.url));
+const TEST_TLS_CERT = readFileSync(join(fixtureDir, "TEST-ONLY-cert.pem"), "utf8"), TEST_TLS_KEY = readFileSync(join(fixtureDir, "TEST-ONLY-key.pem"), "utf8");
 import assert from "node:assert/strict";
 import { REGISTRATION_LINK_RESOLUTION_ENABLED, resolveRegistrationLink, resolveRegistrationLinkWithConstantForTest, pinnedRegistrationGet, privateEvidenceHash, publicRegistrationAddress,
   registrationResolutionScopeHash, type LinkResolutionInput, type ResolverOptions, type ResolvedRegistrationLink } from "./registration-link-resolver.js";
@@ -315,4 +319,28 @@ test("a peer address that differs from the pinned DNS answer is refused on every
     assert.equal(result.status, "refused", mismatchOn);
     assert.equal(requests.length, mismatchOn === "initial" ? 1 : 2, mismatchOn);
   }
+});
+test("seams are inactive unless BOTH dns and get doubles are injected (no live DNS/HTTPS from a seam)", async () => {
+  let live = 0;
+  for (const partial of [{dns: undefined, get: undefined}, {get: undefined}, {dns: undefined}] as Partial<ResolverOptions>[]) {
+    const options = {...resolver(partial), ...partial};
+    for (const key of Object.keys(partial) as (keyof ResolverOptions)[]) if (partial[key] === undefined) delete options[key];
+    assert.equal((await resolveRegistrationLinkWithConstantForTest(link, options, true)).status, "inactive");
+  }
+  const f = await proofFixture();
+  assert.equal(inspectZoomRegistrationConfirmationWithConstantForTest(f.input, {...f.options, readNativeEvent: undefined}, true).status, "inactive");
+  assert.equal(inspectZoomRegistrationConfirmationWithConstantForTest(f.input, {...f.options, authorize: undefined}, true).status, "inactive");
+  assert.equal(live, 0);
+});
+test("guard: no production file references the test seams or the TLS fixture", () => {
+  const root = fileURLToPath(new URL("../", import.meta.url)), offenders: string[] = [];
+  const allowedDefiners = new Set(["calendar/registration-link-resolver.ts", "calendar/zoom-registration-proof.ts"]);
+  const walk = (dir: string) => { for (const name of readdirSync(dir)) {
+    const path = join(dir, name); if (statSync(path).isDirectory()) { if (name !== "node_modules") walk(path); continue; }
+    if (!/\.(ts|tsx|js|mjs)$/.test(name) || /\.test\.(ts|tsx)$/.test(name)) continue;
+    const rel = path.slice(root.length).split("\\").join("/"), text = readFileSync(path, "utf8");
+    if (/TEST-ONLY-(key|cert)|registration-tls/.test(text)) offenders.push(rel + " (tls fixture)");
+    if (/WithConstantForTest/.test(text) && !allowedDefiners.has(rel)) offenders.push(rel + " (seam)");
+  } };
+  walk(root); assert.deepEqual(offenders, []);
 });

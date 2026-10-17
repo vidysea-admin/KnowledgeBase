@@ -1,7 +1,7 @@
-# Manifest — t052-destination-exception-review (fix cycle 1)
+# Manifest — t052-destination-exception-review (fix cycle 2)
 
 **Status:** ready-for-check
-**Fix cycle:** 1
+**Fix cycle:** 2
 **Base SHA:** 9e55b6428c5f000e1bc25b24bd0a52ed11473b54
 **Lane:** C:\Users\product\Desktop\KnowledgeBase-lanes\w17-t052fix (branch lane/w17-t052fix)
 **Contract:** qa/contracts/goal-t052.md; D-079; ruling 4 (activation only after an independent checker PASS on THIS cycle).
@@ -58,3 +58,8 @@ F4 requires `CONSTANT && options.enabled === true`. With the constant false no t
 
 ## Not verified
 Live DNS/TLS against real Brevo/Zoom hosts (no network); activation wiring, durable approval lookup, consume/replay (do not exist); M15.
+
+## Fix cycle 2 (verdict 0f15dc38 on 0f71beef)
+- Seam: both `...WithConstantForTest` exports now return inactive unless dns AND get doubles (resolver) / authorize AND readNativeEvent (proof; it does no I/O) are injected. Tests: seams inactive with any double missing; guard test scans src/ and fails if any non-.test file other than the two defining modules references `WithConstantForTest`, or any non-test file references the TLS fixture.
+- Key: fixture moved out of src/ to packages/meeting-bot/__fixtures__/registration-tls/ (TEST-ONLY-cert.pem, TEST-ONLY-key.pem, README.txt), non-CA leaf (CA:FALSE), SAN localhost/pinned.test, read at test runtime. Old .ts fixture deleted. Not under tsconfig include, so never built. A PEM key is still committed (node has no cert generation API); it is a throwaway for 127.0.0.1 tests only.
+- Tests 23/23 pass; tsc clean. Mutations M1-M4 and M16 (seam active without doubles) all KILLED; hashes checked with -c core.autocrlf=true. Constants still false. Files LF.

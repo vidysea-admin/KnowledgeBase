@@ -96,7 +96,9 @@ export function inspectZoomRegistrationConfirmation(input: ZoomProofInput, optio
   return inspectWithConstant(input, options, ZOOM_PROVIDER_CORRELATION_ENABLED);
 }
 /** TEST SEAM ONLY: lets tests exercise the active path while the shipped constant stays false. No production caller may use it. */
-export const inspectZoomRegistrationConfirmationWithConstantForTest = inspectWithConstant;
+export const inspectZoomRegistrationConfirmationWithConstantForTest = (input: ZoomProofInput, options: ZoomProofOptions, constantEnabled: boolean) =>
+  // The proof module does no I/O; its only external inputs are the two injected adapters, both required here.
+  options.authorize && options.readNativeEvent ? inspectWithConstant(input, options, constantEnabled) : {status: "inactive" as const, reason: "approval-required"};
 function inspectWithConstant(input: ZoomProofInput, options: ZoomProofOptions, constantEnabled: boolean) {
   const refuse = (reason: string) => ({status: "refused" as const, reason});
   if (constantEnabled !== true || options.enabled !== true || !options.authorize || !options.readNativeEvent)
